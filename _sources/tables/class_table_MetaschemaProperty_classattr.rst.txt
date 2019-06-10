@@ -1,0 +1,10 @@
+.. _class_table_MetaschemaProperty_classattr_rst:
+
+============   ================================================================================   ========   ====
+Option         Description                                                                        Required   Type
+============   ================================================================================   ========   ====
+name           Name of the property.                                                              X          str 
+python_types   Python types of instances that the property is valid for. [AUTOMATED]                         list
+schema         JSON schema describing valid values for the property.                              X          dict
+types          Types of instances that the property is valid for. [AUTOMATED]                                list
+============   ================================================================================   ========   ====

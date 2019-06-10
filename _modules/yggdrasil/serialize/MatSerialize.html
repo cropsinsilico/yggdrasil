@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.serialize.MatSerialize &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.serialize.MatSerialize &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -180,18 +174,18 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.io</span> <span class="k">import</span> <span class="n">savemat</span><span class="p">,</span> <span class="n">loadmat</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize</span> <span class="k">import</span> <span class="n">register_serializer</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize.DefaultSerialize</span> <span class="k">import</span> <span class="n">DefaultSerialize</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.serialize.SerializeBase</span> <span class="k">import</span> <span class="n">SerializeBase</span>
 
 
-<div class="viewcode-block" id="MatSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.MatSerialize.MatSerialize">[docs]</a><span class="nd">@register_serializer</span>
-<span class="k">class</span> <span class="nc">MatSerialize</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">):</span>
+<div class="viewcode-block" id="MatSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.MatSerialize.MatSerialize">[docs]</a><span class="k">class</span> <span class="nc">MatSerialize</span><span class="p">(</span><span class="n">SerializeBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for serializing a python object into a bytes message using the</span>
 <span class="sd">    Matlab .mat format.&quot;&quot;&quot;</span>
     
     <span class="n">_seritype</span> <span class="o">=</span> <span class="s1">&#39;mat&#39;</span>
-    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">_default_type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">}</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Serializes objects using the Matlab .mat &#39;</span>
+                                   <span class="s1">&#39;format.&#39;</span><span class="p">)</span>
+    <span class="n">default_datatype</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">}</span>
+    <span class="n">concats_as_str</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="MatSerialize.func_serialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.MatSerialize.MatSerialize.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
@@ -233,6 +227,24 @@
         <span class="n">fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
+<div class="viewcode-block" id="MatSerialize.concatenate"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.MatSerialize.MatSerialize.concatenate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">concatenate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">objects</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concatenate objects to get object that would be recieved if</span>
+<span class="sd">        the concatenated serialization were deserialized.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            objects (list): Objects to be concatenated.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Set of objects that results from concatenating those provided.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
+            <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">total</span><span class="p">]</span></div>
+        
 <div class="viewcode-block" id="MatSerialize.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.MatSerialize.MatSerialize.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
@@ -241,12 +253,15 @@
 <span class="sd">            dict: Dictionary of variables to use for testing.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">)]]),</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)]])}</span>
+        <span class="c1"># msg = {&#39;a&#39;: np.array([[int(1)]]), &#39;b&#39;: np.array([[float(1)]])}</span>
+        <span class="n">msg1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">)]]),</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)]])}</span>
+        <span class="n">msg2</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">)]]),</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)]])}</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MatSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">()</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">msg</span><span class="p">,</span> <span class="n">msg</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">msg1</span><span class="p">,</span> <span class="n">msg2</span><span class="p">]</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;empty&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span><span class="o">.</span><span class="n">func_serialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span><span class="o">.</span><span class="n">func_serialize</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">_newline</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;exact_contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Contains a time stamp</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
@@ -284,7 +299,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

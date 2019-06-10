@@ -28,6 +28,14 @@ yggdrasil.serialize.tests.test\_DefaultSerialize module
     :undoc-members:
     :show-inheritance:
 
+yggdrasil.serialize.tests.test\_FunctionalSerialize module
+----------------------------------------------------------
+
+.. automodule:: yggdrasil.serialize.tests.test_FunctionalSerialize
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 yggdrasil.serialize.tests.test\_JSONSerialize module
 ----------------------------------------------------
 
@@ -72,6 +80,14 @@ yggdrasil.serialize.tests.test\_PlySerialize module
 ---------------------------------------------------
 
 .. automodule:: yggdrasil.serialize.tests.test_PlySerialize
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.serialize.tests.test\_SerializeBase module
+----------------------------------------------------
+
+.. automodule:: yggdrasil.serialize.tests.test_SerializeBase
     :members:
     :undoc-members:
     :show-inheritance:

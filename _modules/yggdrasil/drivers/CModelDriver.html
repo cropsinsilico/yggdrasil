@@ -1,0 +1,600 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="yggdrasil.drivers" href="../drivers.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+        
+      <li>yggdrasil.drivers.CModelDriver</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yggdrasil.drivers.CModelDriver</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">CompiledModelDriver</span><span class="p">,</span> <span class="n">CompilerBase</span><span class="p">,</span> <span class="n">ArchiverBase</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="k">import</span> <span class="n">get_language_dir</span>
+
+
+<span class="n">_default_internal_libtype</span> <span class="o">=</span> <span class="s1">&#39;object&#39;</span>
+<span class="c1"># if platform._is_win:  # pragma: windows</span>
+<span class="c1">#     _default_internal_libtype = &#39;static&#39;</span>
+
+
+<div class="viewcode-block" id="CCompilerBase"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CCompilerBase">[docs]</a><span class="k">class</span> <span class="nc">CCompilerBase</span><span class="p">(</span><span class="n">CompilerBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for C compilers.&quot;&quot;&quot;</span>
+    <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span>
+    <span class="n">default_executable_env</span> <span class="o">=</span> <span class="s1">&#39;CC&#39;</span>
+    <span class="c1"># TODO: Additional flags environment variables?</span>
+    <span class="n">default_flags_env</span> <span class="o">=</span> <span class="s1">&#39;CFLAGS&#39;</span>
+    <span class="n">default_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="s1">&#39;-Wall&#39;</span><span class="p">]</span>
+    <span class="c1"># GCC &amp; CLANG have similar call patterns</span>
+    <span class="n">linker_attributes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;default_flags_env&#39;</span><span class="p">:</span> <span class="s1">&#39;LDFLAGS&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;search_path_env&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;LIBRARY_PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;LD_LIBRARY_PATH&#39;</span><span class="p">]}</span>
+    <span class="n">search_path_env</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;C_INCLUDE_PATH&#39;</span><span class="p">]</span>
+    <span class="n">search_path_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-E&#39;</span><span class="p">,</span> <span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;-xc&#39;</span><span class="p">,</span> <span class="s1">&#39;/dev/null&#39;</span><span class="p">]</span>
+    <span class="n">search_regex_begin</span> <span class="o">=</span> <span class="s1">&#39;#include &quot;...&quot; search starts here:&#39;</span>
+    <span class="n">search_regex_end</span> <span class="o">=</span> <span class="s1">&#39;End of search list.&#39;</span>
+    <span class="n">search_regex</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;(?:#include &lt;...&gt; search starts here:)|&#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;(?: ([^\n]+?)(?: \(framework directory\))?)\n&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="CCompilerBase.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CCompilerBase.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="sd">        to registration including things like platform dependent properties and</span>
+<span class="sd">        checking environment variables for default settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span><span class="p">,</span>
+                                         <span class="n">search_path_flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-Xlinker&#39;</span><span class="p">,</span> <span class="s1">&#39;-v&#39;</span><span class="p">],</span>
+                                         <span class="n">search_regex</span><span class="o">=</span><span class="p">[</span><span class="sa">r</span><span class="s1">&#39;\t([^\t\n]+)\n&#39;</span><span class="p">],</span>
+                                         <span class="n">search_regex_begin</span><span class="o">=</span><span class="s1">&#39;Library search paths:&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span><span class="p">,</span>
+                                         <span class="n">search_path_flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-Xlinker&#39;</span><span class="p">,</span> <span class="s1">&#39;--verbose&#39;</span><span class="p">],</span>
+                                         <span class="n">search_regex</span><span class="o">=</span><span class="p">[</span><span class="sa">r</span><span class="s1">&#39;SEARCH_DIR\(&quot;=([^&quot;]+)&quot;\);&#39;</span><span class="p">])</span>
+        <span class="n">CompilerBase</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CCompilerBase.call"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CCompilerBase.call">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call the compiler with the provided arguments. For |yggdrasil| C</span>
+<span class="sd">        models will always be linked using the C++ linker since some parts of</span>
+<span class="sd">        the interface library are written in C++.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dont_link&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;linker_language&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+    
+
+<div class="viewcode-block" id="GCCCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.GCCCompiler">[docs]</a><span class="k">class</span> <span class="nc">GCCCompiler</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for gcc compiler/linker.&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;gcc&#39;</span>
+    <span class="n">platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MacOS&#39;</span><span class="p">,</span> <span class="s1">&#39;Linux&#39;</span><span class="p">,</span> <span class="s1">&#39;Windows&#39;</span><span class="p">]</span>
+    <span class="n">default_archiver</span> <span class="o">=</span> <span class="s1">&#39;ar&#39;</span></div>
+
+
+<div class="viewcode-block" id="ClangCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.ClangCompiler">[docs]</a><span class="k">class</span> <span class="nc">ClangCompiler</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;clang compiler on Apple Mac OS.&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;clang&#39;</span>
+    <span class="n">platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MacOS&#39;</span><span class="p">]</span>
+    <span class="n">default_archiver</span> <span class="o">=</span> <span class="s1">&#39;libtool&#39;</span></div>
+
+
+<div class="viewcode-block" id="MSVCCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.MSVCCompiler">[docs]</a><span class="k">class</span> <span class="nc">MSVCCompiler</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Microsoft Visual Studio C Compiler.&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;cl&#39;</span>
+    <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">]</span>
+    <span class="n">platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Windows&#39;</span><span class="p">]</span>
+    <span class="n">default_flags_env</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CXXFLAGS&#39;</span><span class="p">]</span>
+    <span class="c1"># TODO: Currently everything compiled as C++ on windows to allow use</span>
+    <span class="c1"># of complex types. Use &#39;/TC&#39; instead of &#39;/TP&#39; for strictly C</span>
+    <span class="n">default_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/W4&#39;</span><span class="p">,</span>      <span class="c1"># Display all errors</span>
+                     <span class="s1">&#39;/Zi&#39;</span><span class="p">,</span>      <span class="c1"># Symbolic debug in .pdb (implies debug)</span>
+                     <span class="c1"># &#39;/MTd&#39;,     # Use LIBCMTD.lib to create multithreaded .exe</span>
+                     <span class="c1"># &#39;/Z7&#39;,      # Symbolic debug in .obj (implies debug)</span>
+                     <span class="s2">&quot;/EHsc&quot;</span><span class="p">,</span>    <span class="c1"># Catch C++ exceptions only (C don&#39;t throw C++)</span>
+                     <span class="s1">&#39;/TP&#39;</span><span class="p">,</span>      <span class="c1"># Treat all files as C++</span>
+                     <span class="s2">&quot;/nologo&quot;</span><span class="p">,</span>  <span class="c1"># Suppress startup banner</span>
+                     <span class="c1"># Don&#39;t show errors from using scanf, strcpy, etc.</span>
+                     <span class="s2">&quot;-D_CRT_SECURE_NO_WARNINGS&quot;</span><span class="p">]</span>
+    <span class="n">output_key</span> <span class="o">=</span> <span class="s1">&#39;/Fo</span><span class="si">%s</span><span class="s1">&#39;</span>
+    <span class="n">output_first</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">default_linker</span> <span class="o">=</span> <span class="s1">&#39;LINK&#39;</span>
+    <span class="n">default_archiver</span> <span class="o">=</span> <span class="s1">&#39;LIB&#39;</span>
+    <span class="n">linker_switch</span> <span class="o">=</span> <span class="s1">&#39;/link&#39;</span>
+    <span class="n">search_path_env</span> <span class="o">=</span> <span class="s1">&#39;INCLUDE&#39;</span>
+    <span class="n">search_path_flags</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">version_flags</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">product_exts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.dir&#39;</span><span class="p">,</span> <span class="s1">&#39;.ilk&#39;</span><span class="p">,</span> <span class="s1">&#39;.pdb&#39;</span><span class="p">,</span> <span class="s1">&#39;.sln&#39;</span><span class="p">,</span> <span class="s1">&#39;.vcxproj&#39;</span><span class="p">,</span> <span class="s1">&#39;.vcxproj.filters&#39;</span><span class="p">]</span>
+    <span class="n">combine_with_linker</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Must be explicit; linker is separate .exe</span>
+    <span class="n">linker_attributes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">GCCCompiler</span><span class="o">.</span><span class="n">linker_attributes</span><span class="p">,</span>
+                             <span class="n">default_executable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">default_flags_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">output_key</span><span class="o">=</span><span class="s1">&#39;/OUT:</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                             <span class="n">output_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">output_first_library</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="n">flag_options</span><span class="o">=</span><span class="n">OrderedDict</span><span class="p">(</span>
+                                 <span class="p">[(</span><span class="s1">&#39;library_libs&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                                  <span class="p">(</span><span class="s1">&#39;library_dirs&#39;</span><span class="p">,</span> <span class="s1">&#39;/LIBPATH:</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)]),</span>
+                             <span class="n">shared_library_flag</span><span class="o">=</span><span class="s1">&#39;/DLL&#39;</span><span class="p">,</span>
+                             <span class="n">search_path_env</span><span class="o">=</span><span class="s1">&#39;LIB&#39;</span><span class="p">,</span>
+                             <span class="n">search_path_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="MSVCCompiler.language_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.MSVCCompiler.language_version">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">language_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to cls.call.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Version of compiler/interpreter for this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">version_flags</span><span class="p">,</span> <span class="n">skip_flags</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">allow_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;Copyright&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Version call failed: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;Copyright&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div></div>
+
+    
+<span class="c1"># C Archivers</span>
+<div class="viewcode-block" id="ARArchiver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.ARArchiver">[docs]</a><span class="k">class</span> <span class="nc">ARArchiver</span><span class="p">(</span><span class="n">ArchiverBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Archiver class for ar tool.&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;ar&#39;</span>
+    <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">]</span>
+    <span class="n">default_executable_env</span> <span class="o">=</span> <span class="s1">&#39;AR&#39;</span>
+    <span class="n">static_library_flag</span> <span class="o">=</span> <span class="s1">&#39;rcs&#39;</span>
+    <span class="n">output_key</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">output_first_library</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="LibtoolArchiver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.LibtoolArchiver">[docs]</a><span class="k">class</span> <span class="nc">LibtoolArchiver</span><span class="p">(</span><span class="n">ArchiverBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Archiver class for libtool tool.&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;libtool&#39;</span>
+    <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">]</span>
+    <span class="n">default_executable_env</span> <span class="o">=</span> <span class="s1">&#39;LIBTOOL&#39;</span>
+    <span class="n">static_library_flag</span> <span class="o">=</span> <span class="s1">&#39;-static&#39;</span>  <span class="c1"># This is the default</span></div>
+    
+
+<div class="viewcode-block" id="MSVCArchiver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.MSVCArchiver">[docs]</a><span class="k">class</span> <span class="nc">MSVCArchiver</span><span class="p">(</span><span class="n">ArchiverBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Microsoft Visual Studio C Archiver.&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;LIB&#39;</span>
+    <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">]</span>
+    <span class="n">platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Windows&#39;</span><span class="p">]</span>
+    <span class="n">static_library_flag</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">output_key</span> <span class="o">=</span> <span class="s1">&#39;/OUT:</span><span class="si">%s</span><span class="s1">&#39;</span></div>
+    
+
+<span class="c1"># _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), &#39;../&#39;))</span>
+<span class="c1"># _incl_interface = os.path.join(_top_dir, &#39;interface&#39;)</span>
+<span class="n">_top_lang_dir</span> <span class="o">=</span> <span class="n">get_language_dir</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
+<span class="n">_incl_interface</span> <span class="o">=</span> <span class="n">_top_lang_dir</span>
+<span class="n">_incl_seri</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_lang_dir</span><span class="p">,</span> <span class="s1">&#39;serialize&#39;</span><span class="p">)</span>
+<span class="n">_incl_comm</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_lang_dir</span><span class="p">,</span> <span class="s1">&#39;communication&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver">[docs]</a><span class="k">class</span> <span class="nc">CModelDriver</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running C models.&quot;&quot;&quot;</span>
+
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is written in C.&#39;</span><span class="p">)</span>
+    <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;c&#39;</span>
+    <span class="n">language_ext</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.c&#39;</span><span class="p">,</span> <span class="s1">&#39;.h&#39;</span><span class="p">]</span>
+    <span class="n">interface_library</span> <span class="o">=</span> <span class="s1">&#39;ygg&#39;</span>
+    <span class="n">supported_comms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ipc&#39;</span><span class="p">,</span> <span class="s1">&#39;zmq&#39;</span><span class="p">]</span>
+    <span class="n">supported_comm_options</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ipc&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;platforms&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;MacOS&#39;</span><span class="p">,</span> <span class="s1">&#39;Linux&#39;</span><span class="p">]},</span>
+        <span class="s1">&#39;zmq&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;libraries&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;zmq&#39;</span><span class="p">,</span> <span class="s1">&#39;czmq&#39;</span><span class="p">]}}</span>
+    <span class="n">interface_directories</span> <span class="o">=</span> <span class="p">[</span><span class="n">_incl_interface</span><span class="p">]</span>
+    <span class="n">external_libraries</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;rapidjson&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span>
+                                              <span class="s1">&#39;rapidjson&#39;</span><span class="p">,</span> <span class="s1">&#39;include&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;rapidjson&#39;</span><span class="p">,</span> <span class="s1">&#39;rapidjson.h&#39;</span><span class="p">),</span>
+                      <span class="s1">&#39;libtype&#39;</span><span class="p">:</span> <span class="s1">&#39;header_only&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;c&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;zmq&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="s1">&#39;zmq.h&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;libtype&#39;</span><span class="p">:</span> <span class="s1">&#39;shared&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;c&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;czmq&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="s1">&#39;czmq.h&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;libtype&#39;</span><span class="p">:</span> <span class="s1">&#39;shared&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;c&#39;</span><span class="p">}}</span>
+    <span class="n">internal_libraries</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ygg&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_incl_interface</span><span class="p">,</span> <span class="s1">&#39;YggInterface.c&#39;</span><span class="p">),</span>
+                <span class="c1"># &#39;directory&#39;: _incl_interface,</span>
+                <span class="s1">&#39;linker_language&#39;</span><span class="p">:</span> <span class="s1">&#39;c++&#39;</span><span class="p">,</span>  <span class="c1"># Some dependencies are C++</span>
+                <span class="s1">&#39;internal_dependencies&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;datatypes&#39;</span><span class="p">,</span> <span class="s1">&#39;regex&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;external_dependencies&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;rapidjson&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;include_dirs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">_incl_comm</span><span class="p">,</span> <span class="n">_incl_seri</span><span class="p">],</span>
+                <span class="s1">&#39;compiler_flags&#39;</span><span class="p">:</span> <span class="p">[]},</span>
+        <span class="s1">&#39;regex_win32&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;regex_win32.cpp&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;directory&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_lang_dir</span><span class="p">,</span> <span class="s1">&#39;regex&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;c++&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;libtype&#39;</span><span class="p">:</span> <span class="n">_default_internal_libtype</span><span class="p">,</span>
+                        <span class="s1">&#39;internal_dependencies&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                        <span class="s1">&#39;external_dependencies&#39;</span><span class="p">:</span> <span class="p">[]},</span>
+        <span class="s1">&#39;regex_posix&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;regex_posix.h&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;directory&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_lang_dir</span><span class="p">,</span> <span class="s1">&#39;regex&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;libtype&#39;</span><span class="p">:</span> <span class="s1">&#39;header_only&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;internal_dependencies&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                        <span class="s1">&#39;external_dependencies&#39;</span><span class="p">:</span> <span class="p">[]},</span>
+        <span class="s1">&#39;datatypes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;directory&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_lang_dir</span><span class="p">,</span> <span class="s1">&#39;datatypes&#39;</span><span class="p">),</span>
+                      <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;c++&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;libtype&#39;</span><span class="p">:</span> <span class="n">_default_internal_libtype</span><span class="p">,</span>
+                      <span class="s1">&#39;internal_dependencies&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;regex&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;external_dependencies&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;rapidjson&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;include_dirs&#39;</span><span class="p">:</span> <span class="p">[]}}</span>
+    <span class="n">type_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;int&#39;</span><span class="p">:</span> <span class="s1">&#39;intX_t&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;float&#39;</span><span class="p">:</span> <span class="s1">&#39;floatX_t&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;string&#39;</span><span class="p">:</span> <span class="s1">&#39;char*&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;array&#39;</span><span class="p">:</span> <span class="s1">&#39;vector_t&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;object&#39;</span><span class="p">:</span> <span class="s1">&#39;map_t&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;boolean&#39;</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;null&#39;</span><span class="p">:</span> <span class="s1">&#39;NULL&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uint&#39;</span><span class="p">:</span> <span class="s1">&#39;uintX_t&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;complex&#39;</span><span class="p">:</span> <span class="s1">&#39;complex_X&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;bytes&#39;</span><span class="p">:</span> <span class="s1">&#39;char*&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;unicode&#39;</span><span class="p">:</span> <span class="s1">&#39;char*&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;1darray&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;ndarray&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;ply&#39;</span><span class="p">:</span> <span class="s1">&#39;ply_t&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="s1">&#39;obj_t&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="s1">&#39;map_t&#39;</span><span class="p">}</span>
+    <span class="n">function_param</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;comment&#39;</span><span class="p">:</span> <span class="s1">&#39;//&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;true&#39;</span><span class="p">:</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span><span class="p">,</span>
+        <span class="s1">&#39;print&#39;</span><span class="p">:</span> <span class="s1">&#39;printf(</span><span class="se">\&quot;</span><span class="si">{message}</span><span class="se">\&quot;</span><span class="s1">);&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;return -1;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;block_end&#39;</span><span class="p">:</span> <span class="s1">&#39;}&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;if_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;if (</span><span class="si">{cond}</span><span class="s1">) {{&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;for_begin&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;for (</span><span class="si">{iter_var}</span><span class="s1"> = </span><span class="si">{iter_begin}</span><span class="s1">; </span><span class="si">{iter_var}</span><span class="s1"> &lt; </span><span class="si">{iter_end}</span><span class="s1">; &#39;</span>
+                      <span class="s1">&#39;</span><span class="si">{iter_var}</span><span class="s1">++) {{&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;while_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;while (</span><span class="si">{cond}</span><span class="s1">) {{&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;break&#39;</span><span class="p">:</span> <span class="s1">&#39;break;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;declare&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{type}</span><span class="s1"> </span><span class="si">{name}</span><span class="s1">;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;assign&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> = </span><span class="si">{value}</span><span class="s1">;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exec_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;int main() {&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exec_end&#39;</span><span class="p">:</span> <span class="s1">&#39;  return 0;</span><span class="se">\n</span><span class="s1">}&#39;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="CModelDriver.after_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
+<span class="sd">        registration.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">default_compiler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">default_compiler</span> <span class="o">=</span> <span class="s1">&#39;gcc&#39;</span>
+            <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">default_compiler</span> <span class="o">=</span> <span class="s1">&#39;clang&#39;</span>
+            <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">default_compiler</span> <span class="o">=</span> <span class="s1">&#39;cl&#39;</span>
+        <span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">archiver</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;archiver&#39;</span><span class="p">)</span>
+        <span class="n">linker</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;linker&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;zmq&#39;</span><span class="p">,</span> <span class="s1">&#39;czmq&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;libtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;static&#39;</span>
+                <span class="n">libtype</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;libtype&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">libtype</span> <span class="o">==</span> <span class="s1">&#39;static&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="n">tool</span> <span class="o">=</span> <span class="n">archiver</span>
+                    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tool</span> <span class="o">=</span> <span class="n">linker</span>
+                    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;build_library&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">libtype</span><span class="p">]</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">get_output_file</span><span class="p">(</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Platform specific regex internal library</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="n">regex_lib</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="s1">&#39;regex_win32&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">regex_lib</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="s1">&#39;regex_posix&#39;</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="s1">&#39;regex&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">regex_lib</span>
+        <span class="c1"># Platform specific internal library options</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="s1">&#39;ygg&#39;</span><span class="p">][</span><span class="s1">&#39;include_dirs&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="n">_top_lang_dir</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="n">stdint_win</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_lang_dir</span><span class="p">,</span> <span class="s1">&#39;windows_stdint.h&#39;</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">stdint_win</span><span class="p">))</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">stdint_win</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_lang_dir</span><span class="p">,</span> <span class="s1">&#39;stdint.h&#39;</span><span class="p">))</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="s1">&#39;datatypes&#39;</span><span class="p">][</span><span class="s1">&#39;include_dirs&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="n">_top_lang_dir</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ygg&#39;</span><span class="p">,</span> <span class="s1">&#39;datatypes&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s1">&#39;compiler_flags&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="n">x</span><span class="p">]:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;compiler_flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;compiler_flags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-fPIC&#39;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="CModelDriver.configure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.configure">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options for this language. This includes locating</span>
+<span class="sd">        any required external libraries and setting option defaults.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg (YggConfigParser): Config class that options should be set for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Section, option, description tuples for options that could not</span>
+<span class="sd">                be set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Call __func__ to avoid direct invoking of class which dosn&#39;t exist</span>
+        <span class="c1"># in after_registration where this is called</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">configure</span><span class="o">.</span><span class="vm">__func__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
+        <span class="c1"># Change configuration to be directory containing include files</span>
+        <span class="n">rjlib</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;rapidjson_include&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">rjlib</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">rjlib</span><span class="p">):</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;rapidjson_include&#39;</span><span class="p">,</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">rjlib</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+        
+<div class="viewcode-block" id="CModelDriver.update_ld_library_path"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.update_ld_library_path">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">update_ld_library_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update provided dictionary of environment variables so that</span>
+<span class="sd">        LD_LIBRARY_PATH includes the interface directory containing the interface</span>
+<span class="sd">        libraries.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            env (dict): Dictionary of enviroment variables to be updated.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Updated dictionary of environment variables.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span><span class="p">:</span>
+            <span class="n">path_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">prev_path</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;LD_LIBRARY_PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">prev_path</span><span class="p">:</span>
+                <span class="n">path_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prev_path</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_language_dir</span><span class="p">()]:</span>
+                <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">prev_path</span><span class="p">:</span>
+                    <span class="n">path_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">path_list</span><span class="p">:</span>
+                <span class="n">env</span><span class="p">[</span><span class="s1">&#39;LD_LIBRARY_PATH&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">env</span></div>
+
+<div class="viewcode-block" id="CModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Environment variables for the model process.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_ld_library_path</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.9.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../../_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

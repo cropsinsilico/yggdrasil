@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes.tests &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.metaschema.datatypes.tests &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../index.html"/>
         <link rel="up" title="yggdrasil.metaschema.datatypes" href="../datatypes.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -198,13 +192,10 @@
 <div class="viewcode-block" id="test_register_type_errors"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_register_type_errors">[docs]</a><span class="k">def</span> <span class="nf">test_register_type_errors</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test errors in register_type for duplicate.&quot;&quot;&quot;</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">register_type</span><span class="p">,</span> <span class="n">ScalarMetaschemaType</span><span class="p">)</span>
-    <span class="c1"># fake_prop = type(&#39;FakeType&#39;, (ScalarMetaschemaType, ),</span>
-    <span class="c1">#                  {&#39;name&#39;: &#39;number&#39;})</span>
-    <span class="c1"># assert_raises(ValueError, datatypes.register_type, fake_prop)</span>
-    <span class="n">fake_prop</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;FakeType&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">ScalarMetaschemaType</span><span class="p">,</span> <span class="p">),</span>
-                     <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;new&#39;</span><span class="p">,</span> <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;invalid&#39;</span><span class="p">]})</span>
-    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">register_type</span><span class="p">,</span> <span class="n">fake_prop</span><span class="p">)</span></div>
-
+    <span class="n">type_args</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;FakeType&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">ScalarMetaschemaType</span><span class="p">,</span> <span class="p">),</span>
+                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;new&#39;</span><span class="p">,</span> <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;invalid&#39;</span><span class="p">]})</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="o">*</span><span class="n">type_args</span><span class="p">)</span></div>
+    
 
 <div class="viewcode-block" id="test_add_type_from_schema_errors"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_add_type_from_schema_errors">[docs]</a><span class="k">def</span> <span class="nf">test_add_type_from_schema_errors</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test errors in add_type_from_schema.&quot;&quot;&quot;</span>
@@ -228,11 +219,12 @@
 
 <div class="viewcode-block" id="test_guess_type_from_obj"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_guess_type_from_obj">[docs]</a><span class="k">def</span> <span class="nf">test_guess_type_from_obj</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test guess_type_from_obj.&quot;&quot;&quot;</span>
-    <span class="n">invalid_objects</span> <span class="o">=</span> <span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">()]</span>
+    <span class="n">invalid_objects</span> <span class="o">=</span> <span class="p">[</span><span class="nb">object</span><span class="p">()]</span>  <span class="c1"># , object()]</span>
     <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_valid_objects</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">assert_equal</span><span class="p">(</span><span class="n">datatypes</span><span class="o">.</span><span class="n">guess_type_from_obj</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">invalid_objects</span><span class="p">:</span>
-        <span class="n">assert_raises</span><span class="p">(</span><span class="n">datatypes</span><span class="o">.</span><span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">guess_type_from_obj</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span></div>
+        <span class="n">assert_raises</span><span class="p">(</span><span class="n">datatypes</span><span class="o">.</span><span class="n">MetaschemaTypeError</span><span class="p">,</span>
+                      <span class="n">datatypes</span><span class="o">.</span><span class="n">guess_type_from_obj</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="test_encode_decode"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_encode_decode">[docs]</a><span class="k">def</span> <span class="nf">test_encode_decode</span><span class="p">():</span>
@@ -241,7 +233,11 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">assert_equal</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-        <span class="n">datatypes</span><span class="o">.</span><span class="n">encode_data</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">encode_data</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">decode_data</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">decode_data</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="test_encode_decode_readable"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_encode_decode_readable">[docs]</a><span class="k">def</span> <span class="nf">test_encode_decode_readable</span><span class="p">():</span>
@@ -315,7 +311,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

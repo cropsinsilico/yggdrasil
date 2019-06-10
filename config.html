@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration Files &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>Configuration Files &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/>
         <link rel="next" title="Units" href="units.html"/>
         <link rel="prev" title="YAML Files" href="yaml.html"/> 
 
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,23 +103,21 @@
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration Files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#debug-options">Debug Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#windows-options">Windows Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#language-options">Language Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#c-options">C Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#matlab-options">Matlab Options</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#rabbitmq-options">RabbitMQ Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#parallel-options">Parallel Options</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -244,11 +242,11 @@ yggdrasil calls from the models.</td>
 </tbody>
 </table>
 </div>
-<div class="section" id="windows-options">
-<h2>Windows Options<a class="headerlink" href="#windows-options" title="Permalink to this headline">¶</a></h2>
-<p>On Windows, it may be necessary for you to manually specify the location of
-the <code class="docutils literal notranslate"><span class="pre">libzmq</span></code> and <code class="docutils literal notranslate"><span class="pre">czmq</span></code> headers and libraries. These can be set using
-the following config options. This should not be necessary on Linux/MacOS.</p>
+<div class="section" id="language-options">
+<h2>Language Options<a class="headerlink" href="#language-options" title="Permalink to this headline">¶</a></h2>
+<p>Each supported language has a dedicated section in the config file with
+options that control how models of that language will be handled. The
+following options are available to all languages:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="21%" />
@@ -260,20 +258,155 @@ the following config options. This should not be necessary on Linux/MacOS.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>libzmq_include</td>
+<tr class="row-even"><td>commtypes</td>
+<td>A list of communication mechanisms types available
+for use in the language. If libraries are installed
+that later enable a new communication mechanism,
+running <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> will update this list.</td>
+</tr>
+<tr class="row-odd"><td>disable</td>
+<td>A boolean determining if models in the specified
+language should be disabled. This option serves as a
+for isolating languages for testing.</td>
+</tr>
+</tbody>
+</table>
+<p>Options available for all compiled languages include:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>compiler</td>
+<td>Name of, or full path to, the compiler that should
+be used for compiling models.</td>
+</tr>
+<tr class="row-odd"><td>compiler_flags</td>
+<td>A list of flags that should be used when calling the
+compiler.</td>
+</tr>
+<tr class="row-even"><td>linker</td>
+<td>Name of, or full path to, the linker that should be
+used for linking models (and the interface library).</td>
+</tr>
+<tr class="row-odd"><td>linker_flags</td>
+<td>A list of flags that should be used when calling the
+linker.</td>
+</tr>
+<tr class="row-even"><td>archiver</td>
+<td>Name of, or full path to, the archiver that should
+be used for creating static interface libraries.</td>
+</tr>
+<tr class="row-odd"><td>archiver_flags</td>
+<td>A list of flags that should be used when calling the
+archiver.</td>
+</tr>
+</tbody>
+</table>
+<p>Options available for all interpreted languages include:x</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>interpreter</td>
+<td>Full path to the interpreter executable that should
+be used for running models.</td>
+</tr>
+<tr class="row-odd"><td>interpreter_flags</td>
+<td>A list of flags that should be used when calling the
+interpreter.</td>
+</tr>
+</tbody>
+</table>
+<p>In addition to these general options, some languages also have specific
+options related to their treatment of models or dependencies.</p>
+<div class="section" id="c-options">
+<h3>C Options<a class="headerlink" href="#c-options" title="Permalink to this headline">¶</a></h3>
+<p>If they are not installed in a standard location or you would like to
+use an alternate version than the one identified by yggdrasil, it may
+be necessary for you to manually specify the location of dependency
+headers and/or libraries. These can be set using the following config
+options.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>rapidjson_include</td>
+<td>Full path to the directory containing the rapidjson
+headers.</td>
+</tr>
+<tr class="row-odd"><td>zmq_include</td>
 <td>Full path to the zmq.h header.</td>
 </tr>
-<tr class="row-odd"><td>libzmq_static</td>
+<tr class="row-even"><td>zmq_static</td>
 <td>Full path to the zmq.lib static library.</td>
 </tr>
-<tr class="row-even"><td>czmq_include</td>
+<tr class="row-odd"><td>czmq_include</td>
 <td>Full path to the czmq.h header.</td>
 </tr>
-<tr class="row-odd"><td>czmq_static</td>
+<tr class="row-even"><td>czmq_static</td>
 <td>Full path to the czmq.lib static library.</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section" id="matlab-options">
+<h3>Matlab Options<a class="headerlink" href="#matlab-options" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>startup_waittime_s</td>
+<td>Time (in seconds) that should be waited for a
+Matlab shared engine to start before raising an
+error. On some systems this will need to be &gt;10s in
+order to allow for long Matlab startup times.</td>
+</tr>
+<tr class="row-odd"><td>disable_engine</td>
+<td>Boolean controling whether or not Matlab shared
+engines should be used to run models. This option is
+useful when debugging Matlab models as the shared
+engine, while reducing startup time, can result in
+orphaned processes for models that raise errors.</td>
+</tr>
+<tr class="row-even"><td>matlabroot</td>
+<td>The full path to the Matlab root directory.</td>
+</tr>
+<tr class="row-odd"><td>version</td>
+<td>The version of Matlab being used to run models. This
+option should only be set by yggdrasil and is only
+used to speedup reporting of the version.</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="section" id="rabbitmq-options">
 <h2>RabbitMQ Options<a class="headerlink" href="#rabbitmq-options" title="Permalink to this headline">¶</a></h2>
@@ -387,7 +520,7 @@ include:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

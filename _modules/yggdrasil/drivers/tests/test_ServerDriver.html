@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests.test_ServerDriver &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.drivers.tests.test_ServerDriver &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../index.html"/>
         <link rel="up" title="yggdrasil.drivers" href="../../drivers.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -268,6 +262,12 @@
             <span class="n">assert_raises</span><span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span></div></div>
 
 
+<div class="viewcode-block" id="TestServerDriverNoInit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoInit">[docs]</a><span class="k">class</span> <span class="nc">TestServerDriverNoInit</span><span class="p">(</span><span class="n">TestServerParam</span><span class="p">,</span>
+                             <span class="n">parent</span><span class="o">.</span><span class="n">TestConnectionDriverNoInit</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for ServerDriver class without init.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+            
+
 <div class="viewcode-block" id="TestServerDriver"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver">[docs]</a><span class="k">class</span> <span class="nc">TestServerDriver</span><span class="p">(</span><span class="n">TestServerParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestConnectionDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for ServerDriver class.&quot;&quot;&quot;</span>
 
@@ -379,7 +379,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.serialize.PandasSerialize &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.serialize.PandasSerialize &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -181,37 +175,43 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">serialize</span><span class="p">,</span> <span class="n">units</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.ArrayMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">OneDArrayMetaschemaType</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">register_serializer</span><span class="p">,</span> <span class="n">pandas2numpy</span><span class="p">,</span> <span class="n">list2pandas</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.serialize.AsciiTableSerialize</span> <span class="k">import</span> <span class="n">AsciiTableSerialize</span>
 
 
-<div class="viewcode-block" id="PandasSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize">[docs]</a><span class="nd">@register_serializer</span>
-<span class="k">class</span> <span class="nc">PandasSerialize</span><span class="p">(</span><span class="n">AsciiTableSerialize</span><span class="p">):</span>
+<div class="viewcode-block" id="PandasSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize">[docs]</a><span class="k">class</span> <span class="nc">PandasSerialize</span><span class="p">(</span><span class="n">AsciiTableSerialize</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for serializing/deserializing Pandas data frames.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        delimiter (str, optional): Delimiter that should be used to serialize</span>
-<span class="sd">            pandas data frames to/from csv style files. Defaults to \t.</span>
-<span class="sd">        write_header (bool, optional): If True, headers will be added to</span>
-<span class="sd">            serialized tables. Defaults to True.</span>
+<span class="sd">        dont_write_header (bool, optional): If True, headers will not be added</span>
+<span class="sd">            to serialized tables. Defaults to False.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_seritype</span> <span class="o">=</span> <span class="s1">&#39;pandas&#39;</span>
-    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">AsciiTableSerialize</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">,</span>
-        <span class="n">write_header</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Serializes tables using the pandas package.&#39;</span><span class="p">)</span>
+    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dont_write_header&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
+                                                <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}</span>
+    <span class="n">_schema_excluded_from_inherit</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;as_array&#39;</span><span class="p">]</span>
+    <span class="n">default_read_meth</span> <span class="o">=</span> <span class="s1">&#39;read&#39;</span>
+    <span class="n">as_array</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">concats_as_str</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># has_header = False</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># self.dont_write_header = False  # Set by schema</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_header_once</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PandasSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">empty_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;obj: Object indicating empty message.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
 
-<div class="viewcode-block" id="PandasSerialize.apply_field_names"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.apply_field_names">[docs]</a>    <span class="k">def</span> <span class="nf">apply_field_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+<div class="viewcode-block" id="PandasSerialize.apply_field_names"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.apply_field_names">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">apply_field_names</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">field_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply field names as columns to a frame, first checking for a mapping.</span>
 <span class="sd">        If there is a direct mapping, the columns are reordered to match the order</span>
 <span class="sd">        of the field names. If there is not an overlap in the field names and</span>
@@ -220,6 +220,8 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            frame (pandas.DataFrame): Frame to apply field names to as columns.</span>
+<span class="sd">            field_names (list, optional): New field names that should be applied.</span>
+<span class="sd">                If not provided, the original frame will be returned unaltered.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            pandas.DataFrame: Frame with updated field names.</span>
@@ -229,7 +231,7 @@
 <span class="sd">                and columns.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">field_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_field_names</span><span class="p">()</span>
+        <span class="c1"># field_names = self.get_field_names()</span>
         <span class="k">if</span> <span class="n">field_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">frame</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
@@ -249,8 +251,8 @@
                 <span class="n">frame</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">field_names</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Partial overlap</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> fields missing from frame: </span><span class="si">%s</span><span class="s2">&quot;</span>
-                                   <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fmiss</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">fmiss</span><span class="p">)))</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> fields (</span><span class="si">%s</span><span class="s2">) missing from frame: </span><span class="si">%s</span><span class="s2">&quot;</span>
+                                   <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fmiss</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">fmiss</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">frame</span><span class="p">)))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Reorder columns</span>
             <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">field_names</span><span class="p">]</span>
@@ -278,12 +280,17 @@
             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args_</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
                     <span class="n">args_</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">args_</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
-        <span class="n">args_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_field_names</span><span class="p">(</span><span class="n">args_</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_field_names</span><span class="p">()</span>
+        <span class="n">args_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_field_names</span><span class="p">(</span><span class="n">args_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span><span class="p">)</span>
         <span class="n">args_</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="c1"># Not in pandas &lt;0.24</span>
                      <span class="c1"># line_terminator=backwards.as_str(self.newline),</span>
                      <span class="n">sep</span><span class="o">=</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span><span class="p">),</span>
-                     <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf8&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">write_header</span><span class="p">)</span>
+                     <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf8&#39;</span><span class="p">,</span>
+                     <span class="n">header</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_write_header</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_header_once</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dont_write_header</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
         <span class="n">fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="c1"># Required to change out \r\n for \n on windows</span>
@@ -303,14 +310,20 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fd</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span>
                               <span class="n">sep</span><span class="o">=</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span><span class="p">),</span>
+                              <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">,</span>
+                              <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
                               <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
         <span class="n">fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>
             <span class="c1"># For Python 3 and higher, make sure strings are bytes</span>
             <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">dtypes</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="nb">object</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">d</span> <span class="o">==</span> <span class="nb">object</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode_type</span><span class="p">):</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
         <span class="c1"># On windows, long != longlong and longlong requires special cformat</span>
         <span class="c1"># For now, long will be used to preserve the use of %ld to match long</span>
@@ -324,26 +337,125 @@
                         <span class="n">new_dtypes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">new_dtypes</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="c1"># Reorder if necessary</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_field_names</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_field_names</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_field_names</span><span class="p">())</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="c1"># for c, d in zip(out.columns, out.dtypes):</span>
-        <span class="c1">#     if d == object:</span>
-        <span class="c1">#         out[c] = out[c].apply(lambda s: s.strip())</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
             <span class="n">typedef</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[]}</span>
-            <span class="n">np_out</span> <span class="o">=</span> <span class="n">pandas2numpy</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+            <span class="n">np_out</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2numpy</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_field_names</span><span class="p">():</span>
                 <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OneDArrayMetaschemaType</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span>
                     <span class="n">np_out</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="n">n</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_serializer</span><span class="p">(</span><span class="n">extract</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">typedef</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
+<div class="viewcode-block" id="PandasSerialize.send_converter"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.send_converter">[docs]</a>    <span class="k">def</span> <span class="nf">send_converter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs conversion from a limited set of objects to a Pandas data</span>
+<span class="sd">        frame for sending to a file via PandasFileComm. Currently supports</span>
+<span class="sd">        converting from structured numpy arrays, lists/tuples of numpy arrays,</span>
+<span class="sd">        and dictionaries.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            obj (object): Object to convert.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pandas.DataFrame: Converted data frame (or unmodified input if</span>
+<span class="sd">                conversion could not be completed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_field_names</span><span class="p">()</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">list2pandas</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">numpy2pandas</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">dict2pandas</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+<div class="viewcode-block" id="PandasSerialize.recv_converter"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.recv_converter">[docs]</a>    <span class="k">def</span> <span class="nf">recv_converter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs conversion to a limited set of objects from a Pandas data</span>
+<span class="sd">        frame for receiving from a file via PandasFileComm. Currently supports</span>
+<span class="sd">        converting to lists/tuples of numpy arrays.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            obj (pandas.DataFrame): Data frame to convert.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: pandas.DataFrame: Converted data frame (or unmodified input if</span>
+<span class="sd">                conversion could not be completed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2list</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PandasSerialize.object2dict"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.object2dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">object2dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a message object into a dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            obj (object): Object that would be serialized by this class and</span>
+<span class="sd">                should be returned in a dictionary form.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary version of the provided object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2dict</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;f</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PandasSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">object2dict</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PandasSerialize.object2array"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.object2array">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">object2array</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a message object into an array.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            obj (object): Object that would be serialized by this class and</span>
+<span class="sd">                should be returned in an array form.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.array: Array version of the provided object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2numpy</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;f</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PandasSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">object2array</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PandasSerialize.concatenate"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.concatenate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">concatenate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">objects</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concatenate objects to get object that would be recieved if</span>
+<span class="sd">        the concatenated serialization were deserialized.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            objects (list): Objects to be concatenated.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Set of objects that results from concatenating those provided.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">objects</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objects</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">pandas</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PandasSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+    
 <div class="viewcode-block" id="PandasSerialize.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">no_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">not_as_frames</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Args:</span>
+<span class="sd">            not_as_frames (bool, optional): If True, the returned example</span>
+<span class="sd">                includes data that is not in a pandas data frame. Defaults to</span>
+<span class="sd">                False.</span>
 <span class="sd">            no_names (bool, optional): If True, an example is returned where the</span>
 <span class="sd">                names are not provided to the deserializer. Defaults to False.</span>
 
@@ -351,35 +463,73 @@
 <span class="sd">            dict: Dictionary of variables to use for testing.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PandasSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">(</span><span class="n">as_array</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;as_array&#39;</span><span class="p">]:</span>
-            <span class="k">del</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">field_names</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PandasSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">(</span><span class="n">array_columns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                              <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;as_array&#39;</span><span class="p">]:</span>  <span class="c1"># , &#39;format_str&#39;]:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]:</span>
+                <span class="k">del</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;extra_kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;empty&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">no_names</span><span class="p">:</span>
-            <span class="k">del</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;field_names&#39;</span><span class="p">]</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">list2pandas</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]]</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;f0</span><span class="se">\t</span><span class="s1">f1</span><span class="se">\t</span><span class="s1">f2</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;one</span><span class="se">\t</span><span class="s1">1</span><span class="se">\t</span><span class="s1">1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;two</span><span class="se">\t</span><span class="s1">2</span><span class="se">\t</span><span class="s1">2.0</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;three</span><span class="se">\t</span><span class="s1">3</span><span class="se">\t</span><span class="s1">3.0</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;one</span><span class="se">\t</span><span class="s1">1</span><span class="se">\t</span><span class="s1">1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;two</span><span class="se">\t</span><span class="s1">2</span><span class="se">\t</span><span class="s1">2.0</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;three</span><span class="se">\t</span><span class="s1">3</span><span class="se">\t</span><span class="s1">3.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">],</span> <span class="n">out</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s1">&#39;field_names&#39;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">]</span>
+            <span class="n">header_line</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;f0</span><span class="se">\t</span><span class="s1">f1</span><span class="se">\t</span><span class="s1">f2</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">field_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span>
-                           <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;field_names&#39;</span><span class="p">]]</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">list2pandas</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">field_names</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;field_names&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]:</span>
+                <span class="n">field_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span>
+                               <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;field_names&#39;</span><span class="p">]]</span>
+            <span class="n">header_line</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;name</span><span class="se">\t</span><span class="s1">count</span><span class="se">\t</span><span class="s1">size</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">header_line</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;one</span><span class="se">\t</span><span class="s1">1</span><span class="se">\t</span><span class="s1">1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;two</span><span class="se">\t</span><span class="s1">2</span><span class="se">\t</span><span class="s1">2.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;three</span><span class="se">\t</span><span class="s1">3</span><span class="se">\t</span><span class="s1">3.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;one</span><span class="se">\t</span><span class="s1">1</span><span class="se">\t</span><span class="s1">1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;two</span><span class="se">\t</span><span class="s1">2</span><span class="se">\t</span><span class="s1">2.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;three</span><span class="se">\t</span><span class="s1">3</span><span class="se">\t</span><span class="s1">3.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;concatenate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[([],</span> <span class="p">[])]</span>
+        <span class="k">if</span> <span class="n">not_as_frames</span><span class="p">:</span>
+            <span class="c1"># Strip units since pandas data frames are not serialized with units</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[</span><span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
                               <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]]</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;name</span><span class="se">\t</span><span class="s1">count</span><span class="se">\t</span><span class="s1">size</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;one</span><span class="se">\t</span><span class="s1">1</span><span class="se">\t</span><span class="s1">1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;two</span><span class="se">\t</span><span class="s1">2</span><span class="se">\t</span><span class="s1">2.0</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;three</span><span class="se">\t</span><span class="s1">3</span><span class="se">\t</span><span class="s1">3.0</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;one</span><span class="se">\t</span><span class="s1">1</span><span class="se">\t</span><span class="s1">1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;two</span><span class="se">\t</span><span class="s1">2</span><span class="se">\t</span><span class="s1">2.0</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;three</span><span class="se">\t</span><span class="s1">3</span><span class="se">\t</span><span class="s1">3.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">serialize</span><span class="o">.</span><span class="n">list2pandas</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">field_names</span><span class="p">)</span>
+                              <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]]</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;typedef&#39;</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">out</span></div></div>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="PandasSerialize.enable_file_header"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.enable_file_header">[docs]</a>    <span class="k">def</span> <span class="nf">enable_file_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set serializer attributes to enable file headers to be included in</span>
+<span class="sd">        the serializations.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dont_write_header</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_header_once</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="PandasSerialize.disable_file_header"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.disable_file_header">[docs]</a>    <span class="k">def</span> <span class="nf">disable_file_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set serializer attributes to disable file headers from being</span>
+<span class="sd">        included in the serializations.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dont_write_header</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_header_once</span> <span class="o">=</span> <span class="kc">True</span></div>
+        
+<div class="viewcode-block" id="PandasSerialize.serialize_file_header"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.serialize_file_header">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_file_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the serialized header information that should be prepended</span>
+<span class="sd">        to files serialized using this class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: Header string that should be written to the file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span></div>
+
+<div class="viewcode-block" id="PandasSerialize.deserialize_file_header"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.deserialize_file_header">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize_file_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize the header information from the file and update the</span>
+<span class="sd">        serializer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fd (file): File containing header.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
 </pre></div>
 
            </div>
@@ -416,7 +566,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

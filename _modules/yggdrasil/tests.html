@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.tests &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -191,10 +185,11 @@
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">psutil</span>
 <span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">cfg_logging</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="k">import</span> <span class="n">get_default_comm</span><span class="p">,</span> <span class="n">YggClass</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">units</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">cleanup_comms</span><span class="p">,</span> <span class="n">get_comm_class</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">units</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">cleanup_comms</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
 
 
 <span class="c1"># Test data</span>
@@ -208,7 +203,7 @@
 <span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;scripts&#39;</span><span class="p">)</span>
 <span class="n">script_list</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;gcc_model.c&#39;</span><span class="p">,</span> <span class="s1">&#39;hellofunc.c&#39;</span><span class="p">]),</span>
-    <span class="p">(</span><span class="s1">&#39;cpp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;gcc_model.cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;hellofunc.c&#39;</span><span class="p">]),</span>
+    <span class="p">(</span><span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;gcc_model.cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;hellofunc.c&#39;</span><span class="p">]),</span>
     <span class="p">(</span><span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="s1">&#39;gcc_model&#39;</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;gcc_model&#39;</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;matlab_model.m&#39;</span><span class="p">),</span>
@@ -223,6 +218,10 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">scripts</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 <span class="c1"># scripts = {k: os.path.join(script_dir, v) for k, v in script_list}</span>
+<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+    <span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sleep&#39;</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]</span>
     
 <span class="c1"># Test yamls</span>
 <span class="n">yaml_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;yamls&#39;</span><span class="p">)</span>
@@ -245,14 +244,186 @@
 <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">makefile0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="s2">&quot;Makefile&quot;</span><span class="p">))</span>
 
 
-<span class="c1"># Flag for enabling tests that take a long time</span>
-<span class="n">enable_long_tests</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;YGG_ENABLE_LONG_TESTS&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="c1"># Flag for enabling tests that take a long time or are for extra examples</span>
+<span class="n">enable_long_tests</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">check_environ_bool</span><span class="p">(</span><span class="s2">&quot;YGG_ENABLE_LONG_TESTS&quot;</span><span class="p">)</span>
+<span class="n">skip_extra_examples</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">check_environ_bool</span><span class="p">(</span><span class="s2">&quot;YGG_SKIP_EXTRA_EXAMPLES&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># Wrapped class to allow handling of arrays</span>
+<span class="k">class</span> <span class="nc">WrappedTestCase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">WrappedTestCase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addTypeEqualityFunc</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">_unit_quantity</span><span class="p">,</span> <span class="s1">&#39;assertUnitsEqual&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addTypeEqualityFunc</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">_unit_array</span><span class="p">,</span> <span class="s1">&#39;assertUnitsEqual&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addTypeEqualityFunc</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="s1">&#39;assertArrayEqual&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addTypeEqualityFunc</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="s1">&#39;assertArrayEqual&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">has_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_getAssertEqualityFunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">):</span>
+        <span class="c1"># Allow comparison of tuple to list and units to anything</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">first</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">second</span><span class="p">))</span> <span class="ow">in</span> <span class="p">[(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">),</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertSequenceEqual</span>
+        <span class="k">elif</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">first</span><span class="p">)</span> <span class="ow">or</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">second</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertUnitsEqual</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">WrappedTestCase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_getAssertEqualityFunc</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dont_nest</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Fail if the two objects are unequal as determined by the &#39;==&#39;</span>
+<span class="sd">           operator.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">dont_nest</span><span class="p">):</span>
+            <span class="c1"># Do nested evaluation for objects containing units</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">first</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">second</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqualNested</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">WrappedTestCase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dont_nest</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqualNested</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">assertEqualNested</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Fail if the two objects are unequal as determined by descending</span>
+<span class="sd">        recursively into the object if it is a list, tuple, or dictionary.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertSequenceEqualNested</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">seq_type</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertSequenceEqualNested</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">seq_type</span><span class="o">=</span><span class="nb">tuple</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertDictEqualNested</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">dont_nest</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">assertSequenceEqualNested</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq1</span><span class="p">,</span> <span class="n">seq2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seq_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">seq_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">seq_type_name</span> <span class="o">=</span> <span class="n">seq_type</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="c1"># Currently it makes more sense to allow equality between lists and</span>
+            <span class="c1"># tuples</span>
+            <span class="c1"># if not isinstance(seq1, seq_type):</span>
+            <span class="c1">#     raise self.failureException(</span>
+            <span class="c1">#         &#39;First sequence is not a %s: %s&#39;</span>
+            <span class="c1">#         % (seq_type_name, unittest.util.safe_repr(seq1)))</span>
+            <span class="c1"># if not isinstance(seq2, seq_type):</span>
+            <span class="c1">#     raise self.failureException(</span>
+            <span class="c1">#         &#39;Second sequence is not a %s: %s&#39;</span>
+            <span class="c1">#         % (seq_type_name, unittest.util.safe_repr(seq2)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">seq_type_name</span> <span class="o">=</span> <span class="s2">&quot;sequence&quot;</span>
+
+        <span class="n">differing</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">len1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq1</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">):</span>
+            <span class="n">differing</span> <span class="o">=</span> <span class="s1">&#39;First </span><span class="si">%s</span><span class="s1"> has no length.    Non-sequence?&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">seq_type_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">differing</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">len2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq2</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">):</span>
+                <span class="n">differing</span> <span class="o">=</span> <span class="s1">&#39;Second </span><span class="si">%s</span><span class="s1"> has no length.    Non-sequence?&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">seq_type_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">differing</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">seq1_repr</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">safe_repr</span><span class="p">(</span><span class="n">seq1</span><span class="p">)</span>
+            <span class="n">seq2_repr</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">safe_repr</span><span class="p">(</span><span class="n">seq2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq1_repr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
+                <span class="n">seq1_repr</span> <span class="o">=</span> <span class="n">seq1_repr</span><span class="p">[:</span><span class="mi">30</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;...&#39;</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq2_repr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
+                <span class="n">seq2_repr</span> <span class="o">=</span> <span class="n">seq2_repr</span><span class="p">[:</span><span class="mi">30</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;...&#39;</span>
+            <span class="n">elements</span> <span class="o">=</span> <span class="p">(</span><span class="n">seq_type_name</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span> <span class="n">seq1_repr</span><span class="p">,</span> <span class="n">seq2_repr</span><span class="p">)</span>
+            <span class="n">differing</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">s differ: </span><span class="si">%s</span><span class="s1"> != </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">elements</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">len1</span><span class="p">,</span> <span class="n">len2</span><span class="p">)):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">item1</span> <span class="o">=</span> <span class="n">seq1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">):</span>
+                    <span class="n">differing</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Unable to index element </span><span class="si">%d</span><span class="s1"> of first </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                  <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">seq_type_name</span><span class="p">))</span>
+                    <span class="k">break</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">item2</span> <span class="o">=</span> <span class="n">seq2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">):</span>
+                    <span class="n">differing</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Unable to index element </span><span class="si">%d</span><span class="s1"> of second </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                  <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">seq_type_name</span><span class="p">))</span>
+                    <span class="k">break</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqualNested</span><span class="p">(</span>
+                    <span class="n">item1</span><span class="p">,</span> <span class="n">item2</span><span class="p">,</span>
+                    <span class="n">msg</span><span class="o">=</span><span class="n">differing</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">First differing element at index </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">len1</span> <span class="o">==</span> <span class="n">len2</span><span class="p">):</span>
+                    <span class="k">return</span>
+
+            <span class="k">if</span> <span class="n">len1</span> <span class="o">&gt;</span> <span class="n">len2</span><span class="p">:</span>
+                <span class="n">differing</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">First </span><span class="si">%s</span><span class="s1"> contains </span><span class="si">%d</span><span class="s1"> additional &#39;</span>
+                              <span class="s1">&#39;elements.</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">seq_type_name</span><span class="p">,</span> <span class="n">len1</span> <span class="o">-</span> <span class="n">len2</span><span class="p">))</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">differing</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;First extra element </span><span class="si">%d</span><span class="s1">:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                  <span class="p">(</span><span class="n">len2</span><span class="p">,</span> <span class="n">unittest</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">safe_repr</span><span class="p">(</span><span class="n">seq1</span><span class="p">[</span><span class="n">len2</span><span class="p">])))</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">):</span>
+                    <span class="n">differing</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;Unable to index element </span><span class="si">%d</span><span class="s1"> &#39;</span>
+                                  <span class="s1">&#39;of first </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">len2</span><span class="p">,</span> <span class="n">seq_type_name</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">len1</span> <span class="o">&lt;</span> <span class="n">len2</span><span class="p">:</span>
+                <span class="n">differing</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Second </span><span class="si">%s</span><span class="s1"> contains </span><span class="si">%d</span><span class="s1"> additional &#39;</span>
+                              <span class="s1">&#39;elements.</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">seq_type_name</span><span class="p">,</span> <span class="n">len2</span> <span class="o">-</span> <span class="n">len1</span><span class="p">))</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">differing</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;First extra element </span><span class="si">%d</span><span class="s1">:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                  <span class="p">(</span><span class="n">len1</span><span class="p">,</span> <span class="n">unittest</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">safe_repr</span><span class="p">(</span><span class="n">seq2</span><span class="p">[</span><span class="n">len1</span><span class="p">])))</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">):</span>
+                    <span class="n">differing</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;Unable to index element </span><span class="si">%d</span><span class="s1"> &#39;</span>
+                                  <span class="s1">&#39;of second </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">len1</span><span class="p">,</span> <span class="n">seq_type_name</span><span class="p">))</span>
+        <span class="n">standardMsg</span> <span class="o">=</span> <span class="n">differing</span>
+        <span class="n">diffMsg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">difflib</span><span class="o">.</span><span class="n">ndiff</span><span class="p">(</span><span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">seq1</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(),</span>
+                          <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">seq2</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()))</span>
+        <span class="n">standardMsg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_truncateMessage</span><span class="p">(</span><span class="n">standardMsg</span><span class="p">,</span> <span class="n">diffMsg</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formatMessage</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">standardMsg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">assertDictEqualNested</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="s1">&#39;First argument is not a dictionary&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="n">d2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="s1">&#39;Second argument is not a dictionary&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">d1</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">d2</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span>
+                         <span class="s1">&#39;Dictionaries do not have the same keys&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d1</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">standardMsg</span> <span class="o">=</span> <span class="s1">&#39;Value for key </span><span class="si">%s</span><span class="s1"> differs&#39;</span> <span class="o">%</span> <span class="n">k</span>
+            <span class="n">msg_k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formatMessage</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">standardMsg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">d1</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">d2</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg_k</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">assertUnitsEqual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertion for equality in case of objects with units.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">first</span><span class="p">)</span> <span class="ow">and</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">second</span><span class="p">):</span>
+            <span class="n">first</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">convert_to</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">second</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">first</span><span class="p">),</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">second</span><span class="p">))</span>
+        
+    <span class="k">def</span> <span class="nf">assertArrayEqual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertion for equality in case of arrays.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">standardMsg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formatMessage</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">standardMsg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">failureException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
 
 <span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
     <span class="c1"># Dummy TestCase instance, so we can initialize an instance</span>
     <span class="c1"># and access the assert instance methods</span>
-    <span class="k">class</span> <span class="nc">DummyTestCase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">class</span> <span class="nc">DummyTestCase</span><span class="p">(</span><span class="n">WrappedTestCase</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="nb">super</span><span class="p">(</span><span class="n">DummyTestCase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">&#39;_dummy&#39;</span><span class="p">)</span>
 
@@ -274,18 +445,22 @@
         
 <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
 
-    <span class="n">ut</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">()</span>
+    <span class="n">ut</span> <span class="o">=</span> <span class="n">WrappedTestCase</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">long_running</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decorator for marking long tests that should be skipped if</span>
-<span class="sd">    CIS_ENABLE_LONG_TESTS is set.</span>
+<span class="n">long_running</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">enable_long_tests</span><span class="p">,</span> <span class="s2">&quot;Long tests not enabled.&quot;</span><span class="p">)</span>
+<span class="n">extra_example</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">skip_extra_examples</span><span class="p">,</span> <span class="s2">&quot;Extra examples not enabled.&quot;</span><span class="p">)</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        func (callable): Test function or method.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">enable_long_tests</span><span class="p">,</span> <span class="s2">&quot;Long tests not enabled.&quot;</span><span class="p">)(</span><span class="n">func</span><span class="p">)</span>
+<span class="c1"># def long_running(func):</span>
+<span class="c1">#     r&quot;&quot;&quot;Decorator for marking long tests that should be skipped if</span>
+<span class="c1">#     YGG_ENABLE_LONG_TESTS is set.</span>
+
+<span class="c1">#     Args:</span>
+<span class="c1">#         func (callable): Test function or method.</span>
+
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     return unittest.skipIf(not enable_long_tests, &quot;Long tests not enabled.&quot;)(func)</span>
 
 
 <span class="k">def</span> <span class="nf">assert_raises</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -353,34 +528,7 @@
 <span class="sd">        AssertionError: If the two messages are not equivalent.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)))</span>
-        <span class="n">ut</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">iy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-            <span class="n">assert_equal</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">iy</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
-        <span class="c1"># ut.assertEqual(type(x), type(y))</span>
-        <span class="n">ut</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">iy</span> <span class="ow">in</span> <span class="n">y</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">ix</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-            <span class="n">assert_equal</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">iy</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)):</span>
-        <span class="k">if</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="ow">and</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">and</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">convert_to</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
-            <span class="n">assert_equal</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
-                <span class="n">y</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="ow">and</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="n">ut</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">ut</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">assert_not_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
@@ -457,7 +605,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of comms.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_comm_classes</span><span class="p">:</span>
-            <span class="bp">cls</span> <span class="o">=</span> <span class="n">get_comm_class</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">comm_count</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span>
 
@@ -510,7 +658,9 @@
         <span class="k">if</span> <span class="n">default_comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_comm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_default_comm</span>
         <span class="k">if</span> <span class="n">default_comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_comm</span></div>
+            <span class="kn">from</span> <span class="nn">yggdrasil.communication.DefaultComm</span> <span class="k">import</span> <span class="n">DefaultComm</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_comm</span>
+            <span class="n">DefaultComm</span><span class="o">.</span><span class="n">_reset_alias</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="YggTestBase.reset_default_comm"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.reset_default_comm">[docs]</a>    <span class="k">def</span> <span class="nf">reset_default_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reset the default comm to the original value.&quot;&quot;&quot;</span>
@@ -569,7 +719,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_teardown_complete</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">YggClass</span><span class="p">(</span><span class="s1">&#39;dummy&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">sleeptime</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">(</span><span class="s1">&#39;dummy&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">sleeptime</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
         <span class="c1"># Give comms time to close</span>
         <span class="k">if</span> <span class="n">ncurr_comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">Tout</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">()</span>
@@ -611,7 +761,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cleanup_comm_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Comm classes that should be cleaned up following the test.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">get_default_comm</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">tools</span><span class="o">.</span><span class="n">get_default_comm</span><span class="p">()]</span>
 
 <div class="viewcode-block" id="YggTestBase.cleanup_comms"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.cleanup_comms">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup_comms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup all comms.&quot;&quot;&quot;</span>
@@ -698,21 +848,30 @@
     <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_mod</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_cls</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">skip_init</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_instances</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="YggTestClass.setup"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an instance of the class.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_instance</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_init</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_instance</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="YggTestClass.teardown"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the instance.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clear_instance</span><span class="p">()</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_extra_instances</span><span class="p">)):</span>
+            <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_instances</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_extra_instances</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">inst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_instances</span> <span class="o">=</span> <span class="p">[]</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">description_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -772,19 +931,48 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: Instance of the test driver.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_teardown_complete</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Instance referenced after teardown.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_init</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;skip_init is True, so instance cannot be used.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_instance&#39;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_instance</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instance</span>
 
-<div class="viewcode-block" id="YggTestClass.create_instance"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.create_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="YggTestClass.create_error_instance"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.create_error_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_error_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">error_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_on_init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new instance of the class that is wrapped in ErrorClass.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inst_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">inst_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span>
+        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst_args</span>
+        <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span>
+        <span class="k">if</span> <span class="n">error_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">error_class</span> <span class="o">=</span> <span class="n">ErrorClass</span>
+        <span class="k">if</span> <span class="n">error_class</span> <span class="o">==</span> <span class="n">ErrorClass</span><span class="p">:</span>
+            <span class="c1"># This could be a normal class that contains error classes</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">inst_class</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;error_on_init&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">error_on_init</span>
+        <span class="n">error_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">inst_class</span><span class="o">=</span><span class="n">error_class</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">error_on_init</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="n">MagicTestError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_instance</span><span class="p">,</span> <span class="o">**</span><span class="n">error_kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_instance</span><span class="p">(</span><span class="o">**</span><span class="n">error_kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_extra_instances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="YggTestClass.create_instance"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.create_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new instance of the class.&quot;&quot;&quot;</span>
-        <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">inst_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span><span class="p">)</span>
-        <span class="c1"># print(&quot;created instance&quot;)</span>
+        <span class="k">if</span> <span class="n">inst_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">inst_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span>
+        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst_args</span>
+        <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">inst_class</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">inst</span></div>
 
 <div class="viewcode-block" id="YggTestClass.remove_instance"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.remove_instance">[docs]</a>    <span class="k">def</span> <span class="nf">remove_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove an instance of the class.&quot;&quot;&quot;</span>
-        <span class="c1"># print(&quot;removed instance&quot;)</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="YggTestClass.clear_instance"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.clear_instance">[docs]</a>    <span class="k">def</span> <span class="nf">clear_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -848,6 +1036,9 @@
 <span class="sd">                an error.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">_is_error_class</span> <span class="o">=</span> <span class="kc">True</span>
+        
         <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">error_on_init</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;error_on_init&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">error_on_init</span><span class="p">:</span>
@@ -939,7 +1130,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

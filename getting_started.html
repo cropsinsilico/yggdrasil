@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting started &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>Getting started &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/>
         <link rel="next" title="Formatted I/O" href="formatted_io.html"/>
         <link rel="prev" title="Installation" href="install.html"/> 
 
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -111,16 +111,10 @@
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -188,7 +182,7 @@
             
   <div class="section" id="getting-started">
 <span id="getting-started-rst"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<p>The yggdrasil runs user defined models and orchestrates asynchronous
+<p>The yggdrasil framework runs user defined models and orchestrates asynchronous
 communication between models using drivers that coordinate the different
 components via threads. Model drivers run the models as seperate processes
 and monitor them to redirect output to stdout and determine if the model
@@ -220,11 +214,12 @@ single line of output to stdout:</p>
 <p>(<a class="reference external" href="examples/gs_lesson1.html">Example in other languages</a>)</p>
 <p>The first line signals that there is a model, the second line is the name that
 should be associated with the model for logging, the third line tells the
-framework which driver should be used to run the model, and the forth line is
+framework which language the model is written in (and therefore which driver
+should be used to execute the model), and the forth line is
 the path to the model source code that should be run. There are specialized
 drivers for simple source written in Python, Matlab, C, and C++, but any
-executable can be run as a model using the ‘ModelDriver’ driver. Then the ‘args’
-model parameter should be the path to the execuatable. Additional information on
+executable can be run as a model using <code class="docutils literal notranslate"><span class="pre">language:</span> <span class="pre">executable</span></code> and passing the
+path to the executable to the <code class="docutils literal notranslate"><span class="pre">args</span></code> parameter. Additional information on
 the format yggdrasil YAML files should take can be found in the
 <a class="reference internal" href="yaml.html#yaml-rst"><span class="std std-ref">YAML Files</span></a> section.</p>
 <p>This model can then be run using the yggdrasil framework by calling the
@@ -265,7 +260,7 @@ commandline entry point <cite>yggrun</cite> followed by the path to the YAML.:</
 <p>Models can get input from or send output to files via input and output channels.
 To do so yggdrasil provides several useful functions for interfacing with
 these channels. In the example below, the model receives input from a channel
-named ‘input’ and sends output to a channel named ‘output’.</p>
+named <code class="docutils literal notranslate"><span class="pre">input</span></code> and sends output to a channel named <code class="docutils literal notranslate"><span class="pre">output</span></code>.</p>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -321,6 +316,12 @@ named ‘input’ and sends output to a channel named ‘output’.</p>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson3.html">Example in other languages</a>)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Real models YAMLs should use more description names for the input and output
+channels to make it easier for collaborators to determine the information
+begin passed through the channel.</p>
+</div>
 <p>In the YAML used to run this model, those channels are declared in the model
 definition and then linked to files by entries in the <code class="docutils literal notranslate"><span class="pre">connections</span></code> section
 of the YAML.</p>
@@ -358,7 +359,7 @@ of the YAML.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">input_file</span></code> and <code class="docutils literal notranslate"><span class="pre">output_file</span></code> connection fields can either be
 the path to the file (either absolute or relative to the directory
 containing the YAML file) or a mapping with fields descripting the
-file. In particular, the ‘filetype’ keyword specifies the format of
+file. In particular, the <code class="docutils literal notranslate"><span class="pre">filetype</span></code> keyword specifies the format of
 the file being read/written. Supported values include:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -372,7 +373,7 @@ the file being read/written. Supported values include:</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>binary</td>
-<td>The entire file is read/written all at once.</td>
+<td>The entire file is read/written all at once as bytes.</td>
 </tr>
 <tr class="row-odd"><td>ascii</td>
 <td>The file is read/written one line at a time.</td>
@@ -653,7 +654,7 @@ be read/written.</td>
 </tr>
 </tbody>
 </table>
-<p>A list of possible Input/Output drivers can be found <a class="reference internal" href="io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
+<p>A list of possible Input/Output drivers can be found <a class="reference internal" href="advanced/io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
 <div class="admonition-todo admonition" id="index-0">
 <p class="first admonition-title">Todo</p>
 <p class="last">Link to example with translation at connection.</p>
@@ -705,7 +706,7 @@ be read/written.</td>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

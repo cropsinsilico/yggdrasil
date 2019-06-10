@@ -11,10 +11,34 @@ Subpackages
 Submodules
 ----------
 
+yggdrasil.metaschema.properties.AnyMetaschemaProperties module
+--------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.properties.AnyMetaschemaProperties
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.properties.ArgsMetaschemaProperty module
+-------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.properties.ArgsMetaschemaProperty
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 yggdrasil.metaschema.properties.ArrayMetaschemaProperties module
 ----------------------------------------------------------------
 
 .. automodule:: yggdrasil.metaschema.properties.ArrayMetaschemaProperties
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.properties.ClassMetaschemaProperty module
+--------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.properties.ClassMetaschemaProperty
     :members:
     :undoc-members:
     :show-inheritance:

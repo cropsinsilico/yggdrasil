@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.serialize.tests.test_DefaultSerialize &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.serialize.tests.test_DefaultSerialize &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../index.html"/>
         <link rel="up" title="Module code" href="../../../index.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -177,149 +171,14 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.serialize.tests.test_DefaultSerialize</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">YggTestClassInfo</span><span class="p">,</span> <span class="n">assert_equal</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">serialize</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize</span> <span class="k">import</span> <span class="n">DefaultSerialize</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">encode_type</span>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.serialize.tests</span> <span class="k">import</span> <span class="n">test_SerializeBase</span> <span class="k">as</span> <span class="n">parent</span>
 
 
-<div class="viewcode-block" id="test_demote_string"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.test_demote_string">[docs]</a><span class="k">def</span> <span class="nf">test_demote_string</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test format str creation of typedef.&quot;&quot;&quot;</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">DefaultSerialize</span><span class="o">.</span><span class="n">DefaultSerialize</span><span class="p">(</span><span class="n">format_str</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">}]})</span></div>
-
-
-<div class="viewcode-block" id="TestDefaultSerialize"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize</span><span class="p">(</span><span class="n">YggTestClassInfo</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDefaultSerialize"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestSerializeBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class.&quot;&quot;&quot;</span>
 
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;DefaultSerialize&#39;</span>
-    <span class="n">_empty_msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
-    <span class="n">attr_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">YggTestClassInfo</span><span class="o">.</span><span class="n">attr_list</span><span class="p">)</span>
-                 <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="s1">&#39;typedef&#39;</span><span class="p">,</span> <span class="s1">&#39;numpy_dtype&#39;</span><span class="p">])</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_header_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arg1</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="s1">&#39;two&#39;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">mod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Module for class to be tested.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s1">&#39;yggdrasil.serialize.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Keyword arguments for creating the test instance.&quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_kwargs</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">out</span>
-
-<div class="viewcode-block" id="TestDefaultSerialize.empty_head"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.empty_head">[docs]</a>    <span class="k">def</span> <span class="nf">empty_head</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Empty header for message only contains the size.&quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="n">incomplete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">msg</span> <span class="o">==</span> <span class="n">tools</span><span class="o">.</span><span class="n">YGG_MSG_EOF</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;eof&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="n">out</span></div>
-
-<div class="viewcode-block" id="TestDefaultSerialize.map_sent2recv"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.map_sent2recv">[docs]</a>    <span class="k">def</span> <span class="nf">map_sent2recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a sent object into a received one.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">obj</span></div>
-
-<div class="viewcode-block" id="TestDefaultSerialize.assert_result_equal"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.assert_result_equal">[docs]</a>    <span class="k">def</span> <span class="nf">assert_result_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that serialized/deserialized objects equal.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">map_sent2recv</span><span class="p">(</span><span class="n">y</span><span class="p">))</span></div>
-
-<div class="viewcode-block" id="TestDefaultSerialize.test_field_specs"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_field_specs">[docs]</a>    <span class="k">def</span> <span class="nf">test_field_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test field specifiers.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_user_defined</span><span class="p">,</span>
-                          <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_user_defined&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="p">,</span>
-                          <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">extra_kwargs</span><span class="p">,</span>
-                          <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;extra_kwargs&#39;</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span>
-                          <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;typedef&#39;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_field_names</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_field_units</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_field_names</span><span class="p">(),</span>
-                              <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_field_units</span><span class="p">(),</span>
-                              <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;field_units&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span></div>
-        
-<div class="viewcode-block" id="TestDefaultSerialize.test_serialize"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize.&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">iobj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">iobj</span><span class="p">)</span>
-            <span class="n">iout</span><span class="p">,</span> <span class="n">ihead</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">iout</span><span class="p">,</span> <span class="n">iobj</span><span class="p">)</span></div>
-            <span class="c1"># self.assert_equal(ihead, self.empty_head(msg))</span>
-
-<div class="viewcode-block" id="TestDefaultSerialize.test_serialize_no_metadata"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_no_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_no_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serializing without metadata.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
-                                <span class="n">no_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="TestDefaultSerialize.test_deserialize_error"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_deserialize_error">[docs]</a>    <span class="k">def</span> <span class="nf">test_deserialize_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when deserializing message that is not bytes.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
-        
-<div class="viewcode-block" id="TestDefaultSerialize.test_serialize_sinfo"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_sinfo">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_sinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize with serializer info.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_user_defined&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">,</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
-                               <span class="n">add_serializer_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">hout</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_header_info</span><span class="p">)</span>
-            <span class="n">hout</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">)</span>
-            <span class="n">temp_seri</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">get_serializer</span><span class="p">(</span>
-                <span class="n">seritype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">[</span><span class="s1">&#39;seritype&#39;</span><span class="p">])</span>
-            <span class="k">for</span> <span class="n">iobj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]:</span>
-                <span class="n">hout</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">encode_type</span><span class="p">(</span><span class="n">iobj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">typedef</span><span class="p">))</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">iobj</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_header_info</span><span class="p">,</span>
-                                              <span class="n">add_serializer_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">iout</span><span class="p">,</span> <span class="n">ihead</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                <span class="n">hout</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">ihead</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">],</span> <span class="nb">id</span><span class="o">=</span><span class="n">ihead</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
-                            <span class="n">incomplete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">iout</span><span class="p">,</span> <span class="n">iobj</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">ihead</span><span class="p">,</span> <span class="n">hout</span><span class="p">)</span>
-                <span class="c1"># Use info to reconstruct serializer</span>
-                <span class="n">iout</span><span class="p">,</span> <span class="n">ihead</span> <span class="o">=</span> <span class="n">temp_seri</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">iout</span><span class="p">,</span> <span class="n">iobj</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">ihead</span><span class="p">,</span> <span class="n">hout</span><span class="p">)</span>
-                <span class="n">new_seri</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">get_serializer</span><span class="p">(</span><span class="o">**</span><span class="n">ihead</span><span class="p">)</span>
-                <span class="n">iout</span><span class="p">,</span> <span class="n">ihead</span> <span class="o">=</span> <span class="n">new_seri</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">iout</span><span class="p">,</span> <span class="n">iobj</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">ihead</span><span class="p">,</span> <span class="n">hout</span><span class="p">)</span></div>
-            
-<div class="viewcode-block" id="TestDefaultSerialize.test_serialize_header"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_header">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize with header.&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">iobj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">iobj</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_header_info</span><span class="p">)</span>
-            <span class="n">iout</span><span class="p">,</span> <span class="n">ihead</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">iout</span><span class="p">,</span> <span class="n">iobj</span><span class="p">)</span></div>
-            <span class="c1"># self.assert_equal(ihead, self._header_info)</span>
-        
-<div class="viewcode-block" id="TestDefaultSerialize.test_serialize_eof"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_eof">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize EOF.&quot;&quot;&quot;</span>
-        <span class="n">iobj</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">YGG_MSG_EOF</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">iobj</span><span class="p">)</span>
-        <span class="n">iout</span><span class="p">,</span> <span class="n">ihead</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">iout</span><span class="p">,</span> <span class="n">iobj</span><span class="p">)</span></div>
-        <span class="c1"># self.assert_equal(ihead, self.empty_head(msg))</span>
-        
-<div class="viewcode-block" id="TestDefaultSerialize.test_serialize_eof_header"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_eof_header">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_eof_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize EOF with header.&quot;&quot;&quot;</span>
-        <span class="n">iobj</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">YGG_MSG_EOF</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">iobj</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_header_info</span><span class="p">)</span>
-        <span class="n">iout</span><span class="p">,</span> <span class="n">ihead</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">iout</span><span class="p">,</span> <span class="n">iobj</span><span class="p">)</span></div>
-        <span class="c1"># self.assert_equal(ihead, self.empty_head(msg))</span>
         
 <div class="viewcode-block" id="TestDefaultSerialize.test_serialize_no_format"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_no_format">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_no_format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize without format string.&quot;&quot;&quot;</span>
@@ -331,12 +190,6 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">iout</span><span class="p">,</span> <span class="n">iobj</span><span class="p">)</span></div>
                 <span class="c1"># self.assert_equal(ihead, self._header_info)</span>
             <span class="c1"># self.assert_raises(Exception, self.instance.serialize, [&#39;msg&#39;, 0])</span>
-        
-<div class="viewcode-block" id="TestDefaultSerialize.test_deserialize_empty"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_deserialize_empty">[docs]</a>    <span class="k">def</span> <span class="nf">test_deserialize_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test call for empty string.&quot;&quot;&quot;</span>
-        <span class="n">out</span><span class="p">,</span> <span class="n">head</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_empty_msg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;empty&#39;</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_head</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_empty_msg</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TestDefaultSerialize.test_invalid_update"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_invalid_update">[docs]</a>    <span class="k">def</span> <span class="nf">test_invalid_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error raised when serializer updated with type that isn&#39;t</span>
@@ -350,13 +203,14 @@
 <div class="viewcode-block" id="TestDefaultSerialize_format"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_format</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with format.&quot;&quot;&quot;</span>
 
-    <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;as_format&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+    <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;table_example&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;include_oldkws&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="TestDefaultSerialize_array"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_array">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_array</span><span class="p">(</span><span class="n">TestDefaultSerialize_format</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with format as array.&quot;&quot;&quot;</span>
 
-    <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;as_format&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+    <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;table_example&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;include_oldkws&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                          <span class="s1">&#39;array_columns&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="TestDefaultSerialize_uniform"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_uniform</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">):</span>
@@ -367,7 +221,6 @@
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;1darray&#39;</span><span class="p">,</span>
                                                      <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
                                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">}},</span>
-               <span class="c1"># &#39;field_units&#39;: [&#39;cm&#39;, &#39;g&#39;]},</span>
                <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="p">[],</span>
                <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">)],</span>
                            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">)]],</span>
@@ -375,8 +228,7 @@
                <span class="s1">&#39;typedef&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;1darray&#39;</span><span class="p">,</span>
                                                       <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
                                                       <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">}},</span>
-               <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>  <span class="c1"># np.dtype([(&#39;f0&#39;, &#39;&lt;f8&#39;), (&#39;f1&#39;, &#39;&lt;f8&#39;)]),</span>
-               <span class="s1">&#39;is_user_defined&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+               <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">)}</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 
 
@@ -403,83 +255,7 @@
                                      <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span>
                                      <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;g&#39;</span><span class="p">}]}</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
-
-
-<div class="viewcode-block" id="TestDefaultSerialize_func"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_func</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with functions.&quot;&quot;&quot;</span>
-
-    <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;as_format&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize_func</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">func_serialize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func_serialize</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">func_deserialize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func_deserialize</span>
-
-<div class="viewcode-block" id="TestDefaultSerialize_func.get_options"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;func_serialize&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_serialize</span><span class="p">,</span>
-                          <span class="s1">&#39;func_deserialize&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_deserialize</span><span class="p">},</span>
-               <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">],</span>
-                           <span class="p">[</span><span class="s1">&#39;two&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">]],</span>
-               <span class="s1">&#39;extra_kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span>
-               <span class="s1">&#39;typedef&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">},</span>
-               <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-               <span class="s1">&#39;is_user_defined&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
-        <span class="k">return</span> <span class="n">out</span></div>
-        
-    <span class="k">def</span> <span class="nf">_func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method that serializes using repr.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
-
-    <span class="k">def</span> <span class="nf">_func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method that deserializes using eval.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;empty&#39;</span><span class="p">]</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">x</span></div>
-
-
-<div class="viewcode-block" id="FakeSerializer"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.FakeSerializer">[docs]</a><span class="k">class</span> <span class="nc">FakeSerializer</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="o">.</span><span class="n">DefaultSerialize</span><span class="p">):</span>
-
-<div class="viewcode-block" id="FakeSerializer.func_serialize"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.FakeSerializer.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method that serializes using repr.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">args</span><span class="p">))</span></div>
-
-<div class="viewcode-block" id="FakeSerializer.func_deserialize"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.FakeSerializer.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method that deserializes using eval.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[]</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">x</span></div></div>
-
-
-<div class="viewcode-block" id="TestDefaultSerialize_class"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_class">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_class</span><span class="p">(</span><span class="n">TestDefaultSerialize_func</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with classes.&quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="TestDefaultSerialize_class.get_options"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_class.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
-        <span class="n">temp_seri</span> <span class="o">=</span> <span class="n">FakeSerializer</span><span class="p">()</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">temp_seri</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">DefaultSerialize</span><span class="o">.</span><span class="n">DefaultSerialize</span><span class="p">))</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize_class</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_options</span><span class="p">()</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;func_serialize&#39;</span><span class="p">:</span> <span class="n">temp_seri</span><span class="p">,</span>
-                         <span class="s1">&#39;func_deserialize&#39;</span><span class="p">:</span> <span class="n">temp_seri</span><span class="p">,</span>
-                         <span class="s1">&#39;func_typedef&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">},</span>
-                         <span class="s1">&#39;encode_func_serialize&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                         <span class="s1">&#39;decode_func_deserialize&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
-        <span class="k">return</span> <span class="n">out</span></div></div>
-        
-
-<div class="viewcode-block" id="TestDefaultSerialize_alias"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_alias">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_alias</span><span class="p">(</span><span class="n">TestDefaultSerialize_format</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with alias.&quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="TestDefaultSerialize_alias.setup"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_alias.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an instance of the class.&quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize_alias</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">alias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="n">DefaultSerialize</span><span class="o">.</span><span class="n">DefaultSerialize</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_instance</span><span class="o">.</span><span class="n">_alias</span> <span class="o">=</span> <span class="n">alias</span></div></div>
-
 
 <div class="viewcode-block" id="TestDefaultSerialize_type"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_type">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_type</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with types.&quot;&quot;&quot;</span>
@@ -493,38 +269,6 @@
                <span class="s1">&#39;typedef&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">},</span>
                <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
-
-
-<div class="viewcode-block" id="TestDefaultSerialize_func_error"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_func_error</span><span class="p">(</span><span class="n">TestDefaultSerialize_func</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with incorrect functions.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">_func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method that serializes using repr.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">args</span>
-
-<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_serialize"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize with function that dosn&#39;t return correct type.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,))</span></div>
-
-<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_serialize_no_metadata"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_no_metadata">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Error testing&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_serialize_no_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serializing without metadata.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
-        
-<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_serialize_header"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_header">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Error testing&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_serialize_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test serialize/deserialize with header.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
-
-<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_serialize_sinfo"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_sinfo">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Error testing&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_serialize_sinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test serialize/deserialize with serializer info.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
-
-<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_field_specs"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_field_specs">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Error testing&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_field_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test field specifiers.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div></div>
 </pre></div>
 
            </div>
@@ -561,7 +305,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

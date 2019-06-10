@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.tests package &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.communication.tests package &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="index.html"/> 
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -102,16 +102,10 @@
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -191,7 +185,7 @@
 <p>Test for AsciiFileComm communication class.</p>
 <dl class="attribute">
 <dt id="yggdrasil.communication.tests.test_AsciiFileComm.TestAsciiFileComm.attr_list">
-<code class="descname">attr_list</code><em class="property"> = ['name', 'address', 'direction', 'serializer', 'recv_timeout', 'close_on_eof_recv', 'opp_address', 'opp_comms', 'maxMsgSize', 'fd', 'read_meth', 'append', 'in_temp', 'open_as_binary', 'newline', 'is_series', 'platform_newline', 'comment']</em><a class="headerlink" href="#yggdrasil.communication.tests.test_AsciiFileComm.TestAsciiFileComm.attr_list" title="Permalink to this definition">¶</a></dt>
+<code class="descname">attr_list</code><em class="property"> = ['name', 'address', 'direction', 'serializer', 'recv_timeout', 'close_on_eof_recv', 'opp_address', 'opp_comms', 'maxMsgSize', 'fd', 'read_meth', 'append', 'in_temp', 'is_series', 'wait_for_creation', 'serializer', 'platform_newline', 'comment']</em><a class="headerlink" href="#yggdrasil.communication.tests.test_AsciiFileComm.TestAsciiFileComm.attr_list" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -250,7 +244,7 @@
 <p>Test for AsciiTableComm communication class.</p>
 <dl class="attribute">
 <dt id="yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.testing_option_kws">
-<code class="descname">testing_option_kws</code><em class="property"> = {'as_array': True}</em><a class="headerlink" href="#yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.testing_option_kws" title="Permalink to this definition">¶</a></dt>
+<code class="descname">testing_option_kws</code><em class="property"> = {'array_columns': True}</em><a class="headerlink" href="#yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.testing_option_kws" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -322,6 +316,12 @@ pair.</p>
 <dd><p>Assert that two messages are equivalent.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.assert_msg_lists_equal">
+<code class="descname">assert_msg_lists_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.assert_msg_lists_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.assert_msg_lists_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that two lists of messages are equivalent.</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.attr_list">
 <code class="descname">attr_list</code><em class="property"> = ['name', 'address', 'direction', 'serializer', 'recv_timeout', 'close_on_eof_recv', 'opp_address', 'opp_comms', 'maxMsgSize']</em><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.attr_list" title="Permalink to this definition">¶</a></dt>
@@ -368,7 +368,7 @@ pair.</p>
 
 <dl class="method">
 <dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.do_send_recv">
-<code class="descname">do_send_recv</code><span class="sig-paren">(</span><em>send_meth='send'</em>, <em>recv_meth='recv'</em>, <em>msg_send=None</em>, <em>msg_recv=None</em>, <em>n_msg_send_meth='n_msg_send'</em>, <em>n_msg_recv_meth='n_msg_recv'</em>, <em>reverse_comms=False</em>, <em>send_kwargs=None</em>, <em>recv_kwargs=None</em>, <em>n_send=1</em>, <em>n_recv=1</em>, <em>close_on_send_eof=None</em>, <em>close_on_recv_eof=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.do_send_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.do_send_recv" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_send_recv</code><span class="sig-paren">(</span><em>send_meth='send'</em>, <em>recv_meth='recv'</em>, <em>msg_send=None</em>, <em>msg_recv=None</em>, <em>n_msg_send_meth='n_msg_send'</em>, <em>n_msg_recv_meth='n_msg_recv'</em>, <em>reverse_comms=False</em>, <em>send_kwargs=None</em>, <em>recv_kwargs=None</em>, <em>n_send=1</em>, <em>n_recv=1</em>, <em>print_status=False</em>, <em>close_on_send_eof=None</em>, <em>close_on_recv_eof=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.do_send_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.do_send_recv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generic send/recv of a message.</p>
 </dd></dl>
 
@@ -486,6 +486,38 @@ pair.</p>
 <dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.recv_instance">
 <code class="descname">recv_instance</code><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.recv_instance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.recv_message_list">
+<code class="descname">recv_message_list</code><span class="sig-paren">(</span><em>recv_inst</em>, <em>expected_result=None</em>, <em>break_on_empty=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.recv_message_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.recv_message_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continue receiving from a receive instance until flag is False (or
+an empty messages is received and break_on_empty is True). On receipt of
+a False flag, the recieved message is checked against the EOF message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>recv_inst</strong> (<a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase" title="yggdrasil.communication.CommBase.CommBase"><em>yggdrasil.communication.CommBase.CommBase</em></a>) – Communication
+instance that should be received from.</li>
+<li><strong>expected_result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – A list of messages that the
+recieved messages should be compared against. Defaults to None
+and is ignored.</li>
+<li><strong>break_on_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, messages will stop being
+received from the communication instance when an empty message
+is received. Defaults to False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Received messages.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -640,6 +672,12 @@ close returns false.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_dict_names">
+<code class="descname">test_send_recv_dict_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_dict_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_dict_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv message as dict with names.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_nolimit">
 <code class="descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test send/recv of a large message.</p>
@@ -669,7 +707,7 @@ close returns false.</p>
 <p>Test for FileComm communication class.</p>
 <dl class="attribute">
 <dt id="yggdrasil.communication.tests.test_FileComm.TestFileComm.attr_list">
-<code class="descname">attr_list</code><em class="property"> = ['name', 'address', 'direction', 'serializer', 'recv_timeout', 'close_on_eof_recv', 'opp_address', 'opp_comms', 'maxMsgSize', 'fd', 'read_meth', 'append', 'in_temp', 'open_as_binary', 'newline', 'is_series', 'platform_newline']</em><a class="headerlink" href="#yggdrasil.communication.tests.test_FileComm.TestFileComm.attr_list" title="Permalink to this definition">¶</a></dt>
+<code class="descname">attr_list</code><em class="property"> = ['name', 'address', 'direction', 'serializer', 'recv_timeout', 'close_on_eof_recv', 'opp_address', 'opp_comms', 'maxMsgSize', 'fd', 'read_meth', 'append', 'in_temp', 'is_series', 'wait_for_creation', 'serializer', 'platform_newline']</em><a class="headerlink" href="#yggdrasil.communication.tests.test_FileComm.TestFileComm.attr_list" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -738,18 +776,6 @@ close returns false.</p>
 <code class="descname">test_work_comm</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_FileComm.html#TestFileComm.test_work_comm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_FileComm.TestFileComm.test_work_comm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disabled: Test creating/removing a work comm.</p>
 </dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.communication.tests.test_FileComm.TestFileComm_ascii">
-<em class="property">class </em><code class="descclassname">yggdrasil.communication.tests.test_FileComm.</code><code class="descname">TestFileComm_ascii</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_FileComm.html#TestFileComm_ascii"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_FileComm.TestFileComm_ascii" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_FileComm.TestFileComm" title="yggdrasil.communication.tests.test_FileComm.TestFileComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_FileComm.TestFileComm</span></code></a></p>
-<p>Test for FileComm communication class with open_as_binary = False.</p>
-<dl class="attribute">
-<dt id="yggdrasil.communication.tests.test_FileComm.TestFileComm_ascii.testing_option_kws">
-<code class="descname">testing_option_kws</code><em class="property"> = {'open_as_binary': False}</em><a class="headerlink" href="#yggdrasil.communication.tests.test_FileComm.TestFileComm_ascii.testing_option_kws" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
@@ -1042,6 +1068,11 @@ close returns false.</p>
 <code class="descname">comm</code><em class="property"> = 'PandasFileComm'</em><a class="headerlink" href="#yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm.comm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="attribute">
+<dt id="yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm.testing_option_kws">
+<code class="descname">testing_option_kws</code><em class="property"> = {'not_as_frames': True}</em><a class="headerlink" href="#yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm.testing_option_kws" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1051,7 +1082,7 @@ close returns false.</p>
 <p>Test for PandasFileComm communication class without field names sent.</p>
 <dl class="attribute">
 <dt id="yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm_nonames.testing_option_kws">
-<code class="descname">testing_option_kws</code><em class="property"> = {'no_names': True}</em><a class="headerlink" href="#yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm_nonames.testing_option_kws" title="Permalink to this definition">¶</a></dt>
+<code class="descname">testing_option_kws</code><em class="property"> = {'no_names': True, 'not_as_frames': True}</em><a class="headerlink" href="#yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm_nonames.testing_option_kws" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1166,6 +1197,12 @@ close returns false.</p>
 <dt id="yggdrasil.communication.tests.test_RMQComm.test_not_running">
 <code class="descclassname">yggdrasil.communication.tests.test_RMQComm.</code><code class="descname">test_not_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQComm.html#test_not_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.test_not_running" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test raise of an error if a RMQ server is not running.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.communication.tests.test_RMQComm.test_running">
+<code class="descclassname">yggdrasil.communication.tests.test_RMQComm.</code><code class="descname">test_running</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQComm.html#test_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.test_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test checking for server w/ URL.</p>
 </dd></dl>
 
 </div>
@@ -1537,7 +1574,7 @@ dealer has connected.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

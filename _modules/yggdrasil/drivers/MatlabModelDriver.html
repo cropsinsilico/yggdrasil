@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.MatlabModelDriver &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.drivers.MatlabModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="yggdrasil.drivers" href="../drivers.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -180,28 +174,36 @@
             
   <h1>Source code for yggdrasil.drivers.MatlabModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">debug</span><span class="p">,</span> <span class="n">error</span>
+<span class="kn">import</span> <span class="nn">uuid</span> <span class="k">as</span> <span class="nn">uuid_gen</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">psutil</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">weakref</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">config</span>
-<span class="k">try</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
-    <span class="kn">import</span> <span class="nn">matlab.engine</span>
-    <span class="n">_matlab_installed</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
-    <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Could not import matlab.engine. &quot;</span>
-          <span class="o">+</span> <span class="s2">&quot;Matlab support will be disabled.&quot;</span><span class="p">)</span>
-    <span class="n">_matlab_installed</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.ModelDriver</span> <span class="k">import</span> <span class="n">ModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.InterpretedModelDriver</span> <span class="k">import</span> <span class="n">InterpretedModelDriver</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="k">import</span> <span class="n">TimeOut</span><span class="p">,</span> <span class="n">sleep</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">register_component</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="k">import</span> <span class="n">get_language_dir</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+    <span class="n">disable_engine</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;disable_engine&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span> <span class="ow">or</span> <span class="p">(</span><span class="n">disable_engine</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">):</span>
+        <span class="n">_matlab_engine_installed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_subprocess</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;matlab.engine disabled&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">matlab.engine</span>
+        <span class="n">_matlab_engine_installed</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Could not import matlab.engine. &quot;</span>
+                 <span class="o">+</span> <span class="s2">&quot;Matlab support for using a sharedEngine will be disabled.&quot;</span><span class="p">)</span>
+    <span class="n">_matlab_engine_installed</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <span class="n">_top_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;../&#39;</span><span class="p">))</span>
-<span class="n">_incl_interface</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="s1">&#39;interface&#39;</span><span class="p">)</span>
-<span class="n">_incl_io</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="s1">&#39;io&#39;</span><span class="p">)</span>
+<span class="n">_top_lang_dir</span> <span class="o">=</span> <span class="n">get_language_dir</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">)</span>
 <span class="n">_compat_map</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;R2015b&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2.7&#39;</span><span class="p">,</span> <span class="s1">&#39;3.3&#39;</span><span class="p">,</span> <span class="s1">&#39;3.4&#39;</span><span class="p">],</span>
     <span class="s1">&#39;R2017a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2.7&#39;</span><span class="p">,</span> <span class="s1">&#39;3.3&#39;</span><span class="p">,</span> <span class="s1">&#39;3.4&#39;</span><span class="p">,</span> <span class="s1">&#39;3.5&#39;</span><span class="p">],</span>
@@ -240,34 +242,11 @@
 <span class="sd">        bool: True if there is a Matlab engine running, False otherwise.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_installed</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_engine_installed</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
         <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span></div>
-
-
-<div class="viewcode-block" id="get_matlab_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.get_matlab_version">[docs]</a><span class="k">def</span> <span class="nf">get_matlab_version</span><span class="p">():</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of matlab that is installed, if at all.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        str: Matlab version string.</span>
-<span class="sd">    </span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">mtl_id</span> <span class="o">=</span> <span class="s1">&#39;=MATLABROOT=&#39;</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;fprintf(&#39;&quot;</span> <span class="o">+</span> <span class="n">mtl_id</span> <span class="o">+</span> <span class="s2">&quot;R</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">mtl_id</span> <span class="o">+</span> <span class="s2">&quot;&#39;, version(&#39;-release&#39;)); exit();&quot;</span>
-    <span class="n">mtl_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;-nodisplay&#39;</span><span class="p">,</span> <span class="s1">&#39;-nosplash&#39;</span><span class="p">,</span> <span class="s1">&#39;-nodesktop&#39;</span><span class="p">,</span> <span class="s1">&#39;-nojvm&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cmd</span><span class="p">]</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">mtl_proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">mtl_cmd</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not run matlab.&quot;</span><span class="p">)</span>
-    <span class="n">mtl_id</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">match_stype</span><span class="p">(</span><span class="n">mtl_proc</span><span class="p">,</span> <span class="n">mtl_id</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">mtl_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mtl_proc</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">mtl_proc</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not locate matlab root id (</span><span class="si">%s</span><span class="s2">) in output.&quot;</span> <span class="o">%</span> <span class="n">mtl_id</span><span class="p">)</span>
-    <span class="n">mtl_root</span> <span class="o">=</span> <span class="n">mtl_proc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">mtl_id</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">mtl_root</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="locate_matlabroot"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.locate_matlabroot">[docs]</a><span class="k">def</span> <span class="nf">locate_matlabroot</span><span class="p">():</span>  <span class="c1"># pragma: matlab</span>
@@ -277,27 +256,12 @@
 <span class="sd">        str: Full path to matlabroot directory.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># if not _matlab_installed:  # pragma: no matlab</span>
-    <span class="c1">#     raise RuntimeError(&quot;Matlab is not installed.&quot;)</span>
-    <span class="n">mtl_id</span> <span class="o">=</span> <span class="s1">&#39;=MATLABROOT=&#39;</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;fprintf(&#39;&quot;</span> <span class="o">+</span> <span class="n">mtl_id</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">mtl_id</span> <span class="o">+</span> <span class="s2">&quot;&#39;, matlabroot); exit();&quot;</span>
-    <span class="n">mtl_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;-nodisplay&#39;</span><span class="p">,</span> <span class="s1">&#39;-nosplash&#39;</span><span class="p">,</span> <span class="s1">&#39;-nodesktop&#39;</span><span class="p">,</span> <span class="s1">&#39;-nojvm&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cmd</span><span class="p">]</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">mtl_proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">mtl_cmd</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not run matlab.&quot;</span><span class="p">)</span>
-    <span class="n">mtl_id</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">match_stype</span><span class="p">(</span><span class="n">mtl_proc</span><span class="p">,</span> <span class="n">mtl_id</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">mtl_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mtl_proc</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">mtl_proc</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not locate matlab root id (</span><span class="si">%s</span><span class="s2">) in output.&quot;</span> <span class="o">%</span> <span class="n">mtl_id</span><span class="p">)</span>
-    <span class="n">mtl_root</span> <span class="o">=</span> <span class="n">mtl_proc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">mtl_id</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">mtl_root</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">get_matlab_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="install_matlab_engine"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.install_matlab_engine">[docs]</a><span class="k">def</span> <span class="nf">install_matlab_engine</span><span class="p">():</span>  <span class="c1"># pragma: matlab</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Install the MATLAB engine API for Python.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_installed</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_engine_installed</span><span class="p">:</span>
         <span class="n">mtl_root</span> <span class="o">=</span> <span class="n">locate_matlabroot</span><span class="p">()</span>
         <span class="n">mtl_setup</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mtl_root</span><span class="p">,</span> <span class="s1">&#39;extern&#39;</span><span class="p">,</span> <span class="s1">&#39;engines&#39;</span><span class="p">,</span> <span class="s1">&#39;python&#39;</span><span class="p">)</span>
         <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;python setup.py install&#39;</span>
@@ -305,7 +269,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
     
 
-<div class="viewcode-block" id="start_matlab"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.start_matlab">[docs]</a><span class="k">def</span> <span class="nf">start_matlab</span><span class="p">(</span><span class="n">skip_connect</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
+<div class="viewcode-block" id="start_matlab_engine"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.start_matlab_engine">[docs]</a><span class="k">def</span> <span class="nf">start_matlab_engine</span><span class="p">(</span><span class="n">skip_connect</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start a Matlab shared engine session inside a detached screen</span>
 <span class="sd">    session.</span>
 
@@ -325,24 +289,24 @@
 <span class="sd">        RuntimeError: If Matlab is not installed.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_installed</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Matlab is not installed.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_engine_installed</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Matlab engine is not installed.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">timeout</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;startup_waittime_s&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;startup_waittime_s&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
     <span class="n">old_process</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">locate_matlab_engine_processes</span><span class="p">())</span>
     <span class="n">old_matlab</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">())</span>
     <span class="n">screen_session</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;ygg_matlab&#39;</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%j%H%M%S&quot;</span><span class="p">)</span>
                          <span class="o">+</span> <span class="s1">&#39;_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">old_matlab</span><span class="p">))</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;screen&#39;</span><span class="p">,</span> <span class="s1">&#39;-dmS&#39;</span><span class="p">,</span> <span class="n">screen_session</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;matlab_screenrc&#39;</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_lang_dir</span><span class="p">,</span> <span class="s1">&#39;matlab_screenrc&#39;</span><span class="p">),</span>
                 <span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;-nodisplay&#39;</span><span class="p">,</span> <span class="s1">&#39;-nosplash&#39;</span><span class="p">,</span> <span class="s1">&#39;-nodesktop&#39;</span><span class="p">,</span> <span class="s1">&#39;-nojvm&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;matlab.engine.shareEngine&quot;&#39;</span><span class="p">]</span>
         <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">T</span> <span class="o">=</span> <span class="n">TimeOut</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">while</span> <span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">())</span> <span class="o">-</span> <span class="n">old_matlab</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
                <span class="ow">and</span> <span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">):</span>
-            <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Waiting for matlab engine to start&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Waiting for matlab engine to start&#39;</span><span class="p">)</span>
             <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Usually 3 seconds</span>
     <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;screen&#39;</span><span class="p">,</span> <span class="s1">&#39;-X&#39;</span><span class="p">,</span> <span class="s1">&#39;-S&#39;</span><span class="p">,</span> <span class="n">screen_session</span><span class="p">,</span> <span class="s1">&#39;quit&#39;</span><span class="p">]</span>
@@ -355,11 +319,11 @@
     <span class="c1"># Connect to the engine</span>
     <span class="n">matlab_engine</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_connect</span><span class="p">:</span>
-        <span class="n">matlab_engine</span> <span class="o">=</span> <span class="n">connect_matlab</span><span class="p">(</span><span class="n">new_matlab</span><span class="p">,</span> <span class="n">first_connect</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">matlab_engine</span> <span class="o">=</span> <span class="n">connect_matlab_engine</span><span class="p">(</span><span class="n">new_matlab</span><span class="p">,</span> <span class="n">first_connect</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">screen_session</span><span class="p">,</span> <span class="n">matlab_engine</span><span class="p">,</span> <span class="n">new_matlab</span><span class="p">,</span> <span class="n">new_process</span></div>
 
 
-<div class="viewcode-block" id="connect_matlab"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.connect_matlab">[docs]</a><span class="k">def</span> <span class="nf">connect_matlab</span><span class="p">(</span><span class="n">matlab_session</span><span class="p">,</span> <span class="n">first_connect</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
+<div class="viewcode-block" id="connect_matlab_engine"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.connect_matlab_engine">[docs]</a><span class="k">def</span> <span class="nf">connect_matlab_engine</span><span class="p">(</span><span class="n">matlab_session</span><span class="p">,</span> <span class="n">first_connect</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Connect to Matlab engine.</span>
 
 <span class="sd">    Args:</span>
@@ -381,18 +345,19 @@
                            <span class="n">stderr</span><span class="o">=</span><span class="n">err</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
         <span class="n">matlab_engine</span><span class="o">.</span><span class="n">addpath</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">matlab_engine</span><span class="o">.</span><span class="n">addpath</span><span class="p">(</span><span class="n">_incl_interface</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">matlab_engine</span><span class="o">.</span><span class="n">addpath</span><span class="p">(</span><span class="n">_top_lang_dir</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">matlab_engine</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s2">&quot;os = py.importlib.import_module(&#39;os&#39;);&quot;</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">first_connect</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>
             <span class="n">matlab_engine</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s2">&quot;py.reload(os);&quot;</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">matlab_engine</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s2">&quot;py.importlib.reload(os);&quot;</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># matlab_engine.eval(&quot;py.importlib.reload(os);&quot;, nargout=0)</span>
+            <span class="k">pass</span>
     <span class="k">return</span> <span class="n">matlab_engine</span></div>
 
 
-<div class="viewcode-block" id="stop_matlab"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.stop_matlab">[docs]</a><span class="k">def</span> <span class="nf">stop_matlab</span><span class="p">(</span><span class="n">screen_session</span><span class="p">,</span> <span class="n">matlab_engine</span><span class="p">,</span> <span class="n">matlab_session</span><span class="p">,</span> <span class="n">matlab_process</span><span class="p">,</span>
-                <span class="n">keep_engine</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
+<div class="viewcode-block" id="stop_matlab_engine"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.stop_matlab_engine">[docs]</a><span class="k">def</span> <span class="nf">stop_matlab_engine</span><span class="p">(</span><span class="n">screen_session</span><span class="p">,</span> <span class="n">matlab_engine</span><span class="p">,</span> <span class="n">matlab_session</span><span class="p">,</span>
+                       <span class="n">matlab_process</span><span class="p">,</span> <span class="n">keep_engine</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop a Matlab shared engine session running inside a detached screen</span>
 <span class="sd">    session.</span>
 
@@ -410,8 +375,8 @@
 <span class="sd">        RuntimeError: If Matlab is not installed.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_installed</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Matlab is not installed.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_engine_installed</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Matlab engine is not installed.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">keep_engine</span> <span class="ow">and</span> <span class="p">(</span><span class="n">matlab_engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;_matlab&#39;</span> <span class="ow">in</span> <span class="n">matlab_engine</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
             <span class="n">matlab_engine</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
@@ -438,13 +403,13 @@
         <span class="n">T</span> <span class="o">=</span> <span class="n">TimeOut</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
         <span class="k">while</span> <span class="p">((</span><span class="n">matlab_session</span> <span class="ow">in</span> <span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">())</span>
                <span class="ow">and</span> <span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">):</span>
-            <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Waiting for matlab engine to exit&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Waiting for matlab engine to exit&quot;</span><span class="p">)</span>
             <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">matlab_session</span> <span class="ow">in</span> <span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">()):</span>  <span class="c1"># pragma: debug</span>
             <span class="k">if</span> <span class="n">matlab_process</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">matlab_process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
-                <span class="n">error</span><span class="p">(</span><span class="s2">&quot;stop_matlab timed out at </span><span class="si">%f</span><span class="s2"> s. &quot;</span> <span class="o">%</span> <span class="n">T</span><span class="o">.</span><span class="n">elapsed</span>
-                      <span class="o">+</span> <span class="s2">&quot;Killed Matlab sharedEngine process.&quot;</span><span class="p">)</span></div>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;stop_matlab_engine timed out at </span><span class="si">%f</span><span class="s2"> s. &quot;</span> <span class="o">%</span> <span class="n">T</span><span class="o">.</span><span class="n">elapsed</span>
+                             <span class="o">+</span> <span class="s2">&quot;Killed Matlab sharedEngine process.&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="MatlabProcess"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabProcess">[docs]</a><span class="k">class</span> <span class="nc">MatlabProcess</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
@@ -480,8 +445,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">matlab_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_installed</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Matlab is not installed.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_engine_installed</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Matlab engine is not installed.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">sio</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
@@ -609,8 +574,7 @@
                 <span class="k">pass</span></div></div>
 
 
-<div class="viewcode-block" id="MatlabModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">MatlabModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
+<div class="viewcode-block" id="MatlabModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver">[docs]</a><span class="k">class</span> <span class="nc">MatlabModelDriver</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for running Matlab models.</span>
 
 <span class="sd">    Args:</span>
@@ -634,33 +598,295 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_language</span> <span class="o">=</span> <span class="s1">&#39;matlab&#39;</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is written in Matlab.&#39;</span><span class="p">)</span>
+    <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;matlab&#39;</span>
+    <span class="n">language_ext</span> <span class="o">=</span> <span class="s1">&#39;.m&#39;</span>
+    <span class="n">base_languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;python&#39;</span><span class="p">]</span>
+    <span class="n">default_interpreter_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-nodisplay&#39;</span><span class="p">,</span> <span class="s1">&#39;-nosplash&#39;</span><span class="p">,</span> <span class="s1">&#39;-nodesktop&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;-nojvm&#39;</span><span class="p">,</span> <span class="s1">&#39;-batch&#39;</span><span class="p">]</span>
+    <span class="n">version_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fprintf(&#39;R</span><span class="si">%s</span><span class="s2">&#39;, version(&#39;-release&#39;)); exit();&quot;</span><span class="p">]</span>
+    <span class="n">type_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;int&#39;</span><span class="p">:</span> <span class="s1">&#39;intX&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;float&#39;</span><span class="p">:</span> <span class="s1">&#39;single, double&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;string&#39;</span><span class="p">:</span> <span class="s1">&#39;char&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;array&#39;</span><span class="p">:</span> <span class="s1">&#39;cell&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;object&#39;</span><span class="p">:</span> <span class="s1">&#39;containers.Map&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;boolean&#39;</span><span class="p">:</span> <span class="s1">&#39;logical&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;null&#39;</span><span class="p">:</span> <span class="s1">&#39;NaN&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uint&#39;</span><span class="p">:</span> <span class="s1">&#39;uintX&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;complex&#39;</span><span class="p">:</span> <span class="s1">&#39;complex&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;bytes&#39;</span><span class="p">:</span> <span class="s1">&#39;char (utf-8)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;unicode&#39;</span><span class="p">:</span> <span class="s1">&#39;char&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;1darray&#39;</span><span class="p">:</span> <span class="s1">&#39;mat&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;ndarray&#39;</span><span class="p">:</span> <span class="s1">&#39;mat&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;ply&#39;</span><span class="p">:</span> <span class="s1">&#39;containers.Map&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="s1">&#39;containers.Map&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="s1">&#39;containers.Map&#39;</span><span class="p">}</span>
+    <span class="n">function_param</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;comment&#39;</span><span class="p">:</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;true&#39;</span><span class="p">:</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span><span class="p">,</span>
+        <span class="s1">&#39;print&#39;</span><span class="p">:</span> <span class="s1">&#39;disp(</span><span class="se">\&#39;</span><span class="si">{message}</span><span class="se">\&#39;</span><span class="s1">);&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;error(</span><span class="se">\&#39;</span><span class="si">{error_msg}</span><span class="se">\&#39;</span><span class="s1">);&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;block_end&#39;</span><span class="p">:</span> <span class="s1">&#39;end;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;if_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;if (</span><span class="si">{cond}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;for_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;for </span><span class="si">{iter_var}</span><span class="s1"> = </span><span class="si">{iter_begin}</span><span class="s1">:</span><span class="si">{iter_end}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;while_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;while (</span><span class="si">{cond}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;try_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;try&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;try_except&#39;</span><span class="p">:</span> <span class="s1">&#39;catch </span><span class="si">{error_var}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;assign&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> = </span><span class="si">{value}</span><span class="s1">;&#39;</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_installed</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Matlab is not installed.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span> <span class="o">=</span> <span class="n">_matlab_engine_installed</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;skip_interpreter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_wrapper</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">started_matlab</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mlprocess</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_exits</span><span class="p">()</span>
 
-<div class="viewcode-block" id="MatlabModelDriver.is_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
-<span class="sd">        machine.</span>
+<div class="viewcode-block" id="MatlabModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
+<span class="sd">        and which ones are arguments.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            bool: Truth of if this model driver can be run on the current</span>
-<span class="sd">                machine.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): List of arguments provided.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_matlab_installed</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">model_base</span><span class="p">,</span> <span class="n">model_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">))</span>
+        <span class="n">wrap_base</span> <span class="o">=</span> <span class="s1">&#39;wrapped_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">model_base</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">))</span>
+        <span class="c1"># Matlab has a variable name limit of 62</span>
+        <span class="n">wrap_base</span> <span class="o">=</span> <span class="n">wrap_base</span><span class="p">[:</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wrap_base</span><span class="p">),</span> <span class="mi">60</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_wrapper</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">,</span> <span class="n">wrap_base</span> <span class="o">+</span> <span class="n">model_ext</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wrapper_products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_wrapper</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="MatlabModelDriver.write_error_wrapper"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.write_error_wrapper">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_error_wrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">try_lines</span><span class="p">,</span> <span class="n">matlab_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a wrapper for the model that encloses it in a try except so</span>
+<span class="sd">        that the error can be propagated appropriately.</span>
 
-<div class="viewcode-block" id="MatlabModelDriver.start_matlab"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.start_matlab">[docs]</a>    <span class="k">def</span> <span class="nf">start_matlab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="sd">        Args:</span>
+<span class="sd">            fname (str): File where the wrapper should be written.</span>
+<span class="sd">            try_lines (list): List of lines to go in the try block.</span>
+<span class="sd">            model_file (str): Path to model that should be wrapped.</span>
+<span class="sd">            matlab_engine (MatlabEngine, optional): Matlab engine that will be</span>
+<span class="sd">               used to call the wrapper. If not provided, it is assumed the</span>
+<span class="sd">               error will be called using the Matlab interpreter on the command</span>
+<span class="sd">               line. Defautls to None.</span>
+
+<span class="sd">        Raises:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create lines based on use of engine or not</span>
+        <span class="k">if</span> <span class="n">matlab_engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">catch_block</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;error(e.message);&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">catch_block</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rethrow(e);&quot;</span><span class="p">]</span>
+            <span class="c1"># catch_block = [&quot;fprintf(&#39;MATLAB ERROR:\\n%s\\n&#39;, e.message);&quot;,</span>
+            <span class="c1">#                &quot;disp(e.identifier);&quot;,</span>
+            <span class="c1">#                &quot;disp(e.stack);&quot;,</span>
+            <span class="c1">#                &quot;exit(0);&quot;]</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">write_try_except</span><span class="p">(</span><span class="n">try_lines</span><span class="p">,</span> <span class="n">catch_block</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">matlab_engine</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;exit(0);&quot;</span><span class="p">)</span>
+        <span class="c1"># Write lines</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Wrapper:</span><span class="se">\n\t</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">lines</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Wrote wrapper to: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MatlabModelDriver.run_executable"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.run_executable">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_executable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">dont_wrap_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fname_wrapper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">matlab_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run a program using the executable for this language and the</span>
+<span class="sd">        provided arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): The program that should be run and any arguments</span>
+<span class="sd">                that should be provided to it.</span>
+<span class="sd">            dont_wrap_error (bool, optional): If False, the executable will be</span>
+<span class="sd">                wrapped in a try/catch block to prevent errors from stopping</span>
+<span class="sd">                Matlab shutdown. If True, the command will be executed as is</span>
+<span class="sd">                with the Matlab interpreter. Defaults to False.</span>
+<span class="sd">            fname_wrapper (str, optional): File where wrapper should be saved.</span>
+<span class="sd">                If not provided, one is created. Defaults to None.</span>
+<span class="sd">            matlab_engine (MatlabEngine, optional): Matlab engine that should be</span>
+<span class="sd">                used to run the command. If not provided, the Matlab interpreter</span>
+<span class="sd">                is used instead. Defaults to None.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to</span>
+<span class="sd">                cls.executable_command and tools.popen_nobuffer.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Output to stdout from the run command.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If the language is not installed.</span>
+<span class="sd">            RuntimeError: If there is an error when running the command.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Strip file if first argument is a file</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;working_dir&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="c1"># Write wrapper</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">dont_wrap_error</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># TODO: Will this work if there is a function defined in the</span>
+                <span class="c1"># script?</span>
+                <span class="n">try_block</span> <span class="o">=</span> <span class="p">[</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">try_block</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">):</span>
+                    <span class="n">try_block</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Put quotes around arguments since they would be strings when</span>
+                <span class="c1"># passed from the command line</span>
+                <span class="n">func_call</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">:]:</span>
+                    <span class="n">func_call</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;, &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">a</span><span class="p">)</span>
+                <span class="n">func_call</span> <span class="o">+=</span> <span class="s1">&#39;);&#39;</span>
+                <span class="n">try_block</span> <span class="o">=</span> <span class="p">[</span><span class="n">func_call</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">fname_wrapper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">fname_wrapper</span> <span class="o">=</span> <span class="s1">&#39;wrapper_</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid_gen</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+                                                  <span class="bp">cls</span><span class="o">.</span><span class="n">language_ext</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">fname_wrapper</span> <span class="o">=</span> <span class="n">fname_wrapper</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+                <span class="n">working_dir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;working_dir&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cwd&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">working_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">fname_wrapper</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">fname_wrapper</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">write_error_wrapper</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="p">,</span> <span class="n">try_block</span><span class="p">,</span>
+                                    <span class="n">matlab_engine</span><span class="o">=</span><span class="n">matlab_engine</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="p">))</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="p">))[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="c1"># Call base, catching error to remove temp wrapper</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">matlab_engine</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;for_matlab&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">run_executable</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;return_process&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+                <span class="c1"># Add environment variables</span>
+                <span class="n">env</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="n">old_env</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">new_env_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">old_env</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">matlab_engine</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                    <span class="n">matlab_engine</span><span class="o">.</span><span class="n">setenv</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">new_env_str</span> <span class="o">+=</span> <span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;, </span><span class="si">%s</span><span class="s2">, &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+                <span class="n">matlab_engine</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;new_env = py.dict(pyargs(</span><span class="si">%s</span><span class="s1">));&#39;</span>
+                                   <span class="o">%</span> <span class="n">new_env_str</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">matlab_engine</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;os.environ.update(new_env);&#39;</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="c1"># Create matlab process using Matlab engine</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">MatlabProcess</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.MatlabProcess&#39;</span><span class="p">,</span>
+                                    <span class="n">target</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">matlab_engine</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                    <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">matlab_engine</span><span class="o">=</span><span class="n">matlab_engine</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(((</span><span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;return_process&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+                 <span class="ow">and</span> <span class="p">(</span><span class="n">fname_wrapper</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+        
+<div class="viewcode-block" id="MatlabModelDriver.language_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.language_version">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">language_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Version of compiler/interpreter for this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_matlab_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span></div>
+        
+<div class="viewcode-block" id="MatlabModelDriver.executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.executable_command">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose a command for running a program in this language with the</span>
+<span class="sd">        provied arguments. If not already present, the interpreter command and</span>
+<span class="sd">        interpreter flags are prepended to the provided arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): The program that returned command should run and any</span>
+<span class="sd">                arguments that should be provided to it.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Arguments composing the command required to run the program</span>
+<span class="sd">                from the command line using the interpreter for this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if kwargs.get(&#39;exec_type&#39;, &#39;interpreter&#39;) == &#39;interpreter&#39;:</span>
+        <span class="c1">#     args = [&quot;\&quot;%s\&quot;&quot; % (&#39; &#39;.join(args))]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">executable_command</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="MatlabModelDriver.configure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.configure">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options for this language. This includes locating</span>
+<span class="sd">        any required external libraries and setting option defaults.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg (YggConfigParser): Config class that options should be set for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Section, option, description tuples for options that could not</span>
+<span class="sd">                be set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="n">opts</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;startup_waittime_s&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="s1">&#39;The time allowed for a Matlab engine to start&#39;</span>
+                                    <span class="s1">&#39;before timing out and reporting an error.&#39;</span><span class="p">),</span>
+                                   <span class="s1">&#39;10&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;The version (release number) of installed Matlab.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;matlabroot&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;The path to the default installation of matlab.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]}</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">opts</span><span class="p">[</span><span class="s1">&#39;matlabroot&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">opts</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_matlab_info</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
+                <span class="k">pass</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">opts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">opts</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># pragma: matlab</span>
+                    <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">opts</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">opts</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="MatlabModelDriver.get_matlab_info"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.get_matlab_info">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_matlab_info</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the root directory where Matlab is installed and the version</span>
+<span class="sd">        that is installed (if Matlab is installed at all). This will fail if Matlab</span>
+<span class="sd">        is not installed, cannot be started, or does not operate as expected.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: Matlab root directory and Matlab version string.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If Matlab cannot be started or the root directory or</span>
+<span class="sd">                release cannot be determiend.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mtl_id</span> <span class="o">=</span> <span class="s1">&#39;=MATLABROOT=&#39;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;fprintf(&#39;&quot;</span> <span class="o">+</span> <span class="n">mtl_id</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">mtl_id</span> <span class="o">+</span> <span class="s2">&quot;R</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">mtl_id</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+               <span class="o">+</span> <span class="s2">&quot;,matlabroot,version(&#39;-release&#39;));&quot;</span><span class="p">)</span>
+        <span class="n">mtl_proc</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">run_executable</span><span class="p">([</span><span class="n">cmd</span><span class="p">])</span>
+        <span class="n">mtl_id</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">match_stype</span><span class="p">(</span><span class="n">mtl_proc</span><span class="p">,</span> <span class="n">mtl_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mtl_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mtl_proc</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;Could not locate ID string (</span><span class="si">%s</span><span class="s2">) in &quot;</span>
+                                <span class="s2">&quot;output (</span><span class="si">%s</span><span class="s2">).&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">mtl_id</span><span class="p">,</span> <span class="n">mtl_proc</span><span class="p">))</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">mtl_proc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">mtl_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;Could not get matlabroot/version from &quot;</span>
+                                <span class="s2">&quot;output (</span><span class="si">%s</span><span class="s2">).&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">mtl_proc</span><span class="p">))</span>
+        <span class="n">matlabroot</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">release</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">matlabroot</span><span class="p">,</span> <span class="n">release</span></div>
+
+<div class="viewcode-block" id="MatlabModelDriver.start_matlab_engine"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.start_matlab_engine">[docs]</a>    <span class="k">def</span> <span class="nf">start_matlab_engine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start matlab session and connect to it.&quot;&quot;&quot;</span>
         <span class="n">ml_attr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;screen_session&#39;</span><span class="p">,</span> <span class="s1">&#39;mlengine&#39;</span><span class="p">,</span> <span class="s1">&#39;mlsession&#39;</span><span class="p">,</span> <span class="s1">&#39;mlprocess&#39;</span><span class="p">]</span>
         <span class="n">attempt_connect</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
@@ -669,7 +895,7 @@
             <span class="k">for</span> <span class="n">mlsession</span> <span class="ow">in</span> <span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">():</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Trying to connect to session </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">mlsession</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span> <span class="o">=</span> <span class="n">connect_matlab</span><span class="p">(</span><span class="n">mlsession</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span> <span class="o">=</span> <span class="n">connect_matlab_engine</span><span class="p">(</span><span class="n">mlsession</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span> <span class="o">=</span> <span class="n">mlsession</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Connected to existing shared engine: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span><span class="p">)</span>
@@ -682,28 +908,98 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting a matlab shared engine (connect failed)&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting a matlab shared engine (none existing)&quot;</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">start_matlab</span><span class="p">()</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">start_matlab_engine</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ml_attr</span><span class="p">):</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">started_matlab</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="c1"># Add things to Matlab environment</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="o">.</span><span class="n">addpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fdir</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="o">.</span><span class="n">addpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Connected to matlab session &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MatlabModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Environment variables for the model process.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_env</span><span class="p">()</span>
+        <span class="n">path_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">prev_path</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;MATLABPATH&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prev_path</span><span class="p">:</span>
+            <span class="n">path_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prev_path</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_top_dir</span><span class="p">,</span> <span class="n">_top_lang_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">prev_path</span><span class="p">:</span>
+                <span class="n">path_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path_list</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;MATLABPATH&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+        
+<div class="viewcode-block" id="MatlabModelDriver.before_start"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform before the run loop.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_wrapper</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_matlab_engine</span><span class="p">()</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">matlab_engine</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="p">,</span>
+                          <span class="n">no_queue_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">working_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Matlab engine not set. Stopping&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">before_start</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MatlabModelDriver.run_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loop to check if model is still running and forward output.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">periodic_debug</span><span class="p">(</span><span class="s1">&#39;matlab loop&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">100</span><span class="p">)(</span><span class="s1">&#39;Looping&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">is_done</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
+                <span class="k">except</span> <span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">EngineError</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error running model.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_loop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MatlabModelDriver.after_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform after run_loop has finished. Mainly checking</span>
+<span class="sd">        if there was an error and then handling it.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_process</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Model process thread still alive&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">kill_process</span><span class="p">()</span>
+                <span class="k">return</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">after_loop</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MatlabModelDriver.cleanup"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the Matlab session and engine.&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">stop_matlab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span><span class="p">,</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">mlprocess</span><span class="p">,</span> <span class="n">keep_engine</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">started_matlab</span><span class="p">))</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">SystemError</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Failed to exit matlab engine&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">raise_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Stopped Matlab&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">started_matlab</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mlprocess</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">stop_matlab_engine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlprocess</span><span class="p">,</span>
+                                   <span class="n">keep_engine</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">started_matlab</span><span class="p">))</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">SystemError</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Failed to exit matlab engine&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">raise_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Stopped Matlab&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">started_matlab</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mlprocess</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MatlabModelDriver.check_exits"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.check_exits">[docs]</a>    <span class="k">def</span> <span class="nf">check_exits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -714,78 +1010,19 @@
 <span class="sd">            RuntimeError: If there are any exit calls in the file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+        <span class="n">has_exit</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_model_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fd</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;exit&#39;</span><span class="p">):</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                        <span class="s2">&quot;Line </span><span class="si">%d</span><span class="s2"> in &#39;</span><span class="si">%s</span><span class="s2">&#39; contains an &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                        <span class="o">+</span> <span class="s2">&quot;&#39;exit&#39; call which will exit the MATLAB engine &quot;</span>
-                        <span class="o">+</span> <span class="s2">&quot;such that it cannot be reused. Please replace &#39;exit&#39; &quot;</span>
-                        <span class="o">+</span> <span class="s2">&quot;with a return or error.&quot;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="MatlabModelDriver.before_start"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform before the run loop.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">target_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">start_matlab</span><span class="p">()</span>
-
-        <span class="c1"># Add environment variables</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Setting environment variables for Matlab engine.&#39;</span><span class="p">)</span>
-        <span class="n">env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_env</span><span class="p">()</span>
-        <span class="n">old_env</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">new_env_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                    <span class="k">return</span>
-                <span class="n">old_env</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="o">.</span><span class="n">setenv</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                <span class="n">new_env_str</span> <span class="o">+=</span> <span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;, </span><span class="si">%s</span><span class="s2">, &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;new_env = py.dict(pyargs(</span><span class="si">%s</span><span class="s1">));&#39;</span> <span class="o">%</span> <span class="n">new_env_str</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span>
-                               <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s1">&#39;os.environ.update(new_env);&#39;</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-        <span class="c1"># Run</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Matlab engine not set. Stopping&#39;</span><span class="p">)</span>
-                <span class="k">return</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span> <span class="o">=</span> <span class="n">MatlabProcess</span><span class="p">(</span>
-                <span class="n">target</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">),</span>
-                <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.MatlabProcess&#39;</span><span class="p">,</span>
-                <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">matlab_engine</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Starting MatlabProcess&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;MatlabProcess running model.&#39;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="MatlabModelDriver.run_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loop to check if model is still running and forward output.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">periodic_debug</span><span class="p">(</span><span class="s1">&#39;matlab loop&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">100</span><span class="p">)(</span><span class="s1">&#39;Looping&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">is_done</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
-            <span class="k">except</span> <span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">EngineError</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
-            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error running model.&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="MatlabModelDriver.after_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform after run_loop has finished. Mainly checking</span>
-<span class="sd">        if there was an error and then handling it.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_process</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Model process thread still alive&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">kill_process</span><span class="p">()</span>
-            <span class="k">return</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">after_loop</span><span class="p">()</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div></div>
+                    <span class="n">has_exit</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span> <span class="ow">and</span> <span class="n">has_exit</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Line </span><span class="si">%d</span><span class="s2"> in &#39;</span><span class="si">%s</span><span class="s2">&#39; contains an &quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_model_file</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;&#39;exit&#39; call which will exit the MATLAB engine &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;such that it cannot be reused. Please replace &#39;exit&#39; &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;with a return or error.&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
@@ -822,7 +1059,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

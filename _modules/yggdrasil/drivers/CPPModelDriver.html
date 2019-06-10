@@ -1,0 +1,377 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="yggdrasil.drivers" href="../drivers.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+        
+      <li>yggdrasil.drivers.CPPModelDriver</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yggdrasil.drivers.CPPModelDriver</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">CCompilerBase</span><span class="p">,</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">GCCCompiler</span><span class="p">,</span> <span class="n">ClangCompiler</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CPPCompilerBase"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPCompilerBase">[docs]</a><span class="k">class</span> <span class="nc">CPPCompilerBase</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for C++ compilers.&quot;&quot;&quot;</span>
+    <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c++&#39;</span><span class="p">]</span>
+    <span class="n">default_executable_env</span> <span class="o">=</span> <span class="s1">&#39;CXX&#39;</span>
+    <span class="n">default_flags_env</span> <span class="o">=</span> <span class="s1">&#39;CXXFLAGS&#39;</span>
+    <span class="n">cpp_std</span> <span class="o">=</span> <span class="s1">&#39;c++11&#39;</span>
+    <span class="n">search_path_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-E&#39;</span><span class="p">,</span> <span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;-xc++&#39;</span><span class="p">,</span> <span class="s1">&#39;/dev/null&#39;</span><span class="p">]</span>
+    <span class="n">default_linker</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">default_executable</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="CPPCompilerBase.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPCompilerBase.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of compiler flags.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Compiler flags.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Add standard library flag</span>
+        <span class="n">std_flag</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-std=&#39;</span><span class="p">):</span>
+                <span class="n">std_flag</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">std_flag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-std=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cpp_std</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+    
+
+<div class="viewcode-block" id="GPPCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.GPPCompiler">[docs]</a><span class="k">class</span> <span class="nc">GPPCompiler</span><span class="p">(</span><span class="n">CPPCompilerBase</span><span class="p">,</span> <span class="n">GCCCompiler</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for G++ compiler/linker.&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;g++&#39;</span></div>
+
+
+<div class="viewcode-block" id="ClangPPCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.ClangPPCompiler">[docs]</a><span class="k">class</span> <span class="nc">ClangPPCompiler</span><span class="p">(</span><span class="n">CPPCompilerBase</span><span class="p">,</span> <span class="n">ClangCompiler</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;clang++ compiler on Apple Mac OS.&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;clang++&#39;</span></div>
+
+
+<div class="viewcode-block" id="CPPModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver">[docs]</a><span class="k">class</span> <span class="nc">CPPModelDriver</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running C++ models.&quot;&quot;&quot;</span>
+                
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is written in C++.&#39;</span><span class="p">)</span>
+    <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
+    <span class="n">language_ext</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;.CPP&#39;</span><span class="p">,</span> <span class="s1">&#39;.cxx&#39;</span><span class="p">,</span> <span class="s1">&#39;.C&#39;</span><span class="p">,</span> <span class="s1">&#39;.c++&#39;</span><span class="p">,</span> <span class="s1">&#39;.cc&#39;</span><span class="p">,</span> <span class="s1">&#39;.cp&#39;</span><span class="p">,</span> <span class="s1">&#39;.tcc&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;.hpp&#39;</span><span class="p">,</span> <span class="s1">&#39;.HPP&#39;</span><span class="p">,</span> <span class="s1">&#39;.hxx&#39;</span><span class="p">,</span> <span class="s1">&#39;.H&#39;</span><span class="p">,</span> <span class="s1">&#39;.h++&#39;</span><span class="p">,</span> <span class="s1">&#39;.hh&#39;</span><span class="p">,</span> <span class="s1">&#39;.hp&#39;</span><span class="p">,</span> <span class="s1">&#39;.h&#39;</span><span class="p">]</span>
+    <span class="n">language_aliases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cpp&#39;</span><span class="p">]</span>
+    <span class="n">base_languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span>
+    <span class="n">interface_library</span> <span class="o">=</span> <span class="s1">&#39;ygg++&#39;</span>
+    <span class="c1"># To prevent inheritance</span>
+    <span class="n">default_compiler</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">default_linker</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">type_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">CModelDriver</span><span class="o">.</span><span class="n">type_map</span><span class="p">,</span>
+        <span class="n">array</span><span class="o">=</span><span class="s1">&#39;std::vector&lt;void*&gt;&#39;</span><span class="p">,</span>
+        <span class="nb">object</span><span class="o">=</span><span class="s1">&#39;std::map&lt;char*,void*&gt;&#39;</span><span class="p">,</span>
+        <span class="n">schema</span><span class="o">=</span><span class="s1">&#39;MetaschemaType&#39;</span><span class="p">)</span>
+    <span class="n">function_param</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">CModelDriver</span><span class="o">.</span><span class="n">function_param</span><span class="p">,</span>
+        <span class="n">exec_prefix</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;#include &lt;iostream&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                     <span class="s1">&#39;#include &lt;exception&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">),</span>
+        <span class="c1"># print=&#39;std::cout &lt;&lt; &quot;{message}&quot; &lt;&lt; std::endl;&#39;,</span>
+        <span class="n">error</span><span class="o">=</span><span class="s1">&#39;throw </span><span class="se">\&quot;</span><span class="si">{error_msg}</span><span class="se">\&quot;</span><span class="s1">;&#39;</span><span class="p">,</span>
+        <span class="n">try_begin</span><span class="o">=</span><span class="s1">&#39;try {&#39;</span><span class="p">,</span>
+        <span class="n">try_error_type</span><span class="o">=</span><span class="s1">&#39;const std::exception&amp;&#39;</span><span class="p">,</span>
+        <span class="n">try_except</span><span class="o">=</span><span class="s1">&#39;}} catch (</span><span class="si">{error_type}</span><span class="s1"> </span><span class="si">{error_var}</span><span class="s1">) {{&#39;</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="CPPModelDriver.after_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
+<span class="sd">        registration.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">default_compiler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">default_compiler</span> <span class="o">=</span> <span class="s1">&#39;g++&#39;</span>
+            <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">default_compiler</span> <span class="o">=</span> <span class="s1">&#39;clang++&#39;</span>
+            <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">default_compiler</span> <span class="o">=</span> <span class="s1">&#39;cl&#39;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;print&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;std::cout &lt;&lt; &quot;</span><span class="si">{message}</span><span class="s1">&quot; &lt;&lt; std::endl;&#39;</span>
+        <span class="n">CModelDriver</span><span class="o">.</span><span class="n">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">internal_libs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">)</span>
+        <span class="n">internal_libs</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">interface_library</span><span class="p">]</span> <span class="o">=</span> <span class="n">internal_libs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+            <span class="n">CModelDriver</span><span class="o">.</span><span class="n">interface_library</span><span class="p">)</span>
+        <span class="n">internal_libs</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">interface_library</span><span class="p">][</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">get_language_dir</span><span class="p">(),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span>
+                <span class="n">internal_libs</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">interface_library</span><span class="p">][</span><span class="s1">&#39;source&#39;</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language_ext</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">internal_libs</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">interface_library</span><span class="p">][</span><span class="s1">&#39;include_dirs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">get_language_dir</span><span class="p">())</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span> <span class="o">=</span> <span class="n">internal_libs</span></div>
+
+<div class="viewcode-block" id="CPPModelDriver.write_try_except"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.write_try_except">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_try_except</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">try_contents</span><span class="p">,</span> <span class="n">except_contents</span><span class="p">,</span> <span class="n">error_var</span><span class="o">=</span><span class="s1">&#39;e&#39;</span><span class="p">,</span>
+                         <span class="n">error_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to complete a try/except block.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            try_contents (list): Lines of code that should be executed inside</span>
+<span class="sd">                the try block.</span>
+<span class="sd">            except_contents (list): Lines of code that should be executed inside</span>
+<span class="sd">                the except block.</span>
+<span class="sd">            error_var (str, optional): Name of variable where the caught error</span>
+<span class="sd">                should be stored. Defaults to &#39;e&#39;. If &#39;...&#39;, the catch clause</span>
+<span class="sd">                will catch all errors, but there will not be a name error.</span>
+<span class="sd">            error_type (str, optional): Name of error type that should be caught.</span>
+<span class="sd">                If not provided, defaults to None and will be set based on the</span>
+<span class="sd">                class function_param entry for &#39;try_error_type&#39;. If &#39;...&#39;, the</span>
+<span class="sd">                catch clause will catch all errors and error_var will be</span>
+<span class="sd">                ignored.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Lines of code perfoming a try/except block.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">error_type</span> <span class="o">==</span> <span class="s1">&#39;...&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">error_var</span> <span class="o">==</span> <span class="s1">&#39;...&#39;</span><span class="p">):</span>
+            <span class="n">error_type</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">error_var</span> <span class="o">=</span> <span class="s1">&#39;...&#39;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">error_var</span><span class="o">=</span><span class="n">error_var</span><span class="p">,</span> <span class="n">error_type</span><span class="o">=</span><span class="n">error_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CPPModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_try_except</span><span class="p">(</span>
+            <span class="n">try_contents</span><span class="p">,</span> <span class="n">except_contents</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.9.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../../_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

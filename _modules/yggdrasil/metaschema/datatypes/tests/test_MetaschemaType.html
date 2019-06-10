@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes.tests.test_MetaschemaType &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.metaschema.datatypes.tests.test_MetaschemaType &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../../index.html"/>
         <link rel="up" title="yggdrasil.metaschema.datatypes.tests" href="../tests.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -343,10 +337,13 @@
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">:</span>
                 <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_encode_type_kwargs</span><span class="p">)</span>
                 <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode_data</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_encode_data_kwargs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode_data_readable</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode_data_readable</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
                 <span class="n">x2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">decode_data</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">!=</span> <span class="s1">&#39;JSONNullMetaschemaType&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;JSONNullMetaschemaType&#39;</span><span class="p">,</span> <span class="s1">&#39;AnyMetaschemaType&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="n">MetaschemaTypeError</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_check_encoded"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_check_encoded">[docs]</a>    <span class="k">def</span> <span class="nf">test_check_encoded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test check_encoded.&quot;&quot;&quot;</span>
@@ -358,7 +355,7 @@
                                <span class="bp">self</span><span class="o">.</span><span class="n">_valid_encoded</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">{},</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># Test valid</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_encoded</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">check_encoded</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">),</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">check_encoded</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
         <span class="c1"># Test invalid</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_encoded</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">check_encoded</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">),</span> <span class="kc">False</span><span class="p">)</span>
@@ -394,20 +391,26 @@
 <div class="viewcode-block" id="TestMetaschemaType.test_encode_errors"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_encode_errors">[docs]</a>    <span class="k">def</span> <span class="nf">test_encode_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error on encode.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">==</span> <span class="s1">&#39;MetaschemaType&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode</span><span class="p">,</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_validate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_validate</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_validate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">((</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">),</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode</span><span class="p">,</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_validate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode</span><span class="p">,</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_validate</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">((</span><span class="ne">ValueError</span><span class="p">,</span>
+                                    <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">),</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_validate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span>
+                                   <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_decode_errors"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_decode_errors">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error on decode.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">((</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">),</span>
-                           <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">decode</span><span class="p">,</span>
-                           <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_encoded</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_encoded</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">((</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">),</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">decode</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_encoded</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_transform_type"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_transform_type">[docs]</a>    <span class="k">def</span> <span class="nf">test_transform_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test transform_type.&quot;&quot;&quot;</span>
@@ -495,7 +498,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

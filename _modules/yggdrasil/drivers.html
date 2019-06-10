@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.drivers &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -178,24 +172,11 @@
             
   <h1>Source code for yggdrasil.drivers</h1><div class="highlight"><pre>
 <span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;IO and Model drivers.&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
 
 
-<div class="viewcode-block" id="import_driver"><a class="viewcode-back" href="../../yggdrasil.drivers.html#yggdrasil.drivers.import_driver">[docs]</a><span class="k">def</span> <span class="nf">import_driver</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamically import a driver based on a string.</span>
+<span class="n">_non_component_modules</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;lpy_model.py&#39;</span><span class="p">]</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        driver (str): Name of the driver that should be imported.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">driver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">driver</span> <span class="o">=</span> <span class="s1">&#39;Driver&#39;</span>
-    <span class="n">drv</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;yggdrasil.drivers.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">driver</span><span class="p">)</span>
-    <span class="n">class_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">drv</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">class_</span></div>
-                    
 
 <div class="viewcode-block" id="create_driver"><a class="viewcode-back" href="../../yggdrasil.drivers.html#yggdrasil.drivers.create_driver">[docs]</a><span class="k">def</span> <span class="nf">create_driver</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamically create a driver based on a string and other driver</span>
@@ -214,7 +195,7 @@
 <span class="sd">        object: Instance of the requested driver.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">class_</span> <span class="o">=</span> <span class="n">import_driver</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+    <span class="n">class_</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">without_schema</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">instance</span> <span class="o">=</span> <span class="n">class_</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -222,16 +203,9 @@
     <span class="k">return</span> <span class="n">instance</span></div>
 
 
-<span class="k">def</span> <span class="nf">import_all_drivers</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import all drivers to ensure they are registered.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;*.py&#39;</span><span class="p">)):</span>
-        <span class="n">xbase</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">xbase</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">xbase</span> <span class="o">!=</span> <span class="s1">&#39;lpy_model.py&#39;</span><span class="p">):</span>
-            <span class="n">import_driver</span><span class="p">(</span><span class="n">xbase</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
-
-
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;import_driver&#39;</span><span class="p">,</span> <span class="s1">&#39;create_driver&#39;</span><span class="p">,</span> <span class="s1">&#39;Driver&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;ModelDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;PythonModelDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;GCCModelDriver&#39;</span><span class="p">,</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;create_driver&#39;</span><span class="p">,</span> <span class="s1">&#39;Driver&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;ModelDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;PythonModelDriver&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;CModelDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;CPPModelDriver&#39;</span><span class="p">,</span>
            <span class="s1">&#39;MakeModelDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;MatlabModelDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;LPyModelDriver&#39;</span><span class="p">,</span>
            <span class="s1">&#39;ConnectionDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;InputDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;OutputDriver&#39;</span><span class="p">,</span>
            <span class="s1">&#39;FileInputDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;FileOutputDriver&#39;</span><span class="p">,</span>
@@ -274,7 +248,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

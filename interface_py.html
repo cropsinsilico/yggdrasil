@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python Interface &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>Python Interface &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -17,45 +17,37 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="index.html"/>
-        <link rel="up" title="Model Interface" href="model_interface.html"/>
-        <link rel="next" title="C Interface" href="interface_c.html"/>
-        <link rel="prev" title="Model Interface" href="model_interface.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="C Interface" href="interface_c.html" />
+    <link rel="prev" title="Model Interface" href="model_interface.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -122,7 +114,6 @@
 <li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -134,7 +125,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -142,9 +133,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -194,436 +186,368 @@
 <dt id="yggdrasil.interface.YggInterface.YggAsciiArrayInput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggAsciiArrayInput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggAsciiArrayInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggAsciiArrayInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling table-like formatted input as arrays.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
-received from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggAsciiTableInput.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
+received from.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggAsciiTableInput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggAsciiArrayOutput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggAsciiArrayOutput</code><span class="sig-paren">(</span><em>name</em>, <em>fmt</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggAsciiArrayOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggAsciiArrayOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling table-like formatted output as arrays.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
-<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A C style format string specifying how each ‘row’ of output
-should be formated. This should include the newline character.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggAsciiTableOutput.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</p></li>
+<li><p><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A C style format string specifying how each ‘row’ of output
+should be formated. This should include the newline character.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggAsciiTableOutput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggAsciiFileInput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggAsciiFileInput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggAsciiFileInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggAsciiFileInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for generic ASCII input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
-received from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
+received from.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggAsciiFileOutput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggAsciiFileOutput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggAsciiFileOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggAsciiFileOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for generic ASCII output.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggAsciiTableInput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggAsciiTableInput</code><span class="sig-paren">(</span><em>name</em>, <em>as_array=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggAsciiTableInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggAsciiTableInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling table-like formatted input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
-received from.</li>
-<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, recv returns the entire table
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
+received from.</p></li>
+<li><p><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, recv returns the entire table
 array and can only be called once. If False, recv returns row
-entries. Default to False.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</li>
+entries. Default to False.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggAsciiTableOutput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggAsciiTableOutput</code><span class="sig-paren">(</span><em>name</em>, <em>fmt</em>, <em>as_array=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling table-like formatted output.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
-<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A C style format string specifying how each ‘row’ of output
-should be formated. This should include the newline character.</li>
-<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, send expects and entire array.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</p></li>
+<li><p><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A C style format string specifying how each ‘row’ of output
+should be formated. This should include the newline character.</p></li>
+<li><p><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, send expects and entire array.
 If False, send expects the entries for one table row. Defaults to
-False.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</li>
+False.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggInput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggInput</code><span class="sig-paren">(</span><em>name</em>, <em>format_str=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling input from a message queue.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue. Combined with the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue. Combined with the
 suffix ‘_IN’, it should match an environment variable containing
-a message queue key.</li>
-<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – C style format string that should be used
+a message queue key.</p></li>
+<li><p><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – C style format string that should be used
 to deserialize messages that are receieved into a list of python
-objects. Defaults to None and raw string messages are returned.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the underlying comm.</li>
+objects. Defaults to None and raw string messages are returned.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to the underlying comm.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggMatlab">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggMatlab</code><span class="sig-paren">(</span><em>_type</em>, <em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggMatlab" title="Permalink to this definition">¶</a></dt>
 <dd><p>Short interface to identify functions called by Matlab.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of class that should be returned.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – Additional arguments that should be passed to class
-initializer.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of class that should be returned.</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – Additional arguments that should be passed to class
+initializer.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An instance of the requested class.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">obj</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the requested class.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>obj</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggObjInput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggObjInput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggObjInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggObjInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling Obj input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
-received from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
+received from.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggObjOutput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggObjOutput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggObjOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggObjOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling Obj output.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggOutput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggOutput</code><span class="sig-paren">(</span><em>name</em>, <em>format_str=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling output to a message queue.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue. Combined with the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue. Combined with the
 suffix ‘_OUT’, it should match an environment variable containing
-a message queue key.</li>
-<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – C style format string that should be used
+a message queue key.</p></li>
+<li><p><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – C style format string that should be used
 to create a message from a list of python ojbects. Defaults to None
-and raw string messages are sent.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the underlying comm.</li>
+and raw string messages are sent.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to the underlying comm.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggPandasInput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggPandasInput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggPandasInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggPandasInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling Pandas input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
-received from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
+received from.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggPandasOutput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggPandasOutput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggPandasOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggPandasOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling pandasd output.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggPickleInput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggPickleInput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggPickleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggPickleInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling pickled input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
-received from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
+received from.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggPickleOutput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggPickleOutput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggPickleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggPickleOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling pickled output.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggPlyInput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggPlyInput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggPlyInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggPlyInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling Ply input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
-received from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
+received from.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggPlyOutput">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggPlyOutput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggPlyOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggPlyOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling Ply output.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DefaultComm</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -631,48 +555,40 @@ received from.</li>
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggRpcClient</code><span class="sig-paren">(</span><em>name</em>, <em>outfmt='%s'</em>, <em>infmt='%s'</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggRpcClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggRpcClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling requests and response to an RPC Server from a
 client.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the server queues.</li>
-<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to format variables in a
-message sent to the request queue. Defautls to ‘%s’.</li>
-<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to recover variables from
-messages received from the response queue. Defautls to ‘%s’.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the server queues.</p></li>
+<li><p><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to format variables in a
+message sent to the request queue. Defautls to ‘%s’.</p></li>
+<li><p><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to recover variables from
+messages received from the response queue. Defautls to ‘%s’.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">class:.ClientComm: Communication object.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>class:.ClientComm: Communication object.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.interface.YggInterface.YggRpcServer">
 <code class="descclassname">yggdrasil.interface.YggInterface.</code><code class="descname">YggRpcServer</code><span class="sig-paren">(</span><em>name</em>, <em>infmt='%s'</em>, <em>outfmt='%s'</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/interface/YggInterface.html#YggRpcServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInterface.YggRpcServer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling requests and response for an RPC Server.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the server queues.</li>
-<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to recover variables from
-messages received from the request queue. Defaults to ‘%s’.</li>
-<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to format variables in a
-message sent to the response queue. Defautls to ‘%s’.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the server queues.</p></li>
+<li><p><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to recover variables from
+messages received from the request queue. Defaults to ‘%s’.</p></li>
+<li><p><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to format variables in a
+message sent to the response queue. Defautls to ‘%s’.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">class:.ServerComm: Communication object.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>class:.ServerComm: Communication object.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -697,9 +613,7 @@ message sent to the response queue. Defautls to ‘%s’.</li>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -708,7 +622,7 @@ message sent to the response queue. Defautls to ‘%s’.</li>
         <a href="interface_c.html" class="btn btn-neutral float-right" title="C Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="model_interface.html" class="btn btn-neutral" title="Model Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="model_interface.html" class="btn btn-neutral float-left" title="Model Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -717,11 +631,11 @@ message sent to the response queue. Defautls to ‘%s’.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -734,38 +648,15 @@ message sent to the response queue. Defautls to ‘%s’.</li>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.8.7+11.g7573c765.dirty',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

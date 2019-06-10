@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>Overview &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/>
         <link rel="next" title="Installation" href="install.html"/>
         <link rel="prev" title="Welcome to yggdrasil’s documentation!" href="index.html"/> 
 
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -104,16 +104,10 @@
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -181,8 +175,8 @@
             
   <div class="section" id="overview">
 <h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference external" href="https://pypi.org/project/yggdrasil-framework"><img alt="PyPI version" src="https://img.shields.io/pypi/v/yggdrasil-framework.svg?style=flat" /></a> <a class="reference external" href="https://travis-ci.org/cropsinsilico/yggdrasil"><img alt="Build Status" src="https://img.shields.io/travis/cropsinsilico/yggdrasil.svg?style=flat" /></a> <a class="reference external" href="https://ci.appveyor.com/project/langmm/yggdrasil/branch/master"><img alt="Build status" src="https://img.shields.io/appveyor/ci/langmm/yggdrasil.svg?style=flat" /></a> <a class="reference external" href="https://coveralls.io/github/cropsinsilico/yggdrasil?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=master" /></a> <a class="reference external" href="https://codecov.io/gh/cropsinsilico/yggdrasil"><img alt="codecov" src="https://codecov.io/gh/cropsinsilico/yggdrasil/branch/master/graph/badge.svg" /></a>
-<a class="reference external" href="https://www.python.org/dev/peps/pep-0008/"><img alt="PEP8" src="https://img.shields.io/badge/code%20style-pep8-orange.svg" /></a></p>
+<p><img alt="tag version" src="https://img.shields.io/github/tag-date/cropsinsilico/yggdrasil.svg?style=flat-square" /> <a class="reference external" href="https://pypi.org/project/yggdrasil-framework"><img alt="PyPI version" src="https://img.shields.io/pypi/v/yggdrasil-framework.svg?style=flat-square" /></a> <a class="reference external" href="https://travis-ci.org/cropsinsilico/yggdrasil"><img alt="Travis Build Status" src="https://img.shields.io/travis/cropsinsilico/yggdrasil/master.svg?style=flat-square" /></a> <a class="reference external" href="https://ci.appveyor.com/project/langmm/yggdrasil/branch/master"><img alt="Appveyor Build status" src="https://img.shields.io/appveyor/ci/langmm/yggdrasil.svg?style=flat-square" /></a>
+<a class="reference external" href="https://codecov.io/gh/cropsinsilico/yggdrasil"><img alt="codecov" src="https://img.shields.io/codecov/c/github/cropsinsilico/yggdrasil/master.svg?style=flat-square" /></a> <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/"><img alt="PEP8" src="https://img.shields.io/badge/code%20style-pep8-blue.svg?style=flat-square" /></a> <img alt="license" src="https://img.shields.io/pypi/l/yggdrasil-framework.svg?style=flat-square" /> <a class="reference external" href="https://anaconda.org/conda-forge/yggdrasil"><img alt="platform" src="https://img.shields.io/conda/pn/conda-forge/yggdrasil.svg?color=magenta&amp;label=conda%20platforms&amp;style=flat-square" /></a></p>
 <p>The CiS framework, yggdrasil, provides support for combining scientific models
 written in different programming languages. To combine two models,
 modelers add simple communications interfaces to the model code and
@@ -209,6 +203,11 @@ it.</p>
 can be installed from PyPI <a class="reference external" href="https://pypi.org/project/cis-interface/">here</a>,
 cis_interface will no longer be updated.</p>
 </div>
+<p>If you use yggdrasil in your research, please cite the accompanying paper:</p>
+<blockquote>
+<div>Meagan Lang, yggdrasil: a Python package for integrating computational models
+across languages and scales, in silico Plants, Volume 1, Issue 1, 2019, diz001,
+<a class="reference external" href="https://doi.org/10.1093/insilicoplants/diz001">https://doi.org/10.1093/insilicoplants/diz001</a></div></blockquote>
 </div>
 
 
@@ -255,7 +254,7 @@ cis_interface will no longer be updated.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

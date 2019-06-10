@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>Installation &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/>
         <link rel="next" title="Getting started" href="getting_started.html"/>
         <link rel="prev" title="Overview" href="includeme.html"/> 
 
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -112,16 +112,10 @@
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -235,7 +229,7 @@ $ git submodule update
 </div>
 <p>If you do not have admin privileges on the target machine, <code class="docutils literal notranslate"><span class="pre">--user</span></code> can be
 added to the end of either the <code class="docutils literal notranslate"><span class="pre">pip</span></code> or <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> installation commands.
-When using the <code class="docutils literal notranslate"><span class="pre">--user</span></code>, you may need to add the directory containing the
+When using the <code class="docutils literal notranslate"><span class="pre">--user</span></code> flag, you may need to add the directory containing the
 entry point scripts to your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable in order to use
 yggdrasil command line tools (e.g. <code class="docutils literal notranslate"><span class="pre">yggrun</span></code>) without specifying
 their full path. Usually, this directory can be found using the following
@@ -275,19 +269,18 @@ existing rapidjson include directory.</p>
 <p>As local communication on Windows is handled by ZeroMQ, running models written
 in C or C++ will require installing the ZeroMQ libraries for C and C++.
 If you install yggdrasil using conda, these will be installed
-automatically as depencies. If you are not using conda, you will need to
+automatically as dependencies. If you are not using conda, you will need to
 install them yourself.</p>
 <p>Instructions for installing the ZeroMQ C and C++ libraries can be found
 <a class="reference external" href="https://github.com/zeromq/czmq#building-and-installing">here</a>
-At install, yggdrasil will attempt to search for those libraries.
-To speed up the search you can (temporarily) add the directories
-containing the libraries to your PATH environment variable prior to
-running one of the above install commands. If yggdrasil complains
+At install (and any time <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> is called), yggdrasil will attempt
+to search for those libraries in those directories specified by the <code class="docutils literal notranslate"><span class="pre">PATH</span></code>,
+<code class="docutils literal notranslate"><span class="pre">INCLUDE</span></code>, and <code class="docutils literal notranslate"><span class="pre">LIB</span></code> environment variables. If yggdrasil complains
 that it cannot find these libraries, you can manually set them in your
 <code class="docutils literal notranslate"><span class="pre">.yggdrasil.cfg</span></code> file (See <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a>).
 If you install these libraries after installing yggdrasil you can re-configure
 yggdrasil and have it search for the libraries again by calling <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code>
-from the command line.</p>
+from the command line or by setting the appropriate config options manually.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Although not required, the ZeroMQ libraries are also recommended for message
@@ -299,12 +292,15 @@ overhead.</p>
 </div>
 <div class="section" id="additional-steps-for-matlab-models">
 <h2>Additional Steps for Matlab Models<a class="headerlink" href="#additional-steps-for-matlab-models" title="Permalink to this headline">¶</a></h2>
-<p>To run Matlab models, you will also need to install the Matlab engine for
-Python. This requires that you have an existing Matlab installation and license.
-yggdrasil will attempt to install the Matlab engine for Python at
+<p>To run Matlab models, you will need an existing Matlab installation and license.
+While yggdrasil can now run Matlab models via the command line, it is still
+recommended that you install the Matlab engine for Python if you will be running
+Matlab models with yggdrasil frequently as using the engine reduces the time
+added to model startup by starting Matlab.</p>
+<p>yggdrasil will attempt to install the Matlab engine for Python at
 install, but should it fail or if you want to use a non-default version of Matlab,
-you can also do it manually.</p>
-<p>Instructions for installing the Matlab engine as a python package can be found on the
+you can also do it manually. Instructions for installing the Matlab engine as a
+Python package can be found on the
 <a class="reference external" href="https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html">Mathworks website</a>. Once you have installed the Matlab engine as a python
 package, you can re-configure yggdrasil by calling <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code>. from the comamnd
 line.</p>
@@ -346,7 +342,7 @@ message indicating which versions of Python you can use.</p>
 models are not running on the same machine. To use these connections,
 the framework must have access to a
 RabbitMQ server. If you have access to an existing RabbitMQ server,
-the information for that server can either be provided via the yggdrasil
+the information for that server be provided via the yggdrasil
 config file (See
 <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a> for information on setting
 config options).</p>
@@ -402,7 +398,7 @@ for starting a RabbitMQ server.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

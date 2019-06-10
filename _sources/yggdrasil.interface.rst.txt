@@ -1,15 +1,16 @@
 yggdrasil.interface package
 ===========================
 
-Subpackages
------------
-
-.. toctree::
-
-    yggdrasil.interface.tests
-
 Submodules
 ----------
+
+yggdrasil.interface.CisInterface module
+---------------------------------------
+
+.. automodule:: yggdrasil.interface.CisInterface
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 yggdrasil.interface.YggInterface module
 ---------------------------------------

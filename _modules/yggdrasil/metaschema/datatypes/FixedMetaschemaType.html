@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes.FixedMetaschemaType &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.metaschema.datatypes.FixedMetaschemaType &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../index.html"/>
         <link rel="up" title="yggdrasil.metaschema.datatypes" href="../datatypes.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -183,12 +177,12 @@
   <h1>Source code for yggdrasil.metaschema.datatypes.FixedMetaschemaType</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">jsonschema</span>
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">register_type</span><span class="p">,</span> <span class="n">compare_schema</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">compare_schema</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.MetaschemaType</span> <span class="k">import</span> <span class="n">MetaschemaType</span>
 
 
 <div class="viewcode-block" id="create_fixed_type_class"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FixedMetaschemaType.create_fixed_type_class">[docs]</a><span class="k">def</span> <span class="nf">create_fixed_type_class</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">fixed_properties</span><span class="p">,</span>
-                            <span class="n">target_globals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                            <span class="n">target_globals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">class_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a fixed class.</span>
 
 <span class="sd">    Args:</span>
@@ -200,6 +194,8 @@
 <span class="sd">        target_globals (dict, optional): Globals dictionary for module where the</span>
 <span class="sd">            fixed class should be added. If None, the new class is returned.</span>
 <span class="sd">            Defaults to None.</span>
+<span class="sd">        class_name (str, optional): Name that should be given to the class.</span>
+<span class="sd">            If not provided, defaults to &#39;&lt;name.title()&gt;MetaschemaType&#39;.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are treated as attributes that</span>
 <span class="sd">            should be set on the fixed class.</span>
 
@@ -208,6 +204,8 @@
 <span class="sd">            the created class if target_globals is None.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">class_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">class_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">MetaschemaType&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="o">.</span><span class="n">title</span><span class="p">())</span>
     <span class="n">iattr</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
              <span class="s1">&#39;fixed_properties&#39;</span><span class="p">:</span> <span class="n">fixed_properties</span><span class="p">,</span>
@@ -220,8 +218,7 @@
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">iattr</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
                 <span class="n">iattr</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">new_cls</span> <span class="o">=</span> <span class="n">register_type</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">MetaschemaType&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="o">.</span><span class="n">title</span><span class="p">()),</span>
-                                 <span class="p">(</span><span class="n">FixedMetaschemaType</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="p">),</span> <span class="n">iattr</span><span class="p">))</span>
+    <span class="n">new_cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="p">(</span><span class="n">FixedMetaschemaType</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="p">),</span> <span class="n">iattr</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">target_globals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">target_globals</span><span class="p">[</span><span class="n">new_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_cls</span>
         <span class="k">del</span> <span class="n">new_cls</span>
@@ -269,9 +266,8 @@
 
         <span class="n">out</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
-            <span class="n">typedef_base</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
-            <span class="n">typedef_base</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">fixed_properties</span><span class="p">)</span>
-            <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">compare_schema</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="n">typedef_base</span><span class="p">)]</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">fixed_properties</span><span class="p">)</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">compare_schema</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="n">out</span><span class="p">)]</span>
             <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
                 <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;Error(s) in comparison with fixed properties.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
@@ -506,7 +502,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.examples.tests.test_SaM &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.examples.tests.test_SaM &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../index.html"/>
         <link rel="up" title="yggdrasil.examples.tests" href="../tests.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -180,11 +174,12 @@
             
   <h1>Source code for yggdrasil.examples.tests.test_SaM</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">extra_example</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.examples.tests</span> <span class="k">import</span> <span class="n">TestExample</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.MatlabModelDriver</span> <span class="k">import</span> <span class="n">_matlab_installed</span>
 
 
-<div class="viewcode-block" id="TestExampleSaM"><a class="viewcode-back" href="../../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.TestExampleSaM">[docs]</a><span class="k">class</span> <span class="nc">TestExampleSaM</span><span class="p">(</span><span class="n">TestExample</span><span class="p">):</span>
+<div class="viewcode-block" id="TestExampleSaM"><a class="viewcode-back" href="../../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.TestExampleSaM">[docs]</a><span class="nd">@extra_example</span>
+<span class="k">class</span> <span class="nc">TestExampleSaM</span><span class="p">(</span><span class="n">TestExample</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the SaM example.&quot;&quot;&quot;</span>
 
     <span class="n">example_name</span> <span class="o">=</span> <span class="s1">&#39;SaM&#39;</span>
@@ -193,11 +188,10 @@
     <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Results that should be found in the output files.&quot;&quot;&quot;</span>
         <span class="c1"># 1 + 2*n_languages</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">_matlab_installed</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
-                <span class="n">s</span> <span class="o">=</span> <span class="mi">9</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">s</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># pragma: no matlab</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mi">9</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;all_nomatlab&#39;</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mi">7</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">s</span><span class="p">]</span>
@@ -242,7 +236,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

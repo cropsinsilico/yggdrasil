@@ -20,6 +20,14 @@ yggdrasil.examples.tests.test\_ascii\_io module
     :undoc-members:
     :show-inheritance:
 
+yggdrasil.examples.tests.test\_backwards module
+-----------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_backwards
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 yggdrasil.examples.tests.test\_fakeplant module
 -----------------------------------------------
 

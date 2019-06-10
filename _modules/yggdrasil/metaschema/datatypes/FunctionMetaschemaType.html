@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes.FunctionMetaschemaType &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.metaschema.datatypes.FunctionMetaschemaType &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../index.html"/>
         <link rel="up" title="yggdrasil.metaschema.datatypes" href="../datatypes.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -182,78 +176,17 @@
             
   <h1>Source code for yggdrasil.metaschema.datatypes.FunctionMetaschemaType</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">types</span>
-<span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">register_type</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.MetaschemaType</span> <span class="k">import</span> <span class="n">MetaschemaType</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.ClassMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">ClassMetaschemaType</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="FunctionMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FunctionMetaschemaType.FunctionMetaschemaType">[docs]</a><span class="nd">@register_type</span>
-<span class="k">class</span> <span class="nc">FunctionMetaschemaType</span><span class="p">(</span><span class="n">MetaschemaType</span><span class="p">):</span>
+<div class="viewcode-block" id="FunctionMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FunctionMetaschemaType.FunctionMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">FunctionMetaschemaType</span><span class="p">(</span><span class="n">ClassMetaschemaType</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Type for evaluating functions.&quot;&quot;&quot;</span>
 
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;function&#39;</span>
     <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Type for callable Python functions.&#39;</span>
     <span class="n">python_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">BuiltinFunctionType</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">,</span>
-                    <span class="n">types</span><span class="o">.</span><span class="n">BuiltinMethodType</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">)</span>
-
-<div class="viewcode-block" id="FunctionMetaschemaType.normalize"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FunctionMetaschemaType.FunctionMetaschemaType.normalize">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            obj (object): Object to normalize.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            object: Normalized object.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">decode_data</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;function&#39;</span><span class="p">})</span>
-            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
-                <span class="k">pass</span>
-        <span class="k">return</span> <span class="n">obj</span></div>
-
-<div class="viewcode-block" id="FunctionMetaschemaType.encode_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FunctionMetaschemaType.FunctionMetaschemaType.encode_data">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">encode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            obj (object): Object to encode.</span>
-<span class="sd">            typedef (dict): Type definition that should be used to encode the</span>
-<span class="sd">                object.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            string: Encoded object.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># fname = obj.__globals__[&#39;__file__&#39;]</span>
-        <span class="n">mod</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__module__</span>
-        <span class="n">fun</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">fun</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span></div>
-
-<div class="viewcode-block" id="FunctionMetaschemaType.decode_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.FunctionMetaschemaType.FunctionMetaschemaType.decode_data">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">decode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            obj (string): Encoded object to decode.</span>
-<span class="sd">            typedef (dict): Type definition that should be used to decode the</span>
-<span class="sd">                object.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            object: Decoded object.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pkg_mod</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pkg_mod</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not parse function string: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">obj</span><span class="p">)</span>
-        <span class="n">mod</span><span class="p">,</span> <span class="n">fun</span> <span class="o">=</span> <span class="n">pkg_mod</span><span class="p">[:]</span>
-        <span class="n">modobj</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">modobj</span><span class="p">,</span> <span class="n">fun</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Module </span><span class="si">%s</span><span class="s2"> has no funciton </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">modobj</span><span class="p">,</span> <span class="n">fun</span><span class="p">))</span>
-        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">modobj</span><span class="p">,</span> <span class="n">fun</span><span class="p">)</span></div></div>
+                    <span class="n">types</span><span class="o">.</span><span class="n">BuiltinMethodType</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
@@ -290,7 +223,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

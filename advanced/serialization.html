@@ -1,0 +1,575 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Serialization &mdash; yggdrasil 0.9.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/>
+        <link rel="up" title="Advanced" href="index.html"/>
+        <link rel="next" title="JSON Metaschema" href="metaschema.html"/>
+        <link rel="prev" title="Advanced" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Advanced</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Serialization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#message-structure">Message Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#message-header">Message Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#message-body">Message Body</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#scalars">Scalars</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#strings">Strings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#homogeneous-arrays">Homogeneous Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ply-obj">Ply/Obj</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_drivers.html#model-base-classes">Model Base Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html">Code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Advanced</a> &raquo;</li>
+        
+      <li>Serialization</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/advanced/serialization.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="serialization">
+<span id="serialization-rst"></span><h1>Serialization<a class="headerlink" href="#serialization" title="Permalink to this headline">¶</a></h1>
+<p>Serialization, as describes here, refers to the process of turning a variable
+of some type in the sending model’s language into bytes and then reversing
+the process (deserialization) by turning the bytes into a variable of an
+analagous type in the language of the receiving model.</p>
+<p>For most types, yggdrasil uses an enhanced version of
+the <a class="reference external" href="https://www.json.org/">JSON data interchange format</a> to serialize
+data structures and uses <a class="reference external" href="https://json-schema.org/">JSON Schema</a> to describe
+and validate them. The use of JSON and JSON schema has the advantage that there
+are many existing tools for reading, writing, and validating JSON serialized
+data that will make it easier to expand support to other languages in the future.
+For more complex data structures that are not easily or efficiently represented in
+JSON, yggdrasil supports serialization classes that are associated with a new
+expansion type to the core set of JSON types.</p>
+<p>The mapping between datatypes in the different supported languages is shown below.</p>
+<table border="1" class="docutils" id="datatype-mapping-table-rst">
+<colgroup>
+<col width="6%" />
+<col width="11%" />
+<col width="21%" />
+<col width="15%" />
+<col width="15%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Schema</th>
+<th class="head">C</th>
+<th class="head">C++</th>
+<th class="head">Matlab</th>
+<th class="head">Python</th>
+<th class="head">Notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1darray</td>
+<td><code class="docutils literal notranslate"><span class="pre">*</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">*</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">mat</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>array</td>
+<td><code class="docutils literal notranslate"><span class="pre">vector_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">std::vector&lt;void*&gt;</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">cell</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">list</span></code></td>
+<td>Support for dynamic arrays in C/C++ is
+still under development.</td>
+</tr>
+<tr class="row-even"><td>boolean</td>
+<td><code class="docutils literal notranslate"><span class="pre">bool</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">bool</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">logical</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">bool</span></code></td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>bytes</td>
+<td><code class="docutils literal notranslate"><span class="pre">char*</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">char*</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">(utf-8)</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">bytes</span></code></td>
+<td>Precision X is preserved.</td>
+</tr>
+<tr class="row-even"><td>complex</td>
+<td><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">complex</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">numpy.complexX</span></code></td>
+<td>Precision X is preserved.</td>
+</tr>
+<tr class="row-odd"><td>float</td>
+<td><code class="docutils literal notranslate"><span class="pre">floatX_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">floatX_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">single,</span> <span class="pre">double</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">numpy.floatX</span></code></td>
+<td>Precision X is preserved.</td>
+</tr>
+<tr class="row-even"><td>int</td>
+<td><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">intX</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">numpy.intX</span></code></td>
+<td>Precision X is preserved.</td>
+</tr>
+<tr class="row-odd"><td>ndarray</td>
+<td><code class="docutils literal notranslate"><span class="pre">*</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">*</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">mat</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>null</td>
+<td><code class="docutils literal notranslate"><span class="pre">NULL</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">NULL</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">NaN</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>number</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>This covers the JSON default for
+floating point or integer values.</td>
+</tr>
+<tr class="row-even"><td>obj</td>
+<td><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">ObjDict</span></code></td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>object</td>
+<td><code class="docutils literal notranslate"><span class="pre">map_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">std::map&lt;char*,void*&gt;</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">dict</span></code></td>
+<td>Support for dynamic objects in C/C++ is
+still under development.</td>
+</tr>
+<tr class="row-even"><td>ply</td>
+<td><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">PlyDict</span></code></td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>scalar</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>yggdrasil defines scalars as an
+umbrella type encompassing int, uint,
+float, bytes, and unicode.</td>
+</tr>
+<tr class="row-even"><td>schema</td>
+<td><code class="docutils literal notranslate"><span class="pre">map_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">MetaschemaType</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">dict</span></code></td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>string</td>
+<td><code class="docutils literal notranslate"><span class="pre">char*</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">char*</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">char</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">str</span></code></td>
+<td>Encoding dependent on JSON library.</td>
+</tr>
+<tr class="row-even"><td>uint</td>
+<td><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">uintX</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">numpy.uintX</span></code></td>
+<td>Precision X is preserved.</td>
+</tr>
+<tr class="row-odd"><td>unicode</td>
+<td><code class="docutils literal notranslate"><span class="pre">char*</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">char*</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">char</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">str</span></code></td>
+<td>Precision X is preserved.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="message-structure">
+<h2>Message Structure<a class="headerlink" href="#message-structure" title="Permalink to this headline">¶</a></h2>
+<p>Each message consists of two parts, the header and the body which are joined by
+a dedicated string <code class="docutils literal notranslate"><span class="pre">YGG_MSG_HEAD</span></code> such that:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;YGG_MSG_HEAD&lt;header&gt;YGG_MSG_HEAD&lt;body&gt;&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="message-header">
+<h2>Message Header<a class="headerlink" href="#message-header" title="Permalink to this headline">¶</a></h2>
+<p>Message headers are serialized JSON objects with properites that describe the message
+and can be used to deserialize and validate the message on receipt. Although each
+header can contain any information, at a minimum the header must include the
+following properties:</p>
+<table border="1" class="docutils" id="header-parameter-table-rst">
+<colgroup>
+<col width="12%" />
+<col width="9%" />
+<col width="40%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property</th>
+<th class="head">Type</th>
+<th class="head">Description</th>
+<th class="head">Purpose</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>type</td>
+<td>string</td>
+<td>Name of body datatype.</td>
+<td>Deserialization and message
+validation.</td>
+</tr>
+<tr class="row-odd"><td>size</td>
+<td>int</td>
+<td>Size of message body.</td>
+<td>Verifying that the received
+message is complete.</td>
+</tr>
+<tr class="row-even"><td>id</td>
+<td>string</td>
+<td>Unique message identifier.</td>
+<td>Message tracking.</td>
+</tr>
+</tbody>
+</table>
+<p>Depending on the datatype of the object encoded in the body, additional properties
+may be required in order to deserialize and/or validate the object. The properties
+required by each type are defined in the yggdrasil
+<a class="reference internal" href="metaschema.html#metaschema-rst"><span class="std std-ref">JSON metaschema</span></a>. On deserialization, the header is
+validated against the metaschema, used to inform deserialization of the body, and
+then used as a JSON schema to validate the decoded data decoded from the body of the message.</p>
+<p>In addition to type information, the header is also used to pass information
+between models reguarding communication. This information can include things
+like addresses of temporary communication resources, acknowledgement that a
+message was received, and notifications about new or broken connections.</p>
+</div>
+<div class="section" id="message-body">
+<h2>Message Body<a class="headerlink" href="#message-body" title="Permalink to this headline">¶</a></h2>
+<p>The message body is also a serialized JSON document, but during the encoding
+process, data of some types undergo an additional pre-encoding step in order
+to transform the data into a form that is more efficiently JSON encodable prior
+to actually serializing the data via JSON encoding. For
+example, encoding one million 64bit floats would 1) produce a very large JSON
+array and 2) require a large number of digits in order to preserve precision to
+the level of round-off error as would be expected when passing floats between
+programs written in the same language. For such datatypes, it is more efficient
+to use an alternative method of pre-encoding the data into a form that can be
+efficiently JSON encoded.</p>
+<div class="section" id="scalars">
+<h3>Scalars<a class="headerlink" href="#scalars" title="Permalink to this headline">¶</a></h3>
+<p>As described above, precision can be lost when using JSON encoding for
+floating point numbers. In addition, there are some number types that
+JSON encoding dosn’t support. More specifically, JSON encoding does not
+support complex number, unsigned integers, or explicit precision numbers
+(e.g. float32_t vs. float64_t in C). To overcome this limitation,
+yggdrasil passes scalar numbers by pre-encoding their raw
+bytes into an ASCII string representation using the standard
+<a class="reference external" href="https://tools.ietf.org/html/rfc3548.html">base64</a> encoding. To allow
+decoding and validation on receipt of encoded scalars, yggdrasil includes
+the subtype (float, int, uint, complex), precision (in bits), and units in the
+the message header.</p>
+</div>
+<div class="section" id="strings">
+<h3>Strings<a class="headerlink" href="#strings" title="Permalink to this headline">¶</a></h3>
+<p>Because there are a large number of string encodings (e.g. ASCII, UTF-8)
+with varying degrees of support in different languages, yggdrasil supports
+three different string related types. In addition to the core JSON <code class="docutils literal notranslate"><span class="pre">string</span></code>
+type, which will be encoded and mapped to a datatype in
+the programming language of the receiving model according to the JSON
+implementation that is used (the JSON spec indicates UTF-8 should be used by
+default), yggdrasil also supports types of <code class="docutils literal notranslate"><span class="pre">unicode</span></code> and <code class="docutils literal notranslate"><span class="pre">bytes</span></code>.
+Data identified with the <code class="docutils literal notranslate"><span class="pre">bytes</span></code> type will be pre-encoded as ASCII strings
+using the base64 encoding. Data identified with the <code class="docutils literal notranslate"><span class="pre">unicode</span></code> type will
+be pre-encoded by encoding them as bytes using UTF-32 and then encoding those
+bytes as ASCII strings using the base64 encoding. On receipt, messages
+of either type are decoded from base64. Messages containing data specified
+as <code class="docutils literal notranslate"><span class="pre">unicode</span></code> will be decoded and stored in a unicode data type if one
+is available in the receiving language.
+If the receiving language dosn’t have a built-in unicode type (e.g. C),
+the message will be preserved in the encoded UTF-32 bytes format.</p>
+</div>
+<div class="section" id="homogeneous-arrays">
+<h3>Homogeneous Arrays<a class="headerlink" href="#homogeneous-arrays" title="Permalink to this headline">¶</a></h3>
+<p>As mentioned above, large arrays can produce large JSON documents that can
+dramatically increase the size of messages and thereby the time required to
+send/receive data. However, as most languages provide built-in support for
+arrays that are continuous in memory, it is much more efficient to pass the
+arrays in a continuous format. Arrays elements are encoded in the same way
+as scalars using base64 in row-major order. On receipt, languages which are
+column-major order must re-order the data. As is done for scalars,
+yggdrasil passes the data subtype, precision, and units for arrays and
+also sends the array size
+(for one-dimensional arrays) or array shape (for multi-dimensional arrays).
+Arrays of strings are also serialized in this way, but strings are padded
+so that every string has the same width (i.e. elements are fixed width).</p>
+<p>For languages that allow for mixed-type arrays, yggdrasil sends these
+data as JSON arrays of the differently typed elements (or JSON objects if
+field names are provided).</p>
+</div>
+<div class="section" id="ply-obj">
+<h3>Ply/Obj<a class="headerlink" href="#ply-obj" title="Permalink to this headline">¶</a></h3>
+<p>Ply and Obj file formats are designed to efficiently represent 3D structures
+containing large numbers of elements that would require large JSON
+structures containing nested objects and arrays. As such, yggdrasil defines
+Ply and Obj objects as their own data types that are serialized using the Ply and
+Obj file standards during pre-encoding.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="metaschema.html" class="btn btn-neutral float-right" title="JSON Metaschema" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Advanced" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.9.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.serialize.tests.test_serialize &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.serialize.tests.test_serialize &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../index.html"/>
         <link rel="up" title="Module code" href="../../../index.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -180,7 +174,6 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">serialize</span><span class="p">,</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize.DefaultSerialize</span> <span class="k">import</span> <span class="n">DefaultSerialize</span>
 
 
 <span class="n">unsupported_nptype</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bool_&#39;</span><span class="p">]</span>
@@ -238,22 +231,6 @@
 <span class="n">map_cformat2nptype</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
     <span class="p">([</span><span class="s1">&#39;%</span><span class="si">{}</span><span class="s1">%+</span><span class="si">{}</span><span class="s1">j&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">]],</span>
      <span class="s1">&#39;complex128&#39;</span><span class="p">))</span>
-
-
-<div class="viewcode-block" id="test_get_registered_serializers"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_serialize.test_get_registered_serializers">[docs]</a><span class="k">def</span> <span class="nf">test_get_registered_serializers</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_registered_serializers.&quot;&quot;&quot;</span>
-    <span class="n">registry</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">get_registered_serializers</span><span class="p">()</span>
-    <span class="n">assert_equal</span><span class="p">(</span><span class="n">registry</span><span class="p">[</span><span class="n">DefaultSerialize</span><span class="o">.</span><span class="n">_seritype</span><span class="p">],</span> <span class="n">DefaultSerialize</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="test_register_serializer_errors"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_serialize.test_register_serializer_errors">[docs]</a><span class="k">def</span> <span class="nf">test_register_serializer_errors</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test errors in register_serializer for duplicate.&quot;&quot;&quot;</span>
-    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">register_serializer</span><span class="p">,</span> <span class="n">DefaultSerialize</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="test_get_serializer_class_errors"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_serialize.test_get_serializer_class_errors">[docs]</a><span class="k">def</span> <span class="nf">test_get_serializer_class_errors</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test errors in get_serializer_class for invalid serializer.&quot;&quot;&quot;</span>
-    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">get_serializer_class</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="test_extract_formats"><a class="viewcode-back" href="../../../../yggdrasil.serialize.tests.html#yggdrasil.serialize.tests.test_serialize.test_extract_formats">[docs]</a><span class="k">def</span> <span class="nf">test_extract_formats</span><span class="p">():</span>
@@ -803,7 +780,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

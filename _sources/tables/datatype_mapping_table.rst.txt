@@ -1,0 +1,29 @@
+.. _datatype_mapping_table_rst:
+
+=======   =============   =========================   ==================   ==================   ========================================
+Schema    C               C++                         Matlab               Python               Notes                                   
+=======   =============   =========================   ==================   ==================   ========================================
+1darray   ``*``           ``*``                       ``mat``              ``numpy.ndarray``                                            
+array     ``vector_t``    ``std::vector<void*>``      ``cell``             ``list``             Support for dynamic arrays in C/C++ is  
+                                                                                                still under development.                
+boolean   ``bool``        ``bool``                    ``logical``          ``bool``                                                     
+bytes     ``char*``       ``char*``                   ``char (utf-8)``     ``bytes``            Precision X is preserved.               
+complex   ``complex_X``   ``complex_X``               ``complex``          ``numpy.complexX``   Precision X is preserved.               
+float     ``floatX_t``    ``floatX_t``                ``single, double``   ``numpy.floatX``     Precision X is preserved.               
+int       ``intX_t``      ``intX_t``                  ``intX``             ``numpy.intX``       Precision X is preserved.               
+ndarray   ``*``           ``*``                       ``mat``              ``numpy.ndarray``                                            
+null      ``NULL``        ``NULL``                    ``NaN``              ``None``                                                     
+number                                                                                          This covers the JSON default for        
+                                                                                                floating point or integer values.       
+obj       ``obj_t``       ``obj_t``                   ``containers.Map``   ``ObjDict``                                                  
+object    ``map_t``       ``std::map<char*,void*>``   ``containers.Map``   ``dict``             Support for dynamic objects in C/C++ is 
+                                                                                                still under development.                
+ply       ``ply_t``       ``ply_t``                   ``containers.Map``   ``PlyDict``                                                  
+scalar                                                                                          |yggdrasil| defines scalars as an       
+                                                                                                umbrella type encompassing int, uint,   
+                                                                                                float, bytes, and unicode.              
+schema    ``map_t``       ``MetaschemaType``          ``containers.Map``   ``dict``                                                     
+string    ``char*``       ``char*``                   ``char``             ``str``              Encoding dependent on JSON library.     
+uint      ``uintX_t``     ``uintX_t``                 ``uintX``            ``numpy.uintX``      Precision X is preserved.               
+unicode   ``char*``       ``char*``                   ``char``             ``str``              Precision X is preserved.               
+=======   =============   =========================   ==================   ==================   ========================================

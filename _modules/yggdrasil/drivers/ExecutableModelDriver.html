@@ -1,0 +1,331 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>yggdrasil.drivers.ExecutableModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="yggdrasil.drivers" href="../drivers.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+        
+      <li>yggdrasil.drivers.ExecutableModelDriver</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yggdrasil.drivers.ExecutableModelDriver</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">platform</span> <span class="k">as</span> <span class="nn">sys_platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>  <span class="c1"># platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.ModelDriver</span> <span class="k">import</span> <span class="n">ModelDriver</span>
+
+
+<span class="c1"># Version flags for windows appear to cause hang so just use</span>
+<span class="c1"># platform module for now</span>
+<span class="c1"># if platform._is_win:  # pragma: windows</span>
+<span class="c1">#     _os_version_flags = [&#39;winver&#39;]</span>
+<span class="c1"># else:</span>
+<span class="c1">#     _os_version_flags = [&#39;uname&#39;, &#39;-r&#39;]</span>
+
+
+<div class="viewcode-block" id="ExecutableModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver">[docs]</a><span class="k">class</span> <span class="nc">ExecutableModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running executable based models.&quot;&quot;&quot;</span>
+
+    <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;executable&#39;</span>
+    <span class="c1"># version_flags = _os_version_flags</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is an executable.&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExecutableModelDriver.language_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.language_version">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">language_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">version_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to cls.run_executable.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Version of compiler/interpreter for this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">sys_platform</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="ExecutableModelDriver.executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.executable_command">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unused_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose a command for running a program using the exectuable for</span>
+<span class="sd">        this language (compiler/interpreter) with the provided arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): The program that returned command should run and any</span>
+<span class="sd">                arguments that should be provided to it.</span>
+<span class="sd">            unused_kwargs (dict, optional): Existing dictionary that unused</span>
+<span class="sd">                keyword arguments should be added to. Defaults to None and is</span>
+<span class="sd">                ignored.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Arguments composing the command required to run the program</span>
+<span class="sd">                from the command line using the executable for this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">unused_kwargs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">unused_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">args</span></div>
+        
+<div class="viewcode-block" id="ExecutableModelDriver.is_language_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_language_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_language_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the interpreter/compiler for the associated programming</span>
+<span class="sd">        language is installed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the language interpreter/compiler is installed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ExecutableModelDriver.is_configured"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_configured">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_configured</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the appropriate configuration has been performed (e.g.</span>
+<span class="sd">        installation of supporting libraries etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the language has been configured.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ExecutableModelDriver.is_comm_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_comm_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_comm_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a comm is installed for the associated programming</span>
+<span class="sd">        language.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if a comm is installed for this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># executables presumed to include comms</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">commtype</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_comm</span><span class="p">())</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.9.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../../_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

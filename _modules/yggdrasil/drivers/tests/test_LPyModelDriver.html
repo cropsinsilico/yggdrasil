@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests.test_LPyModelDriver &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.drivers.tests.test_LPyModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../index.html"/>
         <link rel="up" title="yggdrasil.drivers" href="../../drivers.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -179,39 +173,34 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.drivers.tests.test_LPyModelDriver</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">scripts</span><span class="p">,</span> <span class="n">assert_raises</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="k">import</span> <span class="n">LPyModelDriver</span>
-<span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_ModelDriver</span> <span class="k">as</span> <span class="nn">parent</span>
+<span></span><span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_InterpretedModelDriver</span> <span class="k">as</span> <span class="nn">parent</span>
 
 
-<div class="viewcode-block" id="test_LPyModelDriver_nolpy"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_LPyModelDriver.test_LPyModelDriver_nolpy">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">LPyModelDriver</span><span class="o">.</span><span class="n">_lpy_installed</span><span class="p">,</span> <span class="s2">&quot;LPy is installed&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">test_LPyModelDriver_nolpy</span><span class="p">():</span>  <span class="c1"># pragma: no lpy</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test LPyModelDriver error when LPy not installed.&quot;&quot;&quot;</span>
-    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">LPyModelDriver</span><span class="o">.</span><span class="n">LPyModelDriver</span><span class="p">,</span>
-                  <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;lpy&#39;</span><span class="p">])</span></div>
-
-
-<div class="viewcode-block" id="TestLPyModelParam"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelParam">[docs]</a><span class="k">class</span> <span class="nc">TestLPyModelParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestModelParam</span><span class="p">):</span>
+<div class="viewcode-block" id="TestLPyModelParam"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelParam">[docs]</a><span class="k">class</span> <span class="nc">TestLPyModelParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestInterpretedModelParam</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for LPyModelDriver class.&quot;&quot;&quot;</span>
 
     <span class="n">driver</span> <span class="o">=</span> <span class="s1">&#39;LPyModelDriver&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestLPyModelParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;lpy&#39;</span><span class="p">]]</span></div>
+<div class="viewcode-block" id="TestLPyModelParam.tests_on_not_installed"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelParam.tests_on_not_installed">[docs]</a>    <span class="k">def</span> <span class="nf">tests_on_not_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Tests for when the driver is not installed.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestLPyModelParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">tests_on_not_installed</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">language_version</span><span class="p">)</span></div></div>
 
         
-<div class="viewcode-block" id="TestLPyModelDriverNoStart"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelDriverNoStart">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">LPyModelDriver</span><span class="o">.</span><span class="n">_lpy_installed</span><span class="p">,</span> <span class="s2">&quot;LPy is not installed&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TestLPyModelDriverNoStart</span><span class="p">(</span><span class="n">TestLPyModelParam</span><span class="p">,</span>
-                                <span class="n">parent</span><span class="o">.</span><span class="n">TestModelDriverNoStart</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
+<div class="viewcode-block" id="TestLPyModelDriverNoInit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelDriverNoInit">[docs]</a><span class="k">class</span> <span class="nc">TestLPyModelDriverNoInit</span><span class="p">(</span><span class="n">TestLPyModelParam</span><span class="p">,</span>
+                               <span class="n">parent</span><span class="o">.</span><span class="n">TestInterpretedModelDriverNoInit</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for LPyModelDriver class without initing the driver.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="TestLPyModelDriverNoStart"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestLPyModelDriverNoStart</span><span class="p">(</span><span class="n">TestLPyModelParam</span><span class="p">,</span>
+                                <span class="n">parent</span><span class="o">.</span><span class="n">TestInterpretedModelDriverNoStart</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for LPyModelDriver class without starting the driver.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="TestLPyModelDriver"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelDriver">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">LPyModelDriver</span><span class="o">.</span><span class="n">_lpy_installed</span><span class="p">,</span> <span class="s2">&quot;LPy is not installed&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TestLPyModelDriver</span><span class="p">(</span><span class="n">TestLPyModelParam</span><span class="p">,</span>
-                         <span class="n">parent</span><span class="o">.</span><span class="n">TestModelDriver</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
+<div class="viewcode-block" id="TestLPyModelDriver"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelDriver">[docs]</a><span class="k">class</span> <span class="nc">TestLPyModelDriver</span><span class="p">(</span><span class="n">TestLPyModelParam</span><span class="p">,</span>
+                         <span class="n">parent</span><span class="o">.</span><span class="n">TestInterpretedModelDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for LPyModelDriver class.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 </pre></div>
@@ -250,7 +239,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

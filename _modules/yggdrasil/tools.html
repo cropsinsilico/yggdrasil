@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tools &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.tools &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -184,6 +178,8 @@
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">signal</span>
@@ -192,9 +188,10 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">cfg_logging</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span><span class="p">,</span> <span class="n">ComponentBase</span>
 
 
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">YGG_MSG_EOF</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;EOF!!!&#39;</span>
 <span class="n">YGG_MSG_BUF</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">2</span>
 
@@ -219,55 +216,112 @@
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not located MainThread&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="check_threads"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.check_threads">[docs]</a><span class="k">def</span> <span class="nf">check_threads</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+<span class="k">def</span> <span class="nf">check_threads</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for threads that are still running.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_thread_registry</span>
-    <span class="c1"># logging.info(&quot;Checking %d threads&quot; % len(_thread_registry))</span>
+    <span class="c1"># logger.info(&quot;Checking %d threads&quot; % len(_thread_registry))</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_thread_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Thread is alive: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Thread is alive: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">threading</span><span class="o">.</span><span class="n">active_count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> threads running&quot;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">active_count</span><span class="p">())</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> threads running&quot;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">active_count</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">threading</span><span class="o">.</span><span class="n">enumerate</span><span class="p">():</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> thread running&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> thread running&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="check_locks"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.check_locks">[docs]</a><span class="k">def</span> <span class="nf">check_locks</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+<span class="k">def</span> <span class="nf">check_locks</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for locks in lock registry that are locked.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_lock_registry</span>
-    <span class="c1"># logging.info(&quot;Checking %d locks&quot; % len(_lock_registry))</span>
+    <span class="c1"># logger.info(&quot;Checking %d locks&quot; % len(_lock_registry))</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_lock_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">res</span><span class="p">:</span>
             <span class="n">v</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Lock could not be acquired: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Lock could not be acquired: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="check_sockets"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.check_sockets">[docs]</a><span class="k">def</span> <span class="nf">check_sockets</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+<span class="k">def</span> <span class="nf">check_sockets</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check registered sockets.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">cleanup_comms</span>
     <span class="n">count</span> <span class="o">=</span> <span class="n">cleanup_comms</span><span class="p">(</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> sockets closed.&quot;</span> <span class="o">%</span> <span class="n">count</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> sockets closed.&quot;</span> <span class="o">%</span> <span class="n">count</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ygg_atexit"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.ygg_atexit">[docs]</a><span class="k">def</span> <span class="nf">ygg_atexit</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+<span class="k">def</span> <span class="nf">check_environ_bool</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">valid_values</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check to see if a boolean environment variable is set to True.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): Name of environment variable to check.</span>
+<span class="sd">        valid_values (list, optional): Values for the environment variable</span>
+<span class="sd">            that indicate it is True. These should all be lower case as</span>
+<span class="sd">            the lower case version of the variable contents will be compared</span>
+<span class="sd">            to the list. Defaults to [&#39;true&#39;, &#39;1&#39;].</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the environment variables is set and is one of the</span>
+<span class="sd">            list valid_values (after being transformed to lower case).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">valid_values</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">is_subprocess</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the current process is a subprocess.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if YGG_SUBPROCESS environment variable is True, False</span>
+<span class="sd">            otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">check_environ_bool</span><span class="p">(</span><span class="s1">&#39;YGG_SUBPROCESS&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">ygg_atexit</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Things to do at exit.&quot;&quot;&quot;</span>
     <span class="n">check_locks</span><span class="p">()</span>
     <span class="n">check_threads</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_SUBPROCESS&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_subprocess</span><span class="p">():</span>
         <span class="n">check_sockets</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY34</span><span class="p">:</span>
         <span class="c1"># Print empty line to ensure close</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
 
 <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ygg_atexit</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="locate_path"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.locate_path">[docs]</a><span class="k">def</span> <span class="nf">locate_path</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">basedir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)):</span>
+<span class="k">def</span> <span class="nf">which</span><span class="p">(</span><span class="n">program</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the path to an executable if it exists.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        program (str): Name of program to locate or full path to program.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Path to executable if it can be located. Otherwise, None.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
+        <span class="k">def</span> <span class="nf">is_exe</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">)</span>
+
+        <span class="n">fpath</span><span class="p">,</span> <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">program</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fpath</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_exe</span><span class="p">(</span><span class="n">program</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">program</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;PATH&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="p">):</span>
+                <span class="n">exe_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">program</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">is_exe</span><span class="p">(</span><span class="n">exe_file</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">exe_file</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
+        <span class="k">return</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">program</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">locate_path</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">basedir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find the full path to a file using where on Windows.&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
@@ -285,10 +339,20 @@
     <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">return</span> <span class="n">out</span>
 
 
-<div class="viewcode-block" id="get_supported_lang"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.get_supported_lang">[docs]</a><span class="k">def</span> <span class="nf">get_supported_lang</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">get_supported_platforms</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of the platforms supported by yggdrasil.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: The name of platforms supported by yggdrasil.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">_supported_platforms</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_supported_lang</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of the model programming languages that are supported</span>
 <span class="sd">    by yggdrasil.</span>
 
@@ -301,10 +365,10 @@
     <span class="n">out</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subtypes</span>
     <span class="k">if</span> <span class="s1">&#39;c++&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
         <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;c++&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s1">&#39;cpp&#39;</span>
-    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">out</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">out</span><span class="p">))</span>
 
 
-<div class="viewcode-block" id="get_supported_comm"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.get_supported_comm">[docs]</a><span class="k">def</span> <span class="nf">get_supported_comm</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">get_supported_comm</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of the communication mechanisms supported by yggdrasil.</span>
 
 <span class="sd">    Returns:</span>
@@ -313,14 +377,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">schema</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">get_schema</span><span class="p">()</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">classes</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CommBase&#39;</span><span class="p">,</span> <span class="s1">&#39;DefaultComm&#39;</span><span class="p">]:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subtypes</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CommBase&#39;</span><span class="p">,</span> <span class="s1">&#39;DefaultComm&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">out</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">out</span><span class="p">))</span>
 
 
-<div class="viewcode-block" id="is_lang_installed"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.is_lang_installed">[docs]</a><span class="k">def</span> <span class="nf">is_lang_installed</span><span class="p">(</span><span class="n">lang</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">is_lang_installed</span><span class="p">(</span><span class="n">lang</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check to see if yggdrasil can run models written in a programming</span>
 <span class="sd">    language on the current machine.</span>
 
@@ -332,13 +396,11 @@
 <span class="sd">            machine, False otherwise.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">schema</span><span class="p">,</span> <span class="n">drivers</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">get_schema</span><span class="p">()</span>
-    <span class="n">drv</span> <span class="o">=</span> <span class="n">drivers</span><span class="o">.</span><span class="n">import_driver</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subtype2class</span><span class="p">[</span><span class="n">lang</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">drv</span><span class="o">.</span><span class="n">is_installed</span><span class="p">()</span></div>
+    <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">drv</span><span class="o">.</span><span class="n">is_installed</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="is_comm_installed"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.is_comm_installed">[docs]</a><span class="k">def</span> <span class="nf">is_comm_installed</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">is_comm_installed</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check to see if yggdrasil can use a communication mechanism on the</span>
 <span class="sd">    current machine.</span>
 
@@ -353,12 +415,11 @@
 <span class="sd">            machine, False otherwise.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">communication</span>
-    <span class="n">cmm</span> <span class="o">=</span> <span class="n">communication</span><span class="o">.</span><span class="n">get_comm_class</span><span class="p">(</span><span class="n">comm</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">cmm</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span></div>
+    <span class="n">cmm</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cmm</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="get_installed_lang"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.get_installed_lang">[docs]</a><span class="k">def</span> <span class="nf">get_installed_lang</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">get_installed_lang</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of the languages that are supported by yggdrasil on the</span>
 <span class="sd">    current machine. This checks for the necessary interpreters, licenses, and/or</span>
 <span class="sd">    compilers.</span>
@@ -372,10 +433,10 @@
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">all_lang</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">is_lang_installed</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">return</span> <span class="n">out</span>
 
 
-<div class="viewcode-block" id="get_installed_comm"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.get_installed_comm">[docs]</a><span class="k">def</span> <span class="nf">get_installed_comm</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_installed_comm</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of the communication channel types that are supported by</span>
 <span class="sd">    yggdrasil on the current machine. This checks the operating system,</span>
 <span class="sd">    supporting libraries, and broker credentials. The order indicates the</span>
@@ -398,15 +459,15 @@
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
     <span class="c1"># Fix order to denote preference</span>
     <span class="n">out_sorted</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;IPCComm&#39;</span><span class="p">,</span> <span class="s1">&#39;RMQComm&#39;</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;zmq&#39;</span><span class="p">,</span> <span class="s1">&#39;ipc&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
             <span class="n">out_sorted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
     <span class="n">out_sorted</span> <span class="o">+=</span> <span class="n">out</span>
-    <span class="k">return</span> <span class="n">out_sorted</span></div>
+    <span class="k">return</span> <span class="n">out_sorted</span>
 
 
-<div class="viewcode-block" id="get_default_comm"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.get_default_comm">[docs]</a><span class="k">def</span> <span class="nf">get_default_comm</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">get_default_comm</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the default comm that should be used for message passing.&quot;&quot;&quot;</span>
     <span class="n">comm_list</span> <span class="o">=</span> <span class="n">get_installed_comm</span><span class="p">()</span>
     <span class="k">if</span> <span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
@@ -428,13 +489,15 @@
             <span class="n">_default_comm</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">tally</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">tally</span><span class="p">[</span><span class="n">_default_comm</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Could not locate an installed comm.&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">_default_comm</span> <span class="o">==</span> <span class="s1">&#39;RMQComm&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;RMQComm cannot be the default comm because &#39;</span>
+    <span class="k">if</span> <span class="n">_default_comm</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Comm&#39;</span><span class="p">):</span>
+        <span class="n">_default_comm</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">_default_comm</span><span class="p">)</span><span class="o">.</span><span class="n">_commtype</span>
+    <span class="k">if</span> <span class="n">_default_comm</span> <span class="o">==</span> <span class="s1">&#39;rmq&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;RMQ cannot be the default comm because &#39;</span>
                                   <span class="o">+</span> <span class="s1">&#39;there is not an RMQ C interface.&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_default_comm</span></div>
+    <span class="k">return</span> <span class="n">_default_comm</span>
 
 
-<div class="viewcode-block" id="get_YGG_MSG_MAX"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.get_YGG_MSG_MAX">[docs]</a><span class="k">def</span> <span class="nf">get_YGG_MSG_MAX</span><span class="p">(</span><span class="n">comm_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_YGG_MSG_MAX</span><span class="p">(</span><span class="n">comm_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the maximum message size for a given comm type.</span>
 
 <span class="sd">    Args:</span>
@@ -448,17 +511,17 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">comm_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">comm_type</span> <span class="o">=</span> <span class="n">get_default_comm</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">comm_type</span> <span class="o">==</span> <span class="s1">&#39;IPCComm&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">comm_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ipc&#39;</span><span class="p">,</span> <span class="s1">&#39;IPCComm&#39;</span><span class="p">]:</span>
         <span class="c1"># OS X limit is 2kb</span>
         <span class="n">out</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">2</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">20</span>
-    <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">return</span> <span class="n">out</span>
 
 
 <span class="c1"># https://stackoverflow.com/questions/35772001/</span>
 <span class="c1"># how-to-handle-the-signal-in-python-on-windows-machine</span>
-<div class="viewcode-block" id="kill"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.kill">[docs]</a><span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">signum</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">signum</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kill process by mapping signal number.</span>
 
 <span class="sd">    Args:</span>
@@ -501,10 +564,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">sigmap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">signum</span><span class="p">,</span> <span class="n">signum</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">signum</span><span class="p">)</span></div>
+        <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">signum</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="sleep"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.sleep">[docs]</a><span class="k">def</span> <span class="nf">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sleep for a specified number of seconds.</span>
 
 <span class="sd">    Args:</span>
@@ -528,10 +591,10 @@
             <span class="k">if</span> <span class="n">interval</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">break</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span></div>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="eval_kwarg"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.eval_kwarg">[docs]</a><span class="k">def</span> <span class="nf">eval_kwarg</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">eval_kwarg</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;If x is a string, eval it. Otherwise just return it.</span>
 
 <span class="sd">    Args:</span>
@@ -546,10 +609,10 @@
             <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">x</span>
-    <span class="k">return</span> <span class="n">x</span></div>
+    <span class="k">return</span> <span class="n">x</span>
 
 
-<div class="viewcode-block" id="YggPopen"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggPopen">[docs]</a><span class="k">class</span> <span class="nc">YggPopen</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">YggPopen</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Uses Popen to open a process without a buffer. If not already set,</span>
 <span class="sd">    the keyword arguments &#39;bufsize&#39;, &#39;stdout&#39;, and &#39;stderr&#39; are set to</span>
 <span class="sd">    0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the</span>
@@ -567,7 +630,7 @@
 <span class="sd">        **kwargs: Additional keywords arguments are passed to Popen.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd_args</span><span class="p">,</span> <span class="n">forward_signals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd_args</span><span class="p">,</span> <span class="n">forward_signals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">for_matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># stdbuf only for linux</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span><span class="p">:</span>
             <span class="n">stdbuf_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;stdbuf&#39;</span><span class="p">,</span> <span class="s1">&#39;-o0&#39;</span><span class="p">,</span> <span class="s1">&#39;-e0&#39;</span><span class="p">]</span>
@@ -578,25 +641,43 @@
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;bufsize&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;stdout&#39;</span><span class="p">,</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;stderr&#39;</span><span class="p">,</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+        <span class="c1"># To prevent forward of signals, process will have a new process group</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">forward_signals</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                <span class="c1"># TODO: Make sure that Matlab handled correctly since pty not</span>
+                <span class="c1"># guaranteed on windows</span>
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;preexec_fn&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;creationflags&#39;</span><span class="p">,</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CREATE_NEW_PROCESS_GROUP</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;creationflags&#39;</span><span class="p">,</span>
+                                  <span class="n">subprocess</span><span class="o">.</span><span class="n">CREATE_NEW_PROCESS_GROUP</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">for_matlab</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+                    <span class="kn">import</span> <span class="nn">pty</span>
+                    <span class="c1"># Matlab requires a tty so a pty is used here to allow</span>
+                    <span class="c1"># the process to be lanched in a new process group.</span>
+                    <span class="c1"># Related Materials:</span>
+                    <span class="c1"># - https://www.mathworks.com/matlabcentral/answers/</span>
+                    <span class="c1">#       359992-system-call-bizarre-behavior</span>
+                    <span class="c1"># - https://gist.github.com/thepaul/1206753</span>
+                    <span class="c1"># - https://stackoverflow.com/questions/30139401/</span>
+                    <span class="c1">#       filter-out-command-that-needs-a-terminal-in-python-</span>
+                    <span class="c1">#       subprocess-module</span>
+                    <span class="n">master_fd</span><span class="p">,</span> <span class="n">slave_fd</span> <span class="o">=</span> <span class="n">pty</span><span class="o">.</span><span class="n">openpty</span><span class="p">()</span>
+                    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;stdin&#39;</span><span class="p">,</span> <span class="n">slave_fd</span><span class="p">)</span>
+
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;preexec_fn&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">setpgrp</span><span class="p">)</span>
         <span class="c1"># if platform._is_win:  # pragma: windows</span>
         <span class="c1">#     kwargs.setdefault(&#39;universal_newlines&#39;, True)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggPopen</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cmd_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggPopen.kill"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggPopen.kill">[docs]</a>    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;On windows using CTRL_BREAK_EVENT to kill the process.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">CTRL_BREAK_EVENT</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">super</span><span class="p">(</span><span class="n">YggPopen</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+            <span class="nb">super</span><span class="p">(</span><span class="n">YggPopen</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="popen_nobuffer"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.popen_nobuffer">[docs]</a><span class="k">def</span> <span class="nf">popen_nobuffer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">popen_nobuffer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Uses Popen to open a process without a buffer. If not already set,</span>
 <span class="sd">    the keyword arguments &#39;bufsize&#39;, &#39;stdout&#39;, and &#39;stderr&#39; are set to</span>
 <span class="sd">    0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the</span>
@@ -616,10 +697,10 @@
 <span class="sd">        YggPopen: Process that was started.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">YggPopen</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">YggPopen</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="print_encoded"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.print_encoded">[docs]</a><span class="k">def</span> <span class="nf">print_encoded</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">print_encoded</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print bytes to stdout, encoding if possible.</span>
 
 <span class="sd">    Args:</span>
@@ -632,16 +713,16 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_unicode</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">UnicodeEncodeError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;sys.stdout.encoding = </span><span class="si">%s</span><span class="s2">, cannot print unicode&quot;</span><span class="p">,</span>
-                      <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;sys.stdout.encoding = </span><span class="si">%s</span><span class="s2">, cannot print unicode&quot;</span><span class="p">,</span>
+                     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">UnicodeEncodeError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+            <span class="nb">print</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="TimeOut"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.TimeOut">[docs]</a><span class="k">class</span> <span class="nc">TimeOut</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">TimeOut</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for checking if a period of time has been elapsed.</span>
 
 <span class="sd">    Args:</span>
@@ -674,14 +755,14 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if there is not any time remaining. False otherwise.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_time</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_time</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_time</span><span class="p">)</span>
 
 
 <span class="c1"># def single_use_method(func):</span>
 <span class="c1">#     r&quot;&quot;&quot;Decorator for marking functions that should only be called once.&quot;&quot;&quot;</span>
 <span class="c1">#     def wrapper(*args, **kwargs):</span>
 <span class="c1">#         if getattr(func, &#39;_single_use_method_called&#39;, False):</span>
-<span class="c1">#             logging.info(&quot;METHOD %s ALREADY CALLED&quot; % func)</span>
+<span class="c1">#             logger.info(&quot;METHOD %s ALREADY CALLED&quot; % func)</span>
 <span class="c1">#             return</span>
 <span class="c1">#         else:</span>
 <span class="c1">#             func._single_use_method_called = True</span>
@@ -689,11 +770,11 @@
 <span class="c1">#     return wrapper</span>
 
 
-<div class="viewcode-block" id="YggClass"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass">[docs]</a><span class="k">class</span> <span class="nc">YggClass</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">LoggerAdapter</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">YggClass</span><span class="p">(</span><span class="n">ComponentBase</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">LoggerAdapter</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for Ygg classes.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        name (str): Class name.</span>
+<span class="sd">        name (str): Name used for component in log messages.</span>
 <span class="sd">        uuid (str, optional): Unique ID for this instance. Defaults to None</span>
 <span class="sd">            and is assigned.</span>
 <span class="sd">        working_dir (str, optional): Working directory. If not provided, the</span>
@@ -702,8 +783,8 @@
 <span class="sd">            spent waiting on a process. Defaults to 60.</span>
 <span class="sd">        sleeptime (float, optional): Time that class should sleep for when</span>
 <span class="sd">            sleep is called. Defaults to 0.01.</span>
-<span class="sd">        **kwargs: Additional keyword arguments are assigned to the extra_kwargs</span>
-<span class="sd">            dictionary.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the ComponentBase</span>
+<span class="sd">            initializer.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Class name.</span>
@@ -714,7 +795,6 @@
 <span class="sd">        timeout (float): Maximum time that should be spent waiting on a process.</span>
 <span class="sd">        working_dir (str): Working directory.</span>
 <span class="sd">        errors (list): List of errors.</span>
-<span class="sd">        extra_kwargs (dict): Keyword arguments that were not parsed.</span>
 <span class="sd">        sched_out (obj): Output from the last scheduled task with output.</span>
 <span class="sd">        logger (logging.Logger): Logger object for this object.</span>
 <span class="sd">        suppress_special_debug (bool): If True, special_debug log messages</span>
@@ -722,25 +802,26 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">_base_defaults</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;uuid&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;timeout&#39;</span><span class="p">,</span> <span class="s1">&#39;sleeptime&#39;</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">timeout</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">sleeptime</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Defaults</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="k">if</span> <span class="n">uuid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid_gen</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">working_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">working_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="c1"># Assign attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="n">uuid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span> <span class="o">=</span> <span class="n">sleeptime</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">longsleep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span> <span class="o">*</span> <span class="mi">10</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="c1"># Set defaults</span>
-        <span class="k">if</span> <span class="n">working_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">working_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
-        <span class="c1"># Assign things</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="n">working_dir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sched_out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_periodic_logs</span> <span class="o">=</span> <span class="p">{}</span>
@@ -753,7 +834,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_old_encoding</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug_flag</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ygg_class</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">YggClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="p">),</span> <span class="p">{})</span>
+        <span class="c1"># Call super class, adding in schema properties</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_defaults</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YggClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">LoggerAdapter</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="p">),</span> <span class="p">{})</span>
+
+    <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Don&#39;t deep copy since threads cannot be copied.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -765,20 +855,20 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of the class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ygg_class</span>
 
-<div class="viewcode-block" id="YggClass.debug_log"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.debug_log">[docs]</a>    <span class="k">def</span> <span class="nf">debug_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+    <span class="k">def</span> <span class="nf">debug_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn on debugging.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">)</span>
-        <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">,</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span>
-        <span class="n">cfg_logging</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Setting debug_log&quot;</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">get_ygg_loglevel</span><span class="p">,</span> <span class="n">set_ygg_loglevel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="o">=</span> <span class="n">get_ygg_loglevel</span><span class="p">()</span>
+        <span class="n">set_ygg_loglevel</span><span class="p">(</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggClass.reset_log"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.reset_log">[docs]</a>    <span class="k">def</span> <span class="nf">reset_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+    <span class="k">def</span> <span class="nf">reset_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resetting logging to prior value.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">set_ygg_loglevel</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span><span class="p">)</span>
-            <span class="n">cfg_logging</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="o">=</span> <span class="kc">None</span></div>
+            <span class="n">set_ygg_loglevel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggClass.pprint"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.pprint">[docs]</a>    <span class="k">def</span> <span class="nf">pprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">block_indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indent_str</span><span class="o">=</span><span class="s1">&#39;    &#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">pprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">block_indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indent_str</span><span class="o">=</span><span class="s1">&#39;    &#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Use pprint to represent an object as a string.</span>
 
 <span class="sd">        Args:</span>
@@ -795,9 +885,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sblock</span> <span class="o">=</span> <span class="n">block_indent</span> <span class="o">*</span> <span class="n">indent_str</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">sblock</span> <span class="o">+</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">sblock</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span></div>
+        <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="YggClass.as_str"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.as_str">[docs]</a>    <span class="k">def</span> <span class="nf">as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return str version of object if it is not already a string.</span>
 
 <span class="sd">        Args:</span>
@@ -811,9 +901,9 @@
             <span class="n">obj_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">obj_str</span> <span class="o">=</span> <span class="n">obj</span>
-        <span class="k">return</span> <span class="n">obj_str</span></div>
+        <span class="k">return</span> <span class="n">obj_str</span>
 
-<div class="viewcode-block" id="YggClass.process"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process logging message.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">_stack_in_log</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">stack</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
@@ -825,22 +915,22 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ygg_class</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="n">new_msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">new_msg</span><span class="p">,</span> <span class="n">kwargs</span></div>
+        <span class="k">return</span> <span class="n">new_msg</span><span class="p">,</span> <span class="n">kwargs</span>
 
-<div class="viewcode-block" id="YggClass.display"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.display">[docs]</a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print a message, no log.&quot;&quot;&quot;</span>
         <span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="n">args</span><span class="p">)</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="n">args</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggClass.verbose_debug"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.verbose_debug">[docs]</a>    <span class="k">def</span> <span class="nf">verbose_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">verbose_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log a verbose debug level message.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         
-<div class="viewcode-block" id="YggClass.dummy_log"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.dummy_log">[docs]</a>    <span class="k">def</span> <span class="nf">dummy_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">dummy_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy log function that dosn&#39;t do anything.&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="k">pass</span>
 
-<div class="viewcode-block" id="YggClass.periodic_debug"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.periodic_debug">[docs]</a>    <span class="k">def</span> <span class="nf">periodic_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">periodic_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log that should occur periodically rather than with every call.</span>
 
 <span class="sd">        Arguments:</span>
@@ -859,7 +949,7 @@
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_periodic_logs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">%</span> <span class="n">period</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_log</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_log</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">special_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -885,7 +975,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span>
 
-<div class="viewcode-block" id="YggClass.print_encoded"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.print_encoded">[docs]</a>    <span class="k">def</span> <span class="nf">print_encoded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">print_encoded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print bytes to stdout, encoding if possible.</span>
 
 <span class="sd">        Args:</span>
@@ -895,16 +985,16 @@
 
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">print_encoded</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">print_encoded</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggClass.printStatus"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print the class status.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">): state:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">): state:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_task_with_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sched_out</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggClass.sched_task"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.sched_task">[docs]</a>    <span class="k">def</span> <span class="nf">sched_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">store_output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">sched_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">store_output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Schedule a task that will be executed after a certain time has</span>
 <span class="sd">        elapsed.</span>
 
@@ -930,9 +1020,9 @@
             <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">func</span><span class="p">]</span> <span class="o">+</span> <span class="n">args</span>
             <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task_with_output</span>
         <span class="n">tobj</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">tobj</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+        <span class="n">tobj</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-<div class="viewcode-block" id="YggClass.sleep"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.sleep">[docs]</a>    <span class="k">def</span> <span class="nf">sleep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">sleep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Have the class sleep for some period of time.</span>
 
 <span class="sd">        Args:</span>
@@ -942,14 +1032,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span>
-        <span class="n">sleep</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
+        <span class="n">sleep</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">timeout_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Key identifying calling object and method.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_timeout_key</span><span class="p">()</span>
 
-<div class="viewcode-block" id="YggClass.get_timeout_key"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.get_timeout_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_timeout_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_timeout_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a key for a given level in the stack, relative to the</span>
 <span class="sd">        function calling get_timeout_key.</span>
 
@@ -977,9 +1067,9 @@
                                  <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">key_suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">key</span> <span class="o">+=</span> <span class="n">key_suffix</span>
-        <span class="k">return</span> <span class="n">key</span></div>
+        <span class="k">return</span> <span class="n">key</span>
 
-<div class="viewcode-block" id="YggClass.start_timeout"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.start_timeout">[docs]</a>    <span class="k">def</span> <span class="nf">start_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">start_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start a timeout for the calling function/method.</span>
 
 <span class="sd">        Args:</span>
@@ -1008,9 +1098,9 @@
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Timeout already registered for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">TimeOut</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-<div class="viewcode-block" id="YggClass.check_timeout"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.check_timeout">[docs]</a>    <span class="k">def</span> <span class="nf">check_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check timeout for the calling function/method.</span>
 
 <span class="sd">        Args:</span>
@@ -1033,9 +1123,9 @@
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;No timeout registered for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
         <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">is_out</span></div>
+        <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">is_out</span>
         
-<div class="viewcode-block" id="YggClass.stop_timeout"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggClass.stop_timeout">[docs]</a>    <span class="k">def</span> <span class="nf">stop_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">stop_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop a timeout for the calling function method.</span>
 
 <span class="sd">        Args:</span>
@@ -1069,10 +1159,10 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Timeout for </span><span class="si">%s</span><span class="s2"> at </span><span class="si">%5.2f</span><span class="s2">/</span><span class="si">%5.2f</span><span class="s2"> s&quot;</span> <span class="o">%</span> <span class="p">(</span>
                     <span class="n">key</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">elapsed</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">max_time</span><span class="p">))</span>
-        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div></div>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        
 
-
-<div class="viewcode-block" id="YggThread"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThread">[docs]</a><span class="k">class</span> <span class="nc">YggThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">,</span> <span class="n">YggClass</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">YggThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">,</span> <span class="n">YggClass</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Thread for Ygg that tracks when the thread is started and joined.</span>
 
 <span class="sd">    Attributes:</span>
@@ -1089,6 +1179,9 @@
         <span class="k">global</span> <span class="n">_lock_registry</span>
         <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;target&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">):</span>
+            <span class="n">ygg_kwargs</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">thread_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span>
                              <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggThread</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">thread_kwargs</span><span class="p">)</span>
@@ -1117,25 +1210,25 @@
         <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="n">_main_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span>
         <span class="c1"># return (not self._calling_thread.is_alive())</span>
 
-<div class="viewcode-block" id="YggThread.set_started_flag"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThread.set_started_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_started_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_started_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the started flag for the thread to True.&quot;&quot;&quot;</span>
         <span class="c1"># self.start_event.set()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">start_flag</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_flag</span> <span class="o">=</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="YggThread.set_terminated_flag"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThread.set_terminated_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_terminated_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_terminated_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the terminated flag for the thread to True.&quot;&quot;&quot;</span>
         <span class="c1"># self.terminate_event.set()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">terminate_flag</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminate_flag</span> <span class="o">=</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="YggThread.unset_started_flag"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThread.unset_started_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_started_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+    <span class="k">def</span> <span class="nf">unset_started_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the started flag for the thread to False.&quot;&quot;&quot;</span>
         <span class="c1"># self.start_event.clear()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">start_flag</span> <span class="o">=</span> <span class="kc">False</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_flag</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="YggThread.unset_terminated_flag"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThread.unset_terminated_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_terminated_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+    <span class="k">def</span> <span class="nf">unset_terminated_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the terminated flag for the thread to False.&quot;&quot;&quot;</span>
         <span class="c1"># self.terminate_event.clear()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">terminated_flag</span> <span class="o">=</span> <span class="kc">False</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminated_flag</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">was_started</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1149,17 +1242,17 @@
         <span class="c1"># return self.terminate_event.is_set()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminate_flag</span>
 
-<div class="viewcode-block" id="YggThread.start"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThread.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start thread and print info.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_terminated</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_started_flag</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">before_start</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggThread</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_calling_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calling_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span>
         <span class="c1"># print(&quot;Thread = %s, Called by %s&quot; % (self.name, self._calling_thread.name))</span>
 
-<div class="viewcode-block" id="YggThread.run"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThread.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue running until terminate event set.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting method&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1169,17 +1262,17 @@
         <span class="k">finally</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;_ygg_target&#39;</span><span class="p">,</span> <span class="s1">&#39;_ygg_args&#39;</span><span class="p">,</span> <span class="s1">&#39;_ygg_kwargs&#39;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
-                    <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span></div>
+                    <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggThread.before_start"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThread.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform on the main thread before starting the thread.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggThread.cleanup"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThread.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform to clean up the thread after it has stopped.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_called</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_called</span> <span class="o">=</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="YggThread.wait"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThread.wait">[docs]</a>    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until thread finish to return using sleeps rather than</span>
 <span class="sd">        blocking.</span>
 
@@ -1194,9 +1287,9 @@
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">verbose_debug</span><span class="p">(</span><span class="s1">&#39;Waiting for thread to finish...&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggThread.terminate"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThread.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the terminate event and wait for the thread to stop.</span>
 
 <span class="sd">        Args:</span>
@@ -1218,18 +1311,18 @@
             <span class="c1"># if self.is_alive():</span>
             <span class="c1">#     self.join(self.timeout)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
-            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span></div>
+            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span>
 
-<div class="viewcode-block" id="YggThread.atexit"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThread.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed when python exits.&quot;&quot;&quot;</span>
         <span class="c1"># self.debug(&#39;is_alive = %s&#39;, self.is_alive())</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Thread alive at exit&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_called</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="YggThreadLoop"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThreadLoop">[docs]</a><span class="k">class</span> <span class="nc">YggThreadLoop</span><span class="p">(</span><span class="n">YggThread</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">YggThreadLoop</span><span class="p">(</span><span class="n">YggThread</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Thread that will run a loop until the terminate event is called.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggThreadLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1238,7 +1331,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">loop_event</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="YggThreadLoop.on_main_terminated"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThreadLoop.on_main_terminated">[docs]</a>    <span class="k">def</span> <span class="nf">on_main_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dont_break</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+    <span class="k">def</span> <span class="nf">on_main_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dont_break</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed when 1st main terminated.</span>
 
 <span class="sd">        Args:</span>
@@ -1248,30 +1341,30 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_1st_main_terminated</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">dont_break</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
 
-<div class="viewcode-block" id="YggThreadLoop.set_break_flag"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThreadLoop.set_break_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_break_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_break_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the break flag for the thread to True.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span> <span class="o">=</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="YggThreadLoop.unset_break_flag"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThreadLoop.unset_break_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_break_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+    <span class="k">def</span> <span class="nf">unset_break_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the break flag for the thread to False.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span> <span class="o">=</span> <span class="kc">False</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">was_break</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the break flag was set.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span>
 
-<div class="viewcode-block" id="YggThreadLoop.set_loop_flag"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThreadLoop.set_loop_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_loop_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_loop_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the loop flag for the thread to True.&quot;&quot;&quot;</span>
         <span class="c1"># self.loop_event.set()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="YggThreadLoop.unset_loop_flag"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThreadLoop.unset_loop_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_loop_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+    <span class="k">def</span> <span class="nf">unset_loop_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the loop flag for the thread to False.&quot;&quot;&quot;</span>
         <span class="c1"># self.loop_event.clear()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">False</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">was_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1279,7 +1372,7 @@
         <span class="c1"># return self.loop_event.is_set()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span>
 
-<div class="viewcode-block" id="YggThreadLoop.wait_for_loop"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThreadLoop.wait_for_loop">[docs]</a>    <span class="k">def</span> <span class="nf">wait_for_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wait_for_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until thread enters loop to return using sleeps rather than</span>
 <span class="sd">        blocking.</span>
 
@@ -1295,24 +1388,24 @@
                <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">verbose_debug</span><span class="p">(</span><span class="s1">&#39;Waiting for thread to enter loop...&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggThreadLoop.before_loop"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThreadLoop.before_loop">[docs]</a>    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed before the loop.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggThreadLoop.run_loop"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThreadLoop.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed on each loop iteration.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ygg_target</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_ygg_target</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_ygg_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_ygg_kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
 
-<div class="viewcode-block" id="YggThreadLoop.after_loop"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThreadLoop.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed after the loop.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggThreadLoop.run"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThreadLoop.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue running until terminate event set.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting loop&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1336,12 +1429,12 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">after_loop</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;AFTER LOOP ERROR&quot;</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;AFTER LOOP ERROR&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="YggThreadLoop.terminate"><a class="viewcode-back" href="../../code_python.html#yggdrasil.tools.YggThreadLoop.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Also set break flag.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">YggThreadLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YggThreadLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 
            </div>
@@ -1378,7 +1471,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

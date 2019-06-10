@@ -43,6 +43,14 @@ yggdrasil.serialize.DirectSerialize module
     :undoc-members:
     :show-inheritance:
 
+yggdrasil.serialize.FunctionalSerialize module
+----------------------------------------------
+
+.. automodule:: yggdrasil.serialize.FunctionalSerialize
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 yggdrasil.serialize.JSONSerialize module
 ----------------------------------------
 
@@ -87,6 +95,14 @@ yggdrasil.serialize.PlySerialize module
 ---------------------------------------
 
 .. automodule:: yggdrasil.serialize.PlySerialize
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.serialize.SerializeBase module
+----------------------------------------
+
+.. automodule:: yggdrasil.serialize.SerializeBase
     :members:
     :undoc-members:
     :show-inheritance:

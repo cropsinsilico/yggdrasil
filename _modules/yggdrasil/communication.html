@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.communication &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -177,10 +171,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.communication</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
 
 
 <span class="k">def</span> <span class="nf">determine_suffix</span><span class="p">(</span><span class="n">no_suffix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reverse_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -218,24 +209,6 @@
     <span class="k">return</span> <span class="n">suffix</span>
 
 
-<div class="viewcode-block" id="get_comm_class"><a class="viewcode-back" href="../../yggdrasil.communication.html#yggdrasil.communication.get_comm_class">[docs]</a><span class="k">def</span> <span class="nf">get_comm_class</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a communication class given it&#39;s name.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        comm (str, optional): Name of communicator class. Defaults to</span>
-<span class="sd">            tools.get_default_comm() if not provided.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        class: Communicator class.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">comm</span> <span class="o">==</span> <span class="s1">&#39;DefaultComm&#39;</span><span class="p">):</span>
-        <span class="n">comm</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_default_comm</span><span class="p">()</span>
-    <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;yggdrasil.communication.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">comm</span><span class="p">)</span>
-    <span class="n">comm_cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">comm_cls</span></div>
-
-
 <div class="viewcode-block" id="new_comm"><a class="viewcode-back" href="../../yggdrasil.communication.html#yggdrasil.communication.new_comm">[docs]</a><span class="k">def</span> <span class="nf">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a new communicator, creating necessary components for</span>
 <span class="sd">    communication (queues, sockets, channels, etc.).</span>
@@ -252,13 +225,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">comm</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">comm</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">comm</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="k">return</span> <span class="n">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">new_comm</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm</span>
             <span class="n">comm</span> <span class="o">=</span> <span class="s1">&#39;ForkComm&#39;</span>
-    <span class="n">comm_cls</span> <span class="o">=</span> <span class="n">get_comm_class</span><span class="p">(</span><span class="n">comm</span><span class="p">)</span>
+    <span class="n">comm_cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;DefaultComm&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">]:</span>
+        <span class="n">commtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">commtype</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">comm_cls</span><span class="o">.</span><span class="n">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
@@ -277,11 +253,6 @@
     <span class="k">return</span> <span class="n">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
     
 
-<div class="viewcode-block" id="DefaultComm"><a class="viewcode-back" href="../../yggdrasil.communication.html#yggdrasil.communication.DefaultComm">[docs]</a><span class="k">def</span> <span class="nf">DefaultComm</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Construct a comm object of the default type.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">get_comm_class</span><span class="p">()(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
 <div class="viewcode-block" id="cleanup_comms"><a class="viewcode-back" href="../../yggdrasil.communication.html#yggdrasil.communication.cleanup_comms">[docs]</a><span class="k">def</span> <span class="nf">cleanup_comms</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call cleanup_comms for the appropriate communicator class.</span>
 
@@ -293,18 +264,10 @@
 <span class="sd">        int: Number of comms closed.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">get_comm_class</span><span class="p">(</span><span class="n">comm</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup_comms</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup_comms</span><span class="p">()</span></div>
 
 
-<span class="k">def</span> <span class="nf">import_all_comms</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import all comms to ensure they are registered.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;*.py&#39;</span><span class="p">)):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
-            <span class="n">get_comm_class</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)[:</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
-
-
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;new_comm&#39;</span><span class="p">,</span> <span class="s1">&#39;get_comm&#39;</span><span class="p">,</span> <span class="s1">&#39;get_comm_class&#39;</span><span class="p">,</span> <span class="s1">&#39;cleanup_comms&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;DefaultComm&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;new_comm&#39;</span><span class="p">,</span> <span class="s1">&#39;get_comm&#39;</span><span class="p">,</span> <span class="s1">&#39;cleanup_comms&#39;</span><span class="p">]</span>
 </pre></div>
 
            </div>
@@ -341,7 +304,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.PickleFileComm &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.communication.PickleFileComm &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="yggdrasil.communication" href="../communication.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -179,14 +173,10 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.communication.PickleFileComm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">FileComm</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">register_component</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize.PickleSerialize</span> <span class="k">import</span> <span class="n">PickleSerialize</span>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">FileComm</span>
 
 
-<div class="viewcode-block" id="PickleFileComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.PickleFileComm.PickleFileComm">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">PickleFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="o">.</span><span class="n">FileComm</span><span class="p">):</span>
+<div class="viewcode-block" id="PickleFileComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.PickleFileComm.PickleFileComm">[docs]</a><span class="k">class</span> <span class="nc">PickleFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="o">.</span><span class="n">FileComm</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to a pickled file on disk.</span>
 
 <span class="sd">    Args:</span>
@@ -196,54 +186,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_filetype</span> <span class="o">=</span> <span class="s1">&#39;pickle&#39;</span>
-    <span class="n">_default_serializer</span> <span class="o">=</span> <span class="n">PickleSerialize</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;readmeth&#39;</span><span class="p">,</span> <span class="s1">&#39;read&#39;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">PickleFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<div class="viewcode-block" id="PickleFileComm.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.PickleFileComm.PickleFileComm.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>
-<span class="sd">                kwargs (dict): Keyword arguments for comms tested with the</span>
-<span class="sd">                    provided content.</span>
-<span class="sd">                send (list): List of objects to send to test file.</span>
-<span class="sd">                recv (list): List of objects that will be received from a test</span>
-<span class="sd">                    file that was sent the messages in &#39;send&#39;.</span>
-<span class="sd">                contents (bytes): Bytes contents of test file created by sending</span>
-<span class="sd">                    the messages in &#39;send&#39;.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PickleFileComm</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">()</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;recv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;send&#39;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">out</span></div>
-        
-    <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reads message from a file.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            timeout (float, optional): Time in seconds to wait for a message.</span>
-<span class="sd">                Defaults to self.recv_timeout. Unused.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            tuple (bool, str): Success or failure of reading from the file and</span>
-<span class="sd">                the read messages as bytes.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">prev_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
-        <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PickleFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_recv</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-        <span class="c1"># Rewind file if message contains more than one pickle</span>
-        <span class="k">if</span> <span class="n">msg</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">:</span>
-            <span class="n">fd</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="n">backwards</span><span class="o">.</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
-            <span class="n">used</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">prev_pos</span> <span class="o">+</span> <span class="n">used</span><span class="p">)</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[:</span><span class="n">used</span><span class="p">]</span>
-            <span class="n">fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span></div>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;The file contains one or more pickled &#39;</span>
+                                   <span class="s1">&#39;Python objects.&#39;</span><span class="p">)</span>
+    <span class="n">_default_serializer</span> <span class="o">=</span> <span class="s1">&#39;pickle&#39;</span>
+    <span class="n">_default_extension</span> <span class="o">=</span> <span class="s1">&#39;.pkl&#39;</span></div>
 </pre></div>
 
            </div>
@@ -280,7 +226,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

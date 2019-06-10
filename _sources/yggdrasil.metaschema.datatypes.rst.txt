@@ -11,10 +11,26 @@ Subpackages
 Submodules
 ----------
 
+yggdrasil.metaschema.datatypes.AnyMetaschemaType module
+-------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.AnyMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 yggdrasil.metaschema.datatypes.ArrayMetaschemaType module
 ---------------------------------------------------------
 
 .. automodule:: yggdrasil.metaschema.datatypes.ArrayMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.ClassMetaschemaType module
+---------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.ClassMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
@@ -39,6 +55,14 @@ yggdrasil.metaschema.datatypes.FunctionMetaschemaType module
 ------------------------------------------------------------
 
 .. automodule:: yggdrasil.metaschema.datatypes.FunctionMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.InstanceMetaschemaType module
+------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.InstanceMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:

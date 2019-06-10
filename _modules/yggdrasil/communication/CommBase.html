@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.CommBase &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.communication.CommBase &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="yggdrasil.communication" href="../communication.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -184,19 +178,19 @@
 <span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">import</span> <span class="nn">atexit</span>
 <span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">info</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">serialize</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="k">import</span> <span class="n">YGG_MSG_EOF</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">new_comm</span><span class="p">,</span> <span class="n">get_comm</span><span class="p">,</span> <span class="n">get_comm_class</span><span class="p">,</span> <span class="n">determine_suffix</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">register_component</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize.DefaultSerialize</span> <span class="k">import</span> <span class="n">DefaultSerialize</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">new_comm</span><span class="p">,</span> <span class="n">get_comm</span><span class="p">,</span> <span class="n">determine_suffix</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.MetaschemaType</span> <span class="k">import</span> <span class="n">MetaschemaType</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">JSONArrayMetaschemaType</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">JSONObjectMetaschemaType</span><span class="p">)</span>
 
 
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">_registered_servers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 <span class="n">_registered_comms</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 <span class="n">_server_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
@@ -275,7 +269,7 @@
         <span class="n">value</span> <span class="o">=</span> <span class="n">_registered_comms</span><span class="p">[</span><span class="n">comm_class</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dont_close</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">get_comm_class</span><span class="p">(</span><span class="n">comm_class</span><span class="p">)</span><span class="o">.</span><span class="n">close_registry_entry</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">comm_class</span><span class="p">)</span><span class="o">.</span><span class="n">close_registry_entry</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">del</span> <span class="n">value</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
@@ -329,8 +323,6 @@
 
 <div class="viewcode-block" id="CommThreadLoop.on_main_terminated"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommThreadLoop.on_main_terminated">[docs]</a>    <span class="k">def</span> <span class="nf">on_main_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions taken on the backlog thread when the main thread stops.&quot;&quot;&quot;</span>
-        <span class="c1"># for i in threading.enumerate():</span>
-        <span class="c1">#     print(i.name)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;is_interface = </span><span class="si">%s</span><span class="s1">, direction = </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
                    <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">is_interface</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">is_interface</span><span class="p">:</span>
@@ -379,8 +371,7 @@
             <span class="n">_registered_servers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="CommBase"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">CommBase</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">):</span>
+<div class="viewcode-block" id="CommBase"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase">[docs]</a><span class="k">class</span> <span class="nc">CommBase</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O.</span>
 
 <span class="sd">    Args:</span>
@@ -392,6 +383,24 @@
 <span class="sd">            through the connection. &#39;send&#39; if the connection will send</span>
 <span class="sd">            messages, &#39;recv&#39; if the connecton will receive messages. Defaults</span>
 <span class="sd">            to &#39;send&#39;.</span>
+<span class="sd">        partner_language (str, optional): Programming language of this comm&#39;s</span>
+<span class="sd">            partner comm. Defaults to &#39;python&#39;.</span>
+<span class="sd">        datatype (schema, optional): JSON schema (with expanded core types</span>
+<span class="sd">            defined by |yggdrasil|) that constrains the type of data that</span>
+<span class="sd">            should be sent/received by this object. Defaults to {&#39;type&#39;: &#39;bytes&#39;}.</span>
+<span class="sd">            Additional information on specifying datatypes can be found</span>
+<span class="sd">            :ref:`here &lt;datatypes_rst&gt;`.</span>
+<span class="sd">        field_names (list, optional): [DEPRECATED] Field names that should be</span>
+<span class="sd">            used to label fields in sent/received tables. This keyword is only</span>
+<span class="sd">            valid for table-like datatypes. If not provided, field names are</span>
+<span class="sd">            created based on the field order.</span>
+<span class="sd">        field_units (list, optional): [DEPRECATED] Field units that should be</span>
+<span class="sd">            used to convert fields in sent/received tables. This keyword is only</span>
+<span class="sd">            valid for table-like datatypes. If not provided, all fields are</span>
+<span class="sd">            assumed to be unitless.</span>
+<span class="sd">        as_array (bool, optional): [DEPRECATED] If True and the datatype is</span>
+<span class="sd">            table-like, tables are sent/recieved with either columns rather</span>
+<span class="sd">            than row by row. Defaults to False.</span>
 <span class="sd">        serializer (:class:.DefaultSerialize, optional): Class with serialize and</span>
 <span class="sd">            deserialize methods that should be used to process sent and received</span>
 <span class="sd">            messages. Defaults to None and is constructed using provided</span>
@@ -439,12 +448,19 @@
 <span class="sd">            code. Defaults to False.</span>
 <span class="sd">        **kwargs: Additional keywords arguments are passed to parent class.</span>
 
+<span class="sd">    Class Attributes:</span>
+<span class="sd">        is_file (bool): True if the comm accesses a file.</span>
+<span class="sd">        _maxMsgSize (int): Maximum size of a single message that should be sent.</span>
+<span class="sd">        address_description (str): Description of the information constituting</span>
+<span class="sd">            an address for this communication mechanism.</span>
+
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): The environment variable where communication address is</span>
 <span class="sd">            stored.</span>
 <span class="sd">        address (str): Communication info.</span>
 <span class="sd">        direction (str): The direction that messages should flow through the</span>
 <span class="sd">            connection.</span>
+<span class="sd">        partner_language (str): Programming language of this comm&#39;s partner comm.</span>
 <span class="sd">        serializer (:class:.DefaultSerialize): Object that will be used to</span>
 <span class="sd">            serialize/deserialize messages to/from python objects.</span>
 <span class="sd">        is_interface (bool): True if this comm is a Python interface binding.</span>
@@ -464,11 +480,9 @@
 <span class="sd">            that will be receiving messages from one or more clients.</span>
 <span class="sd">        is_response_server (bool): If True, the comm is a server-side response</span>
 <span class="sd">            comm.</span>
-<span class="sd">        is_file (bool): True if the comm accesses a file.</span>
 <span class="sd">        recv_converter (func): Converter that should be used on received objects.</span>
 <span class="sd">        send_converter (func): Converter that should be used on sent objects.</span>
 <span class="sd">        matlab (bool): True if the comm will be accessed by Matlab code.</span>
-<span class="sd">        maxMsgSize (int): Maximum size of a single message that should be sent.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: If the comm class is not installed.</span>
@@ -479,25 +493,34 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># TODO: Add serializer to comm schema</span>
-    <span class="n">_commtype</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span>
+    <span class="n">_commtype</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_schema_type</span> <span class="o">=</span> <span class="s1">&#39;comm&#39;</span>
+    <span class="n">_schema_subtype_key</span> <span class="o">=</span> <span class="s1">&#39;commtype&#39;</span>
     <span class="n">_schema_required</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype&#39;</span><span class="p">]</span>
     <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
-                          <span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">_commtype</span><span class="p">},</span>
+                          <span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Communication mechanism &#39;</span>
+                                                       <span class="s1">&#39;that should be used.&#39;</span><span class="p">)},</span>
                           <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;schema&#39;</span><span class="p">,</span>
                                        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">}},</span>
-                          <span class="s1">&#39;recv_converter&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;function&#39;</span><span class="p">},</span>
+                          <span class="s1">&#39;recv_converter&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">]},</span>
                           <span class="s1">&#39;send_converter&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;function&#39;</span><span class="p">},</span>
-                          <span class="s1">&#39;field_names&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
-                          <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
+                          <span class="s1">&#39;field_names&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
+                          <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
                           <span class="s1">&#39;as_array&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}</span>
-    <span class="n">_default_serializer</span> <span class="o">=</span> <span class="n">DefaultSerialize</span>
+    <span class="n">_schema_excluded_from_class</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+    <span class="n">_default_serializer</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span>
+    <span class="n">_default_serializer_class</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_schema_excluded_from_class_validation</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span>
     <span class="n">is_file</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">_maxMsgSize</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">address_description</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span>
-                 <span class="n">dont_open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_interface</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-                 <span class="n">close_on_eof_recv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">close_on_eof_send</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">partner_language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="n">dont_open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_interface</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">recv_timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">close_on_eof_recv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">close_on_eof_send</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">single_use</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reverse_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_suffix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">is_client</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_response_client</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">is_server</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_response_server</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -505,6 +528,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_comm_class</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">comm</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_class</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">MetaschemaType</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CommBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Comm class </span><span class="si">%s</span><span class="s2"> not installed&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
@@ -521,6 +546,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">address</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partner_language</span> <span class="o">=</span> <span class="n">partner_language</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span> <span class="o">=</span> <span class="n">is_client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_server</span> <span class="o">=</span> <span class="n">is_server</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_response_client</span> <span class="o">=</span> <span class="n">is_response_client</span>
@@ -574,34 +600,62 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serializer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialization steps that should be performed after base class, but</span>
 <span class="sd">        before the comm is opened.&quot;&quot;&quot;</span>
-        <span class="n">datatype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">datatype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">datatype</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">datatype</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;serializer_kwargs&#39;</span><span class="p">,</span> <span class="p">{}))</span>
-        <span class="k">if</span> <span class="n">serializer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span> <span class="o">=</span> <span class="n">serializer</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">cls</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;serializer_class&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_serializer</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">seri_kws</span><span class="p">():</span>
+        <span class="n">seri_cls</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;serializer_class&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">seri_kws</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;serializer_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;datatype&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">seri_kws</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="s1">&#39;serializer&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;serializer&#39;</span><span class="p">)))):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_serializer</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">seri_kws</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;seritype&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">seri_kws</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Only update serializer if not already set</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Get serializer class</span>
+            <span class="k">if</span> <span class="n">seri_cls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(((</span><span class="n">seri_kws</span><span class="p">[</span><span class="s1">&#39;seritype&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_serializer</span><span class="p">)</span>
+                     <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_default_serializer_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))):</span>
+                    <span class="n">seri_cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_serializer_class</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">seri_cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;serializer&#39;</span><span class="p">,</span>
+                                                <span class="n">subtype</span><span class="o">=</span><span class="n">seri_kws</span><span class="p">[</span><span class="s1">&#39;seritype&#39;</span><span class="p">])</span>
+            <span class="c1"># Recover keyword arguments for serializer passed to comm class</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">seri_cls</span><span class="o">.</span><span class="n">seri_kws</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-                    <span class="c1"># TODO: Change to pop once old seri keywords not in comm</span>
-                    <span class="c1"># schema directly</span>
-                    <span class="n">datatype</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;datatype = </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">datatype</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">datatype</span><span class="p">)</span>
-        <span class="c1"># Transfer keywords form the schema</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
-                <span class="k">continue</span>
-            <span class="n">default</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">default</span><span class="p">))</span>
+                    <span class="n">seri_kws</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="c1"># Create serializer instance</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;seri_kws = </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">seri_kws</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span> <span class="o">=</span> <span class="n">seri_cls</span><span class="p">(</span><span class="o">**</span><span class="n">seri_kws</span><span class="p">)</span>
+        <span class="c1"># Set send/recv converter based on the serializer</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;recv_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;send_converter&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
+<div class="viewcode-block" id="CommBase.before_registration"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="sd">        to registration.&quot;&quot;&quot;</span>
+        <span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer_class</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;serializer&#39;</span><span class="p">,</span>
+                                                         <span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer</span><span class="p">)</span></div>
+        
 <div class="viewcode-block" id="CommBase.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">serializer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            serializer (str, optional): The name of the serializer that should</span>
+<span class="sd">                be used. If not provided, the _default_serializer class</span>
+<span class="sd">                attribute will be used.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>
@@ -614,29 +668,60 @@
 <span class="sd">                    the messages in &#39;send&#39;.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">],</span>
-               <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]),</span>
-               <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
-               <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]}</span>
+        <span class="k">if</span> <span class="n">serializer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">serializer</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="n">serializer</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))):</span>
+            <span class="n">seri_cls</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer_class</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">seri_cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;serializer&#39;</span><span class="p">,</span> <span class="n">serializer</span><span class="p">)</span>
+        <span class="n">out_seri</span> <span class="o">=</span> <span class="n">seri_cls</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="n">out_seri</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">],</span>
+               <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">out_seri</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]),</span>
+               <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="n">out_seri</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+               <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="n">out_seri</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]}</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;recv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;send&#39;</span><span class="p">])</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;dict&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;f0&#39;</span><span class="p">:</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]}</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;dict&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seri_cls</span><span class="o">.</span><span class="n">object2dict</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">out_seri</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;exact_contents&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;exact_contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">msg_array</span> <span class="o">=</span> <span class="n">seri_cls</span><span class="o">.</span><span class="n">object2array</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">msg_array</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg_array&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg_array</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">],</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg_long&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_maxMsgSize</span> <span class="o">*</span> <span class="sa">b</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg_long&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out_seri</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">out_seri</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="CommBase.printStatus"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print status of the communicator.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CommBase.get_status_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.get_status_message">[docs]</a>    <span class="k">def</span> <span class="nf">get_status_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return lines composing a status message.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            nindent (int, optional): Number of tabs that should be used to</span>
+<span class="sd">                indent each line. Defaults to 0.</span>
+<span class="sd">                </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple(list, prefix): Lines composing the status message and the</span>
+<span class="sd">                prefix string used for the last message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">prefix</span> <span class="o">=</span> <span class="n">nindent</span> <span class="o">*</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)]</span>
         <span class="n">prefix</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;open&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nsent&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_sent</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nrecv&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_recv</span><span class="p">))</span></div>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">),</span>
+                  <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">),</span>
+                  <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;open&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">),</span>
+                  <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nsent&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_sent</span><span class="p">),</span>
+                  <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nrecv&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_recv</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">lines</span><span class="p">,</span> <span class="n">prefix</span></div>
+
+<div class="viewcode-block" id="CommBase.printStatus"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print status of the communicator.&quot;&quot;&quot;</span>
+        <span class="n">lines</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="CommBase.is_installed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -672,18 +757,16 @@
                 <span class="k">elif</span> <span class="n">use_any</span><span class="p">:</span>
                     <span class="n">out</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="k">break</span>
-        <span class="k">elif</span> <span class="n">language</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="s1">&#39;cmake&#39;</span><span class="p">]:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">language</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;lpy&#39;</span><span class="p">,</span> <span class="s1">&#39;matlab&#39;</span><span class="p">]:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">language</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;executable&#39;</span><span class="p">]:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">comm_class</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CommBase&#39;</span><span class="p">,</span> <span class="s1">&#39;AsyncComm&#39;</span><span class="p">,</span> <span class="s1">&#39;ForkComm&#39;</span><span class="p">,</span> <span class="s1">&#39;ErrorClass&#39;</span><span class="p">]:</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">language</span> <span class="ow">in</span> <span class="n">lang_list</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># Default to False for languages so subclasses must be explicit</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="c1"># Check driver</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="p">(</span><span class="n">commtype</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_commtype</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
     <span class="nd">@property</span>
@@ -699,8 +782,13 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">comm_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of communication class.&quot;&quot;&quot;</span>
+        <span class="c1"># TODO: Change this to return self._commtype</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comm_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_comm_class</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_is_error_class&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">name_cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">name_cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_comm_class</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name_cls</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comm_class</span>
 
 <div class="viewcode-block" id="CommBase.underlying_comm_class"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.underlying_comm_class">[docs]</a>    <span class="nd">@classmethod</span>
@@ -725,11 +813,13 @@
 
 <div class="viewcode-block" id="CommBase.register_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.register_comm">[docs]</a>    <span class="k">def</span> <span class="nf">register_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register a comm.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Registering comm: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Registering </span><span class="si">%s</span><span class="s2"> comm: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_class</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
         <span class="n">register_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm_class</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.unregister_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.unregister_comm">[docs]</a>    <span class="k">def</span> <span class="nf">unregister_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">dont_close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unregister a comm.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Unregistering </span><span class="si">%s</span><span class="s2"> comm: </span><span class="si">%s</span><span class="s2"> (dont_close = </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">comm_class</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">dont_close</span><span class="p">)</span>
         <span class="n">unregister_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm_class</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">dont_close</span><span class="o">=</span><span class="n">dont_close</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommBase.comm_count"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.comm_count">[docs]</a>    <span class="nd">@classmethod</span>
@@ -737,9 +827,9 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of communication connections.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">comm_registry</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">out</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">info</span><span class="p">(</span><span class="s1">&#39;There are </span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> comms: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
-                 <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">comm_registry</span><span class="p">()),</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-                 <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">comm_registry</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;There are </span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> comms: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">comm_registry</span><span class="p">()),</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                        <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">comm_registry</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="CommBase.new_comm_kwargs"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.new_comm_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
@@ -763,7 +853,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">new_comm_kwargs</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">new_comm_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">new_cls</span> <span class="o">=</span> <span class="n">get_comm_class</span><span class="p">(</span><span class="n">new_comm_class</span><span class="p">)</span>
+            <span class="n">new_cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">new_comm_class</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">new_cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -792,8 +882,7 @@
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;recv&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;send&#39;</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">_schema_properties</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">input_kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">kwargs</span></div>
 
 <div class="viewcode-block" id="CommBase.bind"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1472,7 +1561,7 @@
             <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_multipart</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_used</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_send_serializer</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
             <span class="c1"># Handle error caused by calling repr on unyt array that isn&#39;t float64</span>
@@ -1790,9 +1879,7 @@
              <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
              <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args_dict</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">))):</span>
             <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;key_order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;key_order&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;key_order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">args_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
             <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;key_order&#39;</span><span class="p">]</span>
         <span class="n">args</span> <span class="o">=</span> <span class="n">JSONArrayMetaschemaType</span><span class="o">.</span><span class="n">coerce_type</span><span class="p">(</span><span class="n">args_dict</span><span class="p">,</span> <span class="o">**</span><span class="n">metadata</span><span class="p">)</span>
         <span class="c1"># Add field order to kwargs so it can be reconstructed</span>
@@ -1914,7 +2001,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

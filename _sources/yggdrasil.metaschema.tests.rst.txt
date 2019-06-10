@@ -1,6 +1,26 @@
 yggdrasil.metaschema.tests package
 ==================================
 
+Submodules
+----------
+
+yggdrasil.metaschema.tests.test\_encoder module
+-----------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.tests.test_encoder
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.tests.test\_normalizer module
+--------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.tests.test_normalizer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 Module contents
 ---------------
 

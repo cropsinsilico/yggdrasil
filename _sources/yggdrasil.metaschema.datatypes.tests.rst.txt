@@ -4,10 +4,26 @@ yggdrasil.metaschema.datatypes.tests package
 Submodules
 ----------
 
+yggdrasil.metaschema.datatypes.tests.test\_AnyMetaschemaType module
+-------------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.tests.test_AnyMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 yggdrasil.metaschema.datatypes.tests.test\_ArrayMetaschemaType module
 ---------------------------------------------------------------------
 
 .. automodule:: yggdrasil.metaschema.datatypes.tests.test_ArrayMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.tests.test\_ClassMetaschemaType module
+---------------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.tests.test_ClassMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
@@ -24,6 +40,14 @@ yggdrasil.metaschema.datatypes.tests.test\_FunctionMetaschemaType module
 ------------------------------------------------------------------------
 
 .. automodule:: yggdrasil.metaschema.datatypes.tests.test_FunctionMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.tests.test\_InstanceMetaschemaType module
+------------------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.tests.test_InstanceMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:

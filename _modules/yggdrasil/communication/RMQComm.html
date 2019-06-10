@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.RMQComm &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.communication.RMQComm &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="yggdrasil.communication" href="../communication.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -181,19 +175,24 @@
   <h1>Source code for yggdrasil.communication.RMQComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">AsyncComm</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">pika</span>
     <span class="n">_rmq_installed</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Could not import pika. &quot;</span>
-                    <span class="o">+</span> <span class="s2">&quot;RabbitMQ support will be disabled.&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Could not import pika. &quot;</span>
+                   <span class="o">+</span> <span class="s2">&quot;RabbitMQ support will be disabled.&quot;</span><span class="p">)</span>
     <span class="n">pika</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_rmq_installed</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">register_component</span>
 
 
 <span class="n">_rmq_param_sep</span> <span class="o">=</span> <span class="s1">&#39;_RMQPARAM_&#39;</span>
+<span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
+    
+<div class="viewcode-block" id="BlockingIOError"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.BlockingIOError">[docs]</a>    <span class="k">class</span> <span class="nc">BlockingIOError</span><span class="p">:</span>
+        <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="check_rmq_server"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.check_rmq_server">[docs]</a><span class="k">def</span> <span class="nf">check_rmq_server</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -245,9 +244,6 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<span class="n">_rmq_server_running</span> <span class="o">=</span> <span class="n">check_rmq_server</span><span class="p">()</span>
-
-
 <div class="viewcode-block" id="RMQServer"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQServer">[docs]</a><span class="k">class</span> <span class="nc">RMQServer</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommServer</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;RMQ server object for cleaning up server connections.&quot;&quot;&quot;</span>
 
@@ -256,8 +252,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQServer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="RMQComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">RMQComm</span><span class="p">(</span><span class="n">AsyncComm</span><span class="o">.</span><span class="n">AsyncComm</span><span class="p">):</span>
+<div class="viewcode-block" id="RMQComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm">[docs]</a><span class="k">class</span> <span class="nc">RMQComm</span><span class="p">(</span><span class="n">AsyncComm</span><span class="o">.</span><span class="n">AsyncComm</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling basic RabbitMQ communications.</span>
 
 <span class="sd">    Attributes:</span>
@@ -267,12 +262,27 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: If a connection cannot be established.</span>
 
+<span class="sd">    Developer Notes:</span>
+<span class="sd">        It is not advised that new language implement a RabbitMQ communication</span>
+<span class="sd">        interface. Rather RMQ communication is included explicitly for</span>
+<span class="sd">        connections between models that are not co-located on the same machine</span>
+<span class="sd">        and are used by the |yggdrasil| framework connections on the Python side.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_commtype</span> <span class="o">=</span> <span class="s1">&#39;rmq&#39;</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;RabbitMQ connection.&#39;</span><span class="p">)</span>
     <span class="c1"># Based on limit of 32bit int, this could be 2**30, but this is</span>
     <span class="c1"># too large for stack allocation in C so 2**20 will be used.</span>
     <span class="n">_maxMsgSize</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">20</span>
+    <span class="n">address_description</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;AMPQ queue address of the form &quot;</span>
+                           <span class="s2">&quot;``&lt;url&gt;_RMQPARAM_&lt;exchange&gt;_RMQPARAM_&lt;queue&gt;`` &quot;</span>
+                           <span class="s2">&quot;where ``url`` is the broker address (see explanation &quot;</span>
+                           <span class="s2">&quot;`here &lt;https://pika.readthedocs.io/en/stable/&quot;</span>
+                           <span class="s2">&quot;examples/using_urlparameters.html&gt;`_), &quot;</span>
+                           <span class="s2">&quot;``exchange`` is the name of the exchange on the queue &quot;</span>
+                           <span class="s2">&quot;that should be used, and ``queue`` is the name of &quot;</span>
+                           <span class="s2">&quot;the queue.&quot;</span><span class="p">)</span>
     
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set null connection and channel.&quot;&quot;&quot;</span>
@@ -280,9 +290,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_open</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="c1"># Check that connection is possible</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">check_rmq_server</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not connect to RabbitMQ server.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_server_class</span> <span class="o">=</span> <span class="n">RMQServer</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -360,26 +367,6 @@
                 <span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">virtual_host</span><span class="p">)</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_rmq_param_sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">url</span><span class="p">,</span> <span class="n">exchange</span><span class="p">,</span> <span class="n">queue</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
-
-<div class="viewcode-block" id="RMQComm.is_installed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the necessary libraries are installed for this</span>
-<span class="sd">        communication class.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            language (str, optional): Specific language that should be checked</span>
-<span class="sd">                for compatibility. Defaults to None and all languages supported</span>
-<span class="sd">                on the current platform will be checked.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            bool: Is the comm installed.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;python&#39;</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">_rmq_server_running</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RMQComm</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="RMQComm.underlying_comm_class"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQComm.RMQComm.underlying_comm_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -519,6 +506,9 @@
                 <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
                                                  <span class="n">auto_delete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                                  <span class="n">passive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">BlockingIOError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_queue_result</span><span class="p">()</span>
             <span class="k">except</span> <span class="p">(</span><span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ChannelClosed</span><span class="p">,</span>
                     <span class="n">pika</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionClosed</span><span class="p">,</span>
                     <span class="ne">AttributeError</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
@@ -676,7 +666,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

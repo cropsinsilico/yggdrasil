@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.LPyModelDriver &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.drivers.LPyModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="yggdrasil.drivers" href="../drivers.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -179,58 +173,42 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.drivers.LPyModelDriver</h1><div class="highlight"><pre>
-<span></span><span class="c1">#</span>
-<span class="c1"># This should not be used directly by modelers</span>
-<span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">debug</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.ModelDriver</span> <span class="k">import</span> <span class="n">ModelDriver</span>
-<span class="k">try</span><span class="p">:</span>  <span class="c1"># pragma: lpy</span>
-    <span class="kn">from</span> <span class="nn">openalea</span> <span class="k">import</span> <span class="n">lpy</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no lpy</span>
-    <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Could not import openalea.lpy. &quot;</span>
-          <span class="o">+</span> <span class="s2">&quot;LPy support will be disabled.&quot;</span><span class="p">)</span>
-    <span class="n">lpy</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">register_component</span>
-<span class="n">_lpy_installed</span> <span class="o">=</span> <span class="p">(</span><span class="n">lpy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="k">import</span> <span class="n">get_language_dir</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.PythonModelDriver</span> <span class="k">import</span> <span class="n">PythonModelDriver</span>
 
 
-<span class="n">_model_script</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;lpy_model.py&#39;</span><span class="p">)</span>
+<span class="n">_model_script</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_language_dir</span><span class="p">(</span><span class="s1">&#39;lpy&#39;</span><span class="p">),</span> <span class="s1">&#39;lpy_model.py&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="LPyModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.LPyModelDriver.LPyModelDriver">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">LPyModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running LPy models.</span>
+<div class="viewcode-block" id="LPyModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.LPyModelDriver.LPyModelDriver">[docs]</a><span class="k">class</span> <span class="nc">LPyModelDriver</span><span class="p">(</span><span class="n">PythonModelDriver</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running LPy models.&quot;&quot;&quot;</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        name (str): Driver name.</span>
-<span class="sd">        args (str): The LPy l-system file.</span>
-<span class="sd">        **kwargs: Additional keyword arguments are passed to parent class&#39;s</span>
-<span class="sd">            __init__ method.</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is an LPy system.&#39;</span><span class="p">)</span>
+    
+    <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;lpy&#39;</span>
+    <span class="n">language_ext</span> <span class="o">=</span> <span class="s1">&#39;.lpy&#39;</span>
+    <span class="c1"># base_languages = [&#39;python&#39;]  # Uncomment if PythonModelDriver not parent</span>
+    <span class="n">default_interpreter_flags</span> <span class="o">=</span> <span class="p">[</span><span class="n">_model_script</span><span class="p">]</span>
+    <span class="n">interface_dependencies</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;openalea.lpy&#39;</span><span class="p">]</span>
+    <span class="n">function_param</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="LPyModelDriver.language_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.language_version">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">language_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
 
-    <span class="n">_language</span> <span class="o">=</span> <span class="s1">&#39;lpy&#39;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_lpy_installed</span><span class="p">:</span>  <span class="c1"># pragma: no lpy</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;LPy is not installed.&quot;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">LPyModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="n">_model_script</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span>
-
-<div class="viewcode-block" id="LPyModelDriver.is_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
-<span class="sd">        machine.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to cls.run_executable.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            bool: Truth of if this model driver can be run on the current</span>
-<span class="sd">                machine.</span>
+<span class="sd">            str: Version of compiler/interpreter for this language.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_lpy_installed</span></div></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">openalea.lpy</span>
+            <span class="k">return</span> <span class="n">openalea</span><span class="o">.</span><span class="n">lpy</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">LPY_VERSION_STR</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;openalea.lpy not installed.&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
@@ -267,7 +245,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

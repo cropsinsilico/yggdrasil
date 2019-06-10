@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests.test_schema &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.tests.test_schema &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="yggdrasil.tests" href="../tests.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -196,6 +190,7 @@
                   <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()}],</span>
       <span class="s1">&#39;connections&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="s1">&#39;outputA&#39;</span><span class="p">,</span>
                        <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="s1">&#39;fileA.txt&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;seritype&#39;</span><span class="p">:</span> <span class="s1">&#39;direct&#39;</span><span class="p">,</span>
                        <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()}]},</span>
      <span class="p">{</span><span class="s1">&#39;models&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span>
@@ -210,6 +205,7 @@
                        <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;fileA.txt&#39;</span><span class="p">,</span>
                                     <span class="s1">&#39;filetype&#39;</span><span class="p">:</span> <span class="s1">&#39;binary&#39;</span><span class="p">,</span>
                                     <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
+                                    <span class="s1">&#39;serializer&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;seritype&#39;</span><span class="p">:</span> <span class="s1">&#39;direct&#39;</span><span class="p">},</span>
                                     <span class="s1">&#39;field_names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">],</span>
                                     <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">]}]}]})]</span>
                                     
@@ -238,7 +234,8 @@
         <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">subtypes</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">classes</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">ksub</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">classes</span><span class="p">:</span>
-            <span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_properties</span><span class="p">(</span><span class="n">ksub</span><span class="p">)</span></div>
+            <span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_properties</span><span class="p">(</span><span class="n">ksub</span><span class="p">)</span>
+            <span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">default_subtype</span></div>
 
 
 <div class="viewcode-block" id="test_create_schema"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_schema.test_create_schema">[docs]</a><span class="k">def</span> <span class="nf">test_create_schema</span><span class="p">():</span>
@@ -286,11 +283,13 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test normalization of legacy formats.&quot;&quot;&quot;</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">get_schema</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">_normalize_objects</span><span class="p">:</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">backwards_compat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">backwards_compat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># , show_errors=True)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected Normalization:</span><span class="se">\n\n</span><span class="s2">A:&quot;</span><span class="p">)</span>
             <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">B:&#39;</span><span class="p">)</span>
             <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
             <span class="k">raise</span></div>
 
@@ -334,7 +333,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Units &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>Units &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/>
         <link rel="next" title="C-Style Format Strings" href="c_format_strings.html"/>
         <link rel="prev" title="Configuration Files" href="config.html"/> 
 
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -102,18 +102,16 @@
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Units</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Units</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#schema-datatypes">Schema Datatypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-objects">Python Objects</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -181,9 +179,49 @@
             
   <div class="section" id="units">
 <span id="units-rst"></span><h1>Units<a class="headerlink" href="#units" title="Permalink to this headline">¶</a></h1>
-<div class="admonition-todo admonition" id="index-0">
-<p class="first admonition-title">Todo</p>
-<p class="last">Explanation of how to specify units.</p>
+<p>Units are handled via the <a class="reference external" href="https://unyt.readthedocs.io/en/stable/">unyt</a>
+package in Python &gt;=3 and via <a class="reference external" href="https://pint.readthedocs.io/en/0.9/">pint</a>
+in Python 2. In both cases, units are specified via strings
+associated with the units (usually the abbreviation; e.g.
+<code class="docutils literal notranslate"><span class="pre">'cm'</span></code> for centimeters or <code class="docutils literal notranslate"><span class="pre">'umol'</span></code> for micromoles). In addition, units can be
+expressed as composites via symbolic arithmetic (e.g. <code class="docutils literal notranslate"><span class="pre">'km/s'</span></code> for kilometers
+per second or <code class="docutils literal notranslate"><span class="pre">'km**2'</span></code> for square kilometer)</p>
+<div class="section" id="schema-datatypes">
+<h2>Schema Datatypes<a class="headerlink" href="#schema-datatypes" title="Permalink to this headline">¶</a></h2>
+<p>The primary case where users will encounter units is within types associated
+with model inputs and outputs in model specification YAML files. If a YAML
+specifies a connection between a model output and input that do not have the
+same units, yggdrasil will automatically perform the conversion from the
+units of the sending model to the units of the receiving model. If the units
+are not compatible, an error will be raised.</p>
+<p>Units can be added to numeric scalars and arrays.</p>
+</div>
+<div class="section" id="python-objects">
+<h2>Python Objects<a class="headerlink" href="#python-objects" title="Permalink to this headline">¶</a></h2>
+<p>In Python, units can be added to numeric types (or retrieved) using the
+yggdrasil units submodule which wraps the particular behavior of the
+underlying packages. Using unyt:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">units</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">unyt_quantity(1., &#39;cm&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">&#39;cm&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+<p>or using pint:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">units</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">1.0 &lt;Unit(&#39;centimeter&#39;)&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">&#39;centimeter&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -231,7 +269,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.JSONFileComm &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.communication.JSONFileComm &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="yggdrasil.communication" href="../communication.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -180,12 +174,9 @@
             
   <h1>Source code for yggdrasil.communication.JSONFileComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">FileComm</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">register_component</span><span class="p">,</span> <span class="n">inherit_schema</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize.JSONSerialize</span> <span class="k">import</span> <span class="n">JSONSerialize</span>
 
 
-<div class="viewcode-block" id="JSONFileComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.JSONFileComm.JSONFileComm">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">JSONFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="o">.</span><span class="n">FileComm</span><span class="p">):</span>
+<div class="viewcode-block" id="JSONFileComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.JSONFileComm.JSONFileComm">[docs]</a><span class="k">class</span> <span class="nc">JSONFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="o">.</span><span class="n">FileComm</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to a JSON file on disk.</span>
 
 <span class="sd">    Args:</span>
@@ -195,29 +186,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_filetype</span> <span class="o">=</span> <span class="s1">&#39;json&#39;</span>
-    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="n">inherit_schema</span><span class="p">(</span>
-        <span class="n">FileComm</span><span class="o">.</span><span class="n">FileComm</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">JSONSerialize</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">)</span>
-    <span class="n">_default_serializer</span> <span class="o">=</span> <span class="n">JSONSerialize</span>
-
-<div class="viewcode-block" id="JSONFileComm.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.JSONFileComm.JSONFileComm.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>
-<span class="sd">                kwargs (dict): Keyword arguments for comms tested with the</span>
-<span class="sd">                    provided content.</span>
-<span class="sd">                send (list): List of objects to send to test file.</span>
-<span class="sd">                recv (list): List of objects that will be received from a test</span>
-<span class="sd">                    file that was sent the messages in &#39;send&#39;.</span>
-<span class="sd">                contents (bytes): Bytes contents of test file created by sending</span>
-<span class="sd">                    the messages in &#39;send&#39;.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">JSONFileComm</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">()</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;recv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;send&#39;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">out</span></div></div>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;The file contains a JSON serialized object.&#39;</span><span class="p">)</span>
+    <span class="n">_default_serializer</span> <span class="o">=</span> <span class="s1">&#39;json&#39;</span></div>
 </pre></div>
 
            </div>
@@ -254,7 +224,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

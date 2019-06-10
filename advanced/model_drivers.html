@@ -1,0 +1,2381 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Model Drivers &mdash; yggdrasil 0.9.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/>
+        <link rel="up" title="Advanced" href="index.html"/>
+        <link rel="next" title="Model Interface" href="model_interface.html"/>
+        <link rel="prev" title="Input/Output Drivers" href="io_drivers.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Advanced</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="serialization.html">Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Model Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-base-classes">Model Base Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html">Code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Advanced</a> &raquo;</li>
+        
+      <li>Model Drivers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/advanced/model_drivers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="model-drivers">
+<span id="model-drivers-rst"></span><h1>Model Drivers<a class="headerlink" href="#model-drivers" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver">
+<em class="property">class </em><code class="descclassname">yggdrasil.drivers.ExecutableModelDriver.</code><code class="descname">ExecutableModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>model_index=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ExecutableModelDriver.html#ExecutableModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for running executable based models.</p>
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.executable_command">
+<em class="property">classmethod </em><code class="descname">executable_command</code><span class="sig-paren">(</span><em>args</em>, <em>unused_kwargs=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ExecutableModelDriver.html#ExecutableModelDriver.executable_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.executable_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compose a command for running a program using the exectuable for
+this language (compiler/interpreter) with the provided arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – The program that returned command should run and any
+arguments that should be provided to it.</li>
+<li><strong>unused_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Existing dictionary that unused
+keyword arguments should be added to. Defaults to None and is
+ignored.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are ignored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Arguments composing the command required to run the program</dt>
+<dd><p class="first last">from the command line using the executable for this language.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_comm_installed">
+<em class="property">classmethod </em><code class="descname">is_comm_installed</code><span class="sig-paren">(</span><em>commtype=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ExecutableModelDriver.html#ExecutableModelDriver.is_comm_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_comm_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if a comm is installed for the associated programming
+language.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if a comm is installed for this language.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_configured">
+<em class="property">classmethod </em><code class="descname">is_configured</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ExecutableModelDriver.html#ExecutableModelDriver.is_configured"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_configured" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the appropriate configuration has been performed (e.g.
+installation of supporting libraries etc.)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the language has been configured.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_language_installed">
+<em class="property">classmethod </em><code class="descname">is_language_installed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ExecutableModelDriver.html#ExecutableModelDriver.is_language_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_language_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the interpreter/compiler for the associated programming
+language is installed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the language interpreter/compiler is installed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.language_version">
+<em class="property">classmethod </em><code class="descname">language_version</code><span class="sig-paren">(</span><em>version_flags=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ExecutableModelDriver.html#ExecutableModelDriver.language_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.language_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the version of this language.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> – Keyword arguments are passed to cls.run_executable.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Version of compiler/interpreter for this language.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver">
+<em class="property">class </em><code class="descclassname">yggdrasil.drivers.PythonModelDriver.</code><code class="descname">PythonModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/PythonModelDriver.html#PythonModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for running Python models.</p>
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_comm_installed">
+<em class="property">classmethod </em><code class="descname">is_comm_installed</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/PythonModelDriver.html#PythonModelDriver.is_comm_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_comm_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if a comm is installed for the associated programming
+language.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent
+class’s method.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if a comm is installed for this language.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_language_installed">
+<em class="property">classmethod </em><code class="descname">is_language_installed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/PythonModelDriver.html#PythonModelDriver.is_language_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_language_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if this model driver is installed on the current
+machine.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Truth of if this model driver can be run on the current</dt>
+<dd>machine.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_library_installed">
+<em class="property">classmethod </em><code class="descname">is_library_installed</code><span class="sig-paren">(</span><em>lib</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/PythonModelDriver.html#PythonModelDriver.is_library_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_library_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if a dependency is installed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lib</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of the library that should be checked.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are ignored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the library is installed, False otherwise.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver">
+<em class="property">class </em><code class="descclassname">yggdrasil.drivers.MatlabModelDriver.</code><code class="descname">MatlabModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for running Matlab models.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Driver name.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – Argument(s) for running the model in matlab.
+Generally, this should be the full path to a Matlab script.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class’s
+__init__ method.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.started_matlab">
+<code class="descname">started_matlab</code><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.started_matlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the driver had to start a new matlab
+engine. False otherwise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.screen_session">
+<code class="descname">screen_session</code><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.screen_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Screen session that Matlab was started in.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.mlengine">
+<code class="descname">mlengine</code><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.mlengine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Matlab engine used to run script.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.mlsession">
+<code class="descname">mlsession</code><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.mlsession" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the Matlab session that was started.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If Matlab is not installed.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Matlab models that call exit will shut down the shared engine.</p>
+</div>
+<dl class="method">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.after_loop">
+<code class="descname">after_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.after_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.after_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to perform after run_loop has finished. Mainly checking
+if there was an error and then handling it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.before_start">
+<code class="descname">before_start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.before_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.before_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to perform before the run loop.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.check_exits">
+<code class="descname">check_exits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.check_exits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.check_exits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check to make sure the program dosn’t contain any exits as exits
+will shut down the Matlab engine as well as the program.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If there are any exit calls in the file.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the Matlab session and engine.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.configure">
+<em class="property">classmethod </em><code class="descname">configure</code><span class="sig-paren">(</span><em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add configuration options for this language. This includes locating
+any required external libraries and setting option defaults.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg</strong> (<em>YggConfigParser</em>) – Config class that options should be set for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Section, option, description tuples for options that could not</dt>
+<dd>be set.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.executable_command">
+<em class="property">classmethod </em><code class="descname">executable_command</code><span class="sig-paren">(</span><em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.executable_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.executable_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compose a command for running a program in this language with the
+provied arguments. If not already present, the interpreter command and
+interpreter flags are prepended to the provided arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – The program that returned command should run and any
+arguments that should be provided to it.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are ignored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Arguments composing the command required to run the program</dt>
+<dd><p class="first last">from the command line using the interpreter for this language.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.get_matlab_info">
+<em class="property">classmethod </em><code class="descname">get_matlab_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.get_matlab_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.get_matlab_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the root directory where Matlab is installed and the version
+that is installed (if Matlab is installed at all). This will fail if Matlab
+is not installed, cannot be started, or does not operate as expected.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Matlab root directory and Matlab version string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If Matlab cannot be started or the root directory or
+release cannot be determiend.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.language_version">
+<em class="property">classmethod </em><code class="descname">language_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.language_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.language_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the version of this language.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Version of compiler/interpreter for this language.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.parse_arguments">
+<code class="descname">parse_arguments</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.parse_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.parse_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort model arguments to determine which one is the executable
+and which ones are arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – List of arguments provided.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.run_executable">
+<em class="property">classmethod </em><code class="descname">run_executable</code><span class="sig-paren">(</span><em>args</em>, <em>dont_wrap_error=False</em>, <em>fname_wrapper=None</em>, <em>matlab_engine=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.run_executable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.run_executable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a program using the executable for this language and the
+provided arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – The program that should be run and any arguments
+that should be provided to it.</li>
+<li><strong>dont_wrap_error</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If False, the executable will be
+wrapped in a try/catch block to prevent errors from stopping
+Matlab shutdown. If True, the command will be executed as is
+with the Matlab interpreter. Defaults to False.</li>
+<li><strong>fname_wrapper</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – File where wrapper should be saved.
+If not provided, one is created. Defaults to None.</li>
+<li><strong>matlab_engine</strong> (<em>MatlabEngine</em><em>, </em><em>optional</em>) – Matlab engine that should be
+used to run the command. If not provided, the Matlab interpreter
+is used instead. Defaults to None.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to
+cls.executable_command and tools.popen_nobuffer.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Output to stdout from the run command.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If the language is not installed.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If there is an error when running the command.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.run_loop">
+<code class="descname">run_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.run_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.run_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loop to check if model is still running and forward output.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.set_env">
+<code class="descname">set_env</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.set_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.set_env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get environment variables that should be set for the model process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Environment variables for the model process.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.start_matlab_engine">
+<code class="descname">start_matlab_engine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.start_matlab_engine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.start_matlab_engine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start matlab session and connect to it.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.write_error_wrapper">
+<em class="property">classmethod </em><code class="descname">write_error_wrapper</code><span class="sig-paren">(</span><em>fname</em>, <em>try_lines</em>, <em>matlab_engine=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MatlabModelDriver.html#MatlabModelDriver.write_error_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.write_error_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a wrapper for the model that encloses it in a try except so
+that the error can be propagated appropriately.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – File where the wrapper should be written.</li>
+<li><strong>try_lines</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – List of lines to go in the try block.</li>
+<li><strong>model_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to model that should be wrapped.</li>
+<li><strong>matlab_engine</strong> (<em>MatlabEngine</em><em>, </em><em>optional</em>) – Matlab engine that will be
+used to call the wrapper. If not provided, it is assumed the
+error will be called using the Matlab interpreter on the command
+line. Defautls to None.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Raises:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.drivers.MakeModelDriver.MakeModelDriver">
+<em class="property">class </em><code class="descclassname">yggdrasil.drivers.MakeModelDriver.</code><code class="descname">MakeModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>skip_compile=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MakeModelDriver.html#MakeModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MakeModelDriver.MakeModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for running make file compiled drivers. Before running the
+make command, the necessary compiler &amp; linker flags for the interface’s
+C/C++ library are stored the environment variables YGGCCFLAGS and YGGLDFLAGS
+respectively. These should be used in the make file to correctly compile
+with the interface’s C/C++ libraries.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Driver name.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – Executable that should be created (make target) and
+any arguments for the executable.</li>
+<li><strong>makefile</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Path to make file either absolute, relative to
+makedir (if provided), or relative to working_dir. Defaults to
+Makefile.</li>
+<li><strong>makedir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Directory where make should be invoked from
+if it is not the same as the directory containing the makefile.
+Defaults to directory containing makefile if provided, otherwise
+working_dir.</li>
+<li><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Make target that should be built to create the
+model executable. Defaults to None.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="yggdrasil.drivers.MakeModelDriver.MakeModelDriver.makefile">
+<code class="descname">makefile</code><a class="headerlink" href="#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.makefile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path to make file either relative to makedir or absolute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.MakeModelDriver.MakeModelDriver.makedir">
+<code class="descname">makedir</code><a class="headerlink" href="#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.makedir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory where make should be invoked from.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.MakeModelDriver.MakeModelDriver.target">
+<code class="descname">target</code><a class="headerlink" href="#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of executable that should be created and called.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If neither the IPC or ZMQ C libraries are available.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="yggdrasil.drivers.MakeModelDriver.MakeModelDriver.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MakeModelDriver.html#MakeModelDriver.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove compiled executable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.MakeModelDriver.MakeModelDriver.compile_model">
+<code class="descname">compile_model</code><span class="sig-paren">(</span><em>target=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MakeModelDriver.html#MakeModelDriver.compile_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.compile_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compile model executable(s).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Target to build.</li>
+<li><strong>**kwargs</strong> – Keyword arguments are passed on to the parent class’s
+method.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.MakeModelDriver.MakeModelDriver.is_source_file">
+<em class="property">classmethod </em><code class="descname">is_source_file</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MakeModelDriver.html#MakeModelDriver.is_source_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.is_source_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the provided file name points to a source files for
+the associated programming language by checking the extension.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the provided file is a source file, False otherwise.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.MakeModelDriver.MakeModelDriver.parse_arguments">
+<code class="descname">parse_arguments</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MakeModelDriver.html#MakeModelDriver.parse_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.parse_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort arguments based on their syntax to determine if an argument
+is a source file, compilation flag, or runtime option/flag that should
+be passed to the model executable.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – List of arguments provided.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.MakeModelDriver.MakeModelDriver.set_env">
+<code class="descname">set_env</code><span class="sig-paren">(</span><em>for_compile=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/MakeModelDriver.html#MakeModelDriver.set_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.set_env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get environment variables that should be set for the model process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>for_compile</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, environment variables are set
+that are necessary for compiling. Defaults to False.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Environment variables for the model process.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver">
+<em class="property">class </em><code class="descclassname">yggdrasil.drivers.CMakeModelDriver.</code><code class="descname">CMakeModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>skip_compile=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CMakeModelDriver.html#CMakeModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for running cmake compiled drivers. Before running the
+cmake command, the cmake commands for setting the necessary compiler &amp; linker
+flags for the interface’s C/C++ library are written to a file called
+‘ygg_cmake.txt’ that should be included in the CMakeLists.txt file (after
+the target executable has been added).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Driver name.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – Executable that should be created (cmake target) and
+any arguments for the executable.</li>
+<li><strong>sourcedir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Source directory to call cmake on. If not
+provided it is set to working_dir. This should be the directory
+containing the CMakeLists.txt file. It can be relative to
+working_dir or absolute.</li>
+<li><strong>builddir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Directory where the build should be saved.
+Defaults to &lt;sourcedir&gt;/build. It can be relative to working_dir
+or absolute.</li>
+<li><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Make target that should be built to create the
+model executable. Defaults to None.</li>
+<li><strong>target_language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Language that the target is written in.
+Defaults to None and will be set based on the source files provided.</li>
+<li><strong>configuration</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Build type/configuration that should be
+built. Defaults to ‘Release’.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.sourcedir">
+<code class="descname">sourcedir</code><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.sourcedir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Source directory to call cmake on.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.builddir">
+<code class="descname">builddir</code><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.builddir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory where the build should be saved.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.target">
+<code class="descname">target</code><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of executable that should be created and called.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.add_libraries">
+<code class="descname">add_libraries</code><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.add_libraries" title="Permalink to this definition">¶</a></dt>
+<dd><p>If True, interface libraries and dependency
+libraries are added using CMake’s ADD_LIBRARY directive. If False,
+interface libraries are found using FIND_LIBRARY.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.target_language">
+<code class="descname">target_language</code><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.target_language" title="Permalink to this definition">¶</a></dt>
+<dd><p>Language that the target is written in.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.target_language_driver">
+<code class="descname">target_language_driver</code><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.target_language_driver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Language driver for the target
+language.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver" title="yggdrasil.drivers.ModelDriver.ModelDriver">ModelDriver</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.configuration">
+<code class="descname">configuration</code><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build type/configuration that should be built.
+This is only used on Windows.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If neither the IPC or ZMQ C libraries are available.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CMakeModelDriver.html#CMakeModelDriver.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove compiled executable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.compile_model">
+<code class="descname">compile_model</code><span class="sig-paren">(</span><em>target=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CMakeModelDriver.html#CMakeModelDriver.compile_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.compile_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compile model executable(s) and appends any products produced by
+the compilation that should be removed after the run is complete.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Target to build.</li>
+<li><strong>**kwargs</strong> – Keyword arguments are passed on to the call_compiler
+method.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.is_source_file">
+<em class="property">classmethod </em><code class="descname">is_source_file</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CMakeModelDriver.html#CMakeModelDriver.is_source_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.is_source_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the provided file name points to a source files for
+the associated programming language by checking the extension.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the provided file is a source file, False otherwise.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.parse_arguments">
+<code class="descname">parse_arguments</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CMakeModelDriver.html#CMakeModelDriver.parse_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.parse_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort arguments based on their syntax to determine if an argument
+is a source file, compilation flag, or runtime option/flag that should
+be passed to the model executable.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – List of arguments provided.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.set_env">
+<code class="descname">set_env</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CMakeModelDriver.html#CMakeModelDriver.set_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.set_env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get environment variables that should be set for the model process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent
+class’s method.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Environment variables for the model process.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.write_wrappers">
+<code class="descname">write_wrappers</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CMakeModelDriver.html#CMakeModelDriver.write_wrappers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.write_wrappers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write any wrappers needed to compile and/or run a model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> – Keyword arguments are passed to the parent class’s method.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Full paths to any created wrappers.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.drivers.LPyModelDriver.LPyModelDriver">
+<em class="property">class </em><code class="descclassname">yggdrasil.drivers.LPyModelDriver.</code><code class="descname">LPyModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/LPyModelDriver.html#LPyModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.LPyModelDriver.LPyModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for running LPy models.</p>
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.LPyModelDriver.LPyModelDriver.language_version">
+<em class="property">classmethod </em><code class="descname">language_version</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/LPyModelDriver.html#LPyModelDriver.language_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.language_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the version of this language.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> – Keyword arguments are passed to cls.run_executable.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Version of compiler/interpreter for this language.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="model-base-classes">
+<h1>Model Base Classes<a class="headerlink" href="#model-base-classes" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver">
+<em class="property">class </em><code class="descclassname">yggdrasil.drivers.InterpretedModelDriver.</code><code class="descname">InterpretedModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InterpretedModelDriver.html#InterpretedModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for models written in interpreted languages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Driver name.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – Argument(s) for running the model on the command
+line. This driver will check to see if there is an interpreter
+included in the args provided. If not, one will be added unless
+skip_interpreter is True.</li>
+<li><strong>interpreter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name or path of interpreter executable that
+should be used to run the model. If not provided, the interpreter
+will be determined based on configuration options for the language
+(if present) and the default_interpreter class attribute.</li>
+<li><strong>interpreter_flags</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – Flags that should be passed to the
+interpreter when running the model. If not provided, the flags are
+determined based on configuration options for the language (if
+present) and the default_interpreter_flags class attribute.</li>
+<li><strong>skip_interpreter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, no interpreter will be
+added to the arguments. This should only be used for subclasses
+that will not be invoking the model via the command line.
+Defaults to False.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Class Attributes:</dt>
+<dd><dl class="first last docutils">
+<dt>default_interpreter (str): Name of interpreter that will be used if not</dt>
+<dd>set explicitly by instance or config file. Defaults to the language
+name if not set.</dd>
+<dt>default_interpreter_flags (list): Flags that will be passed to the</dt>
+<dd>interpreter when running the model by default if not set explicitly
+by instance or config file.</dd>
+</dl>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.interpreter">
+<code class="descname">interpreter</code><a class="headerlink" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.interpreter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name or path to the interpreter that will be used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.interpreter_flags">
+<code class="descname">interpreter_flags</code><a class="headerlink" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.interpreter_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flags that will be passed to the interpreter
+when running a model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.after_registration">
+<em class="property">static </em><code class="descname">after_registration</code><span class="sig-paren">(</span><em>cls</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InterpretedModelDriver.html#InterpretedModelDriver.after_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.after_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Operations that should be performed to modify class attributes after
+registration. For compiled languages this includes selecting the
+default compiler. The order of precedence is the config file ‘compiler’
+option for the language, followed by the environment variable set by
+_compiler_env, followed by the existing class attribute.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.configure">
+<em class="property">classmethod </em><code class="descname">configure</code><span class="sig-paren">(</span><em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InterpretedModelDriver.html#InterpretedModelDriver.configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add configuration options for this language. This includes locating
+any required external libraries and setting option defaults.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg</strong> (<em>YggConfigParser</em>) – Config class that options should be set for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Section, option, description tuples for options that could not</dt>
+<dd>be set.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.executable_command">
+<em class="property">classmethod </em><code class="descname">executable_command</code><span class="sig-paren">(</span><em>args</em>, <em>exec_type='interpreter'</em>, <em>unused_kwargs={}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InterpretedModelDriver.html#InterpretedModelDriver.executable_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.executable_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compose a command for running a program in this language with the
+provied arguments. If not already present, the interpreter command and
+interpreter flags are prepended to the provided arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – The program that returned command should run and any
+arguments that should be provided to it.</li>
+<li><strong>exec_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Type of executable command that will be
+returned. If ‘interpreter’, a command using the interpreter is
+returned and if ‘direct’, the raw args being provided are
+returned. Defaults to ‘interpreter’.</li>
+<li><strong>unused_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Existing dictionary that unused
+keyword arguments should be added to. Defaults to {}.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are ignored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Arguments composing the command required to run the program</dt>
+<dd><p class="first last">from the command line using the interpreter for this language.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If exec_type is not ‘interpreter’ or ‘direct’.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.get_interpreter">
+<em class="property">classmethod </em><code class="descname">get_interpreter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InterpretedModelDriver.html#InterpretedModelDriver.get_interpreter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.get_interpreter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Command required to run a model written in this language from
+the command line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Name of (or path to) interpreter executable.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.get_interpreter_flags">
+<em class="property">classmethod </em><code class="descname">get_interpreter_flags</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InterpretedModelDriver.html#InterpretedModelDriver.get_interpreter_flags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.get_interpreter_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the flags that should be passed to the interpreter when using it
+to run a model on the command line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Flags that should be passed to the interpreter on the command</dt>
+<dd>line.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.language_executable">
+<em class="property">classmethod </em><code class="descname">language_executable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InterpretedModelDriver.html#InterpretedModelDriver.language_executable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.language_executable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Command required to compile/run a model written in this language
+from the command line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Name of (or path to) compiler/interpreter executable required</dt>
+<dd>to run the compiler/interpreter from the command line.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.parse_arguments">
+<code class="descname">parse_arguments</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InterpretedModelDriver.html#InterpretedModelDriver.parse_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.parse_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort model arguments to determine which one is the executable
+and which ones are arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>*args</strong> – Arguments are passed to the parent class’s method.</li>
+<li><strong>**kwargs</strong> – Keyword arguments are passed to the parent class’s method.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver">
+<em class="property">class </em><code class="descclassname">yggdrasil.drivers.CompiledModelDriver.</code><code class="descname">CompiledModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>skip_compile=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for models written in compiled languages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Driver name.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – The model executable and any arguments that should
+be passed to the model executable.</li>
+<li><strong>source_files</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – Source files that should be compiled
+into an executable. Defaults to an empty list and the driver will
+search for a source file based on the model executable (the first
+model argument).</li>
+<li><strong>compiler</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Command or path to executable that should be
+used to compile the model. If not provided, the compiler will be
+determined based on configuration options for the language (if
+present) and the registered compilers that are available on the
+current operating system.</li>
+<li><strong>compiler_flags</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – Flags that should be passed to the
+compiler during compilation. If nto provided, the compiler flags
+will be determined based on configuration options for the language
+(if present), the compiler defaults, and the default_compiler_flags
+class attribute.</li>
+<li><strong>linker</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Command or path to executable that should be
+used to link the model. If not provided, the linker will be
+determined based on configuration options for the language (if
+present) and the registered linkers that are available on the
+current operating system</li>
+<li><strong>linker_flags</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – Flags that should be passed to the
+linker during compilation. If nto provided, the linker flags
+will be determined based on configuration options for the language
+(if present), the linker defaults, and the default_linker_flags
+class attribute.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Class Attributes:</dt>
+<dd><dl class="first last docutils">
+<dt>default_compiler (str): Name of compiler that will be used if not</dt>
+<dd>set explictly by instance or config file.</dd>
+<dt>default_compiler_flags (list): Flags that should be passed to the</dt>
+<dd>compiler by default for this language.</dd>
+<dt>default_linker (str): Name of linker that will be used if not</dt>
+<dd>set explictly by instance or config file</dd>
+<dt>default_linker_flags (list): Flags that should be passed to the</dt>
+<dd>linker by default for this language.</dd>
+</dl>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.source_files">
+<code class="descname">source_files</code><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.source_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Source files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.compiler">
+<code class="descname">compiler</code><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.compiler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name or path to the compiler that should be used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.compiler_flags">
+<code class="descname">compiler_flags</code><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.compiler_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compiler flags.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.linker">
+<code class="descname">linker</code><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.linker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name or path to the linker that should be used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.linker_flags">
+<code class="descname">linker_flags</code><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.linker_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linker flags.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.compiler_tool">
+<code class="descname">compiler_tool</code><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.compiler_tool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compiler tool that will be used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompilerBase" title="yggdrasil.drivers.CompiledModelDriver.CompilerBase">CompilerBase</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.linker_tool">
+<code class="descname">linker_tool</code><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.linker_tool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linker tool that will be used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.LinkerBase" title="yggdrasil.drivers.CompiledModelDriver.LinkerBase">LinkerBase</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.after_registration">
+<em class="property">static </em><code class="descname">after_registration</code><span class="sig-paren">(</span><em>cls</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.after_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.after_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Operations that should be performed to modify class attributes after
+registration. For compiled languages this includes selecting the
+default compiler. The order of precedence is the config file ‘compiler’
+option for the language, followed by the environment variable set by
+_compiler_env, followed by the existing class attribute.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.call_compiler">
+<em class="property">classmethod </em><code class="descname">call_compiler</code><span class="sig-paren">(</span><em>src</em>, <em>language=None</em>, <em>dont_build=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.call_compiler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.call_compiler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compile a source file into an executable or linkable object file,
+checking for errors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to source file.</li>
+<li><strong>out</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Full path to the output object file that should
+be created. Defaults to None and is created from the provided
+source file.</li>
+<li><strong>flags</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – Compilation flags. Defaults to []. If
+compiler_flags is present, flags is replaced by compiler_flags.</li>
+<li><strong>compiler_flags</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – Alternative to flags. Ignored
+if not provided.</li>
+<li><strong>dont_link</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the command will result in a
+linkable object file rather than an executable. Defaults to
+False.</li>
+<li><strong>dont_build</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, cmake configuration/generation
+will be run, but the project will not be built. Defaults to
+None. If provided, this overrides dont_link.</li>
+<li><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the existing compile file will
+be overwritten. Otherwise, it will be kept and this function
+will return without recompiling the source file.</li>
+<li><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Language that should be used to compile
+the files. Defaults to None and the language of the current
+driver is used.</li>
+<li><strong>products</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – Existing Python list that additional
+products produced by the compilation should be appended to.
+Defaults to None and is ignored.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to run_executable.
+and call_linker if dont_link is False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Full path to compiled source.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If there is an error in calling the compiler.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If the compilation command dosn’t yield the specified
+output file.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.call_linker">
+<em class="property">classmethod </em><code class="descname">call_linker</code><span class="sig-paren">(</span><em>obj</em>, <em>language=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.call_linker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.call_linker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Link several object files to create an executable or library (shared
+or static), checking for errors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – Object files that should be linked.</li>
+<li><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Language that should be used to link
+the files. Defaults to None and the language of the current
+driver is used.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to run_executable.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Full path to compiled source.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.compile_dependencies">
+<em class="property">classmethod </em><code class="descname">compile_dependencies</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.compile_dependencies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.compile_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compile any required internal libraries, including the interface.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.compile_model">
+<code class="descname">compile_model</code><span class="sig-paren">(</span><em>source_files=None</em>, <em>skip_interface_flags=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.compile_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.compile_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compile model executable(s).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>source_files</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – Source files that will be compiled.
+Defaults to None and is set to the source_files attribute.</li>
+<li><strong>skip_interface_flags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, interface flags will
+not be added. This includes the logger flag specifying the
+current logging level. Defaults to False.</li>
+<li><strong>**kwargs</strong> – Keyword arguments are passed on to the call_compiler
+method.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Compiled model file path.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.configure_libraries">
+<em class="property">classmethod </em><code class="descname">configure_libraries</code><span class="sig-paren">(</span><em>cfg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.configure_libraries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.configure_libraries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add configuration options for external libraries in this language.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg</strong> (<em>CisConfigParser</em>) – Config class that options should be set for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Section, option, description tuples for options that could not</dt>
+<dd>be set.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.executable_command">
+<em class="property">classmethod </em><code class="descname">executable_command</code><span class="sig-paren">(</span><em>args</em>, <em>exec_type='compiler'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.executable_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.executable_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compose a command for running a program using the compiler for this
+language and the provied arguments. If not already present, the
+compiler command and compiler flags are prepended to the provided
+arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – The program that returned command should run and any
+arguments that should be provided to it. For the compiler, this
+means the source files, for the linker, this means the object
+files.</li>
+<li><strong>exec_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Type of executable command that will be
+returned. If ‘compiler’, a command using the compiler is
+returned, if ‘linker’, a command using the linker is returned,
+and if ‘direct’, the raw args being provided are returned.
+Defaults to ‘compiler’.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to either
+get_linker_flags or get_compiler_flags.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Arguments composing the command required to run the program</dt>
+<dd><p class="first last">from the command line using the compiler for this language.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If exec_type is not ‘compiler’, ‘linker’, or ‘direct’.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_available_tools">
+<em class="property">classmethod </em><code class="descname">get_available_tools</code><span class="sig-paren">(</span><em>tooltype</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.get_available_tools"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_available_tools" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the registry of compilation tools for this language.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tooltype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of tool type that should be returned. Values
+include ‘compiler’, ‘linker’, or ‘archiver’.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Registry of tools for this language.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_compiler_flags">
+<em class="property">classmethod </em><code class="descname">get_compiler_flags</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.get_compiler_flags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_compiler_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the flags required by the current compiler.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> – Keyword arguments are passed to cls.update_compiler_kwargs
+first and then the compiler’s get_flags method.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Flags for the compiler.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_dependency_include_dirs">
+<em class="property">classmethod </em><code class="descname">get_dependency_include_dirs</code><span class="sig-paren">(</span><em>dep</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.get_dependency_include_dirs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_dependency_include_dirs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the include directories for a dependency.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dep</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of internal or external dependency or full path
+to the library.</li>
+<li><strong>default</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Default that should be used if a value
+cannot be determined form internal/external dependencies or
+if dep is not a valid file. Defaults to None and is ignored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Full paths to the directories containing the dependency’s</dt>
+<dd><p class="first last">header(s).</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the include directory cannot be determined for the
+specified dependency and default is None.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_dependency_library">
+<em class="property">classmethod </em><code class="descname">get_dependency_library</code><span class="sig-paren">(</span><em>dep</em>, <em>default=None</em>, <em>libtype=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.get_dependency_library"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_dependency_library" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the library location for a dependency.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dep</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of internal or external dependency or full path
+to the library.</li>
+<li><strong>default</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Default that should be used if a value
+cannot be determined form internal/external dependencies or
+if dep is not a valid file. Defaults to None and is ignored.</li>
+<li><strong>libtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Library type that should be returned.
+Valid values are ‘static’ and ‘shared’. Defaults to None and
+will be set on the dependency’s libtype (if it has one) or
+the _default_libtype parameter (if it doesn’t).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Full path to the library file. For header only libraries,</dt>
+<dd><p class="first last">an empty string will be returned.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If libtype is not ‘static’ or ‘shared’.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the path to the library cannot be determined for the
+specified dependency and default is None.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_dependency_order">
+<em class="property">classmethod </em><code class="descname">get_dependency_order</code><span class="sig-paren">(</span><em>deps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.get_dependency_order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_dependency_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the correct dependency order, including any dependencies for
+the direct dependencies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>deps</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – Dependencies in order.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Dependency order.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_dependency_source">
+<em class="property">classmethod </em><code class="descname">get_dependency_source</code><span class="sig-paren">(</span><em>dep</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.get_dependency_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_dependency_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the path to the library source files (or header files) for a
+dependency.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dep</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of internal or external dependency or full path
+to the library.</li>
+<li><strong>default</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Default that should be used if a value
+cannot be determined form internal/external dependencies or
+if dep is not a valid file. Defaults to None and is ignored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Full path to the library source file. For header only libraries</dt>
+<dd><p class="first last">this will be the header location.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_external_libraries">
+<em class="property">classmethod </em><code class="descname">get_external_libraries</code><span class="sig-paren">(</span><em>no_comm_libs=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.get_external_libraries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_external_libraries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the external libraries that are required based on the
+default comm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>no_comm_libs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, libraries for the installed
+comms are not included in the returned list. Defaults to False.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>The names of external libraries required by the interface</dt>
+<dd>library, including the dependency libraries for the installed
+comm libraries.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_linker_flags">
+<em class="property">classmethod </em><code class="descname">get_linker_flags</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.get_linker_flags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_linker_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the flags required by the current linker.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> – Keyword arguments are passed to cls.update_linker_kwargs
+first and then the linker’s get_flags method.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Flags for the linker.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_tool">
+<em class="property">classmethod </em><code class="descname">get_tool</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.get_tool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_tool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get tool from a driver class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>*args</strong> – Arguments are passed to the get_tool_static method.</li>
+<li><strong>**kwargs</strong> – Keyword arguments are passed to the get_tool_static method.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Class providing an interface to the specified</dt>
+<dd><p class="first last">compilation tool.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompilationToolBase" title="yggdrasil.drivers.CompiledModelDriver.CompilationToolBase">CompilationToolBase</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_tool_instance">
+<code class="descname">get_tool_instance</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.get_tool_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_tool_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get tool from a driver instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>*args</strong> – Arguments are passed to the get_tool_static method.</li>
+<li><strong>**kwargs</strong> – Keyword arguments are passed to the get_tool_static method.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Class providing an interface to the specified</dt>
+<dd><p class="first last">compilation tool.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompilationToolBase" title="yggdrasil.drivers.CompiledModelDriver.CompilationToolBase">CompilationToolBase</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_tool_static">
+<em class="property">static </em><code class="descname">get_tool_static</code><span class="sig-paren">(</span><em>cls</em>, <em>tooltype</em>, <em>return_prop='tool'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.get_tool_static"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_tool_static" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the class associated with the specified compilation tool for
+this language.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tooltype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Type of compilation tool that should be returned.</li>
+<li><strong>return_prop</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Value that should be returned. If
+‘tool’, the tool is returned. If ‘name’, the tool name is
+returned. If ‘flags’, the tool flags are returned. Defaults to
+‘tool’.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Class providing an interface to the specified</dt>
+<dd><p class="first last">compilation tool.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompilationToolBase" title="yggdrasil.drivers.CompiledModelDriver.CompilationToolBase">CompilationToolBase</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">NotImplementedError</span></code></a> – If a tool is not specified.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If return_prop is not ‘tool’, ‘name’, or ‘flags’.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_configured">
+<em class="property">classmethod </em><code class="descname">is_configured</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.is_configured"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_configured" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the appropriate configuration has been performed (e.g.
+installation of supporting libraries etc.)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the language has been configured.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_library_installed">
+<em class="property">classmethod </em><code class="descname">is_library_installed</code><span class="sig-paren">(</span><em>lib</em>, <em>cfg=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.is_library_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_library_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if a dependency is installed by check for the appropriate
+config options setting the path to the library files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lib</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of the library that should be checked.</li>
+<li><strong>cfg</strong> (<em>CisConfigParser</em><em>, </em><em>optional</em>) – Config class that should be checked.
+Defaults to yggdrasil.config.ygg_cfg if not provided.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the library is installed, False otherwise.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.language_executable">
+<em class="property">classmethod </em><code class="descname">language_executable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.language_executable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.language_executable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Command required to compile/run a model written in this language
+from the command line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Name of (or path to) compiler/interpreter executable required</dt>
+<dd>to run the compiler/interpreter from the command line.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.language_version">
+<em class="property">classmethod </em><code class="descname">language_version</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.language_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.language_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the version of this language.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> – Keyword arguments are passed to cls.run_executable.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Version of compiler/interpreter for this language.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.model_command">
+<code class="descname">model_command</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.model_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.model_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the command that should be used to run the model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Any commands/arguments needed to run the model from the</dt>
+<dd>command line.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.parse_arguments">
+<code class="descname">parse_arguments</code><span class="sig-paren">(</span><em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.parse_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.parse_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort model arguments to determine which one is the executable
+and which ones are arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – List of arguments provided.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent
+class’s method.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.run_model">
+<code class="descname">run_model</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.run_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.run_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the model. Unless overridden, the model will be run using
+run_executable.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> – Keyword arguments are passed to run_executable.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.set_env">
+<code class="descname">set_env</code><span class="sig-paren">(</span><em>for_compile=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.set_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.set_env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get environment variables that should be set for the model process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>for_compile</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, environment variables are set
+that are necessary for compiling. Defaults to False.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Environment variables for the model process.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.update_compiler_kwargs">
+<em class="property">classmethod </em><code class="descname">update_compiler_kwargs</code><span class="sig-paren">(</span><em>for_api=False</em>, <em>for_model=False</em>, <em>commtype=None</em>, <em>directory=None</em>, <em>include_dirs=None</em>, <em>definitions=None</em>, <em>skip_interface_flags=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.update_compiler_kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.update_compiler_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update keyword arguments supplied to the compiler get_flags method
+for various options.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dont_link</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the command will result in a
+linkable object file rather than an executable. Defaults to
+False.</li>
+<li><strong>for_api</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, flags are added that are required
+for compiling internal api libraries in this language. This
+includes external communication libraries. Defaults to False.</li>
+<li><strong>for_model</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, flags are added that are
+required for including the interface library. Defaults to False.</li>
+<li><strong>commtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, this is the communication
+type that should be used for the model and flags for just that
+comm type will be included. If None, flags for all installed
+comm types will be included. Default to None. This keyword is
+only used if for_model is True.</li>
+<li><strong>include_dirs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – If provided, each list element will
+be added as an included directory flag. Defaults to None and
+is initialized as an empty list.</li>
+<li><strong>definitions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – If provided, each list element will be
+added as a defintion. Defaults to None and is initialized to an
+empty list.</li>
+<li><strong>skip_interface_flags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, interface flags will
+not be added. Defaults to False.</li>
+<li><strong>internal_dependencies</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – If provided, a list of names
+of internal libraries that are required or linkable object files
+for dependencies. Defaults to an empty list.</li>
+<li><strong>external_dependencies</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – If provided, a list of names
+of external libraries that are required or linkable object files
+for dependencies. Defaults to an empty list.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the compiler
+class’s ‘get_flags’ method and get_linker_flags if dont_link is
+False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Keyword arguments for a get_flags method providing compiler</dt>
+<dd><p class="first last">flags.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.update_linker_kwargs">
+<em class="property">classmethod </em><code class="descname">update_linker_kwargs</code><span class="sig-paren">(</span><em>for_api=False</em>, <em>for_model=False</em>, <em>commtype=None</em>, <em>libtype='object'</em>, <em>skip_interface_flags=False</em>, <em>use_library_path_internal=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.update_linker_kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.update_linker_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update keyword arguments supplied to the linker/archiver get_flags
+method for various options.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>for_api</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, flags are added that are required
+for linking internal api libraries in this language. This
+includes external communication libraries. Defaults to False.</li>
+<li><strong>for_model</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, flags are added that are
+required for including the interface library. Defaults to False.</li>
+<li><strong>commtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, this is the communication
+type that should be used for the model and flags for just that
+comm type will be included. If None, flags for all installed
+comm types will be included. Default to None. This keyword is
+only used if for_model is True.</li>
+<li><strong>libtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Library type that should be created by the
+linker/archiver. Valid values are ‘static’, ‘shared’, or
+‘object’. Defaults to ‘object’.</li>
+<li><strong>skip_interface_flags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, interface flags will
+not be added. Defaults to False.</li>
+<li><strong>libraries</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – Full paths to libraries that should be
+linked against. Defaults to an empty list.</li>
+<li><strong>internal_dependencies</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – If provided, a list of names
+of internal libraries that are required or linkable object files
+for dependencies. Defaults to an empty list.</li>
+<li><strong>external_dependencies</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – If provided, a list of names
+of external libraries that are required or linkable object files
+for dependencies. Defaults to an empty list.</li>
+<li><strong>use_library_path_internal</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, internal
+dependencies are included as full paths. Defaults to False.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the linker
+(or archiver if static is True) ‘get_flags’ method.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Keyword arguments for a get_flags method providing linker/</dt>
+<dd><p class="first last">archiver flags.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.write_wrappers">
+<code class="descname">write_wrappers</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.write_wrappers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.write_wrappers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write any wrappers needed to compile and/or run a model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> – Keyword arguments are passed to the parent class’s method.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Full paths to any created wrappers.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="model_interface.html" class="btn btn-neutral float-right" title="Model Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="io_drivers.html" class="btn btn-neutral" title="Input/Output Drivers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.9.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

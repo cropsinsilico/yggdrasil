@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to yggdrasil’s documentation! &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>Welcome to yggdrasil’s documentation! &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="#"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="#"/>
         <link rel="next" title="Overview" href="includeme.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -227,38 +221,17 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="config.html#debug-options">Debug Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config.html#windows-options">Windows Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html#language-options">Language Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="config.html#rabbitmq-options">RabbitMQ Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="config.html#parallel-options">Parallel Options</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="units.html#schema-datatypes">Schema Datatypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="units.html#python-objects">Python Objects</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="io_drivers.html#file-input-drivers">File Input Drivers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="io_drivers.html#file-output-drivers">File Output Drivers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="io_drivers.html#general-input-drivers">General Input Drivers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="io_drivers.html#general-output-drivers">General Output Drivers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="io_drivers.html#rpc-drivers">RPC Drivers</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="interface_py.html">Python Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="interface_c.html">C Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="interface_cpp.html">C++ Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="interface_m.html">Matlab Interface</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="code_python.html">Python Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_c.html">C Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="examples/gs_lesson1.html">gs_lesson1 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/gs_lesson2.html">gs_lesson2 Example</a></li>
@@ -278,9 +251,26 @@
 <li class="toctree-l2"><a class="reference internal" href="examples/rpc_lesson2.html">rpc_lesson2 Example</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced/serialization.html">Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/schema.html">YAML Validation Schema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/model_drivers.html#model-base-classes">Model Base Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/model_interface.html">Model Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/code.html">Code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="development/general.html">General Development Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/release.html">Release Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/new_language.html">Adding Support for a New Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/new_datatype.html">Defining New Datatypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/todo.html">TODO</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="hackathon2018/setup.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hackathon2018/intro.html">Introduction</a></li>
@@ -350,7 +340,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

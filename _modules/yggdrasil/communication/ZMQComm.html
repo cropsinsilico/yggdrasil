@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.ZMQComm &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.communication.ZMQComm &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="yggdrasil.communication" href="../communication.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -185,14 +179,11 @@
 <span class="kn">import</span> <span class="nn">zmq</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">register_component</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">tools</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">AsyncComm</span>
 
 
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">_socket_type_pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;PUSH&#39;</span><span class="p">,</span> <span class="s1">&#39;PULL&#39;</span><span class="p">),</span>
                       <span class="p">(</span><span class="s1">&#39;PUB&#39;</span><span class="p">,</span> <span class="s1">&#39;SUB&#39;</span><span class="p">),</span>
                       <span class="p">(</span><span class="s1">&#39;REP&#39;</span><span class="p">,</span> <span class="s1">&#39;REQ&#39;</span><span class="p">),</span>
@@ -208,47 +199,6 @@
 <span class="n">_reply_msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;YGG_REPLY&#39;</span>
 <span class="n">_purge_msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;YGG_PURGE&#39;</span>
 <span class="n">_global_context</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Context</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
-
-
-<div class="viewcode-block" id="check_czmq"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.check_czmq">[docs]</a><span class="k">def</span> <span class="nf">check_czmq</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the necessary C/C++ libraries are installed for ZeroMQ.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        bool: True if the libraries are installed, False otherwise.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the libraries are installed</span>
-    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-        <span class="n">opts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;libzmq_include&#39;</span><span class="p">,</span> <span class="s1">&#39;libzmq_static&#39;</span><span class="p">,</span>  <span class="c1"># &#39;libzmq_dynamic&#39;,</span>
-                <span class="s1">&#39;czmq_include&#39;</span><span class="p">,</span> <span class="s1">&#39;czmq_static&#39;</span><span class="p">]</span>  <span class="c1"># , &#39;czmq_dynamic&#39;]</span>
-        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;windows&#39;</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Config option </span><span class="si">%s</span><span class="s2"> not set.&quot;</span> <span class="o">%</span> <span class="n">o</span><span class="p">)</span>
-                <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>
-            <span class="n">cc</span> <span class="o">=</span> <span class="s1">&#39;clang&#39;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">cc</span> <span class="o">=</span> <span class="s1">&#39;gcc&#39;</span>
-        <span class="n">cc</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CC&#39;</span><span class="p">,</span> <span class="n">cc</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">cc</span><span class="p">,</span> <span class="s1">&#39;-lzmq&#39;</span><span class="p">,</span> <span class="s1">&#39;-lczmq&#39;</span><span class="p">],</span>
-                                       <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                                       <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
-            <span class="n">outs</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="c1"># Python 3</span>
-        <span class="c1"># try:</span>
-        <span class="c1">#     outs, errs = process.communicate(timeout=15)</span>
-        <span class="c1"># except subprocess.TimeoutExpired:</span>
-        <span class="c1">#     process.kill()</span>
-        <span class="c1">#     outs, errs = process.communicate()</span>
-        <span class="k">return</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;zmq&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">errs</span><span class="p">)</span></div>
-
-
-<span class="n">_zmq_installed_c</span> <span class="o">=</span> <span class="n">check_czmq</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="get_ipc_host"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.get_ipc_host">[docs]</a><span class="k">def</span> <span class="nf">get_ipc_host</span><span class="p">():</span>
@@ -330,7 +280,8 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="s1">&#39;://&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">address</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Address must contain &#39;://&#39;&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Address must contain &#39;://&#39; (address provided = &#39;</span><span class="si">%s</span><span class="s2">&#39;)&quot;</span>
+                         <span class="o">%</span> <span class="n">address</span><span class="p">)</span>
     <span class="n">protocol</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">address</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;://&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">protocol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_socket_protocols</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Protocol &#39;</span><span class="si">%s</span><span class="s2">&#39; not supported.&quot;</span> <span class="o">%</span> <span class="n">protocol</span><span class="p">)</span>
@@ -379,7 +330,7 @@
             <span class="c1"># print(e, e.errno)</span>
             <span class="k">raise</span> <span class="n">e</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Retrying bind in </span><span class="si">%f</span><span class="s2"> s&quot;</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Retrying bind in </span><span class="si">%f</span><span class="s2"> s&quot;</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="p">)</span>
             <span class="n">tools</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">retry_timeout</span><span class="p">)</span>
             <span class="n">address</span> <span class="o">=</span> <span class="n">bind_socket</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">nretry</span><span class="o">=</span><span class="n">nretry</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
                                   <span class="n">retry_timeout</span><span class="o">=</span><span class="n">retry_timeout</span><span class="p">)</span>
@@ -509,8 +460,7 @@
         <span class="n">CommBase</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;DEALER_server_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="ZMQComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">ZMQComm</span><span class="p">(</span><span class="n">AsyncComm</span><span class="o">.</span><span class="n">AsyncComm</span><span class="p">):</span>
+<div class="viewcode-block" id="ZMQComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm">[docs]</a><span class="k">class</span> <span class="nc">ZMQComm</span><span class="p">(</span><span class="n">AsyncComm</span><span class="o">.</span><span class="n">AsyncComm</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O using ZeroMQ sockets.</span>
 
 <span class="sd">    Args:</span>
@@ -540,12 +490,36 @@
 <span class="sd">        dealer_identity (str): Identity that should be used to route messages</span>
 <span class="sd">            to a dealer socket.</span>
 
+<span class="sd">    Developer Notes:</span>
+<span class="sd">        |yggdrasil| uses the tcp transport by default with a PAIR socket type.</span>
+<span class="sd">        For every connection, |yggdrasil| establishes a second request/reply</span>
+<span class="sd">        connection that is used to confirm messages passed between the primary</span>
+<span class="sd">        PAIR of sockets. On the first send, the model should create a REP socket</span>
+<span class="sd">        on an open tcp address and send that address in the header of the first</span>
+<span class="sd">        message under the key &#39;zmq_reply&#39;. Receiving models should check</span>
+<span class="sd">        message headers for this key and, on receipt, establish the partner</span>
+<span class="sd">        REQ socket with the specified address (receiving comms can receive from</span>
+<span class="sd">        more than one source so they can have more than one request addresses at</span>
+<span class="sd">        at time for this purpose). Following every message, the sending model</span>
+<span class="sd">        should wait for a message on the reply socket and, on receipt, return</span>
+<span class="sd">        the message. Following every message, the receiving model should send</span>
+<span class="sd">        the message &#39;YGG_REPLY&#39; on the request socket and wait for a reply.</span>
+<span class="sd">        When creating worker comms for sending large messages, the sending</span>
+<span class="sd">        model should create the reply comm for the worker in advanced and send</span>
+<span class="sd">        it in the header with the worker address under the key &#39;zmq_reply_worker&#39;.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_commtype</span> <span class="o">=</span> <span class="s1">&#39;zmq&#39;</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;ZeroMQ socket.&#39;</span><span class="p">)</span>
     <span class="c1"># Based on limit of 32bit int, this could be 2**30, but this is</span>
     <span class="c1"># too large for stack allocation in C so 2**20 will be used.</span>
     <span class="n">_maxMsgSize</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">20</span>
+    <span class="n">address_description</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;A ZeroMQ endpoint of the form &quot;</span>
+                           <span class="s2">&quot;&lt;transport&gt;://&lt;address&gt;, where the format of &quot;</span>
+                           <span class="s2">&quot;address depends on the transport. &quot;</span>
+                           <span class="s2">&quot;Additional information can be found &quot;</span>
+                           <span class="s2">&quot;`here &lt;http://api.zeromq.org/3-2:zmq-bind&gt;`_.&quot;</span><span class="p">)</span>
     
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">socket_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">socket_action</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">topic_filter</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
@@ -617,38 +591,26 @@
                                    <span class="n">nretry</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="o">=</span><span class="mf">2.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ZMQComm.printStatus"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print status of the communicator.&quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="n">nindent</span><span class="p">)</span>
-        <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">nindent</span> <span class="o">*</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nsent (zmq)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_zmq_sent</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nsent reply (zmq)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_reply_sent</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_zmq_recv</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nrecv (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_zmq_recv</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nrecv reply (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span>
-                                   <span class="bp">self</span><span class="o">.</span><span class="n">_n_reply_recv</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span></div>
-
-<div class="viewcode-block" id="ZMQComm.is_installed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the necessary libraries are installed for this</span>
-<span class="sd">        communication class.</span>
-
+<div class="viewcode-block" id="ZMQComm.get_status_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.get_status_message">[docs]</a>    <span class="k">def</span> <span class="nf">get_status_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return lines composing a status message.</span>
+<span class="sd">        </span>
 <span class="sd">        Args:</span>
-<span class="sd">            language (str, optional): Specific language that should be checked</span>
-<span class="sd">                for compatibility. Defaults to None and all languages supported</span>
-<span class="sd">                on the current platform will be checked.</span>
-
+<span class="sd">            nindent (int, optional): Number of tabs that should be used to</span>
+<span class="sd">                indent each line. Defaults to 0.</span>
+<span class="sd">                </span>
 <span class="sd">        Returns:</span>
-<span class="sd">            bool: Is the comm installed.</span>
+<span class="sd">            tuple(list, prefix): Lines composing the status message and the</span>
+<span class="sd">                prefix string used for the last message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;python&#39;</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># ZMQ is a requirement so it should always be installed</span>
-        <span class="k">elif</span> <span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">_zmq_installed_c</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span></div>
+        <span class="n">lines</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="n">nindent</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nsent (zmq)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_zmq_sent</span><span class="p">),</span>
+                  <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nsent reply (zmq)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_reply_sent</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_zmq_recv</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nrecv (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_zmq_recv</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span>
+                      <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nrecv reply (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">_n_reply_recv</span><span class="p">[</span><span class="n">k</span><span class="p">])]</span>
+        <span class="k">return</span> <span class="n">lines</span><span class="p">,</span> <span class="n">prefix</span></div>
 
 <div class="viewcode-block" id="ZMQComm.underlying_comm_class"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.underlying_comm_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1384,7 +1346,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

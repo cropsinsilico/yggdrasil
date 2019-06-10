@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication package &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.communication package &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="index.html"/> 
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -102,16 +102,10 @@
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -236,20 +230,6 @@ will be skipped.</li>
 </tr>
 </tbody>
 </table>
-<dl class="attribute">
-<dt id="yggdrasil.communication.AsciiFileComm.AsciiFileComm.comment">
-<code class="descname">comment</code><a class="headerlink" href="#yggdrasil.communication.AsciiFileComm.AsciiFileComm.comment" title="Permalink to this definition">¶</a></dt>
-<dd><p>String indicating a comment.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="classmethod">
 <dt id="yggdrasil.communication.AsciiFileComm.AsciiFileComm.get_testing_options">
 <em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsciiFileComm.html#AsciiFileComm.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.AsciiFileComm.AsciiFileComm.get_testing_options" title="Permalink to this definition">¶</a></dt>
@@ -282,23 +262,6 @@ recv (list): List of objects that will be received from a test</p>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="yggdrasil.communication.AsciiFileComm.AsciiFileComm.opp_comm_kwargs">
-<code class="descname">opp_comm_kwargs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsciiFileComm.html#AsciiFileComm.opp_comm_kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.AsciiFileComm.AsciiFileComm.opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get keyword arguments to initialize communication with opposite
-comm object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Keyword arguments for opposite comm object.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -321,38 +284,6 @@ comm object.</p>
 </tr>
 </tbody>
 </table>
-<dl class="classmethod">
-<dt id="yggdrasil.communication.AsciiMapComm.AsciiMapComm.get_testing_options">
-<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsciiMapComm.html#AsciiMapComm.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.AsciiMapComm.AsciiMapComm.get_testing_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to return a dictionary of testing options for this class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Dictionary of variables to use for testing. Key/value pairs:</dt>
-<dd><dl class="first docutils">
-<dt>kwargs (dict): Keyword arguments for comms tested with the</dt>
-<dd>provided content.</dd>
-</dl>
-<p>send (list): List of objects to send to test file.
-recv (list): List of objects that will be received from a test</p>
-<blockquote>
-<div>file that was sent the messages in ‘send’.</div></blockquote>
-<dl class="last docutils">
-<dt>contents (bytes): Bytes contents of test file created by sending</dt>
-<dd>the messages in ‘send’.</dd>
-</dl>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -361,123 +292,8 @@ recv (list): List of objects that will be received from a test</p>
 <dl class="class">
 <dt id="yggdrasil.communication.AsciiTableComm.AsciiTableComm">
 <em class="property">class </em><code class="descclassname">yggdrasil.communication.AsciiTableComm.</code><code class="descname">AsciiTableComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsciiTableComm.html#AsciiTableComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.AsciiTableComm.AsciiTableComm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.AsciiFileComm.AsciiFileComm" title="yggdrasil.communication.AsciiFileComm.AsciiFileComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.AsciiFileComm.AsciiFileComm</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.FileComm.FileComm" title="yggdrasil.communication.FileComm.FileComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.FileComm.FileComm</span></code></a></p>
 <p>Class for handling I/O from/to a file on disk.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The environment variable where communication address is
-stored.</li>
-<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used to separate
-columns. If not provided and format_str is not set prior to I/O,
-this defaults to whitespace.</li>
-<li><strong>use_astropy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True and the astropy package is
-installed, it will be used to read/write the table. Defaults to
-False.</li>
-<li><strong>**kwargs</strong> – Additional keywords arguments are passed to parent class.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="yggdrasil.communication.AsciiTableComm.AsciiTableComm.advance_in_series">
-<code class="descname">advance_in_series</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsciiTableComm.html#AsciiTableComm.advance_in_series"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.AsciiTableComm.AsciiTableComm.advance_in_series" title="Permalink to this definition">¶</a></dt>
-<dd><p>Advance to a certain file in a series.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Index of file in the series that should be
-moved to. Defaults to None and call will advance to the next
-file in the series.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the file was advanced in the series, False otherwise.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.communication.AsciiTableComm.AsciiTableComm.change_position">
-<code class="descname">change_position</code><span class="sig-paren">(</span><em>file_pos</em>, <em>series_index=None</em>, <em>header_was_read=None</em>, <em>header_was_written=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsciiTableComm.html#AsciiTableComm.change_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.AsciiTableComm.AsciiTableComm.change_position" title="Permalink to this definition">¶</a></dt>
-<dd><p>Change the position in the file/series.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>file_pos</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Position that should be moved to in the file.</li>
-<li><strong>series_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optinal</em>) – Index of the file in the series that
-should be moved to. Defaults to None and will be set to the
-current series index.</li>
-<li><strong>header_was_read</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Status of if header has been
-read or not. Defaults to None and will be set to the current
-value.</li>
-<li><strong>header_was_written</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Status of if header has been
-written or not. Defaults to None and will be set to the current
-value.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="yggdrasil.communication.AsciiTableComm.AsciiTableComm.get_testing_options">
-<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><em>as_array=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsciiTableComm.html#AsciiTableComm.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.AsciiTableComm.AsciiTableComm.get_testing_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to return a dictionary of testing options for this class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Dictionary of variables to use for testing. Key/value pairs:</dt>
-<dd><dl class="first docutils">
-<dt>kwargs (dict): Keyword arguments for comms tested with the</dt>
-<dd>provided content.</dd>
-</dl>
-<p>send (list): List of objects to send to test file.
-recv (list): List of objects that will be received from a test</p>
-<blockquote>
-<div>file that was sent the messages in ‘send’.</div></blockquote>
-<dl class="last docutils">
-<dt>contents (bytes): Bytes contents of test file created by sending</dt>
-<dd>the messages in ‘send’.</dd>
-</dl>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.communication.AsciiTableComm.AsciiTableComm.read_header">
-<code class="descname">read_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsciiTableComm.html#AsciiTableComm.read_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.AsciiTableComm.AsciiTableComm.read_header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read header lines from the file and update serializer info.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.communication.AsciiTableComm.AsciiTableComm.record_position">
-<code class="descname">record_position</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsciiTableComm.html#AsciiTableComm.record_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.AsciiTableComm.AsciiTableComm.record_position" title="Permalink to this definition">¶</a></dt>
-<dd><p>Record the current position in the file/series.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.communication.AsciiTableComm.AsciiTableComm.write_header">
-<code class="descname">write_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsciiTableComm.html#AsciiTableComm.write_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.AsciiTableComm.AsciiTableComm.write_header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write header lines to the file based on the serializer info.</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -618,7 +434,30 @@ backlogged messages.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="code_python.html#yggdrasil.tools.YggThread" title="yggdrasil.tools.YggThread">tools.YggThread</a></td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">tools.YggThread</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.AsyncComm.AsyncComm.get_status_message">
+<code class="descname">get_status_message</code><span class="sig-paren">(</span><em>nindent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsyncComm.html#AsyncComm.get_status_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.AsyncComm.AsyncComm.get_status_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return lines composing a status message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nindent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of tabs that should be used to
+indent each line. Defaults to 0.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Lines composing the status message and the</dt>
+<dd>prefix string used for the last message.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>, prefix)</td>
 </tr>
 </tbody>
 </table>
@@ -874,12 +713,6 @@ backlogged messages.</p>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.communication.AsyncComm.AsyncComm.printStatus">
-<code class="descname">printStatus</code><span class="sig-paren">(</span><em>nindent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsyncComm.html#AsyncComm.printStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.AsyncComm.AsyncComm.printStatus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print status of the communicator.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1298,8 +1131,8 @@ with the response address in the header.</p>
 <span id="yggdrasil-communication-commbase-module"></span><h2>yggdrasil.communication.CommBase module<a class="headerlink" href="#module-yggdrasil.communication.CommBase" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="yggdrasil.communication.CommBase.CommBase">
-<em class="property">class </em><code class="descclassname">yggdrasil.communication.CommBase.</code><code class="descname">CommBase</code><span class="sig-paren">(</span><em>name</em>, <em>address=None</em>, <em>direction='send'</em>, <em>dont_open=False</em>, <em>is_interface=False</em>, <em>recv_timeout=0.0</em>, <em>close_on_eof_recv=True</em>, <em>close_on_eof_send=False</em>, <em>single_use=False</em>, <em>reverse_names=False</em>, <em>no_suffix=False</em>, <em>is_client=False</em>, <em>is_response_client=False</em>, <em>is_server=False</em>, <em>is_response_server=False</em>, <em>comm=None</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="code_python.html#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggClass</span></code></a></p>
+<em class="property">class </em><code class="descclassname">yggdrasil.communication.CommBase.</code><code class="descname">CommBase</code><span class="sig-paren">(</span><em>name</em>, <em>address=None</em>, <em>direction='send'</em>, <em>partner_language='python'</em>, <em>dont_open=False</em>, <em>is_interface=False</em>, <em>recv_timeout=0.0</em>, <em>close_on_eof_recv=True</em>, <em>close_on_eof_send=False</em>, <em>single_use=False</em>, <em>reverse_names=False</em>, <em>no_suffix=False</em>, <em>is_client=False</em>, <em>is_response_client=False</em>, <em>is_server=False</em>, <em>is_response_server=False</em>, <em>comm=None</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggClass</span></code></p>
 <p>Class for handling I/O.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1314,6 +1147,24 @@ address is taken from the environment variable.</li>
 through the connection. ‘send’ if the connection will send
 messages, ‘recv’ if the connecton will receive messages. Defaults
 to ‘send’.</li>
+<li><strong>partner_language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Programming language of this comm’s
+partner comm. Defaults to ‘python’.</li>
+<li><strong>datatype</strong> (<em>schema</em><em>, </em><em>optional</em>) – JSON schema (with expanded core types
+defined by yggdrasil) that constrains the type of data that
+should be sent/received by this object. Defaults to {‘type’: ‘bytes’}.
+Additional information on specifying datatypes can be found
+<a class="reference internal" href="advanced/datatypes.html#datatypes-rst"><span class="std std-ref">here</span></a>.</li>
+<li><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – [DEPRECATED] Field names that should be
+used to label fields in sent/received tables. This keyword is only
+valid for table-like datatypes. If not provided, field names are
+created based on the field order.</li>
+<li><strong>field_units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – [DEPRECATED] Field units that should be
+used to convert fields in sent/received tables. This keyword is only
+valid for table-like datatypes. If not provided, all fields are
+assumed to be unitless.</li>
+<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – [DEPRECATED] If True and the datatype is
+table-like, tables are sent/recieved with either columns rather
+than row by row. Defaults to False.</li>
 <li><strong>(</strong> (<em>serializer</em>) – class:.DefaultSerialize, optional): Class with serialize and
 deserialize methods that should be used to process sent and received
 messages. Defaults to None and is constructed using provided
@@ -1365,6 +1216,15 @@ code. Defaults to False.</li>
 </tr>
 </tbody>
 </table>
+<dl class="docutils">
+<dt>Class Attributes:</dt>
+<dd><p class="first">is_file (bool): True if the comm accesses a file.
+_maxMsgSize (int): Maximum size of a single message that should be sent.
+address_description (str): Description of the information constituting</p>
+<blockquote class="last">
+<div>an address for this communication mechanism.</div></blockquote>
+</dd>
+</dl>
 <dl class="attribute">
 <dt id="yggdrasil.communication.CommBase.CommBase.name">
 <code class="descname">name</code><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.name" title="Permalink to this definition">¶</a></dt>
@@ -1399,6 +1259,20 @@ stored.</p>
 <code class="descname">direction</code><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.direction" title="Permalink to this definition">¶</a></dt>
 <dd><p>The direction that messages should flow through the
 connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.communication.CommBase.CommBase.partner_language">
+<code class="descname">partner_language</code><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.partner_language" title="Permalink to this definition">¶</a></dt>
+<dd><p>Programming language of this comm’s partner comm.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1551,20 +1425,6 @@ comm.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="yggdrasil.communication.CommBase.CommBase.is_file">
-<code class="descname">is_file</code><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.is_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if the comm accesses a file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="yggdrasil.communication.CommBase.CommBase.recv_converter">
 <code class="descname">recv_converter</code><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.recv_converter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converter that should be used on received objects.</p>
@@ -1606,20 +1466,6 @@ comm.</p>
 </table>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="yggdrasil.communication.CommBase.CommBase.maxMsgSize">
-<code class="descname">maxMsgSize</code><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.maxMsgSize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Maximum size of a single message that should be sent.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1649,6 +1495,11 @@ name.</li>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.communication.CommBase.CommBase.address_description">
+<code class="descname">address_description</code><em class="property"> = None</em><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.address_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.communication.CommBase.CommBase.apply_recv_converter">
@@ -1690,6 +1541,13 @@ name.</li>
 <dt id="yggdrasil.communication.CommBase.CommBase.atexit">
 <code class="descname">atexit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.atexit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.atexit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close operations.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="yggdrasil.communication.CommBase.CommBase.before_registration">
+<em class="property">static </em><code class="descname">before_registration</code><span class="sig-paren">(</span><em>cls</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.before_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.before_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Operations that should be performed to modify class attributes prior
+to registration.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1900,15 +1758,42 @@ work_comm_kwargs.</li>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="yggdrasil.communication.CommBase.CommBase.get_status_message">
+<code class="descname">get_status_message</code><span class="sig-paren">(</span><em>nindent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.get_status_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.get_status_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return lines composing a status message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nindent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of tabs that should be used to
+indent each line. Defaults to 0.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Lines composing the status message and the</dt>
+<dd>prefix string used for the last message.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>, prefix)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="classmethod">
 <dt id="yggdrasil.communication.CommBase.CommBase.get_testing_options">
-<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.get_testing_options" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><em>serializer=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.get_testing_options" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to return a dictionary of testing options for this class.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>serializer</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the serializer that should
+be used. If not provided, the _default_serializer class
+attribute will be used.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
 <dt>Dictionary of variables to use for testing. Key/value pairs:</dt>
 <dd><dl class="first docutils">
 <dt>kwargs (dict): Keyword arguments for comms tested with the</dt>
@@ -1926,7 +1811,7 @@ recv (list): List of objects that will be received from a test</p>
 </dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
 </tr>
 </tbody>
 </table>
@@ -2105,8 +1990,8 @@ dictionary.</li>
 </dd></dl>
 
 <dl class="attribute">
-<dt>
-<code class="descname">is_file</code><em class="property"> = False</em></dt>
+<dt id="yggdrasil.communication.CommBase.CommBase.is_file">
+<code class="descname">is_file</code><em class="property"> = False</em><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.is_file" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -2165,8 +2050,8 @@ supported languages.</td>
 </dd></dl>
 
 <dl class="attribute">
-<dt>
-<code class="descname">maxMsgSize</code></dt>
+<dt id="yggdrasil.communication.CommBase.CommBase.maxMsgSize">
+<code class="descname">maxMsgSize</code><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.maxMsgSize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Maximum size of a single message that should be sent.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2421,7 +2306,7 @@ comm object.</p>
 
 <dl class="method">
 <dt id="yggdrasil.communication.CommBase.CommBase.printStatus">
-<code class="descname">printStatus</code><span class="sig-paren">(</span><em>nindent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.printStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.printStatus" title="Permalink to this definition">¶</a></dt>
+<code class="descname">printStatus</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.printStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.printStatus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print status of the communicator.</p>
 </dd></dl>
 
@@ -2765,7 +2650,7 @@ _send_multipart_worker.</li>
 <dl class="class">
 <dt id="yggdrasil.communication.CommBase.CommServer">
 <em class="property">class </em><code class="descclassname">yggdrasil.communication.CommBase.</code><code class="descname">CommServer</code><span class="sig-paren">(</span><em>srv_address</em>, <em>cli_address=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommServer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="code_python.html#yggdrasil.tools.YggThreadLoop" title="yggdrasil.tools.YggThreadLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggThreadLoop</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggThreadLoop</span></code></p>
 <p>Basic server object to keep track of clients.</p>
 <dl class="attribute">
 <dt id="yggdrasil.communication.CommBase.CommServer.cli_count">
@@ -2798,7 +2683,7 @@ _send_multipart_worker.</li>
 <dl class="class">
 <dt id="yggdrasil.communication.CommBase.CommThreadLoop">
 <em class="property">class </em><code class="descclassname">yggdrasil.communication.CommBase.</code><code class="descname">CommThreadLoop</code><span class="sig-paren">(</span><em>comm</em>, <em>name=None</em>, <em>suffix='CommThread'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommThreadLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommThreadLoop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="code_python.html#yggdrasil.tools.YggThreadLoop" title="yggdrasil.tools.YggThreadLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggThreadLoop</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggThreadLoop</span></code></p>
 <p>Thread loop for comms to ensure cleanup.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2930,6 +2815,16 @@ the registry, but it won’t be closed. Defaults to False.</li>
 </dd></dl>
 
 </div>
+<div class="section" id="module-yggdrasil.communication.DefaultComm">
+<span id="yggdrasil-communication-defaultcomm-module"></span><h2>yggdrasil.communication.DefaultComm module<a class="headerlink" href="#module-yggdrasil.communication.DefaultComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yggdrasil.communication.DefaultComm.DefaultComm">
+<em class="property">class </em><code class="descclassname">yggdrasil.communication.DefaultComm.</code><code class="descname">DefaultComm</code><span class="sig-paren">(</span><em>name</em>, <em>address=None</em>, <em>direction='send'</em>, <em>partner_language='python'</em>, <em>dont_open=False</em>, <em>is_interface=False</em>, <em>recv_timeout=0.0</em>, <em>close_on_eof_recv=True</em>, <em>close_on_eof_send=False</em>, <em>single_use=False</em>, <em>reverse_names=False</em>, <em>no_suffix=False</em>, <em>is_client=False</em>, <em>is_response_client=False</em>, <em>is_server=False</em>, <em>is_response_server=False</em>, <em>comm=None</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/DefaultComm.html#DefaultComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.DefaultComm.DefaultComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.CommBase.CommBase" title="yggdrasil.communication.CommBase.CommBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.CommBase.CommBase</span></code></a></p>
+<p>Simple wrapper for default class that allows it to be registered.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="module-yggdrasil.communication.ErrorComm">
 <span id="yggdrasil-communication-errorcomm-module"></span><h2>yggdrasil.communication.ErrorComm module<a class="headerlink" href="#module-yggdrasil.communication.ErrorComm" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
@@ -2994,13 +2889,11 @@ stored.</li>
 <li><strong>read_meth</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Method that should be used to read data
 from the file. Defaults to ‘read’. Ignored if direction is ‘send’.</li>
 <li><strong>append</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True and writing, file is openned in append
-mode. Defaults to False.</li>
+mode. If True and reading, file is kept open even if the end of the
+file is reached to allow for another process to write to the file in
+append mode. Defaults to False.</li>
 <li><strong>in_temp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the path will be considered relative
 to the platform temporary directory. Defaults to False.</li>
-<li><strong>open_as_binary</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the file is opened in binary
-mode. Defaults to True.</li>
-<li><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – String indicating a new line. Defaults to
-serialize._default_newline.</li>
 <li><strong>is_series</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, input/output will be done to
 a series of files. If reading, each file will be processed until
 the end is reached. If writing, each output will be to a new
@@ -3067,34 +2960,6 @@ platform temporary directory.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.communication.FileComm.FileComm.open_as_binary">
-<code class="descname">open_as_binary</code><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.open_as_binary" title="Permalink to this definition">¶</a></dt>
-<dd><p>If True, the file is opened in binary mode.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.communication.FileComm.FileComm.newline">
-<code class="descname">newline</code><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.newline" title="Permalink to this definition">¶</a></dt>
-<dd><p>String indicating a new line.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
 </tr>
 </tbody>
 </table>
@@ -3174,9 +3039,16 @@ the next file in the series.</td>
 </table>
 </dd></dl>
 
+<dl class="staticmethod">
+<dt id="yggdrasil.communication.FileComm.FileComm.before_registration">
+<em class="property">static </em><code class="descname">before_registration</code><span class="sig-paren">(</span><em>cls</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.before_registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.before_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Operations that should be performed to modify class attributes prior
+to registration.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="yggdrasil.communication.FileComm.FileComm.change_position">
-<code class="descname">change_position</code><span class="sig-paren">(</span><em>file_pos</em>, <em>series_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.change_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.change_position" title="Permalink to this definition">¶</a></dt>
+<code class="descname">change_position</code><span class="sig-paren">(</span><em>file_pos</em>, <em>series_index=None</em>, <em>header_was_read=None</em>, <em>header_was_written=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.change_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.change_position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Change the position in the file/series.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3187,6 +3059,12 @@ the next file in the series.</td>
 <li><strong>series_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optinal</em>) – Index of the file in the series that
 should be moved to. Defaults to None and will be set to the
 current series index.</li>
+<li><strong>header_was_read</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Status of if header has been
+read or not. Defaults to None and will be set to the current
+value.</li>
+<li><strong>header_was_written</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Status of if header has been
+written or not. Defaults to None and will be set to the current
+value.</li>
 </ul>
 </td>
 </tr>
@@ -3212,6 +3090,18 @@ current series index.</li>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.FileComm.FileComm.disable_header">
+<code class="descname">disable_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.disable_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.disable_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn off header so that it will not be written.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.FileComm.FileComm.enable_header">
+<code class="descname">enable_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.enable_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.enable_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn on header so that it will be written.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -3241,31 +3131,46 @@ Defaults to None and the current index is used.</td>
 
 <dl class="classmethod">
 <dt id="yggdrasil.communication.FileComm.FileComm.get_testing_options">
-<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><em>read_meth='read'</em>, <em>open_as_binary=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.get_testing_options" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><em>read_meth=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.get_testing_options" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to return a dictionary of testing options for this class.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>read_meth</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Read method that will be used by the test
+class. Defaults to None and will be set by the serialier.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent
+class’s method and the serializers methods for determining the
+default read_meth and concatenating the sent objects into the
+objects that are expected to be received.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
 <dt>Dictionary of variables to use for testing. Key/value pairs:</dt>
 <dd><dl class="first docutils">
 <dt>kwargs (dict): Keyword arguments for comms tested with the</dt>
-<dd>provided content.</dd>
+<dd><p class="first last">provided content.</p>
+</dd>
 </dl>
 <p>send (list): List of objects to send to test file.
 recv (list): List of objects that will be received from a test</p>
 <blockquote>
-<div>file that was sent the messages in ‘send’.</div></blockquote>
+<div><p>file that was sent the messages in ‘send’.</p>
+</div></blockquote>
 <dl class="last docutils">
 <dt>contents (bytes): Bytes contents of test file created by sending</dt>
-<dd>the messages in ‘send’.</dd>
+<dd><p class="first last">the messages in ‘send’.</p>
+</dd>
 </dl>
 </dd>
 </dl>
+</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -3391,6 +3296,12 @@ comm object.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="yggdrasil.communication.FileComm.FileComm.read_header">
+<code class="descname">read_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.read_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.read_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read header lines from the file and update serializer info.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.communication.FileComm.FileComm.record_position">
 <code class="descname">record_position</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.record_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.record_position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record the current position in the file/series.</p>
@@ -3430,10 +3341,38 @@ comm object.</p>
 <dd><p>Remove the file.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="yggdrasil.communication.FileComm.FileComm.reset_position">
+<code class="descname">reset_position</code><span class="sig-paren">(</span><em>truncate=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.reset_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.reset_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move to the front of the file and allow header to be read again.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>truncate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the file will be truncated after
+moving to the beginning, effectively erasing the file. Defaults
+to False.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.FileComm.FileComm.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>obj</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize a message using the associated serializer.</p>
+</dd></dl>
+
 <dl class="classmethod">
 <dt id="yggdrasil.communication.FileComm.FileComm.underlying_comm_class">
 <em class="property">classmethod </em><code class="descname">underlying_comm_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.underlying_comm_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.underlying_comm_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>str: Name of underlying communication class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.FileComm.FileComm.write_header">
+<code class="descname">write_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/FileComm.html#FileComm.write_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.FileComm.FileComm.write_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write header lines to the file based on the serializer info.</p>
 </dd></dl>
 
 </dd></dl>
@@ -3801,6 +3740,18 @@ comm object.</p>
 </table>
 </dd></dl>
 
+<dl class="docutils">
+<dt>Developer Notes:</dt>
+<dd>The default size limit for IPC message queues is 2048 bytes on Mac
+operating systems so it is important that implementation of this
+communication mechanism properly split and send messages larger than
+this limit as more than one message.</dd>
+</dl>
+<dl class="attribute">
+<dt id="yggdrasil.communication.IPCComm.IPCComm.address_description">
+<code class="descname">address_description</code><em class="property"> = 'An IPC message queue key.'</em><a class="headerlink" href="#yggdrasil.communication.IPCComm.IPCComm.address_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="yggdrasil.communication.IPCComm.IPCComm.bind">
 <code class="descname">bind</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/IPCComm.html#IPCComm.bind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.IPCComm.IPCComm.bind" title="Permalink to this definition">¶</a></dt>
@@ -3823,27 +3774,6 @@ comm object.</p>
 <dt id="yggdrasil.communication.IPCComm.IPCComm.confirm_send">
 <code class="descname">confirm_send</code><span class="sig-paren">(</span><em>noblock=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/IPCComm.html#IPCComm.confirm_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.IPCComm.IPCComm.confirm_send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confirm that sent message was received.</p>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="yggdrasil.communication.IPCComm.IPCComm.is_installed">
-<em class="property">classmethod </em><code class="descname">is_installed</code><span class="sig-paren">(</span><em>language=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/IPCComm.html#IPCComm.is_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.IPCComm.IPCComm.is_installed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the necessary libraries are installed for this
-communication class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Specific language that should be checked
-for compatibility. Defaults to None and all languages supported
-on the current platform will be checked.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Is the comm installed.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -4047,38 +3977,6 @@ list.</td>
 </tr>
 </tbody>
 </table>
-<dl class="classmethod">
-<dt id="yggdrasil.communication.JSONFileComm.JSONFileComm.get_testing_options">
-<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/JSONFileComm.html#JSONFileComm.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.JSONFileComm.JSONFileComm.get_testing_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to return a dictionary of testing options for this class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Dictionary of variables to use for testing. Key/value pairs:</dt>
-<dd><dl class="first docutils">
-<dt>kwargs (dict): Keyword arguments for comms tested with the</dt>
-<dd>provided content.</dd>
-</dl>
-<p>send (list): List of objects to send to test file.
-recv (list): List of objects that will be received from a test</p>
-<blockquote>
-<div>file that was sent the messages in ‘send’.</div></blockquote>
-<dl class="last docutils">
-<dt>contents (bytes): Bytes contents of test file created by sending</dt>
-<dd>the messages in ‘send’.</dd>
-</dl>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -4086,7 +3984,7 @@ recv (list): List of objects that will be received from a test</p>
 <span id="yggdrasil-communication-matfilecomm-module"></span><h2>yggdrasil.communication.MatFileComm module<a class="headerlink" href="#module-yggdrasil.communication.MatFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="yggdrasil.communication.MatFileComm.MatFileComm">
-<em class="property">class </em><code class="descclassname">yggdrasil.communication.MatFileComm.</code><code class="descname">MatFileComm</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/MatFileComm.html#MatFileComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.MatFileComm.MatFileComm" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">yggdrasil.communication.MatFileComm.</code><code class="descname">MatFileComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/MatFileComm.html#MatFileComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.MatFileComm.MatFileComm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.FileComm.FileComm" title="yggdrasil.communication.FileComm.FileComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.FileComm.FileComm</span></code></a></p>
 <p>Class for handling I/O from/to a Matlab .mat file on disk.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -4101,38 +3999,6 @@ recv (list): List of objects that will be received from a test</p>
 </tr>
 </tbody>
 </table>
-<dl class="classmethod">
-<dt id="yggdrasil.communication.MatFileComm.MatFileComm.get_testing_options">
-<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/MatFileComm.html#MatFileComm.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.MatFileComm.MatFileComm.get_testing_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to return a dictionary of testing options for this class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Dictionary of variables to use for testing. Key/value pairs:</dt>
-<dd><dl class="first docutils">
-<dt>kwargs (dict): Keyword arguments for comms tested with the</dt>
-<dd>provided content.</dd>
-</dl>
-<p>send (list): List of objects to send to test file.
-recv (list): List of objects that will be received from a test</p>
-<blockquote>
-<div>file that was sent the messages in ‘send’.</div></blockquote>
-<dl class="last docutils">
-<dt>contents (bytes): Bytes contents of test file created by sending</dt>
-<dd>the messages in ‘send’.</dd>
-</dl>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -4156,38 +4022,6 @@ stored.</li>
 </tr>
 </tbody>
 </table>
-<dl class="classmethod">
-<dt id="yggdrasil.communication.ObjFileComm.ObjFileComm.get_testing_options">
-<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ObjFileComm.html#ObjFileComm.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.ObjFileComm.ObjFileComm.get_testing_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to return a dictionary of testing options for this class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Dictionary of variables to use for testing. Key/value pairs:</dt>
-<dd><dl class="first docutils">
-<dt>kwargs (dict): Keyword arguments for comms tested with the</dt>
-<dd>provided content.</dd>
-</dl>
-<p>send (list): List of objects to send to test file.
-recv (list): List of objects that will be received from a test</p>
-<blockquote>
-<div>file that was sent the messages in ‘send’.</div></blockquote>
-<dl class="last docutils">
-<dt>contents (bytes): Bytes contents of test file created by sending</dt>
-<dd>the messages in ‘send’.</dd>
-</dl>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -4213,125 +4047,6 @@ columns. Defaults to ‘t’.</li>
 </tr>
 </tbody>
 </table>
-<dl class="classmethod">
-<dt id="yggdrasil.communication.PandasFileComm.PandasFileComm.get_testing_options">
-<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><em>as_frames=False</em>, <em>no_names=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/PandasFileComm.html#PandasFileComm.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.PandasFileComm.PandasFileComm.get_testing_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to return a dictionary of testing options for this class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>as_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the test objects will be Pandas
-data frames. Defaults to False.</li>
-<li><strong>no_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, an example is returned where the
-names are not provided to the deserializer. Defaults to False.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
-<dt>Dictionary of variables to use for testing. Key/value pairs:</dt>
-<dd><dl class="first docutils">
-<dt>kwargs (dict): Keyword arguments for comms tested with the</dt>
-<dd><p class="first last">provided content.</p>
-</dd>
-</dl>
-<p>send (list): List of objects to send to test file.
-recv (list): List of objects that will be received from a test</p>
-<blockquote>
-<div><p>file that was sent the messages in ‘send’.</p>
-</div></blockquote>
-<dl class="last docutils">
-<dt>contents (bytes): Bytes contents of test file created by sending</dt>
-<dd><p class="first last">the messages in ‘send’.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.communication.PandasFileComm.PandasFileComm.header_was_written">
-<code class="descname">header_was_written</code><a class="headerlink" href="#yggdrasil.communication.PandasFileComm.PandasFileComm.header_was_written" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if head has been written to the current file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.communication.PandasFileComm.PandasFileComm.read_header">
-<code class="descname">read_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/PandasFileComm.html#PandasFileComm.read_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.PandasFileComm.PandasFileComm.read_header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read header lines from the file and update serializer info.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.communication.PandasFileComm.PandasFileComm.write_header">
-<code class="descname">write_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/PandasFileComm.html#PandasFileComm.write_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.PandasFileComm.PandasFileComm.write_header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write header lines to the file based on the serializer info.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.communication.PandasFileComm.pandas_recv_converter">
-<code class="descclassname">yggdrasil.communication.PandasFileComm.</code><code class="descname">pandas_recv_converter</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/PandasFileComm.html#pandas_recv_converter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.PandasFileComm.pandas_recv_converter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs conversion to a limited set of objects from a Pandas data frame
-for receiving from a file via PandasFileComm. Currently supports converting to
-lists/tuples of numpy arrays.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<em>pandas.DataFrame</em>) – Data frame to convert.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>pandas.DataFrame: Converted data frame (or unmodified input if conversion</dt>
-<dd>could not be completed.</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.communication.PandasFileComm.pandas_send_converter">
-<code class="descclassname">yggdrasil.communication.PandasFileComm.</code><code class="descname">pandas_send_converter</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/PandasFileComm.html#pandas_send_converter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.PandasFileComm.pandas_send_converter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs conversion from a limited set of objects to a Pandas data frame
-for sending to a file via PandasFileComm. Currently supports converting from
-structured numpy arrays, lists/tuples of numpy arrays, and dictionaries.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – Object to convert.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Converted data frame (or unmodified input if conversion</dt>
-<dd>could not be completed.</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pandas.DataFrame</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 </div>
@@ -4339,7 +4054,7 @@ structured numpy arrays, lists/tuples of numpy arrays, and dictionaries.</p>
 <span id="yggdrasil-communication-picklefilecomm-module"></span><h2>yggdrasil.communication.PickleFileComm module<a class="headerlink" href="#module-yggdrasil.communication.PickleFileComm" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="yggdrasil.communication.PickleFileComm.PickleFileComm">
-<em class="property">class </em><code class="descclassname">yggdrasil.communication.PickleFileComm.</code><code class="descname">PickleFileComm</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/PickleFileComm.html#PickleFileComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.PickleFileComm.PickleFileComm" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">yggdrasil.communication.PickleFileComm.</code><code class="descname">PickleFileComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/PickleFileComm.html#PickleFileComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.PickleFileComm.PickleFileComm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.FileComm.FileComm" title="yggdrasil.communication.FileComm.FileComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.FileComm.FileComm</span></code></a></p>
 <p>Class for handling I/O from/to a pickled file on disk.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -4354,38 +4069,6 @@ structured numpy arrays, lists/tuples of numpy arrays, and dictionaries.</p>
 </tr>
 </tbody>
 </table>
-<dl class="classmethod">
-<dt id="yggdrasil.communication.PickleFileComm.PickleFileComm.get_testing_options">
-<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/PickleFileComm.html#PickleFileComm.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.PickleFileComm.PickleFileComm.get_testing_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to return a dictionary of testing options for this class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Dictionary of variables to use for testing. Key/value pairs:</dt>
-<dd><dl class="first docutils">
-<dt>kwargs (dict): Keyword arguments for comms tested with the</dt>
-<dd>provided content.</dd>
-</dl>
-<p>send (list): List of objects to send to test file.
-recv (list): List of objects that will be received from a test</p>
-<blockquote>
-<div>file that was sent the messages in ‘send’.</div></blockquote>
-<dl class="last docutils">
-<dt>contents (bytes): Bytes contents of test file created by sending</dt>
-<dd>the messages in ‘send’.</dd>
-</dl>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -4409,38 +4092,6 @@ stored.</li>
 </tr>
 </tbody>
 </table>
-<dl class="classmethod">
-<dt id="yggdrasil.communication.PlyFileComm.PlyFileComm.get_testing_options">
-<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/PlyFileComm.html#PlyFileComm.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.PlyFileComm.PlyFileComm.get_testing_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to return a dictionary of testing options for this class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Dictionary of variables to use for testing. Key/value pairs:</dt>
-<dd><dl class="first docutils">
-<dt>kwargs (dict): Keyword arguments for comms tested with the</dt>
-<dd>provided content.</dd>
-</dl>
-<p>send (list): List of objects to send to test file.
-recv (list): List of objects that will be received from a test</p>
-<blockquote>
-<div>file that was sent the messages in ‘send’.</div></blockquote>
-<dl class="last docutils">
-<dt>contents (bytes): Bytes contents of test file created by sending</dt>
-<dd>the messages in ‘send’.</dd>
-</dl>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -4490,7 +4141,7 @@ established.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="code_python.html#yggdrasil.tools.YggThread" title="yggdrasil.tools.YggThread">tools.YggThread</a></td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">tools.YggThread</td>
 </tr>
 </tbody>
 </table>
@@ -4698,6 +4349,11 @@ the queue.</p>
 <div class="section" id="module-yggdrasil.communication.RMQComm">
 <span id="yggdrasil-communication-rmqcomm-module"></span><h2>yggdrasil.communication.RMQComm module<a class="headerlink" href="#module-yggdrasil.communication.RMQComm" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="yggdrasil.communication.RMQComm.BlockingIOError">
+<em class="property">class </em><code class="descclassname">yggdrasil.communication.RMQComm.</code><code class="descname">BlockingIOError</code><a class="reference internal" href="_modules/yggdrasil/communication/RMQComm.html#BlockingIOError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.RMQComm.BlockingIOError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
 <dt id="yggdrasil.communication.RMQComm.RMQComm">
 <em class="property">class </em><code class="descclassname">yggdrasil.communication.RMQComm.</code><code class="descname">RMQComm</code><span class="sig-paren">(</span><em>name</em>, <em>dont_backlog=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/RMQComm.html#RMQComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.RMQComm.RMQComm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.AsyncComm.AsyncComm" title="yggdrasil.communication.AsyncComm.AsyncComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.AsyncComm.AsyncComm</span></code></a></p>
@@ -4738,6 +4394,18 @@ the queue.</p>
 </tr>
 </tbody>
 </table>
+<dl class="docutils">
+<dt>Developer Notes:</dt>
+<dd>It is not advised that new language implement a RabbitMQ communication
+interface. Rather RMQ communication is included explicitly for
+connections between models that are not co-located on the same machine
+and are used by the yggdrasil framework connections on the Python side.</dd>
+</dl>
+<dl class="attribute">
+<dt id="yggdrasil.communication.RMQComm.RMQComm.address_description">
+<code class="descname">address_description</code><em class="property"> = 'AMPQ queue address of the form ``&lt;url&gt;_RMQPARAM_&lt;exchange&gt;_RMQPARAM_&lt;queue&gt;`` where ``url`` is the broker address (see explanation `here &lt;https://pika.readthedocs.io/en/stable/examples/using_urlparameters.html&gt;`_), ``exchange`` is the name of the exchange on the queue that should be used, and ``queue`` is the name of the queue.'</em><a class="headerlink" href="#yggdrasil.communication.RMQComm.RMQComm.address_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="yggdrasil.communication.RMQComm.RMQComm.bind">
 <code class="descname">bind</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/RMQComm.html#RMQComm.bind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.RMQComm.RMQComm.bind" title="Permalink to this definition">¶</a></dt>
@@ -4833,27 +4501,6 @@ the queue.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="yggdrasil.communication.RMQComm.RMQComm.is_installed">
-<em class="property">classmethod </em><code class="descname">is_installed</code><span class="sig-paren">(</span><em>language=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/RMQComm.html#RMQComm.is_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.RMQComm.RMQComm.is_installed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the necessary libraries are installed for this
-communication class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Specific language that should be checked
-for compatibility. Defaults to None and all languages supported
-on the current platform will be checked.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Is the comm installed.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -5397,38 +5044,6 @@ for output using address from the header.</p>
 </tr>
 </tbody>
 </table>
-<dl class="classmethod">
-<dt id="yggdrasil.communication.YAMLFileComm.YAMLFileComm.get_testing_options">
-<em class="property">classmethod </em><code class="descname">get_testing_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/YAMLFileComm.html#YAMLFileComm.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.YAMLFileComm.YAMLFileComm.get_testing_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to return a dictionary of testing options for this class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Dictionary of variables to use for testing. Key/value pairs:</dt>
-<dd><dl class="first docutils">
-<dt>kwargs (dict): Keyword arguments for comms tested with the</dt>
-<dd>provided content.</dd>
-</dl>
-<p>send (list): List of objects to send to test file.
-recv (list): List of objects that will be received from a test</p>
-<blockquote>
-<div>file that was sent the messages in ‘send’.</div></blockquote>
-<dl class="last docutils">
-<dt>contents (bytes): Bytes contents of test file created by sending</dt>
-<dd>the messages in ‘send’.</dd>
-</dl>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -5563,6 +5178,30 @@ to a dealer socket.</p>
 </table>
 </dd></dl>
 
+<dl class="docutils">
+<dt>Developer Notes:</dt>
+<dd>yggdrasil uses the tcp transport by default with a PAIR socket type.
+For every connection, yggdrasil establishes a second request/reply
+connection that is used to confirm messages passed between the primary
+PAIR of sockets. On the first send, the model should create a REP socket
+on an open tcp address and send that address in the header of the first
+message under the key ‘zmq_reply’. Receiving models should check
+message headers for this key and, on receipt, establish the partner
+REQ socket with the specified address (receiving comms can receive from
+more than one source so they can have more than one request addresses at
+at time for this purpose). Following every message, the sending model
+should wait for a message on the reply socket and, on receipt, return
+the message. Following every message, the receiving model should send
+the message ‘YGG_REPLY’ on the request socket and wait for a reply.
+When creating worker comms for sending large messages, the sending
+model should create the reply comm for the worker in advanced and send
+it in the header with the worker address under the key ‘zmq_reply_worker’.</dd>
+</dl>
+<dl class="attribute">
+<dt id="yggdrasil.communication.ZMQComm.ZMQComm.address_description">
+<code class="descname">address_description</code><em class="property"> = 'A ZeroMQ endpoint of the form &lt;transport&gt;://&lt;address&gt;, where the format of address depends on the transport. Additional information can be found `here &lt;http://api.zeromq.org/3-2:zmq-bind&gt;`_.'</em><a class="headerlink" href="#yggdrasil.communication.ZMQComm.ZMQComm.address_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.communication.ZMQComm.ZMQComm.address_param">
 <code class="descname">address_param</code><a class="headerlink" href="#yggdrasil.communication.ZMQComm.ZMQComm.address_param" title="Permalink to this definition">¶</a></dt>
@@ -5657,6 +5296,29 @@ to a dealer socket.</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="yggdrasil.communication.ZMQComm.ZMQComm.get_status_message">
+<code class="descname">get_status_message</code><span class="sig-paren">(</span><em>nindent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ZMQComm.html#ZMQComm.get_status_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.ZMQComm.ZMQComm.get_status_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return lines composing a status message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nindent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of tabs that should be used to
+indent each line. Defaults to 0.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Lines composing the status message and the</dt>
+<dd>prefix string used for the last message.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>, prefix)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.communication.ZMQComm.ZMQComm.get_work_comm_kwargs">
 <code class="descname">get_work_comm_kwargs</code><a class="headerlink" href="#yggdrasil.communication.ZMQComm.ZMQComm.get_work_comm_kwargs" title="Permalink to this definition">¶</a></dt>
@@ -5716,27 +5378,6 @@ to the work comm.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="yggdrasil.communication.ZMQComm.ZMQComm.is_installed">
-<em class="property">classmethod </em><code class="descname">is_installed</code><span class="sig-paren">(</span><em>language=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ZMQComm.html#ZMQComm.is_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.ZMQComm.ZMQComm.is_installed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the necessary libraries are installed for this
-communication class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Specific language that should be checked
-for compatibility. Defaults to None and all languages supported
-on the current platform will be checked.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Is the comm installed.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -5924,12 +5565,6 @@ comm object.</p>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.communication.ZMQComm.ZMQComm.printStatus">
-<code class="descname">printStatus</code><span class="sig-paren">(</span><em>nindent=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ZMQComm.html#ZMQComm.printStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.ZMQComm.ZMQComm.printStatus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print status of the communicator.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -6224,22 +5859,6 @@ the addresses. Defaults to 1.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="yggdrasil.communication.ZMQComm.check_czmq">
-<code class="descclassname">yggdrasil.communication.ZMQComm.</code><code class="descname">check_czmq</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ZMQComm.html#check_czmq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.ZMQComm.check_czmq" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the necessary C/C++ libraries are installed for ZeroMQ.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the libraries are installed, False otherwise.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="yggdrasil.communication.ZMQComm.format_address">
 <code class="descclassname">yggdrasil.communication.ZMQComm.</code><code class="descname">format_address</code><span class="sig-paren">(</span><em>protocol</em>, <em>host</em>, <em>port=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ZMQComm.html#format_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.ZMQComm.format_address" title="Permalink to this definition">¶</a></dt>
 <dd><p>Format an address based on its parts.</p>
@@ -6386,25 +6005,6 @@ class method new_comm.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="yggdrasil.communication.get_comm_class">
-<code class="descclassname">yggdrasil.communication.</code><code class="descname">get_comm_class</code><span class="sig-paren">(</span><em>comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication.html#get_comm_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.get_comm_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a communication class given it’s name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of communicator class. Defaults to
-tools.get_default_comm() if not provided.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Communicator class.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">class</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="yggdrasil.communication.cleanup_comms">
 <code class="descclassname">yggdrasil.communication.</code><code class="descname">cleanup_comms</code><span class="sig-paren">(</span><em>comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication.html#cleanup_comms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.cleanup_comms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call cleanup_comms for the appropriate communicator class.</p>
@@ -6421,12 +6021,6 @@ tools.get_default_comm() if not provided.</td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.communication.DefaultComm">
-<code class="descclassname">yggdrasil.communication.</code><code class="descname">DefaultComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication.html#DefaultComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.DefaultComm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct a comm object of the default type.</p>
 </dd></dl>
 
 </div>
@@ -6467,7 +6061,7 @@ tools.get_default_comm() if not provided.</td>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

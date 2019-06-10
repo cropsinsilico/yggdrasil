@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../index.html"/>
         <link rel="up" title="yggdrasil.metaschema.datatypes" href="../datatypes.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -183,21 +177,23 @@
   <h1>Source code for yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">register_type</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.ContainerMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">ContainerMetaschemaType</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="JSONArrayMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType.JSONArrayMetaschemaType">[docs]</a><span class="nd">@register_type</span>
-<span class="k">class</span> <span class="nc">JSONArrayMetaschemaType</span><span class="p">(</span><span class="n">ContainerMetaschemaType</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Type associated with a set of subtypes.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="JSONArrayMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType.JSONArrayMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">JSONArrayMetaschemaType</span><span class="p">(</span><span class="n">ContainerMetaschemaType</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Type associated with a set of subtypes.</span>
+
+<span class="sd">    Developer Notes:</span>
+<span class="sd">        Support for dynamic arrays in C/C++ is still under development.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;array&#39;</span>
     <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;A container of ordered values.&#39;</span>
-    <span class="n">properties</span> <span class="o">=</span> <span class="n">ContainerMetaschemaType</span><span class="o">.</span><span class="n">properties</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
-    <span class="n">definition_properties</span> <span class="o">=</span> <span class="n">ContainerMetaschemaType</span><span class="o">.</span><span class="n">definition_properties</span>
-    <span class="n">metadata_properties</span> <span class="o">=</span> <span class="n">ContainerMetaschemaType</span><span class="o">.</span><span class="n">metadata_properties</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
-    <span class="n">extract_properties</span> <span class="o">=</span> <span class="n">ContainerMetaschemaType</span><span class="o">.</span><span class="n">extract_properties</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
+    <span class="n">properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
+    <span class="n">metadata_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
+    <span class="n">extract_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
     <span class="n">python_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
     <span class="n">_replaces_existing</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -240,6 +236,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="JSONArrayMetaschemaType.coerce_type"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType.JSONArrayMetaschemaType.coerce_type">[docs]</a>    <span class="nd">@classmethod</span>
@@ -270,6 +268,8 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">key_order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
                 <span class="n">obj</span> <span class="o">=</span> <span class="n">dict2list</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">key_order</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj</span><span class="p">]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">,</span> <span class="p">[]))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
             <span class="n">typedef_validated</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;typedef_validated&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">check_decoded</span><span class="p">([</span><span class="n">obj</span><span class="p">],</span> <span class="n">typedef</span><span class="p">,</span>
@@ -382,7 +382,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests package &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.tests package &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="index.html"/> 
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -102,16 +102,10 @@
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -251,6 +245,21 @@
 </dd></dl>
 
 </div>
+<div class="section" id="module-yggdrasil.tests.test_components">
+<span id="yggdrasil-tests-test-components-module"></span><h2>yggdrasil.tests.test_components module<a class="headerlink" href="#module-yggdrasil.tests.test_components" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="yggdrasil.tests.test_components.test_create_component">
+<code class="descclassname">yggdrasil.tests.test_components.</code><code class="descname">test_create_component</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_components.html#test_create_component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_components.test_create_component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test dynamic creation of component instance.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.tests.test_components.test_import_component">
+<code class="descclassname">yggdrasil.tests.test_components.</code><code class="descname">test_import_component</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_components.html#test_import_component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_components.test_import_component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test dynamic import of component.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="module-yggdrasil.tests.test_config">
 <span id="yggdrasil-tests-test-config-module"></span><h2>yggdrasil.tests.test_config module<a class="headerlink" href="#module-yggdrasil.tests.test_config" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
@@ -293,12 +302,6 @@
 <dt id="yggdrasil.tests.test_config.test_locate_file">
 <code class="descclassname">yggdrasil.tests.test_config.</code><code class="descname">test_locate_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_config.html#test_locate_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_config.test_locate_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test file location method.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.tests.test_config.test_update_config">
-<code class="descclassname">yggdrasil.tests.test_config.</code><code class="descname">test_update_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_config.html#test_update_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_config.test_update_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test update_config.</p>
 </dd></dl>
 
 </div>
@@ -474,7 +477,7 @@ open file descriptors.</li>
 <p>Test class for the TimedRun class using existing data.</p>
 <dl class="attribute">
 <dt id="yggdrasil.tests.test_timing.TestTimedRun.comm_type">
-<code class="descname">comm_type</code><em class="property"> = 'ZMQComm'</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.comm_type" title="Permalink to this definition">¶</a></dt>
+<code class="descname">comm_type</code><em class="property"> = 'zmq'</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.comm_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -612,18 +615,6 @@ open file descriptors.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTemp.test_comm_types">
-<code class="descname">test_comm_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTemp.test_comm_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTemp.test_comm_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test different comm types.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTemp.test_languages">
-<code class="descname">test_languages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTemp.test_languages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTemp.test_languages" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test different combinations of source/destination languages.</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="yggdrasil.tests.test_timing.TestTimedRunTemp.test_perf_func">
 <code class="descname">test_perf_func</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTemp.test_perf_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTemp.test_perf_func" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test perf_func.</p>
@@ -666,18 +657,6 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.test_timing.TestTimedRunTempNoPerf.dont_use_perf">
 <code class="descname">dont_use_perf</code><em class="property"> = True</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTempNoPerf.dont_use_perf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTempNoPerf.test_comm_types">
-<code class="descname">test_comm_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTempNoPerf.test_comm_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTempNoPerf.test_comm_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Disabled: Test different comm types.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTempNoPerf.test_languages">
-<code class="descname">test_languages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTempNoPerf.test_languages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTempNoPerf.test_languages" title="Permalink to this definition">¶</a></dt>
-<dd><p>Disabled: Test different combinations of source/destination languages.</p>
-</dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.tests.test_timing.TestTimedRunTempNoPerf.test_perf_func">
@@ -893,15 +872,15 @@ open file descriptors.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="yggdrasil.tests.test_tools.test_get_installed_comm">
-<code class="descclassname">yggdrasil.tests.test_tools.</code><code class="descname">test_get_installed_comm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_tools.html#test_get_installed_comm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_tools.test_get_installed_comm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test get_installed_comm.</p>
+<dt id="yggdrasil.tests.test_tools.test_get_installed">
+<code class="descclassname">yggdrasil.tests.test_tools.</code><code class="descname">test_get_installed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_tools.html#test_get_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_tools.test_get_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test get_installed_&lt;lang/comm&gt;.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="yggdrasil.tests.test_tools.test_get_installed_lang">
-<code class="descclassname">yggdrasil.tests.test_tools.</code><code class="descname">test_get_installed_lang</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_tools.html#test_get_installed_lang"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_tools.test_get_installed_lang" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test get_installed_lang.</p>
+<dt id="yggdrasil.tests.test_tools.test_get_supported">
+<code class="descclassname">yggdrasil.tests.test_tools.</code><code class="descname">test_get_supported</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_tools.html#test_get_supported"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_tools.test_get_supported" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test get_supported_&lt;platforms/lang/comm&gt;.</p>
 </dd></dl>
 
 <dl class="function">
@@ -914,6 +893,12 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.test_tools.test_popen_nobuffer">
 <code class="descclassname">yggdrasil.tests.test_tools.</code><code class="descname">test_popen_nobuffer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_tools.html#test_popen_nobuffer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_tools.test_popen_nobuffer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test open of process without buffer.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.tests.test_tools.test_which">
+<code class="descclassname">yggdrasil.tests.test_tools.</code><code class="descname">test_which</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_tools.html#test_which"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_tools.test_which" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test location of executable.</p>
 </dd></dl>
 
 </div>
@@ -1309,6 +1294,12 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.test_yamlfile.direct_translate">
 <code class="descclassname">yggdrasil.tests.test_yamlfile.</code><code class="descname">direct_translate</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#direct_translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.direct_translate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test translator that just returns passed message.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.tests.test_yamlfile.test_load_yaml">
+<code class="descclassname">yggdrasil.tests.test_yamlfile.</code><code class="descname">test_load_yaml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#test_load_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.test_load_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test loading yaml.</p>
 </dd></dl>
 
 <dl class="function">
@@ -1727,8 +1718,14 @@ open file descriptors.</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="yggdrasil.tests.YggTestClass.create_error_instance">
+<code class="descname">create_error_instance</code><span class="sig-paren">(</span><em>inst_class=None</em>, <em>args=None</em>, <em>kwargs=None</em>, <em>error_class=None</em>, <em>error_on_init=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestClass.create_error_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestClass.create_error_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new instance of the class that is wrapped in ErrorClass.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.tests.YggTestClass.create_instance">
-<code class="descname">create_instance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestClass.create_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestClass.create_instance" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_instance</code><span class="sig-paren">(</span><em>inst_class=None</em>, <em>args=None</em>, <em>kwargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestClass.create_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestClass.create_instance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new instance of the class.</p>
 </dd></dl>
 
@@ -1818,6 +1815,11 @@ open file descriptors.</li>
 <dd><p>Create an instance of the class.</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="yggdrasil.tests.YggTestClass.skip_init">
+<code class="descname">skip_init</code><em class="property"> = False</em><a class="headerlink" href="#yggdrasil.tests.YggTestClass.skip_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="yggdrasil.tests.YggTestClass.teardown">
 <code class="descname">teardown</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestClass.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestClass.teardown" title="Permalink to this definition">¶</a></dt>
@@ -1890,7 +1892,7 @@ open file descriptors.</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

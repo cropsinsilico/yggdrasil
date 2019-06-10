@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="yggdrasil.drivers" href="../drivers.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -179,45 +173,64 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.drivers.PythonModelDriver</h1><div class="highlight"><pre>
-<span></span><span class="c1">#</span>
-<span class="c1"># This should not be used directly by modelers</span>
-<span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.ModelDriver</span> <span class="k">import</span> <span class="n">ModelDriver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">register_component</span>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.InterpretedModelDriver</span> <span class="k">import</span> <span class="n">InterpretedModelDriver</span>
 
 
-<span class="n">_top_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;../&#39;</span><span class="p">))</span>
-<span class="n">_incl_interface</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="s1">&#39;interface&#39;</span><span class="p">)</span>
-<span class="n">_incl_io</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="s1">&#39;io&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="PythonModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver">[docs]</a><span class="k">class</span> <span class="nc">PythonModelDriver</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running Python models.&quot;&quot;&quot;</span>
 
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is written in Python.&#39;</span><span class="p">)</span>
+    <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;python&#39;</span>
+    <span class="n">language_ext</span> <span class="o">=</span> <span class="s1">&#39;.py&#39;</span>
+    <span class="n">default_interpreter</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span>
+    <span class="n">interface_library</span> <span class="o">=</span> <span class="s1">&#39;yggdrasil.interface.YggInterface&#39;</span>
+    <span class="c1"># supported_comms = [&#39;ipc&#39;, &#39;zmq&#39;, &#39;rmq&#39;]</span>
+    <span class="n">supported_comms</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_comm</span><span class="p">()</span>
+    <span class="n">supported_comm_options</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ipc&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;platforms&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;MacOS&#39;</span><span class="p">,</span> <span class="s1">&#39;Linux&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;libraries&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;sysv_ipc&#39;</span><span class="p">]},</span>
+        <span class="s1">&#39;zmq&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;libraries&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;zmq&#39;</span><span class="p">]},</span>
+        <span class="s1">&#39;rmq&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;libraries&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;pika&#39;</span><span class="p">]}}</span>
+    <span class="n">type_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;int&#39;</span><span class="p">:</span> <span class="s1">&#39;numpy.intX&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;float&#39;</span><span class="p">:</span> <span class="s1">&#39;numpy.floatX&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;string&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;array&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;object&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;boolean&#39;</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;null&#39;</span><span class="p">:</span> <span class="s1">&#39;None&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uint&#39;</span><span class="p">:</span> <span class="s1">&#39;numpy.uintX&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;complex&#39;</span><span class="p">:</span> <span class="s1">&#39;numpy.complexX&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;bytes&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;unicode&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;1darray&#39;</span><span class="p">:</span> <span class="s1">&#39;numpy.ndarray&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;ndarray&#39;</span><span class="p">:</span> <span class="s1">&#39;numpy.ndarray&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;ply&#39;</span><span class="p">:</span> <span class="s1">&#39;PlyDict&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="s1">&#39;ObjDict&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">}</span>
+    <span class="n">function_param</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;comment&#39;</span><span class="p">:</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;true&#39;</span><span class="p">:</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">4</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span><span class="p">,</span>
+        <span class="s1">&#39;print&#39;</span><span class="p">:</span> <span class="s1">&#39;print(</span><span class="se">\&quot;</span><span class="si">{message}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;raise Exception(&quot;</span><span class="si">{error_msg}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;block_end&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;if_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;if (</span><span class="si">{cond}</span><span class="s1">):&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;for_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;for </span><span class="si">{iter_var}</span><span class="s1"> in range(</span><span class="si">{iter_begin}</span><span class="s1">, </span><span class="si">{iter_end}</span><span class="s1">):&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;while_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;while (</span><span class="si">{cond}</span><span class="s1">):&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;try_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;try:&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;try_error_type&#39;</span><span class="p">:</span> <span class="s1">&#39;BaseException&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;try_except&#39;</span><span class="p">:</span> <span class="s1">&#39;except </span><span class="si">{error_type}</span><span class="s1"> as </span><span class="si">{error_var}</span><span class="s1">:&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;assign&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> = </span><span class="si">{value}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exec_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;def main():&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exec_suffix&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;if __name__ == &quot;__main__&quot;:</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;    main()&#39;</span><span class="p">)}</span>
 
-<div class="viewcode-block" id="PythonModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">PythonModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running Python models.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        name (str): Driver name.</span>
-<span class="sd">        args (str or list): Argument(s) for running the model on the command</span>
-<span class="sd">            after the call to python.</span>
-<span class="sd">        \*\*kwargs: Additional keyword arguments are passed to parent class&#39;s</span>
-<span class="sd">            __init__ method.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">_language</span> <span class="o">=</span> <span class="s1">&#39;python&#39;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">PythonModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="s1">&#39;python&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">):</span>
-            <span class="n">python_exec</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">python_exec</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span>
-
-<div class="viewcode-block" id="PythonModelDriver.is_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PythonModelDriver.is_language_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_language_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_language_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
 <span class="sd">        machine.</span>
 
@@ -227,7 +240,48 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># This is being run so python exists</span>
-        <span class="k">return</span> <span class="kc">True</span></div></div>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="PythonModelDriver.is_library_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_library_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_library_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lib</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a dependency is installed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lib (str): Name of the library that should be checked.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the library is installed, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">lib</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="PythonModelDriver.is_comm_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_comm_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_comm_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a comm is installed for the associated programming</span>
+<span class="sd">        language.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if a comm is installed for this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Call __func__ to avoid direct invoking of class which dosn&#39;t exist</span>
+        <span class="c1"># in after_registration where this is called</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">InterpretedModelDriver</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="o">.</span><span class="vm">__func__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;skip_config&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">out</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq_async&#39;</span><span class="p">]):</span>
+            <span class="kn">from</span> <span class="nn">yggdrasil.communication.RMQComm</span> <span class="k">import</span> <span class="n">check_rmq_server</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">check_rmq_server</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
            </div>
@@ -264,7 +318,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>YAML Files &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>YAML Files &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/>
         <link rel="next" title="Configuration Files" href="config.html"/>
         <link rel="prev" title="Server/Client I/O" href="server_client_io.html"/> 
 
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -116,16 +116,10 @@
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -263,7 +257,7 @@ report errors associated with the model.</td>
 <tr class="row-even"><td>c</td>
 <td>The model is written in C.</td>
 </tr>
-<tr class="row-odd"><td>c++/c</td>
+<tr class="row-odd"><td>c++</td>
 <td>The model is written in C++.</td>
 </tr>
 <tr class="row-even"><td>make</td>
@@ -417,7 +411,7 @@ format string (see <a class="reference internal" href="units.html#units-rst"><sp
 <td colspan="2">True or False. If True and filetype is table, the table will
 be read in it’s entirety and passed as an array.</td>
 </tr>
-<tr class="row-odd"><td rowspan="8">filetype</td>
+<tr class="row-odd"><td rowspan="12">filetype</td>
 <td colspan="2">Only valid for connections that direct messages from a file to
 a model input channel or from a model output channel to a file.
 Values indicate how messages should be read from the file and
@@ -451,13 +445,29 @@ frame.</td>
 <tr class="row-even"><td>obj</td>
 <td>The file contains a 3D structure in Obj format.</td>
 </tr>
+<tr class="row-odd"><td>pickle</td>
+<td>The file is a Python pickle file containing one
+more Python objects.</td>
+</tr>
+<tr class="row-even"><td>mat</td>
+<td>The file is a Matlab .mat file containing one or
+more Matlab variables.</td>
+</tr>
+<tr class="row-odd"><td>json</td>
+<td>The file contains one or more JSON encoded data
+structures.</td>
+</tr>
+<tr class="row-even"><td>yaml</td>
+<td>The file contains one or more YAML encoded data
+structures.</td>
+</tr>
 </tbody>
 </table>
 <p>The connection entries are used to determine which driver should be used to
 connect communication channels/files. Any additional keys in the connection
 entry will be passed to the input/output driver that is created for the
 connection. A full description of the available input/output drivers and
-potential arguments can be found <a class="reference internal" href="io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
+potential arguments can be found <a class="reference internal" href="advanced/io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
 <div class="section" id="driver-method">
 <h3>Driver Method<a class="headerlink" href="#driver-method" title="Permalink to this headline">¶</a></h3>
 <p>In specifying communication via drivers, each input/output entry for the models
@@ -480,7 +490,7 @@ yggdrasil API. This can be any text, but should be unique.</td>
 <tr class="row-odd"><td>driver</td>
 <td>The name of the input/output driver class that should be used.
 A list of available input/output drivers can be found
-<a class="reference internal" href="io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</td>
+<a class="reference internal" href="advanced/io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</td>
 </tr>
 <tr class="row-even"><td>args</td>
 <td>For connections made to other models, this should be text that matches
@@ -492,12 +502,12 @@ location of the YAML file.</td>
 </table>
 <p>Any additional keys in the input/output entry will be passed to the input/output
 driver. A full description of the available input/output drivers and potential
-arguments can be found <a class="reference internal" href="io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
+arguments can be found <a class="reference internal" href="advanced/io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
 </div>
 </div>
 <div class="section" id="validation">
 <h2>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
-<p>yggdrasil uses a <a class="reference internal" href="schema.html#schema-rst"><span class="std std-ref">JSON schema</span></a> to validate the provided
+<p>yggdrasil uses a <a class="reference internal" href="advanced/schema.html#schema-rst"><span class="std std-ref">JSON schema</span></a> to validate the provided
 YAML specification files. If you would like to validate a set of YAML specification
 files without running the integration, this can be done via the <code class="docutils literal notranslate"><span class="pre">yggvalidate</span></code> CLI.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggvalidate name1.yml name2.yml ...
@@ -550,7 +560,7 @@ files without running the integration, this can be done via the <code class="doc
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

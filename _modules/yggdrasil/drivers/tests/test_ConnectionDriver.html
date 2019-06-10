@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests.test_ConnectionDriver &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.drivers.tests.test_ConnectionDriver &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../index.html"/>
         <link rel="up" title="yggdrasil.drivers" href="../../drivers.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -179,25 +173,26 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.drivers.tests.test_ConnectionDriver</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">backwards</span>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">MagicTestError</span><span class="p">,</span> <span class="n">assert_raises</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">get_schema</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="k">import</span> <span class="n">import_driver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.tests</span> <span class="k">import</span> <span class="n">test_Driver</span> <span class="k">as</span> <span class="n">parent</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.ConnectionDriver</span> <span class="k">import</span> <span class="n">ConnectionDriver</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">new_comm</span><span class="p">,</span> <span class="n">ZMQComm</span><span class="p">,</span> <span class="n">IPCComm</span><span class="p">,</span> <span class="n">RMQComm</span><span class="p">,</span> <span class="n">get_comm_class</span><span class="p">)</span>
+    <span class="n">new_comm</span><span class="p">,</span> <span class="n">ZMQComm</span><span class="p">,</span> <span class="n">IPCComm</span><span class="p">,</span> <span class="n">RMQComm</span><span class="p">)</span>
 
 
 <span class="n">_default_comm</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_default_comm</span><span class="p">()</span>
 <span class="n">_zmq_installed</span> <span class="o">=</span> <span class="n">ZMQComm</span><span class="o">.</span><span class="n">ZMQComm</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">)</span>
 <span class="n">_ipc_installed</span> <span class="o">=</span> <span class="n">IPCComm</span><span class="o">.</span><span class="n">IPCComm</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">)</span>
-<span class="n">_rmq_server_running</span> <span class="o">=</span> <span class="n">RMQComm</span><span class="o">.</span><span class="n">_rmq_server_running</span>
+<span class="n">_rmq_installed</span> <span class="o">=</span> <span class="n">RMQComm</span><span class="o">.</span><span class="n">RMQComm</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">)</span>
 
-            
-<div class="viewcode-block" id="TestConnectionParam"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam">[docs]</a><span class="k">class</span> <span class="nc">TestConnectionParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestParam</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestConnectionParam"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Temp skip connection tests on windows for &quot;</span>
+                                    <span class="s2">&quot;time&#39;s sake.&quot;</span><span class="p">))</span>
+<span class="k">class</span> <span class="nc">TestConnectionParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestParam</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for the ConnectionDriver class.&quot;&quot;&quot;</span>
 
     <span class="n">comm_name</span> <span class="o">=</span> <span class="n">_default_comm</span>
@@ -211,7 +206,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;icomm_kws&#39;</span><span class="p">,</span> <span class="s1">&#39;ocomm_kws&#39;</span><span class="p">,</span> <span class="s1">&#39;icomm&#39;</span><span class="p">,</span> <span class="s1">&#39;ocomm&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;nrecv&#39;</span><span class="p">,</span> <span class="s1">&#39;nproc&#39;</span><span class="p">,</span> <span class="s1">&#39;nsent&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">,</span> <span class="s1">&#39;translator&#39;</span><span class="p">]</span>
         <span class="c1"># self.timeout = 1.0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_instances</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">description_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -238,6 +232,46 @@
 <div class="viewcode-block" id="TestConnectionParam.assert_msg_equal"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam.assert_msg_equal">[docs]</a>    <span class="k">def</span> <span class="nf">assert_msg_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that two messages are equivalent.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestConnectionParam.assert_msg_lists_equal"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam.assert_msg_lists_equal">[docs]</a>    <span class="k">def</span> <span class="nf">assert_msg_lists_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that two lists of messages are equivalent.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">iy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assert_msg_equal</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">iy</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestConnectionParam.recv_message_list"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam.recv_message_list">[docs]</a>    <span class="k">def</span> <span class="nf">recv_message_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recv_inst</span><span class="p">,</span> <span class="n">expected_result</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">break_on_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue receiving from a receive instance until flag is False (or</span>
+<span class="sd">        an empty messages is received and break_on_empty is True). On receipt of</span>
+<span class="sd">        a False flag, the recieved message is checked against the EOF message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            recv_inst (yggdrasil.communication.CommBase.CommBase): Communication</span>
+<span class="sd">                instance that should be received from.</span>
+<span class="sd">            expected_result (list, optional): A list of messages that the</span>
+<span class="sd">                recieved messages should be compared against. Defaults to None</span>
+<span class="sd">                and is ignored.</span>
+<span class="sd">            break_on_empty (bool, optional): If True, messages will stop being</span>
+<span class="sd">                received from the communication instance when an empty message</span>
+<span class="sd">                is received. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Received messages.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">msg_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="n">recv_inst</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">break_on_empty</span> <span class="ow">and</span> <span class="n">recv_inst</span><span class="o">.</span><span class="n">is_empty_recv</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">):</span>
+                    <span class="k">break</span>  <span class="c1"># pragma: no cover</span>
+                <span class="n">msg_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="n">recv_inst</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">expected_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assert_msg_lists_equal</span><span class="p">(</span><span class="n">msg_list</span><span class="p">,</span> <span class="n">expected_result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg_list</span></div>
 
 <div class="viewcode-block" id="TestConnectionParam.get_options"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
@@ -274,12 +308,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">icomm_import_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;class: Class used for connection input comm.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">get_comm_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ocomm_import_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;class: Class used for connection output comm.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">get_comm_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm_name</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">send_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -318,24 +352,57 @@
 <div class="viewcode-block" id="TestConnectionParam.setup"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize comm object pair.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestConnectionParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">send_kws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_comm_kwargs</span>
-        <span class="n">recv_kws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm_kwargs</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_start</span><span class="p">:</span>
-            <span class="n">send_kws</span><span class="p">[</span><span class="s1">&#39;dont_open&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">recv_kws</span><span class="p">[</span><span class="s1">&#39;dont_open&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">send_kws</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">recv_kws</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_init</span><span class="p">:</span>
+            <span class="n">send_kws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_comm_kwargs</span>
+            <span class="n">recv_kws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm_kwargs</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_start</span><span class="p">:</span>
+                <span class="n">send_kws</span><span class="p">[</span><span class="s1">&#39;dont_open&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">recv_kws</span><span class="p">[</span><span class="s1">&#39;dont_open&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">send_kws</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">recv_kws</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestConnectionParam.teardown"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Destroy comm object pair.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestConnectionParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_instances</span><span class="p">:</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div></div>
-    
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_init</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestConnectionParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestConnectionParam.create_error_instance"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam.create_error_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_error_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inst_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_on_init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new instance of the class where one or both comms is</span>
+<span class="sd">        wrapped in ErrorClass.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inst_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">inst_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span>
+        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_fresh_name</span><span class="p">()]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span>
+        <span class="c1"># Adjust kwargs</span>
+        <span class="k">if</span> <span class="s1">&#39;comm_address&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_address&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ocomm&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">]:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ocomm_kws&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="n">base_comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm_name</span><span class="p">,</span> <span class="n">new_comm_class</span><span class="o">=</span><span class="s1">&#39;ErrorComm&#39;</span><span class="p">,</span>
+                <span class="n">error_on_init</span><span class="o">=</span><span class="n">error_on_init</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;icomm&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">]:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;icomm_kws&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="n">base_comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span><span class="p">,</span> <span class="n">new_comm_class</span><span class="o">=</span><span class="s1">&#39;ErrorComm&#39;</span><span class="p">,</span>
+                <span class="n">error_on_init</span><span class="o">=</span><span class="n">error_on_init</span><span class="p">)</span>
+        <span class="c1"># Get error class</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">error_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ocomm&#39;</span><span class="p">,</span> <span class="s1">&#39;icomm&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">]):</span>
+            <span class="n">error_class</span> <span class="o">=</span> <span class="n">inst_class</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestConnectionParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_error_instance</span><span class="p">(</span>
+            <span class="n">inst_class</span><span class="o">=</span><span class="n">inst_class</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="n">error_class</span><span class="o">=</span><span class="n">error_class</span><span class="p">,</span> <span class="n">error_on_init</span><span class="o">=</span><span class="n">error_on_init</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">error_on_init</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_first_send_done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+            
 
 <div class="viewcode-block" id="TestConnectionDriverNoStart"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestConnectionDriverNoStart</span><span class="p">(</span><span class="n">TestConnectionParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestDriverNoStart</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for the ConnectionDriver class without start.&quot;&quot;&quot;</span>
@@ -363,53 +430,27 @@
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
         <span class="n">flag</span><span class="p">,</span> <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">recv_nolimit</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="TestConnectionDriverNoStart.get_fresh_name"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart.get_fresh_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_fresh_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a fresh name for a new instance that won&#39;t overlap with the base.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span></div>
-
-<div class="viewcode-block" id="TestConnectionDriverNoStart.get_fresh_error_instance"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart.get_fresh_error_instance">[docs]</a>    <span class="k">def</span> <span class="nf">get_fresh_error_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">error_on_init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a driver instance with ErrorComm class for one or both comms.&quot;&quot;&quot;</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_fresh_name</span><span class="p">()]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
-        <span class="c1"># args = self.inst_args</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span>
-        <span class="k">if</span> <span class="s1">&#39;comm_address&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_address&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ocomm&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">]:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ocomm_kws&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                <span class="n">base_comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm_name</span><span class="p">,</span> <span class="n">new_comm_class</span><span class="o">=</span><span class="s1">&#39;ErrorComm&#39;</span><span class="p">,</span>
-                <span class="n">error_on_init</span><span class="o">=</span><span class="n">error_on_init</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;icomm&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">]:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;icomm_kws&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                <span class="n">base_comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span><span class="p">,</span> <span class="n">new_comm_class</span><span class="o">=</span><span class="s1">&#39;ErrorComm&#39;</span><span class="p">,</span>
-                <span class="n">error_on_init</span><span class="o">=</span><span class="n">error_on_init</span><span class="p">)</span>
-        <span class="n">driver_class</span> <span class="o">=</span> <span class="n">import_driver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">error_on_init</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="n">MagicTestError</span><span class="p">,</span> <span class="n">driver_class</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">inst</span> <span class="o">=</span> <span class="n">driver_class</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_first_send_done</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_extra_instances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">inst</span></div>
-
-<div class="viewcode-block" id="TestConnectionDriverNoStart.test_error_init_ocomm"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart.test_error_init_ocomm">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_init_ocomm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+<div class="viewcode-block" id="TestConnectionDriverNoInit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit">[docs]</a><span class="k">class</span> <span class="nc">TestConnectionDriverNoInit</span><span class="p">(</span><span class="n">TestConnectionParam</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for the ConnectionDriver class without init.&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="TestConnectionDriverNoInit.test_error_init_ocomm"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit.test_error_init_ocomm">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_init_ocomm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test forwarding of error from init of ocomm.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_fresh_error_instance</span><span class="p">(</span><span class="s1">&#39;ocomm&#39;</span><span class="p">,</span> <span class="n">error_on_init</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_error_instance</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="s1">&#39;ocomm&#39;</span><span class="p">,</span> <span class="n">error_on_init</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestConnectionDriverNoStart.test_error_open_icomm"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart.test_error_open_icomm">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_open_icomm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestConnectionDriverNoInit.test_error_open_icomm"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit.test_error_open_icomm">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_open_icomm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test fowarding of error from open of icomm.&quot;&quot;&quot;</span>
-        <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fresh_error_instance</span><span class="p">(</span><span class="s1">&#39;icomm&#39;</span><span class="p">)</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_error_instance</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="s1">&#39;icomm&#39;</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">error_replace</span><span class="p">(</span><span class="s1">&#39;open&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="n">MagicTestError</span><span class="p">,</span> <span class="n">inst</span><span class="o">.</span><span class="n">open_comm</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">restore_all</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TestConnectionDriverNoStart.test_error_close_icomm"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart.test_error_close_icomm">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_close_icomm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestConnectionDriverNoInit.test_error_close_icomm"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit.test_error_close_icomm">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_close_icomm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test forwarding of error from close of icomm.&quot;&quot;&quot;</span>
-        <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fresh_error_instance</span><span class="p">(</span><span class="s1">&#39;icomm&#39;</span><span class="p">)</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_error_instance</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="s1">&#39;icomm&#39;</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">open_comm</span><span class="p">()</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">error_replace</span><span class="p">(</span><span class="s1">&#39;close&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="n">MagicTestError</span><span class="p">,</span> <span class="n">inst</span><span class="o">.</span><span class="n">close_comm</span><span class="p">)</span>
@@ -418,9 +459,9 @@
         <span class="n">inst</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="TestConnectionDriverNoStart.test_error_close_ocomm"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart.test_error_close_ocomm">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_close_ocomm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestConnectionDriverNoInit.test_error_close_ocomm"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit.test_error_close_ocomm">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_close_ocomm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test forwarding of error from close of ocomm.&quot;&quot;&quot;</span>
-        <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fresh_error_instance</span><span class="p">(</span><span class="s1">&#39;ocomm&#39;</span><span class="p">)</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_error_instance</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="s1">&#39;ocomm&#39;</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">open_comm</span><span class="p">()</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">error_replace</span><span class="p">(</span><span class="s1">&#39;close&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="n">MagicTestError</span><span class="p">,</span> <span class="n">inst</span><span class="o">.</span><span class="n">close_comm</span><span class="p">)</span>
@@ -429,9 +470,9 @@
         <span class="n">inst</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestConnectionDriverNoStart.test_error_open_fails"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart.test_error_open_fails">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_open_fails</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestConnectionDriverNoInit.test_error_open_fails"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit.test_error_open_fails">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_open_fails</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error raised when comms fail to open.&quot;&quot;&quot;</span>
-        <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fresh_error_instance</span><span class="p">(</span><span class="s1">&#39;both&#39;</span><span class="p">)</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_error_instance</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">)</span>
         <span class="n">old_timeout</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">timeout</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">empty_replace</span><span class="p">(</span><span class="s1">&#39;open&#39;</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">empty_replace</span><span class="p">(</span><span class="s1">&#39;open&#39;</span><span class="p">)</span>
@@ -564,7 +605,7 @@
 <span class="n">s</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span>
 <span class="n">comm_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">comm_types</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">_default_comm</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">_default_comm</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
         <span class="k">continue</span>
     <span class="c1"># Output</span>
     <span class="n">ocls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">OutputDriver&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span>
@@ -579,7 +620,7 @@
     <span class="c1"># Flags</span>
     <span class="n">flag_func</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;RMQAsyncComm&#39;</span><span class="p">]:</span>
-        <span class="n">flag_func</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_rmq_server_running</span><span class="p">,</span>
+        <span class="n">flag_func</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_rmq_installed</span><span class="p">,</span>
                                     <span class="s2">&quot;RMQ Server not running&quot;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">]:</span>
         <span class="n">flag_func</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_zmq_installed</span><span class="p">,</span>
@@ -630,7 +671,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

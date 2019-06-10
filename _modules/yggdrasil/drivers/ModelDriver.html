@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.ModelDriver &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.drivers.ModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="yggdrasil.drivers" href="../drivers.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -182,20 +176,98 @@
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pformat</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">languages</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">locate_file</span><span class="p">,</span> <span class="n">update_language_config</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.Driver</span> <span class="k">import</span> <span class="n">Driver</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Event</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">Queue</span> <span class="k">import</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">Empty</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">queue</span> <span class="k">import</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">Empty</span>  <span class="c1"># python 3.x</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">register_component</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">ModelDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
+<span class="n">_map_language_ext</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="remove_product"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.remove_product">[docs]</a><span class="k">def</span> <span class="nf">remove_product</span><span class="p">(</span><span class="n">product</span><span class="p">,</span> <span class="n">check_for_source</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timer_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete a single product after checking that the product is not (or</span>
+<span class="sd">    does not contain, in the case of directories), source files.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        product (str): Full path to a file or directory that should be</span>
+<span class="sd">            removed.</span>
+<span class="sd">        check_for_source (bool, optional): If True, the specified product</span>
+<span class="sd">            will be checked to ensure that no source files are present. If</span>
+<span class="sd">            a source file is present, a RuntimeError will be raised.</span>
+<span class="sd">            Defaults to False.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        RuntimeError: If the specified product is a source file and</span>
+<span class="sd">            check_for_source is False.</span>
+<span class="sd">        RuntimeError: If the specified product is a directory that contains</span>
+<span class="sd">            a source file and check_for_source is False.</span>
+<span class="sd">        RuntimeError: If the product cannot be removed.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">timer_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">timer_class</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">product</span><span class="p">):</span>
+        <span class="n">ext_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_map_language_ext</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">check_for_source</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">product</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">ext_tuple</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> contains a source file &quot;</span>
+                                            <span class="s2">&quot;(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">product</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">product</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">check_for_source</span><span class="p">:</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">product</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">_map_language_ext</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is a source file.&quot;</span> <span class="o">%</span> <span class="n">product</span><span class="p">)</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">timer_class</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">()</span>
+        <span class="k">while</span> <span class="p">((</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">product</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">product</span><span class="p">):</span>
+                    <span class="n">timer_class</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>
+                    <span class="k">raise</span>
+        <span class="n">timer_class</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">product</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to remove product: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">product</span><span class="p">)</span></div>
+        
+
+<div class="viewcode-block" id="remove_products"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.remove_products">[docs]</a><span class="k">def</span> <span class="nf">remove_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">source_products</span><span class="p">,</span> <span class="n">timer_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete products produced during the process of running the model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        products (list): List of products that should be removed after</span>
+<span class="sd">            checking that they are not source files.</span>
+<span class="sd">        source_products (list): List of products that should be removed</span>
+<span class="sd">            without checking that they are not source files.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># print(&#39;products&#39;, products)</span>
+    <span class="c1"># print(&#39;source_products&#39;, source_products)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">source_products</span><span class="p">:</span>
+        <span class="n">remove_product</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">timer_class</span><span class="o">=</span><span class="n">timer_class</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
+        <span class="n">remove_product</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">timer_class</span><span class="o">=</span><span class="n">timer_class</span><span class="p">,</span> <span class="n">check_for_source</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        
+
+<div class="viewcode-block" id="ModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver">[docs]</a><span class="k">class</span> <span class="nc">ModelDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for Model drivers and for running executable based models.</span>
 
 <span class="sd">    Args:</span>
@@ -203,11 +275,29 @@
 <span class="sd">        args (str or list): Argument(s) for running the model on the command</span>
 <span class="sd">            line. This should be a complete command including the necessary</span>
 <span class="sd">            executable and command line arguments to that executable.</span>
+<span class="sd">        products (list, optional): Paths to files created by the model that</span>
+<span class="sd">            should be cleaned up when the model exits. Entries can be absolute</span>
+<span class="sd">            paths or paths relative to the working directory. Defaults to [].</span>
+<span class="sd">        source_products (list, optional): Files created by running the model</span>
+<span class="sd">            that are source files. These files will be removed without checking</span>
+<span class="sd">            their extension so users should avoid adding files to this list</span>
+<span class="sd">            unless they are sure they should be deleted. Defaults to [].</span>
 <span class="sd">        is_server (bool, optional): If True, the model is assumed to be a server</span>
 <span class="sd">            and an instance of :class:`yggdrasil.drivers.ServerDriver`</span>
 <span class="sd">            is started. Defaults to False.</span>
 <span class="sd">        client_of (str, list, optional): The names of ne or more servers that</span>
 <span class="sd">            this model is a client of. Defaults to empty list.</span>
+<span class="sd">        overwrite (bool, optional): If True, any existing model products</span>
+<span class="sd">            (compilation products, wrapper scripts, etc.) are removed prior to</span>
+<span class="sd">            the run. If False, the products are not removed. Defaults to True.</span>
+<span class="sd">            Setting this to False can improve the performance, particularly for</span>
+<span class="sd">            models that take a long time to compile, but this should only be</span>
+<span class="sd">            done once the model has been fully debugged to ensure that each run</span>
+<span class="sd">            is tested on a clean copy of the model. The value of this keyword</span>
+<span class="sd">            also determines whether or not products are removed after a run.</span>
+<span class="sd">        preserve_cache (bool, optional): If True model products will be kept</span>
+<span class="sd">            following the run, otherwise all products will be cleaned up.</span>
+<span class="sd">            Defaults to False. This keyword is superceeded by overwrite.</span>
 <span class="sd">        with_strace (bool, optional): If True, the command is run with strace (on</span>
 <span class="sd">            Linux) or dtrace (on MacOS). Defaults to False.</span>
 <span class="sd">        strace_flags (list, optional): Flags to pass to strace (or dtrace).</span>
@@ -219,8 +309,63 @@
 <span class="sd">            Defaults to 0.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are passed to parent class.</span>
 
+<span class="sd">    Class Attributes:</span>
+<span class="sd">        language (str): Primary name for the programming language that this</span>
+<span class="sd">            compiler should be used for. [REQUIRED]</span>
+<span class="sd">        language_aliases (list): Additional/alternative names that the language</span>
+<span class="sd">            may be known by.</span>
+<span class="sd">        language_ext (list): Extensions for programs written in the target</span>
+<span class="sd">            language. [REQUIRED]</span>
+<span class="sd">        base_languages (list): Other programming languages that this driver</span>
+<span class="sd">            and the interpreter for the target language are dependent on (e.g.</span>
+<span class="sd">            Matlab models require Python).</span>
+<span class="sd">        executable_type (str): &#39;compiler&#39; or &#39;interpreter&#39; to indicate the type</span>
+<span class="sd">            of the executable for the language. [AUTOMATED]</span>
+<span class="sd">        interface_library (list): Name of the library containing the yggdrasil</span>
+<span class="sd">            interface for the target language. [REQUIRED]</span>
+<span class="sd">        interface_directories (list): Directories containing code in the</span>
+<span class="sd">            interface library for the target language.</span>
+<span class="sd">        interface_dependencies (list): List of names of libraries that are</span>
+<span class="sd">            required to use the interface on the current platform. This dosn&#39;t</span>
+<span class="sd">            include libraries required by specific communication types which are</span>
+<span class="sd">            described by supported_comm_options.</span>
+<span class="sd">        supported_comms (list): Name of comms supported in the target language.</span>
+<span class="sd">            [REQUIRED]</span>
+<span class="sd">        supported_comm_options (dict): Options for the supported comms like the</span>
+<span class="sd">            platforms they are available on and the external libraries required</span>
+<span class="sd">            to use them. [REQUIRED]</span>
+<span class="sd">        external_libraries (dict): Information on external libraries required</span>
+<span class="sd">            for running models in the target language using yggdrasil.</span>
+<span class="sd">        internal_libraries (dict): Information on internal libraries required</span>
+<span class="sd">            for running models in the target language using yggdrasil.</span>
+<span class="sd">        type_map (dict): Mapping of |yggdrasil| extended JSON types to</span>
+<span class="sd">            datatypes in the target programming language. [REQUIRED]</span>
+<span class="sd">        function_param (dict): Options specifying how different operations</span>
+<span class="sd">            would be encoded in the target language (e.g. if statements, for</span>
+<span class="sd">            loops, while loops). [REQUIRED]</span>
+<span class="sd">        version_flags (list): Flags that should be called with the language</span>
+<span class="sd">            executable to determine the version of the compiler/interpreter.</span>
+<span class="sd">            Defaults to [&#39;--version&#39;].</span>
+
 <span class="sd">    Attributes:</span>
 <span class="sd">        args (list): Argument(s) for running the model on the command line.</span>
+<span class="sd">        model_file (str): Full path to the model executable or interpretable</span>
+<span class="sd">            script.</span>
+<span class="sd">        model_args (list): Runtime arguments for running the model on the</span>
+<span class="sd">            command line.</span>
+<span class="sd">        model_src (str): Full path to the model source code. For interpreted</span>
+<span class="sd">            languages, this will be the same as model_file.</span>
+<span class="sd">        overwrite (bool): If True, any existing compilation products will be</span>
+<span class="sd">            overwritten by compilation and cleaned up following the run.</span>
+<span class="sd">            Otherwise, existing products will be used and will remain after</span>
+<span class="sd">            the run.</span>
+<span class="sd">        products (list): Files created by running the model. This includes</span>
+<span class="sd">            compilation products such as executables and/or object files.</span>
+<span class="sd">        source_products (list): Files created by running the model that</span>
+<span class="sd">            are source files. These files will be removed without checking</span>
+<span class="sd">            their extension so users should avoid adding files to this list</span>
+<span class="sd">            unless they are sure they should be deleted.</span>
+<span class="sd">        wrapper_products (list): Files created in order to wrap the model.</span>
 <span class="sd">        process (:class:`yggdrasil.tools.YggPopen`): Process used to run</span>
 <span class="sd">            the model.</span>
 <span class="sd">        is_server (bool): If True, the model is assumed to be a server and an</span>
@@ -233,25 +378,37 @@
 <span class="sd">        with_valgrind (bool): If True, the command is run with valgrind.</span>
 <span class="sd">        valgrind_flags (list): Flags to pass to valgrind.</span>
 <span class="sd">        model_index (int): Index of model in list of models being run.</span>
+<span class="sd">        modified_files (list): List of pairs of originals and copies of files</span>
+<span class="sd">            that should be restored during cleanup.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: If both with_strace and with_valgrind are True.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_language</span> <span class="o">=</span> <span class="s1">&#39;executable&#39;</span>
     <span class="n">_schema_type</span> <span class="o">=</span> <span class="s1">&#39;model&#39;</span>
+    <span class="n">_schema_subtype_key</span> <span class="o">=</span> <span class="s1">&#39;language&#39;</span>
     <span class="n">_schema_required</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">]</span>
     <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
-        <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;executable&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;The programming language that the model &#39;</span>
+                                     <span class="s1">&#39;is written in.&#39;</span><span class="p">)},</span>
         <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
         <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
-                   <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/comm&#39;</span><span class="p">}},</span>
+                   <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/comm&#39;</span><span class="p">},</span>
+                   <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Model inputs described as comm objects.&#39;</span><span class="p">},</span>
         <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
-                    <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/comm&#39;</span><span class="p">}},</span>
+                    <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/comm&#39;</span><span class="p">},</span>
+                    <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Model outputs described as comm objects.&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;products&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                     <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
+        <span class="s1">&#39;source_products&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                            <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
         <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;overwrite&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+        <span class="s1">&#39;preserve_cache&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
         <span class="s1">&#39;is_server&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
         <span class="s1">&#39;client_of&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
                       <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[]},</span>
@@ -261,21 +418,29 @@
         <span class="s1">&#39;with_valgrind&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
         <span class="s1">&#39;valgrind_flags&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;--leak-check=full&#39;</span><span class="p">],</span>  <span class="c1"># &#39;-v&#39;</span>
                            <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}}</span>
+    <span class="n">_schema_excluded_from_class</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">]</span>
+    <span class="n">_schema_excluded_from_class_validation</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">]</span>
+    
+    <span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">language_ext</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">language_aliases</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">base_languages</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">executable_type</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">interface_library</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">interface_directories</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">interface_dependencies</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">supported_comms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">supported_comm_options</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">external_libraries</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">internal_libraries</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">type_map</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">function_param</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">version_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--version&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">model_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">]:</span>
-                <span class="k">continue</span>
-            <span class="n">default</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">default</span><span class="p">))</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">args</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+        <span class="c1"># Setup process things</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span> <span class="o">=</span> <span class="kc">None</span>
@@ -290,32 +455,273 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">model_index</span> <span class="o">=</span> <span class="n">model_index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env_copy</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LANG&#39;</span><span class="p">,</span> <span class="s1">&#39;PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;USER&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_exit_line</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;EXIT&#39;</span>
-        <span class="c1"># print(os.environ.keys())</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_copy</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not installed&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="c1"># Parse arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_model_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_src</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified_files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wrapper_products</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># Remove products</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">overwrite</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_products</span><span class="p">()</span>
+        <span class="c1"># Write wrapper</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wrapper_products</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_wrappers</span><span class="p">()</span>
 
-<div class="viewcode-block" id="ModelDriver.is_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
-<span class="sd">        machine.</span>
+<div class="viewcode-block" id="ModelDriver.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="sd">        to registration including things like platform dependent properties and</span>
+<span class="sd">        checking environment variables for default settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Driver</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_language</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_language_aliases</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language_aliases</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="bp">cls</span><span class="o">.</span><span class="n">language_ext</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language_ext</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))))):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">language_ext</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">language_ext</span><span class="p">]</span></div>
+            
+<div class="viewcode-block" id="ModelDriver.finalize_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.finalize_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">finalize_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed after a class has been fully</span>
+<span class="sd">        initialized and registered.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_configured</span><span class="p">()):</span>
+            <span class="n">update_language_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">global</span> <span class="n">_map_language_ext</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_language_ext</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_map_language_ext</span><span class="p">:</span>
+                <span class="n">_map_language_ext</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">_map_language_ext</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelDriver.get_language_for_source"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.get_language_for_source">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_language_for_source</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">languages</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">early_exit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the language that can be used with the provided source</span>
+<span class="sd">        file(s). If more than one language applies to a set of multiple files,</span>
+<span class="sd">        the language that applies to the most files is returned.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fname (str, list): The full path to one or more files. If more than</span>
+<span class="sd">                one</span>
+<span class="sd">            languages (list, optional): The list of languages that are acceptable.</span>
+<span class="sd">                Defaults to None and any language will be acceptable.</span>
+<span class="sd">            early_exit (bool, optional): If True, the first language identified</span>
+<span class="sd">                will be returned if fname is a list of files. Defaults to False.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            bool: Truth of if this model driver can be run on the current</span>
-<span class="sd">                machine.</span>
+<span class="sd">            str: The language that can operate on the specified file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">lang_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fname</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">ilang</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_language_for_source</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">languages</span><span class="o">=</span><span class="n">languages</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">early_exit</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">ilang</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">ilang</span> <span class="ow">in</span> <span class="n">lang_dict</span><span class="p">:</span>
+                    <span class="n">lang_dict</span><span class="p">[</span><span class="n">ilang</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">lang_dict</span><span class="p">[</span><span class="n">ilang</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">lang_dict</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">lang_dict</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">lang_dict</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">ilang</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_map_language_ext</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">languages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ilang</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">ilang</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot determine language for file(s): &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span></div>
+                
+<div class="viewcode-block" id="ModelDriver.get_map_language_ext"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.get_map_language_ext">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_map_language_ext</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the mapping of all language extensions.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_map_language_ext</span></div>
 
-<div class="viewcode-block" id="ModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">env</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
-        <span class="n">env</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
-        <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_SUBPROCESS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span>
-        <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_INDEX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_index</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">env</span></div>
+<div class="viewcode-block" id="ModelDriver.get_all_language_ext"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.get_all_language_ext">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_all_language_ext</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the list of all language extensions.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_map_language_ext</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="ModelDriver.before_start"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform before the run starts.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ModelDriver.get_language_dir"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.get_language_dir">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_language_dir</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the langauge directory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">languages</span><span class="o">.</span><span class="n">get_language_dir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelDriver.get_language_ext"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.get_language_ext">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_language_ext</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the language extension, including from the base classes.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language_ext</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">get_language_ext</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+        
+<div class="viewcode-block" id="ModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">default_model_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
+<span class="sd">        and which ones are arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): List of arguments provided.</span>
+<span class="sd">            default_model_dir (str, optional): Path to directory that should be</span>
+<span class="sd">                used to normalize the model file path if it is not absolute.</span>
+<span class="sd">                Defaults to None and is set to the working_dir.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">default_model_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">default_model_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_model_file</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_model_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">!=</span> <span class="s1">&#39;executable&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">)):</span>
+            <span class="n">model_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">default_model_dir</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span> <span class="o">=</span> <span class="n">model_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;model_file = &#39;</span><span class="si">%s</span><span class="s2">&#39;, model_dir = &#39;</span><span class="si">%s</span><span class="s2">&#39;, model_args = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelDriver.write_wrappers"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.write_wrappers">[docs]</a>    <span class="k">def</span> <span class="nf">write_wrappers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write any wrappers needed to compile and/or run a model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Keyword arguments are ignored (only included to</span>
+<span class="sd">               allow cascade from child classes).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Full paths to any created wrappers.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+        
+<div class="viewcode-block" id="ModelDriver.model_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.model_command">[docs]</a>    <span class="k">def</span> <span class="nf">model_command</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the command that should be used to run the model.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Any commands/arguments needed to run the model from the</span>
+<span class="sd">                command line.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span></div>
+
+<div class="viewcode-block" id="ModelDriver.language_executable"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.language_executable">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">language_executable</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Command required to compile/run a model written in this language</span>
+<span class="sd">        from the command line.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Name of (or path to) compiler/interpreter executable required</span>
+<span class="sd">                to run the compiler/interpreter from the command line.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;language_executable not implemented for &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
+                                  <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="ModelDriver.executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.executable_command">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unused_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose a command for running a program using the exectuable for</span>
+<span class="sd">        this language (compiler/interpreter) with the provided arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): The program that returned command should run and any</span>
+<span class="sd">                arguments that should be provided to it.</span>
+<span class="sd">            unused_kwargs (dict, optional): Existing dictionary that unused</span>
+<span class="sd">                keyword arguments should be added to. Defaults to None and is</span>
+<span class="sd">                ignored.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Arguments composing the command required to run the program</span>
+<span class="sd">                from the command line using the executable for this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;executable_command not implemented for &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
+                                  <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelDriver.run_executable"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.run_executable">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_executable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">return_process</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run a program using the executable for this language and the</span>
+<span class="sd">        provided arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): The program that should be run and any arguments</span>
+<span class="sd">                that should be provided to it.</span>
+<span class="sd">            return_process (bool, optional): If True, the process class is</span>
+<span class="sd">                returned without checking the process output. If False,</span>
+<span class="sd">                communicate is called on the process and the output is parsed</span>
+<span class="sd">                for errors. Defaults to False.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to</span>
+<span class="sd">                cls.executable_command and tools.popen_nobuffer.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Output to stdout from the run command if return_process is</span>
+<span class="sd">                False, the process if return_process is True.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If the language is not installed.</span>
+<span class="sd">            RuntimeError: If there is an error when running the command.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if not cls.is_language_installed():</span>
+        <span class="c1">#     raise RuntimeError(&quot;Language &#39;%s&#39; is not installed.&quot;</span>
+        <span class="c1">#                        % cls.language)</span>
+        <span class="n">unused_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">executable_command</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">unused_kwargs</span><span class="o">=</span><span class="n">unused_kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Add default keyword arguments</span>
+            <span class="k">if</span> <span class="s1">&#39;working_dir&#39;</span> <span class="ow">in</span> <span class="n">unused_kwargs</span><span class="p">:</span>
+                <span class="n">unused_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;cwd&#39;</span><span class="p">,</span> <span class="n">unused_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;working_dir&#39;</span><span class="p">))</span>
+            <span class="n">unused_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;shell&#39;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">)</span>
+            <span class="c1"># Call command</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running &#39;</span><span class="si">%s</span><span class="s2">&#39; from </span><span class="si">%s</span><span class="s2">&quot;</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">),</span> <span class="n">unused_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cwd&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Process keyword arguments:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+                         <span class="s1">&#39;    &#39;</span> <span class="o">+</span> <span class="n">pformat</span><span class="p">(</span><span class="n">unused_kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">    &#39;</span><span class="p">))</span>
+            <span class="n">proc</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">popen_nobuffer</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="o">**</span><span class="n">unused_kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">return_process</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">proc</span>
+            <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Command &#39;</span><span class="si">%s</span><span class="s2">&#39; failed with code </span><span class="si">%d</span><span class="s2">.&quot;</span>
+                                   <span class="o">%</span> <span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">),</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span><span class="p">))</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">),</span> <span class="n">out</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">out</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not call command &#39;</span><span class="si">%s</span><span class="s2">&#39;: </span><span class="si">%s</span><span class="s2">&quot;</span>
+                               <span class="o">%</span> <span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">),</span> <span class="n">e</span><span class="p">))</span></div>
+        
+<div class="viewcode-block" id="ModelDriver.run_model"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.run_model">[docs]</a>    <span class="k">def</span> <span class="nf">run_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_process</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the model. Unless overridden, the model will be run using</span>
+<span class="sd">        run_executable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            return_process (bool, optional): If True, the process running</span>
+<span class="sd">                the model is returned. If False, the process will block until</span>
+<span class="sd">                the model finishes running. Defaults to True.</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to run_executable.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_env</span><span class="p">()</span>
         <span class="n">pre_args</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_strace</span><span class="p">:</span>
@@ -326,15 +732,309 @@
             <span class="n">pre_args</span> <span class="o">+=</span> <span class="p">[</span><span class="n">pre_cmd</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">strace_flags</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_valgrind</span><span class="p">:</span>
             <span class="n">pre_args</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;valgrind&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">valgrind_flags</span>
-        <span class="c1"># print(pre_args + self.args)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">YggPopen</span><span class="p">(</span><span class="n">pre_args</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
-                                            <span class="n">cwd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span>
-                                            <span class="n">forward_signals</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                            <span class="n">shell</span><span class="o">=</span><span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">)</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="n">pre_args</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_command</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Working directory: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Command: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Environment Variables:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">block_indent</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="c1"># Update keywords</span>
+        <span class="c1"># NOTE: Setting forward_signals to False allows faster debugging</span>
+        <span class="c1"># but should not be used in deployment for cases where models are not</span>
+        <span class="c1"># running locally.</span>
+        <span class="n">default_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span>
+                              <span class="n">forward_signals</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                              <span class="n">shell</span><span class="o">=</span><span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">default_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_executable</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">return_process</span><span class="o">=</span><span class="n">return_process</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="ModelDriver.language_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.language_version">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">language_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">version_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to cls.run_executable.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Version of compiler/interpreter for this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">version_flags</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">version_flags</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">version_flags</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">run_executable</span><span class="p">(</span><span class="n">version_flags</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelDriver.is_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
+<span class="sd">        machine.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Truth of if this model driver can be run on the current</span>
+<span class="sd">                machine.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">is_language_installed</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">are_dependencies_installed</span><span class="p">()</span>
+                <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_configured</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ModelDriver.are_dependencies_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.are_dependencies_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">are_dependencies_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the dependencies are installed for the interface (not</span>
+<span class="sd">        including dependencies needed by a particular communication type).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the dependencies are installed. False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="k">break</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">are_dependencies_installed</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">interface_dependencies</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="k">break</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_library_installed</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="ModelDriver.is_language_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.is_language_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_language_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the interpreter/compiler for the associated programming</span>
+<span class="sd">        language is installed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the language interpreter/compiler is installed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language_executable</span><span class="p">())</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="c1"># TODO: In production out should be False but raise error</span>
+                <span class="c1"># for testing</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">raise</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">is_language_installed</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="ModelDriver.is_source_file"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.is_source_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_source_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the provided file name points to a source files for</span>
+<span class="sd">        the associated programming language by checking the extension.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fname (str): Path to file.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the provided file is a source file, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">model_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_ext</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">model_ext</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_language_ext</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="ModelDriver.is_library_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.is_library_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_library_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lib</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a dependency is installed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lib (str): Name of the library that should be checked.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the library is installed, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Method is_library_installed missing for &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
+                                  <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelDriver.is_configured"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.is_configured">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_configured</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the appropriate configuration has been performed (e.g.</span>
+<span class="sd">        installation of supporting libraries etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the language has been configured.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check for section &amp; diable</span>
+        <span class="n">disable_flag</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">ygg_cfg</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">disable_flag</span> <span class="o">!=</span> <span class="s1">&#39;true&#39;</span><span class="p">))</span>
+        <span class="c1"># Check for commtypes</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">base_languages</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;commtypes&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># Base languages</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">is_configured</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="ModelDriver.is_comm_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.is_comm_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_comm_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_config</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a comm is installed for the associated programming</span>
+<span class="sd">        language.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            commtype (str, optional): If provided, this method will only test</span>
+<span class="sd">                for installation of the specified communication type. Defaults</span>
+<span class="sd">                to None and will check for any installed comm.</span>
+<span class="sd">            skip_config (bool, optional): If True, the config list of comms</span>
+<span class="sd">                installed for this language will not be used to determine if</span>
+<span class="sd">                the comm is installed and the class attribute</span>
+<span class="sd">                supported_comm_options will be processed. Defaults to False and</span>
+<span class="sd">                config options are used in order to improve performance after</span>
+<span class="sd">                initial configuration.</span>
+<span class="sd">            platforms (list, optional): Platforms on which the comm can be</span>
+<span class="sd">                installed. Defaults to None and is ignored unless there is a</span>
+<span class="sd">                value for the commtype in supported_comm_options. This</span>
+<span class="sd">                keyword argument is ignored if skip_config is False.</span>
+<span class="sd">            libraries (list, optional): External libraries that are required</span>
+<span class="sd">                by the specified commtype. Defaults to None and is ignored</span>
+<span class="sd">                unless there is a value for the commtype in supported_comm_options.</span>
+<span class="sd">                This keyword argument is ignored if skip_config is False.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to either</span>
+<span class="sd">                is_comm_installed for the base languages, supported languages,</span>
+<span class="sd">                or is_library_installed as appropriate.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if a comm is installed for this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If there are base_languages for this language, use that language&#39;s</span>
+        <span class="c1"># driver to check for comm installation.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">base_languages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                    <span class="k">break</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="p">(</span>
+                    <span class="n">commtype</span><span class="o">=</span><span class="n">commtype</span><span class="p">,</span> <span class="n">skip_config</span><span class="o">=</span><span class="n">skip_config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">out</span>
+        <span class="c1"># Check for installation based on config option</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_config</span><span class="p">:</span>
+            <span class="n">installed_comms</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;commtypes&#39;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">installed_comms</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">commtype</span> <span class="ow">in</span> <span class="n">installed_comms</span><span class="p">)</span>
+        <span class="c1"># Check for any comm</span>
+        <span class="k">if</span> <span class="n">commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">supported_comms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="p">(</span><span class="n">commtype</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">skip_config</span><span class="o">=</span><span class="n">skip_config</span><span class="p">,</span>
+                                         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># Check that comm is explicitly supported</span>
+        <span class="k">if</span> <span class="n">commtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">supported_comms</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># Set &amp; pop keywords</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">supported_comm_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">commtype</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="n">platforms</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;platforms&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">libraries</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;libraries&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="c1"># Check platforms</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">platforms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">_platform</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">platforms</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># pragma: windows</span>
+        <span class="c1"># Check libraries</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">libraries</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">lib</span> <span class="ow">in</span> <span class="n">libraries</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_library_installed</span><span class="p">(</span><span class="n">lib</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ModelDriver.configure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.configure">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options for this language.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg (CisConfigParser): Config class that options should be set for.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Section, option, description tuples for options that could not</span>
+<span class="sd">                be set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Base languages</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
+            <span class="n">x_drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">x_drv</span><span class="o">.</span><span class="n">is_configured</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+                <span class="c1"># This shouldn&#39;t actually be called because configuration should</span>
+                <span class="c1"># occur on import</span>
+                <span class="n">x_drv</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="c1"># Section and executable</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)):</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="c1"># Locate executable</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_language_installed</span><span class="p">())</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">executable_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))):</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">fpath</span> <span class="o">=</span> <span class="n">locate_file</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language_executable</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">fpath</span><span class="p">:</span>
+                    <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">executable_type</span><span class="p">,</span> <span class="n">fpath</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="c1"># Only do additional configuration if no base languages</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
+            <span class="c1"># Configure libraries</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">configure_libraries</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+            <span class="c1"># Installed comms</span>
+            <span class="n">comms</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">supported_comms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="p">(</span><span class="n">commtype</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">skip_config</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                    <span class="n">comms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;commtypes&#39;</span><span class="p">,</span> <span class="n">comms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="ModelDriver.configure_libraries"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.configure_libraries">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">configure_libraries</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options for external libraries in this language.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg (CisConfigParser): Config class that options should be set for.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Section, option, description tuples for options that could not</span>
+<span class="sd">                be set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+        
+<div class="viewcode-block" id="ModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Environment variables for the model process.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
+        <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_SUBPROCESS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span>
+        <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_INDEX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">env</span></div>
+
+<div class="viewcode-block" id="ModelDriver.before_start"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_queue_thread</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform before the run starts.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            no_queue_thread (bool, optional): If True, the queue_thread is not</span>
+<span class="sd">                created/started. Defaults to False.</span>
+<span class="sd">            **kwargs: Keyword arguments are pased to run_model.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_model</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># Start thread to queue output</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">YggThreadLoop</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">enqueue_output_loop</span><span class="p">,</span>
-                                                <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.EnqueueLoop&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">no_queue_thread</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">YggThreadLoop</span><span class="p">(</span>
+                <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">enqueue_output_loop</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.EnqueueLoop&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ModelDriver.enqueue_output_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.enqueue_output_loop">[docs]</a>    <span class="k">def</span> <span class="nf">enqueue_output_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Keep passing lines to queue.&quot;&quot;&quot;</span>
@@ -366,7 +1066,8 @@
 <div class="viewcode-block" id="ModelDriver.before_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.before_loop">[docs]</a>    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions before loop.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Running </span><span class="si">%s</span><span class="s1"> from </span><span class="si">%s</span><span class="s1"> with cwd </span><span class="si">%s</span><span class="s1"> and env </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">))</span></div>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">model_command</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span>
+                   <span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="ModelDriver.run_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loop to check if model is still running and forward output.&quot;&quot;&quot;</span>
@@ -395,7 +1096,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Queue thread still alive&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Queue thread still alive&quot;</span><span class="p">)</span>
                 <span class="c1"># Loop was broken from outside, kill the queueing thread</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">kill_process</span><span class="p">()</span>
                 <span class="c1"># self.queue_thread.set_break_flag()</span>
@@ -484,13 +1185,260 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gracefully stop the driver.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wait_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;.graceful_stop&#39;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span></div></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span></div>
 
+<div class="viewcode-block" id="ModelDriver.cleanup"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove compile executable.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">overwrite</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_products</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restore_files</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModelDriver.restore_files"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.restore_files">[docs]</a>    <span class="k">def</span> <span class="nf">restore_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Restore modified files to their original form.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">modified</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modified_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">original</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">modified</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">modified</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelDriver.remove_products"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.remove_products">[docs]</a>    <span class="k">def</span> <span class="nf">remove_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete products produced during the process of running the model.&quot;&quot;&quot;</span>
+        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span>
+        <span class="n">source_products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_products</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapper_products</span>
+        <span class="n">remove_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">source_products</span><span class="p">,</span> <span class="n">timer_class</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
+            
     <span class="c1"># def do_terminate(self):</span>
     <span class="c1">#     r&quot;&quot;&quot;Terminate the process running the model.&quot;&quot;&quot;</span>
     <span class="c1">#     self.debug(&#39;&#39;)</span>
     <span class="c1">#     self.kill_process()</span>
     <span class="c1">#     super(ModelDriver, self).do_terminate()</span>
+                
+    <span class="c1"># Methods for automated model wrapping</span>
+<div class="viewcode-block" id="ModelDriver.run_code"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.run_code">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_code</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run code by first writing it as an executable and then calling</span>
+<span class="sd">        the driver.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lines (list): Lines of code to be wrapped as an executable.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the</span>
+<span class="sd">                write_executable method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;test_code_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())[:</span><span class="mi">13</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">working_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">code_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
+        <span class="c1"># code_dir = working_dir</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">code_dir</span><span class="p">,</span> <span class="n">name</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_language_ext</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">write_executable</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># TODO: Run the code</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
+            <span class="n">inst</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="n">fname</span><span class="p">],</span> <span class="n">working_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">)</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">run_model</span><span class="p">(</span><span class="n">return_process</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Failed generated code:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
+            <span class="k">raise</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">inst</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">inst</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
+                
+<div class="viewcode-block" id="ModelDriver.write_executable"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.write_executable">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_executable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to complete a program that will run</span>
+<span class="sd">        the provided lines.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lines (list): Lines of code to be wrapped as an executable.</span>
+<span class="sd">            prefix (list, optional): Lines of code that should proceed the</span>
+<span class="sd">                wrapped code. Defaults to None and is ignored. (e.g. C/C++</span>
+<span class="sd">                include statements).</span>
+<span class="sd">            suffix (list, optional): Lines of code that should follow the</span>
+<span class="sd">                wrapped code. Defaults to None and is ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            lines: Lines of code wrapping the provided lines with the</span>
+<span class="sd">                necessary code to run it as an executable (e.g. C/C++&#39;s main).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;function_param attribute not set for&quot;</span>
+                                      <span class="s2">&quot;language &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Add standard &amp; user defined prefixes</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="s1">&#39;exec_prefix&#39;</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;exec_prefix&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">))):</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;exec_prefix&#39;</span><span class="p">])</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">prefix</span> <span class="o">=</span> <span class="p">[</span><span class="n">prefix</span><span class="p">]</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="n">prefix</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="c1"># Add code with begin/end book ends</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="s1">&#39;exec_begin&#39;</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;exec_begin&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">))):</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;exec_begin&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">lines</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;exec_end&#39;</span><span class="p">,</span>
+                                              <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;block_end&#39;</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="n">lines</span>
+        <span class="k">if</span> <span class="n">out</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="c1"># Add standard &amp; user defined suffixes</span>
+        <span class="k">if</span> <span class="n">suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">suffix</span> <span class="o">=</span> <span class="p">[</span><span class="n">suffix</span><span class="p">]</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="n">suffix</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="s1">&#39;exec_suffix&#39;</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;exec_suffix&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">))):</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;exec_suffix&#39;</span><span class="p">])</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+                
+<div class="viewcode-block" id="ModelDriver.write_if_block"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.write_if_block">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_if_block</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cond</span><span class="p">,</span> <span class="n">block_contents</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to complete a conditional block.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cond (str): Conditional that should determine block execution.</span>
+<span class="sd">            block_contents (list): Lines of code that should be executed inside</span>
+<span class="sd">                the block.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Lines of code performing conditional execution of a block.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;function_param attribute not set for&quot;</span>
+                                      <span class="s2">&quot;language &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Opening for statement line</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;if_begin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cond</span><span class="o">=</span><span class="n">cond</span><span class="p">))</span>
+        <span class="c1"># Indent loop contents</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">block_contents</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">block_contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">block_contents</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">block_contents</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span>
+        <span class="c1"># Close block</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;if_end&#39;</span><span class="p">,</span>
+                                          <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;block_end&#39;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+                   
+<div class="viewcode-block" id="ModelDriver.write_for_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.write_for_loop">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_for_loop</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">iter_var</span><span class="p">,</span> <span class="n">iter_begin</span><span class="p">,</span> <span class="n">iter_end</span><span class="p">,</span> <span class="n">loop_contents</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to complete a for loop.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            iter_var (str): Name of variable that iterator should use.</span>
+<span class="sd">            iter_begin (int): Beginning of iteration.</span>
+<span class="sd">            iter_end (int): End of iteration.</span>
+<span class="sd">            loop_contents (list): Lines of code that should be executed inside</span>
+<span class="sd">                the loop.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Lines of code performing a loop.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;function_param attribute not set for&quot;</span>
+                                      <span class="s2">&quot;language &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Opening for statement line</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;for_begin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">iter_var</span><span class="o">=</span><span class="n">iter_var</span><span class="p">,</span> <span class="n">iter_begin</span><span class="o">=</span><span class="n">iter_begin</span><span class="p">,</span> <span class="n">iter_end</span><span class="o">=</span><span class="n">iter_end</span><span class="p">))</span>
+        <span class="c1"># Indent loop contents</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loop_contents</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">loop_contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">loop_contents</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">loop_contents</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span>
+        <span class="c1"># Close block</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;for_end&#39;</span><span class="p">,</span>
+                                          <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;block_end&#39;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="ModelDriver.write_while_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.write_while_loop">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_while_loop</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cond</span><span class="p">,</span> <span class="n">loop_contents</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to complete a for loop.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cond (str): Conditional that should determine loop execution.</span>
+<span class="sd">            loop_contents (list): Lines of code that should be executed inside</span>
+<span class="sd">                the loop.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Lines of code performing a loop.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;function_param attribute not set for&quot;</span>
+                                      <span class="s2">&quot;language &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Opening for statement line</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;while_begin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cond</span><span class="o">=</span><span class="n">cond</span><span class="p">))</span>
+        <span class="c1"># Indent loop contents</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loop_contents</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">loop_contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">loop_contents</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">loop_contents</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span>
+        <span class="c1"># Close block</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;while_end&#39;</span><span class="p">,</span>
+                                          <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;block_end&#39;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="ModelDriver.write_try_except"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.write_try_except">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_try_except</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">try_contents</span><span class="p">,</span> <span class="n">except_contents</span><span class="p">,</span> <span class="n">error_var</span><span class="o">=</span><span class="s1">&#39;e&#39;</span><span class="p">,</span>
+                         <span class="n">error_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to complete a try/except block.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            try_contents (list): Lines of code that should be executed inside</span>
+<span class="sd">                the try block.</span>
+<span class="sd">            except_contents (list): Lines of code that should be executed inside</span>
+<span class="sd">                the except block.</span>
+<span class="sd">            error_var (str, optional): Name of variable where the caught error</span>
+<span class="sd">                should be stored. Defaults to &#39;e&#39;.</span>
+<span class="sd">            error_type (str, optional): Name of error type that should be caught.</span>
+<span class="sd">                If not provided, defaults to None and will be set based on the</span>
+<span class="sd">                class function_param entry for &#39;try_error_type&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Lines of code perfoming a try/except block.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;try_begin&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;function_param attribute not set for&quot;</span>
+                                      <span class="s2">&quot;language &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">error_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">error_type</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;try_error_type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Try block contents</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">try_contents</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">try_contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">try_contents</span><span class="p">]</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;try_begin&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">try_contents</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span>
+        <span class="c1"># Except block contents</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">except_contents</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">except_contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">except_contents</span><span class="p">]</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;try_except&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">error_var</span><span class="o">=</span><span class="n">error_var</span><span class="p">,</span>
+                                                           <span class="n">error_type</span><span class="o">=</span><span class="n">error_type</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">except_contents</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span>
+        <span class="c1"># Close block</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;try_end&#39;</span><span class="p">,</span>
+                                          <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;block_end&#39;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
            </div>
@@ -527,7 +1475,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.tests.test_RMQAsyncComm &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.communication.tests.test_RMQAsyncComm &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../index.html"/>
         <link rel="up" title="yggdrasil.communication" href="../../communication.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -183,11 +177,14 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_raises</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">new_comm</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication.RMQComm</span> <span class="k">import</span> <span class="n">_rmq_server_running</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.RMQComm</span> <span class="k">import</span> <span class="n">RMQComm</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication.tests</span> <span class="k">import</span> <span class="n">test_RMQComm</span> <span class="k">as</span> <span class="n">parent</span>
 
+
+<span class="n">_rmq_installed</span> <span class="o">=</span> <span class="n">RMQComm</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">)</span>
+
     
-<div class="viewcode-block" id="TestRMQAsyncComm"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_rmq_server_running</span><span class="p">,</span> <span class="s2">&quot;RMQ Server not running&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="TestRMQAsyncComm"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_rmq_installed</span><span class="p">,</span> <span class="s2">&quot;RMQ Server not running&quot;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">TestRMQAsyncComm</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestRMQComm</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for RMQAsyncComm communication class.&quot;&quot;&quot;</span>
 
@@ -209,7 +206,7 @@
     <span class="c1">#     pass</span>
         
 
-<div class="viewcode-block" id="test_not_running"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQAsyncComm.test_not_running">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">_rmq_server_running</span><span class="p">,</span> <span class="s2">&quot;RMQ Server running&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="test_not_running"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQAsyncComm.test_not_running">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">_rmq_installed</span><span class="p">,</span> <span class="s2">&quot;RMQ Server running&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">test_not_running</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test raise of an error if a RMQ server is not running.&quot;&quot;&quot;</span>
     <span class="n">comm_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="s1">&#39;RMQAsyncComm&#39;</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="n">reverse_names</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -250,7 +247,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

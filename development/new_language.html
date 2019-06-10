@@ -1,0 +1,490 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Adding Support for a New Language &mdash; yggdrasil 0.9.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/>
+        <link rel="up" title="Development" href="index.html"/>
+        <link rel="next" title="Defining New Datatypes" href="new_datatype.html"/>
+        <link rel="prev" title="Release Steps" href="release.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Development</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="general.html">General Development Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Adding Support for a New Language</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#write-the-language-driver">Write the Language Driver</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#interpreted-languages">Interpreted Languages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#compiled-languages">Compiled Languages</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#write-the-language-communication-interface">Write the Language Communication Interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#from-an-interface-in-a-supported-language-recommnded">From an Interface in a Supported Language (Recommnded)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#from-scratch">From Scratch</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="new_datatype.html">Defining New Datatypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="todo.html">TODO</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Development</a> &raquo;</li>
+        
+      <li>Adding Support for a New Language</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/development/new_language.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="adding-support-for-a-new-language">
+<h1>Adding Support for a New Language<a class="headerlink" href="#adding-support-for-a-new-language" title="Permalink to this headline">¶</a></h1>
+<p>The yggdrasil package has been redesigned to make adding support for a new language
+as easy as possible, but developers will need some Python programming knowledge and
+a descent familiarity with the language being added.</p>
+<div class="section" id="write-the-language-driver">
+<h2>Write the Language Driver<a class="headerlink" href="#write-the-language-driver" title="Permalink to this headline">¶</a></h2>
+<p>The first step in adding language support is to write a driver for the language.
+Model drivers take care of things like writting any necessary wrappers, compiling
+the code (if necessary), and running the code. Generally, new languages will fall
+into one of two categories, interpreted or compiled. Based on the category that
+the language falls under, developers should use the associated base class
+(<a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver" title="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver</span></code></a> or
+<a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver" title="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver</span></code></a>) as a parent class.
+These base classes parameterize the required model driver operations so that
+developers should not have to write a large amount of code.</p>
+<p>In addition to the type specific steps below, developers can control the behavior of
+their class by defining the following class attributes:</p>
+<p>and the class method <code class="docutils literal notranslate"><span class="pre">is_library_installed</span></code>, which is used to determine if
+dependencies are installed.</p>
+<div class="section" id="interpreted-languages">
+<h3>Interpreted Languages<a class="headerlink" href="#interpreted-languages" title="Permalink to this headline">¶</a></h3>
+<p>Additional class attributes specific to interpreted model drivers include:</p>
+</div>
+<div class="section" id="compiled-languages">
+<h3>Compiled Languages<a class="headerlink" href="#compiled-languages" title="Permalink to this headline">¶</a></h3>
+<p>Additional class attributes specific to compiled model drivers include:</p>
+<div class="section" id="compilation-tools">
+<h4>Compilation Tools<a class="headerlink" href="#compilation-tools" title="Permalink to this headline">¶</a></h4>
+<p>For compiled languages, yggdrasil allows multiple compilation tools to be defined for
+the same language, particularly when different tools are required on different
+operating systems. In these cases, developers should create classes for the
+compilation tools (i.e. compilers, linkers, archivers) associated with the language.
+yggdrasil defines several base classes for this purpose which should be used
+as parent classes for any new tools.</p>
+<p>For compilers, the class is <a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompilerBase" title="yggdrasil.drivers.CompiledModelDriver.CompilerBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.CompiledModelDriver.CompilerBase</span></code></a>.
+The behavior of the compiler is defined by these class attributes:</p>
+<p>Most compilers, also serve as linkers so it is unlikely that developers will
+need to define new linkers (outside of the linker related compiler class attributes
+above), but there is also a linker base class if developers need finer tuned access
+to the class’s behavior. For linkers, the class is
+<a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.LinkerBase" title="yggdrasil.drivers.CompiledModelDriver.LinkerBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.CompiledModelDriver.LinkerBase</span></code></a> adn the behavior of the
+linker is defined by these class attributes:</p>
+<p>Many archivers can be used for multiple languages so check the other languages
+before adding a new one. If the target archiver already exists for other languages,
+developers should add the new language to the accepted list of languages on the
+class associated with the archiver. For archivers, the base class is
+<a class="reference internal" href="../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.ArchiverBase" title="yggdrasil.drivers.CompiledModelDriver.ArchiverBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.CompiledModelDriver.ArchiverBase</span></code></a>.
+The behavior of the archiver is defined by these class attributes:</p>
+</div>
+</div>
+</div>
+<div class="section" id="write-the-language-communication-interface">
+<h2>Write the Language Communication Interface<a class="headerlink" href="#write-the-language-communication-interface" title="Permalink to this headline">¶</a></h2>
+<p>The second phase of adding support for a new language is to write the language
+interface. This step is more involved than writing the model driver for the
+language, but the majority of the required development will be in the language
+being added.</p>
+<p>For new languages, developers should first do a review to
+identify existing tools for calling code in one of the languages that yggdrasil
+already supports (e.g. the R interface uses the
+<a class="reference external" href="https://rstudio.github.io/reticulate/">reticulate</a> package to
+call the Python interface from R). If such a tool exists, then the developers task is
+must easier.</p>
+<div class="section" id="from-an-interface-in-a-supported-language-recommnded">
+<h3>From an Interface in a Supported Language (Recommnded)<a class="headerlink" href="#from-an-interface-in-a-supported-language-recommnded" title="Permalink to this headline">¶</a></h3>
+<p>If there is an existing tool for accessing code written in one of the supporting
+languages, the developer will use that tool to wrap the interface from the already
+supported language. Examples of this can be found in the Matlab and R interface
+which both wrap the Python interface. The wrapper interface must have, at minimum:</p>
+<ol class="arabic simple">
+<li><em>Functions/Classes for creating communicator objects.</em> The created functions/classes
+should take as input a channel name (and optional format string for creating
+communicator objects for output), calls the wrapped interface, and
+returns the class/object representing the communicator in a form that can be used
+in the language being added. For object oriented languages, it may be easiest
+to create a new class that wraps access to the object returned by the wrapped
+interface. There must be a way to distinguish from input and output communicators
+either by exposing separate functions/classes or via an explicit argument.</li>
+<li><em>Functions/Methods for calling the wrapped send/recv functions/methods.</em> The
+created functions/classes must be able to access the wrapped communicator class
+or data object and call the appropriate send/recv function or method, converting
+the inputs and outputs of these functions into forms that make sense for the
+language being added (See next point).</li>
+<li><em>Conversion functions/methods.</em> While tools for calling external programming
+languages often handle most of the type conversion necessary for the two
+languages to interact, these conversions are often incomplete or insufficient
+for the purposes of yggdrasil (e.g. R does not have built-in support for
+variable precision integers and float). In such cases, the developer adding the
+language may need to write a conversion function that handles these
+inconsistencies.</li>
+</ol>
+</div>
+<div class="section" id="from-scratch">
+<h3>From Scratch<a class="headerlink" href="#from-scratch" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="create-comm-class-object">
+<h4>Create “Comm” Class/Object<a class="headerlink" href="#create-comm-class-object" title="Permalink to this headline">¶</a></h4>
+<p>For a language to added,
+there must be an interface to at least one of the supported communication
+mechanisms. Because it is widely supported in different programming languages,
+we recommend adding a ZeroMQ communication interface as a starting point. The
+new interface will need to defined a class or data object that wraps access to
+the underlying communication mechanism (e.g. ZeroMQ).</p>
+<p>This includes creating
+the communication connection based on a channel name. yggdrasil will store
+information about the communication associated with the connection in an
+environment variable with the name <code class="docutils literal notranslate"><span class="pre">'&lt;channel_name&gt;_IN'</span></code> if the channel
+is providing input to the model and <code class="docutils literal notranslate"><span class="pre">'&lt;channel_name&gt;_OUT'</span></code> if the channel is
+handling output from the model. The exact content of the environment variable
+depends on the communication mechanisms as shown in the table below.</p>
+</div>
+<div class="section" id="required-methods-functions">
+<h4>Required Methods/Functions<a class="headerlink" href="#required-methods-functions" title="Permalink to this headline">¶</a></h4>
+<p>The interface must also provide methods/functions for accesing the underlying
+communication class’s methods for sending and receiving messages. This is
+usually straight forward (assuming serialization is implemented), but there
+are some communication mechanisms with require some additional features (e.g.
+ZeroMQ). The table below includes some notes on implementing each of the
+supported communication mechanisms.</p>
+<table border="1" class="docutils" id="comm-devnotes-table-rst">
+<colgroup>
+<col width="3%" />
+<col width="32%" />
+<col width="65%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Comm</th>
+<th class="head">Address</th>
+<th class="head">Developer Notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ipc</td>
+<td>An IPC message queue key.</td>
+<td>The default size limit for IPC message queues is 2048 bytes on Mac operating
+systems so it is important that implementation of this communication mechanism
+properly split and send messages larger than this limit as more than one
+message.</td>
+</tr>
+<tr class="row-odd"><td>rmq</td>
+<td>AMPQ queue address of the form <code class="docutils literal notranslate"><span class="pre">&lt;url&gt;_R</span>
+<span class="pre">MQPARAM_&lt;exchange&gt;_RMQPARAM_&lt;queue&gt;</span></code>
+where <code class="docutils literal notranslate"><span class="pre">url</span></code> is the broker address (see
+explanation <a class="reference external" href="https://pika.readthedocs.io/en/stable/examples/using_urlparameters.html">here</a>), <code class="docutils literal notranslate"><span class="pre">exchange</span></code> is the name
+of the exchange on the queue that should
+be used, and <code class="docutils literal notranslate"><span class="pre">queue</span></code> is the name of
+the queue.</td>
+<td>It is not advised that new language implement a RabbitMQ communication
+interface. Rather RMQ communication is included explicitly for connections
+between models that are not co-located on the same machine and are used by the
+yggdrasil framework connections on the Python side.</td>
+</tr>
+<tr class="row-even"><td>zmq</td>
+<td>A ZeroMQ endpoint of the form
+&lt;transport&gt;://&lt;address&gt;, where the
+format of address depends on the
+transport. Additional information can be
+found <a class="reference external" href="http://api.zeromq.org/3-2:zmq-bind">here</a>.</td>
+<td>yggdrasil uses the tcp transport by default with a PAIR socket type. For every
+connection, yggdrasil establishes a second request/reply connection that is
+used to confirm messages passed between the primary PAIR of sockets. On the
+first send, the model should create a REP socket on an open tcp address and send
+that address in the header of the first message under the key ‘zmq_reply’.
+Receiving models should check message headers for this key and, on receipt,
+establish the partner REQ socket with the specified address (receiving comms can
+receive from more than one source so they can have more than one request
+addresses at at time for this purpose). Following every message, the sending
+model should wait for a message on the reply socket and, on receipt, return the
+message. Following every message, the receiving model should send the message
+‘YGG_REPLY’ on the request socket and wait for a reply. When creating worker
+comms for sending large messages, the sending model should create the reply comm
+for the worker in advanced and send it in the header with the worker address
+under the key ‘zmq_reply_worker’.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="implement-serialization">
+<h4>Implement Serialization<a class="headerlink" href="#implement-serialization" title="Permalink to this headline">¶</a></h4>
+<p>The most involved part of writing the interface will be writing the
+serialization and deserialization routines. The specific serialization protocol
+used by yggdrasil is described in detail here <a class="reference internal" href="../advanced/serialization.html#serialization-rst"><span class="std std-ref">here</span></a>.
+The developer adding support for the new language will need to add support for
+serialization of all of the datatypes listed in
+<a class="reference internal" href="../tables/datatype_mapping_table.html#datatype-mapping-table-rst"><span class="std std-ref">this table</span></a>.</p>
+</div>
+<div class="section" id="sending-large-messages">
+<h4>Sending Large Messages<a class="headerlink" href="#sending-large-messages" title="Permalink to this headline">¶</a></h4>
+<p>Most communication mechanisms have limits on the sizes of messages that can be
+sent as single messages (e.g. 2048 for IPC on MacOS). To overcome this yggdrasil
+splits up serialized messages that are larger than the limit (including the
+serialized header) into smaller messages and sending them through a new
+connection created explicitly for carrying the large message.</p>
+<p>When a model is sending to output, it should check the size of each outgoing message
+(including the header). If a message exceeds the limit, it should</p>
+<ol class="arabic simple">
+<li>Create a new work comm and add the work comm’s address to the message header
+under the ‘address’ key.</li>
+<li>Send the revised header with as much of the message as will fit within the limit.</li>
+<li>Send the remains of the message as chunks with sizes set by the limit
+through the new work comm.</li>
+</ol>
+<p>When a model is receiving, it should check that the message is not smaller than
+the size indicated by the header. If the message is smaller, it should</p>
+<ol class="arabic simple">
+<li>Create a new work comm using the address in the message header.</li>
+<li>Continue receiving messages through the work comm until the message is
+complete (or the connection is closed).</li>
+<li>Combine the received message chunks to form the complete messages and
+deserialize them.</li>
+</ol>
+<p>When creating an interface in a new language, the developer must replicate this
+behavior.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="new_datatype.html" class="btn btn-neutral float-right" title="Defining New Datatypes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="release.html" class="btn btn-neutral" title="Release Steps" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.9.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

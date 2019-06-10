@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.metaschema &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -190,13 +184,12 @@
     <span class="n">get_registered_types</span><span class="p">,</span> <span class="n">import_all_types</span><span class="p">,</span> <span class="n">_jsonschema_ver_maj</span><span class="p">)</span>
 
 
-<span class="c1"># TODO: this should be included in release as YAML/JSON and then loaded</span>
 <span class="n">_metaschema_fbase</span> <span class="o">=</span> <span class="s1">&#39;.ygg_metaschema.json&#39;</span>
 <span class="n">_metaschema_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">yggdrasil</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="n">_metaschema_fbase</span><span class="p">))</span>
 <span class="n">_metaschema</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">_validator</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">_base_schema</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span>
+<span class="n">_base_schema</span> <span class="o">=</span> <span class="p">{</span><span class="sa">u</span><span class="s1">&#39;$schema&#39;</span><span class="p">:</span> <span class="sa">u</span><span class="s1">&#39;http://json-schema.org/draft-04/schema&#39;</span><span class="p">}</span>
 
 
 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">_metaschema_fname</span><span class="p">):</span>
@@ -232,6 +225,11 @@
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Metaschema file already exists.&quot;</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">_base_validator</span><span class="o">.</span><span class="n">META_SCHEMA</span><span class="p">)</span>
     <span class="n">out</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Ygg meta-schema for data type schemas&quot;</span>
+    <span class="c1"># Lower versions have a differing draft4</span>
+    <span class="k">if</span> <span class="n">_jsonschema_ver_maj</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;minItems&#39;</span><span class="p">,</span> <span class="s1">&#39;uniqueItems&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;enum&#39;</span><span class="p">]:</span>
+                <span class="k">del</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;enum&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">]</span>
     <span class="c1"># TODO: Replace schema with a link to the metaschema in the documentation</span>
     <span class="c1"># del out[&#39;$schema&#39;]</span>
     <span class="c1"># Add properties</span>
@@ -345,6 +343,20 @@
     <span class="bp">cls</span><span class="o">.</span><span class="n">check_schema</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
 
 
+<span class="c1"># def normalize_schema(obj):</span>
+<span class="c1">#     r&quot;&quot;&quot;Normalize a schema against the metaschema.</span>
+
+<span class="c1">#     Args:</span>
+<span class="c1">#         obj (dict): Schema to be normalized.</span>
+
+<span class="c1">#     Returns:</span>
+<span class="c1">#         dict: Normalized schema.</span>
+
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     cls = get_validator()</span>
+<span class="c1">#     return cls.normalize_schema(obj)</span>
+
+
 <div class="viewcode-block" id="validate_instance"><a class="viewcode-back" href="../../yggdrasil.metaschema.html#yggdrasil.metaschema.validate_instance">[docs]</a><span class="k">def</span> <span class="nf">validate_instance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an instance against a schema.</span>
 
@@ -422,7 +434,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

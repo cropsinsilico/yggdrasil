@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.CMakeModelDriver &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.drivers.CMakeModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../index.html"/>
         <link rel="up" title="yggdrasil.drivers" href="../drivers.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -181,131 +175,529 @@
   <h1>Source code for yggdrasil.drivers.CMakeModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.ModelDriver</span> <span class="k">import</span> <span class="n">ModelDriver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="k">import</span> <span class="n">GCCModelDriver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">register_component</span><span class="p">,</span> <span class="n">inherit_schema</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">components</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">CompiledModelDriver</span><span class="p">,</span> <span class="n">CompilerBase</span><span class="p">,</span> <span class="n">LinkerBase</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="k">import</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">CPPModelDriver</span>
 
 
-<span class="n">_regex_win32_dir</span> <span class="o">=</span> <span class="n">GCCModelDriver</span><span class="o">.</span><span class="n">_incl_regex</span>
-<span class="n">_regex_win32_lib</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_regex_win32_dir</span><span class="p">,</span> <span class="s1">&#39;build&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;Debug&#39;</span><span class="p">,</span> <span class="s1">&#39;regex_win32.lib&#39;</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="build_regex_win32"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.build_regex_win32">[docs]</a><span class="k">def</span> <span class="nf">build_regex_win32</span><span class="p">():</span>  <span class="c1"># pragma: windows</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Build the regex_win32 library using cmake.&quot;&quot;&quot;</span>
-    <span class="c1"># Configure project</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;-H.&#39;</span><span class="p">,</span> <span class="s1">&#39;-Bbuild&#39;</span><span class="p">]</span>
-    <span class="n">comp_process</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">popen_nobuffer</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">_regex_win32_dir</span><span class="p">)</span>
-    <span class="n">output</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">comp_process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-    <span class="n">exit_code</span> <span class="o">=</span> <span class="n">comp_process</span><span class="o">.</span><span class="n">returncode</span>
-    <span class="k">if</span> <span class="n">exit_code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">))</span>
-        <span class="n">tools</span><span class="o">.</span><span class="n">print_encoded</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not config regex_win32&quot;</span><span class="p">)</span>
-    <span class="c1"># Build project</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;--build&#39;</span><span class="p">,</span> <span class="s1">&#39;build&#39;</span><span class="p">,</span> <span class="s1">&#39;--clean-first&#39;</span><span class="p">]</span>
-    <span class="n">comp_process</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">popen_nobuffer</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">_regex_win32_dir</span><span class="p">)</span>
-    <span class="n">output</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">comp_process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-    <span class="n">exit_code</span> <span class="o">=</span> <span class="n">comp_process</span><span class="o">.</span><span class="n">returncode</span>
-    <span class="k">if</span> <span class="n">exit_code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">))</span>
-        <span class="n">tools</span><span class="o">.</span><span class="n">print_encoded</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not build regex_win32&quot;</span><span class="p">)</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">_regex_win32_lib</span><span class="p">))</span></div>
+<div class="viewcode-block" id="CMakeConfigure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure">[docs]</a><span class="k">class</span> <span class="nc">CMakeConfigure</span><span class="p">(</span><span class="n">CompilerBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;CMake configuration tool.&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;cmake&#39;</span>
+    <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">]</span>
+    <span class="n">is_linker</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">default_flags</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># &#39;-H&#39;]</span>
+    <span class="n">flag_options</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;definitions&#39;</span><span class="p">,</span> <span class="s1">&#39;-D</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span>
+                                <span class="p">(</span><span class="s1">&#39;sourcedir&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>  <span class="c1"># &#39;-S&#39;</span>
+                                <span class="p">(</span><span class="s1">&#39;builddir&#39;</span><span class="p">,</span> <span class="s1">&#39;-B</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span>
+                                <span class="p">(</span><span class="s1">&#39;configuration&#39;</span><span class="p">,</span> <span class="s1">&#39;-DCMAKE_BUILD_TYPE=</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)])</span>
+    <span class="n">output_key</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">compile_only_flag</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">default_builddir</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+    <span class="n">default_archiver</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">add_libraries</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">product_files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Makefile&#39;</span><span class="p">,</span> <span class="s1">&#39;CMakeCache.txt&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;cmake_install.cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;CMakeFiles&#39;</span><span class="p">]</span>
+    <span class="n">remove_product_exts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CMakeFiles&#39;</span><span class="p">]</span>
 
+<div class="viewcode-block" id="CMakeConfigure.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="sd">        to registration including things like platform dependent properties and</span>
+<span class="sd">        checking environment variables for default settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">CompilerBase</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_64bit</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">default_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-DCMAKE_GENERATOR_PLATFORM=x64&#39;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">product_files</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;ALL_BUILD.vcxproj&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;ALL_BUILD.vcxproj.filters&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;Debug&#39;</span><span class="p">,</span> <span class="s1">&#39;Release&#39;</span><span class="p">,</span> <span class="s1">&#39;Win32&#39;</span><span class="p">,</span> <span class="s1">&#39;Win64&#39;</span><span class="p">,</span> <span class="s1">&#39;x64&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;ZERO_CHECK.vcxproj&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;ZERO_CHECK.vcxproj.filters&#39;</span><span class="p">]</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">remove_product_exts</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;Debug&#39;</span><span class="p">,</span> <span class="s1">&#39;Release&#39;</span><span class="p">,</span> <span class="s1">&#39;Win32&#39;</span><span class="p">,</span> <span class="s1">&#39;Win64&#39;</span><span class="p">,</span>
+                                        <span class="s1">&#39;x64&#39;</span><span class="p">,</span> <span class="s1">&#39;.dir&#39;</span><span class="p">]</span></div>
+        
+<div class="viewcode-block" id="CMakeConfigure.append_product"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.append_product">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">append_product</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append a product to the specified list along with additional values</span>
+<span class="sd">        indicated by cls.product_exts.</span>
 
-<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">_regex_win32_lib</span><span class="p">)):</span>  <span class="c1"># pragma: windows</span>
-    <span class="n">build_regex_win32</span><span class="p">()</span>
+<span class="sd">        Args:</span>
+<span class="sd">            products (list): List of of existing products that new product</span>
+<span class="sd">                should be appended to.</span>
+<span class="sd">            src (list): Input arguments to compilation call that was used to</span>
+<span class="sd">                generate the output file (usually one or more source files).</span>
+<span class="sd">            new (str): New product that should be appended to the list.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
 
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;new_dir&#39;</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;dont_append_src&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeConfigure</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">append_product</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span>
+                                                         <span class="n">new</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="CMakeConfigure.get_output_file"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.get_output_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_output_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dont_link</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dont_build</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">sourcedir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">builddir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the appropriate output file or directory that will result</span>
+<span class="sd">        when configuring/building a given source directory.</span>
 
-<div class="viewcode-block" id="create_include"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.create_include">[docs]</a><span class="k">def</span> <span class="nf">create_include</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">compile_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">linker_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create CMakeList include file with necessary includes,</span>
-<span class="sd">    definitions, and linker flags.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            src (str): Directory containing source files being compiled.</span>
+<span class="sd">            dont_link (bool, optional): If True, the result assumes that the</span>
+<span class="sd">                source is just compiled and not linked. If False, the result</span>
+<span class="sd">                will be the final result after linking.</span>
+<span class="sd">            dont_build (bool, optional): Alias for dont_link. If not None, this</span>
+<span class="sd">                keyword overrides the value of dont_link. Defaults to None.</span>
+<span class="sd">            sourcedir (str, optional): Directory where sources files are located.</span>
+<span class="sd">                Defaults to None. If None, src will be used to determine the</span>
+<span class="sd">                value.</span>
+<span class="sd">            builddir (str, optional): Directory where build tree should be</span>
+<span class="sd">                created. Defaults to None. If None, sourcedir will be used.</span>
+<span class="sd">            working_dir (str, optional): Working directory where output file</span>
+<span class="sd">                should be located. Defaults to None and is ignored.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored unless dont_link</span>
+<span class="sd">                is False; then they are passed to get_linker_output_file</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        fname (str): File where the include file should be saved.</span>
-<span class="sd">        target (str): Target that links should be added to.</span>
-<span class="sd">        compile_flags (list, optional): Additional compile flags that</span>
-<span class="sd">            should be set. Defaults to [].</span>
-<span class="sd">        linker_flags (list, optional): Additional linker flags that</span>
-<span class="sd">            should be set. Defaults to [].</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Full path to file that will be produced.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">compile_flags</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">compile_flags</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="n">linker_flags</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">linker_flags</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">_compile_flags</span><span class="p">,</span> <span class="n">_linker_flags</span> <span class="o">=</span> <span class="n">GCCModelDriver</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="n">for_cmake</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">_regex_win32_lib</span><span class="p">))</span>
-        <span class="n">_linker_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_regex_win32_lib</span><span class="p">)</span>
-    <span class="n">compile_flags</span> <span class="o">+=</span> <span class="n">_compile_flags</span>
-    <span class="n">linker_flags</span> <span class="o">+=</span> <span class="n">_linker_flags</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">var_count</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">compile_flags</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-D&#39;</span><span class="p">):</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;ADD_DEFINITIONS(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-I&#39;</span><span class="p">):</span>
-            <span class="n">xdir</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-I&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-                <span class="n">xdir</span> <span class="o">=</span> <span class="n">xdir</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">))</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;INCLUDE_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">xdir</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;ADD_DEFINITIONS(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dont_build</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dont_link</span> <span class="o">=</span> <span class="n">dont_build</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">sourcedir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">src</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">src</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">sourcedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sourcedir</span> <span class="o">=</span> <span class="n">src</span>
+        <span class="k">if</span> <span class="n">builddir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sourcedir</span><span class="p">,</span>
+                                                     <span class="bp">cls</span><span class="o">.</span><span class="n">default_builddir</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">dont_link</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">builddir</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">out</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">working_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">out</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not parse compiler flag &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">linker_flags</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-l&#39;</span><span class="p">):</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;TARGET_LINK_LIBRARIES(</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-L&#39;</span><span class="p">):</span>
-            <span class="n">libdir</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-L&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-                <span class="n">libdir</span> <span class="o">=</span> <span class="n">libdir</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">))</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">libdir</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/LIBPATH:&#39;</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
-            <span class="n">libdir</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/LIBPATH:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s1">&#39;&quot;&#39;</span> <span class="ow">in</span> <span class="n">libdir</span><span class="p">:</span>
-                <span class="n">libdir</span> <span class="o">=</span> <span class="n">libdir</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
-                <span class="n">libdir</span> <span class="o">=</span> <span class="n">libdir</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">))</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">libdir</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeConfigure</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_output_file</span><span class="p">(</span>
+                <span class="n">src</span><span class="p">,</span> <span class="n">dont_link</span><span class="o">=</span><span class="n">dont_link</span><span class="p">,</span> <span class="n">sourcedir</span><span class="o">=</span><span class="n">sourcedir</span><span class="p">,</span>
+                <span class="n">builddir</span><span class="o">=</span><span class="n">builddir</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="CMakeConfigure.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sourcedir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">builddir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of configuration/generation flags.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sourcedir (str, optional): Directory containing the source files to</span>
+<span class="sd">                be compiled and the target CMakeLists.txt file. Defaults to &#39;.&#39;</span>
+<span class="sd">                (the current working directory).</span>
+<span class="sd">            builddir (str, optional): Directory that will contain the build tree.</span>
+<span class="sd">                Defaults to &#39;.&#39; (this current working directory).</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Compiler flags.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If dont_link is True and the provide outfile and</span>
+<span class="sd">                builddir keyword arguments point to conflicting paths.</span>
+<span class="sd">            ValueError: If &#39;include_dirs&#39; is set (&#39;sourcedir&#39; should be used</span>
+<span class="sd">                for cmake to specify the location of the source).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dont_link&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">builddir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">outfile</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outfile&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">outfile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">builddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sourcedir</span><span class="p">,</span>
+                                                             <span class="bp">cls</span><span class="o">.</span><span class="n">default_builddir</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">builddir</span> <span class="o">=</span> <span class="n">outfile</span>
+        <span class="c1"># Pop target (used for build stage file name, but not for any other</span>
+        <span class="c1"># part of the build stage)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># Add conda prefix</span>
+        <span class="c1"># conda_prefix = cls.get_conda_prefix()</span>
+        <span class="c1"># if conda_prefix:</span>
+        <span class="c1">#     kwargs.setdefault(&#39;definitions&#39;, [])</span>
+        <span class="c1">#     kwargs[&#39;definitions&#39;].append(&#39;CMAKE_PREFIX_PATH=%s&#39;</span>
+        <span class="c1">#                                  % os.path.join(conda_prefix, &#39;lib&#39;))</span>
+        <span class="c1">#     kwargs[&#39;definitions&#39;].append(&#39;CMAKE_LIBRARY_PATH=%s&#39;</span>
+        <span class="c1">#                                  % os.path.join(conda_prefix, &#39;lib&#39;))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeConfigure</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="n">sourcedir</span><span class="o">=</span><span class="n">sourcedir</span><span class="p">,</span>
+                                                   <span class="n">builddir</span><span class="o">=</span><span class="n">builddir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="CMakeConfigure.get_executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.get_executable_command">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the command required to run the tool using the specified</span>
+<span class="sd">        arguments and options.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): The arguments that should be passed to the tool. If</span>
+<span class="sd">                skip_flags is False, these are treated as input files that will</span>
+<span class="sd">                be used by the tool.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Output to stdout from the command execution.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;skip_flags&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">sourcedir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sourcedir&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">sourcedir</span> <span class="o">!=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;The argument list &quot;</span>
+                                    <span class="s2">&quot;contents (=&#39;</span><span class="si">%s</span><span class="s2">&#39;) and &#39;sourcedir&#39; (=&#39;</span><span class="si">%s</span><span class="s2">&#39;) &quot;</span>
+                                    <span class="s2">&quot;keyword specify the same thing, but those &quot;</span>
+                                    <span class="s2">&quot;provided do not match.&quot;</span><span class="p">)</span>
+                                   <span class="o">%</span> <span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sourcedir</span><span class="p">))</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;sourcedir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeConfigure</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_executable_command</span><span class="p">([],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="CMakeConfigure.write_wrappers"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.write_wrappers">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_wrappers</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sourcedir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">target_language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write any wrappers needed to compile and/or run a model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Keyword arguments are ignored (only included to</span>
+<span class="sd">               allow cascade from child classes).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Full paths to any created wrappers.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sourcedir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">sourcedir</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeConfigure</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_wrappers</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">include_base</span> <span class="o">=</span> <span class="s1">&#39;ygg_cmake.txt&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">include_base</span> <span class="o">=</span> <span class="s1">&#39;ygg_cmake_</span><span class="si">%s</span><span class="s1">.txt&#39;</span> <span class="o">%</span> <span class="n">target</span>
+        <span class="n">include_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sourcedir</span><span class="p">,</span> <span class="n">include_base</span><span class="p">)</span>
+        <span class="c1"># import pprint</span>
+        <span class="c1"># print(&#39;kwargs&#39;)</span>
+        <span class="c1"># pprint.pprint(kwargs)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;verbose&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">target_language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;driver&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span>
+                                                           <span class="n">target_language</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">create_include</span><span class="p">(</span><span class="n">include_file</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">include_file</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">include_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+        
+<div class="viewcode-block" id="CMakeConfigure.create_include"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.create_include">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_include</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">compile_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">linker_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logging_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">configuration</span><span class="o">=</span><span class="s1">&#39;Release&#39;</span><span class="p">,</span>
+                       <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create CMakeList include file with necessary includes,</span>
+<span class="sd">        definitions, and linker flags.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fname (str): File where the include file should be saved.</span>
+<span class="sd">            target (str): Target that links should be added to.</span>
+<span class="sd">            compile_flags (list, optional): Additional compile flags that</span>
+<span class="sd">                should be set. Defaults to [].</span>
+<span class="sd">            linker_flags (list, optional): Additional linker flags that</span>
+<span class="sd">                should be set. Defaults to [].</span>
+<span class="sd">            driver (CompiledModelDriver, optional): The CompiledModelDriver that</span>
+<span class="sd">                should be used to get compiler/linker flags. Defaults to</span>
+<span class="sd">                CModelDriver.</span>
+<span class="sd">            logging_level (int, optional): Logging level that should be passed</span>
+<span class="sd">                as a definition to the C compiler. Defaults to None and will be</span>
+<span class="sd">                ignored.</span>
+<span class="sd">            configuration (str, optional): Build type/configuration that should</span>
+<span class="sd">                be built. Defaults to &#39;Release&#39;. Only used on Windows to</span>
+<span class="sd">                determin the standard library.</span>
+<span class="sd">            verbose (bool, optional): If True, the contents of the created file</span>
+<span class="sd">                are displayed. Defaults to False.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If a linker or compiler flag cannot be interpreted.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="s1">&#39;$</span><span class="si">{PROJECT_NAME}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">compile_flags</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">compile_flags</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">linker_flags</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">linker_flags</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">driver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">driver</span> <span class="o">=</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">CModelDriver</span>
+        <span class="n">use_library_path</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># platform._is_win</span>
+        <span class="n">library_flags</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">external_library_flags</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">internal_library_flags</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">compile_flags</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">get_compiler_flags</span><span class="p">(</span>
+            <span class="n">skip_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">compile_flags</span><span class="p">,</span> <span class="n">use_library_path</span><span class="o">=</span><span class="n">use_library_path</span><span class="p">,</span>
+            <span class="n">dont_link</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">logging_level</span><span class="o">=</span><span class="n">logging_level</span><span class="p">)</span>
+        <span class="n">linker_flags</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">get_linker_flags</span><span class="p">(</span>
+            <span class="n">skip_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">linker_flags</span><span class="p">,</span> <span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">use_library_path</span><span class="o">=</span><span class="s1">&#39;external_library_flags&#39;</span><span class="p">,</span>
+            <span class="n">external_library_flags</span><span class="o">=</span><span class="n">external_library_flags</span><span class="p">,</span>
+            <span class="n">use_library_path_internal</span><span class="o">=</span><span class="s1">&#39;internal_library_flags&#39;</span><span class="p">,</span>
+            <span class="n">internal_library_flags</span><span class="o">=</span><span class="n">internal_library_flags</span><span class="p">,</span>
+            <span class="n">skip_library_libs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">library_flags</span><span class="o">=</span><span class="n">library_flags</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">preamble_lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">library_flags</span> <span class="o">+=</span> <span class="n">internal_library_flags</span> <span class="o">+</span> <span class="n">external_library_flags</span>
+        <span class="c1"># Suppress warnings on windows about the security of strcpy etc.</span>
+        <span class="c1"># and target x64 if the current platform is 64bit</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="n">new_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;/W4&quot;</span><span class="p">,</span> <span class="s2">&quot;/EHsc&quot;</span><span class="p">,</span> <span class="s1">&#39;/TP&#39;</span><span class="p">,</span> <span class="s2">&quot;/nologo&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;-D_CRT_SECURE_NO_WARNINGS&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">configuration</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;debug&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">new_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;/MTd&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;/MT&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">new_flags</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">compile_flags</span><span class="p">:</span>
+                    <span class="n">compile_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># Compilation flags</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">compile_flags</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-D&#39;</span><span class="p">):</span>
+                <span class="n">preamble_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;ADD_DEFINITIONS(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-I&#39;</span><span class="p">):</span>
+                <span class="n">xdir</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-I&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                    <span class="n">xdir</span> <span class="o">=</span> <span class="n">xdir</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">))</span>
+                <span class="n">new_dir</span> <span class="o">=</span> <span class="s1">&#39;INCLUDE_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">xdir</span>
+                <span class="k">if</span> <span class="n">new_dir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">preamble_lines</span><span class="p">:</span>
+                    <span class="n">preamble_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_dir</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-std=c++&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/std=c++&#39;</span><span class="p">):</span>
+                <span class="n">new_def</span> <span class="o">=</span> <span class="s1">&#39;SET(CMAKE_CXX_STANDARD </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;c++&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">new_def</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">preamble_lines</span><span class="p">:</span>
+                    <span class="n">preamble_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_def</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+                <span class="n">new_def</span> <span class="o">=</span> <span class="s1">&#39;ADD_DEFINITIONS(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">x</span>
+                <span class="k">if</span> <span class="n">new_def</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">preamble_lines</span><span class="p">:</span>
+                    <span class="n">preamble_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_def</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not parse compiler flag &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
+        <span class="c1"># Linker flags</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">linker_flags</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-l&#39;</span><span class="p">):</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;TARGET_LINK_LIBRARIES(</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-L&#39;</span><span class="p">):</span>
+                <span class="n">libdir</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-L&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                    <span class="n">libdir</span> <span class="o">=</span> <span class="n">libdir</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">))</span>
+                <span class="n">preamble_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">libdir</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/LIBPATH:&#39;</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
+                <span class="n">libdir</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/LIBPATH:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">&#39;&quot;&#39;</span> <span class="ow">in</span> <span class="n">libdir</span><span class="p">:</span>
+                    <span class="n">libdir</span> <span class="o">=</span> <span class="n">libdir</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
+                    <span class="n">libdir</span> <span class="o">=</span> <span class="n">libdir</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">))</span>
+                <span class="n">preamble_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">libdir</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                <span class="n">library_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not parse linker flag &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;TARGET_LINK_LIBRARIES(</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+        <span class="c1"># Libraries</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">library_flags</span><span class="p">:</span>
+            <span class="n">xorig</span> <span class="o">=</span> <span class="n">x</span>
             <span class="n">xd</span><span class="p">,</span> <span class="n">xf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="n">xl</span><span class="p">,</span> <span class="n">xe</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">xf</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">xe</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;.so&#39;</span><span class="p">,</span> <span class="s1">&#39;.dll&#39;</span><span class="p">,</span> <span class="s1">&#39;.dylib&#39;</span><span class="p">]:</span>
-                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;ADD_LIBRARY(</span><span class="si">%s</span><span class="s1"> SHARED IMPORTED)&#39;</span> <span class="o">%</span> <span class="n">xl</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;ADD_LIBRARY(</span><span class="si">%s</span><span class="s1"> STATIC IMPORTED)&#39;</span> <span class="o">%</span> <span class="n">xl</span><span class="p">)</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;SET_TARGET_PROPERTIES(&#39;</span><span class="p">)</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;    </span><span class="si">%s</span><span class="s1"> PROPERTIES&#39;</span> <span class="o">%</span> <span class="n">xl</span><span class="p">)</span>
-            <span class="c1"># lines.append(&#39;    PROPERTIES LINKER_LANGUAGE CXX&#39;)</span>
+            <span class="n">xl</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;linker&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">libpath2libname</span><span class="p">(</span><span class="n">xf</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;    IMPORTED_LOCATION </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span>
-                             <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">)))</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">))</span>
+                <span class="n">xd</span> <span class="o">=</span> <span class="n">xd</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">))</span>
+            <span class="n">xn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">xl</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">new_dir</span> <span class="o">=</span> <span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">xd</span>
+            <span class="k">if</span> <span class="n">new_dir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">preamble_lines</span><span class="p">:</span>
+                <span class="n">preamble_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_dir</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">add_libraries</span> <span class="ow">or</span> <span class="p">(</span><span class="n">xorig</span> <span class="ow">in</span> <span class="n">internal_library_flags</span><span class="p">):</span>
+                <span class="c1"># if cls.add_libraries:  # pragma: no cover</span>
+                <span class="c1"># Version adding library</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;if (NOT TARGET </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">xl</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">xe</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;.so&#39;</span><span class="p">,</span> <span class="s1">&#39;.dll&#39;</span><span class="p">,</span> <span class="s1">&#39;.dylib&#39;</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;    ADD_LIBRARY(</span><span class="si">%s</span><span class="s1"> SHARED IMPORTED)&#39;</span> <span class="o">%</span> <span class="n">xl</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;    ADD_LIBRARY(</span><span class="si">%s</span><span class="s1"> STATIC IMPORTED)&#39;</span> <span class="o">%</span> <span class="n">xl</span><span class="p">)</span>
+                <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;    SET_TARGET_PROPERTIES(&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;        </span><span class="si">%s</span><span class="s1"> PROPERTIES&#39;</span> <span class="o">%</span> <span class="n">xl</span><span class="p">,</span>
+                          <span class="c1"># &#39;        LINKER_LANGUAGE CXX&#39;,</span>
+                          <span class="c1"># &#39;        CXX_STANDARD 11&#39;,</span>
+                          <span class="s1">&#39;        IMPORTED_LOCATION </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">,</span>
+                          <span class="s1">&#39;endif()&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;TARGET_LINK_LIBRARIES(</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">xl</span><span class="p">)]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;    IMPORTED_LOCATION </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;TARGET_LINK_LIBRARIES(</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">xl</span><span class="p">))</span>
-            <span class="c1"># lines.append(&#39;FIND_LIBRARY(VAR%d %s HINTS %s)&#39; % (var_count, xf, xd))</span>
-            <span class="c1"># lines.append(&#39;TARGET_LINK_LIBRARIES(%s ${VAR%s})&#39; % (target, var_count))</span>
-            <span class="n">var_count</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not parse linker flag &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
+                <span class="c1"># Version finding library</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;FIND_LIBRARY(</span><span class="si">%s</span><span class="s1">_LIBRARY NAMES </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> HINTS </span><span class="si">%s</span><span class="s1">)&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">xn</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">xf</span><span class="p">,</span> <span class="n">xn</span><span class="p">,</span> <span class="n">xd</span><span class="p">))</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;TARGET_LINK_LIBRARIES(</span><span class="si">%s</span><span class="s1"> ${</span><span class="si">%s</span><span class="s1">_LIBRARY})&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">xn</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">preamble_lines</span> <span class="o">+</span> <span class="n">lines</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;CMake include file:</span><span class="se">\n\t</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;TARGET_LINK_LIBRARIES(</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">lines</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
-            <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CMake include file:</span><span class="se">\n\t</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">lines</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span></div></div>
 
+    
+<div class="viewcode-block" id="CMakeBuilder"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder">[docs]</a><span class="k">class</span> <span class="nc">CMakeBuilder</span><span class="p">(</span><span class="n">LinkerBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;CMake build tool.&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;cmake&#39;</span>
+    <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">]</span>
+    <span class="n">default_flags</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># &#39;--clean-first&#39;]</span>
+    <span class="n">output_key</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">flag_options</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;builddir&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;--build&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}),</span>
+                                <span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;--target&#39;</span><span class="p">),</span>
+                                <span class="p">(</span><span class="s1">&#39;configuration&#39;</span><span class="p">,</span> <span class="s1">&#39;--config&#39;</span><span class="p">)])</span>
+    <span class="n">executable_ext</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
-<div class="viewcode-block" id="CMakeModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">CMakeModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeBuilder.extract_kwargs"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.extract_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">extract_kwargs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_ex</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract linker kwargs, leaving behind just compiler kwargs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            kwargs (dict): Keyword arguments passed to the compiler that should</span>
+<span class="sd">                be sorted into kwargs used by either the compiler or linker or</span>
+<span class="sd">                both. Keywords that are not used by the compiler will be removed</span>
+<span class="sd">                from this dictionary.</span>
+<span class="sd">            **kwargs_ex: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Keyword arguments that should be passed to the linker.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs_ex</span><span class="p">[</span><span class="s1">&#39;add_kws_both&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;add_kws_both&#39;</span><span class="p">,</span> <span class="p">[])</span>
+                                     <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;builddir&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeBuilder</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">extract_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_ex</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="CMakeBuilder.get_output_file"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.get_output_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_output_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">builddir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the appropriate output file that will result when bulding</span>
+<span class="sd">        a given directory.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            obj (str): Directory being built or a file in the directory being</span>
+<span class="sd">                built.</span>
+<span class="sd">            target (str, optional): Target that will be used to create the</span>
+<span class="sd">                output file. Defaults to None. Target is required in order</span>
+<span class="sd">                to determine the name of the file that will be created.</span>
+<span class="sd">            builddir (str, optional): Directory where build tree should be</span>
+<span class="sd">                created. Defaults to None and obj will used (if its a directory)</span>
+<span class="sd">                or the directory containing obj will be used (if its a file).</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Full path to file that will be produced.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If target is None.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">builddir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">obj</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">builddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">builddir</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">obj</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">target</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">obj</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Target is required.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">target</span> <span class="o">==</span> <span class="s1">&#39;clean&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">target</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeBuilder</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_output_file</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">builddir</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="CMakeBuilder.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">builddir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of build flags for building a project using cmake.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target (str, optional): Target that should be built. Defaults to</span>
+<span class="sd">                to None and is ignored.</span>
+<span class="sd">            builddir (str, optional): Directory containing the build tree.</span>
+<span class="sd">                Defaults to None and is set based on outfile is provided or</span>
+<span class="sd">                cls.default_builddir if not.</span>
+<span class="sd">                Defaults to &#39;.&#39; (which will be the current working directory).</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Linker flags.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">outfile</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outfile&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">outfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">target</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">outfile</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">builddir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">builddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">builddir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builddir</span> <span class="o">=</span> <span class="n">CMakeConfigure</span><span class="o">.</span><span class="n">default_builddir</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeBuilder</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
+                                                 <span class="n">builddir</span><span class="o">=</span><span class="n">builddir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="CMakeBuilder.get_executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.get_executable_command">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the command required to run the tool using the specified</span>
+<span class="sd">        arguments and options.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): The arguments that should be passed to the tool. If</span>
+<span class="sd">                skip_flags is False, these are treated as input files that will</span>
+<span class="sd">                be used by the tool.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Output to stdout from the command execution.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;skip_flags&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">builddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;builddir&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">builddir</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">builddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">builddir</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">builddir</span> <span class="o">!=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;The argument list &quot;</span>
+                                    <span class="s2">&quot;contents (=&#39;</span><span class="si">%s</span><span class="s2">&#39;) and &#39;builddir&#39; (=&#39;</span><span class="si">%s</span><span class="s2">&#39;) &quot;</span>
+                                    <span class="s2">&quot;keyword specify the same thing, but those &quot;</span>
+                                    <span class="s2">&quot;provided do not match.&quot;</span><span class="p">)</span>
+                                   <span class="o">%</span> <span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">builddir</span><span class="p">))</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;builddir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeBuilder</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_executable_command</span><span class="p">([],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+    
+
+<div class="viewcode-block" id="CMakeModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver">[docs]</a><span class="k">class</span> <span class="nc">CMakeModelDriver</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running cmake compiled drivers. Before running the</span>
 <span class="sd">    cmake command, the cmake commands for setting the necessary compiler &amp; linker</span>
 <span class="sd">    flags for the interface&#39;s C/C++ library are written to a file called</span>
@@ -317,147 +709,212 @@
 <span class="sd">        args (str, list): Executable that should be created (cmake target) and</span>
 <span class="sd">            any arguments for the executable.</span>
 <span class="sd">        sourcedir (str, optional): Source directory to call cmake on. If not</span>
-<span class="sd">            provided it is set to self.working_dir. This should be the directory</span>
+<span class="sd">            provided it is set to working_dir. This should be the directory</span>
 <span class="sd">            containing the CMakeLists.txt file. It can be relative to</span>
-<span class="sd">            self.working_dir or absolute.</span>
+<span class="sd">            working_dir or absolute.</span>
 <span class="sd">        builddir (str, optional): Directory where the build should be saved.</span>
-<span class="sd">            Defaults to &lt;sourcedir&gt;/build. It can be relative to self.working_dir</span>
+<span class="sd">            Defaults to &lt;sourcedir&gt;/build. It can be relative to working_dir</span>
 <span class="sd">            or absolute.</span>
-<span class="sd">        cmakeargs (list, optional): Arguments that should be passed to cmake.</span>
-<span class="sd">            Defaults to [].</span>
-<span class="sd">        preserve_cache (bool, optional): If True the cmake cache will be kept</span>
-<span class="sd">            following the run, otherwise all files created by cmake will be</span>
-<span class="sd">            cleaned up. Defaults to False.</span>
+<span class="sd">        target (str, optional): Make target that should be built to create the</span>
+<span class="sd">            model executable. Defaults to None.</span>
+<span class="sd">        target_language (str, optional): Language that the target is written in.</span>
+<span class="sd">            Defaults to None and will be set based on the source files provided.</span>
+<span class="sd">        configuration (str, optional): Build type/configuration that should be</span>
+<span class="sd">            built. Defaults to &#39;Release&#39;.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are passed to parent class.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        compiled (bool): True if the compilation was successful, False otherwise.</span>
-<span class="sd">        target (str): Name of executable that should be created and called.</span>
 <span class="sd">        sourcedir (str): Source directory to call cmake on.</span>
 <span class="sd">        builddir (str): Directory where the build should be saved.</span>
-<span class="sd">        cmakeargs (list): Arguments that should be passed to cmake.</span>
-<span class="sd">        preserve_cache (bool): If True the cmake cache will be kept following the</span>
-<span class="sd">            run, otherwise all files created by cmake will be cleaned up.</span>
+<span class="sd">        target (str): Name of executable that should be created and called.</span>
+<span class="sd">        add_libraries (bool): If True, interface libraries and dependency</span>
+<span class="sd">            libraries are added using CMake&#39;s ADD_LIBRARY directive. If False,</span>
+<span class="sd">            interface libraries are found using FIND_LIBRARY.</span>
+<span class="sd">        target_language (str): Language that the target is written in.</span>
+<span class="sd">        target_language_driver (ModelDriver): Language driver for the target</span>
+<span class="sd">            language.</span>
+<span class="sd">        configuration (str): Build type/configuration that should be built.</span>
+<span class="sd">            This is only used on Windows.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: If neither the IPC or ZMQ C libraries are available.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_language</span> <span class="o">=</span> <span class="s1">&#39;cmake&#39;</span>
-    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="n">inherit_schema</span><span class="p">(</span>
-        <span class="n">ModelDriver</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">,</span>
-        <span class="p">{</span><span class="s1">&#39;sourcedir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
-         <span class="s1">&#39;builddir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
-         <span class="s1">&#39;cmakeargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
-                       <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}})</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is written in C/C++ and has a &#39;</span>
+                                   <span class="s1">&#39;CMake build system.&#39;</span><span class="p">)</span>
+    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sourcedir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                          <span class="s1">&#39;builddir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                          <span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                          <span class="s1">&#39;target_language&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                          <span class="s1">&#39;configuration&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;Release&#39;</span><span class="p">}}</span>
+    <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;cmake&#39;</span>
+    <span class="n">base_languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">]</span>
+    <span class="n">add_libraries</span> <span class="o">=</span> <span class="n">CMakeConfigure</span><span class="o">.</span><span class="n">add_libraries</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">preserve_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>  <span class="c1"># pragma: windows</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No library available for models written in C/C++.&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">compiled</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="viewcode-block" id="CMakeModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort arguments based on their syntax to determine if an argument</span>
+<span class="sd">        is a source file, compilation flag, or runtime option/flag that should</span>
+<span class="sd">        be passed to the model executable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): List of arguments provided.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span>
                                                            <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="s1">&#39;build&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">build_base</span> <span class="o">=</span> <span class="s1">&#39;build&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">build_base</span> <span class="o">=</span> <span class="s1">&#39;build_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="n">build_base</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span>
                                                           <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">))</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmakeargs</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cmakeargs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cmakeargs</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">preserve_cache</span> <span class="o">=</span> <span class="n">preserve_cache</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">target_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">include_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="s1">&#39;ygg_cmake.txt&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_file</span>
-        <span class="c1"># Set environment variables</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting environment variables.&quot;</span><span class="p">)</span>
-        <span class="n">create_include</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">include_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
-        <span class="c1"># Compile in a new process</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Making target.&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_cmake</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_files</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">]</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">default_model_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">parse_arguments</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmakelists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="s1">&#39;CMakeLists.txt&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmakelists_copy</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="s1">&#39;CMakeLists_orig.txt&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified_files</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">cmakelists_copy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmakelists</span><span class="p">))</span>
+        <span class="c1"># Determine the underlying language</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_language</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">try_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)))</span>
+            <span class="n">early_exit</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_src</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">try_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_src</span><span class="p">,</span> <span class="n">try_list</span><span class="p">]</span>
+                <span class="n">early_exit</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">languages</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_tool_instance</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">languages</span><span class="p">)</span>
+            <span class="n">languages</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;cmake&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_language_for_source</span><span class="p">(</span>
+                <span class="n">try_list</span><span class="p">,</span> <span class="n">early_exit</span><span class="o">=</span><span class="n">early_exit</span><span class="p">,</span> <span class="n">languages</span><span class="o">=</span><span class="n">languages</span><span class="p">)</span>
+            <span class="c1"># Try to compile C as C++</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_language</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">target_language</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">import_component</span><span class="p">(</span>
+            <span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_language</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="CMakeModelDriver.is_source_file"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.is_source_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_source_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the provided file name points to a source files for</span>
+<span class="sd">        the associated programming language by checking the extension.</span>
 
-<div class="viewcode-block" id="CMakeModelDriver.is_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
-<span class="sd">        machine.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            fname (str): Path to file.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            bool: Truth of if this model driver can be run on the current</span>
-<span class="sd">                machine.</span>
+<span class="sd">            bool: True if the provided file is a source file, False otherwise.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">GCCModelDriver</span><span class="o">.</span><span class="n">GCCModelDriver</span><span class="o">.</span><span class="n">is_installed</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">CModelDriver</span><span class="o">.</span><span class="n">CModelDriver</span><span class="o">.</span><span class="n">is_source_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="n">CPPModelDriver</span><span class="o">.</span><span class="n">CPPModelDriver</span><span class="o">.</span><span class="n">is_source_file</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span></div>
+        
+<div class="viewcode-block" id="CMakeModelDriver.write_wrappers"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.write_wrappers">[docs]</a>    <span class="k">def</span> <span class="nf">write_wrappers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write any wrappers needed to compile and/or run a model.</span>
 
-<div class="viewcode-block" id="CMakeModelDriver.run_cmake"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.run_cmake">[docs]</a>    <span class="k">def</span> <span class="nf">run_cmake</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the cmake command on the source.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to the parent class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Full paths to any created wrappers.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">write_wrappers</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Create cmake files that can be included</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">include_base</span> <span class="o">=</span> <span class="s1">&#39;ygg_cmake.txt&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">include_base</span> <span class="o">=</span> <span class="s1">&#39;ygg_cmake_</span><span class="si">%s</span><span class="s1">.txt&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span>
+        <span class="n">include_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="n">include_base</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_tool_instance</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">create_include</span><span class="p">(</span>
+            <span class="n">include_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span>
+            <span class="n">driver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span><span class="p">,</span>
+            <span class="n">logging_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">getEffectiveLevel</span><span class="p">(),</span>
+            <span class="n">configuration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">include_file</span><span class="p">))</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">include_file</span><span class="p">)</span>
+        <span class="c1"># Create copy of cmakelists and modify</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmakelists</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmakelists_copy</span><span class="p">):</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmakelists</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmakelists_copy</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmakelists</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="n">contents</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmakelists</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="c1"># Add conda prefix as first line</span>
+                <span class="n">conda_prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tool_instance</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get_conda_prefix</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">conda_prefix</span><span class="p">:</span>
+                    <span class="n">newline</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                                 <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conda_prefix</span><span class="p">,</span> <span class="s1">&#39;lib&#39;</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">newline</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+                        <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">newline</span><span class="p">)</span>
+                <span class="c1"># Explicitly set Release/Debug directories to builddir on windows</span>
+                <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                    <span class="k">for</span> <span class="n">artifact</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;runtime&#39;</span><span class="p">,</span> <span class="s1">&#39;library&#39;</span><span class="p">,</span> <span class="s1">&#39;archive&#39;</span><span class="p">]:</span>
+                        <span class="k">for</span> <span class="n">conf</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">,</span> <span class="s1">&#39;debug&#39;</span><span class="p">]:</span>
+                            <span class="n">newline</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span>
+                                <span class="s1">&#39;SET( CMAKE_</span><span class="si">%s</span><span class="s1">_OUTPUT_DIRECTORY_</span><span class="si">%s</span><span class="s1"> &#39;</span>
+                                <span class="o">%</span> <span class="p">(</span><span class="n">artifact</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">conf</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+                                <span class="o">+</span> <span class="s1">&#39;&quot;$</span><span class="si">{OUTPUT_DIRECTORY}</span><span class="s1">&quot;)</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">newline</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+                                <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">newline</span><span class="p">)</span>
+                <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+                <span class="c1"># Add include if not already in the file</span>
+                <span class="n">newline</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">INCLUDE(</span><span class="si">%s</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                             <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">include_file</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">newline</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+                    <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">newline</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="CMakeModelDriver.compile_model"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.compile_model">[docs]</a>    <span class="k">def</span> <span class="nf">compile_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile model executable(s) and appends any products produced by</span>
+<span class="sd">        the compilation that should be removed after the run is complete.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            target (str, optional): Target to build.</span>
+<span class="sd">            **kwargs: Keyword arguments are passed on to the call_compiler</span>
+<span class="sd">                method.</span>
 
-<span class="sd">        Raises:</span>
-<span class="sd">            RuntimeError: If there is an error in running cmake.</span>
-<span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">curdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;CMakeLists.txt&#39;</span><span class="p">):</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">curdir</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;No CMakeLists.txt file found in </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">)</span>
-        <span class="c1"># Configuration</span>
-        <span class="k">if</span> <span class="n">target</span> <span class="o">!=</span> <span class="s1">&#39;clean&#39;</span><span class="p">:</span>
-            <span class="n">config_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cmake&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmakeargs</span>
-            <span class="n">config_cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;-H.&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="s1">&#39;-B</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config_cmd</span><span class="p">))</span>
-            <span class="n">comp_process</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">popen_nobuffer</span><span class="p">(</span><span class="n">config_cmd</span><span class="p">)</span>
-            <span class="n">output</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">comp_process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-            <span class="n">exit_code</span> <span class="o">=</span> <span class="n">comp_process</span><span class="o">.</span><span class="n">returncode</span>
-            <span class="k">if</span> <span class="n">exit_code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">curdir</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_unicode</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;CMake config failed with code </span><span class="si">%d</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">exit_code</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Config output: </span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">output</span><span class="p">)</span>
-        <span class="c1"># Build</span>
-        <span class="n">build_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;--build&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span> <span class="s1">&#39;--clean-first&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">build_cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;--target&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">build_cmd</span><span class="p">))</span>
-        <span class="n">comp_process</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">popen_nobuffer</span><span class="p">(</span><span class="n">build_cmd</span><span class="p">)</span>
-        <span class="n">output</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">comp_process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-        <span class="n">exit_code</span> <span class="o">=</span> <span class="n">comp_process</span><span class="o">.</span><span class="n">returncode</span>
-        <span class="k">if</span> <span class="n">exit_code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">curdir</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_unicode</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;CMake build failed with code </span><span class="si">%d</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">exit_code</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Build output: </span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">output</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Make complete&#39;</span><span class="p">)</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">curdir</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span>
+        <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="s1">&#39;clean&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_linker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
+                                    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span>
+                                    <span class="n">allow_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">default_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
+                                  <span class="n">sourcedir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span>
+                                  <span class="n">builddir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span>
+                                  <span class="n">skip_interface_flags</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">default_kwargs</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">default_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">compile_model</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="CMakeModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Environment variables for the model process.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">CModelDriver</span><span class="o">.</span><span class="n">update_ld_library_path</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+    
 <div class="viewcode-block" id="CMakeModelDriver.cleanup"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove compile executable.&quot;&quot;&quot;</span>
-        <span class="c1"># self.run_cmake(&#39;clean&#39;)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">preserve_cache</span><span class="p">:</span>
-            <span class="n">rmfiles</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">include_file</span><span class="p">,</span>
-                       <span class="bp">self</span><span class="o">.</span><span class="n">target_file</span><span class="p">,</span>
-                       <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span> <span class="s1">&#39;Makefile&#39;</span><span class="p">),</span>
-                       <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span> <span class="s1">&#39;CMakeCache.txt&#39;</span><span class="p">),</span>
-                       <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span> <span class="s1">&#39;cmake_install.cmake&#39;</span><span class="p">),</span>
-                       <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span> <span class="s1">&#39;CMakeFiles&#39;</span><span class="p">)]</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">rmfiles</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-                    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">)):</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">)</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove compiled executable.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compile_model</span><span class="p">(</span><span class="s1">&#39;clean&#39;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div></div>
 </pre></div>
 
@@ -495,7 +952,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

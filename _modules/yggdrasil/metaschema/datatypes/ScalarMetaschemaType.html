@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes.ScalarMetaschemaType &mdash; yggdrasil 0.8.7+11.g7573c765.dirty documentation</title>
+  <title>yggdrasil.metaschema.datatypes.ScalarMetaschemaType &mdash; yggdrasil 0.9.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.7+11.g7573c765.dirty documentation" href="../../../../index.html"/>
+    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../../../../index.html"/>
         <link rel="up" title="yggdrasil.metaschema.datatypes" href="../datatypes.html"/> 
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.8.7
+                0.9.0
               </div>
             
           
@@ -103,16 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -185,25 +179,28 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">units</span><span class="p">,</span> <span class="n">backwards</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">register_type</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.MetaschemaType</span> <span class="k">import</span> <span class="n">MetaschemaType</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.FixedMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">create_fixed_type_class</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties</span> <span class="k">import</span> <span class="n">ScalarMetaschemaProperties</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">get_metaschema_property</span><span class="p">,</span> <span class="n">ScalarMetaschemaProperties</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ScalarMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType">[docs]</a><span class="nd">@register_type</span>
-<span class="k">class</span> <span class="nc">ScalarMetaschemaType</span><span class="p">(</span><span class="n">MetaschemaType</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Type associated with a scalar.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ScalarMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">ScalarMetaschemaType</span><span class="p">(</span><span class="n">MetaschemaType</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Type associated with a scalar.</span>
+
+<span class="sd">    Developer Notes:</span>
+<span class="sd">        |yggdrasil| defines scalars as an umbrella type encompassing int, uint,</span>
+<span class="sd">        float, bytes, and unicode.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;scalar&#39;</span>
     <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;A scalar value with or without units.&#39;</span>
-    <span class="n">properties</span> <span class="o">=</span> <span class="n">MetaschemaType</span><span class="o">.</span><span class="n">properties</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">]</span>
-    <span class="n">definition_properties</span> <span class="o">=</span> <span class="n">MetaschemaType</span><span class="o">.</span><span class="n">definition_properties</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">]</span>
-    <span class="n">metadata_properties</span> <span class="o">=</span> <span class="p">(</span><span class="n">MetaschemaType</span><span class="o">.</span><span class="n">metadata_properties</span>
-                           <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">])</span>
-    <span class="n">extract_properties</span> <span class="o">=</span> <span class="p">(</span><span class="n">MetaschemaType</span><span class="o">.</span><span class="n">extract_properties</span>
-                          <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">])</span>
+    <span class="n">properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">]</span>
+    <span class="n">definition_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">]</span>
+    <span class="n">metadata_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">]</span>
+    <span class="n">extract_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">]</span>
     <span class="n">python_types</span> <span class="o">=</span> <span class="n">ScalarMetaschemaProperties</span><span class="o">.</span><span class="n">_all_python_scalars</span>
 
 <div class="viewcode-block" id="ScalarMetaschemaType.validate"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType.validate">[docs]</a>    <span class="nd">@classmethod</span>
@@ -302,7 +299,11 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">arr</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-        <span class="n">subtype</span> <span class="o">=</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">subtype</span> <span class="o">=</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">subtype_cls</span> <span class="o">=</span> <span class="n">get_metaschema_property</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">)</span>
+            <span class="n">subtype</span> <span class="o">=</span> <span class="n">subtype_cls</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;1darray&#39;</span><span class="p">,</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">]):</span>
             <span class="k">return</span> <span class="n">arr</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
@@ -313,7 +314,7 @@
         <span class="k">elif</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;complex&#39;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">complex</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="k">elif</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode&#39;</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;No method for handling readable serialization of &quot;</span>
                            <span class="o">+</span> <span class="s2">&quot;subtype &#39;</span><span class="si">%s</span><span class="s2">&#39;, falling back to default.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">subtype</span><span class="p">)</span>
@@ -457,9 +458,15 @@
 
 <span class="c1"># Dynamically create explicity scalar classes for shorthand</span>
 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ScalarMetaschemaProperties</span><span class="o">.</span><span class="n">_valid_types</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-    <span class="n">create_fixed_type_class</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;A </span><span class="si">%s</span><span class="s1"> value with or without units.&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">,</span>
-                            <span class="n">ScalarMetaschemaType</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="n">t</span><span class="p">},</span> <span class="nb">globals</span><span class="p">(),</span>
-                            <span class="n">python_types</span><span class="o">=</span><span class="n">ScalarMetaschemaProperties</span><span class="o">.</span><span class="n">_python_scalars</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+    <span class="n">short_doc</span> <span class="o">=</span> <span class="s1">&#39;A </span><span class="si">%s</span><span class="s1"> value with or without units.&#39;</span> <span class="o">%</span> <span class="n">t</span>
+    <span class="n">long_doc</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                <span class="s1">&#39;    Developer Notes:</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="s1">&#39;        Precision X is preserved.</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="n">short_doc</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;target_globals&#39;</span><span class="p">:</span> <span class="nb">globals</span><span class="p">(),</span>
+              <span class="s1">&#39;__doc__&#39;</span><span class="p">:</span> <span class="n">long_doc</span><span class="p">,</span>
+              <span class="s1">&#39;python_types&#39;</span><span class="p">:</span> <span class="n">ScalarMetaschemaProperties</span><span class="o">.</span><span class="n">_python_scalars</span><span class="p">[</span><span class="n">t</span><span class="p">]}</span>
+    <span class="n">create_fixed_type_class</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">short_doc</span><span class="p">,</span> <span class="n">ScalarMetaschemaType</span><span class="p">,</span>
+                            <span class="p">{</span><span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="n">t</span><span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 
            </div>
@@ -496,7 +503,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.8.7+11.g7573c765.dirty',
+            VERSION:'0.9.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
