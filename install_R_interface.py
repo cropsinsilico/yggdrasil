@@ -20,8 +20,9 @@ def install_R_interface(with_sudo=False):
     lang_dir = os.path.join(root_dir, 'yggdrasil', 'languages')
     kwargs = {'cwd': lang_dir}
     if sys.platform in ['win32', 'cygwin']:
-        kwargs['shell'] = True
-        R_cmd = ['call', os.path.join(lang_dir, 'install_interface_R.bat')]
+        # kwargs['shell'] = True
+        # R_cmd = ['call', os.path.join(lang_dir, 'install_interface_R.bat')]
+        R_cmd = [os.path.join(lang_dir, 'install_interface_R.bat')]
     else:
         R_cmd = ['./install_interface_R.sh']
         if with_sudo:
