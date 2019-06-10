@@ -41,7 +41,6 @@ requirements:
     - pyzmq
     - r-base
     - r-bit64
-    - r-float
     - r-reticulate
     - r-zeallot
     - scipy
