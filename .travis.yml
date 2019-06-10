@@ -166,7 +166,7 @@ install:
       # Install from source dist
       python setup.py sdist
       # sudo required for installing R libraries
-      pip install --verbose --sudoR dist/*.tar.gz
+      pip install --verbose dist/*.tar.gz --sudoR
       # Install from source
       # pip install --verbose -e .
     elif [[ -n "$CONDA" ]]; then
