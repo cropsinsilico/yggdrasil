@@ -17,42 +17,35 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -119,7 +112,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
@@ -127,9 +120,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -171,103 +165,101 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <table border="1" class="docutils" id="class-table-compilerbase-classattr-rst">
+  <table class="docutils align-center" id="class-table-compilerbase-classattr-rst">
 <colgroup>
-<col width="19%" />
-<col width="70%" />
-<col width="7%" />
-<col width="4%" />
+<col style="width: 19%" />
+<col style="width: 70%" />
+<col style="width: 7%" />
+<col style="width: 4%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Description</th>
-<th class="head">Required</th>
-<th class="head">Type</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Type</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>combine_with_linker</td>
-<td>If True, the compiler and linker flags can be combined and passed to the
+<tbody>
+<tr class="row-even"><td><p>combine_with_linker</p></td>
+<td><p>If True, the compiler and linker flags can be combined and passed to the
 compiler executable to perform both operations in succession. If False, the
 compilation and linking steps must be performed separately. If None, this is
-determined by checking if the compiler and linker names match.</td>
-<td>&#160;</td>
-<td>bool</td>
+determined by checking if the compiler and linker names match.</p></td>
+<td></td>
+<td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td>compile_only_flag</td>
-<td>Flag that should prepended to compiler/linker combination tool arguments to
-indicate that only compilation should be performed.</td>
-<td>&#160;</td>
-<td>str</td>
+<tr class="row-odd"><td><p>compile_only_flag</p></td>
+<td><p>Flag that should prepended to compiler/linker combination tool arguments to
+indicate that only compilation should be performed.</p></td>
+<td></td>
+<td><p>str</p></td>
 </tr>
-<tr class="row-even"><td>default_archiver</td>
-<td>Name of archiver that should be used to create a static library after compiling
+<tr class="row-even"><td><p>default_archiver</p></td>
+<td><p>Name of archiver that should be used to create a static library after compiling
 with this compiler. If not set, it is assumed that this compiler is also a
-linker.</td>
-<td>&#160;</td>
-<td>str</td>
+linker.</p></td>
+<td></td>
+<td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td>default_archiver_flags</td>
-<td>Flags that should be used with the archiver if no other flags are provided.</td>
-<td>&#160;</td>
-<td>list</td>
+<tr class="row-odd"><td><p>default_archiver_flags</p></td>
+<td><p>Flags that should be used with the archiver if no other flags are provided.</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-even"><td>default_linker</td>
-<td>Name of linker that should be used after compiling with this compiler. If not
-set, it is assumed that this compiler is also a linker.</td>
-<td>&#160;</td>
-<td>str</td>
+<tr class="row-even"><td><p>default_linker</p></td>
+<td><p>Name of linker that should be used after compiling with this compiler. If not
+set, it is assumed that this compiler is also a linker.</p></td>
+<td></td>
+<td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td>default_linker_flags</td>
-<td>Flags that should be used with the linker if no other flags are provided.</td>
-<td>&#160;</td>
-<td>list</td>
+<tr class="row-odd"><td><p>default_linker_flags</p></td>
+<td><p>Flags that should be used with the linker if no other flags are provided.</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-even"><td>is_linker</td>
-<td>If True, the tool also serves as a linker and a separate linker class will be
+<tr class="row-even"><td><p>is_linker</p></td>
+<td><p>If True, the tool also serves as a linker and a separate linker class will be
 automatically generating from the linker_attributes dictionary. This will be set
-to True if no_separate_linking is True.</td>
-<td>&#160;</td>
-<td>bool</td>
+to True if no_separate_linking is True.</p></td>
+<td></td>
+<td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td>linker_attributes</td>
-<td>Attributes that should be added to the linker class created for this tool if
-is_linker is True.</td>
-<td>&#160;</td>
-<td>dict</td>
+<tr class="row-odd"><td><p>linker_attributes</p></td>
+<td><p>Attributes that should be added to the linker class created for this tool if
+is_linker is True.</p></td>
+<td></td>
+<td><p>dict</p></td>
 </tr>
-<tr class="row-even"><td>linker_base_classes</td>
-<td>Base classes that should be used to create the default linker from the compiler
+<tr class="row-even"><td><p>linker_base_classes</p></td>
+<td><p>Base classes that should be used to create the default linker from the compiler
 tool. If None, (LinkerBase, ) is used if no_separate_linking is False and
-(DummyLinkerBase, ) is used if no_separate_linking is True.</td>
-<td>&#160;</td>
-<td>tuple</td>
+(DummyLinkerBase, ) is used if no_separate_linking is True.</p></td>
+<td></td>
+<td><p>tuple</p></td>
 </tr>
-<tr class="row-odd"><td>linker_switch</td>
-<td>Flag to indicate beginning of flags that should be passed to the linker from a
-call to a compiler/linker combination tools (e.g. /link on Windows).</td>
-<td>&#160;</td>
-<td>str</td>
+<tr class="row-odd"><td><p>linker_switch</p></td>
+<td><p>Flag to indicate beginning of flags that should be passed to the linker from a
+call to a compiler/linker combination tools (e.g. /link on Windows).</p></td>
+<td></td>
+<td><p>str</p></td>
 </tr>
-<tr class="row-even"><td>no_separate_linking</td>
-<td>If True, the tool severs as linker but cannot be called for just compilation or
-linking alone.</td>
-<td>&#160;</td>
-<td>bool</td>
+<tr class="row-even"><td><p>no_separate_linking</p></td>
+<td><p>If True, the tool severs as linker but cannot be called for just compilation or
+linking alone.</p></td>
+<td></td>
+<td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td>object_ext</td>
-<td>Extension that should be used for object files.</td>
-<td>&#160;</td>
-<td>str</td>
+<tr class="row-odd"><td><p>object_ext</p></td>
+<td><p>Extension that should be used for object files.</p></td>
+<td></td>
+<td><p>str</p></td>
 </tr>
 </tbody>
 </table>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -276,11 +268,11 @@ linking alone.</td>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -293,38 +285,15 @@ linking alone.</td>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

@@ -17,42 +17,35 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -119,7 +112,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
@@ -127,9 +120,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -171,114 +165,112 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <table border="1" class="docutils" id="class-table-modeldriver-classattr-rst">
+  <table class="docutils align-center" id="class-table-modeldriver-classattr-rst">
 <colgroup>
-<col width="19%" />
-<col width="70%" />
-<col width="7%" />
-<col width="4%" />
+<col style="width: 19%" />
+<col style="width: 70%" />
+<col style="width: 7%" />
+<col style="width: 4%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Description</th>
-<th class="head">Required</th>
-<th class="head">Type</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Type</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>base_languages</td>
-<td>Other programming languages that this driver and the interpreter for the target
-language are dependent on (e.g. Matlab models require Python).</td>
-<td>&#160;</td>
-<td>list</td>
+<tbody>
+<tr class="row-even"><td><p>base_languages</p></td>
+<td><p>Other programming languages that this driver and the interpreter for the target
+language are dependent on (e.g. Matlab models require Python).</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td>executable_type</td>
-<td>‘compiler’ or ‘interpreter’ to indicate the type of the executable for the
-language. [AUTOMATED]</td>
-<td>&#160;</td>
-<td>str</td>
+<tr class="row-odd"><td><p>executable_type</p></td>
+<td><p>‘compiler’ or ‘interpreter’ to indicate the type of the executable for the
+language. [AUTOMATED]</p></td>
+<td></td>
+<td><p>str</p></td>
 </tr>
-<tr class="row-even"><td>external_libraries</td>
-<td>Information on external libraries required for running models in the target
-language using yggdrasil.</td>
-<td>&#160;</td>
-<td>dict</td>
+<tr class="row-even"><td><p>external_libraries</p></td>
+<td><p>Information on external libraries required for running models in the target
+language using yggdrasil.</p></td>
+<td></td>
+<td><p>dict</p></td>
 </tr>
-<tr class="row-odd"><td>function_param</td>
-<td>Options specifying how different operations would be encoded in the target
-language (e.g. if statements, for loops, while loops).</td>
-<td>X</td>
-<td>dict</td>
+<tr class="row-odd"><td><p>function_param</p></td>
+<td><p>Options specifying how different operations would be encoded in the target
+language (e.g. if statements, for loops, while loops).</p></td>
+<td><p>X</p></td>
+<td><p>dict</p></td>
 </tr>
-<tr class="row-even"><td>interface_dependencies</td>
-<td>List of names of libraries that are required to use the interface on the current
+<tr class="row-even"><td><p>interface_dependencies</p></td>
+<td><p>List of names of libraries that are required to use the interface on the current
 platform. This dosn’t include libraries required by specific communication types
-which are described by supported_comm_options.</td>
-<td>&#160;</td>
-<td>list</td>
+which are described by supported_comm_options.</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td>interface_directories</td>
-<td>Directories containing code in the interface library for the target language.</td>
-<td>&#160;</td>
-<td>list</td>
+<tr class="row-odd"><td><p>interface_directories</p></td>
+<td><p>Directories containing code in the interface library for the target language.</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-even"><td>interface_library</td>
-<td>Name of the library containing the yggdrasil interface for the target language.</td>
-<td>X</td>
-<td>list</td>
+<tr class="row-even"><td><p>interface_library</p></td>
+<td><p>Name of the library containing the yggdrasil interface for the target language.</p></td>
+<td><p>X</p></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td>internal_libraries</td>
-<td>Information on internal libraries required for running models in the target
-language using yggdrasil.</td>
-<td>&#160;</td>
-<td>dict</td>
+<tr class="row-odd"><td><p>internal_libraries</p></td>
+<td><p>Information on internal libraries required for running models in the target
+language using yggdrasil.</p></td>
+<td></td>
+<td><p>dict</p></td>
 </tr>
-<tr class="row-even"><td>language</td>
-<td>Primary name for the programming language that this compiler should be used for.</td>
-<td>X</td>
-<td>str</td>
+<tr class="row-even"><td><p>language</p></td>
+<td><p>Primary name for the programming language that this compiler should be used for.</p></td>
+<td><p>X</p></td>
+<td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td>language_aliases</td>
-<td>Additional/alternative names that the language may be known by.</td>
-<td>&#160;</td>
-<td>list</td>
+<tr class="row-odd"><td><p>language_aliases</p></td>
+<td><p>Additional/alternative names that the language may be known by.</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-even"><td>language_ext</td>
-<td>Extensions for programs written in the target language.</td>
-<td>X</td>
-<td>list</td>
+<tr class="row-even"><td><p>language_ext</p></td>
+<td><p>Extensions for programs written in the target language.</p></td>
+<td><p>X</p></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td>supported_comm_options</td>
-<td>Options for the supported comms like the platforms they are available on and the
-external libraries required to use them.</td>
-<td>X</td>
-<td>dict</td>
+<tr class="row-odd"><td><p>supported_comm_options</p></td>
+<td><p>Options for the supported comms like the platforms they are available on and the
+external libraries required to use them.</p></td>
+<td><p>X</p></td>
+<td><p>dict</p></td>
 </tr>
-<tr class="row-even"><td>supported_comms</td>
-<td>Name of comms supported in the target language.</td>
-<td>X</td>
-<td>list</td>
+<tr class="row-even"><td><p>supported_comms</p></td>
+<td><p>Name of comms supported in the target language.</p></td>
+<td><p>X</p></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td>type_map</td>
-<td>Mapping of yggdrasil extended JSON types to datatypes in the target
-programming language.</td>
-<td>X</td>
-<td>dict</td>
+<tr class="row-odd"><td><p>type_map</p></td>
+<td><p>Mapping of yggdrasil extended JSON types to datatypes in the target
+programming language.</p></td>
+<td><p>X</p></td>
+<td><p>dict</p></td>
 </tr>
-<tr class="row-even"><td>version_flags</td>
-<td>Flags that should be called with the language executable to determine the
-version of the compiler/interpreter. Defaults to [‘–version’].</td>
-<td>&#160;</td>
-<td>list</td>
+<tr class="row-even"><td><p>version_flags</p></td>
+<td><p>Flags that should be called with the language executable to determine the
+version of the compiler/interpreter. Defaults to [‘–version’].</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
 </tbody>
 </table>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -287,11 +279,11 @@ version of the compiler/interpreter. Defaults to [‘–version’].</td>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -304,38 +296,15 @@ version of the compiler/interpreter. Defaults to [‘–version’].</td>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

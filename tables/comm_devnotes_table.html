@@ -17,42 +17,35 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -119,7 +112,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
@@ -127,9 +120,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -171,46 +165,46 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <table border="1" class="docutils" id="comm-devnotes-table-rst">
+  <table class="docutils align-center" id="comm-devnotes-table-rst">
 <colgroup>
-<col width="3%" />
-<col width="32%" />
-<col width="65%" />
+<col style="width: 3%" />
+<col style="width: 32%" />
+<col style="width: 65%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Comm</th>
-<th class="head">Address</th>
-<th class="head">Developer Notes</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Comm</p></th>
+<th class="head"><p>Address</p></th>
+<th class="head"><p>Developer Notes</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>ipc</td>
-<td>An IPC message queue key.</td>
-<td>The default size limit for IPC message queues is 2048 bytes on Mac operating
+<tbody>
+<tr class="row-even"><td><p>ipc</p></td>
+<td><p>An IPC message queue key.</p></td>
+<td><p>The default size limit for IPC message queues is 2048 bytes on Mac operating
 systems so it is important that implementation of this communication mechanism
 properly split and send messages larger than this limit as more than one
-message.</td>
+message.</p></td>
 </tr>
-<tr class="row-odd"><td>rmq</td>
-<td>AMPQ queue address of the form <code class="docutils literal notranslate"><span class="pre">&lt;url&gt;_R</span>
+<tr class="row-odd"><td><p>rmq</p></td>
+<td><p>AMPQ queue address of the form <code class="docutils literal notranslate"><span class="pre">&lt;url&gt;_R</span>
 <span class="pre">MQPARAM_&lt;exchange&gt;_RMQPARAM_&lt;queue&gt;</span></code>
 where <code class="docutils literal notranslate"><span class="pre">url</span></code> is the broker address (see
 explanation <a class="reference external" href="https://pika.readthedocs.io/en/stable/examples/using_urlparameters.html">here</a>), <code class="docutils literal notranslate"><span class="pre">exchange</span></code> is the name
 of the exchange on the queue that should
 be used, and <code class="docutils literal notranslate"><span class="pre">queue</span></code> is the name of
-the queue.</td>
-<td>It is not advised that new language implement a RabbitMQ communication
+the queue.</p></td>
+<td><p>It is not advised that new language implement a RabbitMQ communication
 interface. Rather RMQ communication is included explicitly for connections
 between models that are not co-located on the same machine and are used by the
-yggdrasil framework connections on the Python side.</td>
+yggdrasil framework connections on the Python side.</p></td>
 </tr>
-<tr class="row-even"><td>zmq</td>
-<td>A ZeroMQ endpoint of the form
+<tr class="row-even"><td><p>zmq</p></td>
+<td><p>A ZeroMQ endpoint of the form
 &lt;transport&gt;://&lt;address&gt;, where the
 format of address depends on the
 transport. Additional information can be
-found <a class="reference external" href="http://api.zeromq.org/3-2:zmq-bind">here</a>.</td>
-<td>yggdrasil uses the tcp transport by default with a PAIR socket type. For every
+found <a class="reference external" href="http://api.zeromq.org/3-2:zmq-bind">here</a>.</p></td>
+<td><p>yggdrasil uses the tcp transport by default with a PAIR socket type. For every
 connection, yggdrasil establishes a second request/reply connection that is
 used to confirm messages passed between the primary PAIR of sockets. On the
 first send, the model should create a REP socket on an open tcp address and send
@@ -224,16 +218,14 @@ message. Following every message, the receiving model should send the message
 ‘YGG_REPLY’ on the request socket and wait for a reply. When creating worker
 comms for sending large messages, the sending model should create the reply comm
 for the worker in advanced and send it in the header with the worker address
-under the key ‘zmq_reply_worker’.</td>
+under the key ‘zmq_reply_worker’.</p></td>
 </tr>
 </tbody>
 </table>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -242,11 +234,11 @@ under the key ‘zmq_reply_worker’.</td>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -259,38 +251,15 @@ under the key ‘zmq_reply_worker’.</td>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

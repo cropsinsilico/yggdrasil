@@ -17,45 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/>
-        <link rel="up" title="Development" href="index.html"/>
-        <link rel="next" title="Publications" href="../publications.html"/>
-        <link rel="prev" title="Defining New Datatypes" href="new_datatype.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Publications" href="../publications.html" />
+    <link rel="prev" title="Defining New Datatypes" href="new_datatype.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -129,7 +121,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
@@ -137,9 +129,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -186,59 +179,57 @@
   <div class="section" id="todo">
 <h1>TODO<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
-<li>Move all specialized strings to a file that is read in and passed as definitions during compilation for C/C++ (or loaded at import in python/matlab)</li>
-<li>Change C client/server use of direction/serializer info to be more transparent</li>
-<li>Go through docs to strip out deprecated info</li>
-<li>Change “args” in drivers to more transparent wording (source_code, etc.)</li>
-<li>Alias input/output keyword arguments for connections to from/to for clarity</li>
-<li>Update docs to reflect changes to YAML spec</li>
-<li>Docs on datatypes w/ example of user defined data type</li>
-<li>Update/replace io_drivers section of docs</li>
-<li>Remove IOInfo test class as no longer used</li>
-<li>Add example of each supported language (missing LPy, cmake, make)</li>
-<li>Add map class for handling arbitrary objects in C/C++ and then update formatted_io 7, 8, and 9</li>
-<li>change gs_lesson/formatted_io series to have more descriptive names</li>
-<li>Docs on how nested data objects are represented in C/C++.</li>
-<li>Preprocessor macro for dynamically determine message type?</li>
-<li>Try to setup comm/connection testing at class level so that comms only created once</li>
-<li>Regenerate metaschema with $schema entry</li>
-<li>Refence metaschema on website in $id or $schema?</li>
-<li>Clean up dependencies if possible</li>
-<li>Test outside of conda on windows?</li>
-<li>Silence warnings from pint on model processes</li>
-<li>Update base test class for comm and connection drivers to use comm installation bool for generating unittest skip errors</li>
-<li>Use return code to indicate specific errors when using a generated wrapper (e.g. missing comm class)</li>
-<li>Consider passing input/output to/from Matlab function models directly through the matlab engine</li>
-<li>Update yaml.rst docs to reflect new schema</li>
-<li>Add deprecation warnings to handling of old syntax</li>
-<li>Add datatypes as components?</li>
-<li>Improve support for different string encodings (i.e. add datatype property to string)</li>
-<li>Create a set of fundamental tests that every language implementation needs to pass including files containing serialized data that needs to be deserialized and then serialized.</li>
-<li>Changes ‘bytes’ type to ‘ascii’ since that is really what it means</li>
-<li>Allow model specification in JSON in addition to YAML</li>
-<li>Add dedicated classes for schemas and change name of C MetaschemaType to schema?</li>
-<li>Add flag to turn off validation</li>
-<li>Add ‘production’ flag that turns off debug message, validation, and debug compilation flags for performance</li>
-<li>Split drivers into separate directories for model drivers and connection drivers</li>
-<li>Allow use of different ‘default’ communication mechanisms on different connections based on the languages involved</li>
-<li>Clean up component doc strings (move component options descriptions to schema or another arguments section?)</li>
-<li>Add automated deprecation marker for schema options</li>
-<li>Add datatypes example that is automated for all registered languages and tests sending/receiving all supported datatypes</li>
-<li>Simplify input arguments to connection drivers to match schema</li>
-<li>Streamline normalization to speed it up</li>
-<li>Add papers section for listing publication using yggdrasil</li>
-<li>Split ld off as its own linker</li>
-<li>Add comm for using files as temporary storage in passing information between models</li>
-<li>Change cmake to be a C/C++ compiler rather than a separate language with its own driver</li>
-<li>Add forwarding of format string to forked output</li>
+<li><p>Move all specialized strings to a file that is read in and passed as definitions during compilation for C/C++ (or loaded at import in python/matlab)</p></li>
+<li><p>Change C client/server use of direction/serializer info to be more transparent</p></li>
+<li><p>Go through docs to strip out deprecated info</p></li>
+<li><p>Change “args” in drivers to more transparent wording (source_code, etc.)</p></li>
+<li><p>Alias input/output keyword arguments for connections to from/to for clarity</p></li>
+<li><p>Update docs to reflect changes to YAML spec</p></li>
+<li><p>Docs on datatypes w/ example of user defined data type</p></li>
+<li><p>Update/replace io_drivers section of docs</p></li>
+<li><p>Remove IOInfo test class as no longer used</p></li>
+<li><p>Add example of each supported language (missing LPy, cmake, make)</p></li>
+<li><p>Add map class for handling arbitrary objects in C/C++ and then update formatted_io 7, 8, and 9</p></li>
+<li><p>change gs_lesson/formatted_io series to have more descriptive names</p></li>
+<li><p>Docs on how nested data objects are represented in C/C++.</p></li>
+<li><p>Preprocessor macro for dynamically determine message type?</p></li>
+<li><p>Try to setup comm/connection testing at class level so that comms only created once</p></li>
+<li><p>Regenerate metaschema with $schema entry</p></li>
+<li><p>Refence metaschema on website in $id or $schema?</p></li>
+<li><p>Clean up dependencies if possible</p></li>
+<li><p>Test outside of conda on windows?</p></li>
+<li><p>Silence warnings from pint on model processes</p></li>
+<li><p>Update base test class for comm and connection drivers to use comm installation bool for generating unittest skip errors</p></li>
+<li><p>Use return code to indicate specific errors when using a generated wrapper (e.g. missing comm class)</p></li>
+<li><p>Consider passing input/output to/from Matlab function models directly through the matlab engine</p></li>
+<li><p>Update yaml.rst docs to reflect new schema</p></li>
+<li><p>Add deprecation warnings to handling of old syntax</p></li>
+<li><p>Add datatypes as components?</p></li>
+<li><p>Improve support for different string encodings (i.e. add datatype property to string)</p></li>
+<li><p>Create a set of fundamental tests that every language implementation needs to pass including files containing serialized data that needs to be deserialized and then serialized.</p></li>
+<li><p>Changes ‘bytes’ type to ‘ascii’ since that is really what it means</p></li>
+<li><p>Allow model specification in JSON in addition to YAML</p></li>
+<li><p>Add dedicated classes for schemas and change name of C MetaschemaType to schema?</p></li>
+<li><p>Add flag to turn off validation</p></li>
+<li><p>Add ‘production’ flag that turns off debug message, validation, and debug compilation flags for performance</p></li>
+<li><p>Split drivers into separate directories for model drivers and connection drivers</p></li>
+<li><p>Allow use of different ‘default’ communication mechanisms on different connections based on the languages involved</p></li>
+<li><p>Clean up component doc strings (move component options descriptions to schema or another arguments section?)</p></li>
+<li><p>Add automated deprecation marker for schema options</p></li>
+<li><p>Add datatypes example that is automated for all registered languages and tests sending/receiving all supported datatypes</p></li>
+<li><p>Simplify input arguments to connection drivers to match schema</p></li>
+<li><p>Streamline normalization to speed it up</p></li>
+<li><p>Add papers section for listing publication using yggdrasil</p></li>
+<li><p>Split ld off as its own linker</p></li>
+<li><p>Add comm for using files as temporary storage in passing information between models</p></li>
+<li><p>Change cmake to be a C/C++ compiler rather than a separate language with its own driver</p></li>
+<li><p>Add forwarding of format string to forked output</p></li>
 </ul>
 </div>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -247,7 +238,7 @@
         <a href="../publications.html" class="btn btn-neutral float-right" title="Publications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="new_datatype.html" class="btn btn-neutral" title="Defining New Datatypes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="new_datatype.html" class="btn btn-neutral float-left" title="Defining New Datatypes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -256,11 +247,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -273,38 +264,15 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

@@ -17,45 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/>
-        <link rel="up" title="Development" href="index.html"/>
-        <link rel="next" title="TODO" href="todo.html"/>
-        <link rel="prev" title="Adding Support for a New Language" href="new_language.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="TODO" href="todo.html" />
+    <link rel="prev" title="Adding Support for a New Language" href="new_language.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -134,7 +126,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
@@ -142,9 +134,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -215,112 +208,112 @@ The file containing the class definitions should reside in the
 <p>At a minimum, classes for types defined in
 such a manner must override the following method:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">encode_data</span></code>: Takes as input an object for encoding and a type definition
+<li><p><code class="docutils literal notranslate"><span class="pre">encode_data</span></code>: Takes as input an object for encoding and a type definition
 and returns the encoded object which is of a type that is encodable by the
-standard JSON library.</li>
-<li><code class="docutils literal notranslate"><span class="pre">decode_data</span></code>: The reverse of <code class="docutils literal notranslate"><span class="pre">encode_data</span></code>. Takes as input an encoded
-object and the associated type definitions and returns the decoded object.</li>
+standard JSON library.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">decode_data</span></code>: The reverse of <code class="docutils literal notranslate"><span class="pre">encode_data</span></code>. Takes as input an encoded
+object and the associated type definitions and returns the decoded object.</p></li>
 </ul>
 <p>In addition, the behavior of types defined using classes are also
 controlled by the following class attributes:</p>
-<table border="1" class="docutils" id="class-table-metaschematype-classattr-rst">
+<table class="docutils align-center" id="class-table-metaschematype-classattr-rst">
 <colgroup>
-<col width="18%" />
-<col width="67%" />
-<col width="7%" />
-<col width="8%" />
+<col style="width: 18%" />
+<col style="width: 67%" />
+<col style="width: 7%" />
+<col style="width: 8%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Description</th>
-<th class="head">Required</th>
-<th class="head">Type</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Type</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>cross_language_support</td>
-<td>If True, this indicates the types should be serializable across most (if not
+<tbody>
+<tr class="row-even"><td><p>cross_language_support</p></td>
+<td><p>If True, this indicates the types should be serializable across most (if not
 all) of the supported languages. If False, this type is not required to be
-serializable except to/from Python. Defaults to True.</td>
-<td>&#160;</td>
-<td>bool</td>
+serializable except to/from Python. Defaults to True.</p></td>
+<td></td>
+<td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td>definition_properties</td>
-<td>Type properties that are required for YAML or form entries specifying the type.
+<tr class="row-odd"><td><p>definition_properties</p></td>
+<td><p>Type properties that are required for YAML or form entries specifying the type.
 These will also be used to validate type definitions. These properties will be
 added to those from the parent type class unless inherit_properties is False.
-Defaults to [‘type’].</td>
-<td>&#160;</td>
-<td>list</td>
+Defaults to [‘type’].</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-even"><td>description</td>
-<td>A short description of the type.</td>
-<td>X</td>
-<td>str</td>
+<tr class="row-even"><td><p>description</p></td>
+<td><p>A short description of the type.</p></td>
+<td><p>X</p></td>
+<td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td>extract_properties</td>
-<td>Properties that will be extracted from the metadata of a message to construct
+<tr class="row-odd"><td><p>extract_properties</p></td>
+<td><p>Properties that will be extracted from the metadata of a message to construct
 the type definition. These properties will be added to those from the parent
-class unless inherit_properties is False. Defaults to [‘type’, ‘title’].</td>
-<td>&#160;</td>
-<td>list</td>
+class unless inherit_properties is False. Defaults to [‘type’, ‘title’].</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-even"><td>inherit_properties</td>
-<td>If True, a type class’s properties will be a combination of the parent class’s
+<tr class="row-even"><td><p>inherit_properties</p></td>
+<td><p>If True, a type class’s properties will be a combination of the parent class’s
 properties and those explicitly defined in the child class. If False, a type
 class’s properties will only be those explicitly defined in the child class. If
 a list of property attributes, only properties specified by those attributes
-will be inherited from the parent class.</td>
-<td>&#160;</td>
-<td>bool, list</td>
+will be inherited from the parent class.</p></td>
+<td></td>
+<td><p>bool, list</p></td>
 </tr>
-<tr class="row-odd"><td>is_fixed</td>
-<td>True if the type is a fixed version of another type. See FixedMetaschemaType for
-details.</td>
-<td>&#160;</td>
-<td>bool</td>
+<tr class="row-odd"><td><p>is_fixed</p></td>
+<td><p>True if the type is a fixed version of another type. See FixedMetaschemaType for
+details.</p></td>
+<td></td>
+<td><p>bool</p></td>
 </tr>
-<tr class="row-even"><td>loaded_schema_file</td>
-<td>The path to the file the schema for the type was loaded from if it was loaded.</td>
-<td>&#160;</td>
-<td>str, None</td>
+<tr class="row-even"><td><p>loaded_schema_file</p></td>
+<td><p>The path to the file the schema for the type was loaded from if it was loaded.</p></td>
+<td></td>
+<td><p>str, None</p></td>
 </tr>
-<tr class="row-odd"><td>metadata_properties</td>
-<td>Type properties that are required for deserializing instances of the type that
+<tr class="row-odd"><td><p>metadata_properties</p></td>
+<td><p>Type properties that are required for deserializing instances of the type that
 have been serialized. These properties will be added to those from the parent
-class unless inherit_properties is False. Defaults to [‘type’].</td>
-<td>&#160;</td>
-<td>list</td>
+class unless inherit_properties is False. Defaults to [‘type’].</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-even"><td>name</td>
-<td>Name of the type for use in YAML files &amp; form options.</td>
-<td>X</td>
-<td>str</td>
+<tr class="row-even"><td><p>name</p></td>
+<td><p>Name of the type for use in YAML files &amp; form options.</p></td>
+<td><p>X</p></td>
+<td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td>properties</td>
-<td>List of JSON schema properties that this type uses. These properties will be
+<tr class="row-odd"><td><p>properties</p></td>
+<td><p>List of JSON schema properties that this type uses. These properties will be
 added to those form the paretn type class unless inherit_properties is False.
-Defaults to [‘type’, ‘title’].</td>
-<td>&#160;</td>
-<td>list</td>
+Defaults to [‘type’, ‘title’].</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-even"><td>python_types</td>
-<td>List of python types that this type encompasses. [REQUIRED].</td>
-<td>&#160;</td>
-<td>list</td>
+<tr class="row-even"><td><p>python_types</p></td>
+<td><p>List of python types that this type encompasses. [REQUIRED].</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td>schema_file</td>
-<td>If set, the class’s schema is loaded from the specified file at registration and
-moved to the loaded_schema_file class attribute. Defaults to None.</td>
-<td>&#160;</td>
-<td>str, None</td>
+<tr class="row-odd"><td><p>schema_file</p></td>
+<td><p>If set, the class’s schema is loaded from the specified file at registration and
+moved to the loaded_schema_file class attribute. Defaults to None.</p></td>
+<td></td>
+<td><p>str, None</p></td>
 </tr>
-<tr class="row-even"><td>specificity</td>
-<td>Specificity of the type. Types with larger values are more specific while types
+<tr class="row-even"><td><p>specificity</p></td>
+<td><p>Specificity of the type. Types with larger values are more specific while types
 with smaller values are more general. Base types have a specificity of 0. More
-specific types are checked first before more general ones.</td>
-<td>&#160;</td>
-<td>int</td>
+specific types are checked first before more general ones.</p></td>
+<td></td>
+<td><p>int</p></td>
 </tr>
 </tbody>
 </table>
@@ -339,45 +332,45 @@ The file containing the class definitions should reside in the
 <p>At a minimum, classes for properties defined in
 such a manner must override the following method:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">encode</span></code>: Takes as input an object for encoding and a type definition
-and returns the value for the property describing the object.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">encode</span></code>: Takes as input an object for encoding and a type definition
+and returns the value for the property describing the object.</p></li>
 </ul>
 <p>In addition, the behavior of properties are also
 controlled by the following class attributes:</p>
-<table border="1" class="docutils" id="class-table-metaschemaproperty-classattr-rst">
+<table class="docutils align-center" id="class-table-metaschemaproperty-classattr-rst">
 <colgroup>
-<col width="12%" />
-<col width="77%" />
-<col width="8%" />
-<col width="4%" />
+<col style="width: 12%" />
+<col style="width: 77%" />
+<col style="width: 8%" />
+<col style="width: 4%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Description</th>
-<th class="head">Required</th>
-<th class="head">Type</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Type</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>name</td>
-<td>Name of the property.</td>
-<td>X</td>
-<td>str</td>
+<tbody>
+<tr class="row-even"><td><p>name</p></td>
+<td><p>Name of the property.</p></td>
+<td><p>X</p></td>
+<td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td>python_types</td>
-<td>Python types of instances that the property is valid for. [AUTOMATED]</td>
-<td>&#160;</td>
-<td>list</td>
+<tr class="row-odd"><td><p>python_types</p></td>
+<td><p>Python types of instances that the property is valid for. [AUTOMATED]</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
-<tr class="row-even"><td>schema</td>
-<td>JSON schema describing valid values for the property.</td>
-<td>X</td>
-<td>dict</td>
+<tr class="row-even"><td><p>schema</p></td>
+<td><p>JSON schema describing valid values for the property.</p></td>
+<td><p>X</p></td>
+<td><p>dict</p></td>
 </tr>
-<tr class="row-odd"><td>types</td>
-<td>Types of instances that the property is valid for. [AUTOMATED]</td>
-<td>&#160;</td>
-<td>list</td>
+<tr class="row-odd"><td><p>types</p></td>
+<td><p>Types of instances that the property is valid for. [AUTOMATED]</p></td>
+<td></td>
+<td><p>list</p></td>
 </tr>
 </tbody>
 </table>
@@ -386,9 +379,7 @@ controlled by the following class attributes:</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -397,7 +388,7 @@ controlled by the following class attributes:</p>
         <a href="todo.html" class="btn btn-neutral float-right" title="TODO" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="new_language.html" class="btn btn-neutral" title="Adding Support for a New Language" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="new_language.html" class="btn btn-neutral float-left" title="Adding Support for a New Language" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -406,11 +397,11 @@ controlled by the following class attributes:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -423,38 +414,15 @@ controlled by the following class attributes:</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

@@ -3,8 +3,8 @@
 ==================   =================   ================================================================================   ==================================================================================
 Option               Type                Description                                                                        Valid For 'Filetype' Of                                                           
 ==================   =================   ================================================================================   ==================================================================================
-comment              string              One or more characters indicating a comment. Defaults to '# '.                     ['map', 'obj', 'mat', 'pickle', 'ply', 'yaml', 'json', 'table', 'ascii', 'pandas']
-datatype             schema              JSON schema defining the type of object that the serializer will be used to        ['map', 'obj', 'mat', 'pickle', 'ply', 'yaml', 'json', 'table', 'ascii', 'pandas']
+comment              string              One or more characters indicating a comment. Defaults to '# '.                     ['map', 'ply', 'ascii', 'pandas', 'obj', 'pickle', 'yaml', 'table', 'mat', 'json']
+datatype             schema              JSON schema defining the type of object that the serializer will be used to        ['map', 'ply', 'ascii', 'pandas', 'obj', 'pickle', 'yaml', 'table', 'mat', 'json']
                                          serialize/deserialize. Defaults to default_datatype.                                                                                                                 
 default_flow_style   boolean             If True, nested collections will be serialized in the block style. If False,       ['yaml']                                                                          
                                          they will always be serialized in the flow style. See `PyYAML Documentation                                                                                          
@@ -13,12 +13,12 @@ delimiter            string              Delimiter that should be used to separa
                                          to \t.                                                                                                                                                               
 dont_write_header    boolean             If True, headers will not be added to serialized tables. Defaults to False.        ['pandas']                                                                        
 encoding             string              Encoding that should be used to serialize the object. Defaults to 'utf-8'.         ['yaml']                                                                          
-format_str           string              If provided, this string will be used to format messages from a list of            ['table', 'pandas']                                                               
+format_str           string              If provided, this string will be used to format messages from a list of            ['pandas', 'table']                                                               
                                          arguments and parse messages to get a list of arguments in C printf/scanf style.                                                                                     
                                          Defaults to None and messages are assumed to already be bytes.                                                                                                       
 indent               ['string', 'int']   String or number of spaces that should be used to indent each level within the     ['yaml', 'json']                                                                  
                                          seiralized structure. Defaults to '\t'.                                                                                                                              
-newline              string              One or more characters indicating a newline. Defaults to '\n'.                     ['map', 'obj', 'mat', 'pickle', 'ply', 'yaml', 'json', 'table', 'ascii', 'pandas']
+newline              string              One or more characters indicating a newline. Defaults to '\n'.                     ['map', 'ply', 'ascii', 'pandas', 'obj', 'pickle', 'yaml', 'table', 'mat', 'json']
 read_meth            string              Method that should be used to read data from the file. Defaults to 'read'.         ['binary']                                                                        
                                          Ignored if direction is 'send'.                                                                                                                                      
 serializer                               Class with serialize and deserialize methods that should be used to process sent   ['binary']                                                                        
@@ -26,6 +26,6 @@ serializer                               Class with serialize and deserialize me
                                          'serializer_kwargs'.                                                                                                                                                 
 sort_keys            boolean             If True, the serialization of dictionaries will be in key sorted order. Defaults   ['json']                                                                          
                                          to True.                                                                                                                                                             
-use_astropy          boolean             If True, the astropy package will be used to serialize/deserialize table.          ['table', 'pandas']                                                               
+use_astropy          boolean             If True, the astropy package will be used to serialize/deserialize table.          ['pandas', 'table']                                                               
                                          Defaults to False.                                                                                                                                                   
 ==================   =================   ================================================================================   ==================================================================================

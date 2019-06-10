@@ -17,45 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/>
-        <link rel="up" title="Development" href="index.html"/>
-        <link rel="next" title="Adding Support for a New Language" href="new_language.html"/>
-        <link rel="prev" title="General Development Notes" href="general.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Adding Support for a New Language" href="new_language.html" />
+    <link rel="prev" title="General Development Notes" href="general.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -133,7 +125,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
@@ -141,9 +133,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -190,14 +183,13 @@
   <div class="section" id="release-steps">
 <h1>Release Steps<a class="headerlink" href="#release-steps" title="Permalink to this headline">¶</a></h1>
 <ol class="arabic">
-<li><p class="first">[on branch/fork] Make code changes adding desired feature(s).</p>
-</li>
-<li><p class="first">[on branch/fork] Run tests locally.:</p>
+<li><p>[on branch/fork] Make code changes adding desired feature(s).</p></li>
+<li><p>[on branch/fork] Run tests locally.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggtest -svx --nologcapture
 </pre></div>
 </div>
 </li>
-<li><p class="first">[on branch/fork] Regenerate schema if you added any new components (there will be an erorr in the tests if you need to regenerate the schema).:</p>
+<li><p>[on branch/fork] Regenerate schema if you added any new components (there will be an erorr in the tests if you need to regenerate the schema).:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggschema
 $ git add yggdrasil/.ygg_schema.yml
 $ git add yggdrasil/.ygg_metaschema.json
@@ -206,31 +198,27 @@ $ git push origin [BRANCH]
 </pre></div>
 </div>
 </li>
-<li><p class="first">[on branch/fork] Make sure all CI tests pass (<a class="reference external" href="https://travis-ci.org/cropsinsilico/yggdrasil">travis</a>, <a class="reference external" href="https://ci.appveyor.com/project/langmm/yggdrasil">appveyor</a>).:</p>
-</li>
-<li><p class="first">[on branch/fork] Update docs to reflect new features and make sure they build locally:</p>
+<li><p>[on branch/fork] Make sure all CI tests pass (<a class="reference external" href="https://travis-ci.org/cropsinsilico/yggdrasil">travis</a>, <a class="reference external" href="https://ci.appveyor.com/project/langmm/yggdrasil">appveyor</a>).:</p></li>
+<li><p>[on branch/fork] Update docs to reflect new features and make sure they build locally:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd docs
 $ make autodoc
 </pre></div>
 </div>
 </li>
-<li><p class="first">[on branch/fork] Test conda-forge recipe locally using steps below.</p>
-</li>
-<li><p class="first">[on branch/fork] Open pull request to merge changes into master</p>
-</li>
-<li><p class="first">Merge branch into master after tests pass and code review complete</p>
-</li>
-<li><p class="first">Create tag with new version on master:</p>
+<li><p>[on branch/fork] Test conda-forge recipe locally using steps below.</p></li>
+<li><p>[on branch/fork] Open pull request to merge changes into master</p></li>
+<li><p>Merge branch into master after tests pass and code review complete</p></li>
+<li><p>Create tag with new version on master:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git tag x.x.x
 </pre></div>
 </div>
 </li>
-<li><p class="first">Push to github. Pushing a tag will trigger travis testing of the conda build recipe in the yggdrasil repository (under recipe) and, on success, the deployment of source distribution and wheels to PyPI.:</p>
+<li><p>Push to github. Pushing a tag will trigger travis testing of the conda build recipe in the yggdrasil repository (under recipe) and, on success, the deployment of source distribution and wheels to PyPI.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git push; git push --tags
 </pre></div>
 </div>
 </li>
-<li><p class="first">If there are any errors, make updates to the repo/recipe as necessary, delete the tag (provided it has not deployed to PyPI) and push it again.:</p>
+<li><p>If there are any errors, make updates to the repo/recipe as necessary, delete the tag (provided it has not deployed to PyPI) and push it again.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git tag -d x.x.x
 $ git push origin :refs/tags/x.x.x
 $ git tag x.x.x
@@ -238,9 +226,8 @@ $ git push; git push --tags
 </pre></div>
 </div>
 </li>
-<li><p class="first">Once the source distribution has been uploaded to PyPI, update the conda-forge recipe on the cropsinsilico feedstock fork <a class="reference external" href="https://github.com/cropsinsilico/yggdrasil-feedstock">here</a> with the changes from the yggdrasil source repository, the new version, and the SHA256 for the release (this can be found <a class="reference external" href="https://pypi.org/project/yggdrasil-framework/#files">here</a>) and create a pull request to merge the changes into the <a class="reference external" href="https://github.com/conda-forge/yggdrasil-feedstock">conda-forge</a> feedstock.</p>
-</li>
-<li><p class="first">Checkout <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch if it dosn’t already exist (See below), regenerate docs and push to gh-pages branch:</p>
+<li><p>Once the source distribution has been uploaded to PyPI, update the conda-forge recipe on the cropsinsilico feedstock fork <a class="reference external" href="https://github.com/cropsinsilico/yggdrasil-feedstock">here</a> with the changes from the yggdrasil source repository, the new version, and the SHA256 for the release (this can be found <a class="reference external" href="https://pypi.org/project/yggdrasil-framework/#files">here</a>) and create a pull request to merge the changes into the <a class="reference external" href="https://github.com/conda-forge/yggdrasil-feedstock">conda-forge</a> feedstock.</p></li>
+<li><p>Checkout <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch if it dosn’t already exist (See below), regenerate docs and push to gh-pages branch:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd docs
 $ make ghpages
 </pre></div>
@@ -250,36 +237,35 @@ $ make ghpages
 <div class="section" id="updating-and-testing-the-conda-recipe">
 <h2>Updating and Testing the Conda Recipe<a class="headerlink" href="#updating-and-testing-the-conda-recipe" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p class="first">Install <code class="docutils literal notranslate"><span class="pre">conda-build</span></code> if you don’t already have it.:</p>
+<li><p>Install <code class="docutils literal notranslate"><span class="pre">conda-build</span></code> if you don’t already have it.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install conda-build
 </pre></div>
 </div>
 </li>
-<li><p class="first">Update the recipe (<code class="docutils literal notranslate"><span class="pre">recipe/meta.yaml</span></code>) to reflect any changes to the dependencies.</p>
-</li>
-<li><p class="first">Create a new conda environment for testing.:</p>
+<li><p>Update the recipe (<code class="docutils literal notranslate"><span class="pre">recipe/meta.yaml</span></code>) to reflect any changes to the dependencies.</p></li>
+<li><p>Create a new conda environment for testing.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n test_yggdrasil python=3.6
 $ source activate test_yggdrasil
 </pre></div>
 </div>
 </li>
-<li><p class="first">Build the updated recipe.:</p>
+<li><p>Build the updated recipe.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda build &lt;path&gt;/&lt;to&gt;/&lt;recipe&gt;/meta.yaml
 </pre></div>
 </div>
 </li>
-<li><p class="first">Install the local build of yggdrasil.:</p>
+<li><p>Install the local build of yggdrasil.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install --use-local -y yggdrasil
 </pre></div>
 </div>
 </li>
-<li><p class="first">Reconfigure yggdrasil to use test installation and run the tests.:</p>
+<li><p>Reconfigure yggdrasil to use test installation and run the tests.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggconfig
 $ yggtest -svx --nologcapture
 </pre></div>
 </div>
 </li>
-<li><p class="first">Deactivate the test environment and reconfigure yggdrasil to use the original installation.:</p>
+<li><p>Deactivate the test environment and reconfigure yggdrasil to use the original installation.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda deactivate
 $ yggconfig
 </pre></div>
@@ -288,25 +274,24 @@ $ yggconfig
 </ol>
 <p>After the initial creation of the environment etc., the procedure for debugging the recipe will be:</p>
 <ol class="arabic">
-<li><p class="first">Make changes to the source code/recipe.</p>
-</li>
-<li><p class="first">Get clean environment (<code class="docutils literal notranslate"><span class="pre">--force-reinstall</span></code> dosn’t seem to work with <code class="docutils literal notranslate"><span class="pre">--use-local</span></code>).:</p>
+<li><p>Make changes to the source code/recipe.</p></li>
+<li><p>Get clean environment (<code class="docutils literal notranslate"><span class="pre">--force-reinstall</span></code> dosn’t seem to work with <code class="docutils literal notranslate"><span class="pre">--use-local</span></code>).:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda uninstall -y yggdrasil
 $ conda build purge
 </pre></div>
 </div>
 </li>
-<li><p class="first">Re-build the recipe from the local source without tests.:</p>
+<li><p>Re-build the recipe from the local source without tests.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda build --no-test &lt;path&gt;/&lt;to&gt;/&lt;recipe&gt;/meta.yaml
 </pre></div>
 </div>
 </li>
-<li><p class="first">Force re-install of the local build.:</p>
+<li><p>Force re-install of the local build.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install --use-local -y yggdrasil
 </pre></div>
 </div>
 </li>
-<li><p class="first">Run the tests.:</p>
+<li><p>Run the tests.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggtest -svx --nologcapture
 </pre></div>
 </div>
@@ -329,9 +314,7 @@ $ git checkout gh-pages
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -340,7 +323,7 @@ $ git checkout gh-pages
         <a href="new_language.html" class="btn btn-neutral float-right" title="Adding Support for a New Language" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="general.html" class="btn btn-neutral" title="General Development Notes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="general.html" class="btn btn-neutral float-left" title="General Development Notes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -349,11 +332,11 @@ $ git checkout gh-pages
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -366,38 +349,15 @@ $ git checkout gh-pages
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

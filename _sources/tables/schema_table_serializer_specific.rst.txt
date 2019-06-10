@@ -17,11 +17,11 @@ encoded_datatype     schema              JSON schema describing the type that se
                                          func_serialize or func_deserialize are not provided, this needs to be specified                              
                                          in order to serialize non-bytes objects.                                                                     
 encoding             string              Encoding that should be used to serialize the object. Defaults to 'utf-8'.         ['yaml']                  
-field_names          array               The names of fields in the format string. If not provided, names are set based     ['table', 'pandas']       
+field_names          array               The names of fields in the format string. If not provided, names are set based     ['pandas', 'table']       
                                          on the order of the fields in the format string.                                                             
-field_units          array               The units of fields in the format string. If not provided, all fields are          ['table', 'pandas']       
+field_units          array               The units of fields in the format string. If not provided, all fields are          ['pandas', 'table']       
                                          assumed to be dimensionless.                                                                                 
-format_str           string              If provided, this string will be used to format messages from a list of            ['table', 'pandas']       
+format_str           string              If provided, this string will be used to format messages from a list of            ['pandas', 'table']       
                                          arguments and parse messages to get a list of arguments in C printf/scanf style.                             
                                          Defaults to None and messages are assumed to already be bytes.                                               
 func_deserialize     function            Callable object that takes objects of a type that conforms to encoded_datatype     ['functional']            
@@ -34,6 +34,6 @@ indent               ['string', 'int']   String or number of spaces that should 
                                          seiralized structure. Defaults to '\t'.                                                                      
 sort_keys            boolean             If True, the serialization of dictionaries will be in key sorted order. Defaults   ['json']                  
                                          to True.                                                                                                     
-use_astropy          boolean             If True, the astropy package will be used to serialize/deserialize table.          ['table', 'pandas']       
+use_astropy          boolean             If True, the astropy package will be used to serialize/deserialize table.          ['pandas', 'table']       
                                          Defaults to False.                                                                                           
 ==================   =================   ================================================================================   ==========================

@@ -17,45 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/>
-        <link rel="up" title="Advanced" href="index.html"/>
-        <link rel="next" title="YAML Validation Schema" href="schema.html"/>
-        <link rel="prev" title="Serialization" href="serialization.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="YAML Validation Schema" href="schema.html" />
+    <link rel="prev" title="Serialization" href="serialization.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -132,7 +124,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
@@ -140,9 +132,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -194,38 +187,47 @@ type definitions. This metaschema is an expansion of the default metaschema defi
 specific <code class="docutils literal notranslate"><span class="pre">simpleTypes</span></code> that allow validation of more complex/specific data types.</p>
 <p>Data types in the yggdrasil metaschema that are not part of the JSON schema
 metaschema include:</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">1darray:</th><td class="field-body">One dimensional arrays with elements of uniform size that are contiguous in memory.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">bytes:</th><td class="field-body">Raw bytes (to allow encoding of bytes objects in Python 3.6).</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">complex:</th><td class="field-body">Complex numbers.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">float:</th><td class="field-body">Floating point number with support for numpy floats in addition to the Python built-in.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">function:</th><td class="field-body">Python callable.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">int:</th><td class="field-body">Integer number with support for numpy ints in addition to the Python built-in.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">ndarray:</th><td class="field-body">Multi-dimensional arrays with elements of uniform size that are continguous in memory in C order.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">obj:</th><td class="field-body"><a class="reference external" href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">Wavefront OBJ</a> representation of a 3D geometry.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">ply:</th><td class="field-body"><a class="reference external" href="http://paulbourke.net/dataformats/ply/">Polygon File Format</a> representation of a 3D geometry.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">scalar:</th><td class="field-body">Generic scalar that has an optional subtype.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">schema:</th><td class="field-body">A JSON schema.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">uint:</th><td class="field-body">Unsigned integer number with support for numpy uints.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">unicode:</th><td class="field-body">Unicode objects that will be encoded as bytes using utf-8 encoding.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">1darray</dt>
+<dd class="field-odd"><p>One dimensional arrays with elements of uniform size that are contiguous in memory.</p>
+</dd>
+<dt class="field-even">bytes</dt>
+<dd class="field-even"><p>Raw bytes (to allow encoding of bytes objects in Python 3.6).</p>
+</dd>
+<dt class="field-odd">complex</dt>
+<dd class="field-odd"><p>Complex numbers.</p>
+</dd>
+<dt class="field-even">float</dt>
+<dd class="field-even"><p>Floating point number with support for numpy floats in addition to the Python built-in.</p>
+</dd>
+<dt class="field-odd">function</dt>
+<dd class="field-odd"><p>Python callable.</p>
+</dd>
+<dt class="field-even">int</dt>
+<dd class="field-even"><p>Integer number with support for numpy ints in addition to the Python built-in.</p>
+</dd>
+<dt class="field-odd">ndarray</dt>
+<dd class="field-odd"><p>Multi-dimensional arrays with elements of uniform size that are continguous in memory in C order.</p>
+</dd>
+<dt class="field-even">obj</dt>
+<dd class="field-even"><p><a class="reference external" href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">Wavefront OBJ</a> representation of a 3D geometry.</p>
+</dd>
+<dt class="field-odd">ply</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://paulbourke.net/dataformats/ply/">Polygon File Format</a> representation of a 3D geometry.</p>
+</dd>
+<dt class="field-even">scalar</dt>
+<dd class="field-even"><p>Generic scalar that has an optional subtype.</p>
+</dd>
+<dt class="field-odd">schema</dt>
+<dd class="field-odd"><p>A JSON schema.</p>
+</dd>
+<dt class="field-even">uint</dt>
+<dd class="field-even"><p>Unsigned integer number with support for numpy uints.</p>
+</dd>
+<dt class="field-odd">unicode</dt>
+<dd class="field-odd"><p>Unicode objects that will be encoded as bytes using utf-8 encoding.</p>
+</dd>
+</dl>
 <div class="highlight-json notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
   2
   3
@@ -823,9 +825,7 @@ metaschema include:</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -834,7 +834,7 @@ metaschema include:</p>
         <a href="schema.html" class="btn btn-neutral float-right" title="YAML Validation Schema" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="serialization.html" class="btn btn-neutral" title="Serialization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="serialization.html" class="btn btn-neutral float-left" title="Serialization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -843,11 +843,11 @@ metaschema include:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -860,38 +860,15 @@ metaschema include:</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

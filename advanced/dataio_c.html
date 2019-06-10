@@ -17,45 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/>
-        <link rel="up" title="C Code" href="code_c.html"/>
-        <link rel="next" title="C++ Code" href="code_cpp.html"/>
-        <link rel="prev" title="C/C++ Datatypes API" href="datatypes_cpp.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="C++ Code" href="code_cpp.html" />
+    <link rel="prev" title="C/C++ Datatypes API" href="datatypes_cpp.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -141,7 +133,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
@@ -149,9 +141,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -226,12 +219,11 @@
 <dt id="_CPPv410af_is_openK11asciiFile_t">
 <span id="_CPPv310af_is_openK11asciiFile_t"></span><span id="_CPPv210af_is_openK11asciiFile_t"></span><span id="af_is_open__asciiFile_tC"></span><span class="target" id="_ascii_file_8h_1a47a6fed432d1842f8da133abcc44a88c"></span><em class="property">static</em> int <code class="descname">af_is_open</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t">asciiFile_t</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410af_is_openK11asciiFile_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Determine if the file is open. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int 1 if open, 0 if closed. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int 1 if open, 0 if closed. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p></li>
 </ul>
 </dd>
 </dl>
@@ -242,12 +234,11 @@
 <dt id="_CPPv47af_openP11asciiFile_t">
 <span id="_CPPv37af_openP11asciiFile_t"></span><span id="_CPPv27af_openP11asciiFile_t"></span><span id="af_open__asciiFile_tP"></span><span class="target" id="_ascii_file_8h_1a4c6f40e8e6773279180c65e89cede010"></span><em class="property">static</em> int <code class="descname">af_open</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t">asciiFile_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47af_openP11asciiFile_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Open the file. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int 0 if opened successfully, -1 otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int 0 if opened successfully, -1 otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p></li>
 </ul>
 </dd>
 </dl>
@@ -258,12 +249,11 @@
 <dt id="_CPPv48af_closeP11asciiFile_t">
 <span id="_CPPv38af_closeP11asciiFile_t"></span><span id="_CPPv28af_closeP11asciiFile_t"></span><span id="af_close__asciiFile_tP"></span><span class="target" id="_ascii_file_8h_1a0527ea4a37b370f03fe6da956ff82051"></span><em class="property">static</em> int <code class="descname">af_close</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t">asciiFile_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48af_closeP11asciiFile_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Close the file. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int 0 if closed successfully, -1 otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int 0 if closed successfully, -1 otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p></li>
 </ul>
 </dd>
 </dl>
@@ -274,13 +264,12 @@
 <dt id="_CPPv413af_is_commentK11asciiFile_tPKc">
 <span id="_CPPv313af_is_commentK11asciiFile_tPKc"></span><span id="_CPPv213af_is_commentK11asciiFile_tPKc"></span><span id="af_is_comment__asciiFile_tC.cCP"></span><span class="target" id="_ascii_file_8h_1a2563193ae51f894e0c1c66c465b001c7"></span><em class="property">static</em> int <code class="descname">af_is_comment</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t">asciiFile_t</a> <em>t</em>, <em class="property">const</em> char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413af_is_commentK11asciiFile_tPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Check if string starts with a comment. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int 1 if line starts with a comment, 0 otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">line</span></code>: constant character pointer to string that should be checked. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int 1 if line starts with a comment, 0 otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">line</span></code>: constant character pointer to string that should be checked. </p></li>
 </ul>
 </dd>
 </dl>
@@ -291,14 +280,13 @@
 <dt id="_CPPv426af_readline_full_noreallocK11asciiFile_tPc6size_t">
 <span id="_CPPv326af_readline_full_noreallocK11asciiFile_tPc6size_t"></span><span id="_CPPv226af_readline_full_noreallocK11asciiFile_tPc6size_t"></span><span id="af_readline_full_norealloc__asciiFile_tC.cP.s"></span><span class="target" id="_ascii_file_8h_1a51e5de1c6872390470c3e66717477d83"></span><em class="property">static</em> int <code class="descname">af_readline_full_norealloc</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t">asciiFile_t</a> <em>t</em>, char *<em>line</em>, size_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426af_readline_full_noreallocK11asciiFile_tPc6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Read a single line from the file without realloc. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of characters read, -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">line</span></code>: constant character pointer to buffer where the read line should be stored. If line is not large enough to hold the read line, an error will be returned. </li>
-<li><code class="docutils literal notranslate"><span class="pre">n</span></code>: Size of allocated buffer. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of characters read, -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">line</span></code>: constant character pointer to buffer where the read line should be stored. If line is not large enough to hold the read line, an error will be returned. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">n</span></code>: Size of allocated buffer. </p></li>
 </ul>
 </dd>
 </dl>
@@ -309,14 +297,13 @@
 <dt id="_CPPv416af_readline_fullK11asciiFile_tPPcP6size_t">
 <span id="_CPPv316af_readline_fullK11asciiFile_tPPcP6size_t"></span><span id="_CPPv216af_readline_fullK11asciiFile_tPPcP6size_t"></span><span id="af_readline_full__asciiFile_tC.cPP.sP"></span><span class="target" id="_ascii_file_8h_1abe2de982da7e4bc735994b9b8c1925b1"></span><em class="property">static</em> int <code class="descname">af_readline_full</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t">asciiFile_t</a> <em>t</em>, char **<em>line</em>, size_t *<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416af_readline_fullK11asciiFile_tPPcP6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Read a single line from the file with realloc. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of characters read, -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">line</span></code>: constant character pointer to pointer to buffer where the read line should be stored. If line is not large enough to hold the read line, it will be reallocated. </li>
-<li><code class="docutils literal notranslate"><span class="pre">n</span></code>: Pointer to size of allocated buffer. If line is not large enough to hold the read line and is reallocated, n will be changed to the new size. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of characters read, -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">line</span></code>: constant character pointer to pointer to buffer where the read line should be stored. If line is not large enough to hold the read line, it will be reallocated. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">n</span></code>: Pointer to size of allocated buffer. If line is not large enough to hold the read line and is reallocated, n will be changed to the new size. </p></li>
 </ul>
 </dd>
 </dl>
@@ -327,13 +314,12 @@
 <dt id="_CPPv417af_writeline_fullK11asciiFile_tPKc">
 <span id="_CPPv317af_writeline_fullK11asciiFile_tPKc"></span><span id="_CPPv217af_writeline_fullK11asciiFile_tPKc"></span><span id="af_writeline_full__asciiFile_tC.cCP"></span><span class="target" id="_ascii_file_8h_1ae1b11621aad35b3a39ebb6f36385cf94"></span><em class="property">static</em> int <code class="descname">af_writeline_full</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t">asciiFile_t</a> <em>t</em>, <em class="property">const</em> char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417af_writeline_fullK11asciiFile_tPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Write a single line to the file. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of characters written, -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">line</span></code>: constant character pointer to string that should be written. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of characters written, -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">line</span></code>: constant character pointer to string that should be written. </p></li>
 </ul>
 </dd>
 </dl>
@@ -344,14 +330,13 @@
 <dt id="_CPPv49af_updateP11asciiFile_tPKcPKc">
 <span id="_CPPv39af_updateP11asciiFile_tPKcPKc"></span><span id="_CPPv29af_updateP11asciiFile_tPKcPKc"></span><span id="af_update__asciiFile_tP.cCP.cCP"></span><span class="target" id="_ascii_file_8h_1affb789e2968d0c952d24c8b5b64b5320"></span><em class="property">static</em> int <code class="descname">af_update</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t">asciiFile_t</a> *<em>t</em>, <em class="property">const</em> char *<em>filepath</em>, <em class="property">const</em> char *<em>io_mode</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49af_updateP11asciiFile_tPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Update an existing <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> structure. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int -1 if there is an error, 0 otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: asciiFile_t* Address of file structure to update. </li>
-<li><code class="docutils literal notranslate"><span class="pre">filepath</span></code>: constant character pointer to file path. </li>
-<li><code class="docutils literal notranslate"><span class="pre">io_mode</span></code>: constant character pointer to I/O mode. “r” for read, “w” for write. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int -1 if there is an error, 0 otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: asciiFile_t* Address of file structure to update. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">filepath</span></code>: constant character pointer to file path. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">io_mode</span></code>: constant character pointer to I/O mode. “r” for read, “w” for write. </p></li>
 </ul>
 </dd>
 </dl>
@@ -362,15 +347,14 @@
 <dt id="_CPPv49asciiFilePKcPKcPKcPKc">
 <span id="_CPPv39asciiFilePKcPKcPKcPKc"></span><span id="_CPPv29asciiFilePKcPKcPKcPKc"></span><span id="asciiFile__cCP.cCP.cCP.cCP"></span><span class="target" id="_ascii_file_8h_1a90670937615370b08cd7dfafad8fbbba"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t">asciiFile_t</a> <code class="descname">asciiFile</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>filepath</em>, <em class="property">const</em> char *<em>io_mode</em>, <em class="property">const</em> char *<em>comment</em>, <em class="property">const</em> char *<em>newline</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49asciiFilePKcPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> structure. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> File structure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">filepath</span></code>: constant character pointer to file path. </li>
-<li><code class="docutils literal notranslate"><span class="pre">io_mode</span></code>: const character pointer to I/O mode. “r” for read, “w” for write. </li>
-<li><code class="docutils literal notranslate"><span class="pre">comment</span></code>: const character pointer to character(s) that should indicate a comment. If NULL, comment is set to “# “. </li>
-<li><code class="docutils literal notranslate"><span class="pre">newline</span></code>: const character pointer to character(s) that should indicate a newline. If NULL, newline is set to “\n”. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> File structure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">filepath</span></code>: constant character pointer to file path. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">io_mode</span></code>: const character pointer to I/O mode. “r” for read, “w” for write. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">comment</span></code>: const character pointer to character(s) that should indicate a comment. If NULL, comment is set to “# “. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">newline</span></code>: const character pointer to character(s) that should indicate a newline. If NULL, newline is set to “\n”. </p></li>
 </ul>
 </dd>
 </dl>
@@ -437,9 +421,9 @@
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Enums</p>
-<dl class="type">
+<dl class="enum">
 <dt id="_CPPv49fmt_types">
-<span id="_CPPv39fmt_types"></span><span id="_CPPv29fmt_types"></span><span id="fmt_types"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790fa"></span><em class="property">enum </em><code class="descname">fmt_types</code><a class="headerlink" href="#_CPPv49fmt_types" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv39fmt_types"></span><span id="_CPPv29fmt_types"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790fa"></span><em class="property">enum </em><code class="descname">fmt_types</code><a class="headerlink" href="#_CPPv49fmt_types" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Enumerated types to be used for interpreting formats. </p>
 <p><em>Values:</em></p>
 <dl class="enumerator">
@@ -521,12 +505,11 @@
 <dt id="_CPPv421count_complex_formatsPKc">
 <span id="_CPPv321count_complex_formatsPKc"></span><span id="_CPPv221count_complex_formatsPKc"></span><span id="count_complex_formats__cCP"></span><span class="target" id="_ascii_table_8h_1aaec1ba2d1988e74fe162386f0677fcf2"></span><em class="property">static</em> int <code class="descname">count_complex_formats</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>fmt_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421count_complex_formatsPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Count format specifiers for complex numbers. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int Number of complex format specifiers found. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">fmt_str</span></code>: constant character pointer to string that should be searched for format specifiers. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int Number of complex format specifiers found. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">fmt_str</span></code>: constant character pointer to string that should be searched for format specifiers. </p></li>
 </ul>
 </dd>
 </dl>
@@ -537,12 +520,11 @@
 <dt id="_CPPv413count_formatsPKc">
 <span id="_CPPv313count_formatsPKc"></span><span id="_CPPv213count_formatsPKc"></span><span id="count_formats__cCP"></span><span class="target" id="_ascii_table_8h_1a2059b2fabbacee5e6de895822beb99cd"></span><em class="property">static</em> int <code class="descname">count_formats</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>fmt_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413count_formatsPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Count how many % format specifiers there are in format string. Formats are found by counting the number of matches to the regular expression adapted from <a class="reference external" href="https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex">https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex</a>. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int Number of format specifiers found. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">fmt_str</span></code>: constant character pointer to string that should be searched for format specifiers. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int Number of format specifiers found. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">fmt_str</span></code>: constant character pointer to string that should be searched for format specifiers. </p></li>
 </ul>
 </dd>
 </dl>
@@ -553,13 +535,12 @@
 <dt id="_CPPv416simplify_formatsPcK6size_t">
 <span id="_CPPv316simplify_formatsPcK6size_t"></span><span id="_CPPv216simplify_formatsPcK6size_t"></span><span id="simplify_formats__cP.sC"></span><span class="target" id="_ascii_table_8h_1a9d0443ed02f7b09068f88be2a00f4dd9"></span><em class="property">static</em> int <code class="descname">simplify_formats</code><span class="sig-paren">(</span>char *<em>fmt_str</em>, <em class="property">const</em> size_t <em>fmt_len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416simplify_formatsPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Remove extra format characters that confusing sscanf. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int -1 on failure if the regex could not be compiled or the buffer is not big enough to contain the result. If succesful, the new length of buf is returned. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">fmt_str</span></code>: character pointer to string that should be modified. </li>
-<li><code class="docutils literal notranslate"><span class="pre">fmt_len</span></code>: constant size_t, length of the fmt_str buffer. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int -1 on failure if the regex could not be compiled or the buffer is not big enough to contain the result. If succesful, the new length of buf is returned. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">fmt_str</span></code>: character pointer to string that should be modified. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">fmt_len</span></code>: constant size_t, length of the fmt_str buffer. </p></li>
 </ul>
 </dd>
 </dl>
@@ -570,12 +551,11 @@
 <dt id="_CPPv47at_openP12asciiTable_t">
 <span id="_CPPv37at_openP12asciiTable_t"></span><span id="_CPPv27at_openP12asciiTable_t"></span><span id="at_open__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1aa392a2b640022f5fc7f928660f3d4859"></span><em class="property">static</em> int <code class="descname">at_open</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47at_openP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Open the file. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int 0 if opened successfully, -1 otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int 0 if opened successfully, -1 otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 </ul>
 </dd>
 </dl>
@@ -586,12 +566,11 @@
 <dt id="_CPPv48at_closeP12asciiTable_t">
 <span id="_CPPv38at_closeP12asciiTable_t"></span><span id="_CPPv28at_closeP12asciiTable_t"></span><span id="at_close__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1aafdce9672f7a9645a1a7b9af886727ea"></span><em class="property">static</em> void <code class="descname">at_close</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48at_closeP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Close the file. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int 0 if ocloseded successfully, -1 otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int 0 if ocloseded successfully, -1 otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 </ul>
 </dd>
 </dl>
@@ -602,15 +581,14 @@
 <dt id="_CPPv424at_readline_full_reallocK12asciiTable_tPPcK6size_tKi">
 <span id="_CPPv324at_readline_full_reallocK12asciiTable_tPPcK6size_tKi"></span><span id="_CPPv224at_readline_full_reallocK12asciiTable_tPPcK6size_tKi"></span><span id="at_readline_full_realloc__asciiTable_tC.cPP.sC.iC"></span><span class="target" id="_ascii_table_8h_1ae9ea1b6f4cc50b7cd38a10b52c065c23"></span><em class="property">static</em> int <code class="descname">at_readline_full_realloc</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, char **<em>buf</em>, <em class="property">const</em> size_t <em>len_buf</em>, <em class="property">const</em> int <em>allow_realloc</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424at_readline_full_reallocK12asciiTable_tPPcK6size_tKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Read a line from the file until one is returned that is not a comment. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of characters read. -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">buf</span></code>: pointer to memory where read line should be stored. </li>
-<li><code class="docutils literal notranslate"><span class="pre">len_buf</span></code>: Size of buffer where line should be stored. </li>
-<li><code class="docutils literal notranslate"><span class="pre">allow_realloc</span></code>: const int If 1, the buffer will be realloced if it is not large enought. Otherwise an error will be returned. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of characters read. -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">buf</span></code>: pointer to memory where read line should be stored. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">len_buf</span></code>: Size of buffer where line should be stored. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">allow_realloc</span></code>: const int If 1, the buffer will be realloced if it is not large enought. Otherwise an error will be returned. </p></li>
 </ul>
 </dd>
 </dl>
@@ -621,14 +599,13 @@
 <dt id="_CPPv416at_readline_fullK12asciiTable_tPcK6size_t">
 <span id="_CPPv316at_readline_fullK12asciiTable_tPcK6size_t"></span><span id="_CPPv216at_readline_fullK12asciiTable_tPcK6size_t"></span><span id="at_readline_full__asciiTable_tC.cP.sC"></span><span class="target" id="_ascii_table_8h_1a155a43f52185fe1a3ac93c5e00cc9f2d"></span><em class="property">static</em> int <code class="descname">at_readline_full</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, char *<em>buf</em>, <em class="property">const</em> size_t <em>len_buf</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416at_readline_fullK12asciiTable_tPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Read a line from the file until one is returned that is not a comment. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of characters read. -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">buf</span></code>: pointer to memory where read line should be stored. </li>
-<li><code class="docutils literal notranslate"><span class="pre">len_buf</span></code>: Size of buffer where line should be stored. The the message is larger than len_buf, an error will be returned. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of characters read. -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">buf</span></code>: pointer to memory where read line should be stored. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">len_buf</span></code>: Size of buffer where line should be stored. The the message is larger than len_buf, an error will be returned. </p></li>
 </ul>
 </dd>
 </dl>
@@ -639,13 +616,12 @@
 <dt id="_CPPv417at_writeline_fullK12asciiTable_tPKc">
 <span id="_CPPv317at_writeline_fullK12asciiTable_tPKc"></span><span id="_CPPv217at_writeline_fullK12asciiTable_tPKc"></span><span id="at_writeline_full__asciiTable_tC.cCP"></span><span class="target" id="_ascii_table_8h_1a5b94012427bf984488a3b569dd497c94"></span><em class="property">static</em> int <code class="descname">at_writeline_full</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, <em class="property">const</em> char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417at_writeline_fullK12asciiTable_tPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Write a line to the file. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of characters written. -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">line</span></code>: Pointer to line that should be written. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of characters written. -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">line</span></code>: Pointer to line that should be written. </p></li>
 </ul>
 </dd>
 </dl>
@@ -656,14 +632,13 @@
 <dt id="_CPPv416at_vbytes_to_rowK12asciiTable_tPKc7va_list">
 <span id="_CPPv316at_vbytes_to_rowK12asciiTable_tPKc7va_list"></span><span id="_CPPv216at_vbytes_to_rowK12asciiTable_tPKc7va_list"></span><span id="at_vbytes_to_row__asciiTable_tC.cCP.va_list"></span><span class="target" id="_ascii_table_8h_1a15cc80a333c1f3b387261829b099c7bf"></span><em class="property">static</em> int <code class="descname">at_vbytes_to_row</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, <em class="property">const</em> char *<em>line</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416at_vbytes_to_rowK12asciiTable_tPKc7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Parse a line to get row columns. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of arguments filled. -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">line</span></code>: Pointer to memory containing the line to be parsed. </li>
-<li><code class="docutils literal notranslate"><span class="pre">ap</span></code>: va_list Pointers to variables where parsed arguments should be stored. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of arguments filled. -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">line</span></code>: Pointer to memory containing the line to be parsed. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">ap</span></code>: va_list Pointers to variables where parsed arguments should be stored. </p></li>
 </ul>
 </dd>
 </dl>
@@ -674,15 +649,14 @@
 <dt id="_CPPv416at_vrow_to_bytesK12asciiTable_tPcK6size_t7va_list">
 <span id="_CPPv316at_vrow_to_bytesK12asciiTable_tPcK6size_t7va_list"></span><span id="_CPPv216at_vrow_to_bytesK12asciiTable_tPcK6size_t7va_list"></span><span id="at_vrow_to_bytes__asciiTable_tC.cP.sC.va_list"></span><span class="target" id="_ascii_table_8h_1a86b717123c59f37e39cabe1d5e4d9f94"></span><em class="property">static</em> int <code class="descname">at_vrow_to_bytes</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_siz</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416at_vrow_to_bytesK12asciiTable_tPcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format arguments to form a line. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of characters written. -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">buf</span></code>: Pointer to memory where the formated row should be stored. </li>
-<li><code class="docutils literal notranslate"><span class="pre">buf_siz</span></code>: size_t Size of buf. If the formatted message will exceed the size of the buffer, an error will be returned. </li>
-<li><code class="docutils literal notranslate"><span class="pre">ap</span></code>: va_list Variables that should be formatted using the format string to create a line in the table. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of characters written. -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">buf</span></code>: Pointer to memory where the formated row should be stored. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">buf_siz</span></code>: size_t Size of buf. If the formatted message will exceed the size of the buffer, an error will be returned. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">ap</span></code>: va_list Variables that should be formatted using the format string to create a line in the table. </p></li>
 </ul>
 </dd>
 </dl>
@@ -693,13 +667,12 @@
 <dt id="_CPPv412at_vreadlineK12asciiTable_t7va_list">
 <span id="_CPPv312at_vreadlineK12asciiTable_t7va_list"></span><span id="_CPPv212at_vreadlineK12asciiTable_t7va_list"></span><span id="at_vreadline__asciiTable_tC.va_list"></span><span class="target" id="_ascii_table_8h_1a5d3bdde3a0beb050a8699e7d7907d4e6"></span><em class="property">static</em> int <code class="descname">at_vreadline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412at_vreadlineK12asciiTable_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Read a line from the file and parse it. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of characters read. -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">ap</span></code>: va_list Pointers to variables where parsed arguments should be stored. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of characters read. -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">ap</span></code>: va_list Pointers to variables where parsed arguments should be stored. </p></li>
 </ul>
 </dd>
 </dl>
@@ -710,13 +683,12 @@
 <dt id="_CPPv413at_vwritelineK12asciiTable_t7va_list">
 <span id="_CPPv313at_vwritelineK12asciiTable_t7va_list"></span><span id="_CPPv213at_vwritelineK12asciiTable_t7va_list"></span><span id="at_vwriteline__asciiTable_tC.va_list"></span><span class="target" id="_ascii_table_8h_1a2ad380bc74295b4f561d5d496c558843"></span><em class="property">static</em> int <code class="descname">at_vwriteline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413at_vwritelineK12asciiTable_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format arguments to form a line and write it to the file. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of characters written. -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">ap</span></code>: va_list Variables that should be formatted using the format string to create a line in the table. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of characters written. -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">ap</span></code>: va_list Variables that should be formatted using the format string to create a line in the table. </p></li>
 </ul>
 </dd>
 </dl>
@@ -727,13 +699,12 @@
 <dt id="_CPPv411at_readlineK12asciiTable_tz">
 <span id="_CPPv311at_readlineK12asciiTable_tz"></span><span id="_CPPv211at_readlineK12asciiTable_tz"></span><span id="at_readline__asciiTable_tC.z"></span><span class="target" id="_ascii_table_8h_1ae69d8028086c1dfbc9d1f3c47d2b58cd"></span><em class="property">static</em> int <code class="descname">at_readline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411at_readlineK12asciiTable_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Read a line from the file and parse it. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of characters read. -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">...</span></code>: Pointers to variables where parsed arguments should be stored. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of characters read. -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">...</span></code>: Pointers to variables where parsed arguments should be stored. </p></li>
 </ul>
 </dd>
 </dl>
@@ -744,13 +715,12 @@
 <dt id="_CPPv412at_writelineK12asciiTable_tz">
 <span id="_CPPv312at_writelineK12asciiTable_tz"></span><span id="_CPPv212at_writelineK12asciiTable_tz"></span><span id="at_writeline__asciiTable_tC.z"></span><span class="target" id="_ascii_table_8h_1a3537e4479c4c6146115a606c4be89fb0"></span><em class="property">static</em> int <code class="descname">at_writeline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412at_writelineK12asciiTable_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format arguments to form a line and write it to the file. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of characters written. -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">...</span></code>: Variables that should be formatted using the format string to create a line in the table. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of characters written. -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">...</span></code>: Variables that should be formatted using the format string to create a line in the table. </p></li>
 </ul>
 </dd>
 </dl>
@@ -761,12 +731,11 @@
 <dt id="_CPPv414at_writeformatK12asciiTable_t">
 <span id="_CPPv314at_writeformatK12asciiTable_t"></span><span id="_CPPv214at_writeformatK12asciiTable_t"></span><span id="at_writeformat__asciiTable_tC"></span><span class="target" id="_ascii_table_8h_1a99cf4e10276fa57632a44489ce1883ce"></span><em class="property">static</em> int <code class="descname">at_writeformat</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414at_writeformatK12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Write the format string the the file, prepending it with a comment. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int On success, the number of characters written. -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int On success, the number of characters written. -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 </ul>
 </dd>
 </dl>
@@ -777,12 +746,11 @@
 <dt id="_CPPv422at_discover_format_strP12asciiTable_t">
 <span id="_CPPv322at_discover_format_strP12asciiTable_t"></span><span id="_CPPv222at_discover_format_strP12asciiTable_t"></span><span id="at_discover_format_str__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1a065c972ea3d12c9c0b3b18f60ae2fb67"></span><em class="property">static</em> int <code class="descname">at_discover_format_str</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422at_discover_format_strP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Try to find the format string in the file. The format string is assumed to start with a comment. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>0 on success, -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>0 on success, -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 </ul>
 </dd>
 </dl>
@@ -793,12 +761,11 @@
 <dt id="_CPPv412at_set_ncolsP12asciiTable_t">
 <span id="_CPPv312at_set_ncolsP12asciiTable_t"></span><span id="_CPPv212at_set_ncolsP12asciiTable_t"></span><span id="at_set_ncols__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1a0603f9b3c88d350047d07d7ae1be7885"></span><em class="property">static</em> int <code class="descname">at_set_ncols</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412at_set_ncolsP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set the number of columns by counting the format specifiers. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int The number of columns counted. Negative values indicate errors. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int The number of columns counted. Negative values indicate errors. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 </ul>
 </dd>
 </dl>
@@ -809,12 +776,11 @@
 <dt id="_CPPv417at_set_format_sizP12asciiTable_t">
 <span id="_CPPv317at_set_format_sizP12asciiTable_t"></span><span id="_CPPv217at_set_format_sizP12asciiTable_t"></span><span id="at_set_format_siz__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1aaf2ff73c9e5029825d7da00efc5d37c4"></span><em class="property">static</em> int <code class="descname">at_set_format_siz</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417at_set_format_sizP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Determine the column sizes based on the types. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int 0 on success, -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure that sizes will be added to. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int 0 on success, -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure that sizes will be added to. </p></li>
 </ul>
 </dd>
 </dl>
@@ -825,12 +791,11 @@
 <dt id="_CPPv417at_set_format_typP12asciiTable_t">
 <span id="_CPPv317at_set_format_typP12asciiTable_t"></span><span id="_CPPv217at_set_format_typP12asciiTable_t"></span><span id="at_set_format_typ__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1ab0a82f6cbb7d372d6ea2fbab1da2d4af"></span><em class="property">static</em> int <code class="descname">at_set_format_typ</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417at_set_format_typP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Determine the column types by parsing the format string. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int 0 on success, -1 on failure. TODO: switch to regex </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure that types will be added to. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int 0 on success, -1 on failure. TODO: switch to regex </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure that types will be added to. </p></li>
 </ul>
 </dd>
 </dl>
@@ -841,15 +806,14 @@
 <dt id="_CPPv418at_vbytes_to_arrayK12asciiTable_tPKcK6size_t7va_list">
 <span id="_CPPv318at_vbytes_to_arrayK12asciiTable_tPKcK6size_t7va_list"></span><span id="_CPPv218at_vbytes_to_arrayK12asciiTable_tPKcK6size_t7va_list"></span><span id="at_vbytes_to_array__asciiTable_tC.cCP.sC.va_list"></span><span class="target" id="_ascii_table_8h_1a3238694543600c033723a12a910b8671"></span><em class="property">static</em> int <code class="descname">at_vbytes_to_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, <em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>data_siz</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418at_vbytes_to_arrayK12asciiTable_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Convert data into arrays for columns. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int Number of rows read on success, -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">data</span></code>: constant character pointer to memory containing data that should be parsed. </li>
-<li><code class="docutils literal notranslate"><span class="pre">data_siz</span></code>: constant size_t Size of data in bytes. </li>
-<li><code class="docutils literal notranslate"><span class="pre">ap</span></code>: va_list Pointers to pointers to memory where columns should be stored. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int Number of rows read on success, -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">data</span></code>: constant character pointer to memory containing data that should be parsed. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">data_siz</span></code>: constant size_t Size of data in bytes. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">ap</span></code>: va_list Pointers to pointers to memory where columns should be stored. </p></li>
 </ul>
 </dd>
 </dl>
@@ -860,15 +824,14 @@
 <dt id="_CPPv418at_varray_to_bytesK12asciiTable_tPcK6size_t7va_list">
 <span id="_CPPv318at_varray_to_bytesK12asciiTable_tPcK6size_t7va_list"></span><span id="_CPPv218at_varray_to_bytesK12asciiTable_tPcK6size_t7va_list"></span><span id="at_varray_to_bytes__asciiTable_tC.cP.sC.va_list"></span><span class="target" id="_ascii_table_8h_1aa847c52c2fc553e909e1f3e64c6683de"></span><em class="property">static</em> int <code class="descname">at_varray_to_bytes</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, char *<em>data</em>, <em class="property">const</em> size_t <em>data_siz</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418at_varray_to_bytesK12asciiTable_tPcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Encode a set of arrays as bytes. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int Number of bytes written. If larger than data_siz, the message will not be written to data and data should be resized first. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">data</span></code>: Pointer to memory where encoded arrays should be stored. </li>
-<li><code class="docutils literal notranslate"><span class="pre">data_siz</span></code>: Integer size of data. </li>
-<li><code class="docutils literal notranslate"><span class="pre">ap</span></code>: va_list Pointers to memory where column data is stored. The first argument in this set should be an integer, the number of rows in each column array. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int Number of bytes written. If larger than data_siz, the message will not be written to data and data should be resized first. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">data</span></code>: Pointer to memory where encoded arrays should be stored. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">data_siz</span></code>: Integer size of data. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">ap</span></code>: va_list Pointers to memory where column data is stored. The first argument in this set should be an integer, the number of rows in each column array. </p></li>
 </ul>
 </dd>
 </dl>
@@ -879,15 +842,14 @@
 <dt id="_CPPv417at_bytes_to_arrayK12asciiTable_tPc6size_tz">
 <span id="_CPPv317at_bytes_to_arrayK12asciiTable_tPc6size_tz"></span><span id="_CPPv217at_bytes_to_arrayK12asciiTable_tPc6size_tz"></span><span id="at_bytes_to_array__asciiTable_tC.cP.s.z"></span><span class="target" id="_ascii_table_8h_1abb03c7592c2a72561831107582c3abb0"></span><em class="property">static</em> int <code class="descname">at_bytes_to_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, char *<em>data</em>, size_t <em>data_siz</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417at_bytes_to_arrayK12asciiTable_tPc6size_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Convert data into arrays for columns. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int Number of rows read on success, -1 on failure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">data</span></code>: constant character pointer to memory containing data that should be parsed. </li>
-<li><code class="docutils literal notranslate"><span class="pre">data_siz</span></code>: constant size_t Size of data in bytes. </li>
-<li><code class="docutils literal notranslate"><span class="pre">...</span></code>: Pointers to pointers to memory where columns should be stored. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int Number of rows read on success, -1 on failure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">data</span></code>: constant character pointer to memory containing data that should be parsed. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">data_siz</span></code>: constant size_t Size of data in bytes. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">...</span></code>: Pointers to pointers to memory where columns should be stored. </p></li>
 </ul>
 </dd>
 </dl>
@@ -898,15 +860,14 @@
 <dt id="_CPPv417at_array_to_bytesK12asciiTable_tPcK6size_tz">
 <span id="_CPPv317at_array_to_bytesK12asciiTable_tPcK6size_tz"></span><span id="_CPPv217at_array_to_bytesK12asciiTable_tPcK6size_tz"></span><span id="at_array_to_bytes__asciiTable_tC.cP.sC.z"></span><span class="target" id="_ascii_table_8h_1a8ea70b93e3bdcfe6c8f6861b023e60c1"></span><em class="property">static</em> int <code class="descname">at_array_to_bytes</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, char *<em>data</em>, <em class="property">const</em> size_t <em>data_siz</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417at_array_to_bytesK12asciiTable_tPcK6size_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Encode a set of arrays as bytes. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int Number of bytes written. If larger than data_siz, the message will not be written to data and data should be resized first. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
-<li><code class="docutils literal notranslate"><span class="pre">data</span></code>: Pointer to memory where encoded arrays should be stored. </li>
-<li><code class="docutils literal notranslate"><span class="pre">data_siz</span></code>: Integer size of data. </li>
-<li><code class="docutils literal notranslate"><span class="pre">...</span></code>: Pointers to memory where column data is stored. The first argument in this set should be an integer, the number of rows in each column array. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int Number of bytes written. If larger than data_siz, the message will not be written to data and data should be resized first. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[out]</span> <span class="pre">data</span></code>: Pointer to memory where encoded arrays should be stored. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">data_siz</span></code>: Integer size of data. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">...</span></code>: Pointers to memory where column data is stored. The first argument in this set should be an integer, the number of rows in each column array. </p></li>
 </ul>
 </dd>
 </dl>
@@ -917,10 +878,9 @@
 <dt id="_CPPv410at_cleanupP12asciiTable_t">
 <span id="_CPPv310at_cleanupP12asciiTable_t"></span><span id="_CPPv210at_cleanupP12asciiTable_t"></span><span id="at_cleanup__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1a4334fe77589dbea1626482da3fa54abb"></span><em class="property">static</em> void <code class="descname">at_cleanup</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410at_cleanupP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Deallocate and clean up <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> structure. </p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 </ul>
 </dd>
 </dl>
@@ -931,14 +891,13 @@
 <dt id="_CPPv49at_updateP12asciiTable_tPKcPKc">
 <span id="_CPPv39at_updateP12asciiTable_tPKcPKc"></span><span id="_CPPv29at_updateP12asciiTable_tPKcPKc"></span><span id="at_update__asciiTable_tP.cCP.cCP"></span><span class="target" id="_ascii_table_8h_1a634dcd21905d98fe7550716a06c6bf82"></span><em class="property">static</em> int <code class="descname">at_update</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em>, <em class="property">const</em> char *<em>filepath</em>, <em class="property">const</em> char *<em>io_mode</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49at_updateP12asciiTable_tPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Update an existing <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> structure. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int -1 if there is an error, 0 otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">t</span></code>: asciiTable_t* Address of table structure to update. </li>
-<li><code class="docutils literal notranslate"><span class="pre">filepath</span></code>: constant character pointer to file path. </li>
-<li><code class="docutils literal notranslate"><span class="pre">io_mode</span></code>: constant character pointer to I/O mode. “r” for read, “w” for write. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int -1 if there is an error, 0 otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t</span></code>: asciiTable_t* Address of table structure to update. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">filepath</span></code>: constant character pointer to file path. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">io_mode</span></code>: constant character pointer to I/O mode. “r” for read, “w” for write. </p></li>
 </ul>
 </dd>
 </dl>
@@ -949,17 +908,16 @@
 <dt id="_CPPv410asciiTablePKcPKcPKcPKcPKcPKc">
 <span id="_CPPv310asciiTablePKcPKcPKcPKcPKcPKc"></span><span id="_CPPv210asciiTablePKcPKcPKcPKcPKcPKc"></span><span id="asciiTable__cCP.cCP.cCP.cCP.cCP.cCP"></span><span class="target" id="_ascii_table_8h_1a2cc033a42c5436c373793d378b806e9c"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t">asciiTable_t</a> <code class="descname">asciiTable</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>filepath</em>, <em class="property">const</em> char *<em>io_mode</em>, <em class="property">const</em> char *<em>format_str</em>, <em class="property">const</em> char *<em>comment</em>, <em class="property">const</em> char *<em>column</em>, <em class="property">const</em> char *<em>newline</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410asciiTablePKcPKcPKcPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> structure. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">filepath</span></code>: constant character pointer to file path. </li>
-<li><code class="docutils literal notranslate"><span class="pre">io_mode</span></code>: constant character pointer to I/O mode. “r” for read, “w” for write. </li>
-<li><code class="docutils literal notranslate"><span class="pre">format_str</span></code>: constant character pointer to string describing the format of the table roads. Required for io_mode == “w”, but if set to NULL for io_mode == “r”, it will attempt to be read from the table. </li>
-<li><code class="docutils literal notranslate"><span class="pre">comment</span></code>: const character pointer to character(s) that should indicate a comment. If NULL, comment is set to “# “. </li>
-<li><code class="docutils literal notranslate"><span class="pre">column</span></code>: const character pointer to character(s) that should separate columns in the table. If NULL, column is set to “\t”. </li>
-<li><code class="docutils literal notranslate"><span class="pre">newline</span></code>: const character pointer to character(s) that should indicate a newline. If NULL, newline is set to “\n”. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">filepath</span></code>: constant character pointer to file path. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">io_mode</span></code>: constant character pointer to I/O mode. “r” for read, “w” for write. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">format_str</span></code>: constant character pointer to string describing the format of the table roads. Required for io_mode == “w”, but if set to NULL for io_mode == “r”, it will attempt to be read from the table. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">comment</span></code>: const character pointer to character(s) that should indicate a comment. If NULL, comment is set to “# “. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">column</span></code>: const character pointer to character(s) that should separate columns in the table. If NULL, column is set to “\t”. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">newline</span></code>: const character pointer to character(s) that should indicate a newline. If NULL, newline is set to “\n”. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1028,9 +986,7 @@
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -1039,7 +995,7 @@
         <a href="code_cpp.html" class="btn btn-neutral float-right" title="C++ Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="datatypes_cpp.html" class="btn btn-neutral" title="C/C++ Datatypes API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="datatypes_cpp.html" class="btn btn-neutral float-left" title="C/C++ Datatypes API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -1048,11 +1004,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1065,38 +1021,15 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

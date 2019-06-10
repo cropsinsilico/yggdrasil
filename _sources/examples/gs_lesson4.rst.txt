@@ -1,50 +1,6 @@
 gs_lesson4 Example
 ==================
 
-C Version
----------
-
-Model Code:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelA.c
-   :language: c
-   :linenos:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelB.c
-   :language: c
-   :linenos:
-
-
-Model YAML:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/gs_lesson4_c.yml
-   :language: yaml
-   :linenos:
-
-
-
-CMake Version
--------------
-
-Model Code:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelA.cpp
-   :language: c++
-   :linenos:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelB.cpp
-   :language: c++
-   :linenos:
-
-
-Model YAML:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/gs_lesson4_cmake.yml
-   :language: yaml
-   :linenos:
-
-
-
 Python Version
 --------------
 
@@ -62,28 +18,6 @@ Model Code:
 Model YAML:
 
 .. literalinclude:: /../../yggdrasil/examples/gs_lesson4/gs_lesson4_python.yml
-   :language: yaml
-   :linenos:
-
-
-
-Make Version
-------------
-
-Model Code:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelA.cpp
-   :language: c++
-   :linenos:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelB.cpp
-   :language: c++
-   :linenos:
-
-
-Model YAML:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/gs_lesson4_make.yml
    :language: yaml
    :linenos:
 
@@ -111,6 +45,28 @@ Model YAML:
 
 
 
+C Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelA.c
+   :language: c
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelB.c
+   :language: c
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/gs_lesson4_c.yml
+   :language: yaml
+   :linenos:
+
+
+
 C++ Version
 -----------
 
@@ -128,6 +84,50 @@ Model Code:
 Model YAML:
 
 .. literalinclude:: /../../yggdrasil/examples/gs_lesson4/gs_lesson4_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+Make Version
+------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelA.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelB.cpp
+   :language: c++
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/gs_lesson4_make.yml
+   :language: yaml
+   :linenos:
+
+
+
+CMake Version
+-------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelA.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelB.cpp
+   :language: c++
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/gs_lesson4_cmake.yml
    :language: yaml
    :linenos:
 

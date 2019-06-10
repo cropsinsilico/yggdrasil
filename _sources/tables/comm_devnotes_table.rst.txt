@@ -20,8 +20,8 @@ zmq    A ZeroMQ endpoint of the form              |yggdrasil| uses the tcp trans
        <transport>://<address>, where the         connection, |yggdrasil| establishes a second request/reply connection that is   
        format of address depends on the           used to confirm messages passed between the primary PAIR of sockets. On the     
        transport. Additional information can be   first send, the model should create a REP socket on an open tcp address and send
-       found `here <http://api.zeromq.org/3-2     that address in the header of the first message under the key 'zmq_reply'.      
-       :zmq-bind>`_.                              Receiving models should check message headers for this key and, on receipt,     
+       found `here                                that address in the header of the first message under the key 'zmq_reply'.      
+       <http://api.zeromq.org/3-2:zmq-bind>`_.    Receiving models should check message headers for this key and, on receipt,     
                                                   establish the partner REQ socket with the specified address (receiving comms can
                                                   receive from more than one source so they can have more than one request        
                                                   addresses at at time for this purpose). Following every message, the sending    

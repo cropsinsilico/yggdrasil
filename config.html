@@ -17,44 +17,37 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/>
-        <link rel="next" title="Units" href="units.html"/>
-        <link rel="prev" title="YAML Files" href="yaml.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Units" href="units.html" />
+    <link rel="prev" title="YAML Files" href="yaml.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -131,7 +124,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -139,9 +132,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -203,41 +197,41 @@ can have any of the valid
 <a class="reference external" href="https://docs.python.org/2/library/logging.html#levels">logging levels</a>.
 These include:</p>
 <ul class="simple">
-<li><strong>NOTSET:</strong> Do not print any messages.</li>
-<li><strong>CRITICAL:</strong> Print only messages logged as critical.</li>
-<li><strong>ERROR:</strong> Print messages logged as error or critical.</li>
-<li><strong>WARNING:</strong> Print messages logged as warning, error, or critical.</li>
-<li><strong>INFO:</strong> Print messages logged as info, warning, error, or critical.</li>
-<li><strong>DEBUG:</strong> Print messages logged as debug, info, warning, error, or critical.</li>
+<li><p><strong>NOTSET:</strong> Do not print any messages.</p></li>
+<li><p><strong>CRITICAL:</strong> Print only messages logged as critical.</p></li>
+<li><p><strong>ERROR:</strong> Print messages logged as error or critical.</p></li>
+<li><p><strong>WARNING:</strong> Print messages logged as warning, error, or critical.</p></li>
+<li><p><strong>INFO:</strong> Print messages logged as info, warning, error, or critical.</p></li>
+<li><p><strong>DEBUG:</strong> Print messages logged as debug, info, warning, error, or critical.</p></li>
 </ul>
 <p>The debug options are:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="10%" />
-<col width="11%" />
-<col width="79%" />
+<col style="width: 10%" />
+<col style="width: 11%" />
+<col style="width: 79%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Default</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>ygg</td>
-<td>INFO</td>
-<td>Controls the level of messages printed by the
-yggdrasil framework itself.</td>
+<tbody>
+<tr class="row-even"><td><p>ygg</p></td>
+<td><p>INFO</p></td>
+<td><p>Controls the level of messages printed by the
+yggdrasil framework itself.</p></td>
 </tr>
-<tr class="row-odd"><td>rmq</td>
-<td>WARNING</td>
-<td>Controls the level of messages printed by
-RabbitMQ.</td>
+<tr class="row-odd"><td><p>rmq</p></td>
+<td><p>WARNING</p></td>
+<td><p>Controls the level of messages printed by
+RabbitMQ.</p></td>
 </tr>
-<tr class="row-even"><td>client</td>
-<td>INFO</td>
-<td>Controls the level of messages printed by
-yggdrasil calls from the models.</td>
+<tr class="row-even"><td><p>client</p></td>
+<td><p>INFO</p></td>
+<td><p>Controls the level of messages printed by
+yggdrasil calls from the models.</p></td>
 </tr>
 </tbody>
 </table>
@@ -247,87 +241,87 @@ yggdrasil calls from the models.</td>
 <p>Each supported language has a dedicated section in the config file with
 options that control how models of that language will be handled. The
 following options are available to all languages:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="21%" />
-<col width="79%" />
+<col style="width: 21%" />
+<col style="width: 79%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>commtypes</td>
-<td>A list of communication mechanisms types available
+<tbody>
+<tr class="row-even"><td><p>commtypes</p></td>
+<td><p>A list of communication mechanisms types available
 for use in the language. If libraries are installed
 that later enable a new communication mechanism,
-running <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> will update this list.</td>
+running <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> will update this list.</p></td>
 </tr>
-<tr class="row-odd"><td>disable</td>
-<td>A boolean determining if models in the specified
+<tr class="row-odd"><td><p>disable</p></td>
+<td><p>A boolean determining if models in the specified
 language should be disabled. This option serves as a
-for isolating languages for testing.</td>
+for isolating languages for testing.</p></td>
 </tr>
 </tbody>
 </table>
 <p>Options available for all compiled languages include:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="21%" />
-<col width="79%" />
+<col style="width: 21%" />
+<col style="width: 79%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>compiler</td>
-<td>Name of, or full path to, the compiler that should
-be used for compiling models.</td>
+<tbody>
+<tr class="row-even"><td><p>compiler</p></td>
+<td><p>Name of, or full path to, the compiler that should
+be used for compiling models.</p></td>
 </tr>
-<tr class="row-odd"><td>compiler_flags</td>
-<td>A list of flags that should be used when calling the
-compiler.</td>
+<tr class="row-odd"><td><p>compiler_flags</p></td>
+<td><p>A list of flags that should be used when calling the
+compiler.</p></td>
 </tr>
-<tr class="row-even"><td>linker</td>
-<td>Name of, or full path to, the linker that should be
-used for linking models (and the interface library).</td>
+<tr class="row-even"><td><p>linker</p></td>
+<td><p>Name of, or full path to, the linker that should be
+used for linking models (and the interface library).</p></td>
 </tr>
-<tr class="row-odd"><td>linker_flags</td>
-<td>A list of flags that should be used when calling the
-linker.</td>
+<tr class="row-odd"><td><p>linker_flags</p></td>
+<td><p>A list of flags that should be used when calling the
+linker.</p></td>
 </tr>
-<tr class="row-even"><td>archiver</td>
-<td>Name of, or full path to, the archiver that should
-be used for creating static interface libraries.</td>
+<tr class="row-even"><td><p>archiver</p></td>
+<td><p>Name of, or full path to, the archiver that should
+be used for creating static interface libraries.</p></td>
 </tr>
-<tr class="row-odd"><td>archiver_flags</td>
-<td>A list of flags that should be used when calling the
-archiver.</td>
+<tr class="row-odd"><td><p>archiver_flags</p></td>
+<td><p>A list of flags that should be used when calling the
+archiver.</p></td>
 </tr>
 </tbody>
 </table>
 <p>Options available for all interpreted languages include:x</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="25%" />
-<col width="75%" />
+<col style="width: 25%" />
+<col style="width: 75%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>interpreter</td>
-<td>Full path to the interpreter executable that should
-be used for running models.</td>
+<tbody>
+<tr class="row-even"><td><p>interpreter</p></td>
+<td><p>Full path to the interpreter executable that should
+be used for running models.</p></td>
 </tr>
-<tr class="row-odd"><td>interpreter_flags</td>
-<td>A list of flags that should be used when calling the
-interpreter.</td>
+<tr class="row-odd"><td><p>interpreter_flags</p></td>
+<td><p>A list of flags that should be used when calling the
+interpreter.</p></td>
 </tr>
 </tbody>
 </table>
@@ -340,69 +334,69 @@ use an alternate version than the one identified by yggdrasil, it may
 be necessary for you to manually specify the location of dependency
 headers and/or libraries. These can be set using the following config
 options.</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="25%" />
-<col width="75%" />
+<col style="width: 25%" />
+<col style="width: 75%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>rapidjson_include</td>
-<td>Full path to the directory containing the rapidjson
-headers.</td>
+<tbody>
+<tr class="row-even"><td><p>rapidjson_include</p></td>
+<td><p>Full path to the directory containing the rapidjson
+headers.</p></td>
 </tr>
-<tr class="row-odd"><td>zmq_include</td>
-<td>Full path to the zmq.h header.</td>
+<tr class="row-odd"><td><p>zmq_include</p></td>
+<td><p>Full path to the zmq.h header.</p></td>
 </tr>
-<tr class="row-even"><td>zmq_static</td>
-<td>Full path to the zmq.lib static library.</td>
+<tr class="row-even"><td><p>zmq_static</p></td>
+<td><p>Full path to the zmq.lib static library.</p></td>
 </tr>
-<tr class="row-odd"><td>czmq_include</td>
-<td>Full path to the czmq.h header.</td>
+<tr class="row-odd"><td><p>czmq_include</p></td>
+<td><p>Full path to the czmq.h header.</p></td>
 </tr>
-<tr class="row-even"><td>czmq_static</td>
-<td>Full path to the czmq.lib static library.</td>
+<tr class="row-even"><td><p>czmq_static</p></td>
+<td><p>Full path to the czmq.lib static library.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="matlab-options">
 <h3>Matlab Options<a class="headerlink" href="#matlab-options" title="Permalink to this headline">¶</a></h3>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="26%" />
-<col width="74%" />
+<col style="width: 26%" />
+<col style="width: 74%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>startup_waittime_s</td>
-<td>Time (in seconds) that should be waited for a
+<tbody>
+<tr class="row-even"><td><p>startup_waittime_s</p></td>
+<td><p>Time (in seconds) that should be waited for a
 Matlab shared engine to start before raising an
 error. On some systems this will need to be &gt;10s in
-order to allow for long Matlab startup times.</td>
+order to allow for long Matlab startup times.</p></td>
 </tr>
-<tr class="row-odd"><td>disable_engine</td>
-<td>Boolean controling whether or not Matlab shared
+<tr class="row-odd"><td><p>disable_engine</p></td>
+<td><p>Boolean controling whether or not Matlab shared
 engines should be used to run models. This option is
 useful when debugging Matlab models as the shared
 engine, while reducing startup time, can result in
-orphaned processes for models that raise errors.</td>
+orphaned processes for models that raise errors.</p></td>
 </tr>
-<tr class="row-even"><td>matlabroot</td>
-<td>The full path to the Matlab root directory.</td>
+<tr class="row-even"><td><p>matlabroot</p></td>
+<td><p>The full path to the Matlab root directory.</p></td>
 </tr>
-<tr class="row-odd"><td>version</td>
-<td>The version of Matlab being used to run models. This
+<tr class="row-odd"><td><p>version</p></td>
+<td><p>The version of Matlab being used to run models. This
 option should only be set by yggdrasil and is only
-used to speedup reporting of the version.</td>
+used to speedup reporting of the version.</p></td>
 </tr>
 </tbody>
 </table>
@@ -413,38 +407,38 @@ used to speedup reporting of the version.</td>
 <p>Options in the ‘[RMQ]’ section control the behavior of RabbitMQ connections.
 If the option is left blank, the default RabbitMQ option is used.
 These include:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="14%" />
-<col width="14%" />
-<col width="72%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 72%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Default</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>namespace</td>
-<td>&#160;</td>
-<td>RabbitMQ exchange.</td>
+<tbody>
+<tr class="row-even"><td><p>namespace</p></td>
+<td></td>
+<td><p>RabbitMQ exchange.</p></td>
 </tr>
-<tr class="row-odd"><td>host</td>
-<td>localhost</td>
-<td>RabbitMQ server host.</td>
+<tr class="row-odd"><td><p>host</p></td>
+<td><p>localhost</p></td>
+<td><p>RabbitMQ server host.</p></td>
 </tr>
-<tr class="row-even"><td>vhost</td>
-<td>&#160;</td>
-<td>RabbitMQ server virtual host.</td>
+<tr class="row-even"><td><p>vhost</p></td>
+<td></td>
+<td><p>RabbitMQ server virtual host.</p></td>
 </tr>
-<tr class="row-odd"><td>user</td>
-<td>guest</td>
-<td>RabbitMQ server user name.</td>
+<tr class="row-odd"><td><p>user</p></td>
+<td><p>guest</p></td>
+<td><p>RabbitMQ server user name.</p></td>
 </tr>
-<tr class="row-even"><td>password</td>
-<td>guest</td>
-<td>RabbitMQ server password.</td>
+<tr class="row-even"><td><p>password</p></td>
+<td><p>guest</p></td>
+<td><p>RabbitMQ server password.</p></td>
 </tr>
 </tbody>
 </table>
@@ -454,22 +448,22 @@ These include:</p>
 <p>Options in the ‘[parallel]’ section control the behavior of parallelization.
 Although, not supported in the current version of yggdrasil, these
 include:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="15%" />
-<col width="11%" />
-<col width="74%" />
+<col style="width: 15%" />
+<col style="width: 11%" />
+<col style="width: 74%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Default</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>cluster</td>
-<td>&#160;</td>
-<td>List of IP address of cluster nodes.</td>
+<tbody>
+<tr class="row-even"><td><p>cluster</p></td>
+<td></td>
+<td><p>List of IP address of cluster nodes.</p></td>
 </tr>
 </tbody>
 </table>
@@ -478,9 +472,7 @@ include:</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -489,7 +481,7 @@ include:</p>
         <a href="units.html" class="btn btn-neutral float-right" title="Units" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="yaml.html" class="btn btn-neutral" title="YAML Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="yaml.html" class="btn btn-neutral float-left" title="YAML Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -498,11 +490,11 @@ include:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -515,38 +507,15 @@ include:</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

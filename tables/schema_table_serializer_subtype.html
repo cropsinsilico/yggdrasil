@@ -17,42 +17,35 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -119,7 +112,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
@@ -127,9 +120,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -171,63 +165,61 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <table border="1" class="docutils" id="schema-table-serializer-subtype-rst">
+  <table class="docutils align-center" id="schema-table-serializer-subtype-rst">
 <colgroup>
-<col width="11%" />
-<col width="89%" />
+<col style="width: 11%" />
+<col style="width: 89%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Seritype</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Seritype</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>default</td>
-<td>[DEFAULT] Default serializer that uses yggdrasil’s extended JSON serialization
-based on a provided type definition (See discussion <a class="reference internal" href="../advanced/serialization.html#serialization-rst"><span class="std std-ref">here</span></a>).</td>
+<tbody>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>[DEFAULT] Default serializer that uses yggdrasil’s extended JSON serialization
+based on a provided type definition (See discussion <a class="reference internal" href="../advanced/serialization.html#serialization-rst"><span class="std std-ref">here</span></a>).</p></td>
 </tr>
-<tr class="row-odd"><td>direct</td>
-<td>Direct serialization of bytes.</td>
+<tr class="row-odd"><td><p>direct</p></td>
+<td><p>Direct serialization of bytes.</p></td>
 </tr>
-<tr class="row-even"><td>functional</td>
-<td>Serializer that uses provied function to serialize messages.</td>
+<tr class="row-even"><td><p>functional</p></td>
+<td><p>Serializer that uses provied function to serialize messages.</p></td>
 </tr>
-<tr class="row-odd"><td>json</td>
-<td>Serializes Python objects using the JSON standard.</td>
+<tr class="row-odd"><td><p>json</p></td>
+<td><p>Serializes Python objects using the JSON standard.</p></td>
 </tr>
-<tr class="row-even"><td>map</td>
-<td>Serialzation of mapping between key/value pairs with one pair per line and using
-a character delimiter to separate keys and values.</td>
+<tr class="row-even"><td><p>map</p></td>
+<td><p>Serialzation of mapping between key/value pairs with one pair per line and using
+a character delimiter to separate keys and values.</p></td>
 </tr>
-<tr class="row-odd"><td>mat</td>
-<td>Serializes objects using the Matlab .mat format.</td>
+<tr class="row-odd"><td><p>mat</p></td>
+<td><p>Serializes objects using the Matlab .mat format.</p></td>
 </tr>
-<tr class="row-even"><td>obj</td>
-<td>Serialize 3D structures using Obj format.</td>
+<tr class="row-even"><td><p>obj</p></td>
+<td><p>Serialize 3D structures using Obj format.</p></td>
 </tr>
-<tr class="row-odd"><td>pandas</td>
-<td>Serializes tables using the pandas package.</td>
+<tr class="row-odd"><td><p>pandas</p></td>
+<td><p>Serializes tables using the pandas package.</p></td>
 </tr>
-<tr class="row-even"><td>pickle</td>
-<td>Serialize any Python object using a Python pickle.</td>
+<tr class="row-even"><td><p>pickle</p></td>
+<td><p>Serialize any Python object using a Python pickle.</p></td>
 </tr>
-<tr class="row-odd"><td>ply</td>
-<td>Serialize 3D structures using Ply format.</td>
+<tr class="row-odd"><td><p>ply</p></td>
+<td><p>Serialize 3D structures using Ply format.</p></td>
 </tr>
-<tr class="row-even"><td>table</td>
-<td>ASCII tab (or otherwise) delimited table.</td>
+<tr class="row-even"><td><p>table</p></td>
+<td><p>ASCII tab (or otherwise) delimited table.</p></td>
 </tr>
-<tr class="row-odd"><td>yaml</td>
-<td>Serializes Python objects using the YAML standard.</td>
+<tr class="row-odd"><td><p>yaml</p></td>
+<td><p>Serializes Python objects using the YAML standard.</p></td>
 </tr>
 </tbody>
 </table>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -236,11 +228,11 @@ a character delimiter to separate keys and values.</td>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -253,38 +245,15 @@ a character delimiter to separate keys and values.</td>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

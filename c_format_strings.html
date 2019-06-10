@@ -17,44 +17,37 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/>
-        <link rel="next" title="Examples" href="examples/examples_toc.html"/>
-        <link rel="prev" title="Units" href="units.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples/examples_toc.html" />
+    <link rel="prev" title="Units" href="units.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -121,7 +114,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -129,9 +122,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -183,70 +177,70 @@ the designated type. These placeholders take the form of:</p>
 </pre></div>
 </div>
 <p>where the fields are:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="12%" />
-<col width="88%" />
+<col style="width: 12%" />
+<col style="width: 88%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Field</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>flags</td>
-<td>Flags indicating if the string representation should be padded to
+<tbody>
+<tr class="row-even"><td><p>flags</p></td>
+<td><p>Flags indicating if the string representation should be padded to
 the designated with and, if so, should the string be left or right
-justified in the space.</td>
+justified in the space.</p></td>
 </tr>
-<tr class="row-odd"><td>width</td>
-<td>Minimum width that the corresponding string representation of the
-variable should occupy in characters.</td>
+<tr class="row-odd"><td><p>width</p></td>
+<td><p>Minimum width that the corresponding string representation of the
+variable should occupy in characters.</p></td>
 </tr>
-<tr class="row-even"><td>precision</td>
-<td>Limit on the maximum width that the string representation should
-occupy based on the type of the variable.</td>
+<tr class="row-even"><td><p>precision</p></td>
+<td><p>Limit on the maximum width that the string representation should
+occupy based on the type of the variable.</p></td>
 </tr>
-<tr class="row-odd"><td>length</td>
-<td>Character code indicating the size of the variable expected.</td>
+<tr class="row-odd"><td><p>length</p></td>
+<td><p>Character code indicating the size of the variable expected.</p></td>
 </tr>
-<tr class="row-even"><td>type</td>
-<td>Character code specifying what type the placeholder represents.
-This is the only required field.</td>
+<tr class="row-even"><td><p>type</p></td>
+<td><p>Character code specifying what type the placeholder represents.
+This is the only required field.</p></td>
 </tr>
 </tbody>
 </table>
 <p>These strings can then be used to create messages from a list of variables
 (<code class="docutils literal notranslate"><span class="pre">printf</span></code>) or extract variable from messages (<code class="docutils literal notranslate"><span class="pre">scanf</span></code>).</p>
 <p>Some of the most common types are:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="19%" />
-<col width="81%" />
+<col style="width: 19%" />
+<col style="width: 81%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Type Code</th>
-<th class="head">Type</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Type Code</p></th>
+<th class="head"><p>Type</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">s</span></code></td>
-<td>String</td>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">s</span></code></p></td>
+<td><p>String</p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">d</span></code></td>
-<td>Integer</td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">d</span></code></p></td>
+<td><p>Integer</p></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">f</span></code></td>
-<td>Float</td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">f</span></code></p></td>
+<td><p>Float</p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">e</span></code> or <code class="docutils literal notranslate"><span class="pre">E</span></code></td>
-<td>Exponential notation float with <code class="docutils literal notranslate"><span class="pre">e</span></code> or <code class="docutils literal notranslate"><span class="pre">E</span></code> denoting the
-exponent.</td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">e</span></code> or <code class="docutils literal notranslate"><span class="pre">E</span></code></p></td>
+<td><p>Exponential notation float with <code class="docutils literal notranslate"><span class="pre">e</span></code> or <code class="docutils literal notranslate"><span class="pre">E</span></code> denoting the
+exponent.</p></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">g</span></code> or <code class="docutils literal notranslate"><span class="pre">G</span></code></td>
-<td>General format that uses <code class="docutils literal notranslate"><span class="pre">%f</span></code> for numbers with small
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">g</span></code> or <code class="docutils literal notranslate"><span class="pre">G</span></code></p></td>
+<td><p>General format that uses <code class="docutils literal notranslate"><span class="pre">%f</span></code> for numbers with small
 exponents and <code class="docutils literal notranslate"><span class="pre">%e</span></code> or <code class="docutils literal notranslate"><span class="pre">%E</span></code> for numbers with large
-exponents.</td>
+exponents.</p></td>
 </tr>
 </tbody>
 </table>
@@ -257,9 +251,7 @@ each type, please see the
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -268,7 +260,7 @@ each type, please see the
         <a href="examples/examples_toc.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="units.html" class="btn btn-neutral" title="Units" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="units.html" class="btn btn-neutral float-left" title="Units" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -277,11 +269,11 @@ each type, please see the
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -294,38 +286,15 @@ each type, please see the
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

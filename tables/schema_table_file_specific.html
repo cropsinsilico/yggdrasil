@@ -17,42 +17,35 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -119,7 +112,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
@@ -127,9 +120,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -171,105 +165,103 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <table border="1" class="docutils" id="schema-table-file-specific-rst">
+  <table class="docutils align-center" id="schema-table-file-specific-rst">
 <colgroup>
-<col width="9%" />
-<col width="9%" />
-<col width="41%" />
-<col width="42%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 41%" />
+<col style="width: 42%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Option</th>
-<th class="head">Type</th>
-<th class="head">Description</th>
-<th class="head">Valid For ‘Filetype’ Of</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Valid For ‘Filetype’ Of</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>comment</td>
-<td>string</td>
-<td>One or more characters indicating a comment. Defaults to ‘# ‘.</td>
-<td>[‘map’, ‘obj’, ‘mat’, ‘pickle’, ‘ply’, ‘yaml’, ‘json’, ‘table’, ‘ascii’, ‘pandas’]</td>
+<tbody>
+<tr class="row-even"><td><p>comment</p></td>
+<td><p>string</p></td>
+<td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
+<td><p>[‘map’, ‘ply’, ‘ascii’, ‘pandas’, ‘obj’, ‘pickle’, ‘yaml’, ‘table’, ‘mat’, ‘json’]</p></td>
 </tr>
-<tr class="row-odd"><td>datatype</td>
-<td>schema</td>
-<td>JSON schema defining the type of object that the serializer will be used to
-serialize/deserialize. Defaults to default_datatype.</td>
-<td>[‘map’, ‘obj’, ‘mat’, ‘pickle’, ‘ply’, ‘yaml’, ‘json’, ‘table’, ‘ascii’, ‘pandas’]</td>
+<tr class="row-odd"><td><p>datatype</p></td>
+<td><p>schema</p></td>
+<td><p>JSON schema defining the type of object that the serializer will be used to
+serialize/deserialize. Defaults to default_datatype.</p></td>
+<td><p>[‘map’, ‘ply’, ‘ascii’, ‘pandas’, ‘obj’, ‘pickle’, ‘yaml’, ‘table’, ‘mat’, ‘json’]</p></td>
 </tr>
-<tr class="row-even"><td>default_flow_style</td>
-<td>boolean</td>
-<td>If True, nested collections will be serialized in the block style. If False,
-they will always be serialized in the flow style. See <a class="reference external" href="https://pyyaml.org/wiki/PyYAMLDocumentation">PyYAML Documentation</a>.</td>
-<td>[‘yaml’]</td>
+<tr class="row-even"><td><p>default_flow_style</p></td>
+<td><p>boolean</p></td>
+<td><p>If True, nested collections will be serialized in the block style. If False,
+they will always be serialized in the flow style. See <a class="reference external" href="https://pyyaml.org/wiki/PyYAMLDocumentation">PyYAML Documentation</a>.</p></td>
+<td><p>[‘yaml’]</p></td>
 </tr>
-<tr class="row-odd"><td>delimiter</td>
-<td>string</td>
-<td>Delimiter that should be used to separate name/value pairs in the map. Defaults
-to t.</td>
-<td>[‘map’, ‘pandas’, ‘table’]</td>
+<tr class="row-odd"><td><p>delimiter</p></td>
+<td><p>string</p></td>
+<td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
+to t.</p></td>
+<td><p>[‘map’, ‘pandas’, ‘table’]</p></td>
 </tr>
-<tr class="row-even"><td>dont_write_header</td>
-<td>boolean</td>
-<td>If True, headers will not be added to serialized tables. Defaults to False.</td>
-<td>[‘pandas’]</td>
+<tr class="row-even"><td><p>dont_write_header</p></td>
+<td><p>boolean</p></td>
+<td><p>If True, headers will not be added to serialized tables. Defaults to False.</p></td>
+<td><p>[‘pandas’]</p></td>
 </tr>
-<tr class="row-odd"><td>encoding</td>
-<td>string</td>
-<td>Encoding that should be used to serialize the object. Defaults to ‘utf-8’.</td>
-<td>[‘yaml’]</td>
+<tr class="row-odd"><td><p>encoding</p></td>
+<td><p>string</p></td>
+<td><p>Encoding that should be used to serialize the object. Defaults to ‘utf-8’.</p></td>
+<td><p>[‘yaml’]</p></td>
 </tr>
-<tr class="row-even"><td>format_str</td>
-<td>string</td>
-<td>If provided, this string will be used to format messages from a list of
+<tr class="row-even"><td><p>format_str</p></td>
+<td><p>string</p></td>
+<td><p>If provided, this string will be used to format messages from a list of
 arguments and parse messages to get a list of arguments in C printf/scanf style.
-Defaults to None and messages are assumed to already be bytes.</td>
-<td>[‘table’, ‘pandas’]</td>
+Defaults to None and messages are assumed to already be bytes.</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
-<tr class="row-odd"><td>indent</td>
-<td>[‘string’, ‘int’]</td>
-<td>String or number of spaces that should be used to indent each level within the
-seiralized structure. Defaults to ‘t’.</td>
-<td>[‘yaml’, ‘json’]</td>
+<tr class="row-odd"><td><p>indent</p></td>
+<td><p>[‘string’, ‘int’]</p></td>
+<td><p>String or number of spaces that should be used to indent each level within the
+seiralized structure. Defaults to ‘t’.</p></td>
+<td><p>[‘yaml’, ‘json’]</p></td>
 </tr>
-<tr class="row-even"><td>newline</td>
-<td>string</td>
-<td>One or more characters indicating a newline. Defaults to ‘n’.</td>
-<td>[‘map’, ‘obj’, ‘mat’, ‘pickle’, ‘ply’, ‘yaml’, ‘json’, ‘table’, ‘ascii’, ‘pandas’]</td>
+<tr class="row-even"><td><p>newline</p></td>
+<td><p>string</p></td>
+<td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
+<td><p>[‘map’, ‘ply’, ‘ascii’, ‘pandas’, ‘obj’, ‘pickle’, ‘yaml’, ‘table’, ‘mat’, ‘json’]</p></td>
 </tr>
-<tr class="row-odd"><td>read_meth</td>
-<td>string</td>
-<td>Method that should be used to read data from the file. Defaults to ‘read’.
-Ignored if direction is ‘send’.</td>
-<td>[‘binary’]</td>
+<tr class="row-odd"><td><p>read_meth</p></td>
+<td><p>string</p></td>
+<td><p>Method that should be used to read data from the file. Defaults to ‘read’.
+Ignored if direction is ‘send’.</p></td>
+<td><p>[‘binary’]</p></td>
 </tr>
-<tr class="row-even"><td>serializer</td>
-<td>&#160;</td>
-<td>Class with serialize and deserialize methods that should be used to process sent
+<tr class="row-even"><td><p>serializer</p></td>
+<td></td>
+<td><p>Class with serialize and deserialize methods that should be used to process sent
 and received messages. Defaults to None and is constructed using provided
-‘serializer_kwargs’.</td>
-<td>[‘binary’]</td>
+‘serializer_kwargs’.</p></td>
+<td><p>[‘binary’]</p></td>
 </tr>
-<tr class="row-odd"><td>sort_keys</td>
-<td>boolean</td>
-<td>If True, the serialization of dictionaries will be in key sorted order. Defaults
-to True.</td>
-<td>[‘json’]</td>
+<tr class="row-odd"><td><p>sort_keys</p></td>
+<td><p>boolean</p></td>
+<td><p>If True, the serialization of dictionaries will be in key sorted order. Defaults
+to True.</p></td>
+<td><p>[‘json’]</p></td>
 </tr>
-<tr class="row-even"><td>use_astropy</td>
-<td>boolean</td>
-<td>If True, the astropy package will be used to serialize/deserialize table.
-Defaults to False.</td>
-<td>[‘table’, ‘pandas’]</td>
+<tr class="row-even"><td><p>use_astropy</p></td>
+<td><p>boolean</p></td>
+<td><p>If True, the astropy package will be used to serialize/deserialize table.
+Defaults to False.</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 </tbody>
 </table>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -278,11 +270,11 @@ Defaults to False.</td>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -295,38 +287,15 @@ Defaults to False.</td>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

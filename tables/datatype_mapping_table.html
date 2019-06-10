@@ -17,42 +17,35 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="../index.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -119,7 +112,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">yggdrasil</a>
@@ -127,9 +120,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -171,164 +165,162 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <table border="1" class="docutils" id="datatype-mapping-table-rst">
+  <table class="docutils align-center" id="datatype-mapping-table-rst">
 <colgroup>
-<col width="6%" />
-<col width="11%" />
-<col width="21%" />
-<col width="15%" />
-<col width="15%" />
-<col width="33%" />
+<col style="width: 6%" />
+<col style="width: 11%" />
+<col style="width: 21%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 33%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Schema</th>
-<th class="head">C</th>
-<th class="head">C++</th>
-<th class="head">Matlab</th>
-<th class="head">Python</th>
-<th class="head">Notes</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Schema</p></th>
+<th class="head"><p>C</p></th>
+<th class="head"><p>C++</p></th>
+<th class="head"><p>Matlab</p></th>
+<th class="head"><p>Python</p></th>
+<th class="head"><p>Notes</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>1darray</td>
-<td><code class="docutils literal notranslate"><span class="pre">*</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">*</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">mat</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></td>
-<td>&#160;</td>
+<tbody>
+<tr class="row-even"><td><p>1darray</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mat</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>array</td>
-<td><code class="docutils literal notranslate"><span class="pre">vector_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">std::vector&lt;void*&gt;</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">cell</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">list</span></code></td>
-<td>Support for dynamic arrays in C/C++ is
-still under development.</td>
+<tr class="row-odd"><td><p>array</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">vector_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">std::vector&lt;void*&gt;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cell</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
+<td><p>Support for dynamic arrays in C/C++ is
+still under development.</p></td>
 </tr>
-<tr class="row-even"><td>boolean</td>
-<td><code class="docutils literal notranslate"><span class="pre">bool</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">bool</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">logical</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">bool</span></code></td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>boolean</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">logical</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>bytes</td>
-<td><code class="docutils literal notranslate"><span class="pre">char*</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">char*</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">(utf-8)</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">bytes</span></code></td>
-<td>Precision X is preserved.</td>
+<tr class="row-odd"><td><p>bytes</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">(utf-8)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bytes</span></code></p></td>
+<td><p>Precision X is preserved.</p></td>
 </tr>
-<tr class="row-even"><td>complex</td>
-<td><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">complex</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">numpy.complexX</span></code></td>
-<td>Precision X is preserved.</td>
+<tr class="row-even"><td><p>complex</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.complexX</span></code></p></td>
+<td><p>Precision X is preserved.</p></td>
 </tr>
-<tr class="row-odd"><td>float</td>
-<td><code class="docutils literal notranslate"><span class="pre">floatX_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">floatX_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">single,</span> <span class="pre">double</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">numpy.floatX</span></code></td>
-<td>Precision X is preserved.</td>
+<tr class="row-odd"><td><p>float</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">floatX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">floatX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">single,</span> <span class="pre">double</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.floatX</span></code></p></td>
+<td><p>Precision X is preserved.</p></td>
 </tr>
-<tr class="row-even"><td>int</td>
-<td><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">intX</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">numpy.intX</span></code></td>
-<td>Precision X is preserved.</td>
+<tr class="row-even"><td><p>int</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">intX</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.intX</span></code></p></td>
+<td><p>Precision X is preserved.</p></td>
 </tr>
-<tr class="row-odd"><td>ndarray</td>
-<td><code class="docutils literal notranslate"><span class="pre">*</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">*</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">mat</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>ndarray</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mat</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>null</td>
-<td><code class="docutils literal notranslate"><span class="pre">NULL</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">NULL</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">NaN</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>null</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">NaN</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>number</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>This covers the JSON default for
-floating point or integer values.</td>
+<tr class="row-odd"><td><p>number</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>This covers the JSON default for
+floating point or integer values.</p></td>
 </tr>
-<tr class="row-even"><td>obj</td>
-<td><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">ObjDict</span></code></td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>obj</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ObjDict</span></code></p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>object</td>
-<td><code class="docutils literal notranslate"><span class="pre">map_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">std::map&lt;char*,void*&gt;</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">dict</span></code></td>
-<td>Support for dynamic objects in C/C++ is
-still under development.</td>
+<tr class="row-odd"><td><p>object</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">map_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">std::map&lt;char*,void*&gt;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dict</span></code></p></td>
+<td><p>Support for dynamic objects in C/C++ is
+still under development.</p></td>
 </tr>
-<tr class="row-even"><td>ply</td>
-<td><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">PlyDict</span></code></td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>ply</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PlyDict</span></code></p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>scalar</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>yggdrasil defines scalars as an
+<tr class="row-odd"><td><p>scalar</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>yggdrasil defines scalars as an
 umbrella type encompassing int, uint,
-float, bytes, and unicode.</td>
+float, bytes, and unicode.</p></td>
 </tr>
-<tr class="row-even"><td>schema</td>
-<td><code class="docutils literal notranslate"><span class="pre">map_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">MetaschemaType</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">dict</span></code></td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>schema</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">map_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MetaschemaType</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dict</span></code></p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>string</td>
-<td><code class="docutils literal notranslate"><span class="pre">char*</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">char*</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">char</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">str</span></code></td>
-<td>Encoding dependent on JSON library.</td>
+<tr class="row-odd"><td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Encoding dependent on JSON library.</p></td>
 </tr>
-<tr class="row-even"><td>uint</td>
-<td><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">uintX</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">numpy.uintX</span></code></td>
-<td>Precision X is preserved.</td>
+<tr class="row-even"><td><p>uint</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uintX</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.uintX</span></code></p></td>
+<td><p>Precision X is preserved.</p></td>
 </tr>
-<tr class="row-odd"><td>unicode</td>
-<td><code class="docutils literal notranslate"><span class="pre">char*</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">char*</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">char</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">str</span></code></td>
-<td>Precision X is preserved.</td>
+<tr class="row-odd"><td><p>unicode</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Precision X is preserved.</p></td>
 </tr>
 </tbody>
 </table>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -337,11 +329,11 @@ float, bytes, and unicode.</td>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -354,38 +346,15 @@ float, bytes, and unicode.</td>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

@@ -17,42 +17,35 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -119,7 +112,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -127,9 +120,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -326,25 +320,21 @@
 <dt id="yggdrasil.tests.test_runner.TestYggRunner.setup">
 <code class="descname">setup</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_runner.html#TestYggRunner.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_runner.TestYggRunner.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record the number of open comms, threads, and file descriptors.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>nprev_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous comm channels.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nprev_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous comm channels.
 If not provided, it is determined to be the present number of
-default comms.</li>
-<li><strong>nprev_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous threads.
+default comms.</p></li>
+<li><p><strong>nprev_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous threads.
 If not provided, it is determined to be the present number of
-threads.</li>
-<li><strong>nprev_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous open file descriptors.
+threads.</p></li>
+<li><p><strong>nprev_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous open file descriptors.
 If not provided, it is determined to be the present number of
-open file descriptors.</li>
+open file descriptors.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -484,14 +474,11 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.test_timing.TestTimedRun.count">
 <code class="descname">count</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of messages to use for tests.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -513,14 +500,11 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.test_timing.TestTimedRun.size">
 <code class="descname">size</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Size of messages to use for tests.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -630,14 +614,11 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.test_timing.TestTimedRunTemp.time_run_kwargs">
 <code class="descname">time_run_kwargs</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTemp.time_run_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Keyword arguments for time_run.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -696,28 +677,22 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.test_timing.TimedRunTestBase.entry_name">
 <code class="descname">entry_name</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.entry_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of the entry for the provided time_run_args.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.tests.test_timing.TimedRunTestBase.filename">
 <code class="descname">filename</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.filename" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of the file where data is stored.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -730,28 +705,22 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.test_timing.TimedRunTestBase.inst_args">
 <code class="descname">inst_args</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.inst_args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Arguments for creating a class instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.tests.test_timing.TimedRunTestBase.inst_kwargs">
 <code class="descname">inst_kwargs</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.inst_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Keyword arguments for creating a class instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -799,28 +768,22 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.test_timing.TimedRunTestBase.time_run_args">
 <code class="descname">time_run_args</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.time_run_args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Arguments for time_run.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.tests.test_timing.TimedRunTestBase.time_run_kwargs">
 <code class="descname">time_run_kwargs</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.time_run_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Keyword arguments for time_run.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1207,14 +1170,11 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.test_yamlfile.YamlTestBase.contents">
 <code class="descname">contents</code><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.contents" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contents of files.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -1233,14 +1193,11 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.test_yamlfile.YamlTestBase.nfiles">
 <code class="descname">nfiles</code><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.nfiles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of files.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -1265,14 +1222,11 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.test_yamlfile.YamlTestBase.yaml_env">
 <code class="descname">yaml_env</code><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.yaml_env" title="Permalink to this definition">¶</a></dt>
 <dd><p>Environment variable where file path is stored.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1329,20 +1283,16 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.ErrorClass">
 <code class="descclassname">yggdrasil.tests.</code><code class="descname">ErrorClass</code><span class="sig-paren">(</span><em>base_class</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#ErrorClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.ErrorClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrapper to return errored version of a class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>base_class</strong> (<em>class</em>) – Base class to use.</li>
-<li><strong>*args</strong> – Additional arguments are passed to the class constructor.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the class
-constructor.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_class</strong> (<em>class</em>) – Base class to use.</p></li>
+<li><p><strong>*args</strong> – Additional arguments are passed to the class constructor.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to the class
+constructor.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="class">
@@ -1351,32 +1301,25 @@ constructor.</li>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
 <p>Wrapper for unittest.TestCase that allows use of setup and
 teardown methods along with description prefix.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>description_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – String to prepend docstring
-test message with. Default to empty string.</li>
-<li><strong>skip_unittest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the unittest parent
-class will not be initialized. Defaults to False.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>description_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – String to prepend docstring
+test message with. Default to empty string.</p></li>
+<li><p><strong>skip_unittest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the unittest parent
+class will not be initialized. Defaults to False.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="attribute">
 <dt id="yggdrasil.tests.YggTestBase.uuid">
 <code class="descname">uuid</code><a class="headerlink" href="#yggdrasil.tests.YggTestBase.uuid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Random unique identifier.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1384,42 +1327,33 @@ class will not be initialized. Defaults to False.</li>
 <code class="descname">attr_list</code><a class="headerlink" href="#yggdrasil.tests.YggTestBase.attr_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of attributes that should be checked for after
 initialization.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.tests.YggTestBase.timeout">
 <code class="descname">timeout</code><a class="headerlink" href="#yggdrasil.tests.YggTestBase.timeout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Maximum time in seconds for timeouts.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.tests.YggTestBase.sleeptime">
 <code class="descname">sleeptime</code><a class="headerlink" href="#yggdrasil.tests.YggTestBase.sleeptime" title="Permalink to this definition">¶</a></dt>
 <dd><p>Time in seconds that should be waited for sleeps.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -1456,82 +1390,64 @@ initialization.</p>
 <code class="descname">check_file</code><span class="sig-paren">(</span><em>fname</em>, <em>result</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestBase.check_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestBase.check_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check that a file exists, is the correct size, and has the correct
 contents.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file that should be checked.</li>
-<li><strong>result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Contents of the file.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file that should be checked.</p></li>
+<li><p><strong>result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Contents of the file.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.tests.YggTestBase.check_file_contents">
 <code class="descname">check_file_contents</code><span class="sig-paren">(</span><em>fname</em>, <em>result</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestBase.check_file_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestBase.check_file_contents" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check that the contents of a file are correct.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file that should be checked.</li>
-<li><strong>result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Contents of the file.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file that should be checked.</p></li>
+<li><p><strong>result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Contents of the file.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.tests.YggTestBase.check_file_exists">
 <code class="descname">check_file_exists</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestBase.check_file_exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestBase.check_file_exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check that a file exists.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file that should be checked.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file that should be checked.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.tests.YggTestBase.check_file_size">
 <code class="descname">check_file_size</code><span class="sig-paren">(</span><em>fname</em>, <em>fsize</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestBase.check_file_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestBase.check_file_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check that file is the correct size.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file that should be checked.</li>
-<li><strong>fsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Size that the file should be in bytes.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file that should be checked.</p></li>
+<li><p><strong>fsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Size that the file should be in bytes.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.tests.YggTestBase.cleanup_comm_classes">
 <code class="descname">cleanup_comm_classes</code><a class="headerlink" href="#yggdrasil.tests.YggTestBase.cleanup_comm_classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comm classes that should be cleaned up following the test.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -1544,14 +1460,11 @@ contents.</p>
 <dt id="yggdrasil.tests.YggTestBase.comm_count">
 <code class="descname">comm_count</code><a class="headerlink" href="#yggdrasil.tests.YggTestBase.comm_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of comms.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -1570,14 +1483,11 @@ contents.</p>
 <dt id="yggdrasil.tests.YggTestBase.fd_count">
 <code class="descname">fd_count</code><a class="headerlink" href="#yggdrasil.tests.YggTestBase.fd_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of open file descriptors.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -1620,25 +1530,21 @@ contents.</p>
 <dt id="yggdrasil.tests.YggTestBase.setup">
 <code class="descname">setup</code><span class="sig-paren">(</span><em>nprev_comm=None</em>, <em>nprev_thread=None</em>, <em>nprev_fd=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestBase.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record the number of open comms, threads, and file descriptors.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>nprev_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous comm channels.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nprev_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous comm channels.
 If not provided, it is determined to be the present number of
-default comms.</li>
-<li><strong>nprev_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous threads.
+default comms.</p></li>
+<li><p><strong>nprev_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous threads.
 If not provided, it is determined to be the present number of
-threads.</li>
-<li><strong>nprev_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous open file descriptors.
+threads.</p></li>
+<li><p><strong>nprev_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous open file descriptors.
 If not provided, it is determined to be the present number of
-open file descriptors.</li>
+open file descriptors.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -1657,37 +1563,30 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.YggTestBase.teardown">
 <code class="descname">teardown</code><span class="sig-paren">(</span><em>ncurr_comm=None</em>, <em>ncurr_thread=None</em>, <em>ncurr_fd=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestBase.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestBase.teardown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check the number of open comms, threads, and file descriptors.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>ncurr_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of current comms. If not
-provided, it is determined to be the present number of comms.</li>
-<li><strong>ncurr_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of current threads. If not
-provided, it is determined to be the present number of threads.</li>
-<li><strong>ncurr_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of current open file descriptors.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ncurr_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of current comms. If not
+provided, it is determined to be the present number of comms.</p></li>
+<li><p><strong>ncurr_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of current threads. If not
+provided, it is determined to be the present number of threads.</p></li>
+<li><p><strong>ncurr_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of current open file descriptors.
 If not provided, it is determined to be the present number of
-open file descriptors.</li>
+open file descriptors.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.tests.YggTestBase.thread_count">
 <code class="descname">thread_count</code><a class="headerlink" href="#yggdrasil.tests.YggTestBase.thread_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of active threads.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1707,14 +1606,11 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.YggTestClass.cls">
 <code class="descname">cls</code><a class="headerlink" href="#yggdrasil.tests.YggTestClass.cls" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to be tested.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -1751,56 +1647,44 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.YggTestClass.inst_args">
 <code class="descname">inst_args</code><a class="headerlink" href="#yggdrasil.tests.YggTestClass.inst_args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Arguments for creating a class instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.tests.YggTestClass.inst_kwargs">
 <code class="descname">inst_kwargs</code><a class="headerlink" href="#yggdrasil.tests.YggTestClass.inst_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Keyword arguments for creating a class instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.tests.YggTestClass.instance">
 <code class="descname">instance</code><a class="headerlink" href="#yggdrasil.tests.YggTestClass.instance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instance of the test driver.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.tests.YggTestClass.mod">
 <code class="descname">mod</code><a class="headerlink" href="#yggdrasil.tests.YggTestClass.mod" title="Permalink to this definition">¶</a></dt>
 <dd><p>Absolute name of module containing class to be tested.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -1835,14 +1719,11 @@ open file descriptors.</li>
 <dt id="yggdrasil.tests.YggTestClass.testing_options">
 <code class="descname">testing_options</code><a class="headerlink" href="#yggdrasil.tests.YggTestClass.testing_options" title="Permalink to this definition">¶</a></dt>
 <dd><p>Testing options.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1859,9 +1740,7 @@ open file descriptors.</li>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -1870,11 +1749,11 @@ open file descriptors.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1887,38 +1766,15 @@ open file descriptors.</li>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

@@ -17,44 +17,37 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.9.0 documentation" href="index.html"/>
-        <link rel="next" title="Configuration Files" href="config.html"/>
-        <link rel="prev" title="Server/Client I/O" href="server_client_io.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration Files" href="config.html" />
+    <link rel="prev" title="Server/Client I/O" href="server_client_io.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -133,7 +126,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -141,9 +134,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -194,12 +188,12 @@ YAML language can express very complex data structures (more information can be
 found <a class="reference external" href="http://yaml.org/">here</a>), only a few key concepts
 are needed to create a YAML file for use with the yggdrasil framework.</p>
 <ul class="simple">
-<li>Indentation: Entries with the same indentation belong to the same collection.</li>
-<li>Sequences: Entries that begin with a dash and a space (- ) are members
+<li><p>Indentation: Entries with the same indentation belong to the same collection.</p></li>
+<li><p>Sequences: Entries that begin with a dash and a space (- ) are members
 of a sequence collection. Members of a sequence can be text, collections,
-or a mix of both.</li>
-<li>Mappings: Mapping entries use a colon and a space (: ) to seperate a
-<code class="docutils literal notranslate"><span class="pre">key:</span> <span class="pre">value</span></code> pair. Keys are text and values can be text or a collection.</li>
+or a mix of both.</p></li>
+<li><p>Mappings: Mapping entries use a colon and a space (: ) to seperate a
+<code class="docutils literal notranslate"><span class="pre">key:</span> <span class="pre">value</span></code> pair. Keys are text and values can be text or a collection.</p></li>
 </ul>
 <div class="section" id="model-options">
 <h2>Model Options<a class="headerlink" href="#model-options" title="Permalink to this headline">¶</a></h2>
@@ -223,96 +217,96 @@ be run. The value for this key can be a single model entry:</p>
 </pre></div>
 </div>
 <p>At a minimum, each model entry should contain the following keys:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="12%" />
-<col width="16%" />
-<col width="72%" />
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 72%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head" colspan="2">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head" colspan="2"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>name</td>
-<td colspan="2">Unique name used to identify the model. This will be used to
-report errors associated with the model.</td>
+<tbody>
+<tr class="row-even"><td><p>name</p></td>
+<td colspan="2"><p>Unique name used to identify the model. This will be used to
+report errors associated with the model.</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="10">language</td>
-<td colspan="2">The language that the model is written in. Valid values include:</td>
+<tr class="row-odd"><td rowspan="10"><p>language</p></td>
+<td colspan="2"><p>The language that the model is written in. Valid values include:</p></td>
 </tr>
-<tr class="row-even"><td><strong>Value</strong></td>
-<td><strong>Description</strong></td>
+<tr class="row-even"><td><p><strong>Value</strong></p></td>
+<td><p><strong>Description</strong></p></td>
 </tr>
-<tr class="row-odd"><td>executable</td>
-<td>The model is a pre-compiled executable.</td>
+<tr class="row-odd"><td><p>executable</p></td>
+<td><p>The model is a pre-compiled executable.</p></td>
 </tr>
-<tr class="row-even"><td>python</td>
-<td>The model is written in Python.</td>
+<tr class="row-even"><td><p>python</p></td>
+<td><p>The model is written in Python.</p></td>
 </tr>
-<tr class="row-odd"><td>matlab</td>
-<td>The model is written in Matlab.</td>
+<tr class="row-odd"><td><p>matlab</p></td>
+<td><p>The model is written in Matlab.</p></td>
 </tr>
-<tr class="row-even"><td>c</td>
-<td>The model is written in C.</td>
+<tr class="row-even"><td><p>c</p></td>
+<td><p>The model is written in C.</p></td>
 </tr>
-<tr class="row-odd"><td>c++</td>
-<td>The model is written in C++.</td>
+<tr class="row-odd"><td><p>c++</p></td>
+<td><p>The model is written in C++.</p></td>
 </tr>
-<tr class="row-even"><td>make</td>
-<td>The model is written in C/C++ and has a Makefile.</td>
+<tr class="row-even"><td><p>make</p></td>
+<td><p>The model is written in C/C++ and has a Makefile.</p></td>
 </tr>
-<tr class="row-odd"><td>cmake</td>
-<td>The model is written in C/C++ and has a CMakeLists.txt</td>
+<tr class="row-odd"><td><p>cmake</p></td>
+<td><p>The model is written in C/C++ and has a CMakeLists.txt</p></td>
 </tr>
-<tr class="row-even"><td>lpy</td>
-<td>The model is an LPy lsystem model.</td>
+<tr class="row-even"><td><p>lpy</p></td>
+<td><p>The model is an LPy lsystem model.</p></td>
 </tr>
-<tr class="row-odd"><td>args</td>
-<td colspan="2">The full path to the file containing the model program that will
+<tr class="row-odd"><td><p>args</p></td>
+<td colspan="2"><p>The full path to the file containing the model program that will
 be run by the driver or a list starting with the program file and
 including any arguments that should be passed as input to the
-program.</td>
+program.</p></td>
 </tr>
-<tr class="row-even"><td>inputs</td>
-<td colspan="2">A mapping object containing the entry for a model input channel
+<tr class="row-even"><td><p>inputs</p></td>
+<td colspan="2"><p>A mapping object containing the entry for a model input channel
 or a list of input channel entries. If the model does not get
-input from another model, this may be ommitted.</td>
+input from another model, this may be ommitted.</p></td>
 </tr>
-<tr class="row-odd"><td>outputs</td>
-<td colspan="2">A mapping object containing the entry for a model output channel
+<tr class="row-odd"><td><p>outputs</p></td>
+<td colspan="2"><p>A mapping object containing the entry for a model output channel
 or a list of output channel entries. If the model does not output
-to another model, this may be ommitted.</td>
+to another model, this may be ommitted.</p></td>
 </tr>
 </tbody>
 </table>
 <p>Models entries can also have the following optional keys:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="12%" />
-<col width="88%" />
+<col style="width: 12%" />
+<col style="width: 88%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>is_server</td>
-<td>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, this model will be considered to function as a
+<tbody>
+<tr class="row-even"><td><p>is_server</p></td>
+<td><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, this model will be considered to function as a
 server for one or more models. The corresponding channel that
 should be passed to the yggdrasil API will be the name of
-the model.</td>
+the model.</p></td>
 </tr>
-<tr class="row-odd"><td>client_of</td>
-<td>The names of one or more models that this model will call as a
+<tr class="row-odd"><td><p>client_of</p></td>
+<td><p>The names of one or more models that this model will call as a
 server. If there are more than one, this should be specified as
 a sequence collection. The corresponding channel(s) that should
 be passed to the yggdrasil API will be the name of the
 server model joined with the name of the client model with an
 underscore <code class="docutils literal notranslate"><span class="pre">&lt;server_model&gt;_&lt;client_model&gt;</span></code>. There will be one
-channel created for each server the model is a client of.</td>
+channel created for each server the model is a client of.</p></td>
 </tr>
 </tbody>
 </table>
@@ -347,119 +341,119 @@ YAML also needs to contains a <code class="docutils literal notranslate"><span c
 <h2>Connection Options<a class="headerlink" href="#connection-options" title="Permalink to this headline">¶</a></h2>
 <p>The coordesponding value for the <code class="docutils literal notranslate"><span class="pre">connections</span></code> key should be one or more
 mapping collections with the following keys:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="24%" />
-<col width="76%" />
+<col style="width: 24%" />
+<col style="width: 76%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>input/input_file</td>
-<td>The channel/file that messages should be recieved from. To
+<tbody>
+<tr class="row-even"><td><p>input/input_file</p></td>
+<td><p>The channel/file that messages should be recieved from. To
 specify a model channel, this should be the name of an
 entry in a model’s <code class="docutils literal notranslate"><span class="pre">outputs</span></code> section. If this is a file,
 it should be the absolute path to the file or the relative
-path to the file from the directory containing the YAML.</td>
+path to the file from the directory containing the YAML.</p></td>
 </tr>
-<tr class="row-odd"><td>output/output_file</td>
-<td>The channel/file that messages recieved from the <code class="docutils literal notranslate"><span class="pre">input</span></code>
+<tr class="row-odd"><td><p>output/output_file</p></td>
+<td><p>The channel/file that messages recieved from the <code class="docutils literal notranslate"><span class="pre">input</span></code>
 channel/file should be sent to. If the <code class="docutils literal notranslate"><span class="pre">input</span></code> value is
 a file, the <code class="docutils literal notranslate"><span class="pre">output</span></code> value cannot be a file. To specify
 a model channel, this should be the name of an entry in a
-model’s <code class="docutils literal notranslate"><span class="pre">inputs</span></code> section.</td>
+model’s <code class="docutils literal notranslate"><span class="pre">inputs</span></code> section.</p></td>
 </tr>
 </tbody>
 </table>
 <p>Connection mappings can also have the following optional keys:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="16%" />
-<col width="17%" />
-<col width="67%" />
+<col style="width: 16%" />
+<col style="width: 17%" />
+<col style="width: 67%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head" colspan="2">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head" colspan="2"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>translator</td>
-<td colspan="2">One or more functions that should be used to tranlate messages
+<tbody>
+<tr class="row-even"><td><p>translator</p></td>
+<td colspan="2"><p>One or more functions that should be used to tranlate messages
 from the connection input before passing it alone to the
 connection output. Translators should be specified as strings
 with the format “&lt;package.module&gt;:&lt;function&gt;” such that
-&lt;function&gt; can be imported from &lt;package&gt;.</td>
+&lt;function&gt; can be imported from &lt;package&gt;.</p></td>
 </tr>
-<tr class="row-odd"><td>format_str</td>
-<td colspan="2">A C-style format string specifying how messages should be
+<tr class="row-odd"><td><p>format_str</p></td>
+<td colspan="2"><p>A C-style format string specifying how messages should be
 formatted/parsed from/to language specifying types (see
-<a class="reference internal" href="c_format_strings.html#c-style-format-strings-rst"><span class="std std-ref">C-Style Format Strings</span></a>).</td>
+<a class="reference internal" href="c_format_strings.html#c-style-format-strings-rst"><span class="std std-ref">C-Style Format Strings</span></a>).</p></td>
 </tr>
-<tr class="row-even"><td>field_names</td>
-<td colspan="2">A sequence collection of names for the fields present in the
-format string.</td>
+<tr class="row-even"><td><p>field_names</p></td>
+<td colspan="2"><p>A sequence collection of names for the fields present in the
+format string.</p></td>
 </tr>
-<tr class="row-odd"><td>field_units</td>
-<td colspan="2">A sequence collection of units for the fields present in the
-format string (see <a class="reference internal" href="units.html#units-rst"><span class="std std-ref">Units</span></a>).</td>
+<tr class="row-odd"><td><p>field_units</p></td>
+<td colspan="2"><p>A sequence collection of units for the fields present in the
+format string (see <a class="reference internal" href="units.html#units-rst"><span class="std std-ref">Units</span></a>).</p></td>
 </tr>
-<tr class="row-even"><td>as_array</td>
-<td colspan="2">True or False. If True and filetype is table, the table will
-be read in it’s entirety and passed as an array.</td>
+<tr class="row-even"><td><p>as_array</p></td>
+<td colspan="2"><p>True or False. If True and filetype is table, the table will
+be read in it’s entirety and passed as an array.</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="12">filetype</td>
-<td colspan="2">Only valid for connections that direct messages from a file to
+<tr class="row-odd"><td rowspan="12"><p>filetype</p></td>
+<td colspan="2"><p>Only valid for connections that direct messages from a file to
 a model input channel or from a model output channel to a file.
 Values indicate how messages should be read from the file and
-include:</td>
+include:</p></td>
 </tr>
-<tr class="row-even"><td><strong>Value</strong></td>
-<td><strong>Description</strong></td>
+<tr class="row-even"><td><p><strong>Value</strong></p></td>
+<td><p><strong>Description</strong></p></td>
 </tr>
-<tr class="row-odd"><td>binary</td>
-<td>The entire contents of the file are read as a
+<tr class="row-odd"><td><p>binary</p></td>
+<td><p>The entire contents of the file are read as a
 single message. This is the default if not
-provided.</td>
+provided.</p></td>
 </tr>
-<tr class="row-even"><td>ascii</td>
-<td>The contents of the file are read one line at a
-time.</td>
+<tr class="row-even"><td><p>ascii</p></td>
+<td><p>The contents of the file are read one line at a
+time.</p></td>
 </tr>
-<tr class="row-odd"><td>table</td>
-<td>The file is assumed to be an ASCII table and read
+<tr class="row-odd"><td><p>table</p></td>
+<td><p>The file is assumed to be an ASCII table and read
 one row at a time. The format of the table is
 either read from the header or inferred from the
-table.</td>
+table.</p></td>
 </tr>
-<tr class="row-even"><td>pandas</td>
-<td>The file is a table created from a Pandas data
-frame.</td>
+<tr class="row-even"><td><p>pandas</p></td>
+<td><p>The file is a table created from a Pandas data
+frame.</p></td>
 </tr>
-<tr class="row-odd"><td>ply</td>
-<td>The file contains a 3D structure in Ply format.</td>
+<tr class="row-odd"><td><p>ply</p></td>
+<td><p>The file contains a 3D structure in Ply format.</p></td>
 </tr>
-<tr class="row-even"><td>obj</td>
-<td>The file contains a 3D structure in Obj format.</td>
+<tr class="row-even"><td><p>obj</p></td>
+<td><p>The file contains a 3D structure in Obj format.</p></td>
 </tr>
-<tr class="row-odd"><td>pickle</td>
-<td>The file is a Python pickle file containing one
-more Python objects.</td>
+<tr class="row-odd"><td><p>pickle</p></td>
+<td><p>The file is a Python pickle file containing one
+more Python objects.</p></td>
 </tr>
-<tr class="row-even"><td>mat</td>
-<td>The file is a Matlab .mat file containing one or
-more Matlab variables.</td>
+<tr class="row-even"><td><p>mat</p></td>
+<td><p>The file is a Matlab .mat file containing one or
+more Matlab variables.</p></td>
 </tr>
-<tr class="row-odd"><td>json</td>
-<td>The file contains one or more JSON encoded data
-structures.</td>
+<tr class="row-odd"><td><p>json</p></td>
+<td><p>The file contains one or more JSON encoded data
+structures.</p></td>
 </tr>
-<tr class="row-even"><td>yaml</td>
-<td>The file contains one or more YAML encoded data
-structures.</td>
+<tr class="row-even"><td><p>yaml</p></td>
+<td><p>The file contains one or more YAML encoded data
+structures.</p></td>
 </tr>
 </tbody>
 </table>
@@ -472,31 +466,31 @@ potential arguments can be found <a class="reference internal" href="advanced/io
 <h3>Driver Method<a class="headerlink" href="#driver-method" title="Permalink to this headline">¶</a></h3>
 <p>In specifying communication via drivers, each input/output entry for the models
 should be a mapping collection with, at minimum, the following keys:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="8%" />
-<col width="92%" />
+<col style="width: 8%" />
+<col style="width: 92%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>name</td>
-<td>The name of the channel that will be provided by the model to the
-yggdrasil API. This can be any text, but should be unique.</td>
+<tbody>
+<tr class="row-even"><td><p>name</p></td>
+<td><p>The name of the channel that will be provided by the model to the
+yggdrasil API. This can be any text, but should be unique.</p></td>
 </tr>
-<tr class="row-odd"><td>driver</td>
-<td>The name of the input/output driver class that should be used.
+<tr class="row-odd"><td><p>driver</p></td>
+<td><p>The name of the input/output driver class that should be used.
 A list of available input/output drivers can be found
-<a class="reference internal" href="advanced/io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</td>
+<a class="reference internal" href="advanced/io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
-<tr class="row-even"><td>args</td>
-<td>For connections made to other models, this should be text that matches
+<tr class="row-even"><td><p>args</p></td>
+<td><p>For connections made to other models, this should be text that matches
 that of the other model’s corresponding driver. For connections made
 to files, this should be the path to the file, relative to the
-location of the YAML file.</td>
+location of the YAML file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -518,9 +512,7 @@ files without running the integration, this can be done via the <code class="doc
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -529,7 +521,7 @@ files without running the integration, this can be done via the <code class="doc
         <a href="config.html" class="btn btn-neutral float-right" title="Configuration Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="server_client_io.html" class="btn btn-neutral" title="Server/Client I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="server_client_io.html" class="btn btn-neutral float-left" title="Server/Client I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -538,11 +530,11 @@ files without running the integration, this can be done via the <code class="doc
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -555,38 +547,15 @@ files without running the integration, this can be done via the <code class="doc
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.9.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>
