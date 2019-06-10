@@ -166,9 +166,9 @@ install:
       # Install from source dist
       python setup.py sdist
       # sudo required for installing R libraries
-      pip install --verbose dist/*.tar.gz --sudoR
+      pip install --verbose dist/*.tar.gz --install-option="--sudoR"
       # Install from source
-      # pip install --verbose -e .
+      # pip install --verbose -e . --install-option="--sudoR"
     elif [[ -n "$CONDA" ]]; then
       pip uninstall -y numpy
       pip uninstall -y matplotlib

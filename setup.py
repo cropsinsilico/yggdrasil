@@ -2,6 +2,8 @@ import os
 import sys
 import warnings
 from setuptools import setup, find_packages
+from setuptools.command.install import install
+from setuptools.command.develop import develop
 from distutils.sysconfig import get_python_lib
 import versioneer
 import install_matlab_engine
@@ -34,6 +36,7 @@ if 'sdist' not in sys.argv:
 
 
     # Install R interface
+    print('sys.argv', sys.argv)
     with_sudo = (('sudo' in sys.argv) or ('--sudoR' in sys.argv))
     if install_R_interface.install_R_interface(with_sudo=with_sudo):
         R_installed = True
@@ -123,13 +126,53 @@ if '--user' in sys.argv:
                   "to the command line entry points (e.g. yggrun). " +
                   "If 'yggrun' is not a recognized command, try adding " +
                   "'%s' to your PATH." % script_dir)
+
+cmdclass = versioneer.get_cmdclass()
+print(cmdclass)
+install_cmdclass = cmdclass.get('install', install)
+develop_cmdclass = cmdclass.get('develop', develop)
+
+
+class CommandMixin(object):
+    user_options = [('sudoR', None, None),
+                    ('noR', None, None),
+                    ('rj-include-dir=', None, None),
+                    ('rapidjson-include-dir=', None, None)]
+
+    def initialize_options(self):
+        super(CommandMixin, self).initialize_options()
+        self.sudoR = None
+
+    def finalize_options(self):
+        print("value of sudoR is", self.sudoR)
+        super(CommandMixin, self).finalize_options()
+
+    def run(self):
+        global sudoR
+        sudoR = self.sudoR # will be 1 or None
+        super(CommandMixin, self).run()
+        
+
+class InstallCommand(CommandMixin, install_cmdclass):
+    user_options = getattr(install_cmdclass,
+                           'user_options', []) + CommandMixin.user_options
+    
+    
+class DevelopCommand(CommandMixin, develop_cmdclass):
+    user_options = getattr(develop_cmdclass,
+                           'user_options', []) + CommandMixin.user_options
+
+    
+cmdclass['install'] = InstallCommand
+cmdclass['develop'] = DevelopCommand
+    
     
 setup(
     name="yggdrasil-framework",
     packages=find_packages(),
     include_package_data=True,
     version=ygg_ver,
-    cmdclass=versioneer.get_cmdclass(),
+    cmdclass=cmdclass,
     description=("A framework for combining interdependent models from "
                  "multiple languages."),
     long_description=long_description,
