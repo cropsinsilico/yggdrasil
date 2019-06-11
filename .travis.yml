@@ -7,6 +7,9 @@ cache:
 
 addons:
   apt:
+    sources:
+      # - r-packages-trusty
+      - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu trusty-cran35/'
     packages: &native_deps_apt
       - strace
       - valgrind
