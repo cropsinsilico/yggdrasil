@@ -66,9 +66,6 @@ before_install:
     echo "CONDA = $CONDA"
     echo "PYTHON = $PYTHON"
 
-    # Install R package (should be done by setup.py)
-    source "$TRAVIS_BUILD_DIR/ci/install-r-posix.sh"
-
     # Install from source in virtual env
     if [[ -n "$PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then
       echo Installing Python using virtualenv...;
