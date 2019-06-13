@@ -16,6 +16,7 @@ def install_R_interface(with_sudo=False):
         bool: True if install succeded, False otherwise.
 
     """
+    print("install_R_interface", sys.platform)
     root_dir = os.path.dirname(__file__)
     lang_dir = os.path.join(root_dir, 'yggdrasil', 'languages')
     kwargs = {'cwd': lang_dir}
@@ -28,9 +29,11 @@ def install_R_interface(with_sudo=False):
         if with_sudo:
             R_cmd.insert(0, 'sudo')
     try:
+        print("Calling", R_cmd)
         R_proc = subprocess.check_output(R_cmd, **kwargs)
         if PY_MAJOR_VERSION == 3:
             R_proc = R_proc.decode("utf-8")
+        print("output", R_proc)
     except BaseException as e:
         print('Error installing R interface:\n%s' % e)
         return False
