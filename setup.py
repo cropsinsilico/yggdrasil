@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 import warnings
 from setuptools import setup, find_packages
 # from setuptools.command.install import install
@@ -11,6 +12,10 @@ import install_R_interface
 import create_coveragerc
 ygg_ver = versioneer.get_version()
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
+
+
+print("In setup.py", sys.argv)
+logging.critical("In setup.py: %s" % sys.argv)
 
 
 # Don't do coverage or installation of packages for use with other languages
