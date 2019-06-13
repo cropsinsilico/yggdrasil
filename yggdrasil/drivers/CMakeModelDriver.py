@@ -216,10 +216,6 @@ class CMakeConfigure(CompilerBase):
         else:
             include_base = 'ygg_cmake_%s.txt' % target
         include_file = os.path.join(sourcedir, include_base)
-        # import pprint
-        # print('kwargs')
-        # pprint.pprint(kwargs)
-        kwargs['verbose'] = True
         if (target_language is not None) and ('driver' not in kwargs):
             kwargs['driver'] = components.import_component('model',
                                                            target_language)

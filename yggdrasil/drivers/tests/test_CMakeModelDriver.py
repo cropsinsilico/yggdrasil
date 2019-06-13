@@ -89,7 +89,7 @@ def test_create_include():
     CMakeModelDriver.compile_dependencies()
     for c, l, lines in testlist:
         out = CMakeConfigure.create_include(None, target, compile_flags=c,
-                                            linker_flags=l)
+                                            linker_flags=l, verbose=True)
         for x in lines:
             try:
                 assert(x in out)
