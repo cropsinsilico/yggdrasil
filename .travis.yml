@@ -10,6 +10,7 @@ addons:
     sources:
       # - r-packages-trusty
       - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu trusty-cran35/'
+        key_url: 'http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0x51716619E084DAB9'
     packages: &native_deps_apt
       - strace
       - valgrind
