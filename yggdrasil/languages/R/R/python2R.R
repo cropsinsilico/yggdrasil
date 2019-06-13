@@ -1,7 +1,6 @@
 
 
 python2R <- function(pyobj) {
-  # print(class(pyobj))
   np <- reticulate::import('numpy', convert=FALSE)
   if (is(pyobj, "python.builtin.tuple")
       || is(pyobj, "python.builtin.list")) {
@@ -12,7 +11,6 @@ python2R <- function(pyobj) {
         reticulate::py_get_attr(pyobj, '__getitem__'), i-1L))
       out[[i]] <- x
     }
-    return(out)
   } else if (is(pyobj, "python.builtin.dict")) {
     out <- list()
     pyobj_len <- reticulate::py_len(pyobj)
@@ -23,16 +21,18 @@ python2R <- function(pyobj) {
       x <- python2R(call_python_method(pyobj, 'get', k))
       out[[reticulate::py_to_r(k)]] <- x
     }
-    return(out)
+  } else if (is(pyobj, "numpy.uint")) {
+    out <- as.integer(reticulate::py_to_r(pyobj))
   # } else if (is(pyobj, "numpy.float32")) {
   #   # out <- as.single(reticulate::py_to_r(pyobj))
   #   out <- float::fl(reticulate::py_to_r(pyobj))
-  #   return(out)
+  } else if (is(pyobj, "numpy.int32")) {
+    out <- as.integer(reticulate::py_to_r(pyobj))
   } else if (is(pyobj, "numpy.int64")) {
     out <- bit64::as.integer64(reticulate::py_to_r(pyobj))
-    return(out)
   } else if (is(pyobj, "python.builtin.bytes")) {
     pyobj <- pyobj$decode('utf-8')
+    out <- reticulate::py_to_r(pyobj)
   # TODO: There dosn't seem to be variable integer precision in R
   } else if (is(pyobj, "numpy.ndarray")) {
     type_len <- reticulate::py_len(pyobj$dtype)
@@ -45,8 +45,10 @@ python2R <- function(pyobj) {
         out[[i]] <- python2R(x$tolist())
       }
     }
-    return(out)
+  } else {
+    out <- reticulate::py_to_r(pyobj)
   }
-  out <- reticulate::py_to_r(pyobj)
+  # print(class(pyobj))
+  # print(class(out))
   return(out)
 }
