@@ -79,8 +79,10 @@ def install_R_interface(with_sudo=False, skip_requirements=False):
     lang_dir = os.path.join(root_dir, 'yggdrasil', 'languages')
     if sys.platform in ['win32', 'cygwin']:
         R_exe = 'R.exe'
+        pkg_ext = '.zip'
     else:
         R_exe = 'R'
+        pkg_ext = '.tar.gz'
     kwargs = {'cwd': lang_dir}
     # Install requirements
     if not skip_requirements:
