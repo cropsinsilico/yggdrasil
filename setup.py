@@ -39,6 +39,7 @@ if 'sdist' not in sys.argv:
 
 
     # Install R interface
+    print('YGG_USE_SUDO_FOR_R', os.environ.get('YGG_USE_SUDO_FOR_R', False))
     with_sudo = (('sudo' in sys.argv) or ('--sudoR' in sys.argv)
                  or (os.environ.get('YGG_USE_SUDO_FOR_R', '0') == '1'))
     if install_R_interface.install_R_interface(with_sudo=with_sudo):

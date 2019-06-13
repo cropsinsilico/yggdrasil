@@ -23,7 +23,7 @@ def make_call(R_cmd, with_sudo=False, **kwargs):
     if with_sudo and (sys.platform not in ['win32', 'cygwin']):
         R_cmd.insert(0, 'sudo')
     try:
-        print("Calling", R_cmd)
+        print("Calling", sys.platform, with_sudo, R_cmd)
         R_proc = subprocess.check_output(R_cmd, **kwargs)
         if PY_MAJOR_VERSION == 3:
             R_proc = R_proc.decode("utf-8")
@@ -89,6 +89,7 @@ def install_R_interface(with_sudo=False, skip_requirements=False):
         requirements = requirements_from_description(desc_file)
         if (sys.platform in ['win32', 'cygwin']) and ('rtools' not in requirements):
             requirements.append('rtools')
+        requirements = list(set(requirements))
         R_call = ('install.packages(c(%s), repos="http://cloud.r-project.org")'
                   % ', '.join(['\"%s\"' % x for x in requirements]))
         R_cmd = [R_exe, '-e', R_call]
