@@ -99,7 +99,9 @@ install:
   # - "pip install zmq"
 
   # Install yggdrasil allowing pip to resolve requirements
-  - "pip install -e ."
+  - "python setup.py sdist"
+  - "pip install --verbose dist/*.tar.gz"
+  # - "pip install --verbose -e ."
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
