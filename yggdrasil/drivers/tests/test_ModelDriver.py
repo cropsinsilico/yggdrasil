@@ -48,7 +48,7 @@ class TestModelParam(parent.TestParam):
                            'products', 'overwrite']
         self.src = None
         if self.import_cls.language is not None:
-            self.src = scripts[self.import_cls.language]
+            self.src = scripts[self.import_cls.language.lower()]
             if not isinstance(self.src, list):
                 self.src = [self.src]
         if self.src is not None:

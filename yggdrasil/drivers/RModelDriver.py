@@ -23,7 +23,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     default_interpreter = 'Rscript'
     # Dynamically setting the interface library cause circular logic
     interface_library = 'yggdrasil'
-    interface_dependencies = ['reticulate', 'zeallot', 'float', 'bit64']
+    interface_dependencies = ['reticulate', 'zeallot', 'bit64']
     # interface_library = PythonModelDriver.interface_library
     # The Batch version causes output to saved to a file rather than directed to
     # stdout
@@ -31,7 +31,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     send_converters = {'table': serialize.consolidate_array}
     type_map = {
         'int': 'integer, bit64::integer64',
-        'float': 'float::float32, double',
+        'float': 'double',
         'string': 'character',
         'array': 'list',
         'object': 'list',
@@ -65,11 +65,11 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'fprintf': 'print(sprintf(\"{message}\", {variables}))',
         'error': 'stop(\"{error_msg}\")',
         'block_end': '}',
-        'if_begin': 'if({cond}) {',
-        'for_begin': 'for ({iter_var} in {iter_begin}:{iter_end}) {',
-        'while_begin': 'while ({cond}) {',
+        'if_begin': 'if({cond}) {{',
+        'for_begin': 'for ({iter_var} in {iter_begin}:{iter_end}) {{',
+        'while_begin': 'while ({cond}) {{',
         'try_begin': 'tryCatch({',
-        'try_except': '}, error = function({error_var}) {',
+        'try_except': '}}, error = function({error_var}) {{',
         'try_end': '})',
         'assign': '{name} <- {value}'}
 
@@ -85,11 +85,13 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             bool: True if the library is installed, False otherwise.
 
         """
-        try:
-            cls.run_executable(['-e', '\"library(%s)\"' % lib])
-        except RuntimeError:
-            return False
-        return True
+        if lib not in cls._library_cache:
+            try:
+                cls.run_executable(['-e', '\"library(%s)\"' % lib])
+                cls._library_cache[lib] = True
+            except RuntimeError:
+                cls._library_cache[lib] = False
+        return cls._library_cache[lib]
         
     @classmethod
     def language2python(cls, robj):

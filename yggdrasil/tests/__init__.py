@@ -37,7 +37,8 @@ script_list = [
     ('matlab_error', 'matlab_error_model.m'),
     ('python', 'python_model.py'),
     ('error', 'error_model.py'),
-    ('lpy', 'lpy_model.lpy')]
+    ('lpy', 'lpy_model.lpy'),
+    ('r', 'r_model.R')]
 scripts = {}
 for k, v in script_list:
     if isinstance(v, list):

@@ -24,10 +24,10 @@ python2R <- function(pyobj) {
       out[[reticulate::py_to_r(k)]] <- x
     }
     return(out)
-  } else if (is(pyobj, "numpy.float32")) {
-    # out <- as.single(reticulate::py_to_r(pyobj))
-    out <- float::fl(reticulate::py_to_r(pyobj))
-    return(out)
+  # } else if (is(pyobj, "numpy.float32")) {
+  #   # out <- as.single(reticulate::py_to_r(pyobj))
+  #   out <- float::fl(reticulate::py_to_r(pyobj))
+  #   return(out)
   } else if (is(pyobj, "numpy.int64")) {
     out <- bit64::as.integer64(reticulate::py_to_r(pyobj))
     return(out)

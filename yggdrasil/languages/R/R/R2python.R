@@ -9,10 +9,10 @@ R2python <- function(robj) {
       reticulate::r_to_py(float::dbl(robj)))
     return(out)
   } else if (is(robj, "double")) {
-    if (length(attributes(robj)) != 0) {
-      return(call_python_method(numpy, 'float32',
-        reticulate::r_to_py(robj)))
-    }
+    # if (length(attributes(robj)) != 0) {
+    return(call_python_method(numpy, 'float32',
+      reticulate::r_to_py(robj)))
+    # }
   } else if (is(robj, "integer64")) {
     return(call_python_method(numpy, 'int64',
       reticulate::r_to_py(as.integer(robj))))

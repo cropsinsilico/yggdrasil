@@ -263,6 +263,8 @@ class ModelDriver(Driver):
     function_param = None
     version_flags = ['--version']
 
+    _library_cache = {}
+
     def __init__(self, name, args, model_index=0, **kwargs):
         super(ModelDriver, self).__init__(name, **kwargs)
         # Setup process things
