@@ -1,5 +1,6 @@
 import os
 import sys
+import glob
 import subprocess
 PY_MAJOR_VERSION = sys.version_info[0]
 
@@ -36,6 +37,7 @@ def install_R_interface(with_sudo=False):
         print("output", R_proc)
     except BaseException as e:
         print('Error installing R interface:\n%s' % e)
+        print(glob.glob(os.path.join(lang_dir, '*')))
         return False
     return True
 
