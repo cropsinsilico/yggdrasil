@@ -91,15 +91,11 @@ install:
 
   # Install testing dependencies
   - "conda install --yes -c conda-forge numpy scipy"  # Installing via pip causes import error
-  - "pip install nose"
-  - "pip install pytest pytest-cov"
-  - "pip install coverage coveralls codecov flake8"
+  - "pip install -r requirements_testing.txt"
 
   # Install dependencies using conda/pip
-  # - "conda install --yes -c conda-forge nose"
-  # - "conda install --yes -c conda-forge pytest pytest-cov"
-  # - "conda install --yes -c conda-forge numpy coverage coveralls codecov flake8"
-  # - "conda install --yes -c conda-forge pystache pyyaml astropy scipy \"pika<1.0\""
+  # - "conda install --yes -c conda-forge --file requirements_testing.txt"
+  # - "conda install --yes -c conda-forge numpy pystache pyyaml astropy scipy \"pika<1.0\""
   # - "pip install zmq"
 
   # Install yggdrasil allowing pip to resolve requirements

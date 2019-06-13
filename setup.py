@@ -105,21 +105,12 @@ else:
 
 
 # Create requirements list based on platform
-requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
-                "pystache", "pyzmq", "psutil",
-                "matplotlib<3.0; python_version < '3.5'",
-                "matplotlib; python_version >= '3.5'",
-                "jsonschema",
-                "python-rapidjson; python_version >= '3.4'",
-                'pandas<0.21; python_version == "3.4"',
-                'pandas; python_version != "3.4"',
-                "perf",
-                "pint; python_version == '2.7'",
-                "unyt; python_version >= '3.4'",
-                "six",
-                'sysv_ipc; platform_system != "Windows"']
-test_requirements = ['pytest']
-# optional_requirements = ["pika<1.0", "astropy"]
+with open("requirements.txt", 'r') as fd:
+    requirements = fd.read().splitlines()
+with open("requirements_testing.txt", 'r') as fd:
+    test_requirements = fd.read().splitlines()
+# with open("requirements_optional.txt", 'r') as fd:
+#     optional_requirements = fd.read().splitlines()
 
 
 # Warn that local install may not have entry points on path

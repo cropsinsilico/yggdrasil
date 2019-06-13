@@ -163,11 +163,9 @@ install:
       pip install $NUMPY
       pip install $MATPLOTLIB
       pip install $JSONSCHEMA
-      pip install nose
-      pip install pytest "pytest-cov<2.6"
-      pip install coverage coveralls codecov flake8
+      pip install -r requirements_testing.txt
       if [[ $BUILDDOCS == '1' ]]; then
-        pip install sphinx breathe sphinx_rtd_theme
+        pip install -r requirements_documentation.txt
       fi
       # Install from source dist
       python setup.py sdist
@@ -180,11 +178,9 @@ install:
       conda install $NUMPY
       conda install $MATPLOTLIB
       conda install $JSONSCHEMA
-      conda install nose
-      conda install pytest "pytest-cov<2.6"
-      conda install coverage coveralls codecov flake8
+      conda install --file requirements_testing.txt
       if [[ $BUILDDOCS == '1' ]]; then
-        conda install sphinx breathe sphinx_rtd_theme
+        conda install --file requirements_documentation.txt
       fi
       conda build recipe/meta.yaml --python $CONDA
       conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
