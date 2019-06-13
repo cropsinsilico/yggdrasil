@@ -14,12 +14,15 @@ addons:
     packages: &native_deps_apt
       - strace
       - valgrind
+      - gfortran
       - r-base
       # - ccache
     update: true
   homebrew: &native_deps_brew
     packages:
       - valgrind
+      - gcc  # gfortran required for R float package
+      - r
     update: true
 
 os:
