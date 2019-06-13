@@ -35,11 +35,15 @@ def install_R_interface(with_sudo=False):
         if PY_MAJOR_VERSION == 3:
             R_proc = R_proc.decode("utf-8")
         print("output", R_proc)
+        out = True
     except BaseException as e:
         print('Error installing R interface:\n%s' % e)
-        print(glob.glob(os.path.join(lang_dir, '*')))
-        return False
-    return True
+        out = False
+    for x in [os.path.join(lang_dir, '*'),
+              os.path.join(lang_dir, 'R', '*'),
+              os.path.join(os.getcwd(), '*')]:
+        print(x, glob.glob(x))
+    return out
 
 
 if __name__ == "__main__":

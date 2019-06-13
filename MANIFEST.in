@@ -24,6 +24,9 @@ include yggdrasil/examples/gs_lesson4/src/Makefile_linux
 include yggdrasil/examples/gs_lesson4/src/Makefile_windows
 include yggdrasil/languages/MATLAB/matlab_screenrc
 include yggdrasil/languages/LPy/lpy_model.py
+include yggdrasil/languages/R/DESCRIPTION
+include yggdrasil/languages/R/NAMESPACE
+include yggdrasil/languages/R/R/*.R
 include yggdrasil/regex/CMakeLists.txt
 include yggdrasil/tests/scripts/CMakeLists.txt
 include yggdrasil/tests/scripts/Makefile_linux
