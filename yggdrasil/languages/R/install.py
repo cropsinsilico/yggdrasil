@@ -108,7 +108,8 @@ def install(with_sudo=None, skip_requirements=None):
         with_sudo = (('sudo' in sys.argv) or ('--sudoR' in sys.argv)
                      or (os.environ.get('YGG_USE_SUDO_FOR_R', '0') == '1'))
     if skip_requirements is None:
-        skip_requirements = ('--skip_requirements' in sys.argv)
+        skip_requirements = (('--skip_requirements' in sys.argv)
+                             or ('--skip-requirements' in sys.argv))
     # Set platform dependent things
     lang_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if sys.platform in ['win32', 'cygwin']:
