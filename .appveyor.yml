@@ -100,8 +100,11 @@ install:
 
   # Install yggdrasil allowing pip to resolve requirements
   - "python setup.py sdist"
-  - "dir dist"
-  - "pip install --verbose dist\\*.tar.gz"
+  - "dir dist\\*.tar.gz"
+  - for %%a in ("dist\\*.tar.gz") do set YGGSDIST=%%a
+  - echo %YGGSDIST%
+  - "pip install --verbose %YGGSDIST%"
+  # - "pip install --verbose dist\\*.tar.gz"
   # - "pip install --verbose -e ."
 
 cache:
