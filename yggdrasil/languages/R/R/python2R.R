@@ -23,9 +23,9 @@ python2R <- function(pyobj) {
     }
   } else if (is(pyobj, "numpy.uint")) {
     out <- as.integer(reticulate::py_to_r(pyobj))
-  # } else if (is(pyobj, "numpy.float32")) {
-  #   # out <- as.single(reticulate::py_to_r(pyobj))
-  #   out <- float::fl(reticulate::py_to_r(pyobj))
+  } else if (is(pyobj, "numpy.float32")) {
+    # out <- as.single(reticulate::py_to_r(pyobj))
+    out <- float::fl(reticulate::py_to_r(pyobj))
   } else if (is(pyobj, "numpy.int32")) {
     out <- as.integer(reticulate::py_to_r(pyobj))
   } else if (is(pyobj, "numpy.int64")) {
