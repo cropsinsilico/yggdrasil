@@ -22,6 +22,7 @@ recursive-include yggdrasil/examples Makefile_linux
 recursive-include yggdrasil/examples Makefile_windows
 include yggdrasil/examples/gs_lesson4/src/Makefile_linux
 include yggdrasil/examples/gs_lesson4/src/Makefile_windows
+recursive-include yggdrasil/languages install.py
 include yggdrasil/languages/MATLAB/matlab_screenrc
 include yggdrasil/languages/LPy/lpy_model.py
 include yggdrasil/languages/R/DESCRIPTION
@@ -34,6 +35,4 @@ include yggdrasil/tests/scripts/Makefile_windows
 graft docs
 include versioneer.py
 include yggdrasil/_version.py
-include install_matlab_engine.py
 include create_coveragerc.py
-include install_R_interface.py

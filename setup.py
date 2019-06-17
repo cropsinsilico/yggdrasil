@@ -1,53 +1,69 @@
 import os
 import sys
+import gc
+import glob
 import logging
 import warnings
 from setuptools import setup, find_packages
 from distutils.sysconfig import get_python_lib
 import versioneer
-import install_matlab_engine
-import install_R_interface
 import create_coveragerc
 ygg_ver = versioneer.get_version()
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
+lang_dir = os.path.join(ROOT_PATH, 'yggdrasil', 'languages')
 
 
 print("In setup.py", sys.argv)
 logging.critical("In setup.py: %s" % sys.argv)
 
 
+def call_install_language(language, results):
+    r"""Call install for a specific language.
+
+    Args:
+        language (str): Name of language that should be checked.
+        results (dict): Dictionary where result (whether or not the language is
+            installed) should be logged.
+
+    """
+    if not os.path.isfile(os.path.join(lang_dir, language, 'install.py')):
+        return True
+    try:
+        sys.path.append(os.path.join(lang_dir, language))
+        from install import install
+        try:
+            from install import name_in_pragmas
+        except ImportError:
+            name_in_pragmas = language.lower()
+        out = install()
+        results[name_in_pragmas] = out
+    finally:
+        sys.path.pop()
+        del install
+        del name_in_pragmas
+        if 'install' in globals():
+            del globals()['install']
+        if 'install' in sys.modules:
+            del sys.modules['install']
+        gc.collect()
+    if not out:
+        warnings.warn(("Could not complete installation for {lang}. "
+                       "{lang} support will be disabled.").format(lang=language))
+    else:
+        logging.info("Language %s installed." % language)
+        
+
 # Don't do coverage or installation of packages for use with other languages
 # when building a source distribution
 if 'sdist' not in sys.argv:
-    # Attempt to install openalea
-    try:
-        from openalea import lpy
-        lpy_installed = True
-    except ImportError:
-        warnings.warn("Could not import openalea.lpy. " +
-                      "LPy support will be disabled.")
-        lpy_installed = False
-
-
-    # Attempt to install matlab engine
-    if install_matlab_engine.install_matlab(as_user=('--user' in sys.argv)):
-        matlab_installed = True
-    else:
-        warnings.warn("Could not import matlab.engine. " +
-                      "Matlab support will be disabled.")
-        matlab_installed = False
-
-
-    # Install R interface
-    print('YGG_USE_SUDO_FOR_R', os.environ.get('YGG_USE_SUDO_FOR_R', False))
-    with_sudo = (('sudo' in sys.argv) or ('--sudoR' in sys.argv)
-                 or (os.environ.get('YGG_USE_SUDO_FOR_R', '0') == '1'))
-    if install_R_interface.install_R_interface(with_sudo=with_sudo):
-        R_installed = True
-    else:
-        warnings.warn("Could not install R interface. " +
-                      "R support will be disabled.")
-        R_installed = False
+    # Attempt to install languages
+    installed_languages = {}
+    lang_dirs = sorted(glob.glob(os.path.join(lang_dir, '*')))
+    for x in lang_dirs:
+        if not os.path.isdir(x):
+            continue
+        ilang = os.path.basename(x)
+        call_install_language(ilang, installed_languages)
 
 
     # Determine if rapidjson installed and parse user defined location
@@ -82,9 +98,7 @@ if 'sdist' not in sys.argv:
 
 
     # Set coverage options in .coveragerc
-    create_coveragerc.create_coveragerc(matlab_installed=matlab_installed,
-                                        lpy_installed=lpy_installed,
-                                        R_installed=R_installed)
+    create_coveragerc.create_coveragerc(installed_languages)
 
 
 # Create .rst README from .md and get long description
