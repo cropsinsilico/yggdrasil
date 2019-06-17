@@ -100,7 +100,8 @@ install:
 
   # Install yggdrasil allowing pip to resolve requirements
   - "python setup.py sdist"
-  - "pip install --verbose dist/*.zip"
+  - "dir dist\"
+  - "pip install --verbose dist\*.zip"
   # - "pip install --verbose -e ."
 
 cache:
