@@ -1,0 +1,20 @@
+---
+
+model:
+  name: rpcFibCli
+  driver: RModelDriver
+  args:
+    - ./src/rpcFibCli.R
+    - "{{ FIB_ITERATIONS }}"   # env_var passed as argument for number of loops
+  client_of: rpcFibSrv  # Creates an RPC client queue $(client_of)_$(name)
+
+  outputs:
+    - name: output_log
+      driver: FileOutputDriver
+      args: fibCli.txt
+      in_temp: True
+
+  inputs:
+    - name: yaml_in
+      driver: FileInputDriver
+      args: rpcFibCli_r.yml

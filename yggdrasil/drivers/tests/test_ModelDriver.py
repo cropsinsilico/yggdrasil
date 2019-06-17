@@ -1,10 +1,25 @@
+import os
 import copy
 import unittest
 from yggdrasil.tests import assert_raises, scripts
-from yggdrasil.drivers.ModelDriver import ModelDriver
+from yggdrasil.drivers.ModelDriver import ModelDriver, remove_product
 from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 import yggdrasil.drivers.tests.test_Driver as parent
+
+
+def test_remove_product():
+    r"""Test remove_product."""
+    test_file = os.path.join(os.path.dirname(__file__), 'remove_product_test.py')
+    with open(test_file, 'w') as fd:
+        fd.write('print(\'hello\')')
+    try:
+        assert_raises(RuntimeError, remove_product, test_file,
+                      check_for_source=True)
+        assert_raises(RuntimeError, remove_product, os.path.dirname(test_file),
+                      check_for_source=True)
+    finally:
+        os.remove(test_file)
 
 
 def test_ModelDriver_implementation():
@@ -33,7 +48,7 @@ class TestModelParam(parent.TestParam):
                            'products', 'overwrite']
         self.src = None
         if self.import_cls.language is not None:
-            self.src = scripts[self.import_cls.language]
+            self.src = scripts[self.import_cls.language.lower()]
             if not isinstance(self.src, list):
                 self.src = [self.src]
         if self.src is not None:

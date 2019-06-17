@@ -1,0 +1,17 @@
+jsonschema
+matplotlib<3.0; python_version < '3.5'
+matplotlib; python_version >= '3.5'
+numpy>=1.13.0
+pandas<0.21; python_version == '3.4'
+pandas; python_version != '3.4'
+perf
+pint; python_version == '2.7'
+psutil
+pystache
+python-rapidjson; python_version >= '3.4'
+pyyaml
+pyzmq
+scipy
+six
+sysv_ipc; platform_system != 'Windows'
+unyt; python_version >= '3.4'

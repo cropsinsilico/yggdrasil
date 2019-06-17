@@ -1,68 +1,104 @@
 import os
 import sys
+import gc
+import glob
+import logging
 import warnings
 from setuptools import setup, find_packages
 from distutils.sysconfig import get_python_lib
 import versioneer
-import install_matlab_engine
 import create_coveragerc
 ygg_ver = versioneer.get_version()
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
+lang_dir = os.path.join(ROOT_PATH, 'yggdrasil', 'languages')
 
 
-# Attempt to install openalea
-try:
-    from openalea import lpy
-    lpy_installed = True
-except ImportError:
-    warnings.warn("Could not import openalea.lpy. " +
-                  "LPy support will be disabled.")
-    lpy_installed = False
+print("In setup.py", sys.argv)
+logging.critical("In setup.py: %s" % sys.argv)
 
 
-# Attempt to install matlab engine
-if install_matlab_engine.install_matlab(as_user=('--user' in sys.argv)):
-    matlab_installed = True
-else:
-    warnings.warn("Could not import matlab.engine. " +
-                  "Matlab features will be disabled.")
-    matlab_installed = False
+def call_install_language(language, results):
+    r"""Call install for a specific language.
 
+    Args:
+        language (str): Name of language that should be checked.
+        results (dict): Dictionary where result (whether or not the language is
+            installed) should be logged.
 
-# Determine if rapidjson installed and parse user defined location
-rj_include_dir0 = os.path.join(ROOT_PATH, 'yggdrasil', 'rapidjson', 'include')
-for idx, arg in enumerate(sys.argv[:]):
-    if ((arg.startswith('--rj-include-dir=')
-         or arg.startswith('--rapidjson-include-dir='))):
-        sys.argv.pop(idx)
-        rj_include_dir = os.path.abspath(arg.split('=', 1)[1])
-        break
-else:
-    rj_include_dir = rj_include_dir0
-if not os.path.isdir(rj_include_dir):
-    raise RuntimeError("RapidJSON sources could not be located. If you "
-                       "cloned the git repository, initialize the rapidjson "
-                       "git submodule by calling "
-                       "'git submodule update --init --recursive' "
-                       "from inside the repository.")
-if rj_include_dir != rj_include_dir0:
-    def_config_file = os.path.join(ROOT_PATH, 'yggdrasil', 'defaults.cfg')
+    """
+    if not os.path.isfile(os.path.join(lang_dir, language, 'install.py')):
+        return True
     try:
-        import ConfigParser as configparser
-    except ImportError:
-        import configparser
-    cfg = configparser.ConfigParser()
-    cfg.read(def_config_file)
-    if not cfg.has_section('c'):
-        cfg.add_section('c')
-    cfg.set('c', 'rapidjson_include', rj_include_dir)
-    with open(def_config_file, 'w') as fd:
-        cfg.write(fd)
+        sys.path.append(os.path.join(lang_dir, language))
+        from install import install
+        try:
+            from install import name_in_pragmas
+        except ImportError:
+            name_in_pragmas = language.lower()
+        out = install()
+        results[name_in_pragmas] = out
+    finally:
+        sys.path.pop()
+        del install
+        del name_in_pragmas
+        if 'install' in globals():
+            del globals()['install']
+        if 'install' in sys.modules:
+            del sys.modules['install']
+        gc.collect()
+    if not out:
+        warnings.warn(("Could not complete installation for {lang}. "
+                       "{lang} support will be disabled.").format(lang=language))
+    else:
+        logging.info("Language %s installed." % language)
+        
 
-    
-# Set coverage options in .coveragerc
-create_coveragerc.create_coveragerc(matlab_installed=matlab_installed,
-                                    lpy_installed=lpy_installed)
+# Don't do coverage or installation of packages for use with other languages
+# when building a source distribution
+if 'sdist' not in sys.argv:
+    # Attempt to install languages
+    installed_languages = {}
+    lang_dirs = sorted(glob.glob(os.path.join(lang_dir, '*')))
+    for x in lang_dirs:
+        if not os.path.isdir(x):
+            continue
+        ilang = os.path.basename(x)
+        call_install_language(ilang, installed_languages)
+
+
+    # Determine if rapidjson installed and parse user defined location
+    rj_include_dir0 = os.path.join(ROOT_PATH, 'yggdrasil', 'rapidjson', 'include')
+    for idx, arg in enumerate(sys.argv[:]):
+        if ((arg.startswith('--rj-include-dir=')
+             or arg.startswith('--rapidjson-include-dir='))):
+            sys.argv.pop(idx)
+            rj_include_dir = os.path.abspath(arg.split('=', 1)[1])
+            break
+    else:
+        rj_include_dir = rj_include_dir0
+    if not os.path.isdir(rj_include_dir):
+        raise RuntimeError("RapidJSON sources could not be located. If you "
+                           "cloned the git repository, initialize the rapidjson "
+                           "git submodule by calling "
+                           "'git submodule update --init --recursive' "
+                           "from inside the repository.")
+    if rj_include_dir != rj_include_dir0:
+        def_config_file = os.path.join(ROOT_PATH, 'yggdrasil', 'defaults.cfg')
+        try:
+            import ConfigParser as configparser
+        except ImportError:
+            import configparser
+        cfg = configparser.ConfigParser()
+        cfg.read(def_config_file)
+        if not cfg.has_section('c'):
+            cfg.add_section('c')
+        cfg.set('c', 'rapidjson_include', rj_include_dir)
+        with open(def_config_file, 'w') as fd:
+            cfg.write(fd)
+
+
+    # Set coverage options in .coveragerc
+    create_coveragerc.create_coveragerc(installed_languages)
 
 
 # Create .rst README from .md and get long description
@@ -82,21 +118,12 @@ else:
 
 
 # Create requirements list based on platform
-requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
-                "pystache", "pyzmq", "psutil",
-                "matplotlib<3.0; python_version < '3.5'",
-                "matplotlib; python_version >= '3.5'",
-                "jsonschema",
-                "python-rapidjson; python_version >= '3.4'",
-                'pandas<0.21; python_version == "3.4"',
-                'pandas; python_version != "3.4"',
-                "perf",
-                "pint; python_version == '2.7'",
-                "unyt; python_version >= '3.4'",
-                "six",
-                'sysv_ipc; platform_system != "Windows"']
-test_requirements = ['pytest']
-# optional_requirements = ["pika<1.0", "astropy"]
+with open("requirements.txt", 'r') as fd:
+    requirements = fd.read().splitlines()
+with open("requirements_testing.txt", 'r') as fd:
+    test_requirements = fd.read().splitlines()
+# with open("requirements_optional.txt", 'r') as fd:
+#     optional_requirements = fd.read().splitlines()
 
 
 # Warn that local install may not have entry points on path
@@ -108,6 +135,7 @@ if '--user' in sys.argv:
                   "to the command line entry points (e.g. yggrun). " +
                   "If 'yggrun' is not a recognized command, try adding " +
                   "'%s' to your PATH." % script_dir)
+    
     
 setup(
     name="yggdrasil-framework",

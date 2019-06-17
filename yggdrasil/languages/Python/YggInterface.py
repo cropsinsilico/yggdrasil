@@ -1,4 +1,4 @@
-from yggdrasil import backwards, tools, serialize
+from yggdrasil import backwards, tools
 from yggdrasil.communication.DefaultComm import DefaultComm
 
 
@@ -22,8 +22,8 @@ def eof_msg():
     return YGG_MSG_EOF
 
 
-def YggMatlab(_type, args=None):  # pragma: matlab
-    r"""Short interface to identify functions called by Matlab.
+def YggInit(_type, args=None):  # pragma: matlab
+    r"""Short interface to identify functions called by another language.
 
     Args:
         _type (str): Name of class that should be returned.
@@ -48,8 +48,7 @@ def YggMatlab(_type, args=None):  # pragma: matlab
     if isinstance(cls, (int, backwards.bytes_type, backwards.unicode_type)):
         obj = cls
     else:
-        kwargs = {'matlab': True}
-        obj = cls(*args, **kwargs)
+        obj = cls(*args)
     return obj
 
 
@@ -70,10 +69,11 @@ def YggInput(name, format_str=None, **kwargs):
         
     """
     if format_str is not None:
-        if kwargs.get('matlab', False):  # pragma: matlab
-            format_str = backwards.decode_escape(format_str)
         kwargs['format_str'] = format_str
     kwargs.update(direction='recv', is_interface=True, recv_timeout=False)
+    if 'language' not in kwargs:
+        kwargs['language'] = tools.get_subprocess_language()
+    kwargs.update(direction='recv', is_interface=True)
     return DefaultComm(name, **kwargs)
     
 
@@ -94,14 +94,14 @@ def YggOutput(name, format_str=None, **kwargs):
         
     """
     if format_str is not None:
-        if kwargs.get('matlab', False):  # pragma: matlab
-            format_str = backwards.decode_escape(format_str)
         kwargs['format_str'] = format_str
-    kwargs.update(direction='send', is_interface=True, recv_timeout=False)
+    kwargs.update(direction='send', is_interface=True)
+    if 'language' not in kwargs:
+        kwargs['language'] = tools.get_subprocess_language()
     return DefaultComm(name, **kwargs)
 
     
-def YggRpcServer(name, infmt='%s', outfmt='%s', matlab=False):
+def YggRpcServer(name, infmt='%s', outfmt='%s', language=None):
     r"""Get class for handling requests and response for an RPC Server.
 
     Args:
@@ -116,18 +116,17 @@ def YggRpcServer(name, infmt='%s', outfmt='%s', matlab=False):
         
     """
     from yggdrasil.communication import ServerComm
-    if matlab:  # pragma: matlab
-        infmt = backwards.decode_escape(infmt)
-        outfmt = backwards.decode_escape(outfmt)
     icomm_kwargs = dict(format_str=infmt)
     ocomm_kwargs = dict(format_str=outfmt)
+    if language is None:
+        language = tools.get_subprocess_language()
     out = ServerComm.ServerComm(name, response_kwargs=ocomm_kwargs,
-                                is_interface=True, recv_timeout=False,
-                                matlab=matlab, **icomm_kwargs)
+                                language=language, is_interface=True,
+                                recv_timeout=False, **icomm_kwargs)
     return out
     
 
-def YggRpcClient(name, outfmt='%s', infmt='%s', matlab=False):
+def YggRpcClient(name, outfmt='%s', infmt='%s', language=None):
     r"""Get class for handling requests and response to an RPC Server from a
     client.
 
@@ -143,14 +142,13 @@ def YggRpcClient(name, outfmt='%s', infmt='%s', matlab=False):
         
     """
     from yggdrasil.communication import ClientComm
-    if matlab:  # pragma: matlab
-        infmt = backwards.decode_escape(infmt)
-        outfmt = backwards.decode_escape(outfmt)
     icomm_kwargs = dict(format_str=infmt)
     ocomm_kwargs = dict(format_str=outfmt)
+    if language is None:
+        language = tools.get_subprocess_language()
     out = ClientComm.ClientComm(name, response_kwargs=icomm_kwargs,
-                                is_interface=True, recv_timeout=False,
-                                matlab=matlab, **ocomm_kwargs)
+                                language=language, is_interface=True,
+                                recv_timeout=False, **ocomm_kwargs)
     return out
     
 
@@ -220,8 +218,6 @@ def YggAsciiTableOutput(name, fmt, as_array=False, **kwargs):
         DefaultComm: Communication object.
         
     """
-    if kwargs.get('matlab', False):  # pragma: matlab
-        fmt = backwards.decode_escape(fmt)
     kwargs['serializer_kwargs'] = dict(as_array=as_array,
                                        format_str=fmt)
     return YggOutput(name, **kwargs)
@@ -240,7 +236,7 @@ def YggAsciiArrayInput(name, **kwargs):
         DefaultComm: Communication object.
         
     """
-    kwargs['as_array'] = True
+    kwargs.update(as_array=True, recv_converter='table')
     return YggAsciiTableInput(name, **kwargs)
 
 
@@ -257,9 +253,9 @@ def YggAsciiArrayOutput(name, fmt, **kwargs):
         DefaultComm: Communication object.
         
     """
-    if kwargs.get('matlab', False):  # pragma: matlab
-        kwargs['send_converter'] = serialize.consolidate_array
-    kwargs['as_array'] = True
+    if 'language' not in kwargs:
+        kwargs['language'] = tools.get_subprocess_language()
+    kwargs.update(as_array=True, send_converter='table')
     return YggAsciiTableOutput(name, fmt, **kwargs)
 
 
@@ -306,10 +302,9 @@ def YggPandasInput(name, **kwargs):
         DefaultComm: Communication object.
         
     """
-    if kwargs.get('matlab', False):  # pragma: matlab
-        kwargs['recv_converter'] = 'array'
-    else:
-        kwargs['recv_converter'] = 'pandas'
+    if 'language' not in kwargs:
+        kwargs['language'] = tools.get_subprocess_language()
+    kwargs['recv_converter'] = 'pandas'
     return YggInput(name, **kwargs)
 
 
@@ -324,10 +319,9 @@ def YggPandasOutput(name, **kwargs):
         DefaultComm: Communication object.
         
     """
-    if kwargs.get('matlab', False):  # pragma: matlab
-        kwargs['send_converter'] = serialize.consolidate_array
-    else:
-        kwargs['send_converter'] = serialize.pandas2list
+    if 'language' not in kwargs:
+        kwargs['language'] = tools.get_subprocess_language()
+    kwargs['send_converter'] = 'pandas'
     return YggOutput(name, **kwargs)
 
 

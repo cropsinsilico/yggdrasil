@@ -1,0 +1,9 @@
+---
+
+model:
+  name: rpcFibSrv
+  driver: RModelDriver
+  args:
+    - ./src/rpcFibSrv.R
+    - "{{ FIB_SERVER_SLEEP_SECONDS }}"    # env var - time to sleep before returning
+  is_server: True  # Creates a RPC queue called $name

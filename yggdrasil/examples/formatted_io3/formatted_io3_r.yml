@@ -1,0 +1,28 @@
+models:
+  - name: R_modelA
+    language: R
+    args: ./src/formatted_io3_modelA.R
+    inputs: inputA
+    outputs:
+      name: outputA
+      field_names: name,count,size
+
+  - name: R_modelB
+    language: R
+    args: ./src/formatted_io3_modelB.R
+    inputs: inputB
+    outputs:
+      name: outputB
+      field_names: name,count,size
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: inputA
+    as_array: True
+    filetype: table
+  - input: outputB  # Connection between model B output and file
+    output: ./output.txt
+    as_array: True
+    filetype: table

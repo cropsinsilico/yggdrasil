@@ -7,14 +7,22 @@ cache:
 
 addons:
   apt:
+    sources:
+      # - r-packages-trusty
+      - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu trusty-cran35/'
+        key_url: 'http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0x51716619E084DAB9'
     packages: &native_deps_apt
       - strace
       - valgrind
+      - gfortran
+      - r-base
       # - ccache
     update: true
   homebrew: &native_deps_brew
     packages:
       - valgrind
+      - gcc
+      - r
     update: true
 
 os:
@@ -35,6 +43,7 @@ env:
     INSTALLAPY=0
     INSTALLLPY=0
     BUILDDOCS=0
+    YGG_USE_SUDO_FOR_R=1  # sudo required for installing R libraries
   matrix:
     - YGG_ENABLE_LONG_TESTS=1
     - CONDA=yes
@@ -153,11 +162,9 @@ install:
       pip install $NUMPY
       pip install $MATPLOTLIB
       pip install $JSONSCHEMA
-      pip install nose
-      pip install pytest "pytest-cov<2.6"
-      pip install coverage coveralls codecov flake8
+      pip install -r requirements_testing.txt
       if [[ $BUILDDOCS == '1' ]]; then
-        pip install sphinx breathe sphinx_rtd_theme
+        pip install -r requirements_documentation.txt
       fi
       # Install from source dist
       python setup.py sdist
@@ -170,11 +177,9 @@ install:
       conda install $NUMPY
       conda install $MATPLOTLIB
       conda install $JSONSCHEMA
-      conda install nose
-      conda install pytest "pytest-cov<2.6"
-      conda install coverage coveralls codecov flake8
+      conda install --file requirements_testing.txt
       if [[ $BUILDDOCS == '1' ]]; then
-        conda install sphinx breathe sphinx_rtd_theme
+        conda install --file requirements_documentation.txt
       fi
       conda build recipe/meta.yaml --python $CONDA
       conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
@@ -219,7 +224,7 @@ jobs:
     # Python 3.7 requires special dist
     - os: linux
       python: 3.7
-      env: YGG_DEFAULT_COMM=ZMQComm INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1
+      env: YGG_DEFAULT_COMM=ZMQComm INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1 YGG_TEST_PRODUCTION_RUNS=1
       dist: xenial
       sudo: true
       

@@ -13,6 +13,29 @@ from yggdrasil.tests import YggTestClassInfo, assert_equal, assert_raises
 YGG_MSG_MAX = get_YGG_MSG_MAX()
 
 
+class ModelEnv(object):
+    
+    def __init__(self, language=None):
+        new_kw = {'YGG_SUBPROCESS': 'True'}
+        if language is not None:
+            new_kw['YGG_MODEL_LANGUAGE'] = language
+        # Send environment keyword to fake Matlab
+        self.old_kw = {}
+        for k, v in new_kw.items():
+            self.old_kw[k] = os.environ.get(k, None)
+            os.environ[k] = v
+            
+    def __enter__(self):
+        return None
+
+    def __exit__(self, type, value, traceback):
+        for k, v in self.old_kw.items():
+            if v is None:
+                del os.environ[k]
+            else:
+                os.environ[k] = v
+
+
 def test_maxMsgSize():
     r"""Test max message size."""
     assert_equal(YggInterface.maxMsgSize(), YGG_MSG_MAX)
@@ -42,21 +65,22 @@ def test_YggMatlab_class():  # pragma: matlab
     drv = InputDriver.InputDriver(name, 'link')
     drv.start()
     os.environ.update(drv.env)
-    YggInterface.YggMatlab('YggInput', (name, '%f\\n%d'))
-    drv.terminate()
+    with ModelEnv(language='matlab'):
+        YggInterface.YggInit('YggInput', (name, '%f\\n%d'))
+        drv.terminate()
     # Output
     drv = OutputDriver.OutputDriver(name, 'link')
     drv.start()
     os.environ.update(drv.env)
-    YggInterface.YggMatlab('YggOutput', (name, '%f\\n%d'))
-    drv.terminate()
+    with ModelEnv(language='matlab'):
+        YggInterface.YggInit('YggOutput', (name, '%f\\n%d'))
+        drv.terminate()
 
 
-@unittest.skipIf(not MatlabModelDriver.is_installed(), "Matlab not installed.")
-def test_YggMatlab_variables():  # pragma: matlab
+def test_YggInit_variables():
     r"""Test Matlab interface for variables."""
-    assert_equal(YggInterface.YggMatlab('YGG_MSG_MAX'), YGG_MSG_MAX)
-    assert_equal(YggInterface.YggMatlab('YGG_MSG_EOF'), YGG_MSG_EOF)
+    assert_equal(YggInterface.YggInit('YGG_MSG_MAX'), YGG_MSG_MAX)
+    assert_equal(YggInterface.YggInit('YGG_MSG_EOF'), YGG_MSG_EOF)
 
 
 class TestBase(YggTestClassInfo):
@@ -65,7 +89,7 @@ class TestBase(YggTestClassInfo):
         super(TestBase, self).__init__(*args, **kwargs)
         self._mod = 'yggdrasil.interface.YggInterface'
         self.name = 'test' + self.uuid
-        self.matlab = False
+        self.language = None
         self.idriver = None
         self.odriver = None
         self.test_comm = None
@@ -134,13 +158,6 @@ class TestBase(YggTestClassInfo):
             return [self.name, self.name + '_link'], {}
         raise Exception('Direction was not set. (%s)', self.direction)  # pragma: debug
 
-    @property
-    def inst_kwargs(self):
-        r"""dict: Arguments for the interface instance."""
-        out = super(TestBase, self).inst_kwargs
-        out['matlab'] = self.matlab
-        return out
-        
     def get_options(self):
         r"""Get testing options."""
         out = {}
@@ -221,6 +238,12 @@ class TestBase(YggTestClassInfo):
         super(TestBase, self).teardown()
         self.cleanup_comms()
 
+    def create_instance(self):
+        r"""Create a new instance of the class."""
+        with ModelEnv(language=self.language):
+            out = super(TestBase, self).create_instance()
+        return out
+        
     def remove_instance(self, inst):
         r"""Remove an instance."""
         inst.is_interface = False
@@ -261,7 +284,7 @@ class TestYggInputMatlab(TestYggInput):
     r"""Test basic input to python as passed from matlab."""
     def __init__(self, *args, **kwargs):
         super(TestYggInputMatlab, self).__init__(*args, **kwargs)
-        self.matlab = True
+        self.language = 'matlab'
         self.testing_option_kws = {'table_example': True}
         self._inst_kwargs = {'format_str': self.fmt_str_matlab}
 
@@ -306,7 +329,7 @@ class TestYggOutputMatlab(TestYggOutput):
     r"""Test basic output to python as passed from matlab."""
     def __init__(self, *args, **kwargs):
         super(TestYggOutputMatlab, self).__init__(*args, **kwargs)
-        self.matlab = True
+        self.language = 'matlab'
         self.testing_option_kws = {'table_example': True}
         self._inst_kwargs = {'format_str': self.fmt_str_matlab}
 
@@ -346,7 +369,7 @@ class TestYggRpcClientMatlab(TestYggRpcClient):
     r"""Test client-side RPC communication with Python as passed through Matlab."""
     def __init__(self, *args, **kwargs):
         super(TestYggRpcClientMatlab, self).__init__(*args, **kwargs)
-        self.matlab = True
+        self.language = 'matlab'
         self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
 
 
@@ -385,7 +408,7 @@ class TestYggRpcServerMatlab(TestYggRpcServer):
     r"""Test server-side RPC communication with Python as passed through Matlab."""
     def __init__(self, *args, **kwargs):
         super(TestYggRpcServerMatlab, self).__init__(*args, **kwargs)
-        self.matlab = True
+        self.language = 'matlab'
         self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
 
 
@@ -433,7 +456,7 @@ class TestYggAsciiTableOutputMatlab(TestYggAsciiTableOutput):
     r"""Test output from an ascii table as passed through Matlab."""
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiTableOutputMatlab, self).__init__(*args, **kwargs)
-        self.matlab = True
+        self.language = 'matlab'
         self._inst_args = [self.name, self.fmt_str_matlab]
         
 

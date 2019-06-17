@@ -1,5 +1,4 @@
 import os
-import copy
 import shutil
 from collections import OrderedDict
 from yggdrasil import platform, tools
@@ -46,6 +45,15 @@ class CCompilerBase(CompilerBase):
                                          search_path_flags=['-Xlinker', '--verbose'],
                                          search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
         CompilerBase.before_registration(cls)
+
+    @classmethod
+    def call(cls, args, **kwargs):
+        r"""Call the compiler with the provided arguments. For |yggdrasil| C
+        models will always be linked using the C++ linker since some parts of
+        the interface library are written in C++."""
+        if not kwargs.get('dont_link', False):
+            kwargs.setdefault('linker_language', 'c++')
+        return super(CCompilerBase, cls).call(args, **kwargs)
     
 
 class GCCCompiler(CCompilerBase):
@@ -87,6 +95,7 @@ class MSVCCompiler(CCompilerBase):
     search_path_env = 'INCLUDE'
     search_path_flags = None
     version_flags = []
+    product_exts = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj', '.vcxproj.filters']
     combine_with_linker = True  # Must be explicit; linker is separate .exe
     linker_attributes = dict(GCCCompiler.linker_attributes,
                              default_executable=None,
@@ -166,6 +175,7 @@ class CModelDriver(CompiledModelDriver):
     supported_comm_options = {
         'ipc': {'platforms': ['MacOS', 'Linux']},
         'zmq': {'libraries': ['zmq', 'czmq']}}
+    interface_dependencies = ['rapidjson']
     interface_directories = [_incl_interface]
     external_libraries = {
         'rapidjson': {'include': os.path.join(os.path.dirname(tools.__file__),
@@ -228,6 +238,10 @@ class CModelDriver(CompiledModelDriver):
         'interface': '#include \"{interface_library}\"',
         'input': 'yggInput_t {channel} = yggInput(\"{channel_name}\");',
         'output': 'yggOutput_t {channel} = yggOutput(\"{channel_name}\");',
+        'table_input': ('yggInput_t {channel} = yggAsciiTableInput('
+                        '\"{channel_name}\");'),
+        'table_output': ('yggOutput_t {channel} = yggAsciiTableOutput('
+                         '\"{channel_name}\", \"{format_str}\");'),
         'recv': '{flag_var} = yggRecvRealloc({channel}, {recv_var});',
         'send': '{flag_var} = yggSend({channel}, {send_var});',
         'flag_cond': '{flag_var} >= 0',
@@ -259,8 +273,13 @@ class CModelDriver(CompiledModelDriver):
     def after_registration(cls):
         r"""Operations that should be performed to modify class attributes after
         registration."""
-        if platform._is_mac and (cls.default_compiler is None):
-            cls.default_compiler = 'clang'
+        if cls.default_compiler is None:
+            if platform._is_linux:
+                cls.default_compiler = 'gcc'
+            elif platform._is_mac:
+                cls.default_compiler = 'clang'
+            elif platform._is_win:  # pragma: windows
+                cls.default_compiler = 'cl'
         CompiledModelDriver.after_registration(cls)
         archiver = cls.get_tool('archiver')
         linker = cls.get_tool('linker')
@@ -319,19 +338,6 @@ class CModelDriver(CompiledModelDriver):
                     os.path.dirname(os.path.dirname(rjlib)))
         return out
         
-    def compile_model(self, **kwargs):
-        r"""Compile model executable(s) and appends any products produced by
-        the compilation that should be removed after the run is complete."""
-        # Always link using C++ because the interface depends on wrapped C++
-        # libraries in order to use rapidjson
-        kwargs.setdefault('linker_language', 'c++')
-        out = super(CModelDriver, self).compile_model(**kwargs)
-        if platform._is_win:  # pragma: windows
-            for x in copy.deepcopy(self.products):
-                base = os.path.splitext(x)[0]
-                self.products += [base + ext for ext in ['.ilk', '.pdb', '.obj']]
-        return out
-
     @classmethod
     def update_ld_library_path(cls, env):
         r"""Update provided dictionary of environment variables so that

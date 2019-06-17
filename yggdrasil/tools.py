@@ -94,6 +94,26 @@ def check_environ_bool(name, valid_values=['true', '1', True, 1]):
     return (os.environ.get(name, '').lower() in valid_values)
 
 
+def get_subprocess_language():
+    r"""Determine the language of the calling process.
+
+    Returns:
+        str: Name of the programming language responsible for the subprocess.
+
+    """
+    return os.environ.get('YGG_MODEL_LANGUAGE', 'python')
+
+
+def get_subprocess_language_driver():
+    r"""Determine the driver for the langauge of the calling process.
+
+    Returns:
+        ModelDriver: Class used to handle running a model of the process language.
+
+    """
+    return import_component('model', get_subprocess_language())
+
+
 def is_subprocess():
     r"""Determine if the current process is a subprocess.
 
@@ -192,6 +212,10 @@ def get_supported_lang():
     out = s['model'].subtypes
     if 'c++' in out:
         out[out.index('c++')] = 'cpp'
+    # if 'R' in out:
+    #     out[out.index('R')] = 'r'
+    if 'r' in out:
+        out[out.index('r')] = 'R'
     return list(set(out))
 
 

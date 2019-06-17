@@ -24,6 +24,74 @@ logger = logging.getLogger(__name__)
 _map_language_ext = OrderedDict()
 
 
+def remove_product(product, check_for_source=False, timer_class=None):
+    r"""Delete a single product after checking that the product is not (or
+    does not contain, in the case of directories), source files.
+
+    Args:
+        product (str): Full path to a file or directory that should be
+            removed.
+        check_for_source (bool, optional): If True, the specified product
+            will be checked to ensure that no source files are present. If
+            a source file is present, a RuntimeError will be raised.
+            Defaults to False.
+
+    Raises:
+        RuntimeError: If the specified product is a source file and
+            check_for_source is False.
+        RuntimeError: If the specified product is a directory that contains
+            a source file and check_for_source is False.
+        RuntimeError: If the product cannot be removed.
+
+    """
+    if timer_class is None:
+        timer_class = tools.YggClass()
+    if os.path.isdir(product):
+        ext_tuple = tuple(_map_language_ext.keys())
+        if check_for_source:
+            for root, dirs, files in os.walk(product):
+                for f in files:
+                    if f.endswith(ext_tuple):
+                        raise RuntimeError(("%s contains a source file "
+                                            "(%s)") % (product, f))
+        shutil.rmtree(product)
+    elif os.path.isfile(product):
+        if check_for_source:
+            ext = os.path.splitext(product)[-1]
+            if ext in _map_language_ext:
+                raise RuntimeError("%s is a source file." % product)
+        T = timer_class.start_timeout()
+        while ((not T.is_out) and os.path.isfile(product)):
+            try:
+                os.remove(product)
+            except BaseException:  # pragma: debug
+                if os.path.isfile(product):
+                    timer_class.sleep()
+                if T.is_out:
+                    raise
+        timer_class.stop_timeout()
+        if os.path.isfile(product):  # pragma: debug
+            raise RuntimeError("Failed to remove product: %s" % product)
+        
+
+def remove_products(products, source_products, timer_class=None):
+    r"""Delete products produced during the process of running the model.
+
+    Args:
+        products (list): List of products that should be removed after
+            checking that they are not source files.
+        source_products (list): List of products that should be removed
+            without checking that they are not source files.
+
+    """
+    # print('products', products)
+    # print('source_products', source_products)
+    for p in source_products:
+        remove_product(p, timer_class=timer_class)
+    for p in products:
+        remove_product(p, timer_class=timer_class, check_for_source=True)
+        
+
 class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
 
@@ -40,6 +108,10 @@ class ModelDriver(Driver):
             located within the file specified by the source file listed in the
             first argument. If not provided, the model must contain it's own
             calls to the |yggdrasil| interface.
+        source_products (list, optional): Files created by running the model
+            that are source files. These files will be removed without checking
+            their extension so users should avoid adding files to this list
+            unless they are sure they should be deleted. Defaults to [].
         is_server (bool, optional): If True, the model is assumed to be a server
             and an instance of :class:`yggdrasil.drivers.ServerDriver`
             is started. Defaults to False. Use of is_server with function is
@@ -119,9 +191,13 @@ class ModelDriver(Driver):
             overwritten by compilation and cleaned up following the run.
             Otherwise, existing products will be used and will remain after
             the run.
-        products (list): File created by running the model. This includes
-            any wrappers that are created or compile executables/object
-            files.
+        products (list): Files created by running the model. This includes
+            compilation products such as executables and/or object files.
+        source_products (list): Files created by running the model that
+            are source files. These files will be removed without checking
+            their extension so users should avoid adding files to this list
+            unless they are sure they should be deleted.
+        wrapper_products (list): Files created in order to wrap the model.
         process (:class:`yggdrasil.tools.YggPopen`): Process used to run
             the model.
         function (str): The name of the model function that should be wrapped.
@@ -135,6 +211,8 @@ class ModelDriver(Driver):
         with_valgrind (bool): If True, the command is run with valgrind.
         valgrind_flags (list): Flags to pass to valgrind.
         model_index (int): Index of model in list of models being run.
+        modified_files (list): List of pairs of originals and copies of files
+            that should be restored during cleanup.
 
     Raises:
         RuntimeError: If both with_strace and with_valgrind are True.
@@ -159,6 +237,8 @@ class ModelDriver(Driver):
                     'description': 'Model outputs described as comm objects.'},
         'products': {'type': 'array', 'default': [],
                      'items': {'type': 'string'}},
+        'source_products': {'type': 'array', 'default': [],
+                            'items': {'type': 'string'}},
         'working_dir': {'type': 'string'},
         'overwrite': {'type': 'boolean', 'default': True},
         'preserve_cache': {'type': 'boolean', 'default': False},
@@ -192,6 +272,8 @@ class ModelDriver(Driver):
     function_param = None
     version_flags = ['--version']
 
+    _library_cache = {}
+
     def __init__(self, name, args, model_index=0, **kwargs):
         super(ModelDriver, self).__init__(name, **kwargs)
         # Setup process things
@@ -220,8 +302,9 @@ class ModelDriver(Driver):
         self.model_args = []
         self.model_dir = None
         self.model_src = None
-        self.products = []
         self.args = args
+        self.modified_files = []
+        self.wrapper_products = []
         # Update for function
         if self.function:
             self.model_function_file = args[0]
@@ -257,7 +340,7 @@ class ModelDriver(Driver):
         if self.overwrite:
             self.remove_products()
         # Write wrapper
-        self.products += self.write_wrappers()
+        self.wrapper_products += self.write_wrappers()
 
     @staticmethod
     def before_registration(cls):
@@ -554,7 +637,8 @@ class ModelDriver(Driver):
 
         """
         return (cls.is_language_installed() and cls.are_dependencies_installed()
-                and cls.is_comm_installed() and cls.is_configured())
+                and cls.is_interface_installed() and cls.is_comm_installed()
+                and cls.is_configured())
 
     @classmethod
     def are_dependencies_installed(cls):
@@ -576,6 +660,24 @@ class ModelDriver(Driver):
             out = cls.is_library_installed(x)
         return out
 
+    @classmethod
+    def is_interface_installed(cls):
+        r"""Determine if the interface library for the associated programming
+        language is installed.
+
+        Returns:
+            bool: True if the interface library is installed.
+
+        """
+        out = (cls.language is not None)
+        for x in cls.base_languages:
+            if not out:  # pragma: no cover
+                break
+            out = import_component('model', x).is_interface_installed()
+        if out and (cls.interface_library is not None):
+            out = cls.is_library_installed(cls.interface_library)
+        return out
+    
     @classmethod
     def is_language_installed(cls):
         r"""Determine if the interpreter/compiler for the associated programming
@@ -786,7 +888,7 @@ class ModelDriver(Driver):
 
         """
         return []
-        
+
     def set_env(self):
         r"""Get environment variables that should be set for the model process.
 
@@ -798,6 +900,7 @@ class ModelDriver(Driver):
         env.update(os.environ)
         env['YGG_SUBPROCESS'] = "True"
         env['YGG_MODEL_INDEX'] = str(self.model_index)
+        env['YGG_MODEL_LANGUAGE'] = self.language
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):
@@ -975,27 +1078,22 @@ class ModelDriver(Driver):
         if self.function and os.path.isfile(self.model_src):
             assert(os.path.basename(self.model_src).startswith('ygg_'))
             os.remove(self.model_src)
+        self.restore_files()
         super(ModelDriver, self).cleanup()
-        
+
+    def restore_files(self):
+        r"""Restore modified files to their original form."""
+        for (original, modified) in self.modified_files:
+            if os.path.isfile(original):
+                os.remove(modified)
+                shutil.move(original, modified)
+
     def remove_products(self):
         r"""Delete products produced during the process of running the model."""
-        for p in self.products:
-            if os.path.isdir(p):
-                shutil.rmtree(p)
-            elif os.path.isfile(p):
-                T = self.start_timeout()
-                while ((not T.is_out) and os.path.isfile(p)):
-                    try:
-                        os.remove(p)
-                    except BaseException:  # pragma: debug
-                        if os.path.isfile(p):
-                            self.sleep()
-                        if T.is_out:
-                            raise
-                self.stop_timeout()
-                if os.path.isfile(p):  # pragma: debug
-                    raise RuntimeError("Failed to remove product: %s" % p)
-
+        products = self.products
+        source_products = self.source_products + self.wrapper_products
+        remove_products(products, source_products, timer_class=self)
+            
     # def do_terminate(self):
     #     r"""Terminate the process running the model."""
     #     self.debug('')

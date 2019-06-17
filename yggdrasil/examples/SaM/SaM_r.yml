@@ -1,0 +1,21 @@
+---
+
+model:
+  name: SaMR
+  driver: RModelDriver
+  args: src/SaM.R
+
+  inputs:
+    - name: input1_R
+      driver: FileInputDriver
+      args: ./Input/SaM_input.txt
+    - name: static_R
+      driver: FileInputDriver
+      args: ./Input/SaM_static.txt
+
+  outputs:
+    - name: output_R
+      driver: FileOutputDriver
+      args: SaM_output.txt
+      in_temp: True
+

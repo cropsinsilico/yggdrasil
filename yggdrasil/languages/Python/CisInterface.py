@@ -7,7 +7,7 @@ warnings.warn(("YggInterface replaces CisInterface in yggdrasil. "
 
 direct_replace = ['maxMsgSize', 'bufMsgSize', 'eof_msg']
 upper_replace = ['YGG_MSG_MAX', 'YGG_MSG_EOF', 'YGG_MSG_BUF']
-title_replace = ['YggMatlab', 'YggInput', 'YggOutput',
+title_replace = ['YggInit', 'YggInput', 'YggOutput',
                  'YggRpcServer', 'YggRpcClient',
                  'YggAsciiFileInput', 'YggAsciiFileOutput',
                  'YggAsciiTableInput', 'YggAsciiTableOutput',

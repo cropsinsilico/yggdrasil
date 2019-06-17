@@ -1,0 +1,7 @@
+codecov
+coverage
+coveralls
+flake8
+nose
+pytest
+pytest-cov<2.6

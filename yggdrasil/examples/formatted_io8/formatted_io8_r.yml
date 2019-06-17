@@ -1,0 +1,30 @@
+models:
+  - name: R_modelA
+    language: R
+    args: ./src/formatted_io8_modelA.R
+    inputs:
+      - name: inputA
+        type: object
+    outputs:
+      - name: outputA
+        type: object
+
+  - name: R_modelB
+    language: R
+    args: ./src/formatted_io8_modelB.R
+    inputs:
+      - name: inputB
+        type: object
+    outputs:
+      - name: outputB
+        type: object
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: inputA
+    filetype: json
+  - input: outputB  # Connection between model B output and file
+    output: ./output.txt
+    filetype: json

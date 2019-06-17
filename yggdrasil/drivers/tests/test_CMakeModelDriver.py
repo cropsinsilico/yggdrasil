@@ -70,7 +70,7 @@ def test_create_include():
                 ([], ['-Llib_dir'], ['LINK_DIRECTORIES(lib_dir)']),
                 ([], ['/LIBPATH:"lib_dir"'], ['LINK_DIRECTORIES(lib_dir)']),
                 ([], ['m'], ['TARGET_LINK_LIBRARIES(%s m)' % target])]
-    if CMakeModelDriver.add_libraries:  # pragma: debug
+    if CMakeConfigure.add_libraries:  # pragma: debug
         testlist += [([], [fname_dll], ['ADD_LIBRARY(test SHARED IMPORTED)']),
                      ([], [fname_lib], ['ADD_LIBRARY(test STATIC IMPORTED)'])]
     else:
@@ -88,8 +88,8 @@ def test_create_include():
     CModelDriver.compile_dependencies()
     CMakeModelDriver.compile_dependencies()
     for c, l, lines in testlist:
-        out = CMakeModelDriver.create_include(None, target, compile_flags=c,
-                                              linker_flags=l)
+        out = CMakeConfigure.create_include(None, target, compile_flags=c,
+                                            linker_flags=l, verbose=True)
         for x in lines:
             try:
                 assert(x in out)
@@ -99,11 +99,11 @@ def test_create_include():
                 raise
     for fname in [fname_dll, fname_lib]:
         os.remove(fname)
-    assert_raises(ValueError, CMakeModelDriver.create_include,
+    assert_raises(ValueError, CMakeConfigure.create_include,
                   None, target, compile_flags=['invalid'])
-    assert_raises(ValueError, CMakeModelDriver.create_include,
+    assert_raises(ValueError, CMakeConfigure.create_include,
                   None, target, linker_flags=['-invalid'])
-    assert_raises(ValueError, CMakeModelDriver.create_include,
+    assert_raises(ValueError, CMakeConfigure.create_include,
                   None, target, linker_flags=['/invalid'])
 
 

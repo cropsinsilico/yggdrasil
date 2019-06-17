@@ -1,8 +1,10 @@
 import os
+import six
 import uuid
 import unittest
 import tempfile
 import shutil
+from yggdrasil.components import ComponentMeta
 from yggdrasil import runner, tools, platform
 from yggdrasil.examples import yamls, source, ext_map
 from yggdrasil.tests import YggTestBase
@@ -11,6 +13,24 @@ from yggdrasil.tests import YggTestBase
 _ext2lang = {v: k for k, v in ext_map.items()}
 
 
+def make_lang_test(lang):
+    def itest(self):
+        self.run_language(lang.lower())
+    return itest
+
+
+class ExampleMeta(ComponentMeta):
+    def __new__(cls, name, bases, dct):
+        for l in tools.get_supported_lang():
+            itest_name = 'test_%s' % l
+            if itest_name not in dct:
+                itest_func = make_lang_test(l)
+                itest_func.__name__ = itest_name
+                dct[itest_name] = itest_func
+        return super(ExampleMeta, cls).__new__(cls, name, bases, dct)
+
+
+@six.add_metaclass(ExampleMeta)
 class TestExample(YggTestBase, tools.YggClass):
     r"""Base class for running examples."""
 
@@ -164,50 +184,16 @@ class TestExample(YggTestBase, tools.YggClass):
                 if os.path.isfile(fout):
                     os.remove(fout)
 
-    def test_all(self):
-        r"""Test the version of the example that uses all languages."""
-        self.language = 'all'
+    def run_language(self, lang):
+        r"""Run a test for the specified language."""
+        self.language = lang
         self.run_example()
         self.language = None
+
+    def test_all(self):
+        r"""Test the version of the example that uses all languages."""
+        self.run_language('all')
 
     def test_all_nomatlab(self):
         r"""Test the version of the example that uses all languages."""
-        self.language = 'all_nomatlab'
-        self.run_example()
-        self.language = None
-
-    def test_python(self):
-        r"""Test the Python version of the example."""
-        self.language = 'python'
-        self.run_example()
-        self.language = None
-
-    def test_c(self):
-        r"""Test the C version of the example."""
-        self.language = 'c'
-        self.run_example()
-        self.language = None
-
-    def test_cpp(self):
-        r"""Test the C++ version of the example."""
-        self.language = 'cpp'
-        self.run_example()
-        self.language = None
-
-    def test_make(self):
-        r"""Test the Make version of the example."""
-        self.language = 'make'
-        self.run_example()
-        self.language = None
-
-    def test_cmake(self):
-        r"""Test the CMake version of the example."""
-        self.language = 'cmake'
-        self.run_example()
-        self.language = None
-
-    def test_matlab(self):  # pragma: matlab
-        r"""Test the Matlab version of the example."""
-        self.language = 'matlab'
-        self.run_example()
-        self.language = None
+        self.run_language('all_nomatlab')

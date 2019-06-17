@@ -337,8 +337,8 @@ class MakeModelDriver(CompiledModelDriver):
             out = CModelDriver.update_ld_library_path(out)
         return out
         
-    def remove_products(self):
-        r"""Delete products produced during the compilation process."""
+    def cleanup(self):
+        r"""Remove compiled executable."""
         if (self.model_file is not None) and os.path.isfile(self.model_file):
             self.compile_model(target='clean')
-        super(MakeModelDriver, self).remove_products()
+        super(MakeModelDriver, self).cleanup()

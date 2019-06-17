@@ -1,0 +1,39 @@
+---
+
+model:
+  name: ascii_io_R
+  driver: RModelDriver
+  args: src/ascii_io.R
+
+  inputs:
+    - name: inputR_file
+      driver: AsciiFileInputDriver
+      args: ./Input/input_file.txt
+
+    - name: inputR_table
+      driver: AsciiTableInputDriver
+      args: ./Input/input_table.txt
+
+    - name: inputR_array
+      driver: AsciiTableInputDriver
+      args: ./Input/input_array.txt
+      as_array: True
+
+  outputs:
+    - name: outputR_file
+      driver: AsciiFileOutputDriver
+      args: output_file.txt
+      in_temp: True
+
+    - name: outputR_table
+      driver: AsciiTableOutputDriver
+      args: output_table.txt
+      in_temp: True
+      field_names: name,number,value,complex
+
+    - name: outputR_array
+      driver: AsciiTableOutputDriver
+      args: output_array.txt
+      as_array: True
+      in_temp: True
+      field_names: name,number,value,complex

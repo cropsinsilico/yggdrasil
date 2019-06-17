@@ -37,9 +37,11 @@ environment:
     - platform: x64
       PYTHON_VERSION: "2.7"
       YGG_ENABLE_LONG_TESTS: 1
+      YGG_SKIP_EXTRA_EXAMPLES: 1
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_ENABLE_LONG_TESTS: 1
+      YGG_SKIP_EXTRA_EXAMPLES: 1
 
 install:
   - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
@@ -60,6 +62,7 @@ install:
   # - "conda update -q --yes conda"
   - "conda create -q --yes -n test python=%PYTHON_VERSION%"
   - "activate test"
+  - "conda install --yes r-base"
 
   # Check that we have the expected version of Python
   - "python --version"
@@ -88,19 +91,18 @@ install:
 
   # Install testing dependencies
   - "conda install --yes -c conda-forge numpy scipy"  # Installing via pip causes import error
-  - "pip install nose"
-  - "pip install pytest pytest-cov"
-  - "pip install coverage coveralls codecov flake8"
+  - "pip install -r requirements_testing.txt"
 
   # Install dependencies using conda/pip
-  # - "conda install --yes -c conda-forge nose"
-  # - "conda install --yes -c conda-forge pytest pytest-cov"
-  # - "conda install --yes -c conda-forge numpy coverage coveralls codecov flake8"
-  # - "conda install --yes -c conda-forge pystache pyyaml astropy scipy \"pika<1.0\""
+  # - "conda install --yes -c conda-forge --file requirements_testing.txt"
+  # - "conda install --yes -c conda-forge numpy pystache pyyaml astropy scipy \"pika<1.0\""
   # - "pip install zmq"
 
   # Install yggdrasil allowing pip to resolve requirements
-  - "pip install -e ."
+  - "python setup.py sdist"
+  - "dir dist"
+  - "pip install --verbose dist\\*.tar.gz"
+  # - "pip install --verbose -e ."
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'

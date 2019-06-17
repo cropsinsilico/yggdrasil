@@ -1,5 +1,5 @@
 import unittest
-from yggdrasil import tools, backwards
+from yggdrasil import tools, backwards, platform
 from yggdrasil.tests import MagicTestError, assert_raises
 from yggdrasil.schema import get_schema
 from yggdrasil.components import import_component
@@ -14,7 +14,9 @@ _zmq_installed = ZMQComm.ZMQComm.is_installed(language='python')
 _ipc_installed = IPCComm.IPCComm.is_installed(language='python')
 _rmq_installed = RMQComm.RMQComm.is_installed(language='python')
 
-            
+
+@unittest.skipIf(platform._is_win, ("Temp skip connection tests on windows for "
+                                    "time's sake."))
 class TestConnectionParam(parent.TestParam):
     r"""Test parameters for the ConnectionDriver class."""
 

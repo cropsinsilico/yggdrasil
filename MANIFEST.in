@@ -6,6 +6,7 @@ recursive-include yggdrasil *.cfg
 recursive-include yggdrasil *.yml
 recursive-include yggdrasil *.sh
 recursive-include yggdrasil *.m
+recursive-include yggdrasil *.R
 recursive-include yggdrasil *.c
 recursive-include yggdrasil *.h
 recursive-include yggdrasil *.cpp
@@ -21,8 +22,12 @@ recursive-include yggdrasil/examples Makefile_linux
 recursive-include yggdrasil/examples Makefile_windows
 include yggdrasil/examples/gs_lesson4/src/Makefile_linux
 include yggdrasil/examples/gs_lesson4/src/Makefile_windows
+recursive-include yggdrasil/languages install.py
 include yggdrasil/languages/MATLAB/matlab_screenrc
 include yggdrasil/languages/LPy/lpy_model.py
+include yggdrasil/languages/R/DESCRIPTION
+include yggdrasil/languages/R/NAMESPACE
+include yggdrasil/languages/R/R/*.R
 include yggdrasil/regex/CMakeLists.txt
 include yggdrasil/tests/scripts/CMakeLists.txt
 include yggdrasil/tests/scripts/Makefile_linux
@@ -30,5 +35,4 @@ include yggdrasil/tests/scripts/Makefile_windows
 graft docs
 include versioneer.py
 include yggdrasil/_version.py
-include install_matlab_engine.py
 include create_coveragerc.py

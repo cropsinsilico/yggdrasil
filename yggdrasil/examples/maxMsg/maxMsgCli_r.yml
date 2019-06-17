@@ -1,0 +1,7 @@
+---
+
+model:
+  name: maxMsgCli
+  driver: RModelDriver
+  args: ./src/maxMsgCli.R
+  client_of: maxMsgSrv

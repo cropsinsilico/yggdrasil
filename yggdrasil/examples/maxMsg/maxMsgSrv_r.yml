@@ -1,0 +1,7 @@
+---
+
+model:
+  name: maxMsgSrv
+  driver: RModelDriver
+  args: ./src/maxMsgSrv.R
+  is_server: True

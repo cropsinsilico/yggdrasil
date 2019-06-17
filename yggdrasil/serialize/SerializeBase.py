@@ -72,6 +72,10 @@ class SerializeBase(tools.YggClass):
     concats_as_str = True
     
     def __init__(self, **kwargs):
+        if ('format_str' in kwargs):
+            drv = tools.get_subprocess_language_driver()
+            if drv.decode_format is not None:
+                kwargs['format_str'] = drv.decode_format(kwargs['format_str'])
         if isinstance(kwargs.get('datatype', None), MetaschemaType):
             self.datatype = kwargs.pop('datatype')
         super(SerializeBase, self).__init__(**kwargs)

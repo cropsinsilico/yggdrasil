@@ -152,6 +152,23 @@ R2017b            2.7, 3.3, 3.4, 3.5, 3.6
 ==============    =======================
 
 
+Additional Steps for R Models
+-----------------------------
+
+To run R models, you will need to install the 
+`R interpreter <https://www.r-project.org/>`_ and the R packages 
+`reticulate <https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/>`_ 
+package for calling Python from R and 
+`zeallot <install.packages("zeallot")>`_.::
+
+  > install.packages("reticulate")
+  > install.packages("zeallot")
+
+.. note::
+   If you have issues installing on MacOS, check to make sure that ``which ar`` returns
+   the system default (``/usr/bin/ar``). If you have another version of ``ar``
+   installed (e.g. through homebrew's binutils), it may cause conflicts.
+   
 Additional Steps for RabbitMQ Message Passing
 ---------------------------------------------
 

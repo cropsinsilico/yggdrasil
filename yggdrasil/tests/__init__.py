@@ -37,7 +37,8 @@ script_list = [
     ('matlab_error', 'matlab_error_model.m'),
     ('python', 'python_model.py'),
     ('error', 'error_model.py'),
-    ('lpy', 'lpy_model.lpy')]
+    ('lpy', 'lpy_model.lpy'),
+    ('r', 'r_model.R')]
 scripts = {}
 for k, v in script_list:
     if isinstance(v, list):
@@ -71,8 +72,9 @@ else:
 shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
 
 
-# Flag for enabling tests that take a long time
+# Flag for enabling tests that take a long time or are for extra examples
 enable_long_tests = tools.check_environ_bool("YGG_ENABLE_LONG_TESTS")
+skip_extra_examples = tools.check_environ_bool("YGG_SKIP_EXTRA_EXAMPLES")
 
 
 # Wrapped class to allow handling of arrays
@@ -275,6 +277,7 @@ else:  # pragma: Python 3
 
 
 long_running = unittest.skipIf(not enable_long_tests, "Long tests not enabled.")
+extra_example = unittest.skipIf(skip_extra_examples, "Extra examples not enabled.")
 
 
 # def long_running(func):

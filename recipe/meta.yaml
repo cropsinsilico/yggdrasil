@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "0.8.6" %}
+{% set version = "0.9.0" %}
 
 package:
   name: {{ name|lower }}
@@ -39,6 +39,10 @@ requirements:
     - python-rapidjson  # [not py2k]
     - pyyaml
     - pyzmq
+    - r-base
+    - r-bit64
+    - r-reticulate
+    - r-zeallot
     - scipy
     - six
     - sysv_ipc  # [unix]
