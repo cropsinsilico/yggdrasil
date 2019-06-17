@@ -32,6 +32,10 @@ case $1 in
 	echo "Running CMake"
 	yaml='model_function_cmake.yml'
 	;;
+    -R | -r | --R | --r )
+	echo "Running R"
+	yaml='model_function_R.yml'
+	;;
 esac
 
 cisrun $yaml

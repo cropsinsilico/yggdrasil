@@ -1,4 +1,5 @@
 import os
+import copy
 import shutil
 from collections import OrderedDict
 from yggdrasil import platform, tools

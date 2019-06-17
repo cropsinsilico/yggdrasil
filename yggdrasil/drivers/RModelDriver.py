@@ -47,6 +47,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'obj': 'ObjDict',
         'schema': 'list'}
     function_param = {
+        'import': 'source(\"{filename}\")',
         'interface': 'library(yggdrasil)',
         'input': '{channel} <- YggInterface(\"YggInput\", \"{channel_name}\")',
         'output': '{channel} <- YggInterface(\"YggOutput\", \"{channel_name}\")',
@@ -56,6 +57,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                          '\"{channel_name}\", \"{format_str}\")'),
         'recv': 'c({flag_var}, {recv_var}) %<-% {channel}$recv()',
         'send': '{flag_var} <- {channel}$send({send_var})',
+        'function_call': '{output_var} <- {function_name}({input_var})',
+        'define': '{variable} <- {value}',
         'true': 'TRUE',
         'not': '!',
         'comment': '#',
