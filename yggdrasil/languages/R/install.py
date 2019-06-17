@@ -104,6 +104,8 @@ def install(with_sudo=None, skip_requirements=None):
         requirements = list(set(requirements))
         R_call = ('install.packages(c(%s), repos="http://cloud.r-project.org")'
                   % ', '.join(['\"%s\"' % x for x in requirements]))
+        if sys.platform in ['win32', 'cygwin']:
+            R_call = '\'%s\'' % R_call
         depend_cmd = [R_exe, '-e', R_call]
         if not make_call(depend_cmd, **kwargs):
             logging.error("Error installing dependencies.")
