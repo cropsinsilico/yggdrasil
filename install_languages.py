@@ -20,16 +20,13 @@ def call_install_language(language, results):
     if not os.path.isfile(os.path.join(lang_dir, language, 'install.py')):
         return True
     try:
-        sys.path.append(os.path.join(lang_dir, language))
-        from install import install
-        try:
-            from install import name_in_pragmas
-        except ImportError:
-            name_in_pragmas = language.lower()
-        out = install()
+        sys.path.insert(0, os.path.join(lang_dir, language))
+        import install
+        name_in_pragmas = getattr(install, 'name_in_pragmas', language.lower())
+        out = install.install()
         results[name_in_pragmas] = out
     finally:
-        sys.path.pop()
+        sys.path.pop(0)
         del install
         del name_in_pragmas
         if 'install' in globals():

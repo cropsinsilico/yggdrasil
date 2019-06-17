@@ -1,11 +1,35 @@
 import os
 import sys
+import uuid
+import tempfile
 import subprocess
 import logging
 PY_MAJOR_VERSION = sys.version_info[0]
 
 
 name_in_pragmas = 'R'
+
+
+def call_R(R_cmd, **kwargs):
+    r"""Call R commands, checking output.
+
+    Args:
+        R_cmd (list): List of R commands to run.
+        **kwargs: Additional keyword arguments are passed to make_call.
+
+    Returns:
+        bool: True if the call was successful, False otherwise.
+
+    """
+    R_script = os.path.join(tempfile.gettempdir(),
+                            'wrapper_%s.R' % (str(uuid.uuid4()).replace('-', '_')))
+    with open(R_script, 'w') as fd:
+        fd.write('\n'.join(R_cmd))
+    try:
+        out = make_call(['Rscript', R_script], **kwargs)
+    finally:
+        os.remove(R_script)
+    return out
 
 
 def make_call(R_cmd, with_sudo=False, **kwargs):
@@ -33,7 +57,7 @@ def make_call(R_cmd, with_sudo=False, **kwargs):
         print("Output:\n%s" % R_proc)
         out = True
     except BaseException as e:
-        print('Error installing R interface:\n%s' % e)
+        logging.error('Error installing R interface:\n%s' % e)
         out = False
     return out
 
@@ -86,7 +110,7 @@ def install(with_sudo=None, skip_requirements=None):
     if skip_requirements is None:
         skip_requirements = ('--skip_requirements' in sys.argv)
     # Set platform dependent things
-    lang_dir = os.path.dirname(os.path.dirname(__file__))
+    lang_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if sys.platform in ['win32', 'cygwin']:
         R_exe = 'R.exe'
         # pkg_ext = '.zip'
@@ -104,10 +128,9 @@ def install(with_sudo=None, skip_requirements=None):
         requirements = list(set(requirements))
         R_call = ('install.packages(c(%s), repos="http://cloud.r-project.org")'
                   % ', '.join(['\"%s\"' % x for x in requirements]))
-        if sys.platform in ['win32', 'cygwin']:
-            R_call = '\'%s\'' % R_call
-        depend_cmd = [R_exe, '-e', R_call]
-        if not make_call(depend_cmd, **kwargs):
+        # depend_cmd = [R_exe, '-e', R_call]
+        # if not make_call(depend_cmd, **kwargs):
+        if not call_R([R_call], **kwargs):
             logging.error("Error installing dependencies.")
             return False
         logging.info("Installed dependencies.")
@@ -119,16 +142,19 @@ def install(with_sudo=None, skip_requirements=None):
     logging.info("Built R interface.")
     # Install package
     package_name = 'yggdrasil_0.1.tar.gz'
-    install_cmd = [R_exe, '-e',
-                   ("'install.packages(\"%s\", "
-                    "repos=NULL, type=\"source\")'") % package_name]
+    R_call = ("install.packages(\"%s\", "
+              "repos=NULL, type=\"source\")") % package_name
+    # install_cmd = [R_exe, '-e',
+    #                ("'install.packages(\"%s\", "
+    #                 "repos=NULL, type=\"source\")'") % package_name]
     # if sys.platform in ['win32', 'cygwin']:
     #     install_cmd = [R_exe, '-e',
     #                    ("'install.packages(\"%s\", "
     #                     "repos=NULL, type=\"source\")'") % package_name]
     # else:
     #     install_cmd = [R_exe, 'CMD', 'INSTALL', package_name]
-    if not make_call(install_cmd, **kwargs):
+    # if not make_call(install_cmd, **kwargs):
+    if not call_R([R_call], **kwargs):
         logging.error("Error installing R interface from the built package.")
         return False
     logging.info("Installed R interface.")
@@ -138,6 +164,6 @@ def install(with_sudo=None, skip_requirements=None):
 if __name__ == "__main__":
     out = install()
     if out:
-        print("R interface installed.")
+        logging.info("R interface installed.")
     else:
         raise Exception("Failed to install R interface.")
