@@ -1,6 +1,5 @@
 import os
 import sys
-import install_R_interface
 PY_MAJOR_VERSION = sys.version_info[0]
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 # Import config parser
@@ -126,19 +125,8 @@ def create_coveragerc(installed_languages):
 
 
 if __name__ == "__main__":
-    try:
-        import matlab.engine
-        matlab_installed = True
-    except ImportError:
-        matlab_installed = False
-    try:
-        from openalea import lpy
-        lpy_installed = True
-    except ImportError:
-        lpy_installed = False
-    R_installed = install_R_interface.install_R_interface()
-    flag = create_coveragerc(matlab_installed=matlab_installed,
-                             lpy_installed=lpy_installed,
-                             R_installed=R_installed)
+    import install_languages
+    installed_languages = install_languages.install_all_languages()
+    flag = create_coveragerc(installed_languages)
     if not flag:
         raise Exception("Failed to create/update converagerc file.")
