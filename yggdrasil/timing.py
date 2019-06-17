@@ -183,7 +183,8 @@ def get_source(lang, direction, test_name='timed_pipe'):
 
     """
     dir = os.path.join(examples._example_dir, test_name, 'src')
-    out = os.path.join(dir, '%s_%s%s' % (test_name, direction, examples.ext_map[lang]))
+    out = os.path.join(dir, '%s_%s%s' % (test_name, direction,
+                                         examples.ext_map[lang.lower()]))
     return out
 
 
