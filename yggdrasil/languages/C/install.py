@@ -46,3 +46,11 @@ def install(rj_include_dir=None):
         with open(def_config_file, 'w') as fd:
             cfg.write(fd)
     return True
+
+
+if __name__ == "__main__":
+    out = install()
+    if out:
+        print("rapidjson installed.")
+    else:
+        raise Exception("Failed to located rapidjson.")

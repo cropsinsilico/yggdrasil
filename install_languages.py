@@ -62,3 +62,7 @@ def install_all_languages():
         ilang = os.path.basename(x)
         call_install_language(ilang, installed_languages)
     return installed_languages
+
+
+if __name__ == "__main__":
+    install_all_languages()
