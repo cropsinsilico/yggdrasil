@@ -1,4 +1,5 @@
 import os
+from yggdrasil.components import import_component
 
 
 _lang_dir = os.path.dirname(__file__)
@@ -27,3 +28,29 @@ def get_language_dir(lang):
         if os.path.isdir(idir):
             return idir
     raise ValueError("Could not determine directory for the language: '%s'" % lang)
+
+
+def get_language_ext(lang, default=None):
+    r"""Return the file extension associated with the requirested language.
+
+    Args:
+        lang (str): Programming language that extension should be returned for.
+        default (str, optional): Extension that should be returned if no
+            extensions are registered for the language. Defaults to None and
+            an error will be raised if there are not any extensions associated
+            with the language.
+
+    Returns:
+        str: The most common extension associated with the specified language.
+
+    Raises:
+        ValueError: If there are not any executables associated with a language.
+
+    """
+    driver = import_component('model', lang)
+    all_ext = driver.get_language_ext()
+    if not all_ext:
+        if default is not None:
+            return default
+        raise ValueError("No extension associated with language: %s" % lang)
+    return all_ext[0]

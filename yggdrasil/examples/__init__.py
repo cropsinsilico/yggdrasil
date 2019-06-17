@@ -1,7 +1,9 @@
 """Tools for accessing examples from python."""
 import os
+from yggdrasil import tools, languages
 
 
+# TODO: Automate example discovery and testing
 _all_lang = ('python', 'matlab', 'c', 'cpp', 'r')
 ex_dict = {'gs_lesson1': _all_lang,
            'gs_lesson2': _all_lang,
@@ -29,15 +31,12 @@ ex_dict = {'gs_lesson1': _all_lang,
            'timed_pipe': _all_lang,
            'fakeplant': tuple(list(_all_lang) + ['all', 'all_nomatlab']),
            'root_to_shoot': ('python', 'c', 'all', 'all_nomatlab')}
-# TODO: This can be generated from the drivers
-ext_map = {'python': '.py',
-           'matlab': '.m',
-           'r': '.R',
-           'c': '.c',
-           'cpp': '.cpp',
-           'executable': '',
+ext_map = {'executable': '',
            'make': '.cpp',
            'cmake': '.cpp'}
+for lang in tools.get_supported_lang():
+    if lang.lower() not in ext_map:
+        ext_map[lang.lower()] = languages.get_language_ext(lang)
 _example_dir = os.path.dirname(__file__)
 
 
