@@ -274,6 +274,8 @@ class CompilationToolBase(object):
         attr_list = ['default_executable', 'default_flags']
         # Set attributes based on environment variables
         for k in attr_list:
+            # Copy so that list modification is not propagated to subclasses
+            setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
             env = getattr(cls, '%s_env' % k, None)
             if env is not None:
                 if k in ['default_flags']:
