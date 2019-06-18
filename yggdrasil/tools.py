@@ -150,6 +150,10 @@ def which(program):
         str: Path to executable if it can be located. Otherwise, None.
 
     """
+    if platform._is_win and (not program.endswith('.exe')):  # pragma: windows
+        out = which(program + '.exe')
+        if out is not None:
+            return out
     if backwards.PY2:  # pragma: Python 2
         def is_exe(fpath):
             return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
