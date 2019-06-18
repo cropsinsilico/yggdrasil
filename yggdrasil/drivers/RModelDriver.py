@@ -175,7 +175,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         elif isinstance(pyobj, list):
             return [cls.python2language(x) for x in pyobj]
         elif isinstance(pyobj, dict):
-            return {k: cls.python2language(v) for k, v in pyobj.items()}
+            return {backwards.as_str(k): cls.python2language(v)
+                    for k, v in pyobj.items()}
         elif isinstance(pyobj, backwards.string_types):
             return backwards.as_str(pyobj)
         elif isinstance(pyobj, np.string_):
