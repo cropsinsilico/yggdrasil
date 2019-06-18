@@ -47,11 +47,11 @@ python2R <- function(pyobj) {
       }
     }
   } else {
-    print("Default handling for class:")
-    print(class(pyobj))
+    # print("Default handling for class:")
+    # print(class(pyobj))
     out <- reticulate::py_to_r(pyobj)
   }
-  print(class(pyobj))
-  print(class(out))
+  # print(class(pyobj))
+  # print(class(out))
   return(out)
 }

@@ -22,12 +22,20 @@ R2python <- function(robj) {
   } else if (is(robj, "numeric")) {
     out <- call_python_method(numpy, 'float32',
       reticulate::r_to_py(robj))
+  } else if (is(robj, "character")) {
+    print(Encoding(robj))
+    if (Encoding(robj) == "UTF-8") {
+      Encoding(robj) <- "bytes"
+      print(Encoding(robj))
+      print(robj)
+    }
+    out <- reticulate::r_to_py(robj)
   } else {
-    print("Default handling for class:")
-    print(class(robj))
+    # print("Default handling for class:")
+    # print(class(robj))
     out <- reticulate::r_to_py(robj)
   }
-  print(class(robj))
-  print(class(out))
+  # print(class(robj))
+  # print(class(out))
   return(out)
 }
