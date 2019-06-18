@@ -25,7 +25,7 @@ R2python <- function(robj) {
   } else {
     out <- reticulate::r_to_py(robj)
   }
-  # print(class(robj))
-  # print(class(out))
+  print(class(robj))
+  print(class(out))
   return(out)
 }

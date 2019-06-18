@@ -49,7 +49,7 @@ python2R <- function(pyobj) {
   } else {
     out <- reticulate::py_to_r(pyobj)
   }
-  # print(class(pyobj))
-  # print(class(out))
+  print(class(pyobj))
+  print(class(out))
   return(out)
 }
