@@ -44,10 +44,13 @@ def remove_product(product, check_for_source=False, timer_class=None):
         RuntimeError: If the product cannot be removed.
 
     """
+    source_keys = list(_map_language_ext.keys())
+    if '.exe' in source_keys:  # pragma: windows
+        source_keys.remove('.exe')
     if timer_class is None:
         timer_class = tools.YggClass()
     if os.path.isdir(product):
-        ext_tuple = tuple(_map_language_ext.keys())
+        ext_tuple = tuple(source_keys)
         if check_for_source:
             for root, dirs, files in os.walk(product):
                 for f in files:
@@ -58,7 +61,7 @@ def remove_product(product, check_for_source=False, timer_class=None):
     elif os.path.isfile(product):
         if check_for_source:
             ext = os.path.splitext(product)[-1]
-            if ext in _map_language_ext:
+            if ext in source_keys:
                 raise RuntimeError("%s is a source file." % product)
         T = timer_class.start_timeout()
         while ((not T.is_out) and os.path.isfile(product)):

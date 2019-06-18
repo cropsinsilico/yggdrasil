@@ -1757,7 +1757,8 @@ class CompiledModelDriver(ModelDriver):
             else:
                 # Assert that model file is not source code in any of the
                 # registered languages
-                if model_ext in self.get_all_language_ext():  # pragma: debug
+                if (((model_ext in self.get_all_language_ext())
+                     and (model_ext != '.exe'))):  # pragma: debug
                     from yggdrasil.components import import_component
                     from yggdrasil.schema import get_schema
                     s = get_schema()['model']
