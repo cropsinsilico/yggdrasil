@@ -147,7 +147,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             object: Python object in a form that is serialization friendly.
 
         """
-        # print("language2python", robj, type(robj))
+        print("language2python", robj, type(robj))
         if isinstance(robj, tuple):
             return tuple([cls.language2python(x) for x in robj])
         elif isinstance(robj, list):
@@ -169,7 +169,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             object: Python object in a form that is R friendly.
 
         """
-        # print("python2language", pyobj, type(pyobj))
+        print("python2language", pyobj, type(pyobj))
         if isinstance(pyobj, tuple):
             return tuple([cls.python2language(x) for x in pyobj])
         elif isinstance(pyobj, list):
