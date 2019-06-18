@@ -14,16 +14,16 @@ addons:
     packages: &native_deps_apt
       - strace
       - valgrind
-      - gfortran
-      - libblas-dev
-      - liblapack-dev
+      # - gfortran
+      # - libblas-dev
+      # - liblapack-dev
       - r-base
       # - ccache
     update: true
   homebrew: &native_deps_brew
     packages:
       - valgrind
-      - gcc
+      # - gcc
       - r
     update: true
 

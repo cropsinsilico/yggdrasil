@@ -710,6 +710,14 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         r"""str: Name of the class."""
         return self._ygg_class
 
+    @property
+    def interface_info(self):
+        r"""Only do info debug message if is interface."""
+        if is_subprocess():  # pragma: debug
+            return self.info
+        else:
+            return self.dummy_log
+
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
         self.info("Setting debug_log")

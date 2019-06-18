@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from yggdrasil import serialize, backwards
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
+from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
 
 
 class RModelDriver(InterpretedModelDriver):  # pragma: R
@@ -93,6 +94,33 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 cls._library_cache[lib] = False
         return cls._library_cache[lib]
         
+    def add_debug_flags(self, command):
+        r"""Add valgrind flags with the command.
+
+        Args:
+            command (list): Command that debug commands should be added to.
+
+        Returns:
+            list: Command updated with debug commands.
+
+        """
+        if self.with_valgrind:
+            interp = 'R'.join(self.get_interpreter().rsplit('Rscript', 1))
+            return [interp, '-d', '"valgrind %s"'
+                    % ' '.join(self.valgrind_flags), '--vanilla', '-f'] + command
+        return super(RModelDriver, self).add_debug_flags(command)
+        
+    def set_env(self):
+        r"""Get environment variables that should be set for the model process.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(RModelDriver, self).set_env()
+        out['RETICULATE_PYTHON'] = PythonModelDriver.get_interpreter()
+        return out
+        
     @classmethod
     def comm_atexit(cls, comm):
         r"""Operations performed on comm at exit including draining receive.
@@ -148,6 +176,10 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             return [cls.python2language(x) for x in pyobj]
         elif isinstance(pyobj, dict):
             return {k: cls.python2language(v) for k, v in pyobj.items()}
+        elif isinstance(pyobj, backwards.string_types):
+            return backwards.as_str(pyobj)
+        elif isinstance(pyobj, np.string_):
+            return backwards.as_str(pyobj)
         elif isinstance(pyobj, pd.DataFrame):
             # R dosn't have int64 and will cast as float if passed
             for n in pyobj.columns:

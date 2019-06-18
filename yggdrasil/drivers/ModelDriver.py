@@ -553,16 +553,9 @@ class ModelDriver(Driver):
 
         """
         env = self.set_env()
-        pre_args = []
-        if self.with_strace:
-            if platform._is_linux:
-                pre_cmd = 'strace'
-            elif platform._is_mac:
-                pre_cmd = 'dtrace'
-            pre_args += [pre_cmd] + self.strace_flags
-        elif self.with_valgrind:
-            pre_args += ['valgrind'] + self.valgrind_flags
-        command = pre_args + self.model_command()
+        command = self.model_command()
+        if self.with_strace or self.with_valgrind:
+            command = self.add_debug_flags(self.model_command())
         self.debug('Working directory: %s', self.working_dir)
         self.debug('Command: %s', ' '.join(command))
         self.debug('Environment Variables:\n%s', self.pprint(env, block_indent=1))
@@ -576,6 +569,28 @@ class ModelDriver(Driver):
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
         return self.run_executable(command, return_process=return_process, **kwargs)
+
+    def add_debug_flags(self, command):
+        r"""Add valgrind flags with the command.
+
+        Args:
+            command (list): Command that debug commands should be added to.
+
+        Returns:
+            list: Command updated with debug commands.
+
+        """
+        pre_args = []
+        if self.with_strace:
+            if platform._is_linux:
+                pre_cmd = 'strace'
+            elif platform._is_mac:
+                pre_cmd = 'dtrace'
+            pre_args += [pre_cmd] + self.strace_flags
+        elif self.with_valgrind:
+            pre_args += ['valgrind'] + self.valgrind_flags
+        command = pre_args + command
+        return command
         
     @classmethod
     def language_version(cls, version_flags=None, **kwargs):

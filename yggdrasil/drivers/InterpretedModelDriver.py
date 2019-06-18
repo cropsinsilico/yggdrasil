@@ -207,15 +207,42 @@ class InterpretedModelDriver(ModelDriver):
         ext = cls.language_ext
         assert(isinstance(ext, (tuple, list)))
         if exec_type == 'interpreter':
-            # if (((cls.language not in args[0])
-            if (((tools.which(args[0]) is None)
-                 or any([args[0].endswith(e) for e in ext]))):
+            if not cls.is_interpreter(args[0]):
                 args = [cls.get_interpreter()] + cls.get_interpreter_flags() + args
         elif exec_type != 'direct':
             raise ValueError("Invalid exec_type '%s'" % exec_type)
         unused_kwargs.update(kwargs)
         return args
 
+    @classmethod
+    def is_interpreter(cls, cmd):
+        r"""Determine if a command line argument is an interpreter.
+
+        Args:
+            cmd (str): Command that should be checked.
+
+        Returns:
+            bool: True if the command is an interpreter, False otherwise.
+
+        """
+        # (cls.language not in cmd)
+        out = ((tools.which(cmd) is not None)
+               and (not any([cmd.endswith(e) for e in cls.language_ext])))
+        return out
+
+    def add_debug_flags(self, command):
+        r"""Add valgrind flags with the command.
+
+        Args:
+            command (list): Command that debug commands should be added to.
+
+        Returns:
+            list: Command updated with debug commands.
+
+        """
+        out = self.executable_command(command)
+        return super(InterpretedModelDriver, self).add_debug_flags(out)
+        
     @classmethod
     def configure(cls, cfg):
         r"""Add configuration options for this language. This includes locating

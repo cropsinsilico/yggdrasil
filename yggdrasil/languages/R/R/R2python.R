@@ -23,6 +23,8 @@ R2python <- function(robj) {
     out <- call_python_method(numpy, 'float32',
       reticulate::r_to_py(robj))
   } else {
+    print("Default handling for class:")
+    print(class(robj))
     out <- reticulate::r_to_py(robj)
   }
   print(class(robj))

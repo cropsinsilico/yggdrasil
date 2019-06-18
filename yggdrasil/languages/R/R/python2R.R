@@ -25,8 +25,8 @@ python2R <- function(pyobj) {
     out <- as.integer(reticulate::py_to_r(pyobj))
   } else if (is(pyobj, "numpy.float32")) {
     # out <- as.single(reticulate::py_to_r(pyobj))
-    out <- float::fl(reticulate::py_to_r(pyobj))
-    # out <- reticulate::py_to_r(call_python_method(np, 'float64', pyobj))
+    # out <- float::fl(reticulate::py_to_r(pyobj))
+    out <- reticulate::py_to_r(call_python_method(np, 'float64', pyobj))
   } else if (is(pyobj, "numpy.int32")) {
     out <- as.integer(reticulate::py_to_r(pyobj))
   } else if (is(pyobj, "numpy.int64")) {
@@ -47,6 +47,8 @@ python2R <- function(pyobj) {
       }
     }
   } else {
+    print("Default handling for class:")
+    print(class(pyobj))
     out <- reticulate::py_to_r(pyobj)
   }
   print(class(pyobj))

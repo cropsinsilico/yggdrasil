@@ -10,7 +10,6 @@ LazyData: true
 Imports:
     reticulate,
     zeallot,
-    bit64,
-    float
+    bit64
 Depends:
     zeallot
