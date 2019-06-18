@@ -134,6 +134,7 @@ class ARArchiver(ArchiverBase):
     toolname = 'ar'
     languages = ['c', 'c++']
     default_executable_env = 'AR'
+    default_flags_env = None
     static_library_flag = 'rcs'
     output_key = ''
     output_first_library = True

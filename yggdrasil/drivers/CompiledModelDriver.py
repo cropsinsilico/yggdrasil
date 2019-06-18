@@ -513,6 +513,9 @@ class CompilationToolBase(object):
             out = [out]
         if output_first is None:
             output_first = cls.output_first
+        print('defaults', cls, cls.default_flags, cls.default_flags_env,
+              getattr(cls, 'flags', []))
+        print('original', cls, out)
         # Add default & user defined flags
         if not skip_defaults:
             new_flags = cls.default_flags + getattr(cls, 'flags', [])
