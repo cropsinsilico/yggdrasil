@@ -52,6 +52,9 @@ YggInterfaceClass <- setRefClass("YggInterfaceClass",
     },
     call = function(...) {
       return(eval_pyobj('call', ...))
+    },
+    finalize = function(...) {
+      return(eval_pyobj('atexit', ...))
     }
   )
 )

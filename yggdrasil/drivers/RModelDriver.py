@@ -96,6 +96,21 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         return cls._library_cache[lib]
         
     @classmethod
+    def comm_atexit(cls, comm):
+        r"""Operations performed on comm at exit including draining receive.
+        
+        Args:
+            comm (CommBase): Communication object.
+
+        """
+        if comm.direction == 'recv':
+            while comm.recv(timeout=0)[0]:
+                comm.sleep()
+        else:
+            comm.send_eof()
+        comm.linger_close()
+
+    @classmethod
     def language2python(cls, robj):
         r"""Prepare an R object for serialization in Python.
 
