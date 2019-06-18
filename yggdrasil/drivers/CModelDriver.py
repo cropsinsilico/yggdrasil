@@ -331,24 +331,28 @@ class CModelDriver(CompiledModelDriver):
         return out
         
     @classmethod
-    def update_ld_library_path(cls, env):
+    def update_ld_library_path(cls, env, paths_to_add=None):
         r"""Update provided dictionary of environment variables so that
         LD_LIBRARY_PATH includes the interface directory containing the interface
         libraries.
 
         Args:
             env (dict): Dictionary of enviroment variables to be updated.
+            paths_to_add (list, optional): Paths that should be added. If not
+                provided, defaults to [cls.get_language_dir()].
 
         Returns:
             dict: Updated dictionary of environment variables.
 
         """
+        if paths_to_add is None:
+            paths_to_add = [cls.get_language_dir()]
         if platform._is_linux:
             path_list = []
             prev_path = env.pop('LD_LIBRARY_PATH', '')
             if prev_path:
                 path_list.append(prev_path)
-            for x in [cls.get_language_dir()]:
+            for x in paths_to_add:
                 if x not in prev_path:
                     path_list.append(x)
             if path_list:

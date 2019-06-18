@@ -559,11 +559,17 @@ class CompilationToolBase(object):
         conda_prefix = os.environ.get('CONDA_PREFIX', '')
         if not conda_prefix:
             conda_prefix = tools.which('conda')
+            if conda_prefix is not None:
+                conda_prefix = os.path.dirname(os.path.dirname(conda_prefix))
         return conda_prefix
             
     @classmethod
-    def get_search_path(cls):
+    def get_search_path(cls, conda_only=False):
         r"""Determine the paths searched by the tool for external library files.
+
+        Args:
+            conda_only (bool, optional): If True, only the search paths as
+                indicated by a conda environment are returned. Defaults to False.
 
         Returns:
             list: List of paths that the tools will search.
@@ -574,7 +580,7 @@ class CompilationToolBase(object):
                                       "%s tool '%s'" % (cls.tooltype, cls.toolname))
         paths = []
         # Get search paths from environment variable
-        if cls.search_path_env is not None:
+        if (cls.search_path_env is not None) and (not conda_only):
             if not isinstance(cls.search_path_env, list):
                 cls.search_path_env = [cls.search_path_env]
             for ienv in cls.search_path_env:
@@ -583,7 +589,7 @@ class CompilationToolBase(object):
                     if x:
                         paths.append(x)
         # Get flags based on path
-        if cls.search_path_flags is not None:
+        if (cls.search_path_flags is not None) and (not conda_only):
             output = cls.call(cls.search_path_flags, skip_flags=True,
                               allow_error=True)
             # Split on beginning & ending regexes if they exist

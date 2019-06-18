@@ -3,6 +3,7 @@ import pandas as pd
 from yggdrasil import serialize, backwards
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
+from yggdrasil.drivers.CModelDriver import CModelDriver
 
 
 class RModelDriver(InterpretedModelDriver):  # pragma: R
@@ -119,6 +120,9 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         """
         out = super(RModelDriver, self).set_env()
         out['RETICULATE_PYTHON'] = PythonModelDriver.get_interpreter()
+        c_linker = CModelDriver.get_tool('linker')
+        search_dirs = c_linker.get_search_path(conda_only=True)
+        out = CModelDriver.update_ld_library_path(out, paths_to_add=search_dirs)
         return out
         
     @classmethod
