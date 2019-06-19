@@ -180,7 +180,7 @@ class InterpretedModelDriver(ModelDriver):
 
     @classmethod
     def executable_command(cls, args, exec_type='interpreter', unused_kwargs={},
-                           **kwargs):
+                           skip_interpreter_flags=False, **kwargs):
         r"""Compose a command for running a program in this language with the
         provied arguments. If not already present, the interpreter command and
         interpreter flags are prepended to the provided arguments.
@@ -192,6 +192,11 @@ class InterpretedModelDriver(ModelDriver):
                 returned. If 'interpreter', a command using the interpreter is
                 returned and if 'direct', the raw args being provided are
                 returned. Defaults to 'interpreter'.
+            skip_interpreter_flags (bool, optional): If True, interpreter flags
+                will not be added to the command after the interpreter. Defaults
+                to False. Interpreter flags will not be added, reguardless of
+                this keyword, if the first element of args is already an
+                interpreter.
             unused_kwargs (dict, optional): Existing dictionary that unused
                 keyword arguments should be added to. Defaults to {}.
             **kwargs: Additional keyword arguments are ignored.
@@ -208,7 +213,10 @@ class InterpretedModelDriver(ModelDriver):
         assert(isinstance(ext, (tuple, list)))
         if exec_type == 'interpreter':
             if not cls.is_interpreter(args[0]):
-                args = [cls.get_interpreter()] + cls.get_interpreter_flags() + args
+                new_args = [cls.get_interpreter()]
+                if not skip_interpreter_flags:
+                    new_args += cls.get_interpreter_flags()
+                args = new_args + args
         elif exec_type != 'direct':
             raise ValueError("Invalid exec_type '%s'" % exec_type)
         unused_kwargs.update(kwargs)

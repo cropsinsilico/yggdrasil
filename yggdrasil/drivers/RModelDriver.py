@@ -96,6 +96,21 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 cls._library_cache[lib] = False
         return cls._library_cache[lib]
         
+    @classmethod
+    def language_version(cls, **kwargs):
+        r"""Determine the version of this language.
+
+        Args:
+            **kwargs: Keyword arguments are passed to the parent class's
+                method.
+
+        Returns:
+            str: Version of compiler/interpreter for this language.
+
+        """
+        kwargs.setdefault('skip_interpreter_flags', True)
+        return super(RModelDriver, cls).language_version(**kwargs)
+
     def add_debug_flags(self, command):
         r"""Add valgrind flags with the command.
 
