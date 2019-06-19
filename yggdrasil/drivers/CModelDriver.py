@@ -332,7 +332,7 @@ class CModelDriver(CompiledModelDriver):
         return out
         
     @classmethod
-    def update_ld_library_path(cls, env, paths_to_add=None):
+    def update_ld_library_path(cls, env, paths_to_add=None, add_to_front=False):
         r"""Update provided dictionary of environment variables so that
         LD_LIBRARY_PATH includes the interface directory containing the interface
         libraries.
@@ -341,6 +341,8 @@ class CModelDriver(CompiledModelDriver):
             env (dict): Dictionary of enviroment variables to be updated.
             paths_to_add (list, optional): Paths that should be added. If not
                 provided, defaults to [cls.get_language_dir()].
+            add_to_front (bool, optional): If True, new paths are added to the
+                front, rather than the end. Defaults to False.
 
         Returns:
             dict: Updated dictionary of environment variables.
@@ -355,7 +357,10 @@ class CModelDriver(CompiledModelDriver):
                 path_list.append(prev_path)
             for x in paths_to_add:
                 if x not in prev_path:
-                    path_list.append(x)
+                    if add_to_front:
+                        path_list.insert(0, x)
+                    else:
+                        path_list.append(x)
             if path_list:
                 env['LD_LIBRARY_PATH'] = os.pathsep.join(path_list)
         return env

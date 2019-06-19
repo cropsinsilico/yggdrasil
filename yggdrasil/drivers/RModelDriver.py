@@ -29,6 +29,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     # interface_library = PythonModelDriver.interface_library
     # The Batch version causes output to saved to a file rather than directed to
     # stdout
+    default_interpreter_flags = ['--default-packages=methods,utils']
     # default_interpreter_flags = ['CMD', 'BATCH' '--vanilla', '--silent']
     send_converters = {'table': serialize.consolidate_array}
     type_map = {
@@ -122,7 +123,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         out['RETICULATE_PYTHON'] = PythonModelDriver.get_interpreter()
         c_linker = CModelDriver.get_tool('linker')
         search_dirs = c_linker.get_search_path(conda_only=True)
-        out = CModelDriver.update_ld_library_path(out, paths_to_add=search_dirs)
+        out = CModelDriver.update_ld_library_path(out, paths_to_add=search_dirs,
+                                                  add_to_front=True)
         return out
         
     @classmethod

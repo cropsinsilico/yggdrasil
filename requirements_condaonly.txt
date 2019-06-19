@@ -1,0 +1,7 @@
+cmake
+czmq
+python
+r-base
+r-reticulate
+r-zeallot
+zeromq
