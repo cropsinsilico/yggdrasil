@@ -93,18 +93,12 @@ install:
   - "conda install --yes -c conda-forge numpy scipy"  # Installing via pip causes import error
   - "pip install -r requirements_testing.txt"
 
-  # Install dependencies using conda/pip
-  # - "conda install --yes -c conda-forge --file requirements_testing.txt"
-  # - "conda install --yes -c conda-forge numpy pystache pyyaml astropy scipy \"pika<1.0\""
-  # - "pip install zmq"
-
   # Install yggdrasil allowing pip to resolve requirements
   - "python setup.py sdist"
   - "dir dist\\*.tar.gz"
   - for %%a in ("dist\\*.tar.gz") do set YGGSDIST=%%a
   - echo %YGGSDIST%
   - "pip install --verbose %YGGSDIST%"
-  # - "pip install --verbose dist\\*.tar.gz"
   # - "pip install --verbose -e ."
 
 cache:

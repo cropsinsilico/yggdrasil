@@ -179,9 +179,11 @@ install:
       conda install $NUMPY
       conda install $MATPLOTLIB
       conda install $JSONSCHEMA
-      conda install --file requirements_testing.txt
+      sh conda_install.sh requirements_testing.txt
+      # conda install --file requirements_testing.txt
       if [[ $BUILDDOCS == '1' ]]; then
-        conda install --file requirements_documentation.txt
+        sh conda_install.sh requirements_documentation.txt
+        # conda install --file requirements_documentation.txt
       fi
       conda build recipe/meta.yaml --python $CONDA
       conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
