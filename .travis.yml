@@ -7,10 +7,10 @@ cache:
 
 addons:
   apt:
-    sources:
-      # - r-packages-trusty
-      - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu trusty-cran35/'
-        key_url: 'http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0x51716619E084DAB9'
+    # sources:
+    #   # - r-packages-trusty
+    #   - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu trusty-cran35/'
+    #     key_url: 'http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0x51716619E084DAB9'
     packages: &native_deps_apt
       - strace
       - valgrind
@@ -100,6 +100,8 @@ before_install:
       else
         conda install -q conda-build
       fi
+      pip uninstall -y numpy
+      pip uninstall -y matplotlib
       conda info -a
     fi
     
@@ -174,8 +176,6 @@ install:
       # Install from source
       # pip install --verbose -e .
     elif [[ -n "$CONDA" ]]; then
-      pip uninstall -y numpy
-      pip uninstall -y matplotlib
       conda install $NUMPY
       conda install $MATPLOTLIB
       conda install $JSONSCHEMA
