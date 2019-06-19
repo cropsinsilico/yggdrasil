@@ -24,7 +24,6 @@ requirements:
     - sysv_ipc  # [unix]
     - zeromq
   run:
-    - cerberus
     - cmake
     - czmq
     - jsonschema
