@@ -6,9 +6,17 @@ from setuptools import setup, find_packages
 from distutils.sysconfig import get_python_lib
 import versioneer
 import create_coveragerc
-import install_languages
 ygg_ver = versioneer.get_version()
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
+LANG_PATH = os.path.join(ROOT_PATH, 'yggdrasil', 'languages')
+
+
+# Import script from inside package
+sys.path.insert(0, LANG_PATH)
+try:
+    import install_languages
+finally:
+    sys.path.pop(0)
 
 
 print("In setup.py", sys.argv)
@@ -19,7 +27,7 @@ logging.critical("In setup.py: %s" % sys.argv)
 # when building a source distribution
 if 'sdist' not in sys.argv:
     # Attempt to install languages
-    installed_languages = install_languages.install_all_languages()
+    installed_languages = install_languages.install_all_languages(no_import=True)
     # Set coverage options in .coveragerc
     create_coveragerc.create_coveragerc(installed_languages)
 
@@ -105,7 +113,8 @@ setup(
                             'yggtime_os=yggdrasil.command_line:yggtime_os',
                             'yggtime_py=yggdrasil.command_line:yggtime_py',
                             'yggtime_paper=yggdrasil.command_line:yggtime_paper',
-                            'yggvalidate=yggdrasil.command_line:validate_yaml'],
+                            'yggvalidate=yggdrasil.command_line:validate_yaml',
+                            'ygginstall=yggdrasil.command_line:ygginstall'],
     },
     license="BSD",
 )

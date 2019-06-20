@@ -35,7 +35,6 @@ include yggdrasil/tests/scripts/Makefile_windows
 graft docs
 include versioneer.py
 include yggdrasil/_version.py
-include install_languages.py
 include create_coveragerc.py
 include conda_install.sh
 include prune_requirements.py

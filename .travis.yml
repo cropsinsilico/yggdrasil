@@ -102,6 +102,10 @@ before_install:
       fi
       pip uninstall -y numpy
       pip uninstall -y matplotlib
+      # Install r-base from conda to prevent conflict
+      if [[ $INSTALLLPY == '1' ]]; then
+        conda install r-base
+      fi
       conda info -a
     fi
     

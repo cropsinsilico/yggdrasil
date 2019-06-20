@@ -151,6 +151,20 @@ def yggtime_paper():
                          compare_values=_lang_list)
 
 
+def ygginstall():
+    r"""Call installation script."""
+    from yggdrasil.languages import install_languages
+    languages = []
+    for x in sys.argv[1:]:
+        if not x.startswith('-'):
+            languages.append(x)
+    if len(languages) == 0:
+        install_languages.install_all_languages()
+    else:
+        for x in languages:
+            install_languages.install_language(x)
+
+
 if __name__ == '__main__':
     yggrun()
     sys.exit(0)

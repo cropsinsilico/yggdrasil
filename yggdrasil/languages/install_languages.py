@@ -4,21 +4,34 @@ import sys
 import glob
 import logging
 import warnings
-lang_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                        'yggdrasil', 'languages')
+lang_dir = os.path.dirname(__file__)
 
 
-def call_install_language(language, results):
+def install_language(language, results=None, no_import=False):
     r"""Call install for a specific language.
 
     Args:
         language (str): Name of language that should be checked.
-        results (dict): Dictionary where result (whether or not the language is
-            installed) should be logged.
+        results (dict, optional): Dictionary where result (whether or not the
+            language is installed) should be logged. Defaults to None and is
+            initialized to an empty dict.
+        no_import (bool, optional): If True, yggdrasil will not be imported.
+            Defaults to False.
 
     """
+    if no_import is None:
+        no_import = ('--no-import' in sys.argv)
+    if results is None:
+        results = {}
     if not os.path.isfile(os.path.join(lang_dir, language, 'install.py')):
-        return True
+        if not (no_import or os.path.isdir(os.path.join(lang_dir, language))):
+            from yggdrasil.languages import get_language_dir
+            return install_language(os.path.basename(get_language_dir(language)),
+                                    results=results, no_import=True)
+        logging.info("Nothing to be done for %s" % language)
+        name_in_pragmas = language.lower()
+        results[name_in_pragmas] = True
+        return
     try:
         sys.path.insert(0, os.path.join(lang_dir, language))
         import install
@@ -41,10 +54,14 @@ def call_install_language(language, results):
         logging.info("Language %s installed." % language)
 
 
-def install_all_languages():
+def install_all_languages(**kwargs):
     r"""Call install.py for all languages that have one and return a dictionary
     mapping from language name to the installation state (True if install was
     successful, False otherwise).
+
+    Args:
+        **kwargs: Additional keyword arguments are passed to each call to
+            install_language.
 
     Returns:
         dict: Mapping from language name to boolean describing installation
@@ -57,7 +74,7 @@ def install_all_languages():
         if not os.path.isdir(x):
             continue
         ilang = os.path.basename(x)
-        call_install_language(ilang, installed_languages)
+        install_language(ilang, installed_languages, **kwargs)
     return installed_languages
 
 

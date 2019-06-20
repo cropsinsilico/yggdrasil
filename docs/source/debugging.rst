@@ -53,3 +53,23 @@ C++ Errors
     during the receive call. This can be solved by dynamically allocated a 
     variable on heap (e.g. ``char \*x = (char\*)malloc(100)``), just be sure to 
     free the variable at the end.
+
+R Errors
+--------
+
+- You get an error message along the lines of::
+    
+      ImportError: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.20' not found
+
+  - *Possible Causes:* This error usually results from a conflict in the shared libraries
+    available during R calls to Python as handled through the 
+    `reticulate <https://rstudio.github.io/reticulate/>`_ package. The ``reticulate``
+    development team is aware of this (see
+    `this <https://github.com/rstudio/reticulate/issues/428>`_ issue and the issues it
+    references), but has not yet taken steps to address it as of writing this
+    (2019/06/20). This error is most likely to occur if you are using a ``conda`` 
+    environment to manage |yggdrasil|, but are using a version of R that was not 
+    installed via ``conda``. One remedy is to install R using ``conda`` (e.g.
+    ``conda install r-base``). Another solution is to install the missing shared
+    library on your local machine (i.e. outside the conda environment) so that it is
+    available when using R.
