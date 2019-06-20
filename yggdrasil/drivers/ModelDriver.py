@@ -488,7 +488,7 @@ class ModelDriver(Driver):
                                   % cls.language)
 
     @classmethod
-    def run_executable(cls, args, return_process=False, **kwargs):
+    def run_executable(cls, args, return_process=False, quiet=False, **kwargs):
         r"""Run a program using the executable for this language and the
         provided arguments.
 
@@ -499,6 +499,8 @@ class ModelDriver(Driver):
                 returned without checking the process output. If False,
                 communicate is called on the process and the output is parsed
                 for errors. Defaults to False.
+            quiet (bool, optional): If True, the command will be not be printed
+                to the log. Defaults to False.
             **kwargs: Additional keyword arguments are passed to
                 cls.executable_command and tools.popen_nobuffer.
 
@@ -522,8 +524,9 @@ class ModelDriver(Driver):
                 unused_kwargs.setdefault('cwd', unused_kwargs.pop('working_dir'))
             unused_kwargs.setdefault('shell', platform._is_win)
             # Call command
-            logger.info("Running '%s' from %s"
-                        % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
+            if not quiet:
+                logger.info("Running '%s' from %s"
+                            % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
             logger.debug("Process keyword arguments:\n%s\n",
                          '    ' + pformat(unused_kwargs).replace('\n', '\n    '))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)

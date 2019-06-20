@@ -98,7 +98,8 @@ setup(
         "Development Status :: 3 - Alpha",
     ],
     entry_points={
-        'console_scripts': ['yggrun=yggdrasil.command_line:yggrun',
+        'console_scripts': ['ygginfo=yggdrasil.command_line:ygginfo',
+                            'yggrun=yggdrasil.command_line:yggrun',
                             'cisrun=yggdrasil.command_line:yggrun',
                             'yggcc=yggdrasil.command_line:yggcc',
                             'yggccflags=yggdrasil.command_line:cc_flags',

@@ -4,9 +4,28 @@ import sys
 import copy
 import logging
 import traceback
+from collections import OrderedDict
 
 
 logger = logging.getLogger(__name__)
+
+
+def ygginfo():
+    r"""Print information about yggdrasil installation."""
+    from yggdrasil import __version__, tools, config
+    vardict = OrderedDict()
+    vardict['Location'] = os.path.dirname(__file__)
+    vardict['Version'] = __version__
+    vardict['Languages'] = ', '.join(tools.get_installed_lang())
+    vardict['Communication Mechanisms'] = ', '.join(tools.get_installed_comm())
+    vardict['Default Comm Mechanism'] = tools.get_default_comm()
+    vardict['Config File'] = config.usr_config_file
+    max_len = len(max(list(vardict.keys()), key=len))
+    lines = []
+    line_format = '%-' + str(max_len) + 's\t%s'
+    for k, v in vardict.items():
+        lines.append(line_format % (k, v))
+    logger.info("yggdrasil info:\n%s" % '\n'.join(lines))
 
 
 def yggrun():
