@@ -46,7 +46,7 @@ def expand_and_add(path, path_list, dir_list):  # pragma: no cover
 
     """
     if os.path.isabs(path):
-        matches = glob.glob(path)
+        matches = sorted(glob.glob(path))
         path_list += matches
         return len(matches)
     # Try checking for function
