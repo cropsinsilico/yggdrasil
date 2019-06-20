@@ -51,6 +51,23 @@ class MakeCompiler(CompilerBase):
         CompilerBase.before_registration(cls)
         if platform._is_win:  # pragma: windows
             cls.linker_attributes['executable_ext'] = '.exe'
+
+    @classmethod
+    def language_version(cls, **kwargs):
+        r"""Determine the version of this language.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.call.
+
+        Returns:
+            str: Version of compiler/interpreter for this language.
+
+        """
+        out = cls.call(cls.version_flags, skip_flags=True,
+                       allow_error=True, **kwargs)
+        if 'Copyright' not in out:  # pragma: debug
+            raise RuntimeError("Version call failed: %s" % out)
+        return out.split('Copyright')[0]
         
     @classmethod
     def get_output_file(cls, src, target=None, **kwargs):
@@ -183,23 +200,6 @@ class NMakeCompiler(MakeCompiler):
     flag_options = OrderedDict([('makefile', '/f')])
     default_executable = None
     default_linker = None  # Force linker to be initialized with the same name
-
-    @classmethod
-    def language_version(cls, **kwargs):  # pragma: windows
-        r"""Determine the version of this language.
-
-        Args:
-            **kwargs: Keyword arguments are passed to cls.call.
-
-        Returns:
-            str: Version of compiler/interpreter for this language.
-
-        """
-        out = cls.call(cls.version_flags, skip_flags=True,
-                       allow_error=True, **kwargs)
-        if 'Copyright' not in out:  # pragma: debug
-            raise RuntimeError("Version call failed: %s" % out)
-        return out.split('Copyright')[0]
     
 
 class MakeModelDriver(CompiledModelDriver):

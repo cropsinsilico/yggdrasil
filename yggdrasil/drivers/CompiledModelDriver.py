@@ -1113,8 +1113,8 @@ class CompilerBase(CompilationToolBase):
         if (not dont_link):  # pragma: debug
             if (not cls.combine_with_linker):
                 raise ValueError("Cannot combine linker and compiler flags.")
-            warnings.warn('The returned flags will contain linker flags that '
-                          'may need to follow the list of source files.')
+            logger.debug('The returned flags will contain linker flags that '
+                         'may need to follow the list of source files.')
             unused_kwargs_comp = kwargs.pop('unused_kwargs', {})
             unused_kwargs_link = {}
             tool = cls.get_library_tool(libtype=libtype, **unused_kwargs_comp)

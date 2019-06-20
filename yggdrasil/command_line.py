@@ -4,7 +4,6 @@ import sys
 import copy
 import logging
 import traceback
-from collections import OrderedDict
 
 
 logger = logging.getLogger(__name__)
@@ -13,17 +12,32 @@ logger = logging.getLogger(__name__)
 def ygginfo():
     r"""Print information about yggdrasil installation."""
     from yggdrasil import __version__, tools, config
-    vardict = OrderedDict()
-    vardict['Location'] = os.path.dirname(__file__)
-    vardict['Version'] = __version__
-    vardict['Languages'] = ', '.join(tools.get_installed_lang())
-    vardict['Communication Mechanisms'] = ', '.join(tools.get_installed_comm())
-    vardict['Default Comm Mechanism'] = tools.get_default_comm()
-    vardict['Config File'] = config.usr_config_file
-    max_len = len(max(list(vardict.keys()), key=len))
+    from yggdrasil.components import import_component
+    lang_list = tools.get_installed_lang()
+    prefix = '    '
+    vardict = [
+        ('Location', os.path.dirname(__file__)),
+        ('Version', __version__),
+        ('Languages', ', '.join(lang_list)),
+        ('Communication Mechanisms', ', '.join(tools.get_installed_comm())),
+        ('Default Comm Mechanism', tools.get_default_comm()),
+        ('Config File', config.usr_config_file)]
+    if '--no-languages' not in sys.argv:
+        for lang in sorted(lang_list):
+            drv = import_component('model', lang)
+            vardict.append(('%s:' % lang.upper(), ''))
+            if lang == 'executable':
+                vardict.append((prefix + 'Location', ''))
+            else:
+                exec_name = drv.language_executable()
+                if not os.path.isabs(exec_name):
+                    exec_name = tools.which(exec_name)
+                vardict.append((prefix + 'Location', exec_name))
+            vardict.append((prefix + 'Version', drv.language_version()))
+    max_len = max(len(x[0]) for x in vardict)
     lines = []
-    line_format = '%-' + str(max_len) + 's\t%s'
-    for k, v in vardict.items():
+    line_format = '%-' + str(max_len) + 's' + prefix + '%s'
+    for k, v in vardict:
         lines.append(line_format % (k, v))
     logger.info("yggdrasil info:\n%s" % '\n'.join(lines))
 

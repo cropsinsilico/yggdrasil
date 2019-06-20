@@ -180,6 +180,8 @@ def update_language_config(drv, skip_warnings=False, overwrite=False,
         shutil.copy(def_config_file, usr_config_file)
         ygg_cfg_usr.reload()
     for idrv in drv:
+        if ygg_cfg_usr.get(idrv.language, 'disable', 'False').lower() == 'true':
+            continue  # pragma: no cover
         miss += idrv.configure(ygg_cfg_usr)
     ygg_cfg_usr.update_file()
     ygg_cfg.reload()

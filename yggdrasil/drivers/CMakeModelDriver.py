@@ -184,6 +184,9 @@ class CMakeConfigure(CompilerBase):
 
         """
         assert(len(args) == 1)
+        new_args = []
+        if args == cls.version_flags:
+            new_args = args
         if not kwargs.get('skip_flags', False):
             sourcedir = kwargs.get('sourcedir', args[0])
             if sourcedir != args[0]:  # pragma: debug
@@ -193,7 +196,7 @@ class CMakeConfigure(CompilerBase):
                                     "provided do not match.")
                                    % (args[0], sourcedir))
             kwargs['sourcedir'] = args[0]
-        return super(CMakeConfigure, cls).get_executable_command([], **kwargs)
+        return super(CMakeConfigure, cls).get_executable_command(new_args, **kwargs)
     
     @classmethod
     def write_wrappers(cls, target=None, sourcedir=None,
@@ -417,7 +420,7 @@ class CMakeBuilder(LinkerBase):
         kwargs_ex['add_kws_both'] = (kwargs.get('add_kws_both', [])
                                      + ['builddir', 'target'])
         return super(CMakeBuilder, cls).extract_kwargs(kwargs, **kwargs_ex)
-        
+
     @classmethod
     def get_output_file(cls, obj, target=None, builddir=None, **kwargs):
         r"""Determine the appropriate output file that will result when bulding
