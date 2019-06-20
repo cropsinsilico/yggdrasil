@@ -26,16 +26,7 @@ R2python <- function(robj) {
     out <- call_python_method(np, 'float32',
       reticulate::r_to_py(robj))
   } else if (is(robj, "character")) {
-    print(Encoding(robj))
-    if (Encoding(robj) == "UTF-8") {
-      print(robj)
-      print(nchar(robj, type="bytes"))
-      print(nchar(robj, type="chars"))
-      print(nchar(robj, type="width"))
-    }
     out <- reticulate::r_to_py(charToRaw(robj))
-    print(class(out))
-    print(out)
   } else {
     # print("Default handling for class:")
     # print(class(robj))
