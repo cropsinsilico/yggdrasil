@@ -44,6 +44,9 @@ class CCompilerBase(CompilerBase):
             cls.linker_attributes = dict(cls.linker_attributes,
                                          search_path_flags=['-Xlinker', '--verbose'],
                                          search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
+        # if cls.get_conda_prefix is not None:
+        #     cls.default_flags += ['-I%s' % get_language_dir('c'),
+        #                           "-include", "glibc_version_fix.h"]
         CompilerBase.before_registration(cls)
 
     @classmethod
@@ -306,7 +309,8 @@ class CModelDriver(CompiledModelDriver):
             for x in ['ygg', 'datatypes']:
                 if 'compiler_flags' not in cls.internal_libraries[x]:
                     cls.internal_libraries[x]['compiler_flags'] = []
-                cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
+                if '-fPIC' not in cls.internal_libraries[x]['compiler_flags']:
+                    cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
         
     @classmethod
     def configure(cls, cfg):

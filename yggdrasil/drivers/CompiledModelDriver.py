@@ -283,7 +283,10 @@ class CompilationToolBase(object):
                         env = [env]
                     old_val = getattr(cls, k, [])
                     for ienv in env:
-                        old_val += os.environ.get(ienv, '').split()
+                        new_val = os.environ.get(ienv, '').split()
+                        for v in new_val:
+                            if v not in old_val:
+                                old_val.append(v)
                 else:
                     setattr(cls, k, os.environ.get(env, getattr(cls, k)))
         # Set default_executable to name
@@ -515,9 +518,6 @@ class CompilationToolBase(object):
             out = [out]
         if output_first is None:
             output_first = cls.output_first
-        print('defaults', cls, cls.default_flags, cls.default_flags_env,
-              getattr(cls, 'flags', []))
-        print('original', cls, out)
         # Add default & user defined flags
         if not skip_defaults:
             new_flags = cls.default_flags + getattr(cls, 'flags', [])

@@ -168,7 +168,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             object: Python object in a form that is serialization friendly.
 
         """
-        print("language2python", robj, type(robj))
+        # print("language2python", robj, type(robj))
         if isinstance(robj, tuple):
             return tuple([cls.language2python(x) for x in robj])
         elif isinstance(robj, list):
@@ -176,6 +176,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         elif isinstance(robj, dict):
             return {k: cls.language2python(v) for k, v in robj.items()}
         elif isinstance(robj, backwards.string_types):
+            print("language2python", type(robj), len(robj))
             return backwards.as_bytes(robj)
         return robj
 
@@ -190,7 +191,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             object: Python object in a form that is R friendly.
 
         """
-        print("python2language", pyobj, type(pyobj))
+        # print("python2language", pyobj, type(pyobj))
         if isinstance(pyobj, tuple):
             return tuple([cls.python2language(x) for x in pyobj])
         elif isinstance(pyobj, list):
@@ -199,6 +200,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             return {backwards.as_str(k): cls.python2language(v)
                     for k, v in pyobj.items()}
         elif isinstance(pyobj, backwards.string_types):
+            print("python2language", type(pyobj), len(pyobj))
             return backwards.as_str(pyobj)
         elif isinstance(pyobj, np.string_):
             return backwards.as_str(pyobj)

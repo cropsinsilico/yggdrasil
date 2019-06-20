@@ -1,6 +1,9 @@
 
 
 python2R <- function(pyobj) {
+  sys <- reticulate::import('sys')
+  ver <- reticulate::py_get_attr(sys, 'version_info')
+  pyv <- reticulate::py_to_r(reticulate::py_get_attr(ver, 'major'))
   np <- reticulate::import('numpy', convert=FALSE)
   if (is(pyobj, "python.builtin.tuple")
       || is(pyobj, "python.builtin.list")) {
@@ -31,6 +34,8 @@ python2R <- function(pyobj) {
     out <- as.integer(reticulate::py_to_r(pyobj))
   } else if (is(pyobj, "numpy.int64")) {
     out <- bit64::as.integer64(reticulate::py_to_r(pyobj))
+  } else if (is(pyobj, "python.builtin.str") && (pyv == 2)) {
+    out <- reticulate::py_to_r(pyobj)
   } else if (is(pyobj, "python.builtin.bytes")) {
     pyobj <- pyobj$decode('utf-8')
     out <- reticulate::py_to_r(pyobj)
