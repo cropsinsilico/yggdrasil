@@ -47,7 +47,8 @@ env:
     BUILDDOCS=0
     YGG_USE_SUDO_FOR_R=1  # sudo required for installing R libraries
   matrix:
-    - YGG_ENABLE_LONG_TESTS=1
+    - YGG_ENABLE_LONG_TESTS=0
+    - YGG_SKIP_EXTRA_EXAMPLES=1
     - CONDA=yes
 
 before_install:
