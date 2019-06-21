@@ -48,6 +48,53 @@ def write_makevars(fname=None):
     return None
 
 
+def install_packages(package_list, update=False, repos=None, **kwargs):
+    r"""Install R packages from CRAN.
+
+    Args:
+        package_list (str, list): One or more R packages that should be
+            installed.
+        update (bool, optional): If True, existing packages will be removed
+            and then re-installed. If False, nothing will be done for existing
+            packages. Defaults to False.
+        repos (str, optional): Mirror where packages should be installed from.
+            Defaults to 'http://cloud.r-project.org'.
+        **kwargs: Additional keyword arguments are passed to call_R.
+
+    Returns:
+        bool: True if call was successful, False otherwise.
+
+    """
+    if not isinstance(package_list, list):
+        package_list = [package_list]
+    req_list = 'c(%s)' % ', '.join(['\"%s\"' % x for x in package_list])
+    if repos is None:
+        repos = 'http://cloud.r-project.org'
+    if update:
+        # R_cmd = ['install.packages(%s, repos="%s")' % (req_list, repos)]
+        R_cmd = ['req <- %s' % req_list,
+                 'for (x in req) {',
+                 '  if (is.element(x, installed.packages()[,1])) {',
+                 '    remove.packages(x)',
+                 '  }',
+                 '  install.packages(x, dep=TRUE, repos="%s")' % repos,
+                 '}']
+    else:
+        R_cmd = ['req <- %s' % req_list,
+                 'for (x in req) {',
+                 '  if (!is.element(x, installed.packages()[,1])) {',
+                 '    install.packages(x, dep=TRUE, repos="%s")' % repos,
+                 '  } else {',
+                 '    print(sprintf("%s already installed.", x))',
+                 '  }',
+                 '}']
+    if not call_R(R_cmd, **kwargs):
+        logger.error("Error installing dependencies: %s" % ', '.join(package_list))
+        return False
+    logger.info("Installed dependencies: %s" % ', '.join(package_list))
+    return True
+
+            
 def call_R(R_cmd, **kwargs):
     r"""Call R commands, checking output.
 
@@ -171,6 +218,9 @@ def install(with_sudo=None, skip_requirements=None, update_requirements=None):
     # Write Makevars for conda installation
     makevars = None
     if os.environ.get('CONDA_PREFIX', ''):
+        if (sys.platform in ['win32', 'cygwin']):  # pragma: windows
+            if not install_packages('rtools', update=update_requirements, **kwargs):
+                return False
         makevars = write_makevars()
     try:
         # Install requirements
@@ -178,28 +228,7 @@ def install(with_sudo=None, skip_requirements=None, update_requirements=None):
             desc_file = os.path.join(lang_dir, 'R', 'DESCRIPTION')
             assert(os.path.isfile(desc_file))
             requirements = requirements_from_description(desc_file)
-            req_list = 'c(%s)' % ', '.join(['\"%s\"' % x for x in requirements])
-            repos = 'http://cloud.r-project.org'
-            if update_requirements:
-                # R_cmd = ['install.packages(%s, repos="%s")' % (req_list, repos)]
-                R_cmd = ['req <- %s' % req_list,
-                         'for (x in req) {',
-                         '  if (is.element(x, installed.packages()[,1])) {',
-                         '    remove.packages(x)',
-                         '  }',
-                         '  install.packages(x, dep=TRUE, repos="%s")' % repos,
-                         '}']
-            else:
-                R_cmd = ['req <- %s' % req_list,
-                         'for (x in req) {',
-                         '  if (!is.element(x, installed.packages()[,1])) {',
-                         '    install.packages(x, dep=TRUE, repos="%s")' % repos,
-                         '  } else {',
-                         '    print(sprintf("%s already installed.", x))',
-                         '  }',
-                         '}']
-            if not call_R(R_cmd, **kwargs):
-                logger.error("Error installing dependencies.")
+            if not install_packages(requirements, update=update_requirements, **kwargs):
                 if makevars is not None:
                     os.remove(makevars)
                 return False
