@@ -57,7 +57,16 @@ def remove_product(product, check_for_source=False, timer_class=None):
                     if f.endswith(ext_tuple):
                         raise RuntimeError(("%s contains a source file "
                                             "(%s)") % (product, f))
-        shutil.rmtree(product)
+        T = timer_class.start_timeout()
+        while ((not T.is_out) and os.path.isfile(product)):
+            try:
+                shutil.rmtree(product)
+            except BaseException:  # pragma: debug
+                if os.path.isdir(product):
+                    timer_class.sleep()
+                if T.is_out:
+                    raise
+        timer_class.stop_timeout()
     elif os.path.isfile(product):
         if check_for_source:
             ext = os.path.splitext(product)[-1]
