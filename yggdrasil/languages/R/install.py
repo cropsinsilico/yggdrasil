@@ -27,6 +27,8 @@ def write_makevars(fname=None):
     """
     if fname is None:
         fname = os.path.expanduser(os.path.join("~", ".R", "Makevars"))
+        if sys.platform in ['win32', 'cygwin']:
+            fname += '.win'
     if os.path.isfile(fname):
         logger.info("Makevars file already exists: %s" % fname)
         return None
