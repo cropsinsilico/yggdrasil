@@ -218,9 +218,6 @@ def install(with_sudo=None, skip_requirements=None, update_requirements=None):
     # Write Makevars for conda installation
     makevars = None
     if os.environ.get('CONDA_PREFIX', ''):
-        if (sys.platform in ['win32', 'cygwin']):  # pragma: windows
-            if not install_packages('rtools', update=update_requirements, **kwargs):
-                return False
         makevars = write_makevars()
     try:
         # Install requirements
