@@ -58,7 +58,7 @@ python2R <- function(pyobj) {
       }
     } else {
       dtype <- reticulate::py_to_r(pyobj$dtype$name)
-      if (startsWith(dtype, "uint")) {
+      if (substring(dtype, 1, nchar("uint")) == "uint") {
         out <- uint_to_R(pyobj)
       } else if (dtype == "int32") {
         out <- int32_to_R(pyobj)
@@ -66,7 +66,7 @@ python2R <- function(pyobj) {
         out <- int64_to_R(pyobj)
       } else if (dtype == "float32") {
         out <- float32_to_R(pyobj)
-      } else if (startsWith(dtype, "bytes")) {
+      } else if (substring(dtype, 1, nchar("bytes")) == "bytes") {
         out <- bytes_to_R(pyobj)
       } else {
         out <- reticulate::py_to_r(pyobj)
