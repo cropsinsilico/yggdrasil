@@ -139,7 +139,7 @@ class TestExample(YggTestBase, tools.YggClass):
             if isinstance(res, tuple):
                 res[0](fout, *res[1:])
             else:
-                self.check_file_size(fout, len(res))
+                self.check_file_size(fout, res)
                 self.check_file_contents(fout, res)
 
     def run_example(self):

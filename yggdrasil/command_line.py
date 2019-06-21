@@ -4,6 +4,7 @@ import sys
 import copy
 import logging
 import traceback
+import subprocess
 
 
 logger = logging.getLogger(__name__)
@@ -11,10 +12,11 @@ logger = logging.getLogger(__name__)
 
 def ygginfo():
     r"""Print information about yggdrasil installation."""
-    from yggdrasil import __version__, tools, config
+    from yggdrasil import __version__, tools, config, backwards
     from yggdrasil.components import import_component
     lang_list = tools.get_installed_lang()
     prefix = '    '
+    curr_prefix = ''
     vardict = [
         ('Location', os.path.dirname(__file__)),
         ('Version', __version__),
@@ -22,18 +24,70 @@ def ygginfo():
         ('Communication Mechanisms', ', '.join(tools.get_installed_comm())),
         ('Default Comm Mechanism', tools.get_default_comm()),
         ('Config File', config.usr_config_file)]
+    # Add language information
     if '--no-languages' not in sys.argv:
+        # Install languages
+        vardict.append(('Installed Languages:', ''))
+        curr_prefix += prefix
         for lang in sorted(lang_list):
             drv = import_component('model', lang)
-            vardict.append(('%s:' % lang.upper(), ''))
+            vardict.append((curr_prefix + '%s:' % lang.upper(), ''))
+            curr_prefix += prefix
             if lang == 'executable':
-                vardict.append((prefix + 'Location', ''))
+                vardict.append((curr_prefix + 'Location', ''))
             else:
                 exec_name = drv.language_executable()
                 if not os.path.isabs(exec_name):
                     exec_name = tools.which(exec_name)
-                vardict.append((prefix + 'Location', exec_name))
-            vardict.append((prefix + 'Version', drv.language_version()))
+                vardict.append((curr_prefix + 'Location', exec_name))
+            vardict.append((curr_prefix + 'Version', drv.language_version()))
+            curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+        curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+        # Not installed languages
+        vardict.append(("Languages Not Installed:", ''))
+        curr_prefix += prefix
+        for lang in tools.get_supported_lang():
+            if lang in lang_list:
+                continue
+            drv = import_component('model', lang)
+            vardict.append((curr_prefix + '%s:' % lang.upper(), ''))
+            curr_prefix += prefix
+            vardict.append((curr_prefix + "Language Installed",
+                            drv.is_language_installed()))
+            vardict.append((curr_prefix + "Dependencies Installed",
+                            drv.are_dependencies_installed()))
+            vardict.append((curr_prefix + "Interface Installed",
+                            drv.is_interface_installed()))
+            vardict.append((curr_prefix + "Comm Installed",
+                            drv.is_comm_installed()))
+            vardict.append((curr_prefix + "Configured", drv.is_configured()))
+            curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+        curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+    # Add verbose information
+    if '--verbose' in sys.argv:
+        # Conda info
+        if os.environ.get('CONDA_PREFIX', ''):
+            out = backwards.as_str(subprocess.check_output(['conda', 'info'])).strip()
+            curr_prefix += prefix
+            vardict.append((curr_prefix + 'Conda Info:', "\n%s%s"
+                            % (curr_prefix + prefix,
+                               ("\n" + curr_prefix + prefix).join(
+                                   out.splitlines(False)))))
+            curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+        # R and reticulate info
+        Rdrv = import_component("model", "R")
+        if Rdrv.is_installed():
+            out = Rdrv.run_executable(["-e", "sessionInfo()"]).strip()
+            vardict.append((curr_prefix + "R sessionInfo:", "\n%s%s"
+                            % (curr_prefix + prefix,
+                               ("\n" + curr_prefix + prefix).join(
+                                   out.splitlines(False)))))
+            out = Rdrv.run_executable(["-e", "reticulate::py_config()"]).strip()
+            vardict.append((curr_prefix + "R reticulate::py_config():", "\n%s%s"
+                            % (curr_prefix + prefix,
+                               ("\n" + curr_prefix + prefix).join(
+                                   out.splitlines(False)))))
+    # Print things
     max_len = max(len(x[0]) for x in vardict)
     lines = []
     line_format = '%-' + str(max_len) + 's' + prefix + '%s'

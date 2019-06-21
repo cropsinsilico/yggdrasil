@@ -52,3 +52,4 @@ TODO
 * Add comm for using files as temporary storage in passing information between models
 * Change cmake to be a C/C++ compiler rather than a separate language with its own driver
 * Add forwarding of format string to forked output
+* Add contributing guide with reference to ``ygginfo``

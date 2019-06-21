@@ -3,8 +3,8 @@
 Debugging
 #########
 
-Steps for Debugging
-===================
+Tips for Debugging
+==================
 
 #. *Check for known errors.* The list below includes several errors that have
    already been encountered by |yggdrasil| users and the method used to solve 
@@ -16,6 +16,16 @@ Steps for Debugging
    on the location of the user config file and additional logging options).
 #. *Trace the flow of data.* Use the debug messages to trace the flow of data 
    from one model to the next and determine where the failure is occuring.
+#. *Check |yggdrasil| summary.* |yggdrasil| includes a command line utility,
+   ``ygginfo`` that will print out relevent information about |yggdrasil|, the
+   languages it supports, and the operating system. This information can be
+   useful for running down conflicting dependencies or determining why
+   |yggdrasil| thinks a language is or isn't install. Additional information
+   about the system can be display by adding the ``--verbose`` flag, including
+   the current conda environment information (if you are using a conda
+   environment) and informaiton about the current R installation (if R is
+   installed). This information should be included in any Github issues opened
+   related to bugs in order to help us assist you.
 
 Possible Errors
 ===============

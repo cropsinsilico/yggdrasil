@@ -19,6 +19,7 @@ Welcome to yggdrasil's documentation!
    config
    units
    c_format_strings
+   debugging
    examples/examples_toc
    advanced/index
    development/index

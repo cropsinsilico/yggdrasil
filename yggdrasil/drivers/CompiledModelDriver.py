@@ -2464,7 +2464,7 @@ class CompiledModelDriver(ModelDriver):
         """
         compiler = cls.get_tool('compiler')
         if hasattr(compiler, 'language_version'):  # pragma: windows
-            return compiler.language_version(**kwargs)
+            return compiler.language_version(**kwargs).strip()
         kwargs['version_flags'] = compiler.version_flags
         kwargs['skip_flags'] = True
         return super(CompiledModelDriver, cls).language_version(**kwargs)
