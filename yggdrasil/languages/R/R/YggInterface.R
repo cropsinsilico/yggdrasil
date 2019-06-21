@@ -64,7 +64,8 @@ YggInterface <- function(type, ...) {
   ygg <- reticulate::import('yggdrasil.languages.Python.YggInterface', convert=FALSE)
   varargin <- list(...)
   nargin <- length(varargin)
-  pyobj <- ygg$YggInit(type, varargin)
+  pyobj <- ygg$YggInit(R2python(type, not_bytes=TRUE),
+    R2python(varargin, not_bytes=TRUE))
   if (nargin > 0) {
     out <- YggInterfaceClass(pyobj=pyobj)
   } else {

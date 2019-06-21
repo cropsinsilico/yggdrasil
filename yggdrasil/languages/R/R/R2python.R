@@ -1,12 +1,12 @@
 
 
-R2python <- function(robj) {
+R2python <- function(robj, not_bytes=FALSE) {
   sys <- reticulate::import('sys')
   ver <- reticulate::py_get_attr(sys, 'version_info')
   pyv <- reticulate::py_to_r(reticulate::py_get_attr(ver, 'major'))
   np <- reticulate::import('numpy', convert=FALSE)
   if (is(robj, "list")) {
-    robj <- lapply(robj, R2python)
+    robj <- lapply(robj, R2python, not_bytes=not_bytes)
     out <- reticulate::r_to_py(robj)
   } else if (is(robj, "integer64")) {
     out <- call_python_method(np, 'int64',
@@ -26,7 +26,11 @@ R2python <- function(robj) {
     out <- call_python_method(np, 'float32',
       reticulate::r_to_py(robj))
   } else if (is(robj, "character")) {
-    out <- reticulate::r_to_py(charToRaw(robj))
+    if (not_bytes) {
+      out <- reticulate::r_to_py(robj)
+    } else {
+      out <- reticulate::r_to_py(charToRaw(robj))
+    }
   } else if (is(robj, "data.frame")) {
     out <- reticulate::r_to_py(robj)
   } else {
