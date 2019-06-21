@@ -60,7 +60,7 @@ YggInterfaceClass <- setRefClass("YggInterfaceClass",
 )
 
 YggInterface <- function(type, ...) {
-  print(reticulate::py_config())
+  # print(reticulate::py_config())
   ygg <- reticulate::import('yggdrasil.languages.Python.YggInterface', convert=FALSE)
   varargin <- list(...)
   nargin <- length(varargin)

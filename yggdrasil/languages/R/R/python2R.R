@@ -25,20 +25,26 @@ python2R <- function(pyobj) {
       out[[reticulate::py_to_r(k)]] <- x
     }
   } else if (is(pyobj, "numpy.uint")) {
-    out <- as.integer(reticulate::py_to_r(pyobj))
+    out <- uint_to_R(pyobj)
   } else if (is(pyobj, "numpy.float32")) {
-    # out <- as.single(reticulate::py_to_r(pyobj))
-    # out <- float::fl(reticulate::py_to_r(pyobj))
-    out <- reticulate::py_to_r(call_python_method(np, 'float64', pyobj))
+    out <- float32_to_R(pyobj)
   } else if (is(pyobj, "numpy.int32")) {
-    out <- as.integer(reticulate::py_to_r(pyobj))
+    out <- int32_to_R(pyobj)
   } else if (is(pyobj, "numpy.int64")) {
-    out <- bit64::as.integer64(reticulate::py_to_r(pyobj))
+    out <- int64_to_R(pyobj)
   } else if (is(pyobj, "python.builtin.str") && (pyv == 2)) {
     out <- reticulate::py_to_r(pyobj)
   } else if (is(pyobj, "python.builtin.bytes")) {
-    pyobj <- pyobj$decode('utf-8')
+    out <- bytes_to_R(pyobj)
+  } else if (is(pyobj, "pandas.core.frame.DataFrame")) {
     out <- reticulate::py_to_r(pyobj)
+    ncol_data = ncol(out)
+    for (i in 1:ncol_data) {
+      icol <- call_python_method(call_python_method(pyobj, '__getitem__',
+        call_python_method(reticulate::py_get_attr(pyobj, 'columns'),
+          '__getitem__', i - 1)), 'to_numpy')
+      out[, i] <- python2R(icol)
+    }
   # TODO: There dosn't seem to be variable integer precision in R
   } else if (is(pyobj, "numpy.ndarray")) {
     type_len <- reticulate::py_len(pyobj$dtype)
@@ -49,6 +55,21 @@ python2R <- function(pyobj) {
         x <- reticulate::py_call(
 	  reticulate::py_get_attr(pyobj, '__getitem__'), i-1L)
         out[[i]] <- python2R(x$tolist())
+      }
+    } else {
+      dtype <- reticulate::py_to_r(pyobj$dtype$name)
+      if (startsWith(dtype, "uint")) {
+        out <- uint_to_R(pyobj)
+      } else if (dtype == "int32") {
+        out <- int32_to_R(pyobj)
+      } else if (dtype == "int64") {
+        out <- int64_to_R(pyobj)
+      } else if (dtype == "float32") {
+        out <- float32_to_R(pyobj)
+      } else if (startsWith(dtype, "bytes")) {
+        out <- bytes_to_R(pyobj)
+      } else {
+        out <- reticulate::py_to_r(pyobj)
       }
     }
   } else {
