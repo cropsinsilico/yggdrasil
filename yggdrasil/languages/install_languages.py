@@ -5,6 +5,8 @@ import glob
 import logging
 import warnings
 lang_dir = os.path.dirname(__file__)
+logger = logging.getLogger(__name__)
+logger.setLevel(level=logging.INFO)
 
 
 def install_language(language, results=None, no_import=False):
@@ -28,7 +30,7 @@ def install_language(language, results=None, no_import=False):
             from yggdrasil.languages import get_language_dir
             return install_language(os.path.basename(get_language_dir(language)),
                                     results=results, no_import=True)
-        logging.info("Nothing to be done for %s" % language)
+        logger.info("Nothing to be done for %s" % language)
         name_in_pragmas = language.lower()
         results[name_in_pragmas] = True
         return
@@ -51,7 +53,7 @@ def install_language(language, results=None, no_import=False):
         warnings.warn(("Could not complete installation for {lang}. "
                        "{lang} support will be disabled.").format(lang=language))
     else:
-        logging.info("Language %s installed." % language)
+        logger.info("Language %s installed." % language)
 
 
 def install_all_languages(**kwargs):

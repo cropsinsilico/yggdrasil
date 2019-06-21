@@ -5,6 +5,8 @@ import tempfile
 import subprocess
 import logging
 PY_MAJOR_VERSION = sys.version_info[0]
+logger = logging.getLogger(__name__)
+logger.setLevel(level=logging.INFO)
 
 
 name_in_pragmas = 'R'
@@ -58,7 +60,7 @@ def make_call(R_cmd, with_sudo=False, **kwargs):
         print("Output:\n%s" % R_proc)
         out = True
     except BaseException as e:
-        logging.error('Error installing R interface:\n%s' % e)
+        logger.error('Error installing R interface:\n%s' % e)
         out = False
     return out
 
@@ -155,30 +157,30 @@ def install(with_sudo=None, skip_requirements=None, update_requirements=None):
                      '  }',
                      '}']
         if not call_R(R_cmd, **kwargs):
-            logging.error("Error installing dependencies.")
+            logger.error("Error installing dependencies.")
             return False
-        logging.info("Installed dependencies.")
+        logger.info("Installed dependencies.")
     # Check to see if yggdrasil installed
     # Build packages
     build_cmd = [R_exe, 'CMD', 'build', 'R']
     if not make_call(build_cmd, **kwargs):
-        logging.error("Error building R interface.")
+        logger.error("Error building R interface.")
         return False
-    logging.info("Built R interface.")
+    logger.info("Built R interface.")
     # Install package
     package_name = 'yggdrasil_0.1.tar.gz'
     R_call = ("install.packages(\"%s\", "
               "repos=NULL, type=\"source\")") % package_name
     if not call_R([R_call], **kwargs):
-        logging.error("Error installing R interface from the built package.")
+        logger.error("Error installing R interface from the built package.")
         return False
-    logging.info("Installed R interface.")
+    logger.info("Installed R interface.")
     return True
 
 
 if __name__ == "__main__":
     out = install()
     if out:
-        logging.info("R interface installed.")
+        logger.info("R interface installed.")
     else:
         raise Exception("Failed to install R interface.")

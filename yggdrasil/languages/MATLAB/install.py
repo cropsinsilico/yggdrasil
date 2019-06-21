@@ -3,6 +3,8 @@ import sys
 import logging
 import subprocess
 PY_MAJOR_VERSION = sys.version_info[0]
+logger = logging.getLogger(__name__)
+logger.setLevel(level=logging.INFO)
 
 
 def install(as_user=None):
@@ -22,7 +24,7 @@ def install(as_user=None):
     # Check to see if its already installed
     try:
         import matlab.engine as mtl_engine
-        logging.info("MATLAB engine for python already installed.")
+        logger.info("MATLAB engine for python already installed.")
         del mtl_engine
         return True
     except ImportError:
@@ -37,18 +39,18 @@ def install(as_user=None):
         if PY_MAJOR_VERSION == 3:
             mtl_proc = mtl_proc.decode("utf-8")
     except BaseException as e:
-        logging.error("Error when calling MATLAB from the command line: %s"
-                      % e)
+        logger.error("Error when calling MATLAB from the command line: %s"
+                     % e)
         return False
     if mtl_id not in mtl_proc:
-        logging.error("ID (%s) not in output from MATLAB process: %s"
+        logger.error("ID (%s) not in output from MATLAB process: %s"
                       % (mtl_id, mtl_proc))
         return False
     mtl_root = mtl_proc.split(mtl_id)[-2]
     # Install engine API
     mtl_setup = os.path.join(mtl_root, 'extern', 'engines', 'python')
     if not os.path.isdir(mtl_setup):
-        logging.error("MATLAB directory dosn't exist: %s" % mtl_setup)
+        logger.error("MATLAB directory dosn't exist: %s" % mtl_setup)
         return False
     blddir = os.path.join(os.path.expanduser('~'), 'matlab_python_api')
     if not os.path.isdir(blddir):
@@ -64,7 +66,7 @@ def install(as_user=None):
             result = result.decode("utf-8")
         print(result)
     except subprocess.CalledProcessError as e:
-        logging.error("Error calling install command for Matlab engine: %s" % e)
+        logger.error("Error calling install command for Matlab engine: %s" % e)
         return False
     return True
 
