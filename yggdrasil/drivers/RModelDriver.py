@@ -1,3 +1,4 @@
+import subprocess
 import numpy as np
 import pandas as pd
 from yggdrasil import serialize, backwards
@@ -111,6 +112,23 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         kwargs.setdefault('skip_interpreter_flags', True)
         return super(RModelDriver, cls).language_version(**kwargs)
 
+    @classmethod
+    def configure(cls, cfg):
+        r"""Add configuration options for this language.
+
+        Args:
+            cfg (CisConfigParser): Config class that options should be set for.
+        
+        Returns:
+            list: Section, option, description tuples for options that could not
+                be set.
+
+        """
+        out = super(RModelDriver, cls).configure(cfg)
+        if cls.are_dependencies_installed() and (not cls.is_interface_installed()):
+            subprocess.check_output(['ygginstall', 'R', '--skip-requirements'])
+        return out
+        
     def add_debug_flags(self, command):
         r"""Add valgrind flags with the command.
 
