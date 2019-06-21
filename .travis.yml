@@ -45,7 +45,7 @@ env:
     INSTALLAPY=0
     INSTALLLPY=0
     BUILDDOCS=0
-    YGG_USE_SUDO_FOR_R=1  # sudo required for installing R libraries
+    YGG_USE_SUDO_FOR_R=1
     YGG_ENABLE_LONG_TESTS=0
     YGG_SKIP_EXTRA_EXAMPLES=1
   matrix:
@@ -110,7 +110,7 @@ before_install:
       fi
       conda info -a
     fi
-    
+
     # Install AstroPy
     if [[ $INSTALLAPY == '1' ]]; then
        echo Installing AstroPy...;
@@ -149,7 +149,7 @@ before_install:
        fi
        echo Checking rabbitmq status...;
        sudo rabbitmqctl status
-       
+
        echo Installing Pika...;
        if [[ -n "$PYTHON" ]]; then
          pip install "pika<1.0.0b1"
@@ -206,7 +206,7 @@ script:
       python create_coveragerc.py
     fi
     yggtest -c setup.cfg --cov-config=.coveragerc
-    
+
 
 after_success:
   - |
@@ -237,15 +237,15 @@ jobs:
       env: YGG_DEFAULT_COMM=ZMQComm INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1 YGG_TEST_PRODUCTION_RUNS=1
       dist: xenial
       sudo: true
-      
+
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
     - os: osx
       python: 2.7
       env: PYTHON=2.7 INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
-         pip: false
-         directories:
+        pip: false
+        directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
     - os: osx
@@ -253,8 +253,8 @@ jobs:
       env: CONDA=3.7 INSTALLRMQ=1 YGG_ENABLE_LONG_TESTS=1
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
-         pip: false
-         directories:
+        pip: false
+        directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
     - name: "Build docs"
@@ -288,7 +288,7 @@ jobs:
         skip_cleanup: true
         local_dir: docs/build/html/
         keep-history: true
-        github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+        github_token: $GITHUB_TOKEN  # Set in travis-ci.org dashboard
         on:
           tags: true
       addons:
