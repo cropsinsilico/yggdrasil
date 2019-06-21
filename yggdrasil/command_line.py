@@ -77,11 +77,19 @@ def ygginfo():
         # R and reticulate info
         Rdrv = import_component("model", "R")
         if Rdrv.is_installed():
+            # Stack size
+            out = Rdrv.run_executable(["-e", "Cstack_info()"]).strip()
+            vardict.append((curr_prefix + "R Cstack_info:", "\n%s%s"
+                            % (curr_prefix + prefix,
+                               ("\n" + curr_prefix + prefix).join(
+                                   out.splitlines(False)))))
+            # Session info
             out = Rdrv.run_executable(["-e", "sessionInfo()"]).strip()
             vardict.append((curr_prefix + "R sessionInfo:", "\n%s%s"
                             % (curr_prefix + prefix,
                                ("\n" + curr_prefix + prefix).join(
                                    out.splitlines(False)))))
+            # Reticulate py_config
             out = Rdrv.run_executable(["-e", ("library(reticulate); "
                                               "reticulate::py_config()")]).strip()
             vardict.append((curr_prefix + "R reticulate::py_config():", "\n%s%s"
