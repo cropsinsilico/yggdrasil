@@ -67,7 +67,7 @@ class MakeCompiler(CompilerBase):
                        allow_error=True, **kwargs)
         if 'Copyright' not in out:  # pragma: debug
             raise RuntimeError("Version call failed: %s" % out)
-        return out.split('Copyright')[0]
+        return (out.split('Copyright')[0]).splitlines()[0].strip()
         
     @classmethod
     def get_output_file(cls, src, target=None, **kwargs):
