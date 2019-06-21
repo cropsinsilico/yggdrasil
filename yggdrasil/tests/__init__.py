@@ -643,9 +643,9 @@ class YggTestBase(unittest.TestCase):
         self.stop_timeout()
         if os.stat(fname).st_size != fsize:  # pragma: debug
             if (result is not None) and (fsize < 200):
-                print("Actual:")
-                print(result)
                 print("Expected:")
+                print(result)
+                print("Actual:")
                 with open(fname, 'r') as fd:
                     print(fd.read())
             raise AssertionError("File size (%d), dosn't match expected size (%d)."
