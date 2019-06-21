@@ -44,7 +44,7 @@ def install(as_user=None):
         return False
     if mtl_id not in mtl_proc:
         logger.error("ID (%s) not in output from MATLAB process: %s"
-                      % (mtl_id, mtl_proc))
+                     % (mtl_id, mtl_proc))
         return False
     mtl_root = mtl_proc.split(mtl_id)[-2]
     # Install engine API

@@ -12,6 +12,42 @@ logger.setLevel(level=logging.INFO)
 name_in_pragmas = 'R'
 
 
+def write_makevars(fname=None):
+    r"""Write a makevars file with CC, CFLAGS, etc. values set based on the
+    environment variables of the same name.
+
+    Args:
+        fname (str, optional): Full path to file where the files should be
+            saved. Defaults to os.path.join("~", ".R", "Makevars").
+
+    Returns:
+        str: Full path to file where Makevars was written. None is returned if
+            a file is not written.
+
+    """
+    if fname is None:
+        fname = os.path.expanduser(os.path.join("~", ".R", "Makevars"))
+    if os.path.isfile(fname):
+        logger.info("Makevars file already exists: %s" % fname)
+        return None
+    lines = []
+    for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS']:
+        env = os.environ.get(x, '')
+        if not env:
+            continue
+        lines.append('%s=%s' % (x, env))
+    if lines:
+        logger.info("Writing Makevars to %s" % fname)
+        if not os.path.isdir(os.path.dirname(fname)):
+            os.mkdir(os.path.dirname(fname))
+        with open(fname, 'w') as fd:
+            fd.write('\n'.join(lines))
+        return fname
+    else:
+        logger.info("Nothing to be written to the Makevars file")
+    return None
+
+
 def call_R(R_cmd, **kwargs):
     r"""Call R commands, checking output.
 
@@ -27,7 +63,7 @@ def call_R(R_cmd, **kwargs):
                             'wrapper_%s.R' % (str(uuid.uuid4()).replace('-', '_')))
     with open(R_script, 'w') as fd:
         fd.write('\n'.join(R_cmd))
-        print('Running:\n    ' + '\n    '.join(R_cmd))
+        logger.info('Running:\n    ' + '\n    '.join(R_cmd))
     try:
         out = make_call(['Rscript', R_script], **kwargs)
     finally:
@@ -53,11 +89,12 @@ def make_call(R_cmd, with_sudo=False, **kwargs):
     if with_sudo and (sys.platform not in ['win32', 'cygwin']):
         R_cmd.insert(0, 'sudo')
     try:
-        print("Calling", sys.platform, with_sudo, R_cmd)
+        logger.info("Calling %s on %s (with_sudo=%s)"
+                    % (' '.join(R_cmd), sys.platform, with_sudo))
         R_proc = subprocess.check_output(R_cmd, **kwargs)
         if PY_MAJOR_VERSION == 3:
             R_proc = R_proc.decode("utf-8")
-        print("Output:\n%s" % R_proc)
+        logger.info("Output:\n%s" % R_proc)
         out = True
     except BaseException as e:
         logger.error('Error installing R interface:\n%s' % e)
@@ -131,50 +168,64 @@ def install(with_sudo=None, skip_requirements=None, update_requirements=None):
     else:
         R_exe = 'R'
     kwargs = {'cwd': lang_dir, 'with_sudo': with_sudo}
-    # Install requirements
-    if not skip_requirements:
-        desc_file = os.path.join(lang_dir, 'R', 'DESCRIPTION')
-        assert(os.path.isfile(desc_file))
-        requirements = requirements_from_description(desc_file)
-        req_list = 'c(%s)' % ', '.join(['\"%s\"' % x for x in requirements])
-        repos = 'http://cloud.r-project.org'
-        if update_requirements:
-            # R_cmd = ['install.packages(%s, repos="%s")' % (req_list, repos)]
-            R_cmd = ['req <- %s' % req_list,
-                     'for (x in req) {',
-                     '  if (is.element(x, installed.packages()[,1])) {',
-                     '    remove.packages(x)',
-                     '  }',
-                     '  install.packages(x, dep=TRUE, repos="%s")' % repos,
-                     '}']
-        else:
-            R_cmd = ['req <- %s' % req_list,
-                     'for (x in req) {',
-                     '  if (!is.element(x, installed.packages()[,1])) {',
-                     '    install.packages(x, dep=TRUE, repos="%s")' % repos,
-                     '  } else {',
-                     '    print(sprintf("%s already installed.", x))',
-                     '  }',
-                     '}']
-        if not call_R(R_cmd, **kwargs):
-            logger.error("Error installing dependencies.")
+    # Write Makevars for conda installation
+    makevars = None
+    if os.environ.get('CONDA_PREFIX', ''):
+        makevars = write_makevars()
+    try:
+        # Install requirements
+        if not skip_requirements:
+            desc_file = os.path.join(lang_dir, 'R', 'DESCRIPTION')
+            assert(os.path.isfile(desc_file))
+            requirements = requirements_from_description(desc_file)
+            req_list = 'c(%s)' % ', '.join(['\"%s\"' % x for x in requirements])
+            repos = 'http://cloud.r-project.org'
+            if update_requirements:
+                # R_cmd = ['install.packages(%s, repos="%s")' % (req_list, repos)]
+                R_cmd = ['req <- %s' % req_list,
+                         'for (x in req) {',
+                         '  if (is.element(x, installed.packages()[,1])) {',
+                         '    remove.packages(x)',
+                         '  }',
+                         '  install.packages(x, dep=TRUE, repos="%s")' % repos,
+                         '}']
+            else:
+                R_cmd = ['req <- %s' % req_list,
+                         'for (x in req) {',
+                         '  if (!is.element(x, installed.packages()[,1])) {',
+                         '    install.packages(x, dep=TRUE, repos="%s")' % repos,
+                         '  } else {',
+                         '    print(sprintf("%s already installed.", x))',
+                         '  }',
+                         '}']
+            if not call_R(R_cmd, **kwargs):
+                logger.error("Error installing dependencies.")
+                if makevars is not None:
+                    os.remove(makevars)
+                return False
+            logger.info("Installed dependencies.")
+        # Check to see if yggdrasil installed
+        # Build packages
+        build_cmd = [R_exe, 'CMD', 'build', 'R']
+        if not make_call(build_cmd, **kwargs):
+            logger.error("Error building R interface.")
+            if makevars is not None:
+                os.remove(makevars)
             return False
-        logger.info("Installed dependencies.")
-    # Check to see if yggdrasil installed
-    # Build packages
-    build_cmd = [R_exe, 'CMD', 'build', 'R']
-    if not make_call(build_cmd, **kwargs):
-        logger.error("Error building R interface.")
-        return False
-    logger.info("Built R interface.")
-    # Install package
-    package_name = 'yggdrasil_0.1.tar.gz'
-    R_call = ("install.packages(\"%s\", "
-              "repos=NULL, type=\"source\")") % package_name
-    if not call_R([R_call], **kwargs):
-        logger.error("Error installing R interface from the built package.")
-        return False
-    logger.info("Installed R interface.")
+        logger.info("Built R interface.")
+        # Install package
+        package_name = 'yggdrasil_0.1.tar.gz'
+        R_call = ("install.packages(\"%s\", "
+                  "repos=NULL, type=\"source\")") % package_name
+        if not call_R([R_call], **kwargs):
+            logger.error("Error installing R interface from the built package.")
+            if makevars is not None:
+                os.remove(makevars)
+            return False
+        logger.info("Installed R interface.")
+    finally:
+        if makevars is not None:
+            os.remove(makevars)
     return True
 
 

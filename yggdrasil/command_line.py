@@ -83,6 +83,17 @@ def ygginfo():
                             % (curr_prefix + prefix,
                                ("\n" + curr_prefix + prefix).join(
                                    out.splitlines(False)))))
+            # Compilation tools
+            interp = 'R'.join(Rdrv.get_interpreter().rsplit('Rscript', 1))
+            vardict.append((curr_prefix + "R C Compiler:", ""))
+            curr_prefix += prefix
+            for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS']:
+                out = backwards.as_str(subprocess.check_output([interp, 'CMD',
+                                                                'config', x])).strip()
+                vardict.append((curr_prefix + x, "%s"
+                                % ("\n" + curr_prefix + prefix).join(
+                                    out.splitlines(False))))
+            curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             # Session info
             out = Rdrv.run_executable(["-e", "sessionInfo()"]).strip()
             vardict.append((curr_prefix + "R sessionInfo:", "\n%s%s"
