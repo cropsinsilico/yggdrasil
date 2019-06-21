@@ -66,7 +66,8 @@ def restore_makevars(makevars, old_makevars):
     """
     if makevars is None:
         return
-    os.remove(makevars)
+    if os.path.isfile(makevars):
+        os.remove(makevars)
     if old_makevars:
         os.environ['R_MAKEVARS_USER'] = old_makevars
     else:
