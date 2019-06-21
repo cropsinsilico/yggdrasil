@@ -82,7 +82,8 @@ def ygginfo():
                             % (curr_prefix + prefix,
                                ("\n" + curr_prefix + prefix).join(
                                    out.splitlines(False)))))
-            out = Rdrv.run_executable(["-e", "reticulate::py_config()"]).strip()
+            out = Rdrv.run_executable(["-e", ("library(reticulate); "
+                                              "reticulate::py_config()")]).strip()
             vardict.append((curr_prefix + "R reticulate::py_config():", "\n%s%s"
                             % (curr_prefix + prefix,
                                ("\n" + curr_prefix + prefix).join(
