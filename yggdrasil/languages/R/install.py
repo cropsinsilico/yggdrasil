@@ -71,7 +71,8 @@ def restore_makevars(makevars, old_makevars):
     if old_makevars:
         os.environ['R_MAKEVARS_USER'] = old_makevars
     else:
-        del os.environ['R_MAKEVARS_USER']
+        if 'R_MAKEVARS_USER' in os.environ:
+            del os.environ['R_MAKEVARS_USER']
 
 
 def install_packages(package_list, update=False, repos=None, **kwargs):
