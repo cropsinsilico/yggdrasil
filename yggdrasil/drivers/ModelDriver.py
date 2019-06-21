@@ -58,7 +58,7 @@ def remove_product(product, check_for_source=False, timer_class=None):
                         raise RuntimeError(("%s contains a source file "
                                             "(%s)") % (product, f))
         T = timer_class.start_timeout()
-        while ((not T.is_out) and os.path.isfile(product)):
+        while ((not T.is_out) and os.path.isdir(product)):
             try:
                 shutil.rmtree(product)
             except BaseException:  # pragma: debug
