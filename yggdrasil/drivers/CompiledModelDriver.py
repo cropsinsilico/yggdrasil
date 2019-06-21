@@ -845,7 +845,8 @@ class CompilationToolBase(object):
         # Run command
         output = ''
         try:
-            unused_kwargs.setdefault('env', cls.set_env())
+            if not skip_flags:
+                unused_kwargs.setdefault('env', cls.set_env())
             if cls.toolname == 'cmake':
                 logger.info('Command: "%s"' % ' '.join(cmd))
             logger.debug('Command: "%s"' % ' '.join(cmd))

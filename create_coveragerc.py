@@ -125,7 +125,13 @@ def create_coveragerc(installed_languages):
 
 
 if __name__ == "__main__":
-    import install_languages
+    LANG_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                             'yggdrasil', 'languages')
+    sys.path.insert(0, LANG_PATH)
+    try:
+        import install_languages
+    finally:
+        sys.path.pop(0)
     installed_languages = install_languages.install_all_languages()
     flag = create_coveragerc(installed_languages)
     if not flag:
