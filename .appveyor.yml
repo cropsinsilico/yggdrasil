@@ -114,6 +114,7 @@ cache:
 build: false
 
 before_test:
+  - "ygginfo --verbose"
   - "flake8 yggdrasil"
 
 test_script:
