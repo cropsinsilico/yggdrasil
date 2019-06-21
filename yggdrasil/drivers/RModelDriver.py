@@ -124,7 +124,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 be set.
 
         """
-        out = super(RModelDriver, cls).configure(cfg)
+        out = InterpretedModelDriver.configure.__func__(cls, cfg)
         if cls.are_dependencies_installed() and (not cls.is_interface_installed()):
             subprocess.check_output(['ygginstall', 'R', '--skip-requirements'])
         return out

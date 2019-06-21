@@ -264,7 +264,7 @@ class InterpretedModelDriver(ModelDriver):
                 be set.
 
         """
-        out = super(InterpretedModelDriver, cls).configure(cfg)
+        out = ModelDriver.configure.__func__(cls, cfg)
         # Locate executable
         if not cls.is_language_installed():  # pragma: debug
             fpath = locate_file(cls.language_executable())

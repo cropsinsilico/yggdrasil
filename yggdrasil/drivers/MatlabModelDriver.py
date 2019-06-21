@@ -665,7 +665,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 be set.
 
         """
-        out = super(MatlabModelDriver, cls).configure(cfg)
+        out = InterpretedModelDriver.configure.__func__(cls, cfg)
         opts = {
             'startup_waittime_s': [('The time allowed for a Matlab engine to start'
                                     'before timing out and reporting an error.'),

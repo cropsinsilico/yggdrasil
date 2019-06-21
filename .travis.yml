@@ -200,6 +200,8 @@ install:
 
 script:
   - |
+    ygginfo --verbose
+  - |
     flake8 yggdrasil
   - |
     if [[ -n "$CONDA" ]]; then
