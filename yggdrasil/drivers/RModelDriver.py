@@ -125,8 +125,11 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
 
         """
         out = InterpretedModelDriver.configure.__func__(cls, cfg)
-        if cls.are_dependencies_installed() and (not cls.is_interface_installed()):
-            subprocess.check_output(['ygginstall', 'R', '--skip-requirements'])
+        if cls.is_language_installed() and (not cls.is_interface_installed()):
+            args = ['ygginstall', 'R']
+            if cls.are_dependencies_installed():
+                args.append('--skip-requirements')
+            subprocess.check_output(args)
         return out
         
     def add_debug_flags(self, command):
@@ -196,10 +199,6 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         elif isinstance(robj, backwards.string_types):
             # print("language2python", type(robj), len(robj))
             return backwards.as_bytes(robj)
-        elif isinstance(robj, pd.DataFrame):
-            # R dosn't have int64 and will cast as float if passed
-            for n in robj.columns:
-                print("language2python", n, robj[n].dtype)
         return robj
 
     @classmethod
@@ -229,7 +228,6 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         elif isinstance(pyobj, pd.DataFrame):
             # R dosn't have int64 and will cast as float if passed
             for n in pyobj.columns:
-                print("python2language", n, pyobj[n].dtype)
                 if pyobj[n].dtype == np.dtype('int64'):
                     pyobj[n] = pyobj[n].astype('int32')
                 elif ((not backwards.PY2)

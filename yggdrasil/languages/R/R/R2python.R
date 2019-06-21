@@ -28,10 +28,6 @@ R2python <- function(robj) {
   } else if (is(robj, "character")) {
     out <- reticulate::r_to_py(charToRaw(robj))
   } else if (is(robj, "data.frame")) {
-    ncol_data = ncol(robj)
-    for (i in 1:ncol_data) {
-      print(class(robj[, i]))
-    }
     out <- reticulate::r_to_py(robj)
   } else {
     # print("Default handling for class:")
