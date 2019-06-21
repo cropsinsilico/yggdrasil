@@ -8,7 +8,7 @@ from collections import OrderedDict
 from yggdrasil import platform, backwards, components
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, LinkerBase)
-from yggdrasil.drivers import CModelDriver, CPPModelDriver
+from yggdrasil.drivers import CModelDriver
 
 
 logger = logging.getLogger(__name__)
@@ -635,8 +635,14 @@ class CMakeModelDriver(CompiledModelDriver):
             bool: True if the provided file is a source file, False otherwise.
 
         """
-        return (CModelDriver.CModelDriver.is_source_file(fname)
-                or CPPModelDriver.CPPModelDriver.is_source_file(fname))
+        compiler = cls.get_tool('compiler')
+        for lang in compiler.languages:
+            if lang == cls.language:
+                continue
+            drv = components.import_component('model', lang)
+            if drv.is_source_file(fname):
+                return True
+        return False
         
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.

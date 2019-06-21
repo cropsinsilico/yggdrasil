@@ -481,7 +481,8 @@ class CommBase(tools.YggClass):
         to registration."""
         tools.YggClass.before_registration(cls)
         cls._default_serializer_class = import_component('serializer',
-                                                         cls._default_serializer)
+                                                         cls._default_serializer,
+                                                         without_schema=True)
         
     @classmethod
     def get_testing_options(cls, serializer=None, **kwargs):

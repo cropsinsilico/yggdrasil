@@ -519,7 +519,16 @@ class CompilationToolBase(object):
         if output_first is None:
             output_first = cls.output_first
         # Add default & user defined flags
-        if not skip_defaults:
+        if skip_defaults:
+            # Include flags set by the environment (this is especially
+            # important when using the Conda compilers
+            env = getattr(cls, 'default_flags_env', None)
+            if env is not None:
+                if not isinstance(env, list):
+                    env = [env]
+                for ienv in env:
+                    out += os.environ.get(ienv, '').split()
+        else:
             new_flags = cls.default_flags + getattr(cls, 'flags', [])
             for x in new_flags:
                 # It is on the user to make sure there are not conflicting flags
@@ -845,8 +854,8 @@ class CompilationToolBase(object):
         # Run command
         output = ''
         try:
-            if not skip_flags:
-                unused_kwargs.setdefault('env', cls.set_env())
+            if (not skip_flags) and ('env' not in unused_kwargs):
+                unused_kwargs['env'] = cls.set_env()
             logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
@@ -1788,6 +1797,7 @@ class CompiledModelDriver(ModelDriver):
                                   + self.language_ext[0])
                 self.source_files.append(self.model_src)
         # Add intermediate files and executable by doing a dry run
+        self.set_target_language()  # Required by make and cmake
         kwargs = dict(products=self.products, dry_run=True)
         if model_is_source:
             kwargs['out'] = None
@@ -1848,6 +1858,16 @@ class CompiledModelDriver(ModelDriver):
                 setattr(cls, 'default_%s' % k, default_tool_name)
                 if (default_tool_name is not None) and (k == 'compiler'):
                     compiler = get_compilation_tool(k, default_tool_name)
+
+    def set_target_language(self):
+        r"""Set the language of the target being compiled (usually the same
+        as the language associated with this driver.
+
+        Returns:
+            str: Name of language.
+
+        """
+        return self.language
 
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
@@ -2626,22 +2646,29 @@ class CompiledModelDriver(ModelDriver):
                     out.append((k_lang, opt, desc))
         return out
 
-    def set_env(self, for_compile=False):
+    def set_env(self, for_compile=False, compile_kwargs=None, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
         Args:
             for_compile (bool, optional): If True, environment variables are set
                 that are necessary for compiling. Defaults to False.
+            compile_kwargs (dict, optional): Keyword arguments that should be
+                passed to the compiler's set_env method. Defaults to empty dict.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(CompiledModelDriver, self).set_env()
+        out = super(CompiledModelDriver, self).set_env(**kwargs)
         if for_compile:
+            if compile_kwargs is None:
+                compile_kwargs = {}
             compiler = self.get_tool_instance('compiler')
             out = compiler.set_env(existing=out,
-                                   logging_level=self.logger.getEffectiveLevel())
+                                   logging_level=self.logger.getEffectiveLevel(),
+                                   **compile_kwargs)
         return out
         
     @classmethod

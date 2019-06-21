@@ -1,5 +1,6 @@
 import os
 import copy
+import glob
 from collections import OrderedDict
 from yggdrasil import components, backwards, platform
 from yggdrasil.drivers.CompiledModelDriver import (
@@ -20,18 +21,48 @@ class MakeCompiler(CompilerBase):
             working_dir.
         target (str, optional): Make target that should be built to create the
             model executable. Defaults to None.
+        target_language (str, optional): Language that the target is written in.
+            Defaults to None and will be set based on the source files provided.
+        env_compiler (str, optional): Environment variable where the compiler
+            executable should be stored for use within the Makefile. Defaults
+            to 'CC'.
+        env_compiler_flags (str, optional): Environment variable where the
+            compiler flags should be stored (including those required to compile
+            against the |yggdrasil| interface). Defaults to 'CFLAGS'.
+        env_linker (str, optional): Environment variable where the linker
+            executable should be stored for use within the Makefile. Defaults
+            to 'CC'. If the same variable is provided for both env_compiler and
+            env_linker, this indicates that the same program should be used for
+            both compiling and linking (e.g. gcc). In such cases, the compiler
+            will be stored there and it is assumed that it will be appropriate
+            for linking as well.
+        env_linker_flags (str, optional): Environment variable where the
+            linker flags should be stored (including those required to link
+            against the |yggdrasil| interface). Defaults to 'LDFLAGS'.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
         makefile (str): Path to make file either relative to makedir or absolute.
         makedir (str): Directory where make should be invoked from.
         target (str): Name of executable that should be created and called.
+        target_language (str): Language that the target is written in.
+        target_language_driver (ModelDriver): Language driver for the target
+            language.
+        env_compiler (str): Compiler environment variable.
+        env_compiler_flags (str): Compiler flags environment variable.
+        env_linker (str): Linker environment variable.
+        env_linker_flags (str): Linker flags environment variable.
 
     """
     _schema_properties = {
         'makefile': {'type': 'string', 'default': 'Makefile'},
         'makedir': {'type': 'string'},  # default will depend on makefile
-        'target': {'type': 'string'}}
+        'target': {'type': 'string'},
+        'target_language': {'type': 'string'},
+        'env_compiler': {'type': 'string', 'default': 'CC'},
+        'env_compiler_flags': {'type': 'string', 'default': 'CFLAGS'},
+        'env_linker': {'type': 'string', 'default': 'CC'},
+        'env_linker_flags': {'type': 'string', 'default': 'LDFLAGS'}}
     toolname = 'make'
     languages = ['make', 'c', 'c++']
     platforms = ['MacOS', 'Linux']
@@ -154,14 +185,18 @@ class MakeCompiler(CompilerBase):
         return super(MakeCompiler, cls).get_executable_command(args, **kwargs)
 
     @classmethod
-    def set_env(cls, logging_level=None, language=None, **kwargs):
+    def set_env(cls, logging_level=None, language=None, language_driver=None,
+                **kwargs):
         r"""Get environment variables that should be set for the model process.
 
         Args:
             logging_level (int, optional): Logging level that should be passed
                 to get flags.
             language (str, optional): Language that is being compiled. Defaults
-                to the first language in cls.languages.
+                to the first language in cls.languages that isn't toolname.
+            language_driver (ModelDriver, optional): Driver for language that
+                should be used. Defaults to None and will be imported based
+                on language.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method.
 
@@ -171,25 +206,43 @@ class MakeCompiler(CompilerBase):
         """
         out = super(MakeCompiler, cls).set_env(**kwargs)
         if language is None:
-            language = 'c'
-        drv = components.import_component('model', language)
-        compile_flags = drv.get_compiler_flags(
-            for_model=True, logging_level=logging_level, skip_defaults=True)
-        linker_flags = drv.get_linker_flags(
+            for x in cls.languages:
+                if x != cls.toolname:
+                    language = x
+                    break
+        if language_driver is None:
+            drv_comp = components.import_component('model', language)
+        else:
+            drv_comp = language_driver
+        drv_link = drv_comp
+        if language == 'c':
+            # C models should be compiled with C, but linked using C++
+            drv_link = components.import_component('model', 'c++')
+        compiler = drv_comp.get_tool('compiler')
+        compile_flags = drv_comp.get_compiler_flags(
+            for_model=True, skip_defaults=True,
+            logging_level=logging_level, dont_link=True)
+        linker = drv_link.get_tool('linker')
+        linker_flags = drv_link.get_linker_flags(
             for_model=True, skip_defaults=True)
-        # TODO: Put these in the default_flags_env?
-        # TODO: Change these to be more generic?
-        out['YGGCCFLAGS'] = backwards.as_str(' '.join(compile_flags))
-        out['YGGLDFLAGS'] = backwards.as_str(' '.join(linker_flags))
-        # Set default compiler executable
-        # compiler = drv.get_tool('compiler')
-        # linker = drv.get_tool('linker')
-        # if (((compiler.default_executable_env is not None)
-        #      and (compiler.default_executable_env not in out))):
-        #     out[compiler.default_executable_env] = compiler.get_executable()
-        # if (((linker.default_executable_env is not None)
-        #      and (linker.default_executable_env not in out))):
-        #     out[linker.default_executable_env] = linker.get_executable()
+        for k in ['env_compiler', 'env_compiler_flags',
+                  'env_linker', 'env_linker_flags']:
+            kwargs.setdefault(k, cls._schema_properties[k]['default'])
+        out[kwargs['env_compiler']] = backwards.as_str(compiler.get_executable())
+        out[kwargs['env_compiler_flags']] = backwards.as_str(' '.join(compile_flags))
+        if kwargs['env_compiler'] == kwargs['env_linker']:
+            assert(kwargs['env_compiler_flags'] != kwargs['env_linker_flags'])
+            if (((compiler.languages[0].lower() == 'c')
+                 and (linker.languages[0].lower() in ['c++', 'cpp'])
+                 and ('-lstdc++' not in linker_flags))):
+                linker_flags.append('-lstdc++')
+            out[kwargs['env_linker_flags']] = backwards.as_str(' '.join(linker_flags))
+        else:
+            out[kwargs['env_linker']] = backwards.as_str(linker.get_executable())
+            out[kwargs['env_linker_flags']] = backwards.as_str(' '.join(linker_flags))
+        for k in ['env_compiler', 'env_compiler_flags',
+                  'env_linker', 'env_linker_flags']:
+            print(kwargs[k], out[kwargs[k]])
         return out
     
 
@@ -222,12 +275,33 @@ class MakeModelDriver(CompiledModelDriver):
             working_dir.
         target (str, optional): Make target that should be built to create the
             model executable. Defaults to None.
+        target_language (str, optional): Language that the target is written in.
+            Defaults to None and will be set based on the source files provided.
+        env_compiler (str, optional): Environment variable where the compiler
+            executable should be stored for use within the Makefile. Defaults
+            to 'CC'.
+        env_compiler_flags (str, optional): Environment variable where the
+            compiler flags should be stored (including those required to compile
+            against the |yggdrasil| interface). Defaults to 'CFLAGS'.
+        env_linker (str, optional): Environment variable where the linker
+            executable should be stored for use within the Makefile. Defaults
+            to 'CC'.
+        env_linker_flags (str, optional): Environment variable where the
+            linker flags should be stored (including those required to link
+            against the |yggdrasil| interface). Defaults to 'LDFLAGS'.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
         makefile (str): Path to make file either relative to makedir or absolute.
         makedir (str): Directory where make should be invoked from.
         target (str): Name of executable that should be created and called.
+        target_language (str): Language that the target is written in.
+        target_language_driver (ModelDriver): Language driver for the target
+            language.
+        env_compiler (str): Compiler environment variable.
+        env_compiler_flags (str): Compiler flags environment variable.
+        env_linker (str): Linker environment variable.
+        env_linker_flags (str): Linker flags environment variable.
 
     Raises:
         RuntimeError: If neither the IPC or ZMQ C libraries are available.
@@ -238,7 +312,7 @@ class MakeModelDriver(CompiledModelDriver):
                                    'Makefile for compilation.')
     _schema_properties = copy.deepcopy(MakeCompiler._schema_properties)
     language = 'make'
-    base_languages = ['c']
+    base_languages = ['c', 'c++']
 
     def parse_arguments(self, args):
         r"""Sort arguments based on their syntax to determine if an argument
@@ -269,6 +343,35 @@ class MakeModelDriver(CompiledModelDriver):
             self.makedir = os.path.dirname(self.makefile)
         kwargs = dict(default_model_dir=self.makedir)
         super(MakeModelDriver, self).parse_arguments(args, **kwargs)
+
+    def set_target_language(self):
+        r"""Set the language of the target being compiled (usually the same
+        as the language associated with this driver.
+
+        Returns:
+            str: Name of language.
+
+        """
+        source_dir = self.makedir
+        if self.target_language is None:
+            try_list = sorted(list(glob.glob(os.path.join(source_dir, '*'))))
+            early_exit = False
+            if self.model_src is not None:
+                try_list = [self.model_src, try_list]
+                early_exit = True
+            languages = copy.deepcopy(self.get_tool_instance('compiler').languages)
+            languages.remove('make')
+            try:
+                self.target_language = self.get_language_for_source(
+                    try_list, early_exit=early_exit, languages=languages)
+                self.target_language_driver = components.import_component(
+                    'model', self.target_language)
+            except ValueError:
+                self.target_language_driver = None
+            # Try to compile C as C++
+            # if self.target_language == 'c':
+            #     self.target_language = 'c++'
+        return self.target_language
         
     @classmethod
     def is_source_file(cls, fname):
@@ -312,27 +415,33 @@ class MakeModelDriver(CompiledModelDriver):
                                   # source_files=[],  # Unknown source files, use target
                                   for_model=False,  # flags are in environment
                                   working_dir=self.makedir,
-                                  makefile=self.makefile,
-                                  env=self.set_env(for_compile=True))
+                                  makefile=self.makefile)
             if target is not None:
                 default_kwargs['target'] = target
             for k, v in default_kwargs.items():
                 kwargs.setdefault(k, v)
             return super(MakeModelDriver, self).compile_model(**kwargs)
         
-    def set_env(self, for_compile=False):
+    def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
         Args:
-            for_compile (bool, optional): If True, environment variables are set
-                that are necessary for compiling. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(MakeModelDriver, self).set_env(for_compile=for_compile)
-        if not for_compile:
+        if kwargs.get('for_compile', False):
+            kwargs.setdefault('compile_kwargs', {})
+            kwargs['compile_kwargs']['language'] = self.target_language
+            kwargs['compile_kwargs']['language_driver'] = self.target_language_driver
+            for k in ['env_compiler', 'env_compiler_flags',
+                      'env_linker', 'env_linker_flags']:
+                kwargs['compile_kwargs'][k] = getattr(self, k)
+        out = super(MakeModelDriver, self).set_env(**kwargs)
+        if not kwargs.get('for_compile', False):
             # TODO: Pass language?
             out = CModelDriver.update_ld_library_path(out)
         return out

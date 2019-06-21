@@ -22,12 +22,12 @@ _comptype2key = {'comm': 'commtype',
 # 'compiler': 'toolname',
 # 'linker': 'toolname',
 # 'archiver': 'toolname'}
-_comptype2mod = {'comm': 'communication',
+_comptype2mod = {'serializer': 'serialize',
+                 'comm': 'communication',
                  'file': 'communication',
                  'model': 'drivers',
-                 'connection': 'drivers',
-                 # 'datatype': ['metaschema', 'datatypes'],
-                 'serializer': 'serialize'}
+                 'connection': 'drivers'}
+# 'datatype': ['metaschema', 'datatypes'],
 # 'compiler': 'drivers',
 # 'linker': 'drivers',
 # 'archiver': 'drivers'}
@@ -191,7 +191,12 @@ def import_component(comptype, subtype=None, without_schema=False):
                             pass
                     raise ValueError("Unrecognized %s subtype: %s"
                                      % (comptype, subtype))
-        out_mod = importlib.import_module('yggdrasil.%s.%s' % (mod, class_name))
+        try:
+            out_mod = importlib.import_module('yggdrasil.%s.%s' % (mod, class_name))
+        except ImportError:  # pragma: debug
+            import_all_components(comptype)
+            return import_component(comptype, subtype=subtype,
+                                    without_schema=without_schema)
         out_cls = getattr(out_mod, class_name)
     # Check for an aliased class
     if hasattr(out_cls, '_get_alias'):
