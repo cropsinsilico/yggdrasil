@@ -25,6 +25,7 @@ def call_R(R_cmd, **kwargs):
                             'wrapper_%s.R' % (str(uuid.uuid4()).replace('-', '_')))
     with open(R_script, 'w') as fd:
         fd.write('\n'.join(R_cmd))
+        print('Running:\n    ' + '\n    '.join(R_cmd))
     try:
         out = make_call(['Rscript', R_script], **kwargs)
     finally:
@@ -84,10 +85,13 @@ def requirements_from_description(fname):
                     out.append(x.strip().strip(','))
                 else:
                     in_section = False
+    if (sys.platform in ['win32', 'cygwin']) and ('rtools' not in out):
+        out.append('rtools')
+    out = list(set(out))
     return out
 
 
-def install(with_sudo=None, skip_requirements=None):
+def install(with_sudo=None, skip_requirements=None, update_requirements=None):
     r"""Attempt to install the R interface.
 
     Args:
@@ -98,6 +102,9 @@ def install(with_sudo=None, skip_requirements=None):
         skip_requirements (bool, optional): If True, the requirements will not
             be installed. Defaults to None and is set based on if the flag
             '--skip_requirements' is in sys.argv.
+        update_requirements (bool, optional): If True, the requirements will be
+            updated. Defaults to False. Setting this to True, sets
+            skip_requirements to False.
 
     Returns:
         bool: True if install succeded, False otherwise.
@@ -110,31 +117,48 @@ def install(with_sudo=None, skip_requirements=None):
     if skip_requirements is None:
         skip_requirements = (('--skip_requirements' in sys.argv)
                              or ('--skip-requirements' in sys.argv))
+    if update_requirements is None:
+        update_requirements = (('--update_requirements' in sys.argv)
+                               or ('--update-requirements' in sys.argv))
+    if update_requirements:
+        skip_requirements = False
     # Set platform dependent things
     lang_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if sys.platform in ['win32', 'cygwin']:
         R_exe = 'R.exe'
-        # pkg_ext = '.zip'
     else:
         R_exe = 'R'
-        # pkg_ext = '.tar.gz'
     kwargs = {'cwd': lang_dir, 'with_sudo': with_sudo}
     # Install requirements
     if not skip_requirements:
         desc_file = os.path.join(lang_dir, 'R', 'DESCRIPTION')
         assert(os.path.isfile(desc_file))
         requirements = requirements_from_description(desc_file)
-        if (sys.platform in ['win32', 'cygwin']) and ('rtools' not in requirements):
-            requirements.append('rtools')
-        requirements = list(set(requirements))
-        R_call = ('install.packages(c(%s), repos="http://cloud.r-project.org")'
-                  % ', '.join(['\"%s\"' % x for x in requirements]))
-        # depend_cmd = [R_exe, '-e', R_call]
-        # if not make_call(depend_cmd, **kwargs):
-        if not call_R([R_call], **kwargs):
+        req_list = 'c(%s)' % ', '.join(['\"%s\"' % x for x in requirements])
+        repos = 'http://cloud.r-project.org'
+        if update_requirements:
+            # R_cmd = ['install.packages(%s, repos="%s")' % (req_list, repos)]
+            R_cmd = ['req <- %s' % req_list,
+                     'for (x in req) {',
+                     '  if (is.element(x, installed.packages()[,1])) {',
+                     '    remove.packages(x)',
+                     '  }',
+                     '  install.packages(x, dep=TRUE, repos="%s")' % repos,
+                     '}']
+        else:
+            R_cmd = ['req <- %s' % req_list,
+                     'for (x in req) {',
+                     '  if (!is.element(x, installed.packages()[,1])) {',
+                     '    install.packages(x, dep=TRUE, repos="%s")' % repos,
+                     '  } else {',
+                     '    print(sprintf("%s already installed.", x))',
+                     '  }',
+                     '}']
+        if not call_R(R_cmd, **kwargs):
             logging.error("Error installing dependencies.")
             return False
         logging.info("Installed dependencies.")
+    # Check to see if yggdrasil installed
     # Build packages
     build_cmd = [R_exe, 'CMD', 'build', 'R']
     if not make_call(build_cmd, **kwargs):
@@ -145,16 +169,6 @@ def install(with_sudo=None, skip_requirements=None):
     package_name = 'yggdrasil_0.1.tar.gz'
     R_call = ("install.packages(\"%s\", "
               "repos=NULL, type=\"source\")") % package_name
-    # install_cmd = [R_exe, '-e',
-    #                ("'install.packages(\"%s\", "
-    #                 "repos=NULL, type=\"source\")'") % package_name]
-    # if sys.platform in ['win32', 'cygwin']:
-    #     install_cmd = [R_exe, '-e',
-    #                    ("'install.packages(\"%s\", "
-    #                     "repos=NULL, type=\"source\")'") % package_name]
-    # else:
-    #     install_cmd = [R_exe, 'CMD', 'INSTALL', package_name]
-    # if not make_call(install_cmd, **kwargs):
     if not call_R([R_call], **kwargs):
         logging.error("Error installing R interface from the built package.")
         return False

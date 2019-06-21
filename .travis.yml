@@ -17,14 +17,14 @@ addons:
       # - gfortran
       # - libblas-dev
       # - liblapack-dev
-      - r-base
+      # - r-base
       # - ccache
     update: true
   homebrew: &native_deps_brew
     packages:
       - valgrind
       # - gcc
-      - r
+      # - r
     update: true
 
 os:
@@ -104,11 +104,20 @@ before_install:
       fi
       pip uninstall -y numpy
       pip uninstall -y matplotlib
-      # Install r-base from conda to prevent conflict
+      conda info -a
+    fi
+    
+    # Install r-base from conda, apt, or homebrew
+    if [[ -n "$CONDA" || $INSTALLLPY == '1' ]]; then
       if [[ $INSTALLLPY == '1' ]]; then
         conda install r-base
       fi
-      conda info -a
+    elif [[ -n "$PYTHON" ]]; then
+      if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        sudo apt-get install r-base
+      elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        brew install r
+      fi
     fi
 
     # Install AstroPy
