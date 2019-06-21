@@ -62,7 +62,7 @@ install:
   # - "conda update -q --yes conda"
   - "conda create -q --yes -n test python=%PYTHON_VERSION%"
   - "activate test"
-  - "conda install --yes r-base"
+  - "conda install --yes -c r r-base=3.5.1"
 
   # Check that we have the expected version of Python
   - "python --version"

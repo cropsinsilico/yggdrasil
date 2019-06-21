@@ -21,17 +21,19 @@ def write_makevars(fname=None):
             saved. Defaults to os.path.join("~", ".R", "Makevars").
 
     Returns:
-        str: Full path to file where Makevars was written. None is returned if
-            a file is not written.
+        tuple(str, str): Full path to file where Makevars was written and the
+            file indicated by the previous value of the R_MAKEVARS_USER
+            environment variable. None is returned for either/both if a file is
+            not written and/or the environment variable wasn't set.
 
     """
     if fname is None:
-        fname = os.path.expanduser(os.path.join("~", ".R", "Makevars"))
+        fname = os.path.expanduser(os.path.join("~", ".R", "Makevars_temp"))
         if sys.platform in ['win32', 'cygwin']:
             fname += '.win'
     if os.path.isfile(fname):
         logger.info("Makevars file already exists: %s" % fname)
-        return None
+        return None, None
     lines = []
     for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS']:
         env = os.environ.get(x, '')
@@ -44,10 +46,31 @@ def write_makevars(fname=None):
             os.mkdir(os.path.dirname(fname))
         with open(fname, 'w') as fd:
             fd.write('\n'.join(lines))
-        return fname
+        old_makevars = os.environ.get('R_MAKEVARS_USER', None)
+        os.environ['R_MAKEVARS_USER'] = fname
+        return fname, old_makevars
     else:
         logger.info("Nothing to be written to the Makevars file")
-    return None
+    return None, None
+
+
+def restore_makevars(makevars, old_makevars):
+    r"""Restore original makevars environemnt variable and remove temporary file.
+
+    Args:
+       makevars (str): Full path to the file where the temporary Makevars file
+           was written. If None, nothing is done.
+       old_makevars (str): Full path to the file where the old Makevars file
+           is as defined by the environment variable R_MAKEVARS_USER.
+
+    """
+    if makevars is None:
+        return
+    os.remove(makevars)
+    if old_makevars:
+        os.environ['R_MAKEVARS_USER'] = old_makevars
+    else:
+        del os.environ['R_MAKEVARS_USER']
 
 
 def install_packages(package_list, update=False, repos=None, **kwargs):
@@ -219,8 +242,9 @@ def install(with_sudo=None, skip_requirements=None, update_requirements=None):
     kwargs = {'cwd': lang_dir, 'with_sudo': with_sudo}
     # Write Makevars for conda installation
     makevars = None
+    old_makevars = None
     if os.environ.get('CONDA_PREFIX', ''):
-        makevars = write_makevars()
+        makevars, old_makevars = write_makevars()
     try:
         # Install requirements
         if not skip_requirements:
@@ -228,8 +252,7 @@ def install(with_sudo=None, skip_requirements=None, update_requirements=None):
             assert(os.path.isfile(desc_file))
             requirements = requirements_from_description(desc_file)
             if not install_packages(requirements, update=update_requirements, **kwargs):
-                if makevars is not None:
-                    os.remove(makevars)
+                restore_makevars(makevars, old_makevars)
                 return False
             logger.info("Installed dependencies.")
         # Check to see if yggdrasil installed
@@ -237,8 +260,7 @@ def install(with_sudo=None, skip_requirements=None, update_requirements=None):
         build_cmd = [R_exe, 'CMD', 'build', 'R']
         if not make_call(build_cmd, **kwargs):
             logger.error("Error building R interface.")
-            if makevars is not None:
-                os.remove(makevars)
+            restore_makevars(makevars, old_makevars)
             return False
         logger.info("Built R interface.")
         # Install package
@@ -247,13 +269,11 @@ def install(with_sudo=None, skip_requirements=None, update_requirements=None):
                   "repos=NULL, type=\"source\")") % package_name
         if not call_R([R_call], **kwargs):
             logger.error("Error installing R interface from the built package.")
-            if makevars is not None:
-                os.remove(makevars)
+            restore_makevars(makevars, old_makevars)
             return False
         logger.info("Installed R interface.")
     finally:
-        if makevars is not None:
-            os.remove(makevars)
+        restore_makevars(makevars, old_makevars)
     return True
 
 
