@@ -209,13 +209,15 @@ install:
 
 script:
   - |
-    ygginfo --verbose
+    which R
+    which Rscript
   - |
     flake8 yggdrasil
   - |
     if [[ -n "$CONDA" ]]; then
       python create_coveragerc.py
     fi
+    ygginfo --verbose
     yggtest -c setup.cfg --cov-config=.coveragerc
 
 
