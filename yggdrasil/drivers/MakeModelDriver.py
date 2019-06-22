@@ -210,20 +210,15 @@ class MakeCompiler(CompilerBase):
                 if x != cls.toolname:
                     language = x
                     break
-        if language_driver is None:
-            drv_comp = components.import_component('model', language)
-        else:
-            drv_comp = language_driver
-        drv_link = drv_comp
-        if language == 'c':
-            # C models should be compiled with C, but linked using C++
-            drv_link = components.import_component('model', 'c++')
-        compiler = drv_comp.get_tool('compiler')
-        compile_flags = drv_comp.get_compiler_flags(
+        drv = language_driver
+        if drv is None:
+            drv = components.import_component('model', language)
+        compiler = drv.get_tool('compiler')
+        compile_flags = drv.get_compiler_flags(
             for_model=True, skip_defaults=True,
             logging_level=logging_level, dont_link=True)
-        linker = drv_link.get_tool('linker')
-        linker_flags = drv_link.get_linker_flags(
+        linker = drv.get_tool('linker')
+        linker_flags = drv.get_linker_flags(
             for_model=True, skip_defaults=True)
         for k in ['env_compiler', 'env_compiler_flags',
                   'env_linker', 'env_linker_flags']:
@@ -232,17 +227,17 @@ class MakeCompiler(CompilerBase):
         out[kwargs['env_compiler_flags']] = backwards.as_str(' '.join(compile_flags))
         if kwargs['env_compiler'] == kwargs['env_linker']:
             assert(kwargs['env_compiler_flags'] != kwargs['env_linker_flags'])
+            # yggdrasil requires that linking be done in C++
             if (((compiler.languages[0].lower() == 'c')
-                 and (linker.languages[0].lower() in ['c++', 'cpp'])
                  and ('-lstdc++' not in linker_flags))):
                 linker_flags.append('-lstdc++')
             out[kwargs['env_linker_flags']] = backwards.as_str(' '.join(linker_flags))
         else:
             out[kwargs['env_linker']] = backwards.as_str(linker.get_executable())
             out[kwargs['env_linker_flags']] = backwards.as_str(' '.join(linker_flags))
-        # for k in ['env_compiler', 'env_compiler_flags',
-        #           'env_linker', 'env_linker_flags']:
-        #     print(kwargs[k], out[kwargs[k]])
+        for k in ['env_compiler', 'env_compiler_flags',
+                  'env_linker', 'env_linker_flags']:
+            print(kwargs[k], out[kwargs[k]])
         return out
     
 
@@ -360,7 +355,7 @@ class MakeModelDriver(CompiledModelDriver):
                 try_list = [self.model_src, try_list]
                 early_exit = True
             languages = copy.deepcopy(self.get_tool_instance('compiler').languages)
-            languages.remove('make')
+            languages.remove(self.language)
             try:
                 self.target_language = self.get_language_for_source(
                     try_list, early_exit=early_exit, languages=languages)
@@ -442,8 +437,11 @@ class MakeModelDriver(CompiledModelDriver):
                 kwargs['compile_kwargs'][k] = getattr(self, k)
         out = super(MakeModelDriver, self).set_env(**kwargs)
         if not kwargs.get('for_compile', False):
-            # TODO: Pass language?
-            out = CModelDriver.update_ld_library_path(out)
+            if hasattr(self.target_language_driver, 'update_ld_library_path'):
+                self.target_language_driver.update_ld_library_path(out)
+            # C++ may also need the C libraries
+            if self.target_language == 'c++':
+                out = CModelDriver.update_ld_library_path(out)
         return out
         
     def cleanup(self):

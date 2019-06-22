@@ -606,23 +606,36 @@ class CMakeModelDriver(CompiledModelDriver):
         self.cmakelists = os.path.join(self.sourcedir, 'CMakeLists.txt')
         self.cmakelists_copy = os.path.join(self.sourcedir, 'CMakeLists_orig.txt')
         self.modified_files.append((self.cmakelists_copy, self.cmakelists))
-        # Determine the underlying language
+
+    def set_target_language(self):
+        r"""Set the language of the target being compiled (usually the same
+        as the language associated with this driver.
+
+        Returns:
+            str: Name of language.
+
+        """
+        source_dir = self.sourcedir
         if self.target_language is None:
-            try_list = list(glob.glob(os.path.join(self.sourcedir, '*')))
+            try_list = sorted(list(glob.glob(os.path.join(source_dir, '*'))))
             early_exit = False
             if self.model_src is not None:
                 try_list = [self.model_src, try_list]
                 early_exit = True
             languages = copy.deepcopy(self.get_tool_instance('compiler').languages)
-            languages.remove('cmake')
-            self.target_language = self.get_language_for_source(
-                try_list, early_exit=early_exit, languages=languages)
+            languages.remove(self.language)
+            try:
+                self.target_language = self.get_language_for_source(
+                    try_list, early_exit=early_exit, languages=languages)
+                self.target_language_driver = components.import_component(
+                    'model', self.target_language)
+            except ValueError:
+                self.target_language_driver = None
             # Try to compile C as C++
-            if self.target_language == 'c':
-                self.target_language = 'c++'
-        self.target_language_driver = components.import_component(
-            'model', self.target_language)
-        
+            # if self.target_language == 'c':
+            #     self.target_language = 'c++'
+        return self.target_language
+    
     @classmethod
     def is_source_file(cls, fname):
         r"""Determine if the provided file name points to a source files for
@@ -738,7 +751,11 @@ class CMakeModelDriver(CompiledModelDriver):
 
         """
         out = super(CMakeModelDriver, self).set_env(**kwargs)
-        out = CModelDriver.CModelDriver.update_ld_library_path(out)
+        if hasattr(self.target_language_driver, 'update_ld_library_path'):
+            self.target_language_driver.update_ld_library_path(out)
+        # C++ may also need the C libraries
+        if self.target_language == 'c++':
+            out = CModelDriver.CModelDriver.update_ld_library_path(out)
         return out
     
     def cleanup(self):
