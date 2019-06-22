@@ -206,10 +206,8 @@ class MakeCompiler(CompilerBase):
         """
         out = super(MakeCompiler, cls).set_env(**kwargs)
         if language is None:
-            for x in cls.languages:
-                if x != cls.toolname:
-                    language = x
-                    break
+            # This should be the first language that is not the build tool
+            language = cls.languages[1]
         drv = language_driver
         if drv is None:
             drv = components.import_component('model', language)
