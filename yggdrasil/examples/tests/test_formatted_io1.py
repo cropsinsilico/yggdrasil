@@ -1,8 +1,8 @@
 import os
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
-class TestExampleFIO1(TestExample):
+class TestExampleFIO1(ExampleTstBase):
     r"""Test the Formatted I/O lesson 1 example."""
 
     example_name = 'formatted_io1'

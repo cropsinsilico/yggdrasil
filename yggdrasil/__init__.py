@@ -68,7 +68,8 @@ def expand_and_add(path, path_list, dir_list):  # pragma: no cover
 
 
 def run_tsts(verbose=True, nocapture=True, stop=True,
-             nologcapture=True, withcoverage=True):  # pragma: no cover
+             nologcapture=True, withcoverage=True,
+             withexamples=False):  # pragma: no cover
     r"""Run tests for the package. Relative paths are interpreted to be
     relative to the package root directory.
 
@@ -84,6 +85,8 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             which allows logged messages to be printed. Defaults to True.
         withcoverage (bool, optional): If True, set option '--with-coverage'
             which invokes coverage. Defaults to True.
+        withexamples (bool, optional): If True, example testing will be
+            enabled. Defaults to False.
 
     """
     if _test_package is None:
@@ -110,6 +113,8 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             pass
         elif x == '--nocover':
             withcoverage = False
+        elif x in ['--withexamples', '--with-examples']:
+            withexamples = True
         elif x.startswith('-'):
             argv.append(x)
             if (_test_package_name == 'pytest') and (x in ['-c']):
@@ -144,6 +149,9 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
                                   [package_dir, os.getcwd()]):
                 expanded_test_paths.append(x)
     # os.chdir(package_dir)
+    if withexamples:
+        old_with_examples = os.environ.get('YGG_ENABLE_EXAMPLE_TESTS', None)
+        os.environ['YGG_ENABLE_EXAMPLE_TESTS'] = 'True'
     argv += expanded_test_paths
     logger.info("Running %s from %s", argv, os.getcwd())
     try:
@@ -167,6 +175,11 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
         os.chdir(initial_dir)
         if old_skip_norm is None:
             del os.environ['YGG_SKIP_COMPONENT_VALIDATION']
+        if withexamples:
+            if old_with_examples is None:
+                del os.environ['YGG_ENABLE_EXAMPLE_TESTS']
+            else:
+                os.environ['YGG_ENABLE_EXAMPLE_TESTS'] = old_with_examples
     return error_code
 
 

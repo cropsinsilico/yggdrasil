@@ -1,8 +1,8 @@
 import os
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
-class TestExampleRPC2(TestExample):
+class TestExampleRPC2(ExampleTstBase):
     r"""Test the rpc_lesson2 example."""
     
     example_name = 'rpc_lesson2'
