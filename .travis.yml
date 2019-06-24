@@ -45,10 +45,11 @@ env:
     INSTALLAPY=0
     INSTALLLPY=0
     BUILDDOCS=0
+    YGG_RUN_TESTS=0
     YGG_ENABLE_LONG_TESTS=0
-    YGG_SKIP_EXTRA_EXAMPLES=1
   matrix:
-    - YGG_ENABLE_LONG_TESTS=0
+    - YGG_RUN_TESTS=1
+    - YGG_ENABLE_LONG_TESTS=1
     - CONDA=yes
 
 before_install:
@@ -218,7 +219,11 @@ script:
       python create_coveragerc.py
     fi
     ygginfo --verbose
-    yggtest -c setup.cfg --cov-config=.coveragerc
+    if [[ $YGG_RUN_TESTS == '1' ]]; then
+      yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples
+    else
+      yggtest -c setup.cfg --cov-config=.coveragerc
+    fi
 
 
 after_success:

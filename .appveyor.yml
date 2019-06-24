@@ -126,7 +126,7 @@ before_test:
   - "flake8 yggdrasil"
 
 test_script:
-  - "yggtest"
+  - "yggtest --with-examples"
 
 after_test:
   - "codecov"
