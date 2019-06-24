@@ -1,10 +1,8 @@
-import os
 import copy
-import glob
 from collections import OrderedDict
 from yggdrasil import components, backwards, platform
-from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase)
+from yggdrasil.drivers.CompiledModelDriver import CompilerBase
+from yggdrasil.drivers.BuildModelDriver import BuildModelDriver
 from yggdrasil.drivers.CModelDriver import CModelDriver
 
 
@@ -233,9 +231,9 @@ class MakeCompiler(CompilerBase):
         else:
             out[kwargs['env_linker']] = backwards.as_str(linker.get_executable())
             out[kwargs['env_linker_flags']] = backwards.as_str(' '.join(linker_flags))
-        for k in ['env_compiler', 'env_compiler_flags',
-                  'env_linker', 'env_linker_flags']:
-            print(kwargs[k], out[kwargs[k]])
+        # for k in ['env_compiler', 'env_compiler_flags',
+        #           'env_linker', 'env_linker_flags']:
+        #     print(kwargs[k], out[kwargs[k]])
         return out
     
 
@@ -248,7 +246,7 @@ class NMakeCompiler(MakeCompiler):
     default_linker = None  # Force linker to be initialized with the same name
     
 
-class MakeModelDriver(CompiledModelDriver):
+class MakeModelDriver(BuildModelDriver):
     r"""Class for running make file compiled drivers. Before running the
     make command, the necessary compiler & linker flags for the interface's
     C/C++ library are stored the environment variables YGGCCFLAGS and YGGLDFLAGS
@@ -306,87 +304,23 @@ class MakeModelDriver(CompiledModelDriver):
     _schema_properties = copy.deepcopy(MakeCompiler._schema_properties)
     language = 'make'
     base_languages = ['c', 'c++']
+    built_where_called = True
 
-    def parse_arguments(self, args):
+    def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
         is a source file, compilation flag, or runtime option/flag that should
         be passed to the model executable.
 
         Args:
             args (list): List of arguments provided.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         """
-        # Set makedir before passing to parent class so that makedir is used
-        # to normalize the model file path rather than the working directory
-        # which may be different.
-        if not os.path.isabs(self.makefile):
-            if self.makedir is not None:
-                self.makefile = os.path.normpath(
-                    os.path.join(self.makedir, self.makefile))
-            else:
-                src_dir = os.path.dirname(args[0])
-                if not os.path.isabs(src_dir):
-                    src_dir = os.path.join(self.working_dir, src_dir)
-                for x in [self.working_dir, src_dir]:
-                    y = os.path.normpath(os.path.join(x, self.makefile))
-                    if os.path.isfile(y):
-                        self.makefile = y
-                        break
-        if self.makedir is None:
-            self.makedir = os.path.dirname(self.makefile)
-        kwargs = dict(default_model_dir=self.makedir)
+        self.buildfile = self.makefile
+        self.compile_working_dir = self.makedir
         super(MakeModelDriver, self).parse_arguments(args, **kwargs)
 
-    def set_target_language(self):
-        r"""Set the language of the target being compiled (usually the same
-        as the language associated with this driver.
-
-        Returns:
-            str: Name of language.
-
-        """
-        source_dir = self.makedir
-        if self.target_language is None:
-            try_list = sorted(list(glob.glob(os.path.join(source_dir, '*'))))
-            early_exit = False
-            if self.model_src is not None:
-                try_list = [self.model_src, try_list]
-                early_exit = True
-            languages = copy.deepcopy(self.get_tool_instance('compiler').languages)
-            languages.remove(self.language)
-            try:
-                self.target_language = self.get_language_for_source(
-                    try_list, early_exit=early_exit, languages=languages)
-                self.target_language_driver = components.import_component(
-                    'model', self.target_language)
-            except ValueError:
-                self.target_language_driver = None
-            # Try to compile C as C++
-            # if self.target_language == 'c':
-            #     self.target_language = 'c++'
-        return self.target_language
-        
-    @classmethod
-    def is_source_file(cls, fname):
-        r"""Determine if the provided file name points to a source files for
-        the associated programming language by checking the extension.
-
-        Args:
-            fname (str): Path to file.
-
-        Returns:
-            bool: True if the provided file is a source file, False otherwise.
-
-        """
-        compiler = cls.get_tool('compiler')
-        for lang in compiler.languages:
-            if lang == cls.language:
-                continue
-            drv = components.import_component('model', lang)
-            if drv.is_source_file(fname):
-                return True
-        return False
-        
     def compile_model(self, target=None, **kwargs):
         r"""Compile model executable(s).
 
@@ -401,14 +335,14 @@ class MakeModelDriver(CompiledModelDriver):
         if target == 'clean':
             return self.call_compiler([], target=target,
                                       out=target, overwrite=True,
-                                      makefile=self.makefile,
+                                      makefile=self.buildfile,
                                       working_dir=self.working_dir, **kwargs)
         else:
             default_kwargs = dict(skip_interface_flags=True,
                                   # source_files=[],  # Unknown source files, use target
                                   for_model=False,  # flags are in environment
                                   working_dir=self.makedir,
-                                  makefile=self.makefile)
+                                  makefile=self.buildfile)
             if target is not None:
                 default_kwargs['target'] = target
             for k, v in default_kwargs.items():
@@ -441,9 +375,3 @@ class MakeModelDriver(CompiledModelDriver):
             if self.target_language == 'c++':
                 out = CModelDriver.update_ld_library_path(out)
         return out
-        
-    def cleanup(self):
-        r"""Remove compiled executable."""
-        if (self.model_file is not None) and os.path.isfile(self.model_file):
-            self.compile_model(target='clean')
-        super(MakeModelDriver, self).cleanup()

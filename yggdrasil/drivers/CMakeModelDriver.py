@@ -1,13 +1,12 @@
 import os
 import re
-import copy
 import shutil
 import logging
-import glob
 from collections import OrderedDict
 from yggdrasil import platform, backwards, components
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase, LinkerBase)
+    CompilerBase, LinkerBase)
+from yggdrasil.drivers.BuildModelDriver import BuildModelDriver
 from yggdrasil.drivers import CModelDriver
 
 
@@ -521,7 +520,7 @@ class CMakeBuilder(LinkerBase):
         return super(CMakeBuilder, cls).get_executable_command([], **kwargs)
     
 
-class CMakeModelDriver(CompiledModelDriver):
+class CMakeModelDriver(BuildModelDriver):
     r"""Class for running cmake compiled drivers. Before running the
     cmake command, the cmake commands for setting the necessary compiler & linker
     flags for the interface's C/C++ library are written to a file called
@@ -576,87 +575,45 @@ class CMakeModelDriver(CompiledModelDriver):
     language = 'cmake'
     base_languages = ['c', 'c++']
     add_libraries = CMakeConfigure.add_libraries
+    sourcedir_as_sourcefile = True
 
-    def parse_arguments(self, args):
+    def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
         is a source file, compilation flag, or runtime option/flag that should
         be passed to the model executable.
 
         Args:
             args (list): List of arguments provided.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         """
-        if self.sourcedir is None:
-            self.sourcedir = os.path.dirname(args[0])
-        if not os.path.isabs(self.sourcedir):
-            self.sourcedir = os.path.realpath(os.path.join(self.working_dir,
-                                                           self.sourcedir))
-        if self.builddir is None:
-            if self.target is None:
-                build_base = 'build'
-            else:
-                build_base = 'build_%s' % self.target
-            self.builddir = os.path.join(self.sourcedir, build_base)
-        if not os.path.isabs(self.builddir):
-            self.builddir = os.path.realpath(os.path.join(self.working_dir,
-                                                          self.builddir))
-        self.source_files = [self.sourcedir]
-        kwargs = dict(default_model_dir=self.builddir)
+        if self.target is None:
+            self.builddir_base = 'build'
+        else:
+            self.builddir_base = 'build_%s' % self.target
+        self.buildfile_base = 'CMakeLists.txt'
+        # if self.sourcedir is None:
+        #     self.sourcedir = os.path.dirname(args[0])
+        # if not os.path.isabs(self.sourcedir):
+        #     self.sourcedir = os.path.realpath(os.path.join(self.working_dir,
+        #                                                    self.sourcedir))
+        # if self.builddir is None:
+        #     if self.target is None:
+        #         build_base = 'build'
+        #     else:
+        #         build_base = 'build_%s' % self.target
+        #     self.builddir = os.path.join(self.sourcedir, build_base)
+        # if not os.path.isabs(self.builddir):
+        #     self.builddir = os.path.realpath(os.path.join(self.working_dir,
+        #                                                   self.builddir))
+        # self.source_files = [self.sourcedir]
+        # kwargs = dict(default_model_dir=self.builddir)
         super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
         self.cmakelists = os.path.join(self.sourcedir, 'CMakeLists.txt')
         self.cmakelists_copy = os.path.join(self.sourcedir, 'CMakeLists_orig.txt')
         self.modified_files.append((self.cmakelists_copy, self.cmakelists))
 
-    def set_target_language(self):
-        r"""Set the language of the target being compiled (usually the same
-        as the language associated with this driver.
-
-        Returns:
-            str: Name of language.
-
-        """
-        source_dir = self.sourcedir
-        if self.target_language is None:
-            try_list = sorted(list(glob.glob(os.path.join(source_dir, '*'))))
-            early_exit = False
-            if self.model_src is not None:
-                try_list = [self.model_src, try_list]
-                early_exit = True
-            languages = copy.deepcopy(self.get_tool_instance('compiler').languages)
-            languages.remove(self.language)
-            try:
-                self.target_language = self.get_language_for_source(
-                    try_list, early_exit=early_exit, languages=languages)
-                self.target_language_driver = components.import_component(
-                    'model', self.target_language)
-            except ValueError:
-                self.target_language_driver = None
-            # Try to compile C as C++
-            # if self.target_language == 'c':
-            #     self.target_language = 'c++'
-        return self.target_language
-    
-    @classmethod
-    def is_source_file(cls, fname):
-        r"""Determine if the provided file name points to a source files for
-        the associated programming language by checking the extension.
-
-        Args:
-            fname (str): Path to file.
-
-        Returns:
-            bool: True if the provided file is a source file, False otherwise.
-
-        """
-        compiler = cls.get_tool('compiler')
-        for lang in compiler.languages:
-            if lang == cls.language:
-                continue
-            drv = components.import_component('model', lang)
-            if drv.is_source_file(fname):
-                return True
-        return False
-        
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
 
@@ -757,9 +714,3 @@ class CMakeModelDriver(CompiledModelDriver):
         if self.target_language == 'c++':
             out = CModelDriver.CModelDriver.update_ld_library_path(out)
         return out
-    
-    def cleanup(self):
-        r"""Remove compiled executable."""
-        if (self.model_file is not None) and os.path.isfile(self.model_file):
-            self.compile_model('clean')
-        super(CMakeModelDriver, self).cleanup()
