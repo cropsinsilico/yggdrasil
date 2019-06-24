@@ -211,11 +211,11 @@ class MakeCompiler(CompilerBase):
             drv = components.import_component('model', language)
         compiler = drv.get_tool('compiler')
         compile_flags = drv.get_compiler_flags(
-            for_model=True, skip_defaults=True,
+            for_model=True, skip_defaults=True, dont_skip_env_defaults=True,
             logging_level=logging_level, dont_link=True)
         linker = drv.get_tool('linker')
         linker_flags = drv.get_linker_flags(
-            for_model=True, skip_defaults=True)
+            for_model=True, skip_defaults=True, dont_skip_env_defaults=True)
         for k in ['env_compiler', 'env_compiler_flags',
                   'env_linker', 'env_linker_flags']:
             kwargs.setdefault(k, cls._schema_properties[k]['default'])

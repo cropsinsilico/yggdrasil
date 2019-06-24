@@ -484,7 +484,8 @@ class CompilationToolBase(object):
 
     @classmethod
     def get_flags(cls, flags=None, outfile=None, output_first=None,
-                  unused_kwargs=None, skip_defaults=False, **kwargs):
+                  unused_kwargs=None, skip_defaults=False,
+                  dont_skip_env_defaults=False, **kwargs):
         r"""Get a list of flags for the tool.
 
         Args:
@@ -503,6 +504,9 @@ class CompilationToolBase(object):
                 ignored.
             skip_defaults (bool, optional): If True, the default flags will
                 not be added. Defaults to False.
+            dont_skip_env_defaults (bool, optional): If skip_defaults is True,
+                and this keyword is True, the flags from the environment
+                variable will be added. Defaults to False.
             **kwargs: Additional keyword arguments are ignored and added to
                 unused_kwargs if provided.
 
@@ -522,12 +526,13 @@ class CompilationToolBase(object):
         if skip_defaults:
             # Include flags set by the environment (this is especially
             # important when using the Conda compilers
-            env = getattr(cls, 'default_flags_env', None)
-            if env is not None:
-                if not isinstance(env, list):
-                    env = [env]
-                for ienv in env:
-                    out += os.environ.get(ienv, '').split()
+            if dont_skip_env_defaults:
+                env = getattr(cls, 'default_flags_env', None)
+                if env is not None:
+                    if not isinstance(env, list):
+                        env = [env]
+                    for ienv in env:
+                        out += os.environ.get(ienv, '').split()
         else:
             new_flags = cls.default_flags + getattr(cls, 'flags', [])
             for x in new_flags:
