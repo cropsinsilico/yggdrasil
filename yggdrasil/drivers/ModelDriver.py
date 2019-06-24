@@ -96,8 +96,6 @@ def remove_products(products, source_products, timer_class=None):
             without checking that they are not source files.
 
     """
-    # print('products', products)
-    # print('source_products', source_products)
     for p in source_products:
         remove_product(p, timer_class=timer_class)
     for p in products:

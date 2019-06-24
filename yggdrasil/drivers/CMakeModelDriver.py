@@ -593,26 +593,15 @@ class CMakeModelDriver(BuildModelDriver):
         else:
             self.builddir_base = 'build_%s' % self.target
         self.buildfile_base = 'CMakeLists.txt'
-        # if self.sourcedir is None:
-        #     self.sourcedir = os.path.dirname(args[0])
-        # if not os.path.isabs(self.sourcedir):
-        #     self.sourcedir = os.path.realpath(os.path.join(self.working_dir,
-        #                                                    self.sourcedir))
-        # if self.builddir is None:
-        #     if self.target is None:
-        #         build_base = 'build'
-        #     else:
-        #         build_base = 'build_%s' % self.target
-        #     self.builddir = os.path.join(self.sourcedir, build_base)
-        # if not os.path.isabs(self.builddir):
-        #     self.builddir = os.path.realpath(os.path.join(self.working_dir,
-        #                                                   self.builddir))
-        # self.source_files = [self.sourcedir]
-        # kwargs = dict(default_model_dir=self.builddir)
         super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
-        self.cmakelists = os.path.join(self.sourcedir, 'CMakeLists.txt')
-        self.cmakelists_copy = os.path.join(self.sourcedir, 'CMakeLists_orig.txt')
-        self.modified_files.append((self.cmakelists_copy, self.cmakelists))
+        self.buildfile_copy = '_orig'.join(os.path.splitext(self.buildfile))
+        # self.cmakelists = os.path.join(self.sourcedir, 'CMakeLists.txt')
+        # print(self.buildfile)
+        # print(self.cmakelists)
+        # assert(self.buildfile == self.cmakelists)
+        self.modified_files.append((self.buildfile_copy, self.buildfile))
+        # self.cmakelists_copy = os.path.join(self.sourcedir, 'CMakeLists_orig.txt')
+        # self.modified_files.append((self.cmakelists_copy, self.cmakelists))
 
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
@@ -639,12 +628,12 @@ class CMakeModelDriver(BuildModelDriver):
         assert(os.path.isfile(include_file))
         out.append(include_file)
         # Create copy of cmakelists and modify
-        if os.path.isfile(self.cmakelists):
-            if not os.path.isfile(self.cmakelists_copy):
-                shutil.copy2(self.cmakelists, self.cmakelists_copy)
-            with open(self.cmakelists, 'rb') as fd:
+        if os.path.isfile(self.buildfile):
+            if not os.path.isfile(self.buildfile_copy):
+                shutil.copy2(self.buildfile, self.buildfile_copy)
+            with open(self.buildfile, 'rb') as fd:
                 contents = fd.read()
-            with open(self.cmakelists, 'wb') as fd:
+            with open(self.buildfile, 'wb') as fd:
                 # Add conda prefix as first line
                 conda_prefix = self.get_tool_instance('compiler').get_conda_prefix()
                 if conda_prefix:
@@ -670,6 +659,31 @@ class CMakeModelDriver(BuildModelDriver):
                     fd.write(newline)
         return out
 
+    def set_target_language(self):
+        r"""Set the language of the target being compiled (usually the same
+        as the language associated with this driver.
+
+        Returns:
+            str: Name of language.
+
+        """
+        if self.target_language is None:
+            if os.path.isfile(self.buildfile):
+                with open(self.buildfile, 'r') as fd:
+                    lines = fd.readlines()
+                for x in lines:
+                    if not x.strip().upper().startswith('ADD_EXECUTABLE'):
+                        continue
+                    varlist = x.split('(', 1)[-1].rsplit(')', 1)[0].split()
+                    if (self.target is None) or (self.target == varlist[0]):
+                        try:
+                            self.target_language = (
+                                self.get_language_for_source(varlist[1:],
+                                                             early_exit=True))
+                        except ValueError:
+                            pass
+        return super(CMakeModelDriver, self).set_target_language()
+        
     def compile_model(self, target=None, **kwargs):
         r"""Compile model executable(s) and appends any products produced by
         the compilation that should be removed after the run is complete.

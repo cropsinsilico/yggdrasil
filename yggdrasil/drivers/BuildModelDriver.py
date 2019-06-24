@@ -127,6 +127,7 @@ class BuildModelDriver(CompiledModelDriver):
         """
         source_dir = self.sourcedir
         if self.target_language is None:
+            # Get file form cmakelists files
             try_list = sorted(list(glob.glob(os.path.join(source_dir, '*'))))
             early_exit = False
             if self.model_src is not None:
@@ -140,8 +141,8 @@ class BuildModelDriver(CompiledModelDriver):
             except ValueError:
                 pass
             # Try to compile C as C++
-            if self.target_language == 'c':
-                self.target_language = 'c++'
+            # if self.target_language == 'c':
+            #     self.target_language = 'c++'
         if (((self.target_language_driver is None)
              and (self.target_language is not None))):
             self.target_language_driver = components.import_component(
