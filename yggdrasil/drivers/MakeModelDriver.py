@@ -212,7 +212,7 @@ class MakeCompiler(CompilerBase):
         compiler = drv.get_tool('compiler')
         compile_flags = drv.get_compiler_flags(
             for_model=True, skip_defaults=True, dont_skip_env_defaults=True,
-            logging_level=logging_level, dont_link=True)
+            logging_level=logging_level)
         linker = drv.get_tool('linker')
         linker_flags = drv.get_linker_flags(
             for_model=True, skip_defaults=True, dont_skip_env_defaults=True)
