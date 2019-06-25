@@ -249,7 +249,7 @@ class NMakeCompiler(MakeCompiler):
 class MakeModelDriver(BuildModelDriver):
     r"""Class for running make file compiled drivers. Before running the
     make command, the necessary compiler & linker flags for the interface's
-    C/C++ library are stored the environment variables YGGCCFLAGS and YGGLDFLAGS
+    C/C++ library are stored the environment variables CFLAGS and LDFLAGS
     respectively. These should be used in the make file to correctly compile
     with the interface's C/C++ libraries.
 

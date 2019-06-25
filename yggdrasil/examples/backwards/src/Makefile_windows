@@ -1,6 +1,7 @@
 IDIR = .
-CC ?= cl.exe
-CFLAGS += /I$(IDIR)
+# CC ?= cl.exe
+# CFLAGS += /I$(IDIR)
+CFLAGS = $(CFLAGS) /I$(IDIR)
 
 SDIR = .
 ODIR = .

@@ -1,7 +1,7 @@
 IDIR = .
 # CC ?= cl.exe
 # LINK ?= link.exe
-CFLAGS = $(CFLAGS) /I$(IDIR)
+CFLAGSZ = $(CFLAGS) /I$(IDIR)
 
 SDIR = .
 ODIR = .
@@ -20,10 +20,10 @@ gcc_model: $(OBJ)
 
 {$(SDIR)}.c{$(ODIR)}.o:
 	@echo $(OBJ)
-	$(CC) /c $< -Fo$@ $(CFLAGS)
+	$(CC) /c $< -Fo$@ $(CFLAGSZ)
 
 {$(SDIR)}.cpp{$(ODIR)}.o:
-	$(CC) /c $< -Fo$@ $(CFLAGS)
+	$(CC) /c $< -Fo$@ $(CFLAGSZ)
 
 ($OBJ) :
 
