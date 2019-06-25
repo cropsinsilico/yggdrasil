@@ -1,9 +1,13 @@
 import numpy as np
 import pandas as pd
+import logging
 from yggdrasil import serialize, backwards
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
 from yggdrasil.drivers.CModelDriver import CModelDriver
+
+
+logger = logging.getLogger(__name__)
 
 
 class RModelDriver(InterpretedModelDriver):  # pragma: R
@@ -170,8 +174,9 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             comm (CommBase): Communication object.
 
         """
-        print('comm_atexit', comm.direction, type(comm.direction),
-              comm.direction == 'recv')
+        logger.info('comm_atexit: %s, %s, %s'
+                    % (comm.direction, type(comm.direction),
+                       comm.direction == 'recv'))
         if comm.direction == 'recv':
             while comm.recv(timeout=0)[0]:
                 comm.sleep()
