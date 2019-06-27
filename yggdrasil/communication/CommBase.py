@@ -796,13 +796,13 @@ class CommBase(tools.YggClass):
 
     def linger(self):
         r"""Wait for messages to drain."""
-        self.debug('')
+        self.info('')
         if self.direction == 'recv':
             self.wait_for_confirm(timeout=self._timeout_drain)
         else:
             self.drain_messages(variable='n_msg_send')
             self.wait_for_confirm(timeout=self._timeout_drain)
-        self.debug("Finished (timeout_drain = %s)", str(self._timeout_drain))
+        self.info("Finished (timeout_drain = %s)", str(self._timeout_drain))
 
     def language_atexit(self):
         r"""Close operations specific to the language."""
@@ -811,12 +811,12 @@ class CommBase(tools.YggClass):
 
     def atexit(self):  # pragma: debug
         r"""Close operations."""
-        self.debug('atexit begins')
+        self.info('atexit begins')
         self.language_atexit()
         self.close()
-        self.debug('atexit finished: closed=%s, n_msg=%d, close_alive=%s',
-                   self.is_closed, self.n_msg,
-                   self._closing_thread.is_alive())
+        self.info('atexit finished: closed=%s, n_msg=%d, close_alive=%s',
+                  self.is_closed, self.n_msg,
+                  self._closing_thread.is_alive())
 
     @property
     def is_open(self):
