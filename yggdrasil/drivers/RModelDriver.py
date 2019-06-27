@@ -29,7 +29,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     default_interpreter = 'Rscript'
     # Dynamically setting the interface library cause circular logic
     interface_library = 'yggdrasil'
-    interface_dependencies = ['reticulate', 'zeallot', 'bit64']
+    interface_dependencies = ['reticulate', 'zeallot', 'bit64', 'R6']
     # interface_library = PythonModelDriver.interface_library
     # The Batch version causes output to saved to a file rather than directed to
     # stdout
