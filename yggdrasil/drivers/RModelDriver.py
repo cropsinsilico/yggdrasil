@@ -174,14 +174,11 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             comm (CommBase): Communication object.
 
         """
-        logger.info('comm_atexit: %s, %s, %s'
-                    % (comm.direction, type(comm.direction),
-                       comm.direction == 'recv'))
         if comm.direction == 'recv':
             while comm.recv(timeout=0)[0]:
                 comm.sleep()
-        else:
-            comm.send_eof()
+        # else:
+        #     comm.send_eof()
         comm.linger_close()
 
     @classmethod

@@ -811,7 +811,7 @@ class CommBase(tools.YggClass):
 
     def atexit(self):  # pragma: debug
         r"""Close operations."""
-        self.info('atexit begins')
+        self.debug('atexit begins')
         self.language_atexit()
         self.close()
         self.debug('atexit finished: closed=%s, n_msg=%d, close_alive=%s',
