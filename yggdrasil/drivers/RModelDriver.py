@@ -177,8 +177,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         if comm.direction == 'recv':
             while comm.recv(timeout=0)[0]:
                 comm.sleep()
-        # else:
-        #     comm.send_eof()
+        else:
+            comm.send_eof()
         comm.linger_close()
 
     @classmethod
