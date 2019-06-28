@@ -182,7 +182,9 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 comm.sleep()
         else:
             comm.send_eof()
+        logger.info("comm_atexit: before linger close")
         comm.linger_close()
+        logger.info("comm_atexit: after linger close")
 
     @classmethod
     def language2python(cls, robj):

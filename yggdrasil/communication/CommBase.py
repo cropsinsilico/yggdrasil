@@ -813,6 +813,7 @@ class CommBase(tools.YggClass):
         r"""Close operations."""
         self.info('atexit begins')
         self.language_atexit()
+        self.info('atexit after language_atexit, but before close')
         self.close()
         self.info('atexit finished: closed=%s, n_msg=%d, close_alive=%s',
                   self.is_closed, self.n_msg,
