@@ -10,6 +10,8 @@ logger.setLevel(level=logging.INFO)
 
 
 name_in_pragmas = 'R'
+lang_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+desc_file = os.path.join(lang_dir, 'R', 'DESCRIPTION')
 
 
 def write_makevars(fname=None):
@@ -176,12 +178,13 @@ def make_call(R_cmd, with_sudo=False, **kwargs):
     return out
 
 
-def requirements_from_description(fname):
+def requirements_from_description(fname=None):
     r"""Read R requirements from the Imports & Depends sections of the package
     description.
 
     Args:
-        fname (str): Full path to the description file.
+        fname (str, optional): Full path to the description file. Defaults to
+            desc_file.
 
     Returns:
         list: List of R requirements from the Imports & Depends sections.
@@ -189,6 +192,9 @@ def requirements_from_description(fname):
     """
     out = []
     in_section = False
+    if fname is None:
+        fname = desc_file
+    assert(os.path.isfile(fname))
     with open(fname, 'r') as fd:
         for x in fd.readlines():
             if x.startswith(('Imports:', 'Depends:')):
@@ -236,7 +242,6 @@ def install(with_sudo=None, skip_requirements=None, update_requirements=None):
     if update_requirements:
         skip_requirements = False
     # Set platform dependent things
-    lang_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if sys.platform in ['win32', 'cygwin']:
         R_exe = 'R.exe'
     else:
@@ -250,9 +255,7 @@ def install(with_sudo=None, skip_requirements=None, update_requirements=None):
     try:
         # Install requirements
         if not skip_requirements:
-            desc_file = os.path.join(lang_dir, 'R', 'DESCRIPTION')
-            assert(os.path.isfile(desc_file))
-            requirements = requirements_from_description(desc_file)
+            requirements = requirements_from_description()
             if not install_packages(requirements, update=update_requirements, **kwargs):
                 restore_makevars(makevars, old_makevars)
                 return False

@@ -5,6 +5,7 @@ from yggdrasil import serialize, backwards
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
 from yggdrasil.drivers.CModelDriver import CModelDriver
+from yggdrasil.languages.R import install
 
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     default_interpreter = 'Rscript'
     # Dynamically setting the interface library cause circular logic
     interface_library = 'yggdrasil'
-    interface_dependencies = ['reticulate', 'zeallot', 'bit64', 'R6']
+    interface_dependencies = install.requirements_from_description()
     # interface_library = PythonModelDriver.interface_library
     # The Batch version causes output to saved to a file rather than directed to
     # stdout
