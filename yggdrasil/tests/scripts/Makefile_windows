@@ -16,7 +16,7 @@ OBJ = $(ODIR)\gcc_model.o $(ODIR)\hellofunc.o
 all: gcc_model
 
 gcc_model: $(OBJ)
-	$(CC) /link /OUT:$@.exe $** $(LIBS)
+	$(CC) /OUT:$@.exe $** /link $(LIBS)
 
 {$(SDIR)}.c{$(ODIR)}.o:
 	@echo $(OBJ)

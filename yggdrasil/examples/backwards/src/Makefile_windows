@@ -12,10 +12,10 @@ LIBS = $(LDFLAGS)
 all: backwards_modelA backwards_modelB
 
 backwards_modelA: $(ODIR)\backwards_modelA.o
-	$(CC) /OUT:$@.exe $** $(LIBS)
+	$(CC) /OUT:$@.exe $** /link $(LIBS)
 
 backwards_modelB: $(ODIR)\backwards_modelB.o
-	$(CC) /OUT:$@.exe $** $(LIBS)
+	$(CC) /OUT:$@.exe $** /link $(LIBS)
 
 {$(SDIR)}.c{$(ODIR)}.o:
 	$(CC) /c $< -Fo$@ $(CFLAGS)
