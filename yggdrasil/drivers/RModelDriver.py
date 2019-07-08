@@ -28,14 +28,15 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     language_ext = '.R'
     base_languages = ['python']
     default_interpreter = 'Rscript'
-    # Dynamically setting the interface library cause circular logic
+    # Dynamically setting the interface library causes circular a import so
+    # it is defined here statically. For dynamic import, use the following:
+    #     interface_library = PythonModelDriver.interface_library
     interface_library = 'yggdrasil'
     interface_dependencies = install.requirements_from_description()
-    # interface_library = PythonModelDriver.interface_library
     # The Batch version causes output to saved to a file rather than directed to
-    # stdout
+    # stdout so use Rscript instead. For the batch version, use the following:
+    #     default_interpreter_flags = ['CMD', 'BATCH' '--vanilla', '--silent']
     default_interpreter_flags = ['--default-packages=methods,utils']
-    # default_interpreter_flags = ['CMD', 'BATCH' '--vanilla', '--silent']
     send_converters = {'table': serialize.consolidate_array}
     type_map = {
         'int': 'integer, bit64::integer64',
@@ -116,26 +117,6 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         kwargs.setdefault('skip_interpreter_flags', True)
         return super(RModelDriver, cls).language_version(**kwargs)
 
-    # @classmethod
-    # def configure(cls, cfg):
-    #     r"""Add configuration options for this language.
-
-    #     Args:
-    #         cfg (CisConfigParser): Config class that options should be set for.
-        
-    #     Returns:
-    #         list: Section, option, description tuples for options that could not
-    #             be set.
-
-    #     """
-    #     out = InterpretedModelDriver.configure.__func__(cls, cfg)
-    #     if cls.is_language_installed() and (not cls.is_interface_installed()):
-    #         args = ['ygginstall', 'R']
-    #         if cls.are_dependencies_installed():
-    #             args.append('--skip-requirements')
-    #         subprocess.check_output(args)
-    #     return out
-        
     def add_debug_flags(self, command):
         r"""Add valgrind flags with the command.
 
@@ -186,6 +167,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         logger.info("comm_atexit: before linger close")
         comm.linger_close()
         logger.info("comm_atexit: after linger close")
+        # comm.backlog_thread.on_main_terminated()
 
     @classmethod
     def language2python(cls, robj):
@@ -198,7 +180,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             object: Python object in a form that is serialization friendly.
 
         """
-        # print("language2python", robj, type(robj))
+        logger.debug("language2python: %s, %s" % (robj, type(robj)))
         if isinstance(robj, tuple):
             return tuple([cls.language2python(x) for x in robj])
         elif isinstance(robj, list):
@@ -206,7 +188,6 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         elif isinstance(robj, dict):
             return {k: cls.language2python(v) for k, v in robj.items()}
         elif isinstance(robj, backwards.string_types):
-            # print("language2python", type(robj), len(robj))
             return backwards.as_bytes(robj)
         return robj
 
@@ -221,7 +202,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             object: Python object in a form that is R friendly.
 
         """
-        # print("python2language", pyobj, type(pyobj))
+        logger.debug("python2language: %s, %s" % (pyobj, type(pyobj)))
         if isinstance(pyobj, tuple):
             return tuple([cls.python2language(x) for x in pyobj])
         elif isinstance(pyobj, list):
@@ -230,12 +211,12 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             return {backwards.as_str(k): cls.python2language(v)
                     for k, v in pyobj.items()}
         elif isinstance(pyobj, backwards.string_types):
-            # print("python2language", type(pyobj), len(pyobj))
             return backwards.as_str(pyobj)
         elif isinstance(pyobj, np.string_):
             return backwards.as_str(pyobj)
         elif isinstance(pyobj, pd.DataFrame):
-            # R dosn't have int64 and will cast as float if passed
+            # R dosn't have int64 and will cast 64bit ints as floats if passed
+            # without casting them to int32 first
             for n in pyobj.columns:
                 if pyobj[n].dtype == np.dtype('int64'):
                     pyobj[n] = pyobj[n].astype('int32')

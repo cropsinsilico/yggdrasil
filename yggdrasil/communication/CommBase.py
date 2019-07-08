@@ -1327,13 +1327,16 @@ class CommBase(tools.YggClass):
             bool: True if EOF message should be sent, False otherwise.
 
         """
-        self.debug('')
+        self.info('')
         msg_s = self.eof_msg
         with self._closing_thread.lock:
+            self.info("inside lock")
             if not self._eof_sent.is_set():
                 self._eof_sent.set()
             else:  # pragma: debug
+                self.info("eof already sent")
                 return False, msg_s
+        self.info("sending eof")
         return True, msg_s
 
     def on_send(self, msg, header_kwargs=None):
@@ -1440,7 +1443,8 @@ class CommBase(tools.YggClass):
         if not flag:
             return flag
         msg_len = len(msg_s)
-        # Sent first part of message
+        # Sent first part of message which includes the header describing the
+        # work comm
         self.special_debug('Sending %d bytes', msg_len)
         if (msg_len < self.maxMsgSize) or (self.maxMsgSize == 0):
             flag = self._safe_send(msg_s, **kwargs)

@@ -190,9 +190,15 @@ install:
         # conda install --file requirements_documentation.txt
       fi
       conda build recipe/meta.yaml --python $CONDA
-      # conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
-      # --use-local not working in conda 4.6.14
-      conda install --use-local yggdrasil
+      # --use-local not working in
+      #  - conda 4.7.5, conda-build 3.17.8, Python 2.7, 3.6, or 3.7
+      conda --version
+      ls ${CONDA_PREFIX}/conda-bld/
+      if [[ "$CONDA" == "3.7" ]]; then
+        conda install -c local yggdrasil
+      else
+        conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
+      fi
       conda list
     fi
 
