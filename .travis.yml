@@ -7,24 +7,13 @@ cache:
 
 addons:
   apt:
-    # sources:
-    #   # - r-packages-trusty
-    #   - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu trusty-cran35/'
-    #     key_url: 'http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0x51716619E084DAB9'
     packages: &native_deps_apt
       - strace
       - valgrind
-      # - gfortran
-      # - libblas-dev
-      # - liblapack-dev
-      # - r-base
-      # - ccache
     update: true
   homebrew: &native_deps_brew
     packages:
       - valgrind
-      # - gcc
-      # - r
     update: true
 
 os:
@@ -55,9 +44,6 @@ env:
 before_install:
   - |
     echo Installing os level packages...;
-    # if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-    #    # export PATH=/usr/local/opt/ccache/libexec:$PATH
-    # else
     if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
        export PATH=/usr/lib/ccache:$PATH
     fi
@@ -87,6 +73,8 @@ before_install:
     if [[ -n "$CONDA" || $INSTALLLPY == '1' ]]; then
       echo Installing Python using conda...;
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi
+      # At one point this saved time when testing in a Python 2.7 conda environment, but
+      # recent version of conda build have issues when the base conda is not Python 3
       # wget https://repo.anaconda.com/miniconda/Miniconda${CONDA:0:1}-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
       wget https://repo.anaconda.com/miniconda/Miniconda3-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
       bash miniconda.sh -b -p $HOME/miniconda
@@ -202,9 +190,9 @@ install:
         # conda install --file requirements_documentation.txt
       fi
       conda build recipe/meta.yaml --python $CONDA
-      conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
+      # conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
       # --use-local not working in conda 4.6.14
-      # conda install --use-local yggdrasil
+      conda install --use-local yggdrasil
       conda list
     fi
 
