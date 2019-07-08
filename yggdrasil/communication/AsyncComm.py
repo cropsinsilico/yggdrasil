@@ -1,6 +1,10 @@
 import uuid
 import threading
+import logging
 from yggdrasil.communication import CommBase
+
+
+logger = logging.getLogger(__name__)
 
 
 class AsyncTryAgain(Exception):
@@ -33,7 +37,7 @@ class AsyncComm(CommBase.CommBase):
         self.dont_backlog = (dont_backlog
                              or (kwargs.get('language', 'False').lower()
                                  in ['matlab', 'r']))
-        self.info("dont_backlog = %s", self.dont_backlog)
+        logger.info("dont_backlog = %s", self.dont_backlog)
         self._backlog_recv = []
         self._backlog_send = []
         self._backlog_thread = None
