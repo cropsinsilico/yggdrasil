@@ -1414,7 +1414,7 @@ class CommBase(tools.YggClass):
             # self.linger_close()
             # self.close_in_thread(no_wait=True)
         elif ret and self._eof_sent.is_set() and self.close_on_eof_send:
-            self.debug('Close on send EOF')
+            self.info('Close on send EOF')
             self.linger_close()
             # self.close_in_thread(no_wait=True, timeout=False)
         return ret

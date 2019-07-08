@@ -12,7 +12,6 @@ _test_package_name = None
 _test_package = None
 logger = logging.getLogger(__name__)
 order = ['pytest', 'nose']
-# order = ['nose', 'pytest']
 try:
     _test_package_name = order[0]
     _test_package = importlib.import_module(_test_package_name)
@@ -108,8 +107,6 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             argv.append(x)
             opt_val -= 1
         elif x.endswith('yggtest'):
-            # if _test_package_name == 'nose':
-            #     argv.append(x)
             pass
         elif x == '--nocover':
             withcoverage = False
@@ -123,8 +120,6 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             test_paths.append(x)
     if _test_package_name == 'nose':
         argv += ['--detailed-errors', '--exe']
-    # elif _test_package_name == 'pytest':
-    #     argv.append('--ignore=yggdrasil/rapidjson/')
     if verbose:
         argv.append('-v')
     if nocapture:
@@ -139,7 +134,8 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             argv.append('--cover-package=yggdrasil')
         elif _test_package_name == 'pytest':
             argv.append('--cov=%s' % package_dir)
-    # Get expanded tests
+    # Get expanded tests to allow for paths that are relative to either the
+    # yggdrasil root directory or the current working directory
     expanded_test_paths = []
     if not test_paths:
         expanded_test_paths.append(package_dir)
@@ -148,11 +144,11 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             if not expand_and_add(x, expanded_test_paths,
                                   [package_dir, os.getcwd()]):
                 expanded_test_paths.append(x)
-    # os.chdir(package_dir)
     if withexamples:
         old_with_examples = os.environ.get('YGG_ENABLE_EXAMPLE_TESTS', None)
         os.environ['YGG_ENABLE_EXAMPLE_TESTS'] = 'True'
     argv += expanded_test_paths
+    # Run test command and perform cleanup before logging any errors
     logger.info("Running %s from %s", argv, os.getcwd())
     try:
         # Set env
@@ -160,14 +156,6 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
         if old_skip_norm is None:
             os.environ['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
         error_code = subprocess.call(argv)
-        # if _test_package_name == 'nose':
-        #     result = _test_package.run(argv=argv)
-        #     if not result:
-        #         error_code = -1
-        # elif _test_package_name == 'pytest':
-        #     error_code = _test_package.main(argv)
-        # else:
-        #     raise RuntimeError("No test runner.")
     except BaseException:
         logger.exception('Error in running test.')
         error_code = -1

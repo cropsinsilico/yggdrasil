@@ -52,6 +52,24 @@ def YggInit(_type, args=None):  # pragma: matlab
     return obj
 
 
+def InterfaceComm(name, comm_class=None, **kwargs):
+    r"""Short hand for initializing a default comm for use as an interface.
+
+    Args:
+        name (str): The name of the message queue.
+        comm_class (CommBase, optional): Communication class that should be
+            used. Defaults to DefaultComm if not provided.
+        **kwargs: Additional keyword arguments are passed to DefaultComm.
+
+    """
+    if comm_class is None:
+        comm_class = DefaultComm
+    kwargs.update(is_interface=True)
+    if 'language' not in kwargs:
+        kwargs['language'] = tools.get_subprocess_language()
+    return comm_class(name, **kwargs)
+
+
 def YggInput(name, format_str=None, **kwargs):
     r"""Get class for handling input from a message queue.
 
@@ -70,11 +88,8 @@ def YggInput(name, format_str=None, **kwargs):
     """
     if format_str is not None:
         kwargs['format_str'] = format_str
-    kwargs.update(direction='recv', is_interface=True, recv_timeout=False)
-    if 'language' not in kwargs:
-        kwargs['language'] = tools.get_subprocess_language()
-    kwargs.update(direction='recv', is_interface=True)
-    return DefaultComm(name, **kwargs)
+    kwargs.update(direction='recv', recv_timeout=False)
+    return InterfaceComm(name, **kwargs)
     
 
 def YggOutput(name, format_str=None, **kwargs):
@@ -95,10 +110,8 @@ def YggOutput(name, format_str=None, **kwargs):
     """
     if format_str is not None:
         kwargs['format_str'] = format_str
-    kwargs.update(direction='send', is_interface=True)
-    if 'language' not in kwargs:
-        kwargs['language'] = tools.get_subprocess_language()
-    return DefaultComm(name, **kwargs)
+    kwargs.update(direction='send')
+    return InterfaceComm(name, **kwargs)
 
     
 def YggRpcServer(name, infmt='%s', outfmt='%s', language=None):
@@ -118,11 +131,11 @@ def YggRpcServer(name, infmt='%s', outfmt='%s', language=None):
     from yggdrasil.communication import ServerComm
     icomm_kwargs = dict(format_str=infmt)
     ocomm_kwargs = dict(format_str=outfmt)
-    if language is None:
-        language = tools.get_subprocess_language()
-    out = ServerComm.ServerComm(name, response_kwargs=ocomm_kwargs,
-                                language=language, is_interface=True,
-                                recv_timeout=False, **icomm_kwargs)
+    if language is not None:
+        icomm_kwargs['language'] = language
+    out = InterfaceComm(name, comm_class=ServerComm.ServerComm,
+                        response_kwargs=ocomm_kwargs,
+                        recv_timeout=False, **icomm_kwargs)
     return out
     
 
@@ -144,11 +157,11 @@ def YggRpcClient(name, outfmt='%s', infmt='%s', language=None):
     from yggdrasil.communication import ClientComm
     icomm_kwargs = dict(format_str=infmt)
     ocomm_kwargs = dict(format_str=outfmt)
-    if language is None:
-        language = tools.get_subprocess_language()
-    out = ClientComm.ClientComm(name, response_kwargs=icomm_kwargs,
-                                language=language, is_interface=True,
-                                recv_timeout=False, **ocomm_kwargs)
+    if language is not None:
+        ocomm_kwargs['language'] = language
+    out = InterfaceComm(name, comm_class=ClientComm.ClientComm,
+                        response_kwargs=icomm_kwargs,
+                        recv_timeout=False, **ocomm_kwargs)
     return out
     
 
@@ -302,8 +315,6 @@ def YggPandasInput(name, **kwargs):
         DefaultComm: Communication object.
         
     """
-    if 'language' not in kwargs:
-        kwargs['language'] = tools.get_subprocess_language()
     kwargs['recv_converter'] = 'pandas'
     return YggInput(name, **kwargs)
 
@@ -319,8 +330,6 @@ def YggPandasOutput(name, **kwargs):
         DefaultComm: Communication object.
         
     """
-    if 'language' not in kwargs:
-        kwargs['language'] = tools.get_subprocess_language()
     kwargs['send_converter'] = 'pandas'
     return YggOutput(name, **kwargs)
 
