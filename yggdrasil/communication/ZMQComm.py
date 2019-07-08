@@ -763,8 +763,9 @@ class ZMQComm(AsyncComm.AsyncComm):
                 comm. Defaults to False.
 
         """
+        self.info("")
         with self.socket_lock:
-            self.debug("self.socket.closed = %s", str(self.socket.closed))
+            self.info("self.socket.closed = %s", str(self.socket.closed))
             if self.socket.closed:
                 self._bound = False
                 self._connected = False
@@ -781,7 +782,9 @@ class ZMQComm(AsyncComm.AsyncComm):
                 # if (self.direction == 'recv') and (self.protocol == 'ipc'):
                 #     if os.path.isfile(self.host):
                 #         os.remove(self.host)
+            self.info("unregistering")
             self.unregister_comm(self.registry_key)
+            self.info("unregistered")
         super(ZMQComm, self)._close_direct(linger=linger)
 
     def _close_backlog(self, wait=False):

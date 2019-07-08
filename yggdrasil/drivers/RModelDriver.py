@@ -164,9 +164,11 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 comm.sleep()
         else:
             comm.send_eof()
-        logger.info("comm_atexit: before linger close")
-        comm.linger_close()
-        logger.info("comm_atexit: after linger close")
+        if not getattr(comm, 'dont_backlog', True):
+            logger.info("comm_atexit: before linger close")
+            comm.linger_close()
+            logger.info("comm_atexit: after linger close")
+        logger.info('comm_atexit finished')
         # comm.backlog_thread.on_main_terminated()
 
     @classmethod
