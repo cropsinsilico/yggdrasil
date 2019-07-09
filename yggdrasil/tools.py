@@ -710,6 +710,16 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         r"""str: Name of the class."""
         return self._ygg_class
 
+    def language_info(self, languages):
+        r"""Only do info debug message if the language is one of those specified."""
+        if not isinstance(languages, (list, tuple)):
+            languages = [languages]
+        languages = [l.lower() for l in languages]
+        if get_subprocess_language().lower() in languages:  # pragma: debug
+            return self.info
+        else:
+            return self.dummy_log
+
     @property
     def interface_info(self):
         r"""Only do info debug message if is interface."""

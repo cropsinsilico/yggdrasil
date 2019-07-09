@@ -742,7 +742,7 @@ class CommBase(tools.YggClass):
                 comm. Defaults to False.
 
         """
-        self.info('')
+        self.language_info('R')('')
         if linger and self.is_open:
             self.linger()
         else:
@@ -754,15 +754,16 @@ class CommBase(tools.YggClass):
             self._n_sent = 0
             self._n_recv = 0
             if self.is_client:
-                self.info("Signing off from server")
+                self.debug("Signing off from server")
                 self.signoff_from_server()
             if len(self._work_comms) > 0:
-                self.info("Cleaning up %d work comms", len(self._work_comms))
+                self.language_info('R')(
+                    "Cleaning up %d work comms", len(self._work_comms))
                 keys = [k for k in self._work_comms.keys()]
                 for c in keys:
                     self.remove_work_comm(c, linger=linger)
-                self.info("Finished cleaning up work comms")
-        self.info("done")
+                self.language_info('R')("Finished cleaning up work comms")
+        self.language_info('R')("done")
 
     def close_in_thread(self, no_wait=False, timeout=None):
         r"""In a new thread, close the comm when it is empty.
@@ -778,7 +779,7 @@ class CommBase(tools.YggClass):
         if self.language_driver.comm_linger:  # pragma: matlab
             self.linger_close()
             self._closing_thread.set_terminated_flag()
-        self.info("current_thread = %s", threading.current_thread().name)
+        self.debug("current_thread = %s", threading.current_thread().name)
         try:
             self._closing_thread.start()
             _started_thread = True
@@ -811,13 +812,14 @@ class CommBase(tools.YggClass):
 
     def atexit(self):  # pragma: debug
         r"""Close operations."""
-        self.debug('atexit begins')
+        self.language_info('R')('atexit begins')
         self.language_atexit()
-        self.debug('atexit after language_atexit, but before close')
+        self.language_info('R')('atexit after language_atexit, but before close')
         self.close()
-        self.info('atexit finished: closed=%s, n_msg=%d, close_alive=%s',
-                  self.is_closed, self.n_msg,
-                  self._closing_thread.is_alive())
+        self.language_info('R')(
+            'atexit finished: closed=%s, n_msg=%d, close_alive=%s',
+            self.is_closed, self.n_msg,
+            self._closing_thread.is_alive())
 
     @property
     def is_open(self):
@@ -1241,16 +1243,17 @@ class CommBase(tools.YggClass):
         if (not self._used) and self._multiple_first_send:
             out = self._send_1st(*args, **kwargs)
         else:
-            self.info('is_closed = %s', self.is_closed)
+            self.language_info('R')('is_closed = %s', self.is_closed)
             with self._closing_thread.lock:
-                self.info("inside safe_send lock, is_closed = %s", self.is_closed)
+                self.language_info('R')(
+                    "inside safe_send lock, is_closed = %s", self.is_closed)
                 if self.is_closed:  # pragma: debug
                     return False
                 out = self._send(*args, **kwargs)
         if out:
             self._n_sent += 1
             self._last_send = backwards.clock_time()
-        self.info("sent")
+        self.language_info('R')("sent")
         return out
     
     def _send_1st(self, *args, **kwargs):
@@ -1330,16 +1333,16 @@ class CommBase(tools.YggClass):
             bool: True if EOF message should be sent, False otherwise.
 
         """
-        self.info('')
+        self.language_info('R')('')
         msg_s = self.eof_msg
         with self._closing_thread.lock:
-            self.info("inside lock")
+            self.language_info('R')("inside lock")
             if not self._eof_sent.is_set():
                 self._eof_sent.set()
             else:  # pragma: debug
-                self.info("eof already sent")
+                self.language_info('R')("eof already sent")
                 return False, msg_s
-        self.info("sending eof")
+        self.language_info('R')("sending eof")
         return True, msg_s
 
     def on_send(self, msg, header_kwargs=None):
@@ -1420,7 +1423,7 @@ class CommBase(tools.YggClass):
             # self.linger_close()
             # self.close_in_thread(no_wait=True)
         elif ret and self._eof_sent.is_set() and self.close_on_eof_send:
-            self.info('Close on send EOF')
+            self.language_info('R')('Close on send EOF')
             self.linger_close()
             # self.close_in_thread(no_wait=True, timeout=False)
         return ret
