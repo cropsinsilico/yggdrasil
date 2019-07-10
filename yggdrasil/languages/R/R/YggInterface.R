@@ -3,6 +3,12 @@ fprintf <- function(...) {
 }
 
 
+finalize_comm <- function(pyobj) {
+  # pyobj$eval_pyobj('atexit', ...)
+  pyobj$atexit()
+}
+
+
 call_python_method <- function(pyobj, method_name, ...) {
   method = reticulate::py_get_attr(pyobj, method_name)
   if (length(list(...)) == 0) {
@@ -20,6 +26,7 @@ YggInterfaceClass <- R6::R6Class("YggInterfaceClass", list(
     pyobj = NULL,
     initialize = function(pyobj) {
     	self$pyobj <- pyobj
+	reg.finalizer(pyobj, finalize_comm, onexit=TRUE)
     },
     eval_pyobj = function(cmd, ...) {
       args <- list(...)
@@ -57,9 +64,9 @@ YggInterfaceClass <- R6::R6Class("YggInterfaceClass", list(
     },
     call = function(...) {
       return(self$eval_pyobj('call', ...))
-    },
-    finalize = function(...) {
-      return(self$eval_pyobj('atexit', ...))
+    # },
+    # finalize = function(...) {
+    #   return(self$eval_pyobj('atexit', ...))
     }
   )
 )
