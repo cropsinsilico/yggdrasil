@@ -1,6 +1,7 @@
 
 
 python2R <- function(pyobj) {
+  # builtins <- reticulate::import_builtins()
   sys <- reticulate::import('sys')
   ver <- reticulate::py_get_attr(sys, 'version_info')
   pyv <- reticulate::py_to_r(reticulate::py_get_attr(ver, 'major'))
@@ -39,10 +40,12 @@ python2R <- function(pyobj) {
   } else if (is(pyobj, "pandas.core.frame.DataFrame")) {
     out <- reticulate::py_to_r(pyobj)
     ncol_data = ncol(out)
+    columns <- reticulate::py_get_attr(pyobj, 'columns')
     for (i in 1:ncol_data) {
-      icol <- call_python_method(call_python_method(pyobj, '__getitem__',
-        call_python_method(reticulate::py_get_attr(pyobj, 'columns'),
-          '__getitem__', i - 1)), 'to_numpy')
+      icol_name <- call_python_method(columns, '__getitem__',
+        R2python(as.integer(i - 1)))
+      icol <- reticulate::py_get_attr(call_python_method(pyobj, '__getitem__',
+        icol_name), 'values')
       out[, i] <- python2R(icol)
     }
   # TODO: There dosn't seem to be variable integer precision in R

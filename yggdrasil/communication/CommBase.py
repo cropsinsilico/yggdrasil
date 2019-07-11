@@ -432,6 +432,11 @@ class CommBase(tools.YggClass):
         else:
             self.open()
 
+    def __del__(self):
+        r"""Perform at exit operations."""
+        if tools.get_subprocess_language().lower() in ['r']:
+            self.language_info('R')('__del__')
+
     def _init_before_open(self, **kwargs):
         r"""Initialization steps that should be performed after base class, but
         before the comm is opened."""

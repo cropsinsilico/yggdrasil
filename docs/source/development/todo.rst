@@ -44,8 +44,7 @@ TODO
 * Streamline normalization to speed it up
 * Add automation of example code generation
 * autodoc for R
-* testing for R
-* installation for R
+* testing for R native functions
 * improve speed of validation
 * Add papers section for listing publication using yggdrasil
 * Split ld off as its own linker
@@ -53,3 +52,4 @@ TODO
 * Change cmake to be a C/C++ compiler rather than a separate language with its own driver
 * Add forwarding of format string to forked output
 * Add contributing guide with reference to ``ygginfo``
+* Run connections on separate processes instead of threads

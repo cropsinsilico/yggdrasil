@@ -104,7 +104,7 @@ class AsyncComm(CommBase.CommBase):
 
     def _close_backlog(self, wait=False):
         r"""Close the backlog thread."""
-        self.debug('')
+        self.language_info('R')('')
         self.backlog_open = False
         self.backlog_thread.set_break_flag()
         self.backlog_send_ready.set()
@@ -120,7 +120,7 @@ class AsyncComm(CommBase.CommBase):
                 comm. Defaults to False.
 
         """
-        self.debug('')
+        self.language_info('R')('')
         self._close_backlog(wait=True)
         self._close_direct()
         super(AsyncComm, self)._close(linger=linger)
