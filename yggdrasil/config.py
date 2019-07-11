@@ -157,8 +157,8 @@ ygg_cfg = YggConfigParser.from_files([def_config_file, usr_config_file,
                                       loc_config_file])
 
 
-def update_language_config(drv, skip_warnings=False, overwrite=False,
-                           verbose=False):
+def update_language_config(drv, skip_warnings=False, disable_languages=None,
+                           overwrite=False, verbose=False):
     r"""Update configuration options for a language driver.
 
     Args:
@@ -166,6 +166,8 @@ def update_language_config(drv, skip_warnings=False, overwrite=False,
             configured.
         skip_warnings (bool, optional): If True, warnings about missing options
             will not be raised. Defaults to False.
+        disable_languages (list, optional): List of languages that should be
+            disabled. Defaults to an empty list.
         overwrite (bool, optional): If True, the existing file will be overwritten.
             Defaults to False.
         verbose (bool, optional): If True, information about the config file
@@ -178,10 +180,14 @@ def update_language_config(drv, skip_warnings=False, overwrite=False,
     miss = []
     if not isinstance(drv, list):
         drv = [drv]
+    if disable_languages is None:
+        disable_languages = []
     if overwrite:  # pragma: no cover
         shutil.copy(def_config_file, usr_config_file)
         ygg_cfg_usr.reload()
     for idrv in drv:
+        if idrv.language in disable_languages:
+            ygg_cfg_usr.set(idrv.language, 'disable', 'True')
         if ygg_cfg_usr.get(idrv.language, 'disable', 'False').lower() == 'true':
             continue  # pragma: no cover
         miss += idrv.configure(ygg_cfg_usr)

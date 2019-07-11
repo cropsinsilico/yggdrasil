@@ -5,6 +5,7 @@ import copy
 import logging
 import traceback
 import subprocess
+import argparse
 
 
 logger = logging.getLogger(__name__)
@@ -211,10 +212,21 @@ def update_config():
     r"""Update the user config file for yggdrasil."""
     from yggdrasil import config, tools
     from yggdrasil.components import import_component
-    overwrite = ('--overwrite' in sys.argv)
-    drv = [import_component('model', l) for l in tools.get_supported_lang()]
-    config.update_language_config(drv, overwrite=overwrite,
-                                  verbose=True)
+    parser = argparse.ArgumentParser(
+        description='Update the user config file.')
+    parser.add_argument('--overwrite', action='store_true',
+                        help='Overwrite the existing file.')
+    parser.add_argument('--languages', nargs='+',
+                        default=tools.get_supported_lang(),
+                        help=('One or more languages that should be'
+                              'configured.'))
+    parser.add_argument('--disable-languages', nargs='+',
+                        default=[], dest='disable_languages',
+                        help='One or more languages that should be disabled')
+    args = parser.parse_args()
+    drv = [import_component('model', l) for l in args.languages]
+    config.update_language_config(drv, overwrite=args.overwrite, verbose=True,
+                                  disable_languages=args.disable_languages)
 
 
 def yggtime_comm():
