@@ -83,3 +83,10 @@ R Errors
     ``conda install r-base``). Another solution is to install the missing shared
     library on your local machine (i.e. outside the conda environment) so that it is
     available when using R.
+- You get a segfault when calling one of the Python object methods.
+  - *Possible Cause:* The Python and R packages are using different C/C++ libraries. 
+    This can result from using conda to manage the Python packages, but using a 
+    version of R and R packages that were installed outside the conda environment
+    using locally installed versions of the libraries. As above, one solution is to
+    use ``conda`` to install R and the R dependencies.
+    
