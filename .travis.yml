@@ -238,6 +238,7 @@ jobs:
         - rabbitmq
     - os: linux
       python: 3.4
+      env: YGG_ENABLE_LONG_TESTS=1
       script: |
               yggtest tests/test_backwards.py
     - os: linux
