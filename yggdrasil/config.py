@@ -26,7 +26,7 @@ loc_config_file = os.path.join(os.getcwd(), config_file)
 if not os.path.isfile(usr_config_file):
     from yggdrasil.languages import install_languages
     shutil.copy(def_config_file, usr_config_file)
-    install_languages.install_all_languages(no_import=True)
+    install_languages.install_all_languages(from_setup=True)
 logger = logging.getLogger(__name__)
 
 

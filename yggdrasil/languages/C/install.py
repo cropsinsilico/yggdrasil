@@ -1,31 +1,48 @@
 import os
-import sys
+import argparse
 ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                          '..', '..', '..'))
+rj_include_dir0 = os.path.join(ROOT_PATH, 'yggdrasil', 'rapidjson', 'include')
 
 
-def install(rj_include_dir=None):
+def update_argparser(parser=None):
+    r"""Update argument parser with language specific arguments.
+
+    Args:
+        parser (argparse.ArgumentParser, optional): Existing argument parser
+            that should be updated. Default to None and a new argument parser
+            will be created.
+
+    Returns:
+        argparse.ArgumentParser: Argument parser with language specific arguments.
+
+    """
+    if parser is None:
+        parser = argparse.ArgumentParser("Run C installation script.")
+    parser.add_argument('--rj-include-dir', '--rapidjson-include-dir',
+                        default=rj_include_dir0,
+                        nargs=1, help='Rapidjson include directory.')
+    return parser
+
+
+def install(args=None, rj_include_dir=None):
     r"""Check that rapidjson is installed.
 
     Args:
+        args (argparse.Namespace, optional): Arguments parsed from the
+            command line. Default to None and is created from sys.argv.
         rj_include_dir (str, optional): Full path to the include directory for
-            the rapidjson header-only package. Defaults to None and sys.argv
-            is checked for '--rj-include-dir=' or '--rapidjson-include-dir='.
+            the rapidjson header-only package. Defaults to None and args
+            is checked for '--rj-include-dir' or '--rapidjson-include-dir'.
 
     Returns:
         bool: True if the installation is valid, False otherwise.
 
     """
+    if args is None:
+        args = update_argparser().parse_args()
     if rj_include_dir is None:
-        rj_include_dir0 = os.path.join(ROOT_PATH, 'yggdrasil', 'rapidjson', 'include')
-        for idx, arg in enumerate(sys.argv[:]):
-            if ((arg.startswith('--rj-include-dir=')
-                 or arg.startswith('--rapidjson-include-dir='))):
-                sys.argv.pop(idx)
-                rj_include_dir = os.path.abspath(arg.split('=', 1)[1])
-                break
-        else:
-            rj_include_dir = rj_include_dir0
+        rj_include_dir = args.rj_include_dir
     if not os.path.isdir(rj_include_dir):
         raise RuntimeError("RapidJSON sources could not be located. If you "
                            "cloned the git repository, initialize the rapidjson "

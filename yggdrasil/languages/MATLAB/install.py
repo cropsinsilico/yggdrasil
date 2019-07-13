@@ -2,25 +2,50 @@ import os
 import sys
 import logging
 import subprocess
+import argparse
 PY_MAJOR_VERSION = sys.version_info[0]
 logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.INFO)
 
 
-def install(as_user=None):
+def update_argparser(parser=None):
+    r"""Update argument parser with language specific arguments.
+
+    Args:
+        parser (argparse.ArgumentParser, optional): Existing argument parser
+            that should be updated. Default to None and a new argument parser
+            will be created.
+
+    Returns:
+        argparse.ArgumentParser: Argument parser with language specific arguments.
+
+    """
+    if parser is None:
+        parser = argparse.ArgumentParser("Run Matlab installation script.")
+    parser.add_argument('--user', action='store_true',
+                        help=('Installation is being carried out in a user '
+                              'directory.'))
+    return parser
+
+
+def install(args=None, as_user=None):
     r"""Attempt to install the MATLAB engine API for Python.
 
     Arguments:
+        args (argparse.Namespace, optional): Arguments parsed from the
+            command line. Default to None and is created from sys.argv.
         as_user (bool, optional): If True, the install will be called with
-            --user for a local install. Defaults to None and sys.argv is
+            --user for a local install. Defaults to None and args is
             checked for the flag '--user' to determine the value.
 
     Returns:
         bool: True if install succeded, False otherwise.
 
     """
+    if args is None:
+        args = update_argparser().parse_args()
     if as_user is None:
-        as_user = ('--user' in sys.argv)
+        as_user = args.user
     # Check to see if its already installed
     try:
         import matlab.engine as mtl_engine

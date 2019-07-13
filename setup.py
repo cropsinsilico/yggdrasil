@@ -27,7 +27,7 @@ logging.critical("In setup.py: %s" % sys.argv)
 # when building a source distribution
 if 'sdist' not in sys.argv:
     # Attempt to install languages
-    installed_languages = install_languages.install_all_languages(no_import=True)
+    installed_languages = install_languages.install_all_languages(from_setup=True)
     # Set coverage options in .coveragerc
     create_coveragerc.create_coveragerc(installed_languages)
 

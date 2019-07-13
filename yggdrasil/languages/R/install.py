@@ -4,6 +4,7 @@ import uuid
 import tempfile
 import subprocess
 import logging
+import argparse
 PY_MAJOR_VERSION = sys.version_info[0]
 logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.INFO)
@@ -12,6 +13,31 @@ logger.setLevel(level=logging.INFO)
 name_in_pragmas = 'R'
 lang_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 desc_file = os.path.join(lang_dir, 'R', 'DESCRIPTION')
+
+
+def update_argparser(parser=None):
+    r"""Update argument parser with language specific arguments.
+
+    Args:
+        parser (argparse.ArgumentParser, optional): Existing argument parser
+            that should be updated. Default to None and a new argument parser
+            will be created.
+
+    Returns:
+        argparse.ArgumentParser: Argument parser with language specific arguments.
+
+    """
+    if parser is None:
+        parser = argparse.ArgumentParser("Run R installation script.")
+    parser.add_argument('--sudoR', action='store_true', dest='sudo',
+                        help='Run R installation steps with sudo.')
+    parser.add_argument('--skip-r-requirements', '--skip_r_requirements',
+                        action='store_true',
+                        help='Don\'t install dependencies.')
+    parser.add_argument('--update-r-requirements', '--update_r_requirements',
+                        action='store_true',
+                        help='Update the requirements.')
+    return parser
 
 
 def write_makevars(fname=None):
@@ -210,17 +236,20 @@ def requirements_from_description(fname=None):
     return out
 
 
-def install(with_sudo=None, skip_requirements=None, update_requirements=None):
+def install(args=None, with_sudo=None, skip_requirements=None,
+            update_requirements=None):
     r"""Attempt to install the R interface.
 
     Args:
+        args (argparse.Namespace, optional): Arguments parsed from the
+            command line. Default to None and is created from sys.argv.
         with_sudo (bool, optional): If True, the R installation script will be
-            called with sudo. Defaults to None and will be set based on sys.argv
+            called with sudo. Defaults to None and will be set based on args
             and environment variable YGG_USE_SUDO_FOR_R. Only valid for unix
             style operating systems.
         skip_requirements (bool, optional): If True, the requirements will not
             be installed. Defaults to None and is set based on if the flag
-            '--skip_requirements' is in sys.argv.
+            '--skip-r-requirements' is in args.
         update_requirements (bool, optional): If True, the requirements will be
             updated. Defaults to False. Setting this to True, sets
             skip_requirements to False.
@@ -230,15 +259,16 @@ def install(with_sudo=None, skip_requirements=None, update_requirements=None):
 
     """
     # Parse input
+    if args is None:
+        args = update_argparser().parse_args()
     if with_sudo is None:
-        with_sudo = (('sudo' in sys.argv) or ('--sudoR' in sys.argv)
-                     or (os.environ.get('YGG_USE_SUDO_FOR_R', '0') == '1'))
+        with_sudo = ((os.environ.get('YGG_USE_SUDO_FOR_R', '0') == '1')
+                     or args.sudo or ('sudo' in sys.argv))
+        # or args.sudoR)
     if skip_requirements is None:
-        skip_requirements = (('--skip_requirements' in sys.argv)
-                             or ('--skip-requirements' in sys.argv))
+        skip_requirements = args.skip_r_requirements
     if update_requirements is None:
-        update_requirements = (('--update_requirements' in sys.argv)
-                               or ('--update-requirements' in sys.argv))
+        update_requirements = args.update_r_requirements
     if update_requirements:
         skip_requirements = False
     # Set platform dependent things

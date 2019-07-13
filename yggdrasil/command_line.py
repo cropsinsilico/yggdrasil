@@ -25,8 +25,16 @@ def ygginfo():
         ('Communication Mechanisms', ', '.join(tools.get_installed_comm())),
         ('Default Comm Mechanism', tools.get_default_comm()),
         ('Config File', config.usr_config_file)]
+    parser = argparse.ArgumentParser(
+        description='Display information about the current yggdrasil installation.')
+    parser.add_argument('--no-languages', action='store_true',
+                        dest='no_languages',
+                        help='Don\'t print information about individual languages.')
+    parser.add_argument('--verbose', action='store_true',
+                        help='Increase the verbosity of the printed information.')
+    args = parser.parse_args()
     # Add language information
-    if '--no-languages' not in sys.argv:
+    if not args.no_languages:
         # Install languages
         vardict.append(('Installed Languages:', ''))
         curr_prefix += prefix
@@ -65,7 +73,7 @@ def ygginfo():
             curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
         curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
     # Add verbose information
-    if '--verbose' in sys.argv:
+    if args.verbose:
         # Conda info
         if os.environ.get('CONDA_PREFIX', ''):
             out = backwards.as_str(subprocess.check_output(['conda', 'info'])).strip()
@@ -120,13 +128,12 @@ def ygginfo():
 def yggrun():
     r"""Start a run."""
     from yggdrasil import runner
+    parser = argparse.ArgumentParser(description='Run an integration.')
+    parser.add_argument('yamlfile', nargs='+',
+                        help='One or more yaml specification files.')
+    args = parser.parse_args()
     prog = sys.argv[0].split(os.path.sep)[-1]
-    # Print help
-    if '-h' in sys.argv:
-        print('Usage: yggrun [YAMLFILE1] [YAMLFILE2]...')
-        return
-    models = sys.argv[1:]
-    yggRunner = runner.get_runner(models, ygg_debug_prefix=prog)
+    yggRunner = runner.get_runner(args.yamlfile, ygg_debug_prefix=prog)
     try:
         yggRunner.run()
         yggRunner.debug("runner returns, exiting")
@@ -139,9 +146,11 @@ def yggrun():
 def yggcc():
     r"""Compile C/C++ program."""
     from yggdrasil.drivers import CModelDriver
-    # prog = sys.argv[0].split(os.path.sep)[-1]
-    src = sys.argv[1:]
-    out = CModelDriver.CModelDriver.call_compile(src)
+    parser = argparse.ArgumentParser(description='Compile a C/C++ program.')
+    parser.add_argument('source', nargs='+',
+                        help='One or more source files.')
+    args = parser.parse_args()
+    out = CModelDriver.CModelDriver.call_compile(args.source)
     print("executable: %s" % out)
 
 
@@ -203,8 +212,12 @@ def regen_schema():
 def validate_yaml():
     r"""Validate a set of or or more YAMLs defining an integration."""
     from yggdrasil import yamlfile
-    files = sys.argv[1:]
-    yamlfile.parse_yaml(files)
+    parser = argparse.ArgumentParser(
+        description='Validate a set of YAML specification files for an integration.')
+    parser.add_argument('yamlfile', nargs='+',
+                        help='One or more YAML specification files.')
+    args = parser.parse_args()
+    yamlfile.parse_yaml(args.yamlfile)
     logger.info("Validation succesful.")
 
 
@@ -273,15 +286,13 @@ def yggtime_paper():
 def ygginstall():
     r"""Call installation script."""
     from yggdrasil.languages import install_languages
-    languages = []
-    for x in sys.argv[1:]:
-        if not x.startswith('-'):
-            languages.append(x)
-    if len(languages) == 0:
-        install_languages.install_all_languages()
+    parser = install_languages.update_argparser()
+    args = parser.parse_args()
+    if len(args.language) == 0:
+        install_languages.install_all_languages(args=args)
     else:
-        for x in languages:
-            install_languages.install_language(x)
+        for x in args.language:
+            install_languages.install_language(x, args=args)
 
 
 if __name__ == '__main__':
