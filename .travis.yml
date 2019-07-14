@@ -184,10 +184,8 @@ install:
       conda install $MATPLOTLIB
       conda install $JSONSCHEMA
       sh conda_install.sh requirements_testing.txt
-      # conda install --file requirements_testing.txt
       if [[ $BUILDDOCS == '1' ]]; then
         sh conda_install.sh requirements_documentation.txt
-        # conda install --file requirements_documentation.txt
       fi
       conda build recipe/meta.yaml --python $CONDA
       # --use-local not working in
