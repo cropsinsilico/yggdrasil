@@ -9,7 +9,8 @@ export YGG_BUILD_VERSION=$(python -c 'import yggdrasil; print(yggdrasil.__versio
 cd ../
 echo "Source version: ${YGG_SOURCE_VERSION}"
 echo "Build  version: ${YGG_BUILD_VERSION}"
-if [[ "$YGG_SOURCE_VERSION" != "$YGG_BUILD_VERSION" ]]; then
+if [ $YGG_SOURCE_VERSION != $YGG_BUILD_VERSION ]
+then
     echo "Versions do not match"
     exit 1
 fi
@@ -17,7 +18,7 @@ fi
 which R
 which Rscript
 flake8 yggdrasil
-if [[ -n "$CONDA" ]]; then
+if [ -n $CONDA ]; then
     python create_coveragerc.py
 fi
 ygginfo --verbose
