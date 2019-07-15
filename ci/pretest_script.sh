@@ -4,9 +4,9 @@ set -e
 
 echo "Checking that source version matches installed version..."
 export YGG_SOURCE_VERSION=$(python -c 'import versioneer; print(versioneer.get_version())')
-cd yggdrasil
-export YGG_BUILD_VERSION=$(python -c 'import yggdrasil; print(yggdrasil.__version__)')
 cd ../
+export YGG_BUILD_VERSION=$(python -c 'import yggdrasil; print(yggdrasil.__version__)')
+cd yggdrasil
 echo "Source version: ${YGG_SOURCE_VERSION}"
 echo "Build  version: ${YGG_BUILD_VERSION}"
 if [ $YGG_SOURCE_VERSION != $YGG_BUILD_VERSION ]
