@@ -201,16 +201,8 @@ install:
     fi
 
 script:
+  - sh ci/pretest_script.sh
   - |
-    which R
-    which Rscript
-  - |
-    flake8 yggdrasil
-  - |
-    if [[ -n "$CONDA" ]]; then
-      python create_coveragerc.py
-    fi
-    ygginfo --verbose
     if [[ $YGG_RUN_EXAMPLES == '1' ]]; then
       yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples
     else

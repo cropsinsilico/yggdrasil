@@ -1,4 +1,4 @@
-pruned=$(python prune_requirements.py $1)
+pruned=$(python prune_requirements.py $@)
 echo $pruned
 conda install --file $pruned
 rm $pruned
