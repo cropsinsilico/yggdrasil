@@ -25,6 +25,8 @@ def prune(fname_in, fname_out=None):
         with open(ifname_in, 'r') as fd:
             old_lines = fd.readlines()
         for line in old_lines:
+            if line.startswith('#'):
+                continue
             try:
                 req = Requirement(line.strip())
                 if req.marker and (not req.marker.evaluate()):
