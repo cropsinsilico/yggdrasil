@@ -432,11 +432,6 @@ class CommBase(tools.YggClass):
         else:
             self.open()
 
-    def __del__(self):
-        r"""Perform at exit operations."""
-        if tools.get_subprocess_language().lower() in ['r']:
-            self.language_info('R')('__del__')
-
     def _init_before_open(self, **kwargs):
         r"""Initialization steps that should be performed after base class, but
         before the comm is opened."""
@@ -747,7 +742,7 @@ class CommBase(tools.YggClass):
                 comm. Defaults to False.
 
         """
-        self.language_info('R')('')
+        self.debug('')
         if linger and self.is_open:
             self.linger()
         else:
@@ -762,13 +757,13 @@ class CommBase(tools.YggClass):
                 self.debug("Signing off from server")
                 self.signoff_from_server()
             if len(self._work_comms) > 0:
-                self.language_info('R')(
+                self.debug(
                     "Cleaning up %d work comms", len(self._work_comms))
                 keys = [k for k in self._work_comms.keys()]
                 for c in keys:
                     self.remove_work_comm(c, linger=linger)
-                self.language_info('R')("Finished cleaning up work comms")
-        self.language_info('R')("done")
+                self.debug("Finished cleaning up work comms")
+        self.debug("done")
 
     def close_in_thread(self, no_wait=False, timeout=None):
         r"""In a new thread, close the comm when it is empty.
@@ -817,11 +812,11 @@ class CommBase(tools.YggClass):
 
     def atexit(self):  # pragma: debug
         r"""Close operations."""
-        self.language_info('R')('atexit begins')
+        self.debug('atexit begins')
         self.language_atexit()
-        self.language_info('R')('atexit after language_atexit, but before close')
+        self.debug('atexit after language_atexit, but before close')
         self.close()
-        self.language_info('R')(
+        self.debug(
             'atexit finished: closed=%s, n_msg=%d, close_alive=%s',
             self.is_closed, self.n_msg,
             self._closing_thread.is_alive())
@@ -1248,9 +1243,9 @@ class CommBase(tools.YggClass):
         if (not self._used) and self._multiple_first_send:
             out = self._send_1st(*args, **kwargs)
         else:
-            self.language_info('R')('is_closed = %s', self.is_closed)
+            self.debug('is_closed = %s', self.is_closed)
             with self._closing_thread.lock:
-                self.language_info('R')(
+                self.debug(
                     "inside safe_send lock, is_closed = %s", self.is_closed)
                 if self.is_closed:  # pragma: debug
                     return False
@@ -1258,7 +1253,6 @@ class CommBase(tools.YggClass):
         if out:
             self._n_sent += 1
             self._last_send = backwards.clock_time()
-        self.language_info('R')("sent")
         return out
     
     def _send_1st(self, *args, **kwargs):
@@ -1338,16 +1332,13 @@ class CommBase(tools.YggClass):
             bool: True if EOF message should be sent, False otherwise.
 
         """
-        self.language_info('R')('')
+        self.debug('')
         msg_s = self.eof_msg
         with self._closing_thread.lock:
-            self.language_info('R')("inside lock")
             if not self._eof_sent.is_set():
                 self._eof_sent.set()
             else:  # pragma: debug
-                self.language_info('R')("eof already sent")
                 return False, msg_s
-        self.language_info('R')("sending eof")
         return True, msg_s
 
     def on_send(self, msg, header_kwargs=None):
@@ -1428,7 +1419,7 @@ class CommBase(tools.YggClass):
             # self.linger_close()
             # self.close_in_thread(no_wait=True)
         elif ret and self._eof_sent.is_set() and self.close_on_eof_send:
-            self.language_info('R')('Close on send EOF')
+            self.debug('Close on send EOF')
             self.linger_close()
             # self.close_in_thread(no_wait=True, timeout=False)
         return ret
