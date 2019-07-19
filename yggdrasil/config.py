@@ -174,7 +174,7 @@ def update_language_config(drv, skip_warnings=False, disable_languages=None,
             will be displayed. Defaults to False.
 
     """
-    if verbose:  # pragma: no cover
+    if verbose:
         logger.info("Updating user configuration file for yggdrasil at:\n\t%s"
                     % usr_config_file)
     miss = []
@@ -182,7 +182,7 @@ def update_language_config(drv, skip_warnings=False, disable_languages=None,
         drv = [drv]
     if disable_languages is None:
         disable_languages = []
-    if overwrite:  # pragma: no cover
+    if overwrite:
         shutil.copy(def_config_file, usr_config_file)
         ygg_cfg_usr.reload()
     for idrv in drv:

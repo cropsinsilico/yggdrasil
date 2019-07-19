@@ -281,7 +281,7 @@ class InterpretedModelDriver(ModelDriver):
         """
         out = super(InterpretedModelDriver, self).set_env()
         path_list = []
-        if self.path_env_variable is not None:
+        if self.path_env_variable is not None:  # pragma: matlab
             prev_path = out.pop(self.path_env_variable, '')
             if prev_path:
                 path_list.append(prev_path)

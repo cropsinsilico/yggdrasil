@@ -1,7 +1,8 @@
 import os
 import tempfile
 from yggdrasil.tests import assert_equal, assert_warns, assert_raises
-from yggdrasil import config, backwards
+from yggdrasil import config, backwards, tools
+from yggdrasil.components import import_component
 
 
 def make_temp(fname_base, count=1):
@@ -44,6 +45,12 @@ def test_YggConfigParser():
     assert_equal(x.get('test_section', 'fake_option', 5), 5)
     assert_equal(x.get('fake_section', 'fake_option'), None)
     assert_equal(x.get('fake_section', 'fake_option', 5), 5)
+
+
+def test_update_language_config():
+    r"""Test updating configuration for installed languages."""
+    drv = [import_component('model', l) for l in tools.get_supported_lang()]
+    config.update_language_config(drv, overwrite=True, verbose=True)
 
 
 def test_locate_file():
