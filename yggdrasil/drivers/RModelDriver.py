@@ -117,21 +117,21 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         kwargs.setdefault('skip_interpreter_flags', True)
         return super(RModelDriver, cls).language_version(**kwargs)
 
-    def add_debug_flags(self, command):
-        r"""Add valgrind flags with the command.
+    # def add_debug_flags(self, command):
+    #     r"""Add valgrind flags with the command.
 
-        Args:
-            command (list): Command that debug commands should be added to.
+    #     Args:
+    #         command (list): Command that debug commands should be added to.
 
-        Returns:
-            list: Command updated with debug commands.
+    #     Returns:
+    #         list: Command updated with debug commands.
 
-        """
-        if self.with_valgrind:
-            interp = 'R'.join(self.get_interpreter().rsplit('Rscript', 1))
-            return [interp, '-d', '"valgrind %s"'
-                    % ' '.join(self.valgrind_flags), '--vanilla', '-f'] + command
-        return super(RModelDriver, self).add_debug_flags(command)
+    #     """
+    #     if self.with_valgrind:
+    #         interp = 'R'.join(self.get_interpreter().rsplit('Rscript', 1))
+    #         return [interp, '-d', '"valgrind %s"'
+    #                 % ' '.join(self.valgrind_flags), '--vanilla', '-f'] + command
+    #     return super(RModelDriver, self).add_debug_flags(command)
         
     def set_env(self):
         r"""Get environment variables that should be set for the model process.
@@ -149,7 +149,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         return out
         
     @classmethod
-    def comm_atexit(cls, comm):
+    def comm_atexit(cls, comm):  # pragma: no cover
         r"""Operations performed on comm at exit including draining receive.
         
         Args:
@@ -172,7 +172,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         # comm.backlog_thread.on_main_terminated()
 
     @classmethod
-    def language2python(cls, robj):
+    def language2python(cls, robj):  # pragma: no cover
         r"""Prepare an R object for serialization in Python.
 
         Args:
@@ -194,7 +194,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         return robj
 
     @classmethod
-    def python2language(cls, pyobj):
+    def python2language(cls, pyobj):  # pragma: no cover
         r"""Prepare a python object for transformation in R.
 
         Args:
