@@ -288,7 +288,7 @@ def ygginstall():
     from yggdrasil.languages import install_languages
     parser = install_languages.update_argparser()
     args = parser.parse_args()
-    if len(args.language) == 0:
+    if (len(args.language) == 0) or ('all' in args.language):
         install_languages.install_all_languages(args=args)
     else:
         for x in args.language:
