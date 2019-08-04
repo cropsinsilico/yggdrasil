@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import logging
+from collections import OrderedDict
 from yggdrasil import serialize, backwards
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
@@ -203,6 +204,9 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             return tuple([cls.python2language(x) for x in pyobj])
         elif isinstance(pyobj, list):
             return [cls.python2language(x) for x in pyobj]
+        elif isinstance(pyobj, OrderedDict):
+            return OrderedDict([(backwards.as_str(k), cls.python2language(v))
+                                for k, v in pyobj.items()])
         elif isinstance(pyobj, dict):
             return {backwards.as_str(k): cls.python2language(v)
                     for k, v in pyobj.items()}
