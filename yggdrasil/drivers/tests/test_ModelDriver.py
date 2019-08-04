@@ -1,6 +1,7 @@
 import os
 import copy
 import unittest
+from yggdrasil import platform
 from yggdrasil.tests import assert_raises, scripts
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_product
 from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
@@ -109,6 +110,30 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         r"""Test language version."""
         assert(self.import_cls.language_version())
 
+    def run_model_instance(self, **kwargs):
+        r"""Create a driver for a model and run it."""
+        inst_kwargs = copy.deepcopy(self.inst_kwargs)
+        inst_kwargs.update(kwargs)
+        drv = self.create_instance(kwargs=inst_kwargs)
+        drv.start()
+        drv.wait(False)
+        assert(not drv.errors)
+
+    def test_run_model(self):
+        r"""Test running script used without debug."""
+        self.run_model_instance()
+
+    @unittest.skipIf(platform._is_win, "No valgrind on windows")
+    def test_valgrind(self):
+        r"""Test running with valgrind."""
+        self.run_model_instance(with_valgrind=True, with_strace=False)
+        
+    @unittest.skipIf(platform._is_win or platform._is_mac,
+                     "No strace on Windows or MacOS")
+    def test_strace(self):
+        r"""Test running with strace."""
+        self.run_model_instance(with_valgrind=False, with_strace=True)
+        
     # Tests for code generation
     def run_generated_code(self, lines):
         r"""Write and run generated code."""

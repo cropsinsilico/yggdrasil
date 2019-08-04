@@ -248,10 +248,13 @@ class ModelDriver(Driver):
         'client_of': {'type': 'array', 'items': {'type': 'string'},
                       'default': []},
         'with_strace': {'type': 'boolean', 'default': False},
-        'strace_flags': {'type': 'array', 'default': [],
+        'strace_flags': {'type': 'array',
+                         'default': ['-e', 'trace=memory'],
                          'items': {'type': 'string'}},
         'with_valgrind': {'type': 'boolean', 'default': False},
-        'valgrind_flags': {'type': 'array', 'default': ['--leak-check=full'],  # '-v'
+        'valgrind_flags': {'type': 'array',
+                           'default': ['--leak-check=full',
+                                       '--show-leak-kinds=all'],  # '-v'
                            'items': {'type': 'string'}}}
     _schema_excluded_from_class = ['name', 'language', 'args',
                                    'inputs', 'outputs', 'working_dir']
@@ -495,7 +498,8 @@ class ModelDriver(Driver):
                                   % cls.language)
 
     @classmethod
-    def run_executable(cls, args, return_process=False, **kwargs):
+    def run_executable(cls, args, return_process=False, debug_flags=None,
+                       **kwargs):
         r"""Run a program using the executable for this language and the
         provided arguments.
 
@@ -506,6 +510,9 @@ class ModelDriver(Driver):
                 returned without checking the process output. If False,
                 communicate is called on the process and the output is parsed
                 for errors. Defaults to False.
+            debug_flags (list, optional): Debug executable and flags that should
+                be prepended to the executable command. Defaults to None and
+                is ignored.
             **kwargs: Additional keyword arguments are passed to
                 cls.executable_command and tools.popen_nobuffer.
 
@@ -523,6 +530,8 @@ class ModelDriver(Driver):
         #                        % cls.language)
         unused_kwargs = {}
         cmd = cls.executable_command(args, unused_kwargs=unused_kwargs, **kwargs)
+        if isinstance(debug_flags, list):
+            cmd = debug_flags + cmd
         try:
             # Add default keyword arguments
             if 'working_dir' in unused_kwargs:
@@ -562,7 +571,7 @@ class ModelDriver(Driver):
         env = self.set_env()
         command = self.model_command()
         if self.with_strace or self.with_valgrind:
-            command = self.add_debug_flags(self.model_command())
+            kwargs.setdefault('debug_flags', self.debug_flags)
         self.debug('Working directory: %s', self.working_dir)
         self.debug('Command: %s', ' '.join(command))
         self.debug('Environment Variables:\n%s', self.pprint(env, block_indent=1))
@@ -577,27 +586,28 @@ class ModelDriver(Driver):
             kwargs.setdefault(k, v)
         return self.run_executable(command, return_process=return_process, **kwargs)
 
-    def add_debug_flags(self, command):
-        r"""Add valgrind flags with the command.
-
-        Args:
-            command (list): Command that debug commands should be added to.
-
-        Returns:
-            list: Command updated with debug commands.
-
-        """
+    @property
+    def debug_flags(self):
+        r"""list: Flags that should be prepended to an executable command to
+        enable debugging."""
         pre_args = []
         if self.with_strace:
             if platform._is_linux:
-                pre_cmd = 'strace'
-            elif platform._is_mac:
-                pre_cmd = 'dtrace'
-            pre_args += [pre_cmd] + self.strace_flags
+                pre_args += ['strace'] + self.strace_flags
+            else:  # pragma: debug
+                raise RuntimeError("strace not supported on this OS.")
+            # TODO: dtruss cannot be run without sudo, sudo cannot be
+            # added to the model process command if it is not in the original
+            # yggdrasil CLI call, and must be tested with an executable that
+            # is not "signed with restricted entitlements" (which most built-in
+            # utilities (e.g. sleep) are).
+            # elif platform._is_mac:
+            #     if 'sudo' in sys.argv:
+            #         pre_args += ['sudo']
+            #     pre_args += ['dtruss']
         elif self.with_valgrind:
             pre_args += ['valgrind'] + self.valgrind_flags
-        command = pre_args + command
-        return command
+        return pre_args
         
     @classmethod
     def language_version(cls, version_flags=None, **kwargs):

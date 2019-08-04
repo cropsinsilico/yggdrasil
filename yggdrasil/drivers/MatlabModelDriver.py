@@ -599,6 +599,9 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 kwargs['for_matlab'] = True
                 out = super(MatlabModelDriver, cls).run_executable(args, **kwargs)
             else:
+                if kwargs.get('debug_flags', None):  # pragma: debug
+                    logger.warn("Debugging via valgrind, strace, etc. disabled "
+                                "for Matlab when using a Matlab shared engine.")
                 assert(kwargs.get('return_process', False))
                 # Add environment variables
                 env = kwargs.get('env', {})

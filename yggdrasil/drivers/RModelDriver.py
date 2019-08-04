@@ -117,21 +117,15 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         kwargs.setdefault('skip_interpreter_flags', True)
         return super(RModelDriver, cls).language_version(**kwargs)
 
-    # def add_debug_flags(self, command):
-    #     r"""Add valgrind flags with the command.
-
-    #     Args:
-    #         command (list): Command that debug commands should be added to.
-
-    #     Returns:
-    #         list: Command updated with debug commands.
-
-    #     """
+    # @property
+    # def debug_flags(self):
+    #     r"""list: Flags that should be prepended to an executable command to
+    #     enable debugging."""
     #     if self.with_valgrind:
     #         interp = 'R'.join(self.get_interpreter().rsplit('Rscript', 1))
     #         return [interp, '-d', '"valgrind %s"'
-    #                 % ' '.join(self.valgrind_flags), '--vanilla', '-f'] + command
-    #     return super(RModelDriver, self).add_debug_flags(command)
+    #                 % ' '.join(self.valgrind_flags), '--vanilla', '-f']
+    #     return super(RModelDriver, self).debug_flags
         
     def set_env(self):
         r"""Get environment variables that should be set for the model process.

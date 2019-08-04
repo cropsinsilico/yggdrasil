@@ -238,19 +238,6 @@ class InterpretedModelDriver(ModelDriver):
                and (not any([cmd.endswith(e) for e in cls.language_ext])))
         return out
 
-    def add_debug_flags(self, command):
-        r"""Add valgrind flags with the command.
-
-        Args:
-            command (list): Command that debug commands should be added to.
-
-        Returns:
-            list: Command updated with debug commands.
-
-        """
-        out = self.executable_command(command)
-        return super(InterpretedModelDriver, self).add_debug_flags(out)
-        
     @classmethod
     def configure(cls, cfg):
         r"""Add configuration options for this language. This includes locating

@@ -69,8 +69,8 @@ definitions:
           - string
       required:
       - datatype
-      - name
       - commtype
+      - name
       title: comm_base
       type: object
     - anyOf:
@@ -489,8 +489,8 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - filetype
+      - working_dir
       - name
       title: file_base
       type: object
@@ -1077,7 +1077,9 @@ definitions:
             file. It can be relative to working_dir or absolute.
           type: string
         strace_flags:
-          default: []
+          default:
+          - -e
+          - trace=memory
           description: Flags to pass to strace (or dtrace). Defaults to [].
           items:
             type: string
@@ -1093,6 +1095,7 @@ definitions:
         valgrind_flags:
           default:
           - --leak-check=full
+          - --show-leak-kinds=all
           description: Flags to pass to valgrind. Defaults to [].
           items:
             type: string
