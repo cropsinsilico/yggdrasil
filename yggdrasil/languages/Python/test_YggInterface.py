@@ -85,9 +85,11 @@ def test_YggInit_variables():
 
 class TestBase(YggTestClassInfo):
     r"""Test class for interface classes."""
+
+    _mod = 'yggdrasil.interface.YggInterface'
+    
     def __init__(self, *args, **kwargs):
         super(TestBase, self).__init__(*args, **kwargs)
-        self._mod = 'yggdrasil.interface.YggInterface'
         self.name = 'test' + self.uuid
         self.language = None
         self.idriver = None
@@ -254,9 +256,11 @@ class TestBase(YggTestClassInfo):
     
 class TestYggInput(TestBase):
     r"""Test basic input to python."""
+
+    _cls = 'YggInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggInput'
         self.direction = 'input'
         if self.__class__ == TestYggInput:
             self.testing_option_kws = {'table_example': True}
@@ -291,9 +295,11 @@ class TestYggInputMatlab(TestYggInput):
 
 class TestYggOutput(TestBase):
     r"""Test basic output to python."""
+
+    _cls = 'YggOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggOutput'
         self.direction = 'output'
         if self.__class__ == TestYggOutput:
             self.testing_option_kws = {'table_example': True}
@@ -336,9 +342,11 @@ class TestYggOutputMatlab(TestYggOutput):
 
 class TestYggRpcClient(TestYggOutput):
     r"""Test client-side RPC communication with Python."""
+
+    _cls = 'YggRpcClient'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggRpcClient, self).__init__(*args, **kwargs)
-        self._cls = 'YggRpcClient'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ServerComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
@@ -375,9 +383,11 @@ class TestYggRpcClientMatlab(TestYggRpcClient):
 
 class TestYggRpcServer(TestYggInput):
     r"""Test server-side RPC communication with Python."""
+
+    _cls = 'YggRpcServer'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggRpcServer, self).__init__(*args, **kwargs)
-        self._cls = 'YggRpcServer'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ClientComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
@@ -415,18 +425,22 @@ class TestYggRpcServerMatlab(TestYggRpcServer):
 # AsciiFile
 class TestYggAsciiFileInput(TestYggInput):
     r"""Test input from an unformatted text file."""
+
+    _cls = 'YggAsciiFileInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiFileInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggAsciiFileInput'
         self.is_file = True
         self.filecomm = 'AsciiFileComm'
 
 
 class TestYggAsciiFileOutput(TestYggOutput):
     r"""Test output to an unformatted text file."""
+
+    _cls = 'YggAsciiFileOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiFileOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggAsciiFileOutput'
         self.is_file = True
         self.filecomm = 'AsciiFileComm'
 
@@ -434,18 +448,22 @@ class TestYggAsciiFileOutput(TestYggOutput):
 # AsciiTable
 class TestYggAsciiTableInput(TestYggAsciiFileInput):
     r"""Test input from an ascii table."""
+
+    _cls = 'YggAsciiTableInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiTableInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggAsciiTableInput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
 
         
 class TestYggAsciiTableOutput(TestYggAsciiFileOutput):
     r"""Test output from an ascii table."""
+
+    _cls = 'YggAsciiTableOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiTableOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggAsciiTableOutput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
         self._inst_args = [self.name, self.fmt_str]
@@ -463,9 +481,11 @@ class TestYggAsciiTableOutputMatlab(TestYggAsciiTableOutput):
 # AsciiTable Array
 class TestYggAsciiArrayInput(TestYggAsciiTableInput):
     r"""Test input from an ASCII table."""
+
+    _cls = 'YggAsciiArrayInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiArrayInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggAsciiArrayInput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
         self.testing_option_kws = {'array_columns': True}
@@ -473,9 +493,11 @@ class TestYggAsciiArrayInput(TestYggAsciiTableInput):
 
 class TestYggAsciiArrayOutput(TestYggAsciiTableOutput):
     r"""Test input from an ASCII table."""
+
+    _cls = 'YggAsciiArrayOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiArrayOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggAsciiArrayOutput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
         self.testing_option_kws = {'array_columns': True}
@@ -484,18 +506,22 @@ class TestYggAsciiArrayOutput(TestYggAsciiTableOutput):
 # Pickle
 class TestYggPickleInput(TestYggInput):
     r"""Test input from a pickle file."""
+
+    _cls = 'YggPickleInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggPickleInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggPickleInput'
         self.is_file = True
         self.filecomm = 'PickleFileComm'
 
 
 class TestYggPickleOutput(TestYggOutput):
     r"""Test output from a pickle."""
+
+    _cls = 'YggPickleOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggPickleOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggPickleOutput'
         self.is_file = True
         self.filecomm = 'PickleFileComm'
 
@@ -503,9 +529,11 @@ class TestYggPickleOutput(TestYggOutput):
 # Pandas
 class TestYggPandasInput(TestYggInput):
     r"""Test input from a pandas file."""
+
+    _cls = 'YggPandasInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggPandasInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggPandasInput'
         self.is_file = True
         self.filecomm = 'PandasFileComm'
         # self.testing_option_kws = {'as_frames': True}
@@ -513,9 +541,11 @@ class TestYggPandasInput(TestYggInput):
 
 class TestYggPandasOutput(TestYggOutput):
     r"""Test output from a pandas."""
+
+    _cls = 'YggPandasOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggPandasOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggPandasOutput'
         self.is_file = True
         self.filecomm = 'PandasFileComm'
         # self.testing_option_kws = {'as_frames': True}
@@ -524,18 +554,22 @@ class TestYggPandasOutput(TestYggOutput):
 # Ply
 class TestYggPlyInput(TestYggInput):
     r"""Test input from a ply file."""
+
+    _cls = 'YggPlyInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggPlyInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggPlyInput'
         self.is_file = True
         self.filecomm = 'PlyFileComm'
 
 
 class TestYggPlyOutput(TestYggOutput):
     r"""Test output from a ply."""
+
+    _cls = 'YggPlyOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggPlyOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggPlyOutput'
         self.is_file = True
         self.filecomm = 'PlyFileComm'
 
@@ -543,17 +577,21 @@ class TestYggPlyOutput(TestYggOutput):
 # Obj
 class TestYggObjInput(TestYggInput):
     r"""Test input from a obj file."""
+
+    _cls = 'YggObjInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggObjInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggObjInput'
         self.is_file = True
         self.filecomm = 'ObjFileComm'
 
 
 class TestYggObjOutput(TestYggOutput):
     r"""Test output from a obj."""
+
+    _cls = 'YggObjOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggObjOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggObjOutput'
         self.is_file = True
         self.filecomm = 'ObjFileComm'
