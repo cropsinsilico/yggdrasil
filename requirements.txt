@@ -5,7 +5,7 @@ numpy>=1.13.0
 pandas<0.21; python_version == '3.4'
 pandas; python_version != '3.4' and python_version > '2.7'
 pandas<=0.22; python_version == '2.7'
-perf
+pyperf
 pint; python_version == '2.7'
 psutil
 pystache
