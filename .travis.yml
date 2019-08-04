@@ -33,6 +33,7 @@ env:
     INSTALLRMQ=0
     INSTALLAPY=0
     INSTALLLPY=0
+    INSTALLR=1
     BUILDDOCS=0
     YGG_RUN_EXAMPLES=0
     YGG_ENABLE_LONG_TESTS=0
@@ -97,16 +98,18 @@ before_install:
     fi
     
     # Install r-base from conda, apt, or homebrew
-    if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
-      if [[ $INSTALLLPY == '1' ]]; then
-        conda install r-base
-      fi
-    elif [[ -n "$YGG_PYTHON" ]]; then
-      export YGG_USE_SUDO_FOR_R=1
-      if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-        sudo apt-get install r-base
-      elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        brew install r
+    if [[ $INSTALLR == '1' ]]; then
+      if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
+        if [[ $INSTALLLPY == '1' ]]; then
+          conda install r-base
+        fi
+      elif [[ -n "$YGG_PYTHON" ]]; then
+        export YGG_USE_SUDO_FOR_R=1
+        if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+          sudo apt-get install r-base
+        elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+          brew install r
+        fi
       fi
     fi
 
@@ -224,7 +227,7 @@ jobs:
     - stage: test
       os: linux
       python: 2.7
-      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 JSONSCHEMA=jsonschema==2.6.0 INSTALLZMQ=0 INSTALLRMQ=1 INSTALLLPY=1
+      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 JSONSCHEMA=jsonschema==2.6.0 INSTALLZMQ=0 INSTALLRMQ=1 INSTALLLPY=1 INSTALLR=0
       services:
         - rabbitmq
     - os: linux
