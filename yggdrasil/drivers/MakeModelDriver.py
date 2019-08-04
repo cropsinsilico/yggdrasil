@@ -231,9 +231,6 @@ class MakeCompiler(CompilerBase):
         else:
             out[kwargs['env_linker']] = backwards.as_str(linker.get_executable())
             out[kwargs['env_linker_flags']] = backwards.as_str(' '.join(linker_flags))
-        # for k in ['env_compiler', 'env_compiler_flags',
-        #           'env_linker', 'env_linker_flags']:
-        #     print(kwargs[k], out[kwargs[k]])
         return out
     
 

@@ -55,6 +55,16 @@ class TestModelParam(parent.TestParam):
         if self.src is not None:
             self.args = copy.deepcopy(self.src)
 
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        out = super(TestModelParam, self).inst_kwargs
+        if self.src is not None:
+            wd = os.path.dirname(self.src[0])
+            if wd:
+                out.setdefault('working_dir', wd)
+        return out
+        
     def tests_on_not_installed(self):
         r"""Tests for when the driver is not installed."""
         if self.import_cls.is_installed():
