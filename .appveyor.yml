@@ -62,7 +62,7 @@ install:
   # - "conda update -q --yes conda"
   - "conda create -q --yes -n test python=%PYTHON_VERSION%"
   - "activate test"
-  - "conda install --yes -c r r-base"
+  - "conda install --yes -c conda-forge r-base"
 
   # Download and install Rtools
   - ps: (new-object net.webclient).DownloadFile(
