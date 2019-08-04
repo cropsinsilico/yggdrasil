@@ -847,6 +847,19 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         out = super(MatlabModelDriver, self).set_env()
         if self.using_matlab_engine:
             out['YGG_MATLAB_ENGINE'] = 'True'
+        # TODO: Move the following to InterpretedModelDriver once another
+        # language sets path_env_variable
+        path_list = []
+        prev_path = out.pop(self.path_env_variable, '')
+        if prev_path:
+            path_list.append(prev_path)
+        if isinstance(self.paths_to_add, list):
+            for x in self.paths_to_add:
+                if x not in prev_path:
+                    path_list.append(x)
+        path_list.append(self.model_dir)
+        if path_list:
+            out[self.path_env_variable] = os.pathsep.join(path_list)
         return out
         
     @classmethod
