@@ -15,10 +15,12 @@ then
     exit 1
 fi
 
-which R
-which Rscript
+if [ -n $INSTALLR ]; then
+    which R
+    which Rscript
+fi
 flake8 yggdrasil
-if [ -n $CONDA ]; then
+if [ -n $YGG_CONDA ]; then
     python create_coveragerc.py
 fi
 ygginfo --verbose
