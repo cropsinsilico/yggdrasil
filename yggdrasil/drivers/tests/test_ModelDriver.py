@@ -126,7 +126,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
     @unittest.skipIf(platform._is_win, "No valgrind on windows")
     def test_valgrind(self):
         r"""Test running with valgrind."""
-        self.run_model_instance(with_valgrind=True, with_strace=False)
+        self.run_model_instance(with_valgrind=True, with_strace=False,
+                                valgrind_flags=['--leak-check=full'])
         
     @unittest.skipIf(platform._is_win or platform._is_mac,
                      "No strace on Windows or MacOS")
