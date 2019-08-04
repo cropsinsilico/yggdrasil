@@ -39,7 +39,7 @@ env:
     YGG_ENABLE_LONG_TESTS=0
   matrix:
     - YGG_ENABLE_LONG_TESTS=1
-    - YGG_RUN_EXAMPLES=1 YGG_CONDA=yes
+    - YGG_RUN_EXAMPLES=1
     - YGG_CONDA=yes
 
 before_install:
