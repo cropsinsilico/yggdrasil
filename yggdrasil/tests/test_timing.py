@@ -59,7 +59,7 @@ class TimedRunTestBase(YggTestClass):
     platform = None
     python_ver = None
     comm_type = None
-    dont_use_perf = False
+    dont_use_pyperf = False
     language = _test_lang
     count = 1
     size = 1
@@ -76,7 +76,7 @@ class TimedRunTestBase(YggTestClass):
         r"""dict: Keyword arguments for creating a class instance."""
         return {'test_name': self.test_name, 'filename': self._filename,
                 'platform': self.platform, 'python_ver': self.python_ver,
-                'comm_type': self.comm_type, 'dont_use_perf': self.dont_use_perf,
+                'comm_type': self.comm_type, 'dont_use_pyperf': self.dont_use_pyperf,
                 'max_errors': self.max_errors}
 
     @property
@@ -140,7 +140,7 @@ class TestTimedRun(TimedRunTestBase):
         return self.instance.base_msg_size
 
     def test_json(self):
-        r"""Test loading/saving perf data as json."""
+        r"""Test loading/saving pyperf data as json."""
         self.check_filename()
         old_text = self.get_raw_data()
         x = self.instance.load(as_json=True)
@@ -219,10 +219,10 @@ class TestTimedRun(TimedRunTestBase):
                       [self.size], self.count, nrep=self.nrep,
                       time_method='invalid')
 
-    def test_perfjson_to_pandas(self):
-        r"""Test perfjson_to_pandas."""
+    def test_pyperfjson_to_pandas(self):
+        r"""Test pyperfjson_to_pandas."""
         self.check_filename()
-        timing.perfjson_to_pandas(self.filename)
+        timing.pyperfjson_to_pandas(self.filename)
 
     def test_fits(self):
         r"""Test fits to scaling on one platform."""
@@ -285,8 +285,8 @@ class TestTimedRunTemp(TimedRunTestBase):
         r"""Remove the temporary file if it exists."""
         if os.path.isfile(self.instance.filename):
             os.remove(self.instance.filename)
-        if os.path.isfile(self.instance.perfscript):  # pragma: debug
-            os.remove(self.instance.perfscript)
+        if os.path.isfile(self.instance.pyperfscript):  # pragma: debug
+            os.remove(self.instance.pyperfscript)
 
     def setup(self, *args, **kwargs):
         r"""Cleanup the file if it exists and then reload."""
@@ -306,9 +306,9 @@ class TestTimedRunTemp(TimedRunTestBase):
         out['overwrite'] = True
         return out
 
-    def test_perf_func(self):
-        r"""Test perf_func."""
-        timing.perf_func(1, self.instance, self.count, self.size, 0)
+    def test_pyperf_func(self):
+        r"""Test pyperf_func."""
+        timing.pyperf_func(1, self.instance, self.count, self.size, 0)
 
     def test_run_overwrite(self):
         r"""Test performing a run twice, the second time with ovewrite."""
@@ -321,19 +321,19 @@ class TestTimedRunTemp(TimedRunTestBase):
 
 
 @long_running
-class TestTimedRunTempNoPerf(TestTimedRunTemp):
-    r"""Test class for the TimedRun class using temporary data without perf."""
+class TestTimedRunTempNoPyperf(TestTimedRunTemp):
+    r"""Test class for the TimedRun class using temporary data without pyperf."""
 
     _filename = None  # This forces use of standard name with .dat extension
-    dont_use_perf = True
+    dont_use_pyperf = True
 
     @property
     def description_prefix(self):
         r"""String prefix to prepend docstr test message with."""
-        out = super(TestTimedRunTempNoPerf, self).description_prefix
-        out += ' (w/o perf)'
+        out = super(TestTimedRunTempNoPyperf, self).description_prefix
+        out += ' (w/o pyperf)'
         return out
 
-    def test_perf_func(self):
-        r"""Disabled: Test perf_func."""
+    def test_pyperf_func(self):
+        r"""Disabled: Test pyperf_func."""
         pass
