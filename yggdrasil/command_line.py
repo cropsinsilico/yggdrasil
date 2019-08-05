@@ -109,9 +109,19 @@ def ygginfo():
                             % (curr_prefix + prefix,
                                ("\n" + curr_prefix + prefix).join(
                                    out.splitlines(False)))))
+            # Reticulate conda_list
+            out = Rdrv.run_executable(
+                ["-e", ("library(reticulate); "
+                        "reticulate::conda_list()")]).strip()
+            vardict.append((curr_prefix + "R reticulate::conda_list():", "\n%s%s"
+                            % (curr_prefix + prefix,
+                               ("\n" + curr_prefix + prefix).join(
+                                   out.splitlines(False)))))
             # Reticulate py_config
-            out = Rdrv.run_executable(["-e", ("library(reticulate); "
-                                              "reticulate::py_config()")]).strip()
+            out = Rdrv.run_executable(
+                ["-e", ("library(reticulate); "
+                        "reticulate::use_condaenv(Sys.getenv(\"CONDA_DEFAULT_ENV\")); "
+                        "reticulate::py_config()")]).strip()
             vardict.append((curr_prefix + "R reticulate::py_config():", "\n%s%s"
                             % (curr_prefix + prefix,
                                ("\n" + curr_prefix + prefix).join(
