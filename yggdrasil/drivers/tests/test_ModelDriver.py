@@ -136,8 +136,16 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
     @unittest.skipIf(platform._is_win, "No valgrind on windows")
     def test_valgrind(self):
         r"""Test running with valgrind."""
-        self.run_model_instance(with_valgrind=True, with_strace=False,
-                                valgrind_flags=['--leak-check=full'])
+        valgrind_log = os.path.join(
+            self.working_dir,
+            'valgrind_log_%s.log' % self.uuid.replace('-', '_'))
+        try:
+            self.run_model_instance(with_valgrind=True, with_strace=False,
+                                    valgrind_flags=['--leak-check=full',
+                                                    '--log-file=%s' % valgrind_log])
+        finally:
+            if os.path.isfile(valgrind_log):
+                os.remove(valgrind_log)
         
     @unittest.skipIf(platform._is_win or platform._is_mac,
                      "No strace on Windows or MacOS")
