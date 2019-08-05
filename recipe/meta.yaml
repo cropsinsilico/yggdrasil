@@ -30,7 +30,7 @@ requirements:
     - matplotlib
     - numpy
     - pandas
-    - perf
+    - pyperf
     - pint  # [py2k]
     - psutil
     - pystache
