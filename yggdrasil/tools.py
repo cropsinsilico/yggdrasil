@@ -94,6 +94,34 @@ def check_environ_bool(name, valid_values=['true', '1', True, 1]):
     return (os.environ.get(name, '').lower() in valid_values)
 
 
+def get_conda_prefix():
+    r"""Determine the conda path prefix for the current environment.
+
+    Returns:
+        str: Full path to the directory prefix used for the current conda
+            environment if one exits. If conda cannot be located, None is
+            returned.
+
+    """
+    conda_prefix = os.environ.get('CONDA_PREFIX', None)
+    if not conda_prefix:
+        conda_prefix = which('conda')
+        if conda_prefix is not None:
+            conda_prefix = os.path.dirname(os.path.dirname(conda_prefix))
+    return conda_prefix
+
+
+def get_conda_env():
+    r"""Determine the name of the current conda environment.
+
+    Returns:
+        str: Name of the current conda environment if one is activated. If a
+            conda environment is not activated, None is returned.
+
+    """
+    return os.environ.get('CONDA_DEFAULT_ENV', None)
+
+
 def get_subprocess_language():
     r"""Determine the language of the calling process.
 

@@ -575,12 +575,7 @@ class CompilationToolBase(object):
                 installed.
 
         """
-        conda_prefix = os.environ.get('CONDA_PREFIX', '')
-        if not conda_prefix:
-            conda_prefix = tools.which('conda')
-            if conda_prefix is not None:
-                conda_prefix = os.path.dirname(os.path.dirname(conda_prefix))
-        return conda_prefix
+        return tools.get_conda_prefix()
             
     @classmethod
     def get_search_path(cls, conda_only=False):
