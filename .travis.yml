@@ -184,9 +184,7 @@ install:
       # Install from source
       # pip install --verbose -e .
     elif [[ -n "$YGG_CONDA" ]]; then
-      conda install $NUMPY
-      conda install $MATPLOTLIB
-      conda install $JSONSCHEMA
+      conda install $NUMPY $MATPLOTLIB $JSONSCHEMA
       sh conda_install.sh requirements_testing.txt
       if [[ $BUILDDOCS == '1' ]]; then
         sh conda_install.sh requirements_documentation.txt
@@ -197,7 +195,8 @@ install:
       conda --version
       ls ${CONDA_PREFIX}/conda-bld/
       if [[ "$YGG_CONDA" == "3.7" ]]; then
-        conda install -c local yggdrasil
+        conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
+        # conda install -c local yggdrasil
       else
         conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
       fi
@@ -205,7 +204,7 @@ install:
     fi
 
 script:
-  - sh ci/pretest_script.sh
+  - sh ci/pretest_script.sh || travis_terminate 1;
   - |
     if [[ $YGG_RUN_EXAMPLES == '1' ]]; then
       yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples
