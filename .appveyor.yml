@@ -22,6 +22,7 @@ environment:
     INSTALLZMQ: 1
     INSTALLRMQ: 0
     APPVEYOR_SAVE_CACHE_ON_ERROR: true
+    YGG_RUN_EXAMPLES: 0
 
   erlang_download_url: "http://erlang.org/download/otp_win64_20.2.exe"
   erlang_exe_path: "C:\\Users\\appveyor\\erlang.exe"
@@ -37,11 +38,12 @@ environment:
     - platform: x64
       PYTHON_VERSION: "2.7"
       YGG_ENABLE_LONG_TESTS: 1
-      YGG_SKIP_EXTRA_EXAMPLES: 1
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_ENABLE_LONG_TESTS: 1
-      YGG_SKIP_EXTRA_EXAMPLES: 1
+    - platform: x64
+      PYTHON_VERSION: "3.6"
+      YGG_RUN_EXAMPLES: 1
 
 install:
   - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
@@ -126,7 +128,8 @@ before_test:
   - "flake8 yggdrasil"
 
 test_script:
-  - "yggtest --with-examples"
+  - "if %YGG_RUN_EXAMPLES% == 0 yggtest"
+  - "if %YGG_RUN_EXAMPLES% == 1 yggtest --with-examples"
 
 after_test:
   - "codecov"
