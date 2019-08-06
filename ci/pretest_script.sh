@@ -22,4 +22,8 @@ flake8 yggdrasil
 if [ -n $YGG_CONDA ]; then
     python create_coveragerc.py
 fi
+if [ ! -f ".coveragerc" ]; then
+    echo ".coveragerc file dosn't exist."
+    exit 1
+fi
 ygginfo --verbose
