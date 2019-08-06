@@ -147,7 +147,7 @@ before_install:
           if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
              brew install rabbitmq
           else
-             sudo apt-get install rabbitmq
+             sudo apt-get install rabbitmq-server
           fi
           echo Starting RabbitMQ...;
           export PATH="${PATH}:/usr/local/sbin";
