@@ -15,7 +15,7 @@ then
     exit 1
 fi
 
-if [ "$INSTALLR" == "1" ]; then
+if [ "$INSTALLR" = "1" ]; then
     which R
     which Rscript
 fi
