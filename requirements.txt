@@ -3,10 +3,10 @@ matplotlib<3.0; python_version < '3.5'
 matplotlib; python_version >= '3.5'
 numpy>=1.13.0
 pandas<0.21; python_version == '3.4'
-pandas; python_version != '3.4' and python_version > '2.7'
-pandas<=0.22; python_version == '2.7'
+pandas; python_version > '3.4'
+pandas<=0.22; python_version < '3.4'
 pyperf
-pint; python_version == '2.7'
+pint; python_version < '3.4'
 psutil
 pystache
 python-rapidjson; python_version >= '3.4'
