@@ -230,8 +230,6 @@ def requirements_from_description(fname=None):
                     out.append(x.strip().strip(','))
                 else:
                     in_section = False
-    if (sys.platform in ['win32', 'cygwin']) and ('rtools' not in out):
-        out.append('rtools')
     out = list(set(out))
     return out
 
