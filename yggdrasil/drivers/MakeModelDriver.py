@@ -94,6 +94,8 @@ class MakeCompiler(CompilerBase):
         """
         out = cls.call(cls.version_flags, skip_flags=True,
                        allow_error=True, **kwargs)
+        print('Make version output from: %s' % cls.version_flags)
+        print(out)
         if 'Copyright' not in out:  # pragma: debug
             raise RuntimeError("Version call failed: %s" % out)
         return (out.split('Copyright')[0]).splitlines()[0].strip()
