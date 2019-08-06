@@ -22,7 +22,6 @@ def conda_env_exists(name):
         if x.startswith('#') or (not x):
             continue
         envs.append(x.split()[0])
-    print(envs)
     return (name in envs)
 
 
@@ -69,6 +68,9 @@ def create_devenv(env_type, python='3.6', **kwargs):
     req_suffixes = ['', '_testing']
     if env_type == 'conda':
         req_suffixes.append('_condaonly')
+    elif env_type == 'pip':
+        print(subprocess.check_output(['conda', 'install', '-y', '--name', name,
+                                       'czmq', 'zeromq']).decode("utf-8"))
     req = [os.path.join(_pkg_dir, 'requirements%s.txt' % x)
            for x in req_suffixes]
     args = ([python_cmd, os.path.join(_utils_dir,

@@ -242,6 +242,8 @@ def update_config():
     from yggdrasil.components import import_component
     parser = argparse.ArgumentParser(
         description='Update the user config file.')
+    parser.add_argument('--show-file', action='store_true',
+                        help='Print the path to the config file without updating it.')
     parser.add_argument('--overwrite', action='store_true',
                         help='Overwrite the existing file.')
     parser.add_argument('--languages', nargs='+',
@@ -252,6 +254,9 @@ def update_config():
                         default=[], dest='disable_languages',
                         help='One or more languages that should be disabled')
     args = parser.parse_args()
+    if args.show_file:
+        print('Config file located here: %s' % config.usr_config_file)
+        return
     drv = [import_component('model', l) for l in args.languages]
     config.update_language_config(drv, overwrite=args.overwrite, verbose=True,
                                   disable_languages=args.disable_languages)
