@@ -213,8 +213,8 @@ install:
       else
         conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
       fi
-      conda list
     fi
+    conda list
 
 script:
   - sh ci/pretest_script.sh || travis_terminate 1;
