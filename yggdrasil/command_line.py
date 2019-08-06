@@ -90,6 +90,8 @@ def ygginfo():
             # R and reticulate info
             Rdrv = import_component("model", "R")
             if Rdrv.is_installed():
+                env_reticulate = copy.deepcopy(os.environ)
+                env_reticulate['RETICULATE_PYTHON'] = sys.executable
                 # Stack size
                 out = Rdrv.run_executable(["-e", "Cstack_info()"]).strip()
                 vardict.append((curr_prefix + "R Cstack_info:", "\n%s%s"
@@ -117,7 +119,8 @@ def ygginfo():
                 if os.environ.get('CONDA_PREFIX', ''):
                     out = Rdrv.run_executable(
                         ["-e", ("library(reticulate); "
-                                "reticulate::conda_list()")]).strip()
+                                "reticulate::conda_list()")],
+                        env=env_reticulate).strip()
                     vardict.append((curr_prefix + "R reticulate::conda_list():",
                                     "\n%s%s" % (curr_prefix + prefix,
                                                 ("\n" + curr_prefix + prefix).join(
@@ -131,7 +134,8 @@ def ygginfo():
                 else:
                     iargs = ("library(reticulate); "
                              "reticulate::py_config()")
-                out = Rdrv.run_executable(["-e", iargs]).strip()
+                out = Rdrv.run_executable(["-e", iargs],
+                                          env=env_reticulate).strip()
                 vardict.append((curr_prefix + "R reticulate::py_config():",
                                 "\n%s%s" % (curr_prefix + prefix,
                                             ("\n" + curr_prefix + prefix).join(
