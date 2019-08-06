@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def ygginfo():
     r"""Print information about yggdrasil installation."""
-    from yggdrasil import __version__, tools, config, backwards
+    from yggdrasil import __version__, tools, config, backwards, platform
     from yggdrasil.components import import_component
     lang_list = tools.get_installed_lang()
     prefix = '    '
@@ -125,16 +125,20 @@ def ygginfo():
                                     "\n%s%s" % (curr_prefix + prefix,
                                                 ("\n" + curr_prefix + prefix).join(
                                                     out.splitlines(False)))))
+                # Windows python versions
+                if platform._is_win:  # pragma: windows
+                    out = Rdrv.run_executable(
+                        ["-e", ("library(reticulate); "
+                                "reticulate::py_versions_windows()")],
+                        env=env_reticulate).strip()
+                    vardict.append((curr_prefix
+                                    + "R reticulate::py_versions_windows():",
+                                    "\n%s%s" % (curr_prefix + prefix,
+                                                ("\n" + curr_prefix + prefix).join(
+                                                    out.splitlines(False)))))
                 # Reticulate py_config
-                if os.environ.get('CONDA_PREFIX', ''):
-                    iargs = ("library(reticulate); "
-                             "reticulate::use_condaenv("
-                             "Sys.getenv(\"CONDA_DEFAULT_ENV\")); "
-                             "reticulate::py_config()")
-                else:
-                    iargs = ("library(reticulate); "
-                             "reticulate::py_config()")
-                out = Rdrv.run_executable(["-e", iargs],
+                out = Rdrv.run_executable(["-e", ("library(reticulate); "
+                                                  "reticulate::py_config()")],
                                           env=env_reticulate).strip()
                 vardict.append((curr_prefix + "R reticulate::py_config():",
                                 "\n%s%s" % (curr_prefix + prefix,
