@@ -33,111 +33,117 @@ def ygginfo():
     parser.add_argument('--verbose', action='store_true',
                         help='Increase the verbosity of the printed information.')
     args = parser.parse_args()
-    # Add language information
-    if not args.no_languages:
-        # Install languages
-        vardict.append(('Installed Languages:', ''))
-        curr_prefix += prefix
-        for lang in sorted(lang_list):
-            drv = import_component('model', lang)
-            vardict.append((curr_prefix + '%s:' % lang.upper(), ''))
+    try:
+        # Add language information
+        if not args.no_languages:
+            # Install languages
+            vardict.append(('Installed Languages:', ''))
             curr_prefix += prefix
-            if lang == 'executable':
-                vardict.append((curr_prefix + 'Location', ''))
-            else:
-                exec_name = drv.language_executable()
-                if not os.path.isabs(exec_name):
-                    exec_name = tools.which(exec_name)
-                vardict.append((curr_prefix + 'Location', exec_name))
-            vardict.append((curr_prefix + 'Version', drv.language_version()))
+            for lang in sorted(lang_list):
+                drv = import_component('model', lang)
+                vardict.append((curr_prefix + '%s:' % lang.upper(), ''))
+                curr_prefix += prefix
+                if lang == 'executable':
+                    vardict.append((curr_prefix + 'Location', ''))
+                else:
+                    exec_name = drv.language_executable()
+                    if not os.path.isabs(exec_name):
+                        exec_name = tools.which(exec_name)
+                    vardict.append((curr_prefix + 'Location', exec_name))
+                vardict.append((curr_prefix + 'Version',
+                                drv.language_version()))
+                curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
-        curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
-        # Not installed languages
-        vardict.append(("Languages Not Installed:", ''))
-        curr_prefix += prefix
-        for lang in tools.get_supported_lang():
-            if lang in lang_list:
-                continue
-            drv = import_component('model', lang)
-            vardict.append((curr_prefix + '%s:' % lang.upper(), ''))
+            # Not installed languages
+            vardict.append(("Languages Not Installed:", ''))
             curr_prefix += prefix
-            vardict.append((curr_prefix + "Language Installed",
-                            drv.is_language_installed()))
-            vardict.append((curr_prefix + "Dependencies Installed",
-                            drv.are_dependencies_installed()))
-            vardict.append((curr_prefix + "Interface Installed",
-                            drv.is_interface_installed()))
-            vardict.append((curr_prefix + "Comm Installed",
-                            drv.is_comm_installed()))
-            vardict.append((curr_prefix + "Configured", drv.is_configured()))
+            for lang in tools.get_supported_lang():
+                if lang in lang_list:
+                    continue
+                drv = import_component('model', lang)
+                vardict.append((curr_prefix + '%s:' % lang.upper(), ''))
+                curr_prefix += prefix
+                vardict.append((curr_prefix + "Language Installed",
+                                drv.is_language_installed()))
+                vardict.append((curr_prefix + "Dependencies Installed",
+                                drv.are_dependencies_installed()))
+                vardict.append((curr_prefix + "Interface Installed",
+                                drv.is_interface_installed()))
+                vardict.append((curr_prefix + "Comm Installed",
+                                drv.is_comm_installed()))
+                vardict.append((curr_prefix + "Configured",
+                                drv.is_configured()))
+                curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
-        curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
-    # Add verbose information
-    if args.verbose:
-        # Conda info
-        if os.environ.get('CONDA_PREFIX', ''):
-            out = backwards.as_str(subprocess.check_output(['conda', 'info'])).strip()
-            curr_prefix += prefix
-            vardict.append((curr_prefix + 'Conda Info:', "\n%s%s"
-                            % (curr_prefix + prefix,
-                               ("\n" + curr_prefix + prefix).join(
-                                   out.splitlines(False)))))
-            curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
-        # R and reticulate info
-        Rdrv = import_component("model", "R")
-        if Rdrv.is_installed():
-            # Stack size
-            out = Rdrv.run_executable(["-e", "Cstack_info()"]).strip()
-            vardict.append((curr_prefix + "R Cstack_info:", "\n%s%s"
-                            % (curr_prefix + prefix,
-                               ("\n" + curr_prefix + prefix).join(
-                                   out.splitlines(False)))))
-            # Compilation tools
-            interp = 'R'.join(Rdrv.get_interpreter().rsplit('Rscript', 1))
-            vardict.append((curr_prefix + "R C Compiler:", ""))
-            curr_prefix += prefix
-            for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS']:
-                out = backwards.as_str(subprocess.check_output([interp, 'CMD',
-                                                                'config', x])).strip()
-                vardict.append((curr_prefix + x, "%s"
-                                % ("\n" + curr_prefix + prefix).join(
-                                    out.splitlines(False))))
-            curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
-            # Session info
-            out = Rdrv.run_executable(["-e", "sessionInfo()"]).strip()
-            vardict.append((curr_prefix + "R sessionInfo:", "\n%s%s"
-                            % (curr_prefix + prefix,
-                               ("\n" + curr_prefix + prefix).join(
-                                   out.splitlines(False)))))
-            # Reticulate conda_list
+        # Add verbose information
+        if args.verbose:
+            # Conda info
             if os.environ.get('CONDA_PREFIX', ''):
-                out = Rdrv.run_executable(
-                    ["-e", ("library(reticulate); "
-                            "reticulate::conda_list()")]).strip()
-                vardict.append((curr_prefix + "R reticulate::conda_list():",
+                out = backwards.as_str(subprocess.check_output(
+                    ['conda', 'info'])).strip()
+                curr_prefix += prefix
+                vardict.append((curr_prefix + 'Conda Info:', "\n%s%s"
+                                % (curr_prefix + prefix,
+                                   ("\n" + curr_prefix + prefix).join(
+                                       out.splitlines(False)))))
+                curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+            # R and reticulate info
+            Rdrv = import_component("model", "R")
+            if Rdrv.is_installed():
+                # Stack size
+                out = Rdrv.run_executable(["-e", "Cstack_info()"]).strip()
+                vardict.append((curr_prefix + "R Cstack_info:", "\n%s%s"
+                                % (curr_prefix + prefix,
+                                   ("\n" + curr_prefix + prefix).join(
+                                       out.splitlines(False)))))
+                # Compilation tools
+                interp = 'R'.join(Rdrv.get_interpreter().rsplit('Rscript', 1))
+                vardict.append((curr_prefix + "R C Compiler:", ""))
+                curr_prefix += prefix
+                for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS']:
+                    out = backwards.as_str(subprocess.check_output(
+                        [interp, 'CMD', 'config', x])).strip()
+                    vardict.append((curr_prefix + x, "%s"
+                                    % ("\n" + curr_prefix + prefix).join(
+                                        out.splitlines(False))))
+                curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+                # Session info
+                out = Rdrv.run_executable(["-e", "sessionInfo()"]).strip()
+                vardict.append((curr_prefix + "R sessionInfo:", "\n%s%s"
+                                % (curr_prefix + prefix,
+                                   ("\n" + curr_prefix + prefix).join(
+                                       out.splitlines(False)))))
+                # Reticulate conda_list
+                if os.environ.get('CONDA_PREFIX', ''):
+                    out = Rdrv.run_executable(
+                        ["-e", ("library(reticulate); "
+                                "reticulate::conda_list()")]).strip()
+                    vardict.append((curr_prefix + "R reticulate::conda_list():",
+                                    "\n%s%s" % (curr_prefix + prefix,
+                                                ("\n" + curr_prefix + prefix).join(
+                                                    out.splitlines(False)))))
+                # Reticulate py_config
+                if os.environ.get('CONDA_PREFIX', ''):
+                    iargs = ("library(reticulate); "
+                             "reticulate::use_condaenv("
+                             "Sys.getenv(\"CONDA_DEFAULT_ENV\")); "
+                             "reticulate::py_config()")
+                else:
+                    iargs = ("library(reticulate); "
+                             "reticulate::py_config()")
+                out = Rdrv.run_executable(["-e", iargs]).strip()
+                vardict.append((curr_prefix + "R reticulate::py_config():",
                                 "\n%s%s" % (curr_prefix + prefix,
                                             ("\n" + curr_prefix + prefix).join(
                                                 out.splitlines(False)))))
-            # Reticulate py_config
-            if os.environ.get('CONDA_PREFIX', ''):
-                iargs = ("library(reticulate); "
-                         "reticulate::use_condaenv(Sys.getenv(\"CONDA_DEFAULT_ENV\")); "
-                         "reticulate::py_config()")
-            else:
-                iargs = ("library(reticulate); "
-                         "reticulate::py_config()")
-            out = Rdrv.run_executable(["-e", iargs]).strip()
-            vardict.append((curr_prefix + "R reticulate::py_config():", "\n%s%s"
-                            % (curr_prefix + prefix,
-                               ("\n" + curr_prefix + prefix).join(
-                                   out.splitlines(False)))))
-    # Print things
-    max_len = max(len(x[0]) for x in vardict)
-    lines = []
-    line_format = '%-' + str(max_len) + 's' + prefix + '%s'
-    for k, v in vardict:
-        lines.append(line_format % (k, v))
-    logger.info("yggdrasil info:\n%s" % '\n'.join(lines))
+    finally:
+        # Print things
+        max_len = max(len(x[0]) for x in vardict)
+        lines = []
+        line_format = '%-' + str(max_len) + 's' + prefix + '%s'
+        for k, v in vardict:
+            lines.append(line_format % (k, v))
+        logger.info("yggdrasil info:\n%s" % '\n'.join(lines))
 
 
 def yggrun():
