@@ -185,9 +185,9 @@ install:
       # pip install --verbose -e .
     elif [[ -n "$YGG_CONDA" ]]; then
       conda install $NUMPY $MATPLOTLIB $JSONSCHEMA
-      sh conda_install.sh requirements_testing.txt
+      python utils/install_from_requirements.py conda requirements_testing.txt
       if [[ $BUILDDOCS == '1' ]]; then
-        sh conda_install.sh requirements_documentation.txt
+        python utils/install_from_requirements.py conda requirements_documentation.txt
       fi
       conda build recipe/meta.yaml --python $YGG_CONDA
       # --use-local not working in
