@@ -188,6 +188,7 @@ install:
       pip install --verbose dist/*.tar.gz
       # Install from source
       # pip install --verbose -e .
+      pip list
     elif [[ -n "$YGG_CONDA" ]]; then
       conda install $NUMPY $MATPLOTLIB $JSONSCHEMA
       python utils/install_from_requirements.py conda requirements_testing.txt
@@ -213,8 +214,8 @@ install:
       else
         conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
       fi
+      conda list
     fi
-    conda list
 
 script:
   - sh ci/pretest_script.sh || travis_terminate 1;
