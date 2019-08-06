@@ -94,11 +94,13 @@ class MakeCompiler(CompilerBase):
         """
         out = cls.call(cls.version_flags, skip_flags=True,
                        allow_error=True, **kwargs)
-        print('Make version output from: %s' % cls.version_flags)
-        print(out)
         if 'Copyright' not in out:  # pragma: debug
             raise RuntimeError("Version call failed: %s" % out)
-        return (out.split('Copyright')[0]).splitlines()[0].strip()
+        for x in (out.split('Copyright')[0]).splitlines():
+            if x.strip():
+                return x.strip()
+        else:  # pragma: debug
+            raise Exception("Could not extract version from string:\n%s" % out)
         
     @classmethod
     def get_output_file(cls, src, target=None, **kwargs):
