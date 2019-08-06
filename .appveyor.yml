@@ -129,7 +129,7 @@ before_test:
 
 test_script:
   - "if %YGG_RUN_EXAMPLES% == 0 yggtest"
-  - "if %YGG_RUN_EXAMPLES% == 1 yggtest --with-examples"
+  - "if %YGG_RUN_EXAMPLES% == 1 yggtest examples --with-examples"
 
 after_test:
   - "codecov"
