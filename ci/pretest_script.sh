@@ -26,4 +26,5 @@ if [ ! -f ".coveragerc" ]; then
     echo ".coveragerc file dosn't exist."
     exit 1
 fi
+cat .coveragerc
 ygginfo --verbose
