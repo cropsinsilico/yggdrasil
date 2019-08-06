@@ -87,7 +87,7 @@ before_install:
       conda update -q conda
       conda create -q -n test-environment python=$YGG_CONDA
       source activate test-environment
-      conda install -q conda-build
+      conda install -q conda-build conda-verify
       # if [[ "${YGG_CONDA:0:1}" == "2" ]]; then
       #   conda install -q "conda-build<3.18.2"
       # else
@@ -196,7 +196,8 @@ install:
       conda --version
       ls ${CONDA_PREFIX}/conda-bld/
       if [[ "$YGG_CONDA" == "3.7" ]]; then
-        conda install -c local yggdrasil
+        # conda install -c local yggdrasil
+        conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
       else
         conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
       fi
