@@ -198,10 +198,13 @@ install:
       # --use-local not working in
       #  - conda 4.7.5, conda-build 3.17.8, Python 2.7, 3.6, or 3.7
       conda --version
+      echo "CONDA_PREFIX = $CONDA_PREFIX"
+      echo "CONDA_ROOT   = $CONDA_ROOT"
       ls ${CONDA_PREFIX}/conda-bld/
+      ls ${CONDA_ROOT}/conda-bld/
       if [[ "$YGG_CONDA" == "3.7" ]]; then
         # conda install -c local yggdrasil
-        conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
+        conda install --use-local yggdrasil
       else
         conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
       fi
