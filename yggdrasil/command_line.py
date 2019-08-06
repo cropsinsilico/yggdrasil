@@ -136,6 +136,18 @@ def ygginfo():
                                     "\n%s%s" % (curr_prefix + prefix,
                                                 ("\n" + curr_prefix + prefix).join(
                                                     out.splitlines(False)))))
+                # conda_binary
+                if platform._is_win:  # pragma: windows
+                    out = Rdrv.run_executable(
+                        ["-e", ("library(reticulate); "
+                                "conda <- reticulate:::conda_binary(\"auto\"); "
+                                "system(paste(conda, \"info --json\"))")],
+                        env=env_reticulate).strip()
+                    vardict.append((curr_prefix
+                                    + "R reticulate::py_versions_windows():",
+                                    "\n%s%s" % (curr_prefix + prefix,
+                                                ("\n" + curr_prefix + prefix).join(
+                                                    out.splitlines(False)))))
                 # Reticulate py_config
                 out = Rdrv.run_executable(["-e", ("library(reticulate); "
                                                   "reticulate::py_config()")],
