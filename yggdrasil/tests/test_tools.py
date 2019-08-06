@@ -4,6 +4,16 @@ from yggdrasil import tools, platform
 from yggdrasil.tests import YggTestClass, assert_equal
 
 
+def test_get_conda_prefix():
+    r"""Test get_conda_prefix."""
+    tools.get_conda_prefix()
+
+    
+def test_get_conda_env():
+    r"""Test get_conda_env."""
+    tools.get_conda_env()
+    
+
 def test_get_supported():
     r"""Test get_supported_<platforms/lang/comm>."""
     tools.get_supported_platforms()
@@ -116,6 +126,8 @@ class TestYggClass(YggTestClass):
         self.instance.special_debug(1)
         self.instance.suppress_special_debug = False
         self.instance.interface_info(1)
+        self.instance.language_info([])(1)
+        self.instance.language_info('python')(1)
 
     def test_timeout(self):
         r"""Test functionality of timeout."""

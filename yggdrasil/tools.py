@@ -104,10 +104,13 @@ def get_conda_prefix():
 
     """
     conda_prefix = os.environ.get('CONDA_PREFIX', None)
-    if not conda_prefix:
-        conda_prefix = which('conda')
-        if conda_prefix is not None:
-            conda_prefix = os.path.dirname(os.path.dirname(conda_prefix))
+    # This part should be enabled if the conda base enviroment dosn't have
+    # CONDA_PREFIX set. Older version of conda behaved this way so it is
+    # possible that a future release will as well.
+    # if not conda_prefix:
+    #     conda_prefix = which('conda')
+    #     if conda_prefix is not None:
+    #         conda_prefix = os.path.dirname(os.path.dirname(conda_prefix))
     return conda_prefix
 
 
