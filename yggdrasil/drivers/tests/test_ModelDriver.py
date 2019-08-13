@@ -1,7 +1,7 @@
 import os
 import copy
 import unittest
-from yggdrasil import platform
+from yggdrasil import platform, tools
 from yggdrasil.tests import assert_raises, scripts
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_product
 from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
@@ -134,6 +134,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         self.run_model_instance()
 
     @unittest.skipIf(platform._is_win, "No valgrind on windows")
+    @unittest.skipIf(tools.which('valgrind') is None,
+                     "Valgrind not installed.")
     def test_valgrind(self):
         r"""Test running with valgrind."""
         valgrind_log = os.path.join(
@@ -149,6 +151,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         
     @unittest.skipIf(platform._is_win or platform._is_mac,
                      "No strace on Windows or MacOS")
+    @unittest.skipIf(tools.which('strace') is None,
+                     "strace not installed.")
     def test_strace(self):
         r"""Test running with strace."""
         self.run_model_instance(with_valgrind=False, with_strace=True)
