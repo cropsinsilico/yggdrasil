@@ -89,7 +89,7 @@ def update_argparser(parser=None, language=None, no_import=None,
     """
     if (no_import is None) and from_setup:
         no_import = True
-    all_languages = get_language_directories()
+    all_languages = [x.lower() for x in get_language_directories()]
     if parser is None:
         parser = argparse.ArgumentParser(
             "Run the installation scripts for one or more languages.")
@@ -99,6 +99,7 @@ def update_argparser(parser=None, language=None, no_import=None,
         if not from_setup:
             parser.add_argument('language', nargs='*',
                                 choices=(['all'] + all_languages),
+                                type=str.lower,
                                 default='all',
                                 help='One or more languages to install.')
     if ('-h' in sys.argv) or ('--help' in sys.argv) or from_setup:
