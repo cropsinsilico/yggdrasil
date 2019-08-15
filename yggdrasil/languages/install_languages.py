@@ -11,6 +11,11 @@ logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.INFO)
 
 
+def is_path(fdir):
+    pdir, base = os.path.split(fdir)
+    return(base in os.listdir(pdir))
+
+
 def get_language_directories():
     r"""Get language directories.
 
@@ -43,11 +48,12 @@ def import_language_install(language, no_import=False):
         module: Language installation module.
 
     """
-    if not os.path.isfile(os.path.join(lang_dir, language, 'install.py')):
-        if not (no_import or os.path.isdir(os.path.join(lang_dir, language))):
+    if not is_path(os.path.join(lang_dir, language, 'install.py')):
+        if not (no_import or is_path(os.path.join(lang_dir, language))):
             from yggdrasil.languages import get_language_dir
-            yield import_language_install(
-                os.path.basename(get_language_dir(language)), no_import=True)
+            fname = os.path.basename(get_language_dir(language))
+            with import_language_install(fname, no_import=True) as install:
+                yield install
         else:
             yield None
     else:

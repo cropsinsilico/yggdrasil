@@ -1,4 +1,5 @@
 import unittest
+from yggdrasil import platform
 from yggdrasil.languages import install_languages
 
 
@@ -10,7 +11,8 @@ class TestInstallLanguages(unittest.TestCase):
         install_languages.update_argparser(arglist=['python'])
         with self.assertRaises(SystemExit):
             install_languages.update_argparser(arglist=['-h'])
-            unittest.main(exit=False)
+            if not platform._is_win:
+                unittest.main(exit=False)
 
     def test_install_language(self):
         r"""Test install_language."""
