@@ -106,7 +106,7 @@ def update_argparser(parser=None, language=None, no_import=None,
         if no_import is None:
             no_import = False
         if language is None:
-            language = get_language_directories()
+            language = all_languages
     else:
         args = parser.parse_known_args()[0]
         if no_import is None:
@@ -155,30 +155,6 @@ def install_language(language, results=None, no_import=False, args=None):
             name_in_pragmas = getattr(install, 'name_in_pragmas', language.lower())
             out = install.install(args=args)
             results[name_in_pragmas] = out
-    # if not os.path.isfile(os.path.join(lang_dir, language, 'install.py')):
-    #     if not (no_import or os.path.isdir(os.path.join(lang_dir, language))):
-    #         from yggdrasil.languages import get_language_dir
-    #         return install_language(os.path.basename(get_language_dir(language)),
-    #                                 results=results, no_import=True)
-    #     logger.info("Nothing to be done for %s" % language)
-    #     name_in_pragmas = language.lower()
-    #     results[name_in_pragmas] = True
-    #     return
-    # try:
-    #     sys.path.insert(0, os.path.join(lang_dir, language))
-    #     import install
-    #     name_in_pragmas = getattr(install, 'name_in_pragmas', language.lower())
-    #     out = install.install()
-    #     results[name_in_pragmas] = out
-    # finally:
-    #     sys.path.pop(0)
-    #     del install
-    #     del name_in_pragmas
-    #     if 'install' in globals():
-    #         del globals()['install']
-    #     if 'install' in sys.modules:
-    #         del sys.modules['install']
-    #     gc.collect()
     if not out:
         warnings.warn(("Could not complete installation for {lang}. "
                        "{lang} support will be disabled.").format(lang=language))
