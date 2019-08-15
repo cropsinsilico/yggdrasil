@@ -254,8 +254,9 @@ jobs:
     - os: linux
       python: 3.4
       env: YGG_ENABLE_LONG_TESTS=1
-      script: |
-              yggtest tests/test_backwards.py
+      script:
+        - sh ci/pretest_script.sh || travis_terminate 1;
+        - yggtest -c setup.cfg --cov-config=.coveragerc tests/test_backwards.py
     - os: linux
       python: 3.6
       env: INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=1 YGG_SKIP_COMPONENT_VALIDATION=0
