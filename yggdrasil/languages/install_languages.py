@@ -100,7 +100,7 @@ def update_argparser(parser=None, language=None, no_import=None,
         parser.add_argument('--no-import', action='store_true',
                             help=('Don\'t import the yggdrasil package in '
                                   'calling the installation script.'))
-        if not (from_setup or language):
+        if not from_setup:
             parser.add_argument('language', nargs='*',
                                 choices=(['all'] + all_languages),
                                 type=str.lower,
@@ -110,7 +110,7 @@ def update_argparser(parser=None, language=None, no_import=None,
         if no_import is None:
             no_import = False
         if language is None:
-            language = all_languages
+            language = get_language_directories()
     else:
         args = parser.parse_known_args(args=arglist)[0]
         if no_import is None:
@@ -129,7 +129,7 @@ def update_argparser(parser=None, language=None, no_import=None,
     return parser
 
 
-def install_language(language, results=None, no_import=None, args=None,
+def install_language(language, results=None, no_import=False, args=None,
                      arglist=None):
     r"""Call install for a specific language.
 
