@@ -200,6 +200,7 @@ install:
       conda --version
       echo "CONDA_PREFIX = $CONDA_PREFIX"
       echo "CONDA_ROOT   = $CONDA_ROOT"
+      conda index ${CONDA_PREFIX}/conda-bld
       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
         ls ${CONDA_PREFIX}/conda-bld/osx-64
         ls ${CONDA_ROOT}/conda-bld/osx-64
@@ -207,12 +208,13 @@ install:
         ls ${CONDA_PREFIX}/conda-bld/linux-64
         ls ${CONDA_ROOT}/conda-bld/linux-64
       fi
-      if [[ "$YGG_CONDA" == "3.7" ]]; then
-        # conda install -c local yggdrasil
-        conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
-      else
-        conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
-      fi
+      conda install -c file:/${CONDA_PREFIX}/conda-bld yggdrasil
+      # if [[ "$YGG_CONDA" == "3.7" ]]; then
+      #   # conda install -c local yggdrasil
+      #   conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
+      # else
+      #   conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
+      # fi
       conda list
     fi
 
