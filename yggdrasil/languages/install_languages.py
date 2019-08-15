@@ -67,7 +67,7 @@ def import_language_install(language, no_import=False):
 
 
 def update_argparser(parser=None, language=None, no_import=None,
-                     from_setup=False):
+                     from_setup=False, arglist=None):
     r"""Update argument parser with language specific arguments.
 
     Args:
@@ -82,11 +82,15 @@ def update_argparser(parser=None, language=None, no_import=None,
         from_setup (bool, optional): If True, the function is being called from
             setup.py and the positional arguments should not be parsed and
             unrecognized arguments will be ignored. Defaults to False.
+        arglist (list, optional): List of arguments to parse. Defaults to
+            None and sys.argv is used.
 
     Returns:
         argparse.ArgumentParser: Argument parser with language specific arguments.
 
     """
+    if arglist is None:
+        arglist = sys.argv
     if (no_import is None) and from_setup:
         no_import = True
     all_languages = [x.lower() for x in get_language_directories()]
@@ -96,19 +100,19 @@ def update_argparser(parser=None, language=None, no_import=None,
         parser.add_argument('--no-import', action='store_true',
                             help=('Don\'t import the yggdrasil package in '
                                   'calling the installation script.'))
-        if not from_setup:
+        if not (from_setup or language):
             parser.add_argument('language', nargs='*',
                                 choices=(['all'] + all_languages),
                                 type=str.lower,
                                 default='all',
                                 help='One or more languages to install.')
-    if ('-h' in sys.argv) or ('--help' in sys.argv) or from_setup:
+    if ('-h' in arglist) or ('--help' in arglist) or from_setup:
         if no_import is None:
             no_import = False
         if language is None:
             language = all_languages
     else:
-        args = parser.parse_known_args()[0]
+        args = parser.parse_known_args(args=arglist)[0]
         if no_import is None:
             no_import = args.no_import
         if language is None:
@@ -125,7 +129,8 @@ def update_argparser(parser=None, language=None, no_import=None,
     return parser
 
 
-def install_language(language, results=None, no_import=False, args=None):
+def install_language(language, results=None, no_import=None, args=None,
+                     arglist=None):
     r"""Call install for a specific language.
 
     Args:
@@ -137,10 +142,14 @@ def install_language(language, results=None, no_import=False, args=None):
             Defaults to False.
         args (argparse.Namespace, optional): Arguments parsed from the
             command line. Default to None and is created.
+        arglist (list, optional): List of arguments to parse. Defaults to
+            None and sys.argv is used.
 
     """
     if args is None:
-        args = update_argparser(no_import=no_import).parse_args()
+        parser = update_argparser(language=language, no_import=no_import,
+                                  arglist=arglist)
+        args = parser.parse_args(args=arglist)
     if no_import is None:
         no_import = args.no_import
     if results is None:
@@ -162,7 +171,7 @@ def install_language(language, results=None, no_import=False, args=None):
         logger.info("Language %s installed." % language)
 
 
-def install_all_languages(from_setup=False, **kwargs):
+def install_all_languages(from_setup=False, arglist=None, **kwargs):
     r"""Call install.py for all languages that have one and return a dictionary
     mapping from language name to the installation state (True if install was
     successful, False otherwise).
@@ -171,6 +180,8 @@ def install_all_languages(from_setup=False, **kwargs):
         from_setup (bool, optional): If True, the function is being called from
             setup.py and the positional arguments should not be parsed and
             unrecognized arguments will be ignored. Defaults to False.
+        arglist (list, optional): List of arguments to parse. Defaults to
+            None and sys.argv is used.
         **kwargs: Additional keyword arguments are passed to each call to
             install_language.
 
@@ -182,7 +193,8 @@ def install_all_languages(from_setup=False, **kwargs):
     if not kwargs.get('args', None):
         kwargs['args'], _ = update_argparser(
             from_setup=True,
-            no_import=kwargs.get('no_import', None)).parse_known_args()
+            no_import=kwargs.get('no_import', None),
+            arglist=arglist).parse_known_args(args=arglist)
     installed_languages = {}
     for ilang in get_language_directories():
         install_language(ilang, installed_languages, **kwargs)
