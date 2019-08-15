@@ -50,20 +50,20 @@ def import_language_install(language, no_import=False):
                 os.path.basename(get_language_dir(language)), no_import=True)
         else:
             yield None
-        return
-    try:
-        sys.path.insert(0, os.path.join(lang_dir, language))
-        import install
-        yield install
-    finally:
-        sys.path.pop(0)
-        if install is not None:
-            del install
-        if 'install' in globals():
-            del globals()['install']
-        if 'install' in sys.modules:
-            del sys.modules['install']
-        gc.collect()
+    else:
+        try:
+            sys.path.insert(0, os.path.join(lang_dir, language))
+            import install
+            yield install
+        finally:
+            sys.path.pop(0)
+            if install is not None:
+                del install
+            if 'install' in globals():
+                del globals()['install']
+            if 'install' in sys.modules:
+                del sys.modules['install']
+            gc.collect()
 
 
 def update_argparser(parser=None, language=None, no_import=None,
