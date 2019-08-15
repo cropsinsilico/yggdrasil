@@ -147,9 +147,8 @@ def install_language(language, results=None, no_import=None, args=None,
 
     """
     if args is None:
-        parser = update_argparser(language=language, no_import=no_import,
-                                  arglist=arglist)
-        args = parser.parse_args(args=arglist)
+        args = update_argparser(no_import=no_import,
+                                arglist=arglist).parse_args(args=arglist)
     if no_import is None:
         no_import = args.no_import
     if results is None:
