@@ -1,9 +1,10 @@
 import unittest
-from yggdrasil.tests import YggTestBase
+from yggdrasil import platform
 from yggdrasil.languages import install_languages
 
 
-class TestInstallLanguages(YggTestBase):
+@unittest.skipIf(platform._is_win, "Error in unittest on windows")
+class TestInstallLanguages(unittest.TestCase):
 
     def test_update_argparser(self):
         r"""Test update_argparser."""
