@@ -335,7 +335,7 @@ class ModelDriver(Driver):
     def finalize_registration(cls):
         r"""Operations that should be performed after a class has been fully
         initialized and registered."""
-        if (not cls.is_configured()):
+        if (not cls.is_configured()):  # pragma: no cover
             # This will only be run the first time yggdrasil is imported
             update_language_config(cls)
         global _map_language_ext
