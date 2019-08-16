@@ -1104,7 +1104,7 @@ class CompilerBase(CompilationToolBase):
             kwargs['definitions'].append('YGG_DEBUG=%d' % logging_level)
         # Call parent class
         outfile_link = None
-        if not dont_link:  # pragma: debug
+        if not dont_link:
             outfile_link = kwargs.pop('outfile', None)
         out = super(CompilerBase, cls).get_flags(**kwargs)
         # Add flags for compilation only or provided output file
@@ -1113,12 +1113,12 @@ class CompilerBase(CompilationToolBase):
             if cls.compile_only_flag not in out:
                 out.insert(0, cls.compile_only_flag)
         # Add linker switch
-        if (not dont_link) or add_linker_switch:  # pragma: debug
+        if (not dont_link) or add_linker_switch:
             if cls.linker_switch is not None:  # pragma: windows
                 if cls.linker_switch not in out:
                     out.append(cls.linker_switch)
         # Add linker flags
-        if (not dont_link):  # pragma: debug
+        if (not dont_link):
             if (not cls.combine_with_linker):
                 raise ValueError("Cannot combine linker and compiler flags.")
             logger.debug('The returned flags will contain linker flags that '
