@@ -12,17 +12,44 @@ logger.setLevel(level=logging.INFO)
 
 
 def is_path(fpath):
+    r"""Determine if a path is valid in a case-sensitive manner.
+
+    Args:
+        fpath (str): Full path to be tested.
+
+    Returns:
+        bool: True if the path exists, False otherwise.
+
+    """
     pdir, base = os.path.split(fpath)
     return(base in os.listdir(pdir))
 
 
 def is_file(fname):
+    r"""Determine if a file is valid in a case-sensitive manner.
+
+    Args:
+        fname (str): Full file path to be tested.
+
+    Returns:
+        bool: True if the file exists, False otherwise.
+
+    """
     if not os.path.isfile(fname):
         return False
     return is_path(fname)
 
 
 def is_dir(fdir):
+    r"""Determine if a directory is valid in a case-sensitive manner.
+
+    Args:
+        fdir (str): Full directory path to be tested.
+
+    Returns:
+        bool: True if the directory exists, False otherwise.
+
+    """
     if not os.path.isdir(fdir):
         return False
     return is_path(fdir)
@@ -77,8 +104,6 @@ def import_language_install(language, no_import=False):
             sys.path.pop(0)
             if install is not None:
                 del install
-            if 'install' in globals():
-                del globals()['install']
             if 'install' in sys.modules:
                 del sys.modules['install']
             gc.collect()
@@ -147,7 +172,7 @@ def update_argparser(parser=None, language=None, no_import=None,
     return parser
 
 
-def install_language(language, results=None, no_import=False, args=None,
+def install_language(language, results=None, no_import=None, args=None,
                      arglist=None):
     r"""Call install for a specific language.
 
@@ -157,7 +182,8 @@ def install_language(language, results=None, no_import=False, args=None,
             language is installed) should be logged. Defaults to None and is
             initialized to an empty dict.
         no_import (bool, optional): If True, yggdrasil will not be imported.
-            Defaults to False.
+            Defaults to None and is set based on the value parsed from
+            arglist.
         args (argparse.Namespace, optional): Arguments parsed from the
             command line. Default to None and is created.
         arglist (list, optional): List of arguments to parse. Defaults to

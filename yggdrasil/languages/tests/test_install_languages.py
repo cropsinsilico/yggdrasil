@@ -9,7 +9,9 @@ class TestInstallLanguages(unittest.TestCase):
         r"""Test update_argparser."""
         install_languages.update_argparser(arglist=['all'])
         install_languages.update_argparser(arglist=['python'])
-        if not backwards.PY2:  # pragma: Python 2
+        install_languages.update_argparser(language='python',
+                                           arglist=['python'])
+        if not backwards.PY2:  # pragma: Python 3
             with self.assertRaises(SystemExit):
                 install_languages.update_argparser(arglist=['-h'])
                 unittest.main(exit=False)
