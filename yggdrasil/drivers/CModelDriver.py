@@ -1,7 +1,8 @@
 import os
 import shutil
+import subprocess
 from collections import OrderedDict
-from yggdrasil import platform, tools
+from yggdrasil import platform, tools, backwards
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, ArchiverBase)
 from yggdrasil.languages import get_language_dir
@@ -333,6 +334,33 @@ class CModelDriver(CompiledModelDriver):
         if (rjlib is not None) and os.path.isfile(rjlib):
             cfg.set(cls._language, 'rapidjson_include',
                     os.path.dirname(os.path.dirname(rjlib)))
+        return out
+        
+    @classmethod
+    def update_compiler_kwargs(cls, **kwargs):
+        r"""Update keyword arguments supplied to the compiler get_flags method
+        for various options.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Keyword arguments for a get_flags method providing compiler
+                flags.
+
+        """
+        out = super(CModelDriver, cls).update_compiler_kwargs(**kwargs)
+        if platform._is_mac:
+            try:
+                fname = subprocess.check_output(
+                    'echo "$(xcode-select -p)/SDKs/MacOSX.sdk/usr/include"',
+                    shell=True).strip()
+            except BaseException:  # pragma: debug
+                fname = b''
+            if os.path.isdir(fname):
+                out.setdefault('include_dirs', [])
+                out['include_dirs'].append(backwards.as_str(fname))
         return out
         
     @classmethod
