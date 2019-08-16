@@ -10,7 +10,12 @@ class TestRModelParam(parent.TestInterpretedModelParam):
 class TestRModelDriverNoInit(TestRModelParam,
                              parent.TestInterpretedModelDriverNoInit):
     r"""Test runner for RModelDriver without init."""
-    pass
+
+    def test_is_library_installed(self):
+        r"""Test is_library_installed for invalid library."""
+        self.assert_equal(
+            self.import_cls.is_library_installed('invalid_unicorn'),
+            False)
 
 
 class TestRModelDriverNoStart(TestRModelParam,
