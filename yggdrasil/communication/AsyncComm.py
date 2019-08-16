@@ -30,9 +30,7 @@ class AsyncComm(CommBase.CommBase):
     def __init__(self, name, dont_backlog=False, **kwargs):
         # TODO: Fix the cleanup of Python threads in languages that call the
         # Python API underneath
-        self.dont_backlog = (dont_backlog
-                             or (kwargs.get('language', 'False').lower()
-                                 in ['matlab', 'r']))
+        self.dont_backlog = (dont_backlog or kwargs.get('is_interface', False))
         self._backlog_recv = []
         self._backlog_send = []
         self._backlog_thread = None
