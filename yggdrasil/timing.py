@@ -5,15 +5,7 @@ import copy
 import json
 import yaml
 import uuid
-try:
-    import pyperf
-    _using_perf = False
-except ImportError:  # pragma: debug
-    import perf as pyperf
-    if not hasattr(pyperf, 'perf_counter'):
-        raise ImportError("Could not import pyperf under new name 'pyperf' "
-                          "or old name 'perf'.")
-    _using_perf = True
+import pyperf
 import subprocess
 import warnings
 import tempfile
@@ -103,17 +95,9 @@ def write_pyperf_script(script_file, nmsg, msg_size,
             Defaults to False.
 
     """
-    if _using_perf:
-        lines = ['import perf as pyperf']
-    else:
-        lines = ['import pyperf']
-    lines += [
+    lines = [
+        'import pyperf',
         'import os',
-        #
-        # 'print("script")',
-        # 'for k, v in os.environ.items():',
-        # '    print("\'%s\': %s" % (k, v))',
-        #
         'from yggdrasil import timing',
         'nrep = %d' % nrep,
         'nmsg = %d' % nmsg,
