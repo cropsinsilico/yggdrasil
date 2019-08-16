@@ -225,16 +225,16 @@ class MakeCompiler(CompilerBase):
             kwargs.setdefault(k, cls._schema_properties[k]['default'])
         out[kwargs['env_compiler']] = backwards.as_str(compiler.get_executable())
         out[kwargs['env_compiler_flags']] = backwards.as_str(' '.join(compile_flags))
-        if kwargs['env_compiler'] == kwargs['env_linker']:
-            assert(kwargs['env_compiler_flags'] != kwargs['env_linker_flags'])
-            # yggdrasil requires that linking be done in C++
-            if (((compiler.languages[0].lower() == 'c')
-                 and ('-lstdc++' not in linker_flags))):
-                linker_flags.append('-lstdc++')
-            out[kwargs['env_linker_flags']] = backwards.as_str(' '.join(linker_flags))
-        else:
+        # yggdrasil requires that linking be done in C++
+        if (((compiler.languages[0].lower() == 'c')
+             and ('-lstdc++' not in linker_flags))):
+            linker_flags.append('-lstdc++')
+        out[kwargs['env_linker_flags']] = backwards.as_str(' '.join(linker_flags))
+        if kwargs['env_compiler'] != kwargs['env_linker']:  # pragma: debug
             out[kwargs['env_linker']] = backwards.as_str(linker.get_executable())
-            out[kwargs['env_linker_flags']] = backwards.as_str(' '.join(linker_flags))
+            raise NotImplementedError("Functionality allowing linker to be specified "
+                                      "in a separate environment variable from the "
+                                      "compiler is untested.")
         return out
     
 

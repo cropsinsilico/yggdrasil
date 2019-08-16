@@ -335,7 +335,8 @@ class ModelDriver(Driver):
     def finalize_registration(cls):
         r"""Operations that should be performed after a class has been fully
         initialized and registered."""
-        if (not cls.is_configured()):
+        if (not cls.is_configured()):  # pragma: no cover
+            # This will only be run the first time yggdrasil is imported
             update_language_config(cls)
         global _map_language_ext
         for x in cls.get_language_ext():
@@ -747,7 +748,7 @@ class ModelDriver(Driver):
             out = (ygg_cfg.get(cls.language, 'commtypes', None) is not None)
         # Base languages
         for x in cls.base_languages:
-            if not out:
+            if not out:  # pragma: debug
                 break
             out = import_component('model', x).is_configured()
         return out
