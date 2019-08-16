@@ -1,12 +1,11 @@
 import os
 import numpy as np
-import unittest
 from yggdrasil.communication import get_comm
 from yggdrasil.interface import YggInterface
-from yggdrasil.tools import YGG_MSG_EOF, get_YGG_MSG_MAX, YGG_MSG_BUF
+from yggdrasil.tools import (
+    YGG_MSG_EOF, get_YGG_MSG_MAX, YGG_MSG_BUF, is_lang_installed)
 from yggdrasil.components import import_component
 from yggdrasil.drivers import (InputDriver, OutputDriver)
-from yggdrasil.drivers.MatlabModelDriver import MatlabModelDriver
 from yggdrasil.tests import YggTestClassInfo, assert_equal, assert_raises
 
 
@@ -19,7 +18,7 @@ class ModelEnv(object):
         new_kw = {'YGG_SUBPROCESS': 'True'}
         if language is not None:
             new_kw['YGG_MODEL_LANGUAGE'] = language
-        # Send environment keyword to fake Matlab
+        # Send environment keyword to fake language
         self.old_kw = {}
         for k, v in new_kw.items():
             self.old_kw[k] = os.environ.get(k, None)
@@ -32,7 +31,7 @@ class ModelEnv(object):
         for k, v in self.old_kw.items():
             if v is None:
                 del os.environ[k]
-            else:
+            else:  # pragma: no cover
                 os.environ[k] = v
 
 
@@ -55,32 +54,71 @@ def test_init():
     r"""Test error on init."""
     assert_raises(Exception, YggInterface.YggInput, 'error')
     assert_raises(Exception, YggInterface.YggOutput, 'error')
-    
 
-@unittest.skipIf(not MatlabModelDriver.is_installed(), "Matlab not installed.")
-def test_YggMatlab_class():  # pragma: matlab
-    r"""Test Matlab interface for classes."""
-    name = 'test'
-    # Input
-    drv = InputDriver.InputDriver(name, 'link')
-    drv.start()
-    os.environ.update(drv.env)
-    with ModelEnv(language='matlab'):
-        YggInterface.YggInit('YggInput', (name, '%f\\n%d'))
-        drv.terminate()
-    # Output
-    drv = OutputDriver.OutputDriver(name, 'link')
-    drv.start()
-    os.environ.update(drv.env)
-    with ModelEnv(language='matlab'):
-        YggInterface.YggInit('YggOutput', (name, '%f\\n%d'))
-        drv.terminate()
+
+def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
+                 input_interface='YggInput', output_interface='YggOutput'):
+    r"""Function to perform simple send/receive between two comms using a
+    language interface that calls the Python interface.
+    
+    Args:
+        language (str, optional): Language that should be mimicked for the
+            interface test. Defaults to 'python'.
+        fmt (str, optional): Format string to use for the test. Defaults to
+            '%f\\n%d'.
+        msg (object, optional): Message object that should be used for the
+            test. Defaults to [float(1.0), int(2)].
+        input_interface (str, optional): Name of the interface function/class
+            that should be used for the test. Defaults to 'YggInput'.
+        output_interface (str, optional): Name of the interface function/class
+            that should be used for the test. Defaults to 'YggOutput'.
+
+    """
+    name = 'test_%s' % language
+    # Create and start drivers to transport messages
+    odrv = OutputDriver.OutputDriver(name, 'link')
+    odrv.start()
+    os.environ.update(odrv.env)
+    idrv = InputDriver.InputDriver(name, 'link', comm_env=odrv.comm_env)
+    idrv.start()
+    os.environ.update(idrv.env)
+    # Connect and utilize interface under disguise as target language
+    with ModelEnv(language=language):
+        # Output
+        o = YggInterface.YggInit(output_interface, (name, fmt))
+        o.send(*msg)
+        o.send_eof()
+        o.close()
+        # Input
+        i = YggInterface.YggInit(input_interface, (name, fmt))
+        assert_equal(i.recv(), (True, msg))
+        assert_equal(i.recv(), (False, YGG_MSG_EOF))
+    odrv.terminate()
+    idrv.terminate()
+
+
+def test_YggInit_langauge():
+    r"""Test access to YggInit via languages that call the Python interface."""
+    for language in ['matlab', 'R']:
+        if not is_lang_installed(language):
+            continue
+        do_send_recv(language=language)
+
+
+def test_YggInit_backwards():
+    r"""Check access to old class names for backwards compat."""
+    do_send_recv(input_interface='CisInput',
+                 output_interface='PsiOutput')
 
 
 def test_YggInit_variables():
     r"""Test Matlab interface for variables."""
     assert_equal(YggInterface.YggInit('YGG_MSG_MAX'), YGG_MSG_MAX)
     assert_equal(YggInterface.YggInit('YGG_MSG_EOF'), YGG_MSG_EOF)
+    assert_equal(YggInterface.YggInit('YGG_MSG_EOF'),
+                 YggInterface.YggInit('CIS_MSG_EOF'))
+    assert_equal(YggInterface.YggInit('YGG_MSG_EOF'),
+                 YggInterface.YggInit('PSI_MSG_EOF'))
 
 
 class TestBase(YggTestClassInfo):
