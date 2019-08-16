@@ -686,7 +686,7 @@ class CMakeModelDriver(BuildModelDriver):
                             self.target_language = (
                                 self.get_language_for_source(varlist[1:],
                                                              early_exit=True))
-                        except ValueError:
+                        except ValueError:  # pragma: debug
                             pass
         return super(CMakeModelDriver, self).set_target_language()
         

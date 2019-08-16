@@ -77,4 +77,10 @@ class TestMakeModelDriverNoStart(TestMakeModelParam,
 
 class TestMakeModelDriver(TestMakeModelParam, parent.TestCompiledModelDriver):
     r"""Test runner for MakeModelDriver."""
-    pass
+
+    def __init__(self, *args, **kwargs):
+        super(TestMakeModelDriver, self).__init__(*args, **kwargs)
+        # Version specifying makedir in parts
+        makedir_parts = os.path.split(self.makedir)
+        self._inst_kwargs['working_dir'] = makedir_parts[0]
+        self._inst_kwargs['makedir'] = makedir_parts[1]
