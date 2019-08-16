@@ -634,6 +634,12 @@ class CMakeModelDriver(BuildModelDriver):
             with open(self.buildfile, 'rb') as fd:
                 contents = fd.read()
             with open(self.buildfile, 'wb') as fd:
+                # Change test compilation to static library to prevent error when
+                # cross compiling
+                newline = backwards.as_bytes(
+                    'set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")\n')
+                if newline not in contents:
+                    fd.write(newline)
                 # Add conda prefix as first line
                 conda_prefix = self.get_tool_instance('compiler').get_conda_prefix()
                 if conda_prefix:
