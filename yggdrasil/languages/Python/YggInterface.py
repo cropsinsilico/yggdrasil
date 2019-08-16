@@ -22,7 +22,7 @@ def eof_msg():
     return YGG_MSG_EOF
 
 
-def YggInit(_type, args=None):  # pragma: matlab
+def YggInit(_type, args=None):
     r"""Short interface to identify functions called by another language.
 
     Args:
@@ -114,7 +114,7 @@ def YggOutput(name, format_str=None, **kwargs):
     return InterfaceComm(name, **kwargs)
 
     
-def YggRpcServer(name, infmt='%s', outfmt='%s', language=None):
+def YggRpcServer(name, infmt='%s', outfmt='%s'):
     r"""Get class for handling requests and response for an RPC Server.
 
     Args:
@@ -131,15 +131,13 @@ def YggRpcServer(name, infmt='%s', outfmt='%s', language=None):
     from yggdrasil.communication import ServerComm
     icomm_kwargs = dict(format_str=infmt)
     ocomm_kwargs = dict(format_str=outfmt)
-    if language is not None:
-        icomm_kwargs['language'] = language
     out = InterfaceComm(name, comm_class=ServerComm.ServerComm,
                         response_kwargs=ocomm_kwargs,
                         recv_timeout=False, **icomm_kwargs)
     return out
     
 
-def YggRpcClient(name, outfmt='%s', infmt='%s', language=None):
+def YggRpcClient(name, outfmt='%s', infmt='%s'):
     r"""Get class for handling requests and response to an RPC Server from a
     client.
 
@@ -157,8 +155,6 @@ def YggRpcClient(name, outfmt='%s', infmt='%s', language=None):
     from yggdrasil.communication import ClientComm
     icomm_kwargs = dict(format_str=infmt)
     ocomm_kwargs = dict(format_str=outfmt)
-    if language is not None:
-        ocomm_kwargs['language'] = language
     out = InterfaceComm(name, comm_class=ClientComm.ClientComm,
                         response_kwargs=icomm_kwargs,
                         recv_timeout=False, **ocomm_kwargs)
