@@ -280,7 +280,9 @@ def update_config():
                               'configured.'))
     parser.add_argument('--disable-languages', nargs='+',
                         default=[], dest='disable_languages',
-                        help='One or more languages that should be disabled')
+                        help='One or more languages that should be disabled.')
+    parser.add_argument('--enable-languages', nargs='+', default=[],
+                        help='One or more languages that should be enabled.')
     args = parser.parse_args()
     if args.show_file:
         print('Config file located here: %s' % config.usr_config_file)
@@ -290,7 +292,8 @@ def update_config():
         return
     drv = [import_component('model', l) for l in args.languages]
     config.update_language_config(drv, overwrite=args.overwrite, verbose=True,
-                                  disable_languages=args.disable_languages)
+                                  disable_languages=args.disable_languages,
+                                  enable_languages=args.enable_languages)
 
 
 def yggtime_comm():

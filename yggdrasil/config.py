@@ -157,7 +157,8 @@ ygg_cfg = YggConfigParser.from_files([def_config_file, usr_config_file,
                                       loc_config_file])
 
 
-def update_language_config(drv, skip_warnings=False, disable_languages=None,
+def update_language_config(drv, skip_warnings=False,
+                           disable_languages=None, enable_languages=None,
                            overwrite=False, verbose=False):
     r"""Update configuration options for a language driver.
 
@@ -168,6 +169,8 @@ def update_language_config(drv, skip_warnings=False, disable_languages=None,
             will not be raised. Defaults to False.
         disable_languages (list, optional): List of languages that should be
             disabled. Defaults to an empty list.
+        enable_languages (list, optional): List of languages that should be
+            enabled. Defaults to an empty list.
         overwrite (bool, optional): If True, the existing file will be overwritten.
             Defaults to False.
         verbose (bool, optional): If True, information about the config file
@@ -182,12 +185,20 @@ def update_language_config(drv, skip_warnings=False, disable_languages=None,
         drv = [drv]
     if disable_languages is None:
         disable_languages = []
+    if enable_languages is None:
+        enable_languages = []
     if overwrite:
         shutil.copy(def_config_file, usr_config_file)
         ygg_cfg_usr.reload()
     for idrv in drv:
-        if idrv.language in disable_languages:
+        if (((idrv.language in disable_languages)
+             and (idrv.language in enable_languages))):
+            logger.info(("%s language both enabled and disabled. "
+                         "No action will be taken.") % idrv.language)
+        elif idrv.language in disable_languages:
             ygg_cfg_usr.set(idrv.language, 'disable', 'True')
+        elif idrv.language in enable_languages:
+            ygg_cfg_usr.set(idrv.language, 'disable', 'False')
         if ygg_cfg_usr.get(idrv.language, 'disable', 'False').lower() == 'true':
             continue  # pragma: no cover
         miss += idrv.configure(ygg_cfg_usr)

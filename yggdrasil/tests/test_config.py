@@ -51,6 +51,13 @@ def test_update_language_config():
     r"""Test updating configuration for installed languages."""
     drv = [import_component('model', l) for l in tools.get_supported_lang()]
     config.update_language_config(drv, overwrite=True, verbose=True)
+    try:
+        config.update_language_config(drv[0], disable_languages=[drv[0].language])
+        config.update_language_config(drv[0],
+                                      disable_languages=[drv[0].language],
+                                      enable_languages=[drv[0].language])
+    finally:
+        config.update_language_config(drv[0], enable_languages=[drv[0].language])
 
 
 def test_locate_file():
