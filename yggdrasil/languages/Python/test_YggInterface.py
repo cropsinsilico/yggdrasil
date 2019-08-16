@@ -75,6 +75,12 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
 
     """
     name = 'test_%s' % language
+    # Set converter based on language driver
+    ldrv = import_component('model', language)
+    converter = ldrv.python2language
+    if converter is None:
+        def converter(x):
+            return x
     # Create and start drivers to transport messages
     odrv = OutputDriver.OutputDriver(name, 'link')
     odrv.start()
@@ -83,23 +89,26 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
     idrv.start()
     os.environ.update(idrv.env)
     # Connect and utilize interface under disguise as target language
-    with ModelEnv(language=language):
-        # Output
-        o = YggInterface.YggInit(output_interface, (name, fmt))
-        o.send(*msg)
-        o.send_eof()
-        o.close()
-        # Input
-        i = YggInterface.YggInit(input_interface, (name, fmt))
-        assert_equal(i.recv(), (True, msg))
-        assert_equal(i.recv(), (False, YGG_MSG_EOF))
-    odrv.terminate()
-    idrv.terminate()
+    try:
+        with ModelEnv(language=language):
+            # Output
+            o = YggInterface.YggInit(output_interface, (name, fmt))
+            o.send(*msg)
+            o.send_eof()
+            o.close()
+            # Input
+            i = YggInterface.YggInit(input_interface, (name, fmt))
+            assert_equal(i.recv(), (True, converter(msg)))
+            assert_equal(i.recv(), (False, converter(YGG_MSG_EOF)))
+    finally:
+        odrv.terminate()
+        idrv.terminate()
 
 
 def test_YggInit_langauge():
     r"""Test access to YggInit via languages that call the Python interface."""
     for language in ['matlab', 'R']:
+        print(language)
         if not is_lang_installed(language):
             continue
         do_send_recv(language=language)
