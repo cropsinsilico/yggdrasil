@@ -270,6 +270,8 @@ def update_config():
         description='Update the user config file.')
     parser.add_argument('--show-file', action='store_true',
                         help='Print the path to the config file without updating it.')
+    parser.add_argument('--remove-file', action='store_true',
+                        help='Remove the existing config file and return.')
     parser.add_argument('--overwrite', action='store_true',
                         help='Overwrite the existing file.')
     parser.add_argument('--languages', nargs='+',
@@ -282,6 +284,9 @@ def update_config():
     args = parser.parse_args()
     if args.show_file:
         print('Config file located here: %s' % config.usr_config_file)
+    if args.remove_file and os.path.isfile(config.usr_config_file):
+        os.remove(config.usr_config_file)
+    if args.show_file or args.remove_file:
         return
     drv = [import_component('model', l) for l in args.languages]
     config.update_language_config(drv, overwrite=args.overwrite, verbose=True,

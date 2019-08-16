@@ -256,6 +256,7 @@ jobs:
       env: YGG_ENABLE_LONG_TESTS=1
       script:
         - sh ci/pretest_script.sh || travis_terminate 1;
+	- yggconfig --remove-file
         - yggtest -c setup.cfg --cov-config=.coveragerc tests/test_backwards.py
     - os: linux
       python: 3.6
