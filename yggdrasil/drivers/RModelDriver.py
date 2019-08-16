@@ -144,7 +144,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         return out
         
     @classmethod
-    def comm_atexit(cls, comm):
+    def comm_atexit(cls, comm):  # pragma: no cover
         r"""Operations performed on comm at exit including draining receive.
         
         Args:
