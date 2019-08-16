@@ -144,30 +144,23 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         return out
         
     @classmethod
-    def comm_atexit(cls, comm):  # pragma: no cover
+    def comm_atexit(cls, comm):
         r"""Operations performed on comm at exit including draining receive.
         
         Args:
             comm (CommBase): Communication object.
 
         """
-        logger.info('comm_atexit: %s, %s, %s'
-                    % (comm.direction, type(comm.direction),
-                       comm.direction == 'recv'))
         if comm.direction == 'recv':
             while comm.recv(timeout=0)[0]:
                 comm.sleep()
         else:
             comm.send_eof()
         if not getattr(comm, 'dont_backlog', True):
-            logger.info("comm_atexit: before linger close")
             comm.linger_close()
-            logger.info("comm_atexit: after linger close")
-        logger.info('comm_atexit finished')
-        # comm.backlog_thread.on_main_terminated()
 
     @classmethod
-    def language2python(cls, robj):  # pragma: no cover
+    def language2python(cls, robj):
         r"""Prepare an R object for serialization in Python.
 
         Args:
@@ -189,7 +182,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         return robj
 
     @classmethod
-    def python2language(cls, pyobj):  # pragma: no cover
+    def python2language(cls, pyobj):
         r"""Prepare a python object for transformation in R.
 
         Args:

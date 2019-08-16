@@ -378,7 +378,7 @@ class CommBase(tools.YggClass):
             partner_language = 'python'
             recv_timeout = False
         if language is None:
-            language = 'python'  # tools.get_subprocess_language()
+            language = 'python'
         self.language = language
         self.partner_language = partner_language
         self.language_driver = import_component('model', self.language)
@@ -1399,7 +1399,7 @@ class CommBase(tools.YggClass):
         """
         if self.single_use and self._used:  # pragma: debug
             raise RuntimeError("This comm is single use and it was already used.")
-        if self.language_driver.language2python is not None:  # pragma: debug
+        if self.language_driver.language2python is not None:
             args = self.language_driver.language2python(args)
         try:
             ret = self.send_multipart(args, **kwargs)
@@ -1628,7 +1628,7 @@ class CommBase(tools.YggClass):
             self.debug('Linger close on single use')
             self.linger_close()
         out = (flag, msg)
-        if self.language_driver.python2language is not None:  # pragma: debug
+        if self.language_driver.python2language is not None:
             out = self.language_driver.python2language(out)
         return out
 
