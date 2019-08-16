@@ -23,8 +23,10 @@ def register_example(example_dir):
             example.
 
     Returns:
-
-    Raises:
+        tuple (list, dict, dict): A list of available languages, a dictionary
+            mapping from language to YAML specification files for the example,
+            and a dictionary mapping from language to source files for the
+            example.
 
     """
     # Check that the source directory and test exist
@@ -32,7 +34,8 @@ def register_example(example_dir):
     srcdir = os.path.join(example_dir, 'src')
     testfile = os.path.join(_example_dir, 'tests',
                             'test_%s.py' % example_base)
-    if not os.path.isfile(testfile):
+    if not os.path.isfile(testfile):  # pragma: no cover
+        # TODO: Automate test creation
         logging.error("Missing test file: %s" % testfile)
     assert(os.path.isdir(srcdir))
     # Determine which languages are present in the example
