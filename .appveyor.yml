@@ -128,6 +128,7 @@ before_test:
   - "flake8 yggdrasil"
 
 test_script:
+  - "type .coveragerc"
   - "if %YGG_RUN_EXAMPLES% == 0 yggtest -c setup.cfg --cov-config=.coveragerc"
   - "if %YGG_RUN_EXAMPLES% == 1 yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples"
 
