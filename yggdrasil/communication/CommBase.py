@@ -805,7 +805,7 @@ class CommBase(tools.YggClass):
             self.wait_for_confirm(timeout=self._timeout_drain)
         self.debug("Finished (timeout_drain = %s)", str(self._timeout_drain))
 
-    def language_atexit(self):
+    def language_atexit(self):  # pragma: debug
         r"""Close operations specific to the language."""
         if self.language_driver.comm_atexit is not None:
             self.language_driver.comm_atexit(self)
@@ -1399,7 +1399,7 @@ class CommBase(tools.YggClass):
         """
         if self.single_use and self._used:  # pragma: debug
             raise RuntimeError("This comm is single use and it was already used.")
-        if self.language_driver.language2python is not None:
+        if self.language_driver.language2python is not None:  # pragma: debug
             args = self.language_driver.language2python(args)
         try:
             ret = self.send_multipart(args, **kwargs)
@@ -1628,7 +1628,7 @@ class CommBase(tools.YggClass):
             self.debug('Linger close on single use')
             self.linger_close()
         out = (flag, msg)
-        if self.language_driver.python2language is not None:
+        if self.language_driver.python2language is not None:  # pragma: debug
             out = self.language_driver.python2language(out)
         return out
 
