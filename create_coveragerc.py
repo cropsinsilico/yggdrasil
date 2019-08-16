@@ -61,7 +61,12 @@ def create_coveragerc(installed_languages):
     """
     if HandyConfigParser is None:
         return False
-    covrc = os.path.join(os.path.dirname(__file__), '.coveragerc')
+    debug_msg = 'cwd = %s, os.path.dirname(__file__) = %s' % (
+        os.getcwd(), os.path.dirname(__file__))
+    print(debug_msg)
+    # covdir = os.path.dirname(__file__)
+    covdir = os.getcwd()
+    covrc = os.path.join(covdir, '.coveragerc')
     cp = HandyConfigParser("")
     # Read from existing .coveragerc
     if os.path.isfile(covrc):
