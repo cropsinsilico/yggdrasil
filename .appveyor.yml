@@ -110,7 +110,7 @@ install:
   - echo %YGGSDIST%
   - "pip install --verbose %YGGSDIST%"
   # - "pip install --verbose -e ."
-  # - "python create_coveragerc.py"
+  - "python create_coveragerc.py"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
