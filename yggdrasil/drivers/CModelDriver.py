@@ -72,6 +72,8 @@ class ClangCompiler(CCompilerBase):
     toolname = 'clang'
     platforms = ['MacOS']
     default_archiver = 'libtool'
+    flag_options = OrderedDict(list(CCompilerBase.flag_options.items())
+                               + [('sysroot', '--sysroot')])
 
 
 class MSVCCompiler(CCompilerBase):
@@ -335,6 +337,34 @@ class CModelDriver(CompiledModelDriver):
             cfg.set(cls._language, 'rapidjson_include',
                     os.path.dirname(os.path.dirname(rjlib)))
         return out
+
+    @classmethod
+    def get_OSX_SYSROOT(cls):
+        r"""Determin the path to the OSX SDK.
+
+        Returns:
+            str: Full path to the SDK directory if one is located. None
+                otherwise.
+
+        """
+        fname = None
+        if platform._is_mac:
+            print('CONDA_BUILD_SYSROOT',
+                  os.environ.get('CONDA_BUILD_SYSROOT', None))
+            fname_try = [
+                ('$(xcode-select -p)/Platforms/MacOSX.platform/Developer/'
+                 'SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk'),
+                '$(xcode-select -p)/SDKs/MacOSX.sdk/usr/include']
+            for fcheck in fname_try:
+                try:
+                    fname = subprocess.check_output('echo "%s"' % fcheck,
+                                                    shell=True).strip()
+                    if os.path.isdir(fname):
+                        fname = backwards.as_str(fname)
+                        break
+                except BaseException:  # pragma: debug
+                    pass
+        return fname
         
     @classmethod
     def update_compiler_kwargs(cls, **kwargs):
@@ -351,16 +381,17 @@ class CModelDriver(CompiledModelDriver):
 
         """
         out = super(CModelDriver, cls).update_compiler_kwargs(**kwargs)
-        if platform._is_mac:
-            try:
-                fname = subprocess.check_output(
-                    'echo "$(xcode-select -p)/SDKs/MacOSX.sdk/usr/include"',
-                    shell=True).strip()
-            except BaseException:  # pragma: debug
-                fname = b''
-            if os.path.isdir(fname):
+        if platform._is_mac and os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
+            osx_sysroot = cls.get_OSX_SYSROOT()
+            if osx_sysroot is not None:
+                out['sysroot'] = osx_sysroot
                 out.setdefault('include_dirs', [])
-                out['include_dirs'].append(backwards.as_str(fname))
+                out['include_dirs'].append(osx_sysroot)
+                out.setdefault('definitions', [])
+                out['definitions'] += [
+                    'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
+                    % os.environ['MACOSX_DEPLOYMENT_TARGET'],
+                    'CMAKE_OSX_SYSROOT=%s' % osx_sysroot]
         return out
         
     @classmethod
