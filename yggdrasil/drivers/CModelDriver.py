@@ -13,6 +13,37 @@ _default_internal_libtype = 'object'
 #     _default_internal_libtype = 'static'
 
 
+def get_OSX_SYSROOT():
+    r"""Determin the path to the OSX SDK.
+
+    Returns:
+        str: Full path to the SDK directory if one is located. None
+            otherwise.
+
+    """
+    fname = None
+    if platform._is_mac:
+        print('CONDA_BUILD_SYSROOT',
+              os.environ.get('CONDA_BUILD_SYSROOT', None))
+        fname_try = [
+            ('$(xcode-select -p)/Platforms/MacOSX.platform/Developer/'
+             'SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk'),
+            '$(xcode-select -p)/SDKs/MacOSX.sdk/usr/include']
+        for fcheck in fname_try:
+            try:
+                fname = subprocess.check_output('echo "%s"' % fcheck,
+                                                shell=True).strip()
+                if os.path.isdir(fname):
+                    fname = backwards.as_str(fname)
+                    break
+            except BaseException:  # pragma: debug
+                pass
+    return fname
+
+
+_osx_sysroot = get_OSX_SYSROOT()
+
+
 class CCompilerBase(CompilerBase):
     r"""Base class for C compilers."""
     languages = ['c']
@@ -339,34 +370,6 @@ class CModelDriver(CompiledModelDriver):
         return out
 
     @classmethod
-    def get_OSX_SYSROOT(cls):
-        r"""Determin the path to the OSX SDK.
-
-        Returns:
-            str: Full path to the SDK directory if one is located. None
-                otherwise.
-
-        """
-        fname = None
-        if platform._is_mac:
-            print('CONDA_BUILD_SYSROOT',
-                  os.environ.get('CONDA_BUILD_SYSROOT', None))
-            fname_try = [
-                ('$(xcode-select -p)/Platforms/MacOSX.platform/Developer/'
-                 'SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk'),
-                '$(xcode-select -p)/SDKs/MacOSX.sdk/usr/include']
-            for fcheck in fname_try:
-                try:
-                    fname = subprocess.check_output('echo "%s"' % fcheck,
-                                                    shell=True).strip()
-                    if os.path.isdir(fname):
-                        fname = backwards.as_str(fname)
-                        break
-                except BaseException:  # pragma: debug
-                    pass
-        return fname
-        
-    @classmethod
     def update_compiler_kwargs(cls, **kwargs):
         r"""Update keyword arguments supplied to the compiler get_flags method
         for various options.
@@ -381,17 +384,19 @@ class CModelDriver(CompiledModelDriver):
 
         """
         out = super(CModelDriver, cls).update_compiler_kwargs(**kwargs)
-        if platform._is_mac and os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
-            osx_sysroot = cls.get_OSX_SYSROOT()
-            if osx_sysroot is not None:
-                out['sysroot'] = osx_sysroot
+        if platform._is_mac:
+            print('sysroot', _osx_sysroot)
+            if _osx_sysroot is not None:
+                out['sysroot'] = _osx_sysroot
                 out.setdefault('include_dirs', [])
-                out['include_dirs'].append(osx_sysroot)
+                out['include_dirs'].append(_osx_sysroot)
                 out.setdefault('definitions', [])
-                out['definitions'] += [
-                    'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
-                    % os.environ['MACOSX_DEPLOYMENT_TARGET'],
-                    'CMAKE_OSX_SYSROOT=%s' % osx_sysroot]
+                out['definitions'].append(
+                    'CMAKE__OSX_SYSROOT=%s' % _osx_sysroot)
+                if os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
+                    out['definitions'].append(
+                        'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
+                        % os.environ['MACOSX_DEPLOYMENT_TARGET'])
         return out
         
     @classmethod
