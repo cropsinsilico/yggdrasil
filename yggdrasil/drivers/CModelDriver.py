@@ -392,7 +392,7 @@ class CModelDriver(CompiledModelDriver):
                 out['include_dirs'].append(_osx_sysroot)
                 out.setdefault('definitions', [])
                 out['definitions'].append(
-                    'CMAKE__OSX_SYSROOT=%s' % _osx_sysroot)
+                    'CMAKE_OSX_SYSROOT=%s' % _osx_sysroot)
                 if os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
                     out['definitions'].append(
                         'CMAKE_OSX_DEPLOYMENT_TARGET=%s'

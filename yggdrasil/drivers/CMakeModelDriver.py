@@ -716,6 +716,33 @@ class CMakeModelDriver(BuildModelDriver):
                 kwargs.setdefault(k, v)
             return super(CMakeModelDriver, self).compile_model(**kwargs)
 
+    @classmethod
+    def update_compiler_kwargs(cls, **kwargs):
+        r"""Update keyword arguments supplied to the compiler get_flags method
+        for various options.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Keyword arguments for a get_flags method providing compiler
+                flags.
+
+        """
+        out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
+        if platform._is_mac:
+            print('sysroot (cmake)', CModelDriver._osx_sysroot)
+            if CModelDriver._osx_sysroot is not None:
+                out.setdefault('definitions', [])
+                out['definitions'].append(
+                    'CMAKE_OSX_SYSROOT=%s' % CModelDriver._osx_sysroot)
+                if os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
+                    out['definitions'].append(
+                        'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
+                        % os.environ['MACOSX_DEPLOYMENT_TARGET'])
+        return out
+    
     def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
