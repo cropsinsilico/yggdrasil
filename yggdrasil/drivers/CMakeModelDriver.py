@@ -735,15 +735,14 @@ class CMakeModelDriver(BuildModelDriver):
 
         """
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
-        if platform._is_mac:
-            if CModelDriver._osx_sysroot is not None:
-                out.setdefault('definitions', [])
+        if CModelDriver._osx_sysroot is not None:
+            out.setdefault('definitions', [])
+            out['definitions'].append(
+                'CMAKE_OSX_SYSROOT=%s' % CModelDriver._osx_sysroot)
+            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
                 out['definitions'].append(
-                    'CMAKE_OSX_SYSROOT=%s' % CModelDriver._osx_sysroot)
-                if os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
-                    out['definitions'].append(
-                        'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
-                        % os.environ['MACOSX_DEPLOYMENT_TARGET'])
+                    'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
+                    % os.environ['MACOSX_DEPLOYMENT_TARGET'])
         return out
     
     def set_env(self, **kwargs):

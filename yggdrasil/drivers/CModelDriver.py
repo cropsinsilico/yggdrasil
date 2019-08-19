@@ -384,17 +384,37 @@ class CModelDriver(CompiledModelDriver):
         out = super(CModelDriver, cls).update_compiler_kwargs(**kwargs)
         if _osx_sysroot is not None:
             out['sysroot'] = _osx_sysroot
-            out.setdefault('include_dirs', [])
-            out['include_dirs'].append(os.path.join(
-                _osx_sysroot, 'usr', 'include'))
-            out.setdefault('definitions', [])
-            out['definitions'].append(
-                'CMAKE_OSX_SYSROOT=%s' % _osx_sysroot)
-            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
-                out['definitions'].append(
-                    'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
-                    % os.environ['MACOSX_DEPLOYMENT_TARGET'])
+            # out.setdefault('include_dirs', [])
+            # out['include_dirs'].append(os.path.join(
+            #     _osx_sysroot, 'usr', 'include'))
         return out
+        
+    @classmethod
+    def call_linker(cls, obj, language=None, **kwargs):
+        r"""Link several object files to create an executable or library (shared
+        or static), checking for errors.
+
+        Args:
+            obj (list): Object files that should be linked.
+            language (str, optional): Language that should be used to link
+                the files. Defaults to None and the language of the current
+                driver is used.
+            **kwargs: Additional keyword arguments are passed to run_executable.
+
+        Returns:
+            str: Full path to compiled source.
+
+        """
+        if (((cls.language == 'c') and (language is None)
+             and kwargs.get('for_model', False)
+             and (not kwargs.get('skip_interface_flags', False)))):
+            print('before', kwargs)
+            language = 'c++'
+            kwargs.update(cls.update_linker_kwargs(**kwargs))
+            kwargs['skip_interface_flags'] = True
+            print('after', kwargs)
+        return super(CModelDriver, cls).call_linker(obj, language=language,
+                                                    **kwargs)
         
     @classmethod
     def update_ld_library_path(cls, env, paths_to_add=None, add_to_front=False):
