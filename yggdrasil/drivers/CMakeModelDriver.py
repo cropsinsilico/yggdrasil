@@ -595,13 +595,7 @@ class CMakeModelDriver(BuildModelDriver):
         self.buildfile_base = 'CMakeLists.txt'
         super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
         self.buildfile_copy = '_orig'.join(os.path.splitext(self.buildfile))
-        # self.cmakelists = os.path.join(self.sourcedir, 'CMakeLists.txt')
-        # print(self.buildfile)
-        # print(self.cmakelists)
-        # assert(self.buildfile == self.cmakelists)
         self.modified_files.append((self.buildfile_copy, self.buildfile))
-        # self.cmakelists_copy = os.path.join(self.sourcedir, 'CMakeLists_orig.txt')
-        # self.modified_files.append((self.cmakelists_copy, self.cmakelists))
 
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
@@ -628,41 +622,50 @@ class CMakeModelDriver(BuildModelDriver):
         assert(os.path.isfile(include_file))
         out.append(include_file)
         # Create copy of cmakelists and modify
+        contents = b''
+        newlines_before = []
+        newlines_after = []
         if os.path.isfile(self.buildfile):
             if not os.path.isfile(self.buildfile_copy):
                 shutil.copy2(self.buildfile, self.buildfile_copy)
             with open(self.buildfile, 'rb') as fd:
                 contents = fd.read()
+            # Prevent error when cross compiling by building static lib as test
+            newlines_before.append(
+                'set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")\n')
+            # Set sysroot on mac to allow for use of alternate SDK
+            newlines_before.append(
+                'set(CMAKE_CXX_FLAGS "--sysroot ${CMAKE_OSX_SYSROOT} '
+                '${CMAKE_CXX_FLAGS}")\n')
+            # Add conda prefix as first line so that conda installed C libraries are
+            # used
+            conda_prefix = self.get_tool_instance('compiler').get_conda_prefix()
+            if conda_prefix:
+                newlines_before.append(
+                    'LINK_DIRECTORIES(%s)\n' % os.path.join(conda_prefix, 'lib'))
+            # Explicitly set Release/Debug directories to builddir on windows
+            if platform._is_win:  # pragma: windows
+                for artifact in ['runtime', 'library', 'archive']:
+                    for conf in ['release', 'debug']:
+                        newlines_before.append(
+                            'SET( CMAKE_%s_OUTPUT_DIRECTORY_%s '
+                            % (artifact.upper(), conf.upper())
+                            + '"${OUTPUT_DIRECTORY}")\n')
+            # Add yggdrasil created include if not already in the file
+            newlines_after.append(
+                '\nINCLUDE(%s)\n' % os.path.basename(include_file))
+            # Write contents to the build file, check for new lines that may
+            # already be included
             with open(self.buildfile, 'wb') as fd:
-                # Change test compilation to static library to prevent error when
-                # cross compiling
-                newline = backwards.as_bytes(
-                    'set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")\n')
-                if newline not in contents:
-                    fd.write(newline)
-                # Add conda prefix as first line
-                conda_prefix = self.get_tool_instance('compiler').get_conda_prefix()
-                if conda_prefix:
-                    newline = backwards.as_bytes('LINK_DIRECTORIES(%s)\n'
-                                                 % os.path.join(conda_prefix, 'lib'))
+                for newline in newlines_before:
+                    newline = backwards.as_bytes(newline)
                     if newline not in contents:
                         fd.write(newline)
-                # Explicitly set Release/Debug directories to builddir on windows
-                if platform._is_win:  # pragma: windows
-                    for artifact in ['runtime', 'library', 'archive']:
-                        for conf in ['release', 'debug']:
-                            newline = backwards.as_bytes(
-                                'SET( CMAKE_%s_OUTPUT_DIRECTORY_%s '
-                                % (artifact.upper(), conf.upper())
-                                + '"${OUTPUT_DIRECTORY}")\n')
-                            if newline not in contents:
-                                fd.write(newline)
                 fd.write(contents)
-                # Add include if not already in the file
-                newline = backwards.as_bytes('\nINCLUDE(%s)\n'
-                                             % os.path.basename(include_file))
-                if newline not in contents:
-                    fd.write(newline)
+                for newline in newlines_after:
+                    newline = backwards.as_bytes(newline)
+                    if newline not in contents:
+                        fd.write(newline)
         return out
 
     def set_target_language(self):
@@ -732,7 +735,6 @@ class CMakeModelDriver(BuildModelDriver):
         """
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         if platform._is_mac:
-            print('sysroot (cmake)', CModelDriver._osx_sysroot)
             if CModelDriver._osx_sysroot is not None:
                 out.setdefault('definitions', [])
                 out['definitions'].append(

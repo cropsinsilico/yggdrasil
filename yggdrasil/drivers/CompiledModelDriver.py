@@ -2797,7 +2797,7 @@ class CompiledModelDriver(ModelDriver):
         return out
 
     @classmethod
-    def call_linker(cls, obj, language=None, **kwargs):
+    def call_linker(cls, obj, language=None, dont_update_kwargs=False, **kwargs):
         r"""Link several object files to create an executable or library (shared
         or static), checking for errors.
 
@@ -2806,6 +2806,8 @@ class CompiledModelDriver(ModelDriver):
             language (str, optional): Language that should be used to link
                 the files. Defaults to None and the language of the current
                 driver is used.
+            dont_update_kwargs (bool, optional): If True, the kwargs will not
+                be updated using update_linker_kwargs. Defaults to False.
             **kwargs: Additional keyword arguments are passed to run_executable.
 
         Returns:
@@ -2815,6 +2817,8 @@ class CompiledModelDriver(ModelDriver):
         language = kwargs.pop('linker_language', language)
         # Link using another driver if the language dosn't match
         if (language is not None) and (language != cls.language):
+            kwargs = cls.update_linker_kwargs(**kwargs)
+            kwargs['dont_update_kwargs'] = True
             drv = import_component('model', language)
             return drv.call_linker(obj, **kwargs)
         # Determine tool that should be used
@@ -2823,6 +2827,7 @@ class CompiledModelDriver(ModelDriver):
         else:
             tool = cls.get_tool('linker')
         # Compile using the tool after updating the flags
-        kwargs = cls.update_linker_kwargs(**kwargs)
+        if not dont_update_kwargs:
+            kwargs = cls.update_linker_kwargs(**kwargs)
         out = tool.call(obj, **kwargs)
         return out
