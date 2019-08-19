@@ -634,9 +634,10 @@ class CMakeModelDriver(BuildModelDriver):
             newlines_before.append(
                 'set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")\n')
             # Set sysroot on mac to allow for use of alternate SDK
-            newlines_before.append(
-                'set(CMAKE_CXX_FLAGS "--sysroot ${CMAKE_OSX_SYSROOT} '
-                '${CMAKE_CXX_FLAGS}")\n')
+            if platform._is_mac:
+                newlines_before.append(
+                    'set(CMAKE_CXX_FLAGS "--sysroot ${CMAKE_OSX_SYSROOT} '
+                    '${CMAKE_CXX_FLAGS}")\n')
             # Add conda prefix as first line so that conda installed C libraries are
             # used
             conda_prefix = self.get_tool_instance('compiler').get_conda_prefix()
