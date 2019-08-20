@@ -3,7 +3,7 @@ import re
 import shutil
 import logging
 from collections import OrderedDict
-from yggdrasil import platform, backwards, components
+from yggdrasil import platform, components
 from yggdrasil.drivers.CompiledModelDriver import (
     CompilerBase, LinkerBase)
 from yggdrasil.drivers.BuildModelDriver import BuildModelDriver
@@ -298,7 +298,7 @@ class CMakeConfigure(CompilerBase):
                 if x not in compile_flags:
                     compile_flags.append(x)
         # Compilation flags
-        prev_sysroot = False
+        prev_sysroot = 0
         for x in compile_flags:
             if x.startswith('-D'):
                 preamble_lines.append('ADD_DEFINITIONS(%s)' % x)
@@ -315,18 +315,28 @@ class CMakeConfigure(CompilerBase):
                     preamble_lines.append(new_def)
             elif x.startswith('--sysroot'):
                 assert(not x.startswith('--sysroot='))
-                prev_sysroot = True
-            elif prev_sysroot:
-                preamble_lines.append((
-                    'set(CMAKE_CXX_FLAGS "--sysroot '
-                    '%s ${CMAKE_CXX_FLAGS}")') % x)
-                prev_sysroot = False
+                prev_sysroot = 1
+            elif prev_sysroot == 1:
+                preamble_lines += [
+                    ('set(CMAKE_CXX_FLAGS "--sysroot '
+                     '%s ${CMAKE_CXX_FLAGS}")') % x,
+                    ('set(CMAKE_C_FLAGS "--sysroot '
+                     '%s ${CMAKE_C_FLAGS}")') % x]
+                prev_sysroot = 2
             elif x.startswith('-') or x.startswith('/'):
                 new_def = 'ADD_DEFINITIONS(%s)' % x
                 if new_def not in preamble_lines:
                     preamble_lines.append(new_def)
             else:
                 raise ValueError("Could not parse compiler flag '%s'." % x)
+        # Set sysroot based on CMAKE_OSX_SYSROOT if sysroot not set
+        # explicitly
+        # if (not prev_sysroot) and platform._is_mac:
+        if platform._is_mac:
+            preamble_lines = (
+                ['set(%s "--sysroot ${CMAKE_OSX_SYSROOT} ${%s}")' % (x, x)
+                 for x in ['CMAKE_C_FLAGS', 'CMAKE_CXX_FLAGS']]
+                + preamble_lines)
         # Linker flags
         for x in linker_flags:
             if x.startswith('-l'):
@@ -384,14 +394,16 @@ class CMakeConfigure(CompilerBase):
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
         lines = preamble_lines + lines
-        if verbose:  # pragma: debug
-            logger.info('CMake include file:\n\t' + '\n\t'.join(lines))
+        verbose = True
+        log_msg = 'CMake include file:\n\t' + '\n\t'.join(lines)
+        if verbose:
+            logger.info(log_msg)
         else:
-            logger.debug('CMake include file:\n\t' + '\n\t'.join(lines))
+            logger.debug(log_msg)
         if fname is None:
             return lines
         else:
-            if os.path.isfile(fname):  # pragma: debug
+            if os.path.isfile(fname):
                 os.remove(fname)
             with open(fname, 'w') as fd:
                 fd.write('\n'.join(lines))
@@ -631,28 +643,22 @@ class CMakeModelDriver(BuildModelDriver):
         assert(os.path.isfile(include_file))
         out.append(include_file)
         # Create copy of cmakelists and modify
-        contents = b''
         newlines_before = []
         newlines_after = []
         if os.path.isfile(self.buildfile):
             if not os.path.isfile(self.buildfile_copy):
                 shutil.copy2(self.buildfile, self.buildfile_copy)
-            with open(self.buildfile, 'rb') as fd:
-                contents = fd.read()
+            with open(self.buildfile, 'r') as fd:
+                contents = fd.read().splitlines()
             # Prevent error when cross compiling by building static lib as test
             newlines_before.append(
-                'set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")\n')
-            # Set sysroot on mac to allow for use of alternate SDK
-            if platform._is_mac:
-                newlines_before.append(
-                    'set(CMAKE_CXX_FLAGS "--sysroot ${CMAKE_OSX_SYSROOT} '
-                    '${CMAKE_CXX_FLAGS}")\n')
+                'set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")')
             # Add conda prefix as first line so that conda installed C libraries are
             # used
             conda_prefix = self.get_tool_instance('compiler').get_conda_prefix()
             if conda_prefix:
                 newlines_before.append(
-                    'LINK_DIRECTORIES(%s)\n' % os.path.join(conda_prefix, 'lib'))
+                    'LINK_DIRECTORIES(%s)' % os.path.join(conda_prefix, 'lib'))
             # Explicitly set Release/Debug directories to builddir on windows
             if platform._is_win:  # pragma: windows
                 for artifact in ['runtime', 'library', 'archive']:
@@ -660,22 +666,29 @@ class CMakeModelDriver(BuildModelDriver):
                         newlines_before.append(
                             'SET( CMAKE_%s_OUTPUT_DIRECTORY_%s '
                             % (artifact.upper(), conf.upper())
-                            + '"${OUTPUT_DIRECTORY}")\n')
+                            + '"${OUTPUT_DIRECTORY}")')
             # Add yggdrasil created include if not already in the file
             newlines_after.append(
-                '\nINCLUDE(%s)\n' % os.path.basename(include_file))
+                'INCLUDE(%s)' % os.path.basename(include_file))
+            # Consolidate lines, checking for lines that already exist
+            lines = []
+            for newline in newlines_before:
+                if newline not in contents:
+                    lines.append(newline)
+            lines += contents
+            for newline in newlines_after:
+                if newline not in contents:
+                    lines.append(newline)
             # Write contents to the build file, check for new lines that may
             # already be included
-            with open(self.buildfile, 'wb') as fd:
-                for newline in newlines_before:
-                    newline = backwards.as_bytes(newline)
-                    if newline not in contents:
-                        fd.write(newline)
-                fd.write(contents)
-                for newline in newlines_after:
-                    newline = backwards.as_bytes(newline)
-                    if newline not in contents:
-                        fd.write(newline)
+            kwargs['verbose'] = True
+            log_msg = 'New CMakeLists.txt:\n\t' + '\n\t'.join(lines)
+            if kwargs.get('verbose', False):
+                logger.info(log_msg)
+            else:
+                logger.debug(log_msg)
+            with open(self.buildfile, 'w') as fd:
+                fd.write('\n'.join(lines))
         return out
 
     def set_target_language(self):
