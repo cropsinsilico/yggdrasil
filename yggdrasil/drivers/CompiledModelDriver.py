@@ -2822,7 +2822,6 @@ class CompiledModelDriver(ModelDriver):
             tool = cls.get_tool('archiver')
         else:
             tool = cls.get_tool('linker')
-        print('tool', tool)
         # Compile using the tool after updating the flags
         kwargs = cls.update_linker_kwargs(**kwargs)
         out = tool.call(obj, **kwargs)

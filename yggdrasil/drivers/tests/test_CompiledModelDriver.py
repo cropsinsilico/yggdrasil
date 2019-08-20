@@ -225,7 +225,9 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
         if compiler:
             if ((compiler.combine_with_linker
                  or compiler.no_separate_linking)):
-                print(compiler, compiler.get_flags(invalid_kw=True))
+                print(compiler, compiler.get_flags(invalid_kw=True,
+                                                   unused_kwargs={},
+                                                   libraries=[]))
             else:
                 self.assert_raises(ValueError, compiler.get_flags)
 
