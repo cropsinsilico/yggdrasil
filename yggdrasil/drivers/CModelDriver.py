@@ -102,13 +102,17 @@ class ClangCompiler(CCompilerBase):
     platforms = ['MacOS']
     default_archiver = 'libtool'
     flag_options = OrderedDict(list(CCompilerBase.flag_options.items())
-                               + [('sysroot', '--sysroot')])
+                               + [('sysroot', '--sysroot'),
+                                  ('isysroot', '-isysroot'),
+                                  ('mmacosx-version-min',
+                                   '-mmacosx-version-min=%s')])
     linker_attributes = dict(CCompilerBase.linker_attributes,
                              flag_options=OrderedDict(
                                  list(CCompilerBase.linker_attributes.get(
                                      'flag_options',
                                      LinkerBase.flag_options).items())
-                                 + [('sysroot', '--sysroot')]))
+                                 + [('sysroot', '--sysroot'),
+                                    ('isysroot', '-isysroot')]))
 
 
 class MSVCCompiler(CCompilerBase):
@@ -390,6 +394,9 @@ class CModelDriver(CompiledModelDriver):
         out = super(CModelDriver, cls).update_compiler_kwargs(**kwargs)
         if _osx_sysroot is not None:
             out['sysroot'] = _osx_sysroot
+            out['isysroot'] = _osx_sysroot
+            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', False):
+                out['mmacosx-version-min'] = '${MACOSX_DEPLOYMENT_TARGET}'
             out.setdefault('include_dirs', [])
             out['include_dirs'].append(os.path.join(
                 _osx_sysroot, 'usr', 'include'))
@@ -412,6 +419,7 @@ class CModelDriver(CompiledModelDriver):
         out = super(CModelDriver, cls).update_linker_kwargs(**kwargs)
         if _osx_sysroot is not None:
             out['sysroot'] = _osx_sysroot
+            out['isysroot'] = _osx_sysroot
             out.setdefault('library_dirs', [])
             out['library_dirs'].append(os.path.join(
                 _osx_sysroot, 'usr', 'lib'))
