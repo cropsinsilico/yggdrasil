@@ -396,7 +396,8 @@ class CModelDriver(CompiledModelDriver):
             out['sysroot'] = _osx_sysroot
             out['isysroot'] = _osx_sysroot
             if os.environ.get('MACOSX_DEPLOYMENT_TARGET', False):
-                out['mmacosx-version-min'] = '${MACOSX_DEPLOYMENT_TARGET}'
+                out['mmacosx-version-min'] = os.environ[
+                    'MACOSX_DEPLOYMENT_TARGET']
             out.setdefault('include_dirs', [])
             out['include_dirs'].append(os.path.join(
                 _osx_sysroot, 'usr', 'include'))
@@ -418,8 +419,8 @@ class CModelDriver(CompiledModelDriver):
         """
         out = super(CModelDriver, cls).update_linker_kwargs(**kwargs)
         if _osx_sysroot is not None:
-            out['sysroot'] = _osx_sysroot
-            out['isysroot'] = _osx_sysroot
+            # out['sysroot'] = _osx_sysroot
+            # out['isysroot'] = _osx_sysroot
             out.setdefault('library_dirs', [])
             out['library_dirs'].append(os.path.join(
                 _osx_sysroot, 'usr', 'lib'))
