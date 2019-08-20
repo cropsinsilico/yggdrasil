@@ -429,11 +429,9 @@ class CModelDriver(CompiledModelDriver):
         if (((cls.language == 'c') and (language is None)
              and kwargs.get('for_model', False)
              and (not kwargs.get('skip_interface_flags', False)))):
-            print('before', kwargs)
             language = 'c++'
             kwargs.update(cls.update_linker_kwargs(**kwargs))
             kwargs['skip_interface_flags'] = True
-            print('after', kwargs)
         return super(CModelDriver, cls).call_linker(obj, language=language,
                                                     **kwargs)
         
