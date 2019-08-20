@@ -309,6 +309,10 @@ jobs:
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
+      script:
+        - sh ci/pretest_script.sh || travis_terminate 1;
+        - yggtest -c setup.cfg --cov-config=.coveragerc drivers/tests/test_CModelDriver.py
+        - yggtest -c setup.cfg --cov-config=.coveragerc drivers/tests/test_CMakeModelDriver.py
     - name: "Build docs"
       python: 3.6
       env: BUILDDOCS=1
