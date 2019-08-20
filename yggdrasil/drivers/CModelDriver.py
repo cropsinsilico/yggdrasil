@@ -390,6 +390,27 @@ class CModelDriver(CompiledModelDriver):
         return out
         
     @classmethod
+    def update_linker_kwargs(cls, **kwargs):
+        r"""Update keyword arguments supplied to the linker get_flags method
+        for various options.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Keyword arguments for a get_flags method providing linker
+                flags.
+
+        """
+        out = super(CModelDriver, cls).update_linker_kwargs(**kwargs)
+        if _osx_sysroot is not None:
+            out.setdefault('library_dirs', [])
+            out['library_dirs'].append(os.path.join(
+                _osx_sysroot, 'usr', 'lib'))
+        return out
+        
+    @classmethod
     def call_linker(cls, obj, language=None, **kwargs):
         r"""Link several object files to create an executable or library (shared
         or static), checking for errors.

@@ -298,6 +298,7 @@ class CMakeConfigure(CompilerBase):
                 if x not in compile_flags:
                     compile_flags.append(x)
         # Compilation flags
+        prev_sysroot = False
         for x in compile_flags:
             if x.startswith('-D'):
                 preamble_lines.append('ADD_DEFINITIONS(%s)' % x)
@@ -312,6 +313,14 @@ class CMakeConfigure(CompilerBase):
                 new_def = 'SET(CMAKE_CXX_STANDARD %s)' % x.split('c++')[-1]
                 if new_def not in preamble_lines:
                     preamble_lines.append(new_def)
+            elif x.startswith('--sysroot'):
+                assert(not x.startswith('--sysroot='))
+                prev_sysroot = True
+            elif prev_sysroot:
+                preamble_lines.append((
+                    'set(CMAKE_CXX_FLAGS "--sysroot '
+                    '%s ${CMAKE_CXX_FLAGS}")') % x)
+                prev_sysroot = False
             elif x.startswith('-') or x.startswith('/'):
                 new_def = 'ADD_DEFINITIONS(%s)' % x
                 if new_def not in preamble_lines:
