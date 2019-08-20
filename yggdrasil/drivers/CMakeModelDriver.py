@@ -422,6 +422,22 @@ class CMakeBuilder(LinkerBase):
     executable_ext = ''
 
     @classmethod
+    def call(cls, *args, **kwargs):
+        r"""Print contents of CMakeCache.txt before raising error."""
+        try:
+            return super(CMakeBuilder, cls).call(*args, **kwargs)
+        except BaseException:  # pragma: debug
+            cache = 'CMakeCache.txt'
+            if kwargs.get('working_dir', None):
+                cache = os.path.join(kwargs['working_dir'], cache)
+            if os.path.isfile(cache):
+                with open(cache, 'r') as fd:
+                    print('CMakeCache.txt:\n%s' % fd.read())
+            else:
+                print('Cache file does not exist: %s' % cache)
+            raise
+
+    @classmethod
     def extract_kwargs(cls, kwargs, **kwargs_ex):
         r"""Extract linker kwargs, leaving behind just compiler kwargs.
 
