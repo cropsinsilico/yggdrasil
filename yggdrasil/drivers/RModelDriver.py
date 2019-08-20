@@ -203,9 +203,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         elif isinstance(pyobj, dict):
             return {backwards.as_str(k): cls.python2language(v)
                     for k, v in pyobj.items()}
-        elif isinstance(pyobj, backwards.string_types):
-            return backwards.as_str(pyobj)
-        elif isinstance(pyobj, np.string_):
+        elif isinstance(pyobj, tuple(list(backwards.string_types)
+                                     + [np.string_])):
             return backwards.as_str(pyobj)
         elif isinstance(pyobj, pd.DataFrame):
             # R dosn't have int64 and will cast 64bit ints as floats if passed
