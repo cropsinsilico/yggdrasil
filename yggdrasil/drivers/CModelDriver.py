@@ -4,7 +4,7 @@ import subprocess
 from collections import OrderedDict
 from yggdrasil import platform, tools, backwards
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase, ArchiverBase)
+    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase)
 from yggdrasil.languages import get_language_dir
 
 
@@ -103,6 +103,12 @@ class ClangCompiler(CCompilerBase):
     default_archiver = 'libtool'
     flag_options = OrderedDict(list(CCompilerBase.flag_options.items())
                                + [('sysroot', '--sysroot')])
+    linker_attributes = dict(CCompilerBase.linker_attributes,
+                             flag_options=OrderedDict(
+                                 list(CCompilerBase.linker_attributes.get(
+                                     'flag_options',
+                                     LinkerBase.flag_options).items())
+                                 + [('sysroot', '--sysroot')]))
 
 
 class MSVCCompiler(CCompilerBase):
@@ -405,6 +411,7 @@ class CModelDriver(CompiledModelDriver):
         """
         out = super(CModelDriver, cls).update_linker_kwargs(**kwargs)
         if _osx_sysroot is not None:
+            out['sysroot'] = _osx_sysroot
             out.setdefault('library_dirs', [])
             out['library_dirs'].append(os.path.join(
                 _osx_sysroot, 'usr', 'lib'))
