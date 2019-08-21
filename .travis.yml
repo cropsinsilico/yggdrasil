@@ -101,6 +101,7 @@ before_install:
         # https://github.com/conda-forge/mpi-feedstock/issues/4
         export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-10.9}
         export CONDA_BUILD_SYSROOT="$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk"
+	export SDKROOT=${CONDA_BUILD_SYSROOT}
 
         if [[ ! -d ${CONDA_BUILD_SYSROOT} || "$OSX_FORCE_SDK_DOWNLOAD" == "1" ]]; then
           echo "Downloading ${MACOSX_DEPLOYMENT_TARGET} sdk to ${CONDA_BUILD_SYSROOT}"
@@ -217,11 +218,7 @@ install:
       # --use-local not working in
       #  - conda 4.7.5, conda-build 3.17.8, Python 2.7, 3.6, or 3.7
       conda --version
-      echo "CONDA_PREFIX = $CONDA_PREFIX"
-      echo "CONDA_ROOT   = $CONDA_ROOT"
-      echo "CONDA_BUILD_SYSROOT (before index) = $CONDA_BUILD_SYSROOT"
       conda index ${CONDA_PREFIX}/conda-bld
-      echo "CONDA_BUILD_SYSROOT (before install) = $CONDA_BUILD_SYSROOT"
       conda install -c file:/${CONDA_PREFIX}/conda-bld yggdrasil
       # if [[ "$YGG_CONDA" == "3.7" ]]; then
       #   # conda install -c local yggdrasil
@@ -230,8 +227,6 @@ install:
       #   conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
       # fi
       conda list
-      export CONDA_BUILD_SYSROOT="$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk"
-      echo "CONDA_BUILD_SYSROOT (after install) = $CONDA_BUILD_SYSROOT"
     fi
 
 script:
@@ -308,7 +303,7 @@ jobs:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
       script:
-        - echo "CONDA_BUILD_SYSROOT (at test) = $CONDA_BUILD_SYSROOT"
+        - echo "SDKROOT (at test) = $SDKROOT"
         - sh ci/pretest_script.sh || travis_terminate 1;
         - yggtest -c setup.cfg --cov-config=.coveragerc drivers/tests/test_CModelDriver.py
         - yggtest -c setup.cfg --cov-config=.coveragerc drivers/tests/test_CMakeModelDriver.py

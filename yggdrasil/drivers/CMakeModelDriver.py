@@ -270,7 +270,7 @@ class CMakeConfigure(CompilerBase):
         external_library_flags = []
         internal_library_flags = []
         compile_flags = driver.get_compiler_flags(
-            skip_defaults=True,
+            skip_defaults=True, skip_sysroot=True,
             flags=compile_flags, use_library_path=use_library_path,
             dont_link=True, for_model=True, dry_run=True,
             logging_level=logging_level)
@@ -298,8 +298,8 @@ class CMakeConfigure(CompilerBase):
                 if x not in compile_flags:
                     compile_flags.append(x)
         # Compilation flags
-        prev_sysroot = 0
-        prev_isysroot = 0
+        # prev_sysroot = 0
+        # prev_isysroot = 0
         for x in compile_flags:
             if x.startswith('-D'):
                 preamble_lines.append('ADD_DEFINITIONS(%s)' % x)
@@ -314,26 +314,26 @@ class CMakeConfigure(CompilerBase):
                 new_def = 'SET(CMAKE_CXX_STANDARD %s)' % x.split('c++')[-1]
                 if new_def not in preamble_lines:
                     preamble_lines.append(new_def)
-            elif x.startswith('-isysroot'):
-                assert(not x.startswith('-isysroot='))
-                prev_isysroot = 1
-            elif prev_isysroot == 1:
-                preamble_lines += [
-                    ('set(CMAKE_CXX_FLAGS "-isysroot '
-                     '%s ${CMAKE_CXX_FLAGS}")') % x,
-                    ('set(CMAKE_C_FLAGS "-isysroot '
-                     '%s ${CMAKE_C_FLAGS}")') % x]
-                prev_isysroot = 2
-            elif x.startswith('--sysroot'):
-                assert(not x.startswith('--sysroot='))
-                prev_sysroot = 1
-            elif prev_sysroot == 1:
-                preamble_lines += [
-                    ('set(CMAKE_CXX_FLAGS "--sysroot '
-                     '%s ${CMAKE_CXX_FLAGS}")') % x,
-                    ('set(CMAKE_C_FLAGS "--sysroot '
-                     '%s ${CMAKE_C_FLAGS}")') % x]
-                prev_sysroot = 2
+            # elif x.startswith('-isysroot'):
+            #     assert(not x.startswith('-isysroot='))
+            #     prev_isysroot = 1
+            # elif prev_isysroot == 1:
+            #     preamble_lines += [
+            #         ('set(CMAKE_CXX_FLAGS "-isysroot '
+            #          '%s ${CMAKE_CXX_FLAGS}")') % x,
+            #         ('set(CMAKE_C_FLAGS "-isysroot '
+            #          '%s ${CMAKE_C_FLAGS}")') % x]
+            #     prev_isysroot = 2
+            # elif x.startswith('--sysroot'):
+            #     assert(not x.startswith('--sysroot='))
+            #     prev_sysroot = 1
+            # elif prev_sysroot == 1:
+            #     preamble_lines += [
+            #         ('set(CMAKE_CXX_FLAGS "--sysroot '
+            #          '%s ${CMAKE_CXX_FLAGS}")') % x,
+            #         ('set(CMAKE_C_FLAGS "--sysroot '
+            #          '%s ${CMAKE_C_FLAGS}")') % x]
+            #     prev_sysroot = 2
             elif x.startswith('-') or x.startswith('/'):
                 new_def = 'ADD_DEFINITIONS(%s)' % x
                 if new_def not in preamble_lines:
@@ -343,11 +343,11 @@ class CMakeConfigure(CompilerBase):
         # Set sysroot based on CMAKE_OSX_SYSROOT if sysroot not set
         # explicitly
         # if (not prev_sysroot) and platform._is_mac:
-        if platform._is_mac:
-            preamble_lines = (
-                ['set(%s "--sysroot ${CMAKE_OSX_SYSROOT} ${%s}")' % (x, x)
-                 for x in ['CMAKE_C_FLAGS', 'CMAKE_CXX_FLAGS']]
-                + preamble_lines)
+        # if platform._is_mac:
+        #     preamble_lines = (
+        #         ['set(%s "--sysroot ${CMAKE_OSX_SYSROOT} ${%s}")' % (x, x)
+        #          for x in ['CMAKE_C_FLAGS', 'CMAKE_CXX_FLAGS']]
+        #         + preamble_lines)
         # Linker flags
         for x in linker_flags:
             if x.startswith('-l'):

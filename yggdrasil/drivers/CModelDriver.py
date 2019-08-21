@@ -4,7 +4,7 @@ import subprocess
 from collections import OrderedDict
 from yggdrasil import platform, tools, backwards
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase)
+    CompiledModelDriver, CompilerBase, ArchiverBase)
 from yggdrasil.languages import get_language_dir
 
 
@@ -23,26 +23,33 @@ def get_OSX_SYSROOT():
     """
     fname = None
     if platform._is_mac:
-        print('get_OSX_SYSROOT',
-              os.environ.get('MACOSX_DEPLOYMENT_TARGET', False),
-              os.environ.get('CONDA_BUILD_SYSROOT', False))
-        fname_try = [
-            ('$(xcode-select -p)/Platforms/MacOSX.platform/'
-             'Developer/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk'),
-            '$(xcode-select -p)/SDKs/MacOSX.sdk']
-        if os.environ.get('CONDA_BUILD_SYSROOT', False):
-            fname_try.insert(0, os.environ['CONDA_BUILD_SYSROOT'])
+        try:
+            xcode_dir = backwards.as_str(subprocess.check_output(
+                'echo "$(xcode-select -p)"', shell=True).strip())
+        except BaseException:  # pragma: debug
+            xcode_dir = None
+        print(('get_OSX_SYSROOT: MACOSX_DEPLOYMENT_TARGET=%s, '
+               'CONDA_BUILD_SYSROOT=%s, SDKROOT=%s')
+              % (os.environ.get('MACOSX_DEPLOYMENT_TARGET', False),
+                 os.environ.get('CONDA_BUILD_SYSROOT', False),
+                 os.environ.get('SDKROOT', False)))
+        fname_try = []
+        if xcode_dir is not None:
+            fname_base = os.path.join(xcode_dir, 'Platforms',
+                                      'MacOSX.platform', 'Developer',
+                                      'SDKs', 'MacOSX%s.sdk')
+            fname_try += [
+                fname_base % os.environ.get('MACOSX_DEPLOYMENT_TARGET', ''),
+                fname_base % '',
+                os.path.join(xcode_dir, 'SDKs', 'MacOSX.sdk')]
+        if os.environ.get('SDKROOT', False):
+            fname_try.insert(0, os.environ['SDKROOT'])
+        # if os.environ.get('CONDA_BUILD_SYSROOT', False):
+        #     fname_try.insert(0, os.environ['CONDA_BUILD_SYSROOT'])
         for fcheck in fname_try:
-            try:
-                print('checking...', fcheck)
-                fname = subprocess.check_output('echo "%s"' % fcheck,
-                                                shell=True).strip()
-                print('dir:', fname, os.path.isdir(fname))
-                if os.path.isdir(fname):
-                    fname = backwards.as_str(fname)
-                    break
-            except BaseException:  # pragma: debug
-                pass
+            if os.path.isdir(fcheck):
+                fname = fcheck
+                break
     return fname
 
 
@@ -114,14 +121,6 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
-    linker_attributes = dict(CCompilerBase.linker_attributes,
-                             flag_options=OrderedDict(
-                                 list(CCompilerBase.linker_attributes.get(
-                                     'flag_options',
-                                     LinkerBase.flag_options).items())
-                                 + [('sysroot', '--sysroot'),
-                                    ('isysroot', {'key': '-isysroot',
-                                                  'prepend': True})]))
 
 
 class MSVCCompiler(CCompilerBase):
@@ -387,11 +386,13 @@ class CModelDriver(CompiledModelDriver):
         return out
 
     @classmethod
-    def update_compiler_kwargs(cls, **kwargs):
+    def update_compiler_kwargs(cls, skip_sysroot=False, **kwargs):
         r"""Update keyword arguments supplied to the compiler get_flags method
         for various options.
 
         Args:
+            skip_sysroot (bool, optional): If True, the isysroot flag will
+                not be added. Defaults to False.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method.
 
@@ -401,39 +402,12 @@ class CModelDriver(CompiledModelDriver):
 
         """
         out = super(CModelDriver, cls).update_compiler_kwargs(**kwargs)
-        if _osx_sysroot is not None:
-            # out['sysroot'] = _osx_sysroot
+        if (not skip_sysroot) and (_osx_sysroot is not None):
             out['isysroot'] = _osx_sysroot
             if os.environ.get('MACOSX_DEPLOYMENT_TARGET', False):
                 out['mmacosx-version-min'] = os.environ[
                     'MACOSX_DEPLOYMENT_TARGET']
-            # out.setdefault('include_dirs', [])
-            # out['include_dirs'].append(os.path.join(
-            #     _osx_sysroot, 'usr', 'include'))
         return out
-        
-    # @classmethod
-    # def update_linker_kwargs(cls, **kwargs):
-    #     r"""Update keyword arguments supplied to the linker get_flags method
-    #     for various options.
-
-    #     Args:
-    #         **kwargs: Additional keyword arguments are passed to the parent
-    #             class's method.
-
-    #     Returns:
-    #         dict: Keyword arguments for a get_flags method providing linker
-    #             flags.
-
-    #     """
-    #     out = super(CModelDriver, cls).update_linker_kwargs(**kwargs)
-    #     if _osx_sysroot is not None:
-    #         # out['sysroot'] = _osx_sysroot
-    #         out['isysroot'] = _osx_sysroot
-    #         # out.setdefault('library_dirs', [])
-    #         # out['library_dirs'].append(os.path.join(
-    #         #     _osx_sysroot, 'usr', 'lib'))
-    #     return out
         
     @classmethod
     def call_linker(cls, obj, language=None, **kwargs):
