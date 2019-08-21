@@ -44,8 +44,6 @@ def get_OSX_SYSROOT():
                 os.path.join(xcode_dir, 'SDKs', 'MacOSX.sdk')]
         if os.environ.get('SDKROOT', False):
             fname_try.insert(0, os.environ['SDKROOT'])
-        # if os.environ.get('CONDA_BUILD_SYSROOT', False):
-        #     fname_try.insert(0, os.environ['CONDA_BUILD_SYSROOT'])
         for fcheck in fname_try:
             if os.path.isdir(fcheck):
                 fname = fcheck
