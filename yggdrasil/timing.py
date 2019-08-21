@@ -5,7 +5,7 @@ import copy
 import json
 import yaml
 import uuid
-import perf
+import pyperf
 import subprocess
 import warnings
 import tempfile
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 _linewidth = 2
 _legend_fontsize = 14
 mpl.rc('font', size=18)
-_perf_warmups = 0
+_pyperf_warmups = 0
 
 
 # TODO:
@@ -70,10 +70,10 @@ def get_comm_list():
     return _comm_list
 
 
-def write_perf_script(script_file, nmsg, msg_size,
-                      lang_src, lang_dst, comm_type,
-                      nrep=10, max_errors=5, matlab_running=False):
-    r"""Write a script to run perf.
+def write_pyperf_script(script_file, nmsg, msg_size,
+                        lang_src, lang_dst, comm_type,
+                        nrep=10, max_errors=5, matlab_running=False):
+    r"""Write a script to run pyperf.
 
     Args:
         script_file (str): Full path to the file where the script should be
@@ -96,17 +96,12 @@ def write_perf_script(script_file, nmsg, msg_size,
 
     """
     lines = [
-        'import perf',
+        'import pyperf',
         'import os',
-        #
-        # 'print("script")',
-        # 'for k, v in os.environ.items():',
-        # '    print("\'%s\': %s" % (k, v))',
-        #
         'from yggdrasil import timing',
         'nrep = %d' % nrep,
         'nmsg = %d' % nmsg,
-        'warmups = %d' % _perf_warmups,
+        'warmups = %d' % _pyperf_warmups,
         'msg_size = %d' % msg_size,
         'max_errors = %d' % max_errors,
         'lang_src = "%s"' % lang_src,
@@ -120,17 +115,17 @@ def write_perf_script(script_file, nmsg, msg_size,
         'timer = timing.TimedRun(lang_src, lang_dst,'
         '                        comm_type=comm_type,'
         '                        matlab_running=matlab_running)',
-        'runner = perf.Runner(values=1, processes=nrep, warmups=warmups)',
+        'runner = pyperf.Runner(values=1, processes=nrep, warmups=warmups)',
         'out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),',
-        '                             timing.perf_func,',
+        '                             timing.pyperf_func,',
         '                             timer, nmsg, msg_size, max_errors)']
     assert(not os.path.isfile(script_file))
     with open(script_file, 'w') as fd:
         fd.write('\n'.join(lines))
 
 
-def perf_func(loops, timer, nmsg, msg_size, max_errors):
-    r"""Function to do perf loops over function.
+def pyperf_func(loops, timer, nmsg, msg_size, max_errors):
+    r"""Function to do pyperf loops over function.
 
     Args:
         loops (int): Number of loops to perform.
@@ -153,9 +148,9 @@ def perf_func(loops, timer, nmsg, msg_size, max_errors):
         nerrors = 0
         while not flag:
             try:
-                t0 = perf.perf_counter()
-                timer.run(run_uuid, timer=perf.perf_counter)
-                t1 = perf.perf_counter()
+                t0 = pyperf.perf_counter()
+                timer.run(run_uuid, timer=pyperf.perf_counter)
+                t1 = pyperf.perf_counter()
                 tdif = t1 - t0
                 timer.after_run(run_uuid, tdif)
                 ttot += tdif
@@ -183,7 +178,8 @@ def get_source(lang, direction, test_name='timed_pipe'):
 
     """
     dir = os.path.join(examples._example_dir, test_name, 'src')
-    out = os.path.join(dir, '%s_%s%s' % (test_name, direction, examples.ext_map[lang]))
+    out = os.path.join(dir, '%s_%s%s' % (test_name, direction,
+                                         examples.ext_map[lang.lower()]))
     return out
 
 
@@ -195,8 +191,8 @@ class TimedRun(YggTestBase, tools.YggClass):
         lang_dst (str): Language that messages should be sent to.
         test_name (str, optional): Name of the example. Defaults to 'timed_pipe'.
         filename (str, optional): Full path to the file where timing statistics
-           will be saved. This can be a perf json or a Python pickle of run data.
-           Defaults to 'scalings_{test_name}_{comm_type}.json' if dont_use_perf is
+           will be saved. This can be a pyperf json or a Python pickle of run data.
+           Defaults to 'scalings_{test_name}_{comm_type}.json' if dont_use_pyperf is
            False, otherwise the extension is '.dat'.
         comm_type (str, optional): Name of communication class that should be
             used for tests. Defaults to the current default comm class.
@@ -213,8 +209,8 @@ class TimedRun(YggTestBase, tools.YggClass):
             there is an existing Matlab engine before starting, otherwise the
             test will assert that there is not an existing Matlab engine.
             Defaults to False.
-        dont_use_perf (bool, optional): If True, the timings will be run without
-            using the perf package. Defaults to False.
+        dont_use_pyperf (bool, optional): If True, the timings will be run without
+            using the pyperf package. Defaults to False.
 
     Attributes:
         lang_src (str): Language that messages should be sent from.
@@ -222,20 +218,20 @@ class TimedRun(YggTestBase, tools.YggClass):
         platform (str): Platform that the test is being run on.
         python_ver (str): Version of Python that the test should be run with.
         filename (str): Full path to the file where timing statistics will be
-           saved. This can be a perf json or a Python pickle of run data.
+           saved. This can be a pyperf json or a Python pickle of run data.
         comm_type (str): Name of communication class that should be used for
             tests.
         max_errors (int): Maximum number of errors that should be retried.
         matlab_running (bool): True if there was a Matlab engine running when
             the test was created. False otherwise.
-        dont_use_perf (bool): If True, the timings will be run without using the
-            perf package.
+        dont_use_pyperf (bool): If True, the timings will be run without using the
+            pyperf package.
 
     """
 
     def __init__(self, lang_src, lang_dst, test_name='timed_pipe', filename=None,
                  comm_type=None, platform=None, python_ver=None, max_errors=5,
-                 matlab_running=False, dont_use_perf=False, **kwargs):
+                 matlab_running=False, dont_use_pyperf=False, **kwargs):
         if comm_type is None:
             comm_type = tools.get_default_comm()
         if platform is None:
@@ -243,9 +239,9 @@ class TimedRun(YggTestBase, tools.YggClass):
         if python_ver is None:
             python_ver = backwards._python_version
         suffix = '%s_%s_py%s' % (test_name, platform, python_ver.replace('.', ''))
-        self.dont_use_perf = dont_use_perf
+        self.dont_use_pyperf = dont_use_pyperf
         if filename is None:
-            if self.dont_use_perf:
+            if self.dont_use_pyperf:
                 filename = os.path.join(os.getcwd(), 'scaling_%s.dat' % suffix)
             else:
                 filename = os.path.join(os.getcwd(), 'scaling_%s.json' % suffix)
@@ -271,7 +267,7 @@ class TimedRun(YggTestBase, tools.YggClass):
 
     @property
     def data(self):
-        r"""dict or perf.BenchmarkSuite: Timing statistics data."""
+        r"""dict or pyperf.BenchmarkSuite: Timing statistics data."""
         return self._data
 
     def can_run(self, raise_error=False):
@@ -453,8 +449,8 @@ class TimedRun(YggTestBase, tools.YggClass):
         return path
 
     @property
-    def perfscript(self):
-        r"""str: Format string for creating a perf script."""
+    def pyperfscript(self):
+        r"""str: Format string for creating a pyperf script."""
         return os.path.join(self.tempdir, 'runperf.py')
 
     def make_yamlfile(self, path):
@@ -603,10 +599,10 @@ class TimedRun(YggTestBase, tools.YggClass):
         # Only run if there are not enough existing reps to get stat
         if nrep_remain > 0:
             self.can_run(raise_error=True)
-            if self.dont_use_perf:
+            if self.dont_use_pyperf:
                 self.time_run_mine(nmsg, msg_size, nrep_remain)
             else:
-                self.time_run_perf(nmsg, msg_size, nrep_remain)
+                self.time_run_pyperf(nmsg, msg_size, nrep_remain)
             # Reload after new runs have been added
             self.reload()
             reps = self.get_entry(entry_name)
@@ -621,9 +617,9 @@ class TimedRun(YggTestBase, tools.YggClass):
                   ret[1], ret[2], len(reps))
         return ret
 
-    def time_run_perf(self, nmsg, msg_size, nrep):
+    def time_run_pyperf(self, nmsg, msg_size, nrep):
         r"""Time sending a set of messages between the designated models using
-        the perf package.
+        the pyperf package.
 
         Args:
             nmsg (int): Number of messages that should be sent.
@@ -632,25 +628,25 @@ class TimedRun(YggTestBase, tools.YggClass):
                 will be appended to the existing reps for this entry.
 
         """
-        write_perf_script(self.perfscript, nmsg, msg_size,
-                          self.lang_src, self.lang_dst, self.comm_type,
-                          nrep=nrep, matlab_running=self.matlab_running,
-                          max_errors=self.max_errors)
+        write_pyperf_script(self.pyperfscript, nmsg, msg_size,
+                            self.lang_src, self.lang_dst, self.comm_type,
+                            nrep=nrep, matlab_running=self.matlab_running,
+                            max_errors=self.max_errors)
         copy_env = ['TMPDIR', 'YGG_SKIP_COMPONENT_VALIDATION',
                     'YGG_VALIDATE_ALL_MESSAGES', 'CONDA_PREFIX']
         if platform._is_win:  # pragma: windows
             copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS',
                          'INCLUDE', 'LIB', 'LIBPATH']
-        cmd = [sys.executable, self.perfscript, '--append=' + self.filename,
+        cmd = [sys.executable, self.pyperfscript, '--append=' + self.filename,
                '--inherit-environ=' + ','.join(copy_env),
-               '--warmups=%d' % _perf_warmups]
+               '--warmups=%d' % _pyperf_warmups]
         subprocess.call(cmd)
         assert(os.path.isfile(self.filename))
-        os.remove(self.perfscript)
+        os.remove(self.pyperfscript)
 
     def time_run_mine(self, nmsg, msg_size, nrep):
         r"""Time sending a set of messages between the designated models without
-        using the perf package.
+        using the pyperf package.
 
         Args:
             nmsg (int): Number of messages that should be sent.
@@ -694,7 +690,7 @@ class TimedRun(YggTestBase, tools.YggClass):
         """
         cls_kwargs_keys = ['test_name', 'filename', 'matlab_running',
                            'comm_type', 'platform', 'python_ver',
-                           'dont_use_perf', 'max_errors']
+                           'dont_use_pyperf', 'max_errors']
         cls_kwargs = {}
         for k in cls_kwargs_keys:
             if k in kwargs:
@@ -1036,7 +1032,7 @@ class TimedRun(YggTestBase, tools.YggClass):
         """
         out = tuple()
         if self.has_entry(name):
-            if self.dont_use_perf:
+            if self.dont_use_pyperf:
                 out = self.data[name]
             else:
                 out = self.data.get_benchmark(name).get_values()
@@ -1051,7 +1047,7 @@ class TimedRun(YggTestBase, tools.YggClass):
         """
         out = False
         if self.data is not None:
-            if self.dont_use_perf:
+            if self.dont_use_pyperf:
                 out = (name in self.data)
             else:
                 out = (name in self.data.get_benchmark_names())
@@ -1066,7 +1062,7 @@ class TimedRun(YggTestBase, tools.YggClass):
         """
         if not self.has_entry(name):
             return
-        if self.dont_use_perf:
+        if self.dont_use_pyperf:
             data_out = copy.deepcopy(self.data)
             del data_out[name]
         else:
@@ -1094,22 +1090,22 @@ class TimedRun(YggTestBase, tools.YggClass):
         self._data = self.load()
 
     def load(self, as_json=False):
-        r"""Load scalings data from a perf BenchmarkSuite json file or a
+        r"""Load scalings data from a pyperf BenchmarkSuite json file or a
         Python pickle.
 
         Args:
-            as_json (bool, optional): If True and self.dont_use_perf is False,
-                the perf BenchmarkSuite data will be loaded as a dictionary from
+            as_json (bool, optional): If True and self.dont_use_pyperf is False,
+                the pyperf BenchmarkSuite data will be loaded as a dictionary from
                 the json. Defaults to False.
 
         Returns:
-            perf.BenchmarkSuite or dict: Loaded scalings data. None is returned
+            pyperf.BenchmarkSuite or dict: Loaded scalings data. None is returned
                 if the file does not exit.
 
         """
         if not os.path.isfile(self.filename):
             return None
-        if self.dont_use_perf:
+        if self.dont_use_pyperf:
             with open(self.filename, 'rb') as fd:
                 if backwards.PY2:  # pragma: Python 2
                     out = backwards.pickle.load(fd)
@@ -1121,16 +1117,16 @@ class TimedRun(YggTestBase, tools.YggClass):
                 with open(self.filename, 'r') as fd:
                     out = json.load(fd)
             else:
-                out = perf.BenchmarkSuite.load(self.filename)
+                out = pyperf.BenchmarkSuite.load(self.filename)
         return out
 
     def save(self, data, overwrite=False):
-        r"""Save scalings data to a new perf BenchmarkSuite json file or a
+        r"""Save scalings data to a new pyperf BenchmarkSuite json file or a
         Python pickle. If the file exists and overwrite is not set, an error
         will be raised. No file is written if data is None.
 
         Args:
-            data (perf.BenchmarkSuite or dict): Data to be saved.
+            data (pyperf.BenchmarkSuite or dict): Data to be saved.
             overwrite (bool, optional): If True, any existing file will be
                 overwritten. Defaults to False.
 
@@ -1141,11 +1137,11 @@ class TimedRun(YggTestBase, tools.YggClass):
         if os.path.isfile(self.filename) and (not overwrite):
             raise RuntimeError("'%s' exists" % self.filename)
         if data is not None:
-            if self.dont_use_perf:
+            if self.dont_use_pyperf:
                 with open(self.filename, 'wb') as fd:
                     backwards.pickle.dump(data, fd)
             else:
-                if isinstance(data, perf.BenchmarkSuite):
+                if isinstance(data, pyperf.BenchmarkSuite):
                     data.dump(self.filename, replace=overwrite)
                 else:
                     with open(self.filename, 'w') as fd:
@@ -1326,19 +1322,19 @@ def plot_scalings(compare='comm_type', compare_values=None,
     return plotfile
 
 
-def perfjson_to_pandas(json_file):
-    r"""Convert perf benchmarks json file to a Pandas data frame.
+def pyperfjson_to_pandas(json_file):
+    r"""Convert pyperf benchmarks json file to a Pandas data frame.
 
     Args:
         json_file (str): Full path to the JSON benchmarks file that should be
             added.
 
     Returns:
-        pandas.DataFrame: Data frame version of perf benchmarks.
+        pandas.DataFrame: Data frame version of pyperf benchmarks.
 
     """
     # Load benchmarks
-    x_js = perf.BenchmarkSuite.load(json_file)
+    x_js = pyperf.BenchmarkSuite.load(json_file)
     meta = copy.deepcopy(x_js.get_metadata())
     data = None
     # Loop over keys

@@ -194,4 +194,8 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
 
 class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
     r"""Test runner for CMakeModelDriver."""
-    pass
+
+    def test_write_wrappers(self):
+        r"""Test write_wrappers method with verbosity and existing
+        include file."""
+        self.instance.write_wrappers(verbose=True)

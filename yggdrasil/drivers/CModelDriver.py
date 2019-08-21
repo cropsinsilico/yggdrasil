@@ -1,8 +1,9 @@
 import os
 import copy
 import shutil
+import subprocess
 from collections import OrderedDict
-from yggdrasil import platform, tools
+from yggdrasil import platform, tools, backwards
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, ArchiverBase)
 from yggdrasil.languages import get_language_dir
@@ -11,6 +12,47 @@ from yggdrasil.languages import get_language_dir
 _default_internal_libtype = 'object'
 # if platform._is_win:  # pragma: windows
 #     _default_internal_libtype = 'static'
+
+
+def get_OSX_SYSROOT():
+    r"""Determin the path to the OSX SDK.
+
+    Returns:
+        str: Full path to the SDK directory if one is located. None
+            otherwise.
+
+    """
+    fname = None
+    if platform._is_mac:
+        try:
+            xcode_dir = backwards.as_str(subprocess.check_output(
+                'echo "$(xcode-select -p)"', shell=True).strip())
+        except BaseException:  # pragma: debug
+            xcode_dir = None
+        print(('get_OSX_SYSROOT: MACOSX_DEPLOYMENT_TARGET=%s, '
+               'CONDA_BUILD_SYSROOT=%s, SDKROOT=%s')
+              % (os.environ.get('MACOSX_DEPLOYMENT_TARGET', False),
+                 os.environ.get('CONDA_BUILD_SYSROOT', False),
+                 os.environ.get('SDKROOT', False)))
+        fname_try = []
+        if xcode_dir is not None:
+            fname_base = os.path.join(xcode_dir, 'Platforms',
+                                      'MacOSX.platform', 'Developer',
+                                      'SDKs', 'MacOSX%s.sdk')
+            fname_try += [
+                fname_base % os.environ.get('MACOSX_DEPLOYMENT_TARGET', ''),
+                fname_base % '',
+                os.path.join(xcode_dir, 'SDKs', 'MacOSX.sdk')]
+        if os.environ.get('SDKROOT', False):
+            fname_try.insert(0, os.environ['SDKROOT'])
+        for fcheck in fname_try:
+            if os.path.isdir(fcheck):
+                fname = fcheck
+                break
+    return fname
+
+
+_osx_sysroot = get_OSX_SYSROOT()
 
 
 class CCompilerBase(CompilerBase):
@@ -45,6 +87,9 @@ class CCompilerBase(CompilerBase):
             cls.linker_attributes = dict(cls.linker_attributes,
                                          search_path_flags=['-Xlinker', '--verbose'],
                                          search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
+        # if cls.get_conda_prefix is not None:
+        #     cls.default_flags += ['-I%s' % get_language_dir('c'),
+        #                           "-include", "glibc_version_fix.h"]
         CompilerBase.before_registration(cls)
 
     @classmethod
@@ -69,6 +114,12 @@ class ClangCompiler(CCompilerBase):
     toolname = 'clang'
     platforms = ['MacOS']
     default_archiver = 'libtool'
+    flag_options = OrderedDict(list(CCompilerBase.flag_options.items())
+                               + [('sysroot', '--sysroot'),
+                                  ('isysroot', {'key': '-isysroot',
+                                                'prepend': True}),
+                                  ('mmacosx-version-min',
+                                   '-mmacosx-version-min=%s')])
 
 
 class MSVCCompiler(CCompilerBase):
@@ -135,6 +186,7 @@ class ARArchiver(ArchiverBase):
     toolname = 'ar'
     languages = ['c', 'c++']
     default_executable_env = 'AR'
+    default_flags_env = None
     static_library_flag = 'rcs'
     output_key = ''
     output_first_library = True
@@ -314,7 +366,8 @@ class CModelDriver(CompiledModelDriver):
             for x in ['ygg', 'datatypes']:
                 if 'compiler_flags' not in cls.internal_libraries[x]:
                     cls.internal_libraries[x]['compiler_flags'] = []
-                cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
+                if '-fPIC' not in cls.internal_libraries[x]['compiler_flags']:
+                    cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
         
     @classmethod
     def configure(cls, cfg):
@@ -338,28 +391,86 @@ class CModelDriver(CompiledModelDriver):
             cfg.set(cls._language, 'rapidjson_include',
                     os.path.dirname(os.path.dirname(rjlib)))
         return out
+
+    @classmethod
+    def update_compiler_kwargs(cls, skip_sysroot=False, **kwargs):
+        r"""Update keyword arguments supplied to the compiler get_flags method
+        for various options.
+
+        Args:
+            skip_sysroot (bool, optional): If True, the isysroot flag will
+                not be added. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Keyword arguments for a get_flags method providing compiler
+                flags.
+
+        """
+        out = super(CModelDriver, cls).update_compiler_kwargs(**kwargs)
+        if (not skip_sysroot) and (_osx_sysroot is not None):
+            out['isysroot'] = _osx_sysroot
+            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', False):
+                out['mmacosx-version-min'] = os.environ[
+                    'MACOSX_DEPLOYMENT_TARGET']
+        return out
         
     @classmethod
-    def update_ld_library_path(cls, env):
+    def call_linker(cls, obj, language=None, **kwargs):
+        r"""Link several object files to create an executable or library (shared
+        or static), checking for errors.
+
+        Args:
+            obj (list): Object files that should be linked.
+            language (str, optional): Language that should be used to link
+                the files. Defaults to None and the language of the current
+                driver is used.
+            **kwargs: Additional keyword arguments are passed to run_executable.
+
+        Returns:
+            str: Full path to compiled source.
+
+        """
+        if (((cls.language == 'c') and (language is None)
+             and kwargs.get('for_model', False)
+             and (not kwargs.get('skip_interface_flags', False)))):
+            language = 'c++'
+            kwargs.update(cls.update_linker_kwargs(**kwargs))
+            kwargs['skip_interface_flags'] = True
+        return super(CModelDriver, cls).call_linker(obj, language=language,
+                                                    **kwargs)
+        
+    @classmethod
+    def update_ld_library_path(cls, env, paths_to_add=None, add_to_front=False):
         r"""Update provided dictionary of environment variables so that
         LD_LIBRARY_PATH includes the interface directory containing the interface
         libraries.
 
         Args:
             env (dict): Dictionary of enviroment variables to be updated.
+            paths_to_add (list, optional): Paths that should be added. If not
+                provided, defaults to [cls.get_language_dir()].
+            add_to_front (bool, optional): If True, new paths are added to the
+                front, rather than the end. Defaults to False.
 
         Returns:
             dict: Updated dictionary of environment variables.
 
         """
+        if paths_to_add is None:
+            paths_to_add = [cls.get_language_dir()]
         if platform._is_linux:
             path_list = []
             prev_path = env.pop('LD_LIBRARY_PATH', '')
             if prev_path:
                 path_list.append(prev_path)
-            for x in [cls.get_language_dir()]:
+            for x in paths_to_add:
                 if x not in prev_path:
-                    path_list.append(x)
+                    if add_to_front:
+                        path_list.insert(0, x)
+                    else:
+                        path_list.append(x)
             if path_list:
                 env['LD_LIBRARY_PATH'] = os.pathsep.join(path_list)
         return env

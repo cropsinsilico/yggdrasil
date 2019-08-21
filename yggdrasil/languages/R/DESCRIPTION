@@ -11,6 +11,6 @@ Imports:
     reticulate,
     zeallot,
     bit64,
-    float
+    R6
 Depends:
     zeallot

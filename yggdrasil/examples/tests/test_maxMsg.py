@@ -1,7 +1,7 @@
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
-class TestExampleMaxMsg(TestExample):
+class TestExampleMaxMsg(ExampleTstBase):
     r"""Test the MaxMsg example."""
 
     example_name = 'maxMsg'

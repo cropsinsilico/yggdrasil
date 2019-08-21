@@ -274,6 +274,8 @@ class CompilationToolBase(object):
         attr_list = ['default_executable', 'default_flags']
         # Set attributes based on environment variables
         for k in attr_list:
+            # Copy so that list modification is not propagated to subclasses
+            setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
             env = getattr(cls, '%s_env' % k, None)
             if env is not None:
                 if k in ['default_flags']:
@@ -281,7 +283,10 @@ class CompilationToolBase(object):
                         env = [env]
                     old_val = getattr(cls, k, [])
                     for ienv in env:
-                        old_val += os.environ.get(ienv, '').split()
+                        new_val = os.environ.get(ienv, '').split()
+                        for v in new_val:
+                            if v not in old_val:
+                                old_val.append(v)
                 else:
                     setattr(cls, k, os.environ.get(env, getattr(cls, k)))
         # Set default_executable to name
@@ -479,7 +484,8 @@ class CompilationToolBase(object):
 
     @classmethod
     def get_flags(cls, flags=None, outfile=None, output_first=None,
-                  unused_kwargs=None, skip_defaults=False, **kwargs):
+                  unused_kwargs=None, skip_defaults=False,
+                  dont_skip_env_defaults=False, **kwargs):
         r"""Get a list of flags for the tool.
 
         Args:
@@ -498,6 +504,9 @@ class CompilationToolBase(object):
                 ignored.
             skip_defaults (bool, optional): If True, the default flags will
                 not be added. Defaults to False.
+            dont_skip_env_defaults (bool, optional): If skip_defaults is True,
+                and this keyword is True, the flags from the environment
+                variable will be added. Defaults to False.
             **kwargs: Additional keyword arguments are ignored and added to
                 unused_kwargs if provided.
 
@@ -514,7 +523,17 @@ class CompilationToolBase(object):
         if output_first is None:
             output_first = cls.output_first
         # Add default & user defined flags
-        if not skip_defaults:
+        if skip_defaults:
+            # Include flags set by the environment (this is especially
+            # important when using the Conda compilers
+            if dont_skip_env_defaults:
+                env = getattr(cls, 'default_flags_env', None)
+                if env is not None:
+                    if not isinstance(env, list):
+                        env = [env]
+                    for ienv in env:
+                        out += os.environ.get(ienv, '').split()
+        else:
             new_flags = cls.default_flags + getattr(cls, 'flags', [])
             for x in new_flags:
                 # It is on the user to make sure there are not conflicting flags
@@ -556,14 +575,15 @@ class CompilationToolBase(object):
                 installed.
 
         """
-        conda_prefix = os.environ.get('CONDA_PREFIX', '')
-        if not conda_prefix:
-            conda_prefix = tools.which('conda')
-        return conda_prefix
+        return tools.get_conda_prefix()
             
     @classmethod
-    def get_search_path(cls):
+    def get_search_path(cls, conda_only=False):
         r"""Determine the paths searched by the tool for external library files.
+
+        Args:
+            conda_only (bool, optional): If True, only the search paths as
+                indicated by a conda environment are returned. Defaults to False.
 
         Returns:
             list: List of paths that the tools will search.
@@ -574,7 +594,7 @@ class CompilationToolBase(object):
                                       "%s tool '%s'" % (cls.tooltype, cls.toolname))
         paths = []
         # Get search paths from environment variable
-        if cls.search_path_env is not None:
+        if (cls.search_path_env is not None) and (not conda_only):
             if not isinstance(cls.search_path_env, list):
                 cls.search_path_env = [cls.search_path_env]
             for ienv in cls.search_path_env:
@@ -583,7 +603,7 @@ class CompilationToolBase(object):
                     if x:
                         paths.append(x)
         # Get flags based on path
-        if cls.search_path_flags is not None:
+        if (cls.search_path_flags is not None) and (not conda_only):
             output = cls.call(cls.search_path_flags, skip_flags=True,
                               allow_error=True)
             # Split on beginning & ending regexes if they exist
@@ -834,10 +854,9 @@ class CompilationToolBase(object):
         # Run command
         output = ''
         try:
-            unused_kwargs.setdefault('env', cls.set_env())
-            if cls.toolname == 'cmake':
-                logger.info('Command: "%s"' % ' '.join(cmd))
-            logger.debug('Command: "%s"' % ' '.join(cmd))
+            if (not skip_flags) and ('env' not in unused_kwargs):
+                unused_kwargs['env'] = cls.set_env()
+            logger.info('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = backwards.as_str(output)
@@ -1085,7 +1104,7 @@ class CompilerBase(CompilationToolBase):
             kwargs['definitions'].append('YGG_DEBUG=%d' % logging_level)
         # Call parent class
         outfile_link = None
-        if not dont_link:  # pragma: debug
+        if not dont_link:
             outfile_link = kwargs.pop('outfile', None)
         out = super(CompilerBase, cls).get_flags(**kwargs)
         # Add flags for compilation only or provided output file
@@ -1094,16 +1113,16 @@ class CompilerBase(CompilationToolBase):
             if cls.compile_only_flag not in out:
                 out.insert(0, cls.compile_only_flag)
         # Add linker switch
-        if (not dont_link) or add_linker_switch:  # pragma: debug
+        if (not dont_link) or add_linker_switch:
             if cls.linker_switch is not None:  # pragma: windows
                 if cls.linker_switch not in out:
                     out.append(cls.linker_switch)
         # Add linker flags
-        if (not dont_link):  # pragma: debug
+        if (not dont_link):
             if (not cls.combine_with_linker):
                 raise ValueError("Cannot combine linker and compiler flags.")
-            warnings.warn('The returned flags will contain linker flags that '
-                          'may need to follow the list of source files.')
+            logger.debug('The returned flags will contain linker flags that '
+                         'may need to follow the list of source files.')
             unused_kwargs_comp = kwargs.pop('unused_kwargs', {})
             unused_kwargs_link = {}
             tool = cls.get_library_tool(libtype=libtype, **unused_kwargs_comp)
@@ -1757,7 +1776,8 @@ class CompiledModelDriver(ModelDriver):
             else:
                 # Assert that model file is not source code in any of the
                 # registered languages
-                if model_ext in self.get_all_language_ext():  # pragma: debug
+                if (((model_ext in self.get_all_language_ext())
+                     and (model_ext != '.exe'))):  # pragma: debug
                     from yggdrasil.components import import_component
                     from yggdrasil.schema import get_schema
                     s = get_schema()['model']
@@ -1777,6 +1797,7 @@ class CompiledModelDriver(ModelDriver):
                                   + self.language_ext[0])
                 self.source_files.append(self.model_src)
         # Add intermediate files and executable by doing a dry run
+        self.set_target_language()  # Required by make and cmake
         kwargs = dict(products=self.products, dry_run=True)
         if model_is_source:
             kwargs['out'] = None
@@ -1837,6 +1858,16 @@ class CompiledModelDriver(ModelDriver):
                 setattr(cls, 'default_%s' % k, default_tool_name)
                 if (default_tool_name is not None) and (k == 'compiler'):
                     compiler = get_compilation_tool(k, default_tool_name)
+
+    def set_target_language(self):
+        r"""Set the language of the target being compiled (usually the same
+        as the language associated with this driver.
+
+        Returns:
+            str: Name of language.
+
+        """
+        return self.language
 
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
@@ -2452,7 +2483,7 @@ class CompiledModelDriver(ModelDriver):
         """
         compiler = cls.get_tool('compiler')
         if hasattr(compiler, 'language_version'):  # pragma: windows
-            return compiler.language_version(**kwargs)
+            return compiler.language_version(**kwargs).strip()
         kwargs['version_flags'] = compiler.version_flags
         kwargs['skip_flags'] = True
         return super(CompiledModelDriver, cls).language_version(**kwargs)
@@ -2547,7 +2578,7 @@ class CompiledModelDriver(ModelDriver):
             bool: True if the language has been configured.
 
         """
-        out = super(CompiledModelDriver, cls).is_configured()
+        out = ModelDriver.is_configured.__func__(cls)
         if out:
             for k in cls.get_external_libraries():
                 if not out:  # pragma: no cover
@@ -2567,7 +2598,7 @@ class CompiledModelDriver(ModelDriver):
                 be set.
 
         """
-        out = super(CompiledModelDriver, cls).configure_libraries(cfg)
+        out = ModelDriver.configure_libraries.__func__(cls, cfg)
         # Search for external libraries
         for k, v in cls.external_libraries.items():
             k_lang = v.get('language', cls.language)
@@ -2615,22 +2646,29 @@ class CompiledModelDriver(ModelDriver):
                     out.append((k_lang, opt, desc))
         return out
 
-    def set_env(self, for_compile=False):
+    def set_env(self, for_compile=False, compile_kwargs=None, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
         Args:
             for_compile (bool, optional): If True, environment variables are set
                 that are necessary for compiling. Defaults to False.
+            compile_kwargs (dict, optional): Keyword arguments that should be
+                passed to the compiler's set_env method. Defaults to empty dict.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(CompiledModelDriver, self).set_env()
+        out = super(CompiledModelDriver, self).set_env(**kwargs)
         if for_compile:
+            if compile_kwargs is None:
+                compile_kwargs = {}
             compiler = self.get_tool_instance('compiler')
             out = compiler.set_env(existing=out,
-                                   logging_level=self.logger.getEffectiveLevel())
+                                   logging_level=self.logger.getEffectiveLevel(),
+                                   **compile_kwargs)
         return out
         
     @classmethod

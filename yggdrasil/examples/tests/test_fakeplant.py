@@ -1,8 +1,8 @@
 import os
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
-class TestExampleFakeplant(TestExample):
+class TestExampleFakeplant(ExampleTstBase):
     r"""Test the Fakeplant example."""
 
     example_name = 'fakeplant'

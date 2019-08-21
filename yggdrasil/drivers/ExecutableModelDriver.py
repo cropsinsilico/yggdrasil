@@ -1,5 +1,5 @@
 import platform as sys_platform
-from yggdrasil import tools  # platform
+from yggdrasil import tools, platform
 from yggdrasil.drivers.ModelDriver import ModelDriver
 
 
@@ -18,6 +18,16 @@ class ExecutableModelDriver(ModelDriver):
     # version_flags = _os_version_flags
     _schema_subtype_description = ('Model is an executable.')
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        if platform._is_win:  # pragma: windows
+            cls.language_ext = '.exe'
+        ModelDriver.before_registration(cls)
+        
     @classmethod
     def language_version(cls, version_flags=None, **kwargs):
         r"""Determine the version of this language.

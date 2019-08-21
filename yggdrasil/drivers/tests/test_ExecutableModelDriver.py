@@ -48,27 +48,3 @@ class TestExecutableModelDriver(TestExecutableModelParam,
                                 parent.TestModelDriver):
     r"""Test runner for ExecutableModelDriver class."""
     pass
-                           
-
-@unittest.skipIf(platform._is_win, "Platform is windows")
-class TestExecutableModelDriver_valgrind(TestExecutableModelDriver):
-    r"""Test with valgrind."""
-
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for creating a class instance."""
-        out = super(TestExecutableModelDriver_valgrind, self).inst_kwargs
-        out['with_valgrind'] = True
-        return out
-
-
-@unittest.skipIf(platform._is_win, "Platform is windows")
-class TestExecutableModelDriver_strace(TestExecutableModelDriver):
-    r"""Test with strace."""
-
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for creating a class instance."""
-        out = super(TestExecutableModelDriver_strace, self).inst_kwargs
-        out['with_strace'] = True
-        return out

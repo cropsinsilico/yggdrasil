@@ -11,6 +11,7 @@ from yggdrasil.tests import YggTestBase
 
 
 _ext2lang = {v: k for k, v in ext_map.items()}
+_test_registry = {}
 
 
 def make_lang_test(lang):
@@ -21,17 +22,24 @@ def make_lang_test(lang):
 
 class ExampleMeta(ComponentMeta):
     def __new__(cls, name, bases, dct):
-        for l in tools.get_supported_lang():
-            itest_name = 'test_%s' % l
-            if itest_name not in dct:
-                itest_func = make_lang_test(l)
-                itest_func.__name__ = itest_name
-                dct[itest_name] = itest_func
-        return super(ExampleMeta, cls).__new__(cls, name, bases, dct)
+        if dct.get('example_name', None) is not None:
+            for l in tools.get_supported_lang():
+                itest_name = 'test_%s' % l
+                if itest_name not in dct:
+                    itest_func = make_lang_test(l)
+                    itest_func.__name__ = itest_name
+                    dct[itest_name] = itest_func
+        out = super(ExampleMeta, cls).__new__(cls, name, bases, dct)
+        if out.example_name is not None:
+            global _test_registry
+            _test_registry[out.example_name] = out
+        # else:
+        #     out = unittest.skipIf(True, "Test uninitialized.")(out)
+        return out
 
 
 @six.add_metaclass(ExampleMeta)
-class TestExample(YggTestBase, tools.YggClass):
+class ExampleTstBase(YggTestBase, tools.YggClass):
     r"""Base class for running examples."""
 
     example_name = None
@@ -44,7 +52,7 @@ class TestExample(YggTestBase, tools.YggClass):
         self.uuid = str(uuid.uuid4())
         self.runner = None
         # self.debug_flag = True
-        super(TestExample, self).__init__(*args, **kwargs)
+        super(ExampleTstBase, self).__init__(*args, **kwargs)
 
     @property
     def description_prefix(self):
@@ -139,7 +147,7 @@ class TestExample(YggTestBase, tools.YggClass):
             if isinstance(res, tuple):
                 res[0](fout, *res[1:])
             else:
-                self.check_file_size(fout, len(res))
+                self.check_file_size(fout, res)
                 self.check_file_contents(fout, res)
 
     def run_example(self):
@@ -186,6 +194,8 @@ class TestExample(YggTestBase, tools.YggClass):
 
     def run_language(self, lang):
         r"""Run a test for the specified language."""
+        if not tools.check_environ_bool('YGG_ENABLE_EXAMPLE_TESTS'):
+            raise unittest.SkipTest("Example tests not enabled.")
         self.language = lang
         self.run_example()
         self.language = None

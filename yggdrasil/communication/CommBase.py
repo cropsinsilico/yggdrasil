@@ -378,7 +378,7 @@ class CommBase(tools.YggClass):
             partner_language = 'python'
             recv_timeout = False
         if language is None:
-            language = 'python'  # tools.get_subprocess_language()
+            language = 'python'
         self.language = language
         self.partner_language = partner_language
         self.language_driver = import_component('model', self.language)
@@ -481,7 +481,8 @@ class CommBase(tools.YggClass):
         to registration."""
         tools.YggClass.before_registration(cls)
         cls._default_serializer_class = import_component('serializer',
-                                                         cls._default_serializer)
+                                                         cls._default_serializer,
+                                                         without_schema=True)
         
     @classmethod
     def get_testing_options(cls, serializer=None, **kwargs):
@@ -756,7 +757,8 @@ class CommBase(tools.YggClass):
                 self.debug("Signing off from server")
                 self.signoff_from_server()
             if len(self._work_comms) > 0:
-                self.debug("Cleaning up %d work comms", len(self._work_comms))
+                self.debug(
+                    "Cleaning up %d work comms", len(self._work_comms))
                 keys = [k for k in self._work_comms.keys()]
                 for c in keys:
                     self.remove_work_comm(c, linger=linger)
@@ -803,7 +805,7 @@ class CommBase(tools.YggClass):
             self.wait_for_confirm(timeout=self._timeout_drain)
         self.debug("Finished (timeout_drain = %s)", str(self._timeout_drain))
 
-    def language_atexit(self):
+    def language_atexit(self):  # pragma: debug
         r"""Close operations specific to the language."""
         if self.language_driver.comm_atexit is not None:
             self.language_driver.comm_atexit(self)
@@ -811,10 +813,13 @@ class CommBase(tools.YggClass):
     def atexit(self):  # pragma: debug
         r"""Close operations."""
         self.debug('atexit begins')
+        self.language_atexit()
+        self.debug('atexit after language_atexit, but before close')
         self.close()
-        self.debug('atexit finished: closed=%s, n_msg=%d, close_alive=%s',
-                   self.is_closed, self.n_msg,
-                   self._closing_thread.is_alive())
+        self.debug(
+            'atexit finished: closed=%s, n_msg=%d, close_alive=%s',
+            self.is_closed, self.n_msg,
+            self._closing_thread.is_alive())
 
     @property
     def is_open(self):
@@ -1238,7 +1243,10 @@ class CommBase(tools.YggClass):
         if (not self._used) and self._multiple_first_send:
             out = self._send_1st(*args, **kwargs)
         else:
+            self.debug('is_closed = %s', self.is_closed)
             with self._closing_thread.lock:
+                self.debug(
+                    "inside safe_send lock, is_closed = %s", self.is_closed)
                 if self.is_closed:  # pragma: debug
                     return False
                 out = self._send(*args, **kwargs)
@@ -1437,7 +1445,8 @@ class CommBase(tools.YggClass):
         if not flag:
             return flag
         msg_len = len(msg_s)
-        # Sent first part of message
+        # Sent first part of message which includes the header describing the
+        # work comm
         self.special_debug('Sending %d bytes', msg_len)
         if (msg_len < self.maxMsgSize) or (self.maxMsgSize == 0):
             flag = self._safe_send(msg_s, **kwargs)

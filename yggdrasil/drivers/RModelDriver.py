@@ -1,7 +1,15 @@
 import numpy as np
 import pandas as pd
+import logging
+from collections import OrderedDict
 from yggdrasil import serialize, backwards
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
+from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
+from yggdrasil.drivers.CModelDriver import CModelDriver
+from yggdrasil.languages.R import install
+
+
+logger = logging.getLogger(__name__)
 
 
 class RModelDriver(InterpretedModelDriver):  # pragma: R
@@ -21,13 +29,15 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     language_ext = '.R'
     base_languages = ['python']
     default_interpreter = 'Rscript'
-    # Dynamically setting the interface library cause circular logic
+    # Dynamically setting the interface library causes circular a import so
+    # it is defined here statically. For dynamic import, use the following:
+    #     interface_library = PythonModelDriver.interface_library
     interface_library = 'yggdrasil'
-    interface_dependencies = ['reticulate', 'zeallot', 'bit64']
-    # interface_library = PythonModelDriver.interface_library
+    interface_dependencies = install.requirements_from_description()
     # The Batch version causes output to saved to a file rather than directed to
-    # stdout
-    # default_interpreter_flags = ['CMD', 'BATCH' '--vanilla', '--silent']
+    # stdout so use Rscript instead. For the batch version, use the following:
+    #     default_interpreter_flags = ['CMD', 'BATCH' '--vanilla', '--silent']
+    default_interpreter_flags = ['--default-packages=methods,utils']
     send_converters = {'table': serialize.consolidate_array}
     type_map = {
         'int': 'integer, bit64::integer64',
@@ -90,12 +100,68 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         """
         if lib not in cls._library_cache:
             try:
-                cls.run_executable(['-e', '\"library(%s)\"' % lib])
+                cls.run_executable(['-e', 'library(%s)' % lib])
                 cls._library_cache[lib] = True
             except RuntimeError:
                 cls._library_cache[lib] = False
         return cls._library_cache[lib]
         
+    @classmethod
+    def language_version(cls, **kwargs):
+        r"""Determine the version of this language.
+
+        Args:
+            **kwargs: Keyword arguments are passed to the parent class's
+                method.
+
+        Returns:
+            str: Version of compiler/interpreter for this language.
+
+        """
+        kwargs.setdefault('skip_interpreter_flags', True)
+        return super(RModelDriver, cls).language_version(**kwargs)
+
+    # @property
+    # def debug_flags(self):
+    #     r"""list: Flags that should be prepended to an executable command to
+    #     enable debugging."""
+    #     if self.with_valgrind:
+    #         interp = 'R'.join(self.get_interpreter().rsplit('Rscript', 1))
+    #         return [interp, '-d', '"valgrind %s"'
+    #                 % ' '.join(self.valgrind_flags), '--vanilla', '-f']
+    #     return super(RModelDriver, self).debug_flags
+        
+    def set_env(self):
+        r"""Get environment variables that should be set for the model process.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(RModelDriver, self).set_env()
+        out['RETICULATE_PYTHON'] = PythonModelDriver.get_interpreter()
+        c_linker = CModelDriver.get_tool('linker')
+        search_dirs = c_linker.get_search_path(conda_only=True)
+        out = CModelDriver.update_ld_library_path(out, paths_to_add=search_dirs,
+                                                  add_to_front=True)
+        return out
+        
+    @classmethod
+    def comm_atexit(cls, comm):  # pragma: no cover
+        r"""Operations performed on comm at exit including draining receive.
+        
+        Args:
+            comm (CommBase): Communication object.
+
+        """
+        if comm.direction == 'recv':
+            while comm.recv(timeout=0)[0]:
+                comm.sleep()
+        else:
+            comm.send_eof()
+        if not getattr(comm, 'dont_backlog', True):
+            comm.linger_close()
+
     @classmethod
     def language2python(cls, robj):
         r"""Prepare an R object for serialization in Python.
@@ -107,7 +173,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             object: Python object in a form that is serialization friendly.
 
         """
-        # print("language2python", robj, type(robj))
+        logger.debug("language2python: %s, %s" % (robj, type(robj)))
         if isinstance(robj, tuple):
             return tuple([cls.language2python(x) for x in robj])
         elif isinstance(robj, list):
@@ -129,15 +195,23 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             object: Python object in a form that is R friendly.
 
         """
-        # print("python2language", pyobj, type(pyobj))
+        logger.debug("python2language: %s, %s" % (pyobj, type(pyobj)))
         if isinstance(pyobj, tuple):
             return tuple([cls.python2language(x) for x in pyobj])
         elif isinstance(pyobj, list):
             return [cls.python2language(x) for x in pyobj]
+        elif isinstance(pyobj, OrderedDict):
+            return OrderedDict([(backwards.as_str(k), cls.python2language(v))
+                                for k, v in pyobj.items()])
         elif isinstance(pyobj, dict):
-            return {k: cls.python2language(v) for k, v in pyobj.items()}
+            return {backwards.as_str(k): cls.python2language(v)
+                    for k, v in pyobj.items()}
+        elif isinstance(pyobj, tuple(list(backwards.string_types)
+                                     + [np.string_])):
+            return backwards.as_str(pyobj)
         elif isinstance(pyobj, pd.DataFrame):
-            # R dosn't have int64 and will cast as float if passed
+            # R dosn't have int64 and will cast 64bit ints as floats if passed
+            # without casting them to int32 first
             for n in pyobj.columns:
                 if pyobj[n].dtype == np.dtype('int64'):
                     pyobj[n] = pyobj[n].astype('int32')

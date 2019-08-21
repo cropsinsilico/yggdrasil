@@ -180,7 +180,7 @@ class InterpretedModelDriver(ModelDriver):
 
     @classmethod
     def executable_command(cls, args, exec_type='interpreter', unused_kwargs={},
-                           **kwargs):
+                           skip_interpreter_flags=False, **kwargs):
         r"""Compose a command for running a program in this language with the
         provied arguments. If not already present, the interpreter command and
         interpreter flags are prepended to the provided arguments.
@@ -192,6 +192,11 @@ class InterpretedModelDriver(ModelDriver):
                 returned. If 'interpreter', a command using the interpreter is
                 returned and if 'direct', the raw args being provided are
                 returned. Defaults to 'interpreter'.
+            skip_interpreter_flags (bool, optional): If True, interpreter flags
+                will not be added to the command after the interpreter. Defaults
+                to False. Interpreter flags will not be added, reguardless of
+                this keyword, if the first element of args is already an
+                interpreter.
             unused_kwargs (dict, optional): Existing dictionary that unused
                 keyword arguments should be added to. Defaults to {}.
             **kwargs: Additional keyword arguments are ignored.
@@ -207,14 +212,31 @@ class InterpretedModelDriver(ModelDriver):
         ext = cls.language_ext
         assert(isinstance(ext, (tuple, list)))
         if exec_type == 'interpreter':
-            # if (((cls.language not in args[0])
-            if (((tools.which(args[0]) is None)
-                 or any([args[0].endswith(e) for e in ext]))):
-                args = [cls.get_interpreter()] + cls.get_interpreter_flags() + args
+            if not cls.is_interpreter(args[0]):
+                new_args = [cls.get_interpreter()]
+                if not skip_interpreter_flags:
+                    new_args += cls.get_interpreter_flags()
+                args = new_args + args
         elif exec_type != 'direct':
             raise ValueError("Invalid exec_type '%s'" % exec_type)
         unused_kwargs.update(kwargs)
         return args
+
+    @classmethod
+    def is_interpreter(cls, cmd):
+        r"""Determine if a command line argument is an interpreter.
+
+        Args:
+            cmd (str): Command that should be checked.
+
+        Returns:
+            bool: True if the command is an interpreter, False otherwise.
+
+        """
+        # (cls.language not in cmd)
+        out = ((tools.which(cmd) is not None)
+               and (not any([cmd.endswith(e) for e in cls.language_ext])))
+        return out
 
     @classmethod
     def configure(cls, cfg):
@@ -229,7 +251,7 @@ class InterpretedModelDriver(ModelDriver):
                 be set.
 
         """
-        out = super(InterpretedModelDriver, cls).configure(cfg)
+        out = ModelDriver.configure.__func__(cls, cfg)
         # Locate executable
         if not cls.is_language_installed():  # pragma: debug
             fpath = locate_file(cls.language_executable())
@@ -245,16 +267,11 @@ class InterpretedModelDriver(ModelDriver):
 
         """
         out = super(InterpretedModelDriver, self).set_env()
-        path_list = []
-        if self.path_env_variable is not None:
-            prev_path = out.pop(self.path_env_variable, '')
-            if prev_path:
-                path_list.append(prev_path)
-            if isinstance(self.paths_to_add, list):
-                for x in self.paths_to_add:
-                    if x not in prev_path:
-                        path_list.append(x)
-            path_list.append(self.model_dir)
-            if path_list:
-                out[self.path_env_variable] = os.pathsep.join(path_list)
+        if self.path_env_variable is not None:  # pragma: debug
+            if self.language != 'matlab':
+                raise NotImplementedError(
+                    ("Language %s sets path_env_variable. "
+                     "Move part of MatlabModelDriver set_env method "
+                     "to InterpretedModelDriver in place of this "
+                     "warning message.") % self.language)
         return out

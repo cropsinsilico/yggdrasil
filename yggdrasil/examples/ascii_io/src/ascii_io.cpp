@@ -66,6 +66,7 @@ int main(int argc,char *argv[]){
     // Receive a single row with values stored in scalars declared locally
     //ret = yggRecv(TableInput.pi(), &name, &name_siz, &number, &value, &comp);
     ret = TableInput.recv(5, &name, &name_siz, &number, &value, &comp);
+    name_siz = strlen(name);
     if (ret >= 0) {
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
@@ -77,6 +78,7 @@ int main(int argc,char *argv[]){
 	error_code = -1;
 	break;
       }
+      name_siz = BSIZE;
     } else {
       // If the receive was not succesful, send the end-of-file message to
       // close the output file.

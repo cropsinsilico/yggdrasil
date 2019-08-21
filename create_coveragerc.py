@@ -1,6 +1,5 @@
 import os
 import sys
-import install_R_interface
 PY_MAJOR_VERSION = sys.version_info[0]
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 # Import config parser
@@ -62,7 +61,12 @@ def create_coveragerc(installed_languages):
     """
     if HandyConfigParser is None:
         return False
-    covrc = os.path.join(os.path.dirname(__file__), '.coveragerc')
+    debug_msg = 'cwd = %s, os.path.dirname(__file__) = %s' % (
+        os.getcwd(), os.path.dirname(__file__))
+    print(debug_msg)
+    # covdir = os.path.dirname(__file__)
+    covdir = os.getcwd()
+    covrc = os.path.join(covdir, '.coveragerc')
     cp = HandyConfigParser("")
     # Read from existing .coveragerc
     if os.path.isfile(covrc):
@@ -126,19 +130,14 @@ def create_coveragerc(installed_languages):
 
 
 if __name__ == "__main__":
+    LANG_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                             'yggdrasil', 'languages')
+    sys.path.insert(0, LANG_PATH)
     try:
-        import matlab.engine
-        matlab_installed = True
-    except ImportError:
-        matlab_installed = False
-    try:
-        from openalea import lpy
-        lpy_installed = True
-    except ImportError:
-        lpy_installed = False
-    R_installed = install_R_interface.install_R_interface()
-    flag = create_coveragerc(matlab_installed=matlab_installed,
-                             lpy_installed=lpy_installed,
-                             R_installed=R_installed)
+        import install_languages
+    finally:
+        sys.path.pop(0)
+    installed_languages = install_languages.install_all_languages()
+    flag = create_coveragerc(installed_languages)
     if not flag:
         raise Exception("Failed to create/update converagerc file.")

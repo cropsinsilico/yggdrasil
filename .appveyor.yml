@@ -22,6 +22,7 @@ environment:
     INSTALLZMQ: 1
     INSTALLRMQ: 0
     APPVEYOR_SAVE_CACHE_ON_ERROR: true
+    YGG_RUN_EXAMPLES: 0
 
   erlang_download_url: "http://erlang.org/download/otp_win64_20.2.exe"
   erlang_exe_path: "C:\\Users\\appveyor\\erlang.exe"
@@ -37,11 +38,12 @@ environment:
     - platform: x64
       PYTHON_VERSION: "2.7"
       YGG_ENABLE_LONG_TESTS: 1
-      YGG_SKIP_EXTRA_EXAMPLES: 1
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_ENABLE_LONG_TESTS: 1
-      YGG_SKIP_EXTRA_EXAMPLES: 1
+    - platform: x64
+      PYTHON_VERSION: "3.6"
+      YGG_RUN_EXAMPLES: 1
 
 install:
   - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
@@ -62,7 +64,15 @@ install:
   # - "conda update -q --yes conda"
   - "conda create -q --yes -n test python=%PYTHON_VERSION%"
   - "activate test"
-  - "conda install --yes r-base"
+  - "conda install --yes -c conda-forge r-base"
+
+  # Download and install Rtools
+  - ps: (new-object net.webclient).DownloadFile(
+      "https://cran.rstudio.com/bin/windows/Rtools/Rtools35.exe",
+      "C:\projects\rtools.exe")
+  - C:\projects\rtools.exe /VERYSILENT /DIR=C:\Rtools
+  - set PATH=c:\Rtools\bin;%PATH%
+  # - set PATH=c:\Rtools\bin;c:\Rtools\gcc-4.6.3\bin;%PATH%
 
   # Check that we have the expected version of Python
   - "python --version"
@@ -93,16 +103,14 @@ install:
   - "conda install --yes -c conda-forge numpy scipy"  # Installing via pip causes import error
   - "pip install -r requirements_testing.txt"
 
-  # Install dependencies using conda/pip
-  # - "conda install --yes -c conda-forge --file requirements_testing.txt"
-  # - "conda install --yes -c conda-forge numpy pystache pyyaml astropy scipy \"pika<1.0\""
-  # - "pip install zmq"
-
   # Install yggdrasil allowing pip to resolve requirements
   - "python setup.py sdist"
-  - "dir dist"
-  - "pip install --verbose dist\\*.tar.gz"
+  - "dir dist\\*.tar.gz"
+  - for %%a in ("dist\\*.tar.gz") do set YGGSDIST=%%a
+  - echo %YGGSDIST%
+  - "pip install --verbose %YGGSDIST%"
   # - "pip install --verbose -e ."
+  - "python create_coveragerc.py"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
@@ -117,10 +125,13 @@ cache:
 build: false
 
 before_test:
+  - "ygginfo --verbose"
   - "flake8 yggdrasil"
 
 test_script:
-  - "yggtest"
+  - "type .coveragerc"
+  - "if %YGG_RUN_EXAMPLES% == 0 yggtest -c setup.cfg --cov-config=.coveragerc"
+  - "if %YGG_RUN_EXAMPLES% == 1 yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples"
 
 after_test:
   - "codecov"

@@ -1,7 +1,5 @@
 import os
 import sys
-import gc
-import glob
 import logging
 import warnings
 from setuptools import setup, find_packages
@@ -10,93 +8,26 @@ import versioneer
 import create_coveragerc
 ygg_ver = versioneer.get_version()
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
-lang_dir = os.path.join(ROOT_PATH, 'yggdrasil', 'languages')
+LANG_PATH = os.path.join(ROOT_PATH, 'yggdrasil', 'languages')
+
+
+# Import script from inside package
+sys.path.insert(0, LANG_PATH)
+try:
+    import install_languages
+finally:
+    sys.path.pop(0)
 
 
 print("In setup.py", sys.argv)
 logging.critical("In setup.py: %s" % sys.argv)
-
-
-def call_install_language(language, results):
-    r"""Call install for a specific language.
-
-    Args:
-        language (str): Name of language that should be checked.
-        results (dict): Dictionary where result (whether or not the language is
-            installed) should be logged.
-
-    """
-    if not os.path.isfile(os.path.join(lang_dir, language, 'install.py')):
-        return True
-    try:
-        sys.path.append(os.path.join(lang_dir, language))
-        from install import install
-        try:
-            from install import name_in_pragmas
-        except ImportError:
-            name_in_pragmas = language.lower()
-        out = install()
-        results[name_in_pragmas] = out
-    finally:
-        sys.path.pop()
-        del install
-        del name_in_pragmas
-        if 'install' in globals():
-            del globals()['install']
-        if 'install' in sys.modules:
-            del sys.modules['install']
-        gc.collect()
-    if not out:
-        warnings.warn(("Could not complete installation for {lang}. "
-                       "{lang} support will be disabled.").format(lang=language))
-    else:
-        logging.info("Language %s installed." % language)
         
 
 # Don't do coverage or installation of packages for use with other languages
 # when building a source distribution
 if 'sdist' not in sys.argv:
     # Attempt to install languages
-    installed_languages = {}
-    lang_dirs = sorted(glob.glob(os.path.join(lang_dir, '*')))
-    for x in lang_dirs:
-        if not os.path.isdir(x):
-            continue
-        ilang = os.path.basename(x)
-        call_install_language(ilang, installed_languages)
-
-
-    # Determine if rapidjson installed and parse user defined location
-    rj_include_dir0 = os.path.join(ROOT_PATH, 'yggdrasil', 'rapidjson', 'include')
-    for idx, arg in enumerate(sys.argv[:]):
-        if ((arg.startswith('--rj-include-dir=')
-             or arg.startswith('--rapidjson-include-dir='))):
-            sys.argv.pop(idx)
-            rj_include_dir = os.path.abspath(arg.split('=', 1)[1])
-            break
-    else:
-        rj_include_dir = rj_include_dir0
-    if not os.path.isdir(rj_include_dir):
-        raise RuntimeError("RapidJSON sources could not be located. If you "
-                           "cloned the git repository, initialize the rapidjson "
-                           "git submodule by calling "
-                           "'git submodule update --init --recursive' "
-                           "from inside the repository.")
-    if rj_include_dir != rj_include_dir0:
-        def_config_file = os.path.join(ROOT_PATH, 'yggdrasil', 'defaults.cfg')
-        try:
-            import ConfigParser as configparser
-        except ImportError:
-            import configparser
-        cfg = configparser.ConfigParser()
-        cfg.read(def_config_file)
-        if not cfg.has_section('c'):
-            cfg.add_section('c')
-        cfg.set('c', 'rapidjson_include', rj_include_dir)
-        with open(def_config_file, 'w') as fd:
-            cfg.write(fd)
-
-
+    installed_languages = install_languages.install_all_languages(from_setup=True)
     # Set coverage options in .coveragerc
     create_coveragerc.create_coveragerc(installed_languages)
 
@@ -167,7 +98,8 @@ setup(
         "Development Status :: 3 - Alpha",
     ],
     entry_points={
-        'console_scripts': ['yggrun=yggdrasil.command_line:yggrun',
+        'console_scripts': ['ygginfo=yggdrasil.command_line:ygginfo',
+                            'yggrun=yggdrasil.command_line:yggrun',
                             'cisrun=yggdrasil.command_line:yggrun',
                             'yggcc=yggdrasil.command_line:yggcc',
                             'yggccflags=yggdrasil.command_line:cc_flags',
@@ -182,7 +114,8 @@ setup(
                             'yggtime_os=yggdrasil.command_line:yggtime_os',
                             'yggtime_py=yggdrasil.command_line:yggtime_py',
                             'yggtime_paper=yggdrasil.command_line:yggtime_paper',
-                            'yggvalidate=yggdrasil.command_line:validate_yaml'],
+                            'yggvalidate=yggdrasil.command_line:validate_yaml',
+                            'ygginstall=yggdrasil.command_line:ygginstall'],
     },
     license="BSD",
 )

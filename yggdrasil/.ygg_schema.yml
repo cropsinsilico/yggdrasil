@@ -68,8 +68,8 @@ definitions:
           - function
           - string
       required:
-      - commtype
       - datatype
+      - commtype
       - name
       title: comm_base
       type: object
@@ -490,8 +490,8 @@ definitions:
           type: string
       required:
       - filetype
-      - name
       - working_dir
+      - name
       title: file_base
       type: object
     - anyOf:
@@ -931,6 +931,27 @@ definitions:
             function named here. The function must be located within the file specified
             by the source file listed in the first argument. If not provided, the
             model must contain it's own calls to the |yggdrasil| interface.
+        env_compiler:
+          default: CC
+          description: Environment variable where the compiler executable should be
+            stored for use within the Makefile. Defaults to 'CC'.
+          type: string
+        env_compiler_flags:
+          default: CFLAGS
+          description: Environment variable where the compiler flags should be stored
+            (including those required to compile against the |yggdrasil| interface).
+            Defaults to 'CFLAGS'.
+          type: string
+        env_linker:
+          default: CC
+          description: Environment variable where the linker executable should be
+            stored for use within the Makefile. Defaults to 'CC'.
+          type: string
+        env_linker_flags:
+          default: LDFLAGS
+          description: Environment variable where the linker flags should be stored
+            (including those required to link against the |yggdrasil| interface).
+            Defaults to 'LDFLAGS'.
           type: string
         inputs:
           default: []
@@ -1063,7 +1084,9 @@ definitions:
             file. It can be relative to working_dir or absolute.
           type: string
         strace_flags:
-          default: []
+          default:
+          - -e
+          - trace=memory
           description: Flags to pass to strace (or dtrace). Defaults to [].
           items:
             type: string
@@ -1079,6 +1102,7 @@ definitions:
         valgrind_flags:
           default:
           - --leak-check=full
+          - --show-leak-kinds=all
           description: Flags to pass to valgrind. Defaults to [].
           items:
             type: string
@@ -1097,10 +1121,10 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - args
-      - name
       - language
+      - working_dir
+      - name
       title: model_base
       type: object
     - anyOf:
@@ -1171,6 +1195,28 @@ definitions:
             items:
               type: string
             type: array
+          env_compiler:
+            default: CC
+            description: Environment variable where the compiler executable should
+              be stored for use within the Makefile. Defaults to 'CC'.
+            type: string
+          env_compiler_flags:
+            default: CFLAGS
+            description: Environment variable where the compiler flags should be stored
+              (including those required to compile against the |yggdrasil| interface).
+              Defaults to 'CFLAGS'.
+            type: string
+          env_linker:
+            default: CC
+            description: Environment variable where the linker executable should be
+              stored for use within the Makefile. Defaults to 'CC'.
+            type: string
+          env_linker_flags:
+            default: LDFLAGS
+            description: Environment variable where the linker flags should be stored
+              (including those required to link against the |yggdrasil| interface).
+              Defaults to 'LDFLAGS'.
+            type: string
           language:
             default: executable
             description: Model is written in C/C++ and has a Makefile for compilation.
@@ -1214,7 +1260,75 @@ definitions:
             description: Make target that should be built to create the model executable.
               Defaults to None.
             type: string
+          target_language:
+            description: Language that the target is written in. Defaults to None
+              and will be set based on the source files provided.
+            type: string
         title: MakeModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['python'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in Python.
+            enum:
+            - python
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: PythonModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['lpy'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is an LPy system.
+            enum:
+            - lpy
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: LPyModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['matlab'] subtype.
@@ -1412,70 +1526,6 @@ definitions:
             - executable
             type: string
         title: ExecutableModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['python'] subtype.
-        properties:
-          interpreter:
-            description: Name or path of interpreter executable that should be used
-              to run the model. If not provided, the interpreter will be determined
-              based on configuration options for the language (if present) and the
-              default_interpreter class attribute.
-            type: string
-          interpreter_flags:
-            default: []
-            description: Flags that should be passed to the interpreter when running
-              the model. If not provided, the flags are determined based on configuration
-              options for the language (if present) and the default_interpreter_flags
-              class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in Python.
-            enum:
-            - python
-            type: string
-          skip_interpreter:
-            default: false
-            description: If True, no interpreter will be added to the arguments. This
-              should only be used for subclasses that will not be invoking the model
-              via the command line. Defaults to False.
-            type: boolean
-        title: PythonModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['lpy'] subtype.
-        properties:
-          interpreter:
-            description: Name or path of interpreter executable that should be used
-              to run the model. If not provided, the interpreter will be determined
-              based on configuration options for the language (if present) and the
-              default_interpreter class attribute.
-            type: string
-          interpreter_flags:
-            default: []
-            description: Flags that should be passed to the interpreter when running
-              the model. If not provided, the flags are determined based on configuration
-              options for the language (if present) and the default_interpreter_flags
-              class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is an LPy system.
-            enum:
-            - lpy
-            type: string
-          skip_interpreter:
-            default: false
-            description: If True, no interpreter will be added to the arguments. This
-              should only be used for subclasses that will not be invoking the model
-              via the command line. Defaults to False.
-            type: boolean
-        title: LPyModelDriver
         type: object
     description: Schema for model components.
     title: model

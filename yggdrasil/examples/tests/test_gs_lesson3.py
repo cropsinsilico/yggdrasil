@@ -1,8 +1,8 @@
 import os
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
-class TestExampleGS3(TestExample):
+class TestExampleGS3(ExampleTstBase):
     r"""Test the Getting Started Lesson 3 example."""
 
     example_name = 'gs_lesson3'

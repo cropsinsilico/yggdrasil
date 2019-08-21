@@ -14,7 +14,6 @@ class PythonModelDriver(InterpretedModelDriver):
     default_interpreter = sys.executable
     interface_library = 'yggdrasil.interface.YggInterface'
     # supported_comms = ['ipc', 'zmq', 'rmq']
-    supported_comms = tools.get_supported_comm()
     supported_comm_options = {
         'ipc': {'platforms': ['MacOS', 'Linux'],
                 'libraries': ['sysv_ipc']},
@@ -72,6 +71,13 @@ class PythonModelDriver(InterpretedModelDriver):
         'exec_suffix': ('if __name__ == "__main__":\n'
                         '    main()')}
 
+    @staticmethod
+    def finalize_registration(cls):
+        r"""Operations that should be performed after a class has been fully
+        initialized and registered."""
+        cls.supported_comms = tools.get_supported_comm()
+        InterpretedModelDriver.finalize_registration(cls)
+        
     @classmethod
     def is_language_installed(self):
         r"""Determine if this model driver is installed on the current

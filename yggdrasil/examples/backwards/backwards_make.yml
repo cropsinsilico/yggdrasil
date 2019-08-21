@@ -1,14 +1,14 @@
 models:
   - name: make_modelA
     language: make
-    args: ./src/backwards_modelA.cpp
+    args: ./src/backwards_modelA.c
     target: backwards_modelA
     inputs: inputA
     outputs: outputA
 
   - name: make_modelB
     language: make
-    args: ./src/backwards_modelB.cpp
+    args: ./src/backwards_modelB.c
     target: backwards_modelB
     inputs: inputB
     outputs: outputB

@@ -44,21 +44,33 @@ def remove_product(product, check_for_source=False, timer_class=None):
         RuntimeError: If the product cannot be removed.
 
     """
+    source_keys = list(_map_language_ext.keys())
+    if '.exe' in source_keys:  # pragma: windows
+        source_keys.remove('.exe')
     if timer_class is None:
         timer_class = tools.YggClass()
     if os.path.isdir(product):
-        ext_tuple = tuple(_map_language_ext.keys())
+        ext_tuple = tuple(source_keys)
         if check_for_source:
             for root, dirs, files in os.walk(product):
                 for f in files:
                     if f.endswith(ext_tuple):
                         raise RuntimeError(("%s contains a source file "
                                             "(%s)") % (product, f))
-        shutil.rmtree(product)
+        T = timer_class.start_timeout()
+        while ((not T.is_out) and os.path.isdir(product)):
+            try:
+                shutil.rmtree(product)
+            except BaseException:  # pragma: debug
+                if os.path.isdir(product):
+                    timer_class.sleep()
+                if T.is_out:
+                    raise
+        timer_class.stop_timeout()
     elif os.path.isfile(product):
         if check_for_source:
             ext = os.path.splitext(product)[-1]
-            if ext in _map_language_ext:
+            if ext in source_keys:
                 raise RuntimeError("%s is a source file." % product)
         T = timer_class.start_timeout()
         while ((not T.is_out) and os.path.isfile(product)):
@@ -84,8 +96,6 @@ def remove_products(products, source_products, timer_class=None):
             without checking that they are not source files.
 
     """
-    # print('products', products)
-    # print('source_products', source_products)
     for p in source_products:
         remove_product(p, timer_class=timer_class)
     for p in products:
@@ -247,10 +257,13 @@ class ModelDriver(Driver):
         'client_of': {'type': 'array', 'items': {'type': 'string'},
                       'default': []},
         'with_strace': {'type': 'boolean', 'default': False},
-        'strace_flags': {'type': 'array', 'default': [],
+        'strace_flags': {'type': 'array',
+                         'default': ['-e', 'trace=memory'],
                          'items': {'type': 'string'}},
         'with_valgrind': {'type': 'boolean', 'default': False},
-        'valgrind_flags': {'type': 'array', 'default': ['--leak-check=full'],  # '-v'
+        'valgrind_flags': {'type': 'array',
+                           'default': ['--leak-check=full',
+                                       '--show-leak-kinds=all'],  # '-v'
                            'items': {'type': 'string'}}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     # 'inputs', 'outputs', 'working_dir']
@@ -359,7 +372,8 @@ class ModelDriver(Driver):
     def finalize_registration(cls):
         r"""Operations that should be performed after a class has been fully
         initialized and registered."""
-        if (not cls.is_configured()):
+        if (not cls.is_configured()):  # pragma: no cover
+            # This will only be run the first time yggdrasil is imported
             update_language_config(cls)
         global _map_language_ext
         for x in cls.get_language_ext():
@@ -522,7 +536,8 @@ class ModelDriver(Driver):
                                   % cls.language)
 
     @classmethod
-    def run_executable(cls, args, return_process=False, **kwargs):
+    def run_executable(cls, args, return_process=False, debug_flags=None,
+                       **kwargs):
         r"""Run a program using the executable for this language and the
         provided arguments.
 
@@ -533,6 +548,9 @@ class ModelDriver(Driver):
                 returned without checking the process output. If False,
                 communicate is called on the process and the output is parsed
                 for errors. Defaults to False.
+            debug_flags (list, optional): Debug executable and flags that should
+                be prepended to the executable command. Defaults to None and
+                is ignored.
             **kwargs: Additional keyword arguments are passed to
                 cls.executable_command and tools.popen_nobuffer.
 
@@ -550,14 +568,16 @@ class ModelDriver(Driver):
         #                        % cls.language)
         unused_kwargs = {}
         cmd = cls.executable_command(args, unused_kwargs=unused_kwargs, **kwargs)
+        if isinstance(debug_flags, list):
+            cmd = debug_flags + cmd
         try:
             # Add default keyword arguments
             if 'working_dir' in unused_kwargs:
                 unused_kwargs.setdefault('cwd', unused_kwargs.pop('working_dir'))
             unused_kwargs.setdefault('shell', platform._is_win)
             # Call command
-            logger.info("Running '%s' from %s"
-                        % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
+            logger.debug("Running '%s' from %s"
+                         % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
             logger.debug("Process keyword arguments:\n%s\n",
                          '    ' + pformat(unused_kwargs).replace('\n', '\n    '))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
@@ -587,16 +607,9 @@ class ModelDriver(Driver):
 
         """
         env = self.set_env()
-        pre_args = []
-        if self.with_strace:
-            if platform._is_linux:
-                pre_cmd = 'strace'
-            elif platform._is_mac:
-                pre_cmd = 'dtrace'
-            pre_args += [pre_cmd] + self.strace_flags
-        elif self.with_valgrind:
-            pre_args += ['valgrind'] + self.valgrind_flags
-        command = pre_args + self.model_command()
+        command = self.model_command()
+        if self.with_strace or self.with_valgrind:
+            kwargs.setdefault('debug_flags', self.debug_flags)
         self.debug('Working directory: %s', self.working_dir)
         self.debug('Command: %s', ' '.join(command))
         self.debug('Environment Variables:\n%s', self.pprint(env, block_indent=1))
@@ -610,6 +623,29 @@ class ModelDriver(Driver):
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
         return self.run_executable(command, return_process=return_process, **kwargs)
+
+    @property
+    def debug_flags(self):
+        r"""list: Flags that should be prepended to an executable command to
+        enable debugging."""
+        pre_args = []
+        if self.with_strace:
+            if platform._is_linux:
+                pre_args += ['strace'] + self.strace_flags
+            else:  # pragma: debug
+                raise RuntimeError("strace not supported on this OS.")
+            # TODO: dtruss cannot be run without sudo, sudo cannot be
+            # added to the model process command if it is not in the original
+            # yggdrasil CLI call, and must be tested with an executable that
+            # is not "signed with restricted entitlements" (which most built-in
+            # utilities (e.g. sleep) are).
+            # elif platform._is_mac:
+            #     if 'sudo' in sys.argv:
+            #         pre_args += ['sudo']
+            #     pre_args += ['dtruss']
+        elif self.with_valgrind:
+            pre_args += ['valgrind'] + self.valgrind_flags
+        return pre_args
         
     @classmethod
     def language_version(cls, version_flags=None, **kwargs):
@@ -624,7 +660,7 @@ class ModelDriver(Driver):
         """
         if version_flags is None:
             version_flags = cls.version_flags
-        return cls.run_executable(version_flags, **kwargs)
+        return cls.run_executable(version_flags, **kwargs).splitlines()[0].strip()
 
     @classmethod
     def is_installed(cls):
@@ -692,10 +728,7 @@ class ModelDriver(Driver):
             try:
                 out = (tools.which(cls.language_executable()) is not None)
             except NotImplementedError:  # pragma: debug
-                # TODO: In production out should be False but raise error
-                # for testing
                 out = False
-                raise
         for x in cls.base_languages:
             if not out:
                 break
@@ -752,7 +785,7 @@ class ModelDriver(Driver):
             out = (ygg_cfg.get(cls.language, 'commtypes', None) is not None)
         # Base languages
         for x in cls.base_languages:
-            if not out:
+            if not out:  # pragma: debug
                 break
             out = import_component('model', x).is_configured()
         return out
