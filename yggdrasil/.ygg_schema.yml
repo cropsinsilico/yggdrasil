@@ -68,8 +68,8 @@ definitions:
           - function
           - string
       required:
-      - datatype
       - commtype
+      - datatype
       - name
       title: comm_base
       type: object
@@ -489,9 +489,9 @@ definitions:
             is used.
           type: string
       required:
-      - filetype
       - working_dir
       - name
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -926,11 +926,6 @@ definitions:
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
-        function:
-          description: If provided, an integrated model is created by wrapping the
-            function named here. The function must be located within the file specified
-            by the source file listed in the first argument. If not provided, the
-            model must contain it's own calls to the |yggdrasil| interface.
         env_compiler:
           default: CC
           description: Environment variable where the compiler executable should be
@@ -952,6 +947,12 @@ definitions:
           description: Environment variable where the linker flags should be stored
             (including those required to link against the |yggdrasil| interface).
             Defaults to 'LDFLAGS'.
+          type: string
+        function:
+          description: If provided, an integrated model is created by wrapping the
+            function named here. The function must be located within the file specified
+            by the source file listed in the first argument. If not provided, the
+            model must contain it's own calls to the |yggdrasil| interface.
           type: string
         inputs:
           default: []
@@ -1122,9 +1123,9 @@ definitions:
           type: string
       required:
       - args
-      - language
       - working_dir
       - name
+      - language
       title: model_base
       type: object
     - anyOf:
