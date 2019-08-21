@@ -375,7 +375,6 @@ class CMakeConfigure(CompilerBase):
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
         lines = preamble_lines + lines
-        verbose = True
         log_msg = 'CMake include file:\n\t' + '\n\t'.join(lines)
         if verbose:
             logger.info(log_msg)
@@ -678,7 +677,6 @@ class CMakeModelDriver(BuildModelDriver):
                     lines.append(newline)
             # Write contents to the build file, check for new lines that may
             # already be included
-            kwargs['verbose'] = True
             log_msg = 'New CMakeLists.txt:\n\t' + '\n\t'.join(lines)
             if kwargs.get('verbose', False):
                 logger.info(log_msg)

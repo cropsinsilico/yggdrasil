@@ -28,11 +28,6 @@ def get_OSX_SYSROOT():
                 'echo "$(xcode-select -p)"', shell=True).strip())
         except BaseException:  # pragma: debug
             xcode_dir = None
-        print(('get_OSX_SYSROOT: MACOSX_DEPLOYMENT_TARGET=%s, '
-               'CONDA_BUILD_SYSROOT=%s, SDKROOT=%s')
-              % (os.environ.get('MACOSX_DEPLOYMENT_TARGET', False),
-                 os.environ.get('CONDA_BUILD_SYSROOT', False),
-                 os.environ.get('SDKROOT', False)))
         fname_try = []
         if xcode_dir is not None:
             fname_base = os.path.join(xcode_dir, 'Platforms',
