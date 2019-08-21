@@ -23,6 +23,9 @@ def get_OSX_SYSROOT():
     """
     fname = None
     if platform._is_mac:
+        print('get_OSX_SYSROOT',
+              os.environ.get('MACOSX_DEPLOYMENT_TARGET', False),
+              os.environ.get('CONDA_BUILD_SYSROOT', False))
         fname_try = [
             ('$(xcode-select -p)/Platforms/MacOSX.platform/'
              'Developer/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk'),
@@ -31,8 +34,10 @@ def get_OSX_SYSROOT():
             fname_try.insert(0, os.environ['CONDA_BUILD_SYSROOT'])
         for fcheck in fname_try:
             try:
+                print('checking...', fcheck)
                 fname = subprocess.check_output('echo "%s"' % fcheck,
                                                 shell=True).strip()
+                print('dir:', fname, os.path.isdir(fname))
                 if os.path.isdir(fname):
                     fname = backwards.as_str(fname)
                     break
