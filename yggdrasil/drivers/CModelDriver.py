@@ -115,7 +115,8 @@ class ClangCompiler(CCompilerBase):
                                      'flag_options',
                                      LinkerBase.flag_options).items())
                                  + [('sysroot', '--sysroot'),
-                                    ('isysroot', '-isysroot')]))
+                                    ('isysroot', {'key': '-isysroot',
+                                                  'prepend': True})]))
 
 
 class MSVCCompiler(CCompilerBase):
