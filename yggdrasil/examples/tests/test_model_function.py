@@ -1,8 +1,8 @@
 import os
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
-class TestExampleModelFunction(TestExample):
+class TestExampleModelFunction(ExampleTstBase):
     r"""Test the model_function example."""
 
     example_name = 'model_function'
