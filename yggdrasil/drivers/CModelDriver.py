@@ -4,7 +4,7 @@ import subprocess
 from collections import OrderedDict
 from yggdrasil import platform, tools, backwards
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase, ArchiverBase)
+    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase)
 from yggdrasil.languages import get_language_dir
 
 
@@ -109,13 +109,13 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
-    # linker_attributes = dict(CCompilerBase.linker_attributes,
-    #                          flag_options=OrderedDict(
-    #                              list(CCompilerBase.linker_attributes.get(
-    #                                  'flag_options',
-    #                                  LinkerBase.flag_options).items())
-    #                              + [('sysroot', '--sysroot'),
-    #                                 ('isysroot', '-isysroot')]))
+    linker_attributes = dict(CCompilerBase.linker_attributes,
+                             flag_options=OrderedDict(
+                                 list(CCompilerBase.linker_attributes.get(
+                                     'flag_options',
+                                     LinkerBase.flag_options).items())
+                                 + [('sysroot', '--sysroot'),
+                                    ('isysroot', '-isysroot')]))
 
 
 class MSVCCompiler(CCompilerBase):
@@ -406,28 +406,28 @@ class CModelDriver(CompiledModelDriver):
             #     _osx_sysroot, 'usr', 'include'))
         return out
         
-    # @classmethod
-    # def update_linker_kwargs(cls, **kwargs):
-    #     r"""Update keyword arguments supplied to the linker get_flags method
-    #     for various options.
+    @classmethod
+    def update_linker_kwargs(cls, **kwargs):
+        r"""Update keyword arguments supplied to the linker get_flags method
+        for various options.
 
-    #     Args:
-    #         **kwargs: Additional keyword arguments are passed to the parent
-    #             class's method.
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
-    #     Returns:
-    #         dict: Keyword arguments for a get_flags method providing linker
-    #             flags.
+        Returns:
+            dict: Keyword arguments for a get_flags method providing linker
+                flags.
 
-    #     """
-    #     out = super(CModelDriver, cls).update_linker_kwargs(**kwargs)
-    #     if _osx_sysroot is not None:
-    #         out['sysroot'] = _osx_sysroot
-    #         out['isysroot'] = _osx_sysroot
-    #         out.setdefault('library_dirs', [])
-    #         out['library_dirs'].append(os.path.join(
-    #             _osx_sysroot, 'usr', 'lib'))
-    #     return out
+        """
+        out = super(CModelDriver, cls).update_linker_kwargs(**kwargs)
+        if _osx_sysroot is not None:
+            # out['sysroot'] = _osx_sysroot
+            out['isysroot'] = _osx_sysroot
+            # out.setdefault('library_dirs', [])
+            # out['library_dirs'].append(os.path.join(
+            #     _osx_sysroot, 'usr', 'lib'))
+        return out
         
     @classmethod
     def call_linker(cls, obj, language=None, **kwargs):
