@@ -62,7 +62,7 @@ def register_example(example_dir):
             lang = serialize.process_message(os.path.basename(match), lang_search)[0]
             if lang == 'valgrind':
                 continue
-            lang_avail.append(lang)
+            lang_avail.append(lang.lower())
     lang_avail = tuple(sorted(lang_avail))
     # Get YAML and source files for each language
     out_yml = {}
