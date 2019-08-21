@@ -219,8 +219,9 @@ install:
       conda --version
       echo "CONDA_PREFIX = $CONDA_PREFIX"
       echo "CONDA_ROOT   = $CONDA_ROOT"
-      echo "CONDA_BUILD_SYSROOT (before install) = $CONDA_BUILD_SYSROOT"
+      echo "CONDA_BUILD_SYSROOT (before index) = $CONDA_BUILD_SYSROOT"
       conda index ${CONDA_PREFIX}/conda-bld
+      echo "CONDA_BUILD_SYSROOT (before install) = $CONDA_BUILD_SYSROOT"
       conda install -c file:/${CONDA_PREFIX}/conda-bld yggdrasil
       # if [[ "$YGG_CONDA" == "3.7" ]]; then
       #   # conda install -c local yggdrasil
