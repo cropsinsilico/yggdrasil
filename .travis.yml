@@ -229,6 +229,7 @@ install:
       #   conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
       # fi
       conda list
+      export CONDA_BUILD_SYSROOT="$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk"
       echo "CONDA_BUILD_SYSROOT (after install) = $CONDA_BUILD_SYSROOT"
     fi
 
