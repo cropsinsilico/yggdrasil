@@ -110,6 +110,7 @@ before_install:
           # set minimum sdk version to our target
           plutil -replace MinimumSDKVersion -string ${MACOSX_DEPLOYMENT_TARGET} $(xcode-select -p)/Platforms/MacOSX.platform/Info.plist
           plutil -replace DTSDKName -string macosx${MACOSX_DEPLOYMENT_TARGET}internal $(xcode-select -p)/Platforms/MacOSX.platform/Info.plist
+          printf "CONDA_BUILD_SYSROOT:\n  - ${CONDA_BUILD_SYSROOT}  # [osx]\n" > ~/conda_build_config.yaml
         fi
       fi
 
