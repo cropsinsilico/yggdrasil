@@ -34,7 +34,7 @@ case $1 in
 	;;
     -R | -r | --R | --r )
 	echo "Running R"
-	yaml='model_function_R.yml'
+	yaml='model_function_r.yml'
 	;;
 esac
 

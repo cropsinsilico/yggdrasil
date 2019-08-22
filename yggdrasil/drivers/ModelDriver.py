@@ -322,8 +322,9 @@ class ModelDriver(Driver):
         if self.function:
             self.model_function_file = args[0]
             if not os.path.isabs(self.model_function_file):
-                self.model_function_file = os.path.join(self.working_dir,
-                                                        self.model_function_file)
+                self.model_function_file = os.path.normpath(
+                    os.path.join(self.working_dir,
+                                 self.model_function_file))
             if not os.path.isfile(self.model_function_file):
                 raise ValueError("Source file does not exist: '%s'"
                                  % self.model_function_file)
