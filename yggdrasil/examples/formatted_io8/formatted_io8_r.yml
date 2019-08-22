@@ -1,7 +1,7 @@
 models:
-  - name: c_modelA
-    language: c
-    args: ./src/formatted_io8_modelA.c
+  - name: R_modelA
+    language: R
+    args: ./src/formatted_io8_modelA.R
     inputs:
       - name: inputA
         type: object
@@ -9,9 +9,9 @@ models:
       - name: outputA
         type: object
 
-  - name: c_modelB
-    language: c
-    args: ./src/formatted_io8_modelB.c
+  - name: R_modelB
+    language: R
+    args: ./src/formatted_io8_modelB.R
     inputs:
       - name: inputB
         type: object

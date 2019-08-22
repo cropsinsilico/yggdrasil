@@ -14,7 +14,7 @@
 % =============================================================================
 function out = YggInterface(type, varargin)
   YggInterface = py.importlib.import_module('yggdrasil.languages.Python.YggInterface');
-  pyobj = YggInterface.YggMatlab(type, py.list(varargin));
+  pyobj = YggInterface.YggInit(type, py.list(varargin));
   if (nargin > 1);
     out = YggInterfaceClass(pyobj);
   else;

@@ -37,7 +37,8 @@ script_list = [
     ('matlab_error', 'matlab_error_model.m'),
     ('python', 'python_model.py'),
     ('error', 'error_model.py'),
-    ('lpy', 'lpy_model.lpy')]
+    ('lpy', 'lpy_model.lpy'),
+    ('r', 'r_model.R')]
 scripts = {}
 for k, v in script_list:
     if isinstance(v, list):
@@ -629,6 +630,10 @@ class YggTestBase(unittest.TestCase):
             fsize (int): Size that the file should be in bytes.
 
         """
+        result = None
+        if isinstance(fsize, backwards.string_types):
+            result = fsize
+            fsize = len(result)
         Tout = self.start_timeout(2)
         if (os.stat(fname).st_size != fsize):  # pragma: debug
             print('file sizes not equal', os.stat(fname).st_size, fsize)
@@ -637,6 +642,12 @@ class YggTestBase(unittest.TestCase):
             self.sleep()
         self.stop_timeout()
         if os.stat(fname).st_size != fsize:  # pragma: debug
+            if (result is not None) and (fsize < 200):
+                print("Expected:")
+                print(result)
+                print("Actual:")
+                with open(fname, 'r') as fd:
+                    print(fd.read())
             raise AssertionError("File size (%d), dosn't match expected size (%d)."
                                  % (os.stat(fname).st_size, fsize))
 

@@ -1,8 +1,8 @@
 import os
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
-class TestExampleBackwards(TestExample):
+class TestExampleBackwards(ExampleTstBase):
     r"""Test the backwards example."""
 
     example_name = 'backwards'

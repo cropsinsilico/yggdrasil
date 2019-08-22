@@ -94,6 +94,57 @@ def check_environ_bool(name, valid_values=['true', '1', True, 1]):
     return (os.environ.get(name, '').lower() in valid_values)
 
 
+def get_conda_prefix():
+    r"""Determine the conda path prefix for the current environment.
+
+    Returns:
+        str: Full path to the directory prefix used for the current conda
+            environment if one exits. If conda cannot be located, None is
+            returned.
+
+    """
+    conda_prefix = os.environ.get('CONDA_PREFIX', None)
+    # This part should be enabled if the conda base enviroment dosn't have
+    # CONDA_PREFIX set. Older version of conda behaved this way so it is
+    # possible that a future release will as well.
+    # if not conda_prefix:
+    #     conda_prefix = which('conda')
+    #     if conda_prefix is not None:
+    #         conda_prefix = os.path.dirname(os.path.dirname(conda_prefix))
+    return conda_prefix
+
+
+def get_conda_env():
+    r"""Determine the name of the current conda environment.
+
+    Returns:
+        str: Name of the current conda environment if one is activated. If a
+            conda environment is not activated, None is returned.
+
+    """
+    return os.environ.get('CONDA_DEFAULT_ENV', None)
+
+
+def get_subprocess_language():
+    r"""Determine the language of the calling process.
+
+    Returns:
+        str: Name of the programming language responsible for the subprocess.
+
+    """
+    return os.environ.get('YGG_MODEL_LANGUAGE', 'python')
+
+
+def get_subprocess_language_driver():
+    r"""Determine the driver for the langauge of the calling process.
+
+    Returns:
+        ModelDriver: Class used to handle running a model of the process language.
+
+    """
+    return import_component('model', get_subprocess_language())
+
+
 def is_subprocess():
     r"""Determine if the current process is a subprocess.
 
@@ -130,6 +181,10 @@ def which(program):
         str: Path to executable if it can be located. Otherwise, None.
 
     """
+    if platform._is_win and (not program.endswith('.exe')):  # pragma: windows
+        out = which(program + '.exe')
+        if out is not None:
+            return out
     if backwards.PY2:  # pragma: Python 2
         def is_exe(fpath):
             return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
@@ -192,6 +247,10 @@ def get_supported_lang():
     out = s['model'].subtypes
     if 'c++' in out:
         out[out.index('c++')] = 'cpp'
+    # if 'R' in out:
+    #     out[out.index('R')] = 'r'
+    if 'r' in out:
+        out[out.index('r')] = 'R'
     return list(set(out))
 
 
@@ -681,6 +740,24 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
     def ygg_class(self):
         r"""str: Name of the class."""
         return self._ygg_class
+
+    def language_info(self, languages):
+        r"""Only do info debug message if the language is one of those specified."""
+        if not isinstance(languages, (list, tuple)):
+            languages = [languages]
+        languages = [l.lower() for l in languages]
+        if get_subprocess_language().lower() in languages:  # pragma: debug
+            return self.info
+        else:
+            return self.dummy_log
+
+    @property
+    def interface_info(self):
+        r"""Only do info debug message if is interface."""
+        if is_subprocess():  # pragma: debug
+            return self.info
+        else:
+            return self.dummy_log
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""

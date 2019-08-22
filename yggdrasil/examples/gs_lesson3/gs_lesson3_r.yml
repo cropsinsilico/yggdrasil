@@ -1,0 +1,14 @@
+models:
+  - name: R_model
+    language: R  # Runs the R script using default R
+    args: ./src/gs_lesson3.R
+    inputs:
+      - input
+    outputs:
+      - output
+
+connections:
+  - input_file: ./Input/input.txt
+    output: input
+  - input: output
+    output: ./output.txt

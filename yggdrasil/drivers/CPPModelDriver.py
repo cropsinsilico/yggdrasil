@@ -69,6 +69,14 @@ class CPPModelDriver(CModelDriver):
         schema='MetaschemaType')
     function_param = dict(
         CModelDriver.function_param,
+        interface='#include "YggInterface.hpp"',
+        input='YggInput {channel}(\"{channel_name}\");',
+        output='YggOutput {channel}(\"{channel_name}\");',
+        table_input='YggAsciiTableInput {channel}(\"{channel_name}\");',
+        table_output=('YggAsciiTableOutput {channel}(\"{channel_name}\", '
+                      '\"{format_str}\");'),
+        recv='{flag_var} = {channel}.recvRealloc({num_variables}, {variables});',
+        send='{flag_var} = {channel}.send({num_variables}, {variables});',
         exec_prefix=('#include <iostream>\n'
                      '#include <exception>\n'),
         # print='std::cout << "{message}" << std::endl;',

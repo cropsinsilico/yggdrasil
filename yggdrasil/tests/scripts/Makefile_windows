@@ -1,12 +1,12 @@
 IDIR = .
-CC = cl.exe
-LINK = link.exe
-CFLAGS = /I$(IDIR) $(YGGCCFLAGS)
+# CC ?= cl.exe
+# LINK ?= link.exe
+CFLAGSZ = $(CFLAGS) /I$(IDIR)
 
 SDIR = .
 ODIR = .
 
-LIBS = $(YGGLDFLAGS)
+LIBS = $(LDFLAGS)
 
 DEPS = $(IDIR)\hellofunc.h
 
@@ -16,14 +16,14 @@ OBJ = $(ODIR)\gcc_model.o $(ODIR)\hellofunc.o
 all: gcc_model
 
 gcc_model: $(OBJ)
-	$(LINK) /OUT:$@.exe $** $(LIBS)
+	$(CC) /OUT:$@.exe $** /link $(LIBS)
 
 {$(SDIR)}.c{$(ODIR)}.o:
 	@echo $(OBJ)
-	$(CC) /c $< -Fo$@ $(CFLAGS)
+	$(CC) /c $< -Fo$@ $(CFLAGSZ)
 
 {$(SDIR)}.cpp{$(ODIR)}.o:
-	$(CC) /c $< -Fo$@ $(CFLAGS)
+	$(CC) /c $< -Fo$@ $(CFLAGSZ)
 
 ($OBJ) :
 

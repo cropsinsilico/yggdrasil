@@ -763,6 +763,7 @@ class ZMQComm(AsyncComm.AsyncComm):
                 comm. Defaults to False.
 
         """
+        self.debug("")
         with self.socket_lock:
             self.debug("self.socket.closed = %s", str(self.socket.closed))
             if self.socket.closed:

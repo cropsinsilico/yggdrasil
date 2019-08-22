@@ -1,10 +1,10 @@
 import os
 from yggdrasil.tests import extra_example
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
 @extra_example
-class TestExampleSaM(TestExample):
+class TestExampleSaM(ExampleTstBase):
     r"""Test the SaM example."""
 
     example_name = 'SaM'

@@ -142,8 +142,6 @@ class CommThreadLoop(tools.YggThreadLoop):
         self.comm = comm
         if name is None:
             name = '%s.%s' % (comm.name, suffix)
-        # if comm.matlab:
-        #     kwargs['daemon'] = True
         super(CommThreadLoop, self).__init__(name=name, **kwargs)
 
     def on_main_terminated(self):  # pragma: debug
@@ -208,6 +206,10 @@ class CommBase(tools.YggClass):
             through the connection. 'send' if the connection will send
             messages, 'recv' if the connecton will receive messages. Defaults
             to 'send'.
+        is_interface (bool, optional): Set to True if this comm is a Python
+            interface binding. Defaults to False.
+        langauge (str, optional): Programming language of the calling model.
+            Defaults to 'python'.
         partner_language (str, optional): Programming language of this comm's
             partner comm. Defaults to 'python'.
         datatype (schema, optional): JSON schema (with expanded core types
@@ -269,8 +271,6 @@ class CommBase(tools.YggClass):
             sent objects. Defaults to None.
         comm (str, optional): The comm that should be created. This only serves
             as a check that the correct class is being created. Defaults to None.
-        matlab (bool, optional): True if the comm will be accessed by Matlab
-            code. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -285,10 +285,11 @@ class CommBase(tools.YggClass):
         address (str): Communication info.
         direction (str): The direction that messages should flow through the
             connection.
+        is_interface (bool): True if this comm is a Python interface binding.
+        language (str): Language that this comm is being called from.
         partner_language (str): Programming language of this comm's partner comm.
         serializer (:class:.DefaultSerialize): Object that will be used to
             serialize/deserialize messages to/from python objects.
-        is_interface (bool): True if this comm is a Python interface binding.
         recv_timeout (float): Time that should be waited for an incoming
             message before returning None.
         close_on_eof_recv (bool): If True, the comm will be closed when it
@@ -307,7 +308,6 @@ class CommBase(tools.YggClass):
             comm.
         recv_converter (func): Converter that should be used on received objects.
         send_converter (func): Converter that should be used on sent objects.
-        matlab (bool): True if the comm will be accessed by Matlab code.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -317,7 +317,6 @@ class CommBase(tools.YggClass):
 
     """
 
-    # TODO: Add serializer to comm schema
     _commtype = None
     _schema_type = 'comm'
     _schema_subtype_key = 'commtype'
@@ -329,7 +328,7 @@ class CommBase(tools.YggClass):
                           'datatype': {'type': 'schema',
                                        'default': {'type': 'bytes'}},
                           'recv_converter': {'type': ['function', 'string']},
-                          'send_converter': {'type': 'function'},
+                          'send_converter': {'type': ['function', 'string']},
                           'field_names': {'type': 'array',
                                           'items': {'type': 'string'}},
                           'field_units': {'type': 'array',
@@ -343,13 +342,13 @@ class CommBase(tools.YggClass):
     _maxMsgSize = 0
     address_description = None
 
-    def __init__(self, name, address=None, direction='send',
-                 partner_language='python', dont_open=False, is_interface=False,
+    def __init__(self, name, address=None, direction='send', dont_open=False,
+                 is_interface=None, language=None, partner_language='python',
                  recv_timeout=0.0, close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 comm=None, matlab=False, **kwargs):
+                 comm=None, **kwargs):
         self._comm_class = None
         if comm is not None:
             assert(comm == self.comm_class)
@@ -371,14 +370,23 @@ class CommBase(tools.YggClass):
         else:
             self.address = address
         self.direction = direction
+        if is_interface is None:
+            is_interface = False  # tools.is_subprocess()
+        self.is_interface = is_interface
+        if self.is_interface:
+            # All models connect to python connection drivers
+            partner_language = 'python'
+            recv_timeout = False
+        if language is None:
+            language = 'python'
+        self.language = language
         self.partner_language = partner_language
+        self.language_driver = import_component('model', self.language)
         self.is_client = is_client
         self.is_server = is_server
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
-        self.matlab = matlab
         self._server = None
-        self.is_interface = is_interface
         self.recv_timeout = recv_timeout
         self.close_on_eof_recv = close_on_eof_recv
         self.close_on_eof_send = close_on_eof_send
@@ -407,7 +415,6 @@ class CommBase(tools.YggClass):
         #     self._timeout_drain = self.timeout
         self._closing_event = threading.Event()
         self._closing_thread = tools.YggThread(target=self.linger_close,
-                                               # daemon=self.matlab,
                                                name=self.name + '.ClosingThread')
         self._eof_recv = threading.Event()
         self._eof_sent = threading.Event()
@@ -460,10 +467,13 @@ class CommBase(tools.YggClass):
             self.serializer = seri_cls(**seri_kws)
         # Set send/recv converter based on the serializer
         for k in ['recv_converter', 'send_converter']:
-            if getattr(self, k, None) is None:
+            v = getattr(self, k, None)
+            if v is None:
                 v = getattr(self.serializer, k, None)
-                if v is not None:
-                    setattr(self, k, v)
+            if isinstance(v, str):
+                cls_conv = getattr(self.language_driver, k + 's')
+                v = cls_conv.get(v, None)
+            setattr(self, k, v)
 
     @staticmethod
     def before_registration(cls):
@@ -471,7 +481,8 @@ class CommBase(tools.YggClass):
         to registration."""
         tools.YggClass.before_registration(cls)
         cls._default_serializer_class = import_component('serializer',
-                                                         cls._default_serializer)
+                                                         cls._default_serializer,
+                                                         without_schema=True)
         
     @classmethod
     def get_testing_options(cls, serializer=None, **kwargs):
@@ -746,7 +757,8 @@ class CommBase(tools.YggClass):
                 self.debug("Signing off from server")
                 self.signoff_from_server()
             if len(self._work_comms) > 0:
-                self.debug("Cleaning up %d work comms", len(self._work_comms))
+                self.debug(
+                    "Cleaning up %d work comms", len(self._work_comms))
                 keys = [k for k in self._work_comms.keys()]
                 for c in keys:
                     self.remove_work_comm(c, linger=linger)
@@ -764,7 +776,7 @@ class CommBase(tools.YggClass):
                 this will block until the comm is closed.
 
         """
-        if self.matlab:  # pragma: matlab
+        if self.language_driver.comm_linger:  # pragma: matlab
             self.linger_close()
             self._closing_thread.set_terminated_flag()
         self.debug("current_thread = %s", threading.current_thread().name)
@@ -793,22 +805,21 @@ class CommBase(tools.YggClass):
             self.wait_for_confirm(timeout=self._timeout_drain)
         self.debug("Finished (timeout_drain = %s)", str(self._timeout_drain))
 
-    def matlab_atexit(self):  # pragma: matlab
-        r"""Close operations including draining receive."""
-        if self.direction == 'recv':
-            while self.recv(timeout=0)[0]:
-                self.sleep()
-        else:
-            self.send_eof()
-        self.linger_close()
+    def language_atexit(self):  # pragma: debug
+        r"""Close operations specific to the language."""
+        if self.language_driver.comm_atexit is not None:
+            self.language_driver.comm_atexit(self)
 
     def atexit(self):  # pragma: debug
         r"""Close operations."""
         self.debug('atexit begins')
+        self.language_atexit()
+        self.debug('atexit after language_atexit, but before close')
         self.close()
-        self.debug('atexit finished: closed=%s, n_msg=%d, close_alive=%s',
-                   self.is_closed, self.n_msg,
-                   self._closing_thread.is_alive())
+        self.debug(
+            'atexit finished: closed=%s, n_msg=%d, close_alive=%s',
+            self.is_closed, self.n_msg,
+            self._closing_thread.is_alive())
 
     @property
     def is_open(self):
@@ -936,6 +947,9 @@ class CommBase(tools.YggClass):
             return msg_in
         elif isinstance(self.recv_converter, str):
             if self.recv_converter in ['array', 'pandas']:
+                # These are referenced by string since they require the
+                # serializer customized with information from the received
+                # message(s) (e.g. column names).
                 msg_out = self.serializer.consolidate_array(msg_in)
                 if self.recv_converter == 'pandas':
                     msg_out = serialize.numpy2pandas(msg_out)
@@ -959,7 +973,7 @@ class CommBase(tools.YggClass):
         if (self.send_converter is None):
             return msg_in
         elif isinstance(self.send_converter, str):  # pragma: debug
-            raise RuntimeError("String send_converter not supported: '%s'." %
+            raise RuntimeError("Unrecognized send_converter string: '%s'." %
                                self.send_converter)
         else:
             return self.send_converter(msg_in)
@@ -1229,7 +1243,10 @@ class CommBase(tools.YggClass):
         if (not self._used) and self._multiple_first_send:
             out = self._send_1st(*args, **kwargs)
         else:
+            self.debug('is_closed = %s', self.is_closed)
             with self._closing_thread.lock:
+                self.debug(
+                    "inside safe_send lock, is_closed = %s", self.is_closed)
                 if self.is_closed:  # pragma: debug
                     return False
                 out = self._send(*args, **kwargs)
@@ -1382,6 +1399,8 @@ class CommBase(tools.YggClass):
         """
         if self.single_use and self._used:  # pragma: debug
             raise RuntimeError("This comm is single use and it was already used.")
+        if self.language_driver.language2python is not None:
+            args = self.language_driver.language2python(args)
         try:
             ret = self.send_multipart(args, **kwargs)
             if ret:
@@ -1426,7 +1445,8 @@ class CommBase(tools.YggClass):
         if not flag:
             return flag
         msg_len = len(msg_s)
-        # Sent first part of message
+        # Sent first part of message which includes the header describing the
+        # work comm
         self.special_debug('Sending %d bytes', msg_len)
         if (msg_len < self.maxMsgSize) or (self.maxMsgSize == 0):
             flag = self._safe_send(msg_s, **kwargs)
@@ -1607,7 +1627,10 @@ class CommBase(tools.YggClass):
         if self.single_use and self._used:
             self.debug('Linger close on single use')
             self.linger_close()
-        return (flag, msg)
+        out = (flag, msg)
+        if self.language_driver.python2language is not None:
+            out = self.language_driver.python2language(out)
+        return out
 
     def recv_multipart(self, *args, **kwargs):
         r"""Receive a multipart message. If a message is received without a

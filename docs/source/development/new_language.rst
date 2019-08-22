@@ -27,6 +27,11 @@ their class by defining the following class attributes:
 and the class method ``is_library_installed``, which is used to determine if
 dependencies are installed.
 
+
+Model drivers should go in the ``yggdrasil/drivers`` directory and tests should
+go in the ``yggdrasil/drivers/tests`` directory.
+
+
 Interpreted Languages
 ---------------------
 
@@ -81,7 +86,12 @@ Write the Language Communication Interface
 The second phase of adding support for a new language is to write the language
 interface. This step is more involved than writing the model driver for the
 language, but the majority of the required development will be in the language
-being added.
+being added. Tools required for language support that are not meant to be
+accessed via the |yggdrasil| Python package (e.g. the language interface or
+conversion functions) should go in specific language directory under
+`yggdrasil/languages` with a name identifying the languagye
+(e.g. `yggdrasil/languages/MATLAB` for the MATLAB interface contains conversion
+functions and the interface classes/functions written in MATLAB).
 
 For new languages, developers should first do a review to
 identify existing tools for calling code in one of the languages that |yggdrasil|
@@ -207,3 +217,24 @@ the size indicated by the header. If the message is smaller, it should
 
 When creating an interface in a new language, the developer must replicate this
 behavior.
+
+
+Installation Script [OPTIONAL]
+==============================
+
+If there are additional steps that should be taken during the installation of
+|yggdrasil| to allow a language to be supported (e.g. installing dependencies 
+that are not covered by a Python package manager), developers can add these
+to a script called ``install.py`` in the directory they create for their language
+under ``yggdrasil/languages``. This file should, at minimum, include a function
+called ``install`` that dosn't require any input and returns a boolean indicating
+the success or failuer of the additional installation steps. This function can
+also be used to check for the existance of dependencies so that a warning is
+printed during install to advise the user. In addition to the ``install`` function
+developer can also set a ``name_in_pragmas`` variable. This should be a string
+that is used to set coverage pragmas that will be ignored during coverage if
+a language will not be set. (e.g. lines marked by ``# pragma: matlab`` are
+not covered if MATLAB is not supported while lines marked with ``# pragma: no matlab``
+are not covered if MATLAB is installed). If not set, the lower case version of
+the language directory name is assumed for the pragmas. This does not change the
+behavior of the code, only how the coverage report is generated.

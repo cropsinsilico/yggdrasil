@@ -13,7 +13,6 @@ class PythonModelDriver(InterpretedModelDriver):
     default_interpreter = sys.executable
     interface_library = 'yggdrasil.interface.YggInterface'
     # supported_comms = ['ipc', 'zmq', 'rmq']
-    supported_comms = tools.get_supported_comm()
     supported_comm_options = {
         'ipc': {'platforms': ['MacOS', 'Linux'],
                 'libraries': ['sysv_ipc']},
@@ -37,10 +36,22 @@ class PythonModelDriver(InterpretedModelDriver):
         'obj': 'ObjDict',
         'schema': 'dict'}
     function_param = {
-        'comment': '#',
+        'interface': 'from yggdrasil.interface import YggInterface',
+        'input': '{channel} = YggInterface.YggInput(\"{channel_name}\")',
+        'output': '{channel} = YggInterface.YggOutput(\"{channel_name}\")',
+        'table_input': ('{channel} = YggInterface.YggAsciiTableInput('
+                        '\"{channel_name}\")'),
+        'table_output': ('{channel} = YggInterface.YggAsciiTableOutput('
+                         '\"{channel_name}\", \"{format_str}\")'),
+        'recv': '{flag_var}, {recv_var} = {channel}.recv()',
+        'send': '{flag_var} = {channel}.send({send_var})',
         'true': 'True',
+        'not': 'not',
+        'comment': '#',
         'indent': 4 * ' ',
+        'quote': '\"',
         'print': 'print(\"{message}\")',
+        'fprintf': 'print(\"{message}\" % ({variables}))',
         'error': 'raise Exception("{error_msg}")',
         'block_end': '',
         'if_begin': 'if ({cond}):',
@@ -54,6 +65,13 @@ class PythonModelDriver(InterpretedModelDriver):
         'exec_suffix': ('if __name__ == "__main__":\n'
                         '    main()')}
 
+    @staticmethod
+    def finalize_registration(cls):
+        r"""Operations that should be performed after a class has been fully
+        initialized and registered."""
+        cls.supported_comms = tools.get_supported_comm()
+        InterpretedModelDriver.finalize_registration(cls)
+        
     @classmethod
     def is_language_installed(self):
         r"""Determine if this model driver is installed on the current

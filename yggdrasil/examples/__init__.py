@@ -1,149 +1,186 @@
 """Tools for accessing examples from python."""
 import os
+import glob
+import logging
+from yggdrasil import tools, languages, serialize
 
 
-ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
-           'gs_lesson2': ('python', 'matlab', 'c', 'cpp'),
-           'gs_lesson3': ('python', 'matlab', 'c', 'cpp'),
-           'gs_lesson4': ('python', 'matlab', 'c', 'cpp', 'make', 'cmake'),
-           'gs_lesson4b': ('python', 'matlab', 'c', 'cpp'),
-           'backwards': ('python', 'matlab', 'c', 'cpp', 'make', 'cmake'),
-           'formatted_io1': ('python', 'matlab', 'c', 'cpp'),
-           'formatted_io2': ('python', 'matlab', 'c', 'cpp'),
-           'formatted_io3': ('python', 'matlab', 'c', 'cpp'),
-           'formatted_io4': ('python', 'matlab', 'c', 'cpp'),
-           'formatted_io5': ('python', 'matlab', 'c', 'cpp'),
-           'formatted_io6': ('python', 'matlab', 'c', 'cpp'),
-           'formatted_io7': ('python', 'matlab'),  # 'c', 'cpp'),
-           'formatted_io8': ('python', 'matlab'),  # 'c', 'cpp'),
-           'formatted_io9': ('python', 'matlab'),  # 'c', 'cpp'),
-           'rpc_lesson1': ('python', 'matlab', 'c', 'cpp'),
-           'rpc_lesson2': ('python', 'matlab', 'c', 'cpp'),
-           'hello': ('python', 'matlab', 'c', 'cpp'),
-           'model_error': ('python', 'matlab', 'c', 'cpp'),
-           'SaM': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
-           'ascii_io': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
-           'rpcFib': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
-           'maxMsg': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
-           'timed_pipe': ('python', 'matlab', 'c', 'cpp'),
-           'fakeplant': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
-           'root_to_shoot': ('python', 'c', 'all', 'all_nomatlab')}
-# TODO: This can be generated from the drivers
-ext_map = {'python': '.py',
-           'matlab': '.m',
-           'c': '.c',
-           'cpp': '.cpp',
-           'executable': '',
+# TODO: Automate example discovery and testing
+ext_map = {'executable': '',
            'make': '.cpp',
            'cmake': '.cpp'}
+for lang in tools.get_supported_lang():
+    if lang.lower() not in ext_map:
+        ext_map[lang.lower()] = languages.get_language_ext(lang)
 _example_dir = os.path.dirname(__file__)
 
 
-yamls = {}
-source = {}
-for k, lang in ex_dict.items():
-    yamls[k] = {}
-    source[k] = {}
-    idir = os.path.join(_example_dir, k)
-    isrcdir = os.path.join(idir, 'src')
-    for ilang in lang:
-        # Get list of yaml & source files
-        if k == 'rpcFib':
-            if ilang == 'all':
-                cli_l = 'python'
-                par_l = 'matlab'
-                srv_l = 'c'
-            elif ilang == 'all_nomatlab':
-                cli_l = 'python'
-                par_l = 'cpp'
-                srv_l = 'c'
+def register_example(example_dir):
+    r"""Register an example based on the contents of the director.
+
+    Args:
+        example_dir (str): Full path to a directory potentially containing an
+            example.
+
+    Returns:
+        tuple (list, dict, dict): A list of available languages, a dictionary
+            mapping from language to YAML specification files for the example,
+            and a dictionary mapping from language to source files for the
+            example.
+
+    """
+    # Check that the source directory and test exist
+    example_base = os.path.basename(example_dir)
+    srcdir = os.path.join(example_dir, 'src')
+    testfile = os.path.join(_example_dir, 'tests',
+                            'test_%s.py' % example_base)
+    if not os.path.isfile(testfile):  # pragma: no cover
+        # TODO: Automate test creation
+        logging.error("Missing test file: %s" % testfile)
+    assert(os.path.isdir(srcdir))
+    # Determine which languages are present in the example
+    lang_avail = []
+    lang_search = None
+    if example_base in ['rpcFib', 'maxMsg']:
+        lang_search = example_base + 'Cli_%s.yml'
+        lang_avail += ['all', 'all_nomatlab']
+    elif example_base.startswith('rpc_'):
+        lang_search = 'client_%s.yml'
+    elif example_base == 'root_to_shoot':
+        lang_avail += ['all', 'all_nomatlab', 'c', 'python']
+    elif example_base == 'fakeplant':
+        lang_avail += ['all', 'all_nomatlab', 'c', 'cpp', 'matlab', 'python']
+    else:
+        lang_search = example_base + '_%s.yml'
+    if lang_search is not None:
+        for match in glob.glob(os.path.join(example_dir, lang_search % '*')):
+            lang = serialize.process_message(os.path.basename(match), lang_search)[0]
+            if lang == 'valgrind':
+                continue
+            lang_avail.append(lang)
+    lang_avail = tuple(sorted(lang_avail))
+    # Get YAML and source files for each language
+    out_yml = {}
+    out_src = {}
+    src_is_abs = False
+    for lang in lang_avail:
+        yml_names = []
+        src_names = []
+        if example_base == 'rpcFib':
+            if lang == 'all':
+                lang_set = ('python', 'matlab', 'c')
+            elif lang == 'all_nomatlab':
+                lang_set = ('python', 'cpp', 'c')
             else:
-                cli_l = ilang
-                par_l = ilang
-                srv_l = ilang
-            yml_names = ['%sCli_%s.yml' % (k, cli_l),
-                         '%sCliPar_%s.yml' % (k, par_l),
-                         '%sSrv_%s.yml' % (k, srv_l)]
-            src_names = ['%sCli%s' % (k, ext_map[cli_l]),
-                         '%sCliPar%s' % (k, ext_map[par_l]),
-                         '%sSrv%s' % (k, ext_map[srv_l])]
-        elif k == 'maxMsg':
-            if ilang == 'all':
-                cli_l = 'python'
-                srv_l = 'matlab'
-            elif ilang == 'all_nomatlab':
-                cli_l = 'python'
-                srv_l = 'c'
+                lang_set = (lang, lang, lang)
+            yml_names = ['%sCli_%s.yml' % (example_base, lang_set[0]),
+                         '%sCliPar_%s.yml' % (example_base, lang_set[1]),
+                         '%sSrv_%s.yml' % (example_base, lang_set[2])]
+            src_names = ['%sCli%s' % (example_base, ext_map[lang_set[0]]),
+                         '%sCliPar%s' % (example_base, ext_map[lang_set[1]]),
+                         '%sSrv%s' % (example_base, ext_map[lang_set[2]])]
+        elif example_base == 'maxMsg':
+            if lang == 'all':
+                lang_set = ('python', 'matlab')
+            elif lang == 'all_nomatlab':
+                lang_set = ('python', 'c')
             else:
-                cli_l = ilang
-                srv_l = ilang
-            yml_names = ['%sCli_%s.yml' % (k, cli_l),
-                         '%sSrv_%s.yml' % (k, srv_l)]
-            src_names = ['%s%s' % (k, ext_map[cli_l]),
-                         '%s%s' % (k, ext_map[srv_l])]
-        elif k in ['gs_lesson4', 'gs_lesson4b', 'backwards',
-                   'formatted_io1', 'formatted_io2', 'formatted_io3',
-                   'formatted_io4', 'formatted_io5', 'formatted_io6',
-                   'formatted_io7', 'formatted_io8', 'formatted_io9']:
-            yml_names = ['%s_%s.yml' % (k, ilang)]
-            src_names = ['%s_modelA%s' % (k, ext_map[ilang]),
-                         '%s_modelB%s' % (k, ext_map[ilang])]
-        elif k in ['rpc_lesson1', 'rpc_lesson2']:
+                lang_set = (lang, lang)
+            yml_names = ['%sCli_%s.yml' % (example_base, lang_set[0]),
+                         '%sSrv_%s.yml' % (example_base, lang_set[1])]
+            src_names = ['%sCli%s' % (example_base, ext_map[lang_set[0]]),
+                         '%sSrv%s' % (example_base, ext_map[lang_set[1]])]
+        elif example_base.startswith('rpc_'):
+            # TODO: Create server examples in other languages
             yml_names = ['server_python.yml',
-                         'client_%s.yml' % ilang]
-            src_names = ['server.py', 'client%s' % ext_map[ilang]]
-        elif k == 'root_to_shoot':
-            if ilang.startswith('all'):
+                         'client_%s.yml' % lang]
+            src_names = ['server.py', 'client%s' % ext_map[lang]]
+        elif example_base == 'root_to_shoot':
+            if lang.startswith('all'):
                 yml_names = ['root.yml', 'shoot.yml', 'root_to_shoot.yml']
                 src_names = ['root.c', 'shoot.py']
-            elif ilang == 'python':
+            elif lang == 'python':
                 yml_names = ['shoot.yml', 'shoot_files.yml']
                 src_names = ['shoot.py']
-            elif ilang == 'c':
+            elif lang == 'c':
                 yml_names = ['root.yml', 'root_files.yml']
                 src_names = ['root.c']
-        elif k == 'fakeplant':
-            if ilang.startswith('all'):
+        elif example_base == 'fakeplant':
+            if lang.startswith('all'):
                 yml_names = ['canopy.yml', 'light.yml', 'photosynthesis.yml',
                              'fakeplant.yml']
                 src_names = ['canopy.cpp', 'light.c', 'photosynthesis.py']
-                if ilang == 'all_nomatlab':
+                if lang == 'all_nomatlab':
                     yml_names.append('growth_python.yml')
                     src_names.append('growth.py')
                 else:
                     yml_names.append('growth.yml')
                     src_names.append('growth.m')
-            elif ilang == 'python':
+            elif lang == 'python':
                 yml_names = ['photosynthesis.yml', 'photosynthesis_files.yml']
                 src_names = ['photosynthesis.py']
-            elif ilang == 'c':
+            elif lang == 'c':
                 yml_names = ['light.yml', 'light_files.yml']
                 src_names = ['light.c']
-            elif ilang == 'cpp':
+            elif lang == 'cpp':
                 yml_names = ['canopy.yml', 'canopy_files.yml']
                 src_names = ['canopy.cpp']
-            elif ilang == 'matlab':
+            elif lang == 'matlab':
                 yml_names = ['growth.yml', 'growth_files.yml']
                 src_names = ['growth.m']
         else:
-            yml_names = ['%s_%s.yml' % (k, ilang)]
-            if ilang.startswith('all'):
+            src_is_abs = True
+            yml_names = ['%s_%s.yml' % (example_base, lang)]
+            if lang.startswith('all'):
                 src_names = []
-                for lsrc in lang:
+                for lsrc in lang_avail:
                     if lsrc.startswith('all'):
                         continue
-                    if ilang == 'all_nomatlab' and lsrc == 'matlab':
+                    elif (lang == 'all_nomatlab') and (lsrc == 'matlab'):
                         continue
-                    src_names.append('%s%s' % (k, ext_map[lsrc]))
+                    src_names += glob.glob(os.path.join(srcdir,
+                                                        '*' + ext_map[lsrc]))
             else:
-                src_names = ['%s%s' % (k, ext_map[ilang])]
-        # Add full path to yaml & source files
-        yamls[k][ilang] = [os.path.join(idir, y) for y in yml_names]
-        source[k][ilang] = [os.path.join(isrcdir, s) for s in src_names]
-        if len(yamls[k][ilang]) == 1:
-            yamls[k][ilang] = yamls[k][ilang][0]
-        if len(source[k][ilang]) == 1:
-            source[k][ilang] = source[k][ilang][0]
-                                   
-              
+                src_names = glob.glob(os.path.join(srcdir, '*' + ext_map[lang]))
+        out_yml[lang] = [os.path.join(example_dir, y) for y in yml_names]
+        if src_is_abs:
+            out_src[lang] = src_names
+        else:
+            out_src[lang] = [os.path.join(srcdir, s) for s in src_names]
+        if len(out_yml[lang]) == 1:
+            out_yml[lang] = out_yml[lang][0]
+        if len(out_src[lang]) == 1:
+            out_src[lang] = out_src[lang][0]
+    return lang_avail, out_yml, out_src
+
+
+def discover_examples(parent_dir=None):
+    r"""Discover examples under the provided parent directory.
+
+    Args:
+        parent_dir (str, optional): Parent directory containing example
+            directories. Defaults to the directory containing this function if
+            not provided.
+
+    Returns:
+
+    Raises:
+
+    """
+    out = {'lang': {}, 'yml': {}, 'src': {}}
+    if parent_dir is None:
+        parent_dir = _example_dir
+    for match in sorted(glob.glob(os.path.join(parent_dir, '*'))):
+        if match.endswith(('tests', '_')) or (not os.path.isdir(match)):
+            continue
+        match_base = os.path.basename(match)
+        iout = register_example(match)
+        for i, k in enumerate(['lang', 'yml', 'src']):
+            out[k][match_base] = iout[i]
+    return out['lang'], out['yml'], out['src']
+
+
+ex_dict, yamls, source = discover_examples()
+
+
 __all__ = ['yamls', 'source']

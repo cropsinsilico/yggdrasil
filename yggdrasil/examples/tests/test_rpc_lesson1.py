@@ -1,10 +1,10 @@
 import os
 from yggdrasil.tests import extra_example
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
 @extra_example
-class TestExampleRPC1(TestExample):
+class TestExampleRPC1(ExampleTstBase):
     r"""Test the rpc_lesson1 example."""
 
     example_name = 'rpc_lesson1'

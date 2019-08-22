@@ -1,8 +1,8 @@
 import os
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
-class TestExampleRootToShoot(TestExample):
+class TestExampleRootToShoot(ExampleTstBase):
     r"""Test the Root to Shoot example."""
 
     example_name = 'root_to_shoot'

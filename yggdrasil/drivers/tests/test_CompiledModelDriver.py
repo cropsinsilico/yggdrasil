@@ -219,6 +219,18 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
         deps = list(self.import_cls.internal_libraries.keys())
         self.import_cls.get_dependency_order(deps)
 
+    def test_get_flags(self):
+        r"""Test get_flags."""
+        compiler = self.import_cls.get_tool('compiler')
+        if compiler:
+            if ((compiler.combine_with_linker
+                 or compiler.no_separate_linking)):
+                print(compiler, compiler.get_flags(invalid_kw=True,
+                                                   unused_kwargs={},
+                                                   libraries=[]))
+            else:
+                self.assert_raises(ValueError, compiler.get_flags)
+
     def test_get_linker_flags(self):
         r"""Test get_linker_flags."""
         if self.import_cls.get_tool('archiver') is False:

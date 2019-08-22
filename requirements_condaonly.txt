@@ -1,0 +1,6 @@
+cmake
+czmq
+r-base
+r-reticulate
+r-zeallot
+zeromq

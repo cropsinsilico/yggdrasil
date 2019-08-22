@@ -1,10 +1,10 @@
 import os
 from yggdrasil.tests import extra_example
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
 @extra_example
-class TestExampleRpcFib(TestExample):
+class TestExampleRpcFib(ExampleTstBase):
     r"""Test the rpcFib example."""
 
     example_name = 'rpcFib'

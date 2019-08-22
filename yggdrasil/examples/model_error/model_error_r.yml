@@ -1,0 +1,23 @@
+---
+
+model:
+  name: model_error_R
+  driver: RModelDriver
+  args: ./src/model_error.R  # Runs the R script using default R
+
+  inputs:
+    - name: inFile
+      driver: FileInputDriver
+      args: ./Input/input.txt
+    - name: model_errorQueueIn    
+      driver: InputDriver
+      args: model_errorQueue
+
+  outputs:
+    - name: model_errorQueueOut    
+      driver: OutputDriver
+      args: model_errorQueue
+    - name: outFile
+      driver: FileOutputDriver
+      args: output_model_error.txt
+      in_temp: True

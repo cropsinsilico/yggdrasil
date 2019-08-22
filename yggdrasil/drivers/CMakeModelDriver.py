@@ -1,14 +1,13 @@
 import os
 import re
-import copy
 import shutil
 import logging
-import glob
 from collections import OrderedDict
-from yggdrasil import platform, backwards, components
+from yggdrasil import platform, components
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase, LinkerBase)
-from yggdrasil.drivers import CModelDriver, CPPModelDriver
+    CompilerBase, LinkerBase)
+from yggdrasil.drivers.BuildModelDriver import BuildModelDriver
+from yggdrasil.drivers import CModelDriver
 
 
 logger = logging.getLogger(__name__)
@@ -184,6 +183,9 @@ class CMakeConfigure(CompilerBase):
 
         """
         assert(len(args) == 1)
+        new_args = []
+        if args == cls.version_flags:
+            new_args = args
         if not kwargs.get('skip_flags', False):
             sourcedir = kwargs.get('sourcedir', args[0])
             if sourcedir != args[0]:  # pragma: debug
@@ -193,7 +195,7 @@ class CMakeConfigure(CompilerBase):
                                     "provided do not match.")
                                    % (args[0], sourcedir))
             kwargs['sourcedir'] = args[0]
-        return super(CMakeConfigure, cls).get_executable_command([], **kwargs)
+        return super(CMakeConfigure, cls).get_executable_command(new_args, **kwargs)
     
     @classmethod
     def write_wrappers(cls, target=None, sourcedir=None,
@@ -216,10 +218,6 @@ class CMakeConfigure(CompilerBase):
         else:
             include_base = 'ygg_cmake_%s.txt' % target
         include_file = os.path.join(sourcedir, include_base)
-        # import pprint
-        # print('kwargs')
-        # pprint.pprint(kwargs)
-        kwargs['verbose'] = True
         if (target_language is not None) and ('driver' not in kwargs):
             kwargs['driver'] = components.import_component('model',
                                                            target_language)
@@ -272,7 +270,7 @@ class CMakeConfigure(CompilerBase):
         external_library_flags = []
         internal_library_flags = []
         compile_flags = driver.get_compiler_flags(
-            skip_defaults=True,
+            skip_defaults=True, skip_sysroot=True,
             flags=compile_flags, use_library_path=use_library_path,
             dont_link=True, for_model=True, dry_run=True,
             logging_level=logging_level)
@@ -377,14 +375,15 @@ class CMakeConfigure(CompilerBase):
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
         lines = preamble_lines + lines
-        if verbose:  # pragma: debug
-            logger.info('CMake include file:\n\t' + '\n\t'.join(lines))
+        log_msg = 'CMake include file:\n\t' + '\n\t'.join(lines)
+        if verbose:
+            logger.info(log_msg)
         else:
-            logger.debug('CMake include file:\n\t' + '\n\t'.join(lines))
+            logger.debug(log_msg)
         if fname is None:
             return lines
         else:
-            if os.path.isfile(fname):  # pragma: debug
+            if os.path.isfile(fname):
                 os.remove(fname)
             with open(fname, 'w') as fd:
                 fd.write('\n'.join(lines))
@@ -401,6 +400,22 @@ class CMakeBuilder(LinkerBase):
                                 ('target', '--target'),
                                 ('configuration', '--config')])
     executable_ext = ''
+
+    @classmethod
+    def call(cls, *args, **kwargs):
+        r"""Print contents of CMakeCache.txt before raising error."""
+        try:
+            return super(CMakeBuilder, cls).call(*args, **kwargs)
+        except BaseException:  # pragma: debug
+            cache = 'CMakeCache.txt'
+            if kwargs.get('working_dir', None):
+                cache = os.path.join(kwargs['working_dir'], cache)
+            if os.path.isfile(cache):
+                with open(cache, 'r') as fd:
+                    print('CMakeCache.txt:\n%s' % fd.read())
+            else:
+                print('Cache file does not exist: %s' % cache)
+            raise
 
     @classmethod
     def extract_kwargs(cls, kwargs, **kwargs_ex):
@@ -421,7 +436,7 @@ class CMakeBuilder(LinkerBase):
         kwargs_ex['add_kws_both'] = (kwargs.get('add_kws_both', [])
                                      + ['builddir', 'target'])
         return super(CMakeBuilder, cls).extract_kwargs(kwargs, **kwargs_ex)
-        
+
     @classmethod
     def get_output_file(cls, obj, target=None, builddir=None, **kwargs):
         r"""Determine the appropriate output file that will result when bulding
@@ -522,7 +537,7 @@ class CMakeBuilder(LinkerBase):
         return super(CMakeBuilder, cls).get_executable_command([], **kwargs)
     
 
-class CMakeModelDriver(CompiledModelDriver):
+class CMakeModelDriver(BuildModelDriver):
     r"""Class for running cmake compiled drivers. Before running the
     cmake command, the cmake commands for setting the necessary compiler & linker
     flags for the interface's C/C++ library are written to a file called
@@ -577,68 +592,28 @@ class CMakeModelDriver(CompiledModelDriver):
     language = 'cmake'
     base_languages = ['c', 'c++']
     add_libraries = CMakeConfigure.add_libraries
+    sourcedir_as_sourcefile = True
 
-    def parse_arguments(self, args):
+    def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
         is a source file, compilation flag, or runtime option/flag that should
         be passed to the model executable.
 
         Args:
             args (list): List of arguments provided.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         """
-        if self.sourcedir is None:
-            self.sourcedir = os.path.dirname(args[0])
-        if not os.path.isabs(self.sourcedir):
-            self.sourcedir = os.path.realpath(os.path.join(self.working_dir,
-                                                           self.sourcedir))
-        if self.builddir is None:
-            if self.target is None:
-                build_base = 'build'
-            else:
-                build_base = 'build_%s' % self.target
-            self.builddir = os.path.join(self.sourcedir, build_base)
-        if not os.path.isabs(self.builddir):
-            self.builddir = os.path.realpath(os.path.join(self.working_dir,
-                                                          self.builddir))
-        self.source_files = [self.sourcedir]
-        kwargs = dict(default_model_dir=self.builddir)
+        if self.target is None:
+            self.builddir_base = 'build'
+        else:
+            self.builddir_base = 'build_%s' % self.target
+        self.buildfile_base = 'CMakeLists.txt'
         super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
-        self.cmakelists = os.path.join(self.sourcedir, 'CMakeLists.txt')
-        self.cmakelists_copy = os.path.join(self.sourcedir, 'CMakeLists_orig.txt')
-        self.modified_files.append((self.cmakelists_copy, self.cmakelists))
-        # Determine the underlying language
-        if self.target_language is None:
-            try_list = list(glob.glob(os.path.join(self.sourcedir, '*')))
-            early_exit = False
-            if self.model_src is not None:
-                try_list = [self.model_src, try_list]
-                early_exit = True
-            languages = copy.deepcopy(self.get_tool_instance('compiler').languages)
-            languages.remove('cmake')
-            self.target_language = self.get_language_for_source(
-                try_list, early_exit=early_exit, languages=languages)
-            # Try to compile C as C++
-            if self.target_language == 'c':
-                self.target_language = 'c++'
-        self.target_language_driver = components.import_component(
-            'model', self.target_language)
-        
-    @classmethod
-    def is_source_file(cls, fname):
-        r"""Determine if the provided file name points to a source files for
-        the associated programming language by checking the extension.
+        self.buildfile_copy = '_orig'.join(os.path.splitext(self.buildfile))
+        self.modified_files.append((self.buildfile_copy, self.buildfile))
 
-        Args:
-            fname (str): Path to file.
-
-        Returns:
-            bool: True if the provided file is a source file, False otherwise.
-
-        """
-        return (CModelDriver.CModelDriver.is_source_file(fname)
-                or CPPModelDriver.CPPModelDriver.is_source_file(fname))
-        
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
 
@@ -664,37 +639,78 @@ class CMakeModelDriver(CompiledModelDriver):
         assert(os.path.isfile(include_file))
         out.append(include_file)
         # Create copy of cmakelists and modify
-        if os.path.isfile(self.cmakelists):
-            if not os.path.isfile(self.cmakelists_copy):
-                shutil.copy2(self.cmakelists, self.cmakelists_copy)
-            with open(self.cmakelists, 'rb') as fd:
-                contents = fd.read()
-            with open(self.cmakelists, 'wb') as fd:
-                # Add conda prefix as first line
-                conda_prefix = self.get_tool_instance('compiler').get_conda_prefix()
-                if conda_prefix:
-                    newline = backwards.as_bytes('LINK_DIRECTORIES(%s)\n'
-                                                 % os.path.join(conda_prefix, 'lib'))
-                    if newline not in contents:
-                        fd.write(newline)
-                # Explicitly set Release/Debug directories to builddir on windows
-                if platform._is_win:  # pragma: windows
-                    for artifact in ['runtime', 'library', 'archive']:
-                        for conf in ['release', 'debug']:
-                            newline = backwards.as_bytes(
-                                'SET( CMAKE_%s_OUTPUT_DIRECTORY_%s '
-                                % (artifact.upper(), conf.upper())
-                                + '"${OUTPUT_DIRECTORY}")\n')
-                            if newline not in contents:
-                                fd.write(newline)
-                fd.write(contents)
-                # Add include if not already in the file
-                newline = backwards.as_bytes('\nINCLUDE(%s)\n'
-                                             % os.path.basename(include_file))
+        newlines_before = []
+        newlines_after = []
+        if os.path.isfile(self.buildfile):
+            if not os.path.isfile(self.buildfile_copy):
+                shutil.copy2(self.buildfile, self.buildfile_copy)
+            with open(self.buildfile, 'r') as fd:
+                contents = fd.read().splitlines()
+            # Prevent error when cross compiling by building static lib as test
+            newlines_before.append(
+                'set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")')
+            # Add conda prefix as first line so that conda installed C libraries are
+            # used
+            conda_prefix = self.get_tool_instance('compiler').get_conda_prefix()
+            if conda_prefix:
+                newlines_before.append(
+                    'LINK_DIRECTORIES(%s)' % os.path.join(conda_prefix, 'lib'))
+            # Explicitly set Release/Debug directories to builddir on windows
+            if platform._is_win:  # pragma: windows
+                for artifact in ['runtime', 'library', 'archive']:
+                    for conf in ['release', 'debug']:
+                        newlines_before.append(
+                            'SET( CMAKE_%s_OUTPUT_DIRECTORY_%s '
+                            % (artifact.upper(), conf.upper())
+                            + '"${OUTPUT_DIRECTORY}")')
+            # Add yggdrasil created include if not already in the file
+            newlines_after.append(
+                'INCLUDE(%s)' % os.path.basename(include_file))
+            # Consolidate lines, checking for lines that already exist
+            lines = []
+            for newline in newlines_before:
                 if newline not in contents:
-                    fd.write(newline)
+                    lines.append(newline)
+            lines += contents
+            for newline in newlines_after:
+                if newline not in contents:
+                    lines.append(newline)
+            # Write contents to the build file, check for new lines that may
+            # already be included
+            log_msg = 'New CMakeLists.txt:\n\t' + '\n\t'.join(lines)
+            if kwargs.get('verbose', False):
+                logger.info(log_msg)
+            else:
+                logger.debug(log_msg)
+            with open(self.buildfile, 'w') as fd:
+                fd.write('\n'.join(lines))
         return out
 
+    def set_target_language(self):
+        r"""Set the language of the target being compiled (usually the same
+        as the language associated with this driver.
+
+        Returns:
+            str: Name of language.
+
+        """
+        if self.target_language is None:
+            if os.path.isfile(self.buildfile):
+                with open(self.buildfile, 'r') as fd:
+                    lines = fd.readlines()
+                for x in lines:
+                    if not x.strip().upper().startswith('ADD_EXECUTABLE'):
+                        continue
+                    varlist = x.split('(', 1)[-1].rsplit(')', 1)[0].split()
+                    if (self.target is None) or (self.target == varlist[0]):
+                        try:
+                            self.target_language = (
+                                self.get_language_for_source(varlist[1:],
+                                                             early_exit=True))
+                        except ValueError:  # pragma: debug
+                            pass
+        return super(CMakeModelDriver, self).set_target_language()
+        
     def compile_model(self, target=None, **kwargs):
         r"""Compile model executable(s) and appends any products produced by
         the compilation that should be removed after the run is complete.
@@ -721,6 +737,31 @@ class CMakeModelDriver(CompiledModelDriver):
                 kwargs.setdefault(k, v)
             return super(CMakeModelDriver, self).compile_model(**kwargs)
 
+    @classmethod
+    def update_compiler_kwargs(cls, **kwargs):
+        r"""Update keyword arguments supplied to the compiler get_flags method
+        for various options.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Keyword arguments for a get_flags method providing compiler
+                flags.
+
+        """
+        out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
+        if CModelDriver._osx_sysroot is not None:
+            out.setdefault('definitions', [])
+            out['definitions'].append(
+                'CMAKE_OSX_SYSROOT=%s' % CModelDriver._osx_sysroot)
+            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
+                out['definitions'].append(
+                    'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
+                    % os.environ['MACOSX_DEPLOYMENT_TARGET'])
+        return out
+    
     def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
@@ -733,11 +774,9 @@ class CMakeModelDriver(CompiledModelDriver):
 
         """
         out = super(CMakeModelDriver, self).set_env(**kwargs)
-        out = CModelDriver.CModelDriver.update_ld_library_path(out)
+        if hasattr(self.target_language_driver, 'update_ld_library_path'):
+            self.target_language_driver.update_ld_library_path(out)
+        # C++ may also need the C libraries
+        if self.target_language == 'c++':
+            out = CModelDriver.CModelDriver.update_ld_library_path(out)
         return out
-    
-    def cleanup(self):
-        r"""Remove compiled executable."""
-        if (self.model_file is not None) and os.path.isfile(self.model_file):
-            self.compile_model('clean')
-        super(CMakeModelDriver, self).cleanup()

@@ -31,7 +31,7 @@ def create_driver(driver=None, name=None, args=None, **kwargs):
 
 
 __all__ = ['create_driver', 'Driver',
-           'ModelDriver', 'PythonModelDriver',
+           'ModelDriver', 'PythonModelDriver', 'RModelDriver',
            'CModelDriver', 'CPPModelDriver',
            'MakeModelDriver', 'MatlabModelDriver', 'LPyModelDriver',
            'ConnectionDriver', 'InputDriver', 'OutputDriver',

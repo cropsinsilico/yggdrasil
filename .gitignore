@@ -20,6 +20,9 @@ docs/source/modules.rst
 docs/source/examples/*.rst
 docs/source/tables
 
+# Profiling
+prof
+
 # Coverage
 .coveragerc
 .coverage
@@ -62,6 +65,10 @@ yggdrasil_framework.egg-info
 dist/
 build/
 
+# R things
+yggdrasil/languages/*.tar.gz
+yggdrasil/languages/*.RData
+yggdrasil/languages/*.RHistory
 
 # Windows image file caches
 Thumbs.db

@@ -1,6 +1,10 @@
-from yggdrasil import tools
+import os
+from yggdrasil import tools, serialize
 from yggdrasil.config import ygg_cfg, locate_file
 from yggdrasil.drivers.ModelDriver import ModelDriver
+
+
+_top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
 
 
 class InterpretedModelDriver(ModelDriver):
@@ -38,6 +42,29 @@ class InterpretedModelDriver(ModelDriver):
         interpreter (str): Name or path to the interpreter that will be used.
         interpreter_flags (list): Flags that will be passed to the interpreter
             when running a model.
+        path_env_variable (str): Name of the environment variable containing
+            path information for the interpreter for this language.
+        paths_to_add (list): Paths that should be added to the path_env_variable
+            for this language on the process the model is run in.
+        comm_atexit (function): Function taking a comm instance as input that
+            performs any necessary operations during exit. If None, no additional
+            actions are taken.
+        comm_linger (bool): If True, interface comms will linger during close.
+            This should only be required if the language will disreguard Python
+            threads at exit (e.g. when using a Matlab engine).
+        decode_format (function: Function decoding format string created in this
+            language. If None, no additional actions are taken.
+        python2language (function): Function preparing Python objects for
+            transfer to this language. If None, no additional actions are taken.
+        language2python (function): Function preparing objects native to this
+            language for transfer to Python. If None, no additional actions are
+            taken.
+        recv_converters (dict): Mapping between the names of message types (e.g.
+            'array', 'pandas') and functions that should be used to prepare such
+            objects for return when they are received.
+        send_converters (dict): Mapping between the names of message types (e.g.
+            'array', 'pandas') and functions that should be used to prepare such
+            objects for sending.
 
     """
 
@@ -49,6 +76,15 @@ class InterpretedModelDriver(ModelDriver):
     executable_type = 'interpreter'
     default_interpreter = None
     default_interpreter_flags = []
+    path_env_variable = None
+    paths_to_add = [_top_dir]
+    comm_atexit = None
+    comm_linger = False
+    decode_format = None
+    python2language = None
+    language2python = None
+    recv_converters = {'pandas': 'pandas'}
+    send_converters = {'pandas': serialize.pandas2list}
 
     def __init__(self, name, args, **kwargs):
         super(InterpretedModelDriver, self).__init__(name, args, **kwargs)
@@ -82,6 +118,8 @@ class InterpretedModelDriver(ModelDriver):
             # Set default interpreter based on language
             if cls.default_interpreter is None:
                 cls.default_interpreter = cls.language
+            # Add directory containing the interface
+            cls.paths_to_add.append(cls.get_language_dir())
                     
     def parse_arguments(self, *args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
@@ -142,7 +180,7 @@ class InterpretedModelDriver(ModelDriver):
 
     @classmethod
     def executable_command(cls, args, exec_type='interpreter', unused_kwargs={},
-                           **kwargs):
+                           skip_interpreter_flags=False, **kwargs):
         r"""Compose a command for running a program in this language with the
         provied arguments. If not already present, the interpreter command and
         interpreter flags are prepended to the provided arguments.
@@ -154,6 +192,11 @@ class InterpretedModelDriver(ModelDriver):
                 returned. If 'interpreter', a command using the interpreter is
                 returned and if 'direct', the raw args being provided are
                 returned. Defaults to 'interpreter'.
+            skip_interpreter_flags (bool, optional): If True, interpreter flags
+                will not be added to the command after the interpreter. Defaults
+                to False. Interpreter flags will not be added, reguardless of
+                this keyword, if the first element of args is already an
+                interpreter.
             unused_kwargs (dict, optional): Existing dictionary that unused
                 keyword arguments should be added to. Defaults to {}.
             **kwargs: Additional keyword arguments are ignored.
@@ -169,14 +212,31 @@ class InterpretedModelDriver(ModelDriver):
         ext = cls.language_ext
         assert(isinstance(ext, (tuple, list)))
         if exec_type == 'interpreter':
-            # if (((cls.language not in args[0])
-            if (((tools.which(args[0]) is None)
-                 or any([args[0].endswith(e) for e in ext]))):
-                args = [cls.get_interpreter()] + cls.get_interpreter_flags() + args
+            if not cls.is_interpreter(args[0]):
+                new_args = [cls.get_interpreter()]
+                if not skip_interpreter_flags:
+                    new_args += cls.get_interpreter_flags()
+                args = new_args + args
         elif exec_type != 'direct':
             raise ValueError("Invalid exec_type '%s'" % exec_type)
         unused_kwargs.update(kwargs)
         return args
+
+    @classmethod
+    def is_interpreter(cls, cmd):
+        r"""Determine if a command line argument is an interpreter.
+
+        Args:
+            cmd (str): Command that should be checked.
+
+        Returns:
+            bool: True if the command is an interpreter, False otherwise.
+
+        """
+        # (cls.language not in cmd)
+        out = ((tools.which(cmd) is not None)
+               and (not any([cmd.endswith(e) for e in cls.language_ext])))
+        return out
 
     @classmethod
     def configure(cls, cfg):
@@ -191,10 +251,27 @@ class InterpretedModelDriver(ModelDriver):
                 be set.
 
         """
-        out = super(InterpretedModelDriver, cls).configure(cfg)
+        out = ModelDriver.configure.__func__(cls, cfg)
         # Locate executable
         if not cls.is_language_installed():  # pragma: debug
             fpath = locate_file(cls.language_executable())
             if fpath:
                 cfg.set(cls.language, 'interpreter', fpath)
+        return out
+    
+    def set_env(self):
+        r"""Get environment variables that should be set for the model process.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(InterpretedModelDriver, self).set_env()
+        if self.path_env_variable is not None:  # pragma: debug
+            if self.language != 'matlab':
+                raise NotImplementedError(
+                    ("Language %s sets path_env_variable. "
+                     "Move part of MatlabModelDriver set_env method "
+                     "to InterpretedModelDriver in place of this "
+                     "warning message.") % self.language)
         return out

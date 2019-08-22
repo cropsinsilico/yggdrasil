@@ -1,10 +1,10 @@
 import os
 from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import _use_rapidjson
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
-class TestExampleFIO8(TestExample):
+class TestExampleFIO8(ExampleTstBase):
     r"""Test the Formatted I/O lesson 8 example."""
 
     example_name = 'formatted_io8'

@@ -14,9 +14,9 @@ build:
   skip: true  # [win and vc<14]
 
 requirements:
-  build:
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+  # build:
+  #   - {{ compiler('c') }}
+  #   - {{ compiler('cxx') }}
   host:
     - czmq
     - pip
@@ -24,7 +24,6 @@ requirements:
     - sysv_ipc  # [unix]
     - zeromq
   run:
-    - cerberus
     - cmake
     - czmq
     - jsonschema
@@ -39,6 +38,11 @@ requirements:
     - python-rapidjson  # [not py2k]
     - pyyaml
     - pyzmq
+    - r-base
+    - r-bit64
+    - r-r6
+    - r-reticulate
+    - r-zeallot
     - scipy
     - six
     - sysv_ipc  # [unix]

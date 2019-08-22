@@ -7,8 +7,8 @@ try:
     import pika
     _rmq_installed = True
 except ImportError:
-    logger.warning("Could not import pika. "
-                   + "RabbitMQ support will be disabled.")
+    logger.debug("Could not import pika. "
+                 + "RabbitMQ support will be disabled.")
     pika = None
     _rmq_installed = False
 

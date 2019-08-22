@@ -1,7 +1,7 @@
 models:
-  - name: cpp_modelA
-    language: c++
-    args: ./src/formatted_io9_modelA.cpp
+  - name: R_modelA
+    language: R
+    args: ./src/formatted_io7_modelA.R
     inputs:
       - name: inputA
         type: object
@@ -9,9 +9,9 @@ models:
       - name: outputA
         type: object
 
-  - name: cpp_modelB
-    language: c++
-    args: ./src/formatted_io9_modelB.cpp
+  - name: R_modelB
+    language: R
+    args: ./src/formatted_io7_modelB.R
     inputs:
       - name: inputB
         type: object
@@ -24,7 +24,7 @@ connections:
     output: inputB
   - input: ./Input/input.txt  # Connection between file and model A input
     output: inputA
-    filetype: yaml
+    filetype: map
   - input: outputB  # Connection between model B output and file
     output: ./output.txt
-    filetype: yaml
+    filetype: map

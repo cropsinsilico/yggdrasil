@@ -1,13 +1,13 @@
 import os
 import unittest
 from yggdrasil import tools
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
 _default_comm = tools.get_default_comm()
 
 
-class ExampleTimedPipeTestBase(TestExample):
+class ExampleTimedPipeTestBase(ExampleTstBase):
     r"""Base class for testing TimedPipe example with various comm types."""
 
     example_name = 'timed_pipe'

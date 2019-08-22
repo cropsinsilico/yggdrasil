@@ -1,6 +1,7 @@
 import os
 import copy
 import unittest
+from yggdrasil import platform, tools
 from yggdrasil.tests import assert_raises, scripts
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_product
 from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
@@ -48,12 +49,22 @@ class TestModelParam(parent.TestParam):
                            'products', 'overwrite']
         self.src = None
         if self.import_cls.language is not None:
-            self.src = scripts[self.import_cls.language]
+            self.src = scripts[self.import_cls.language.lower()]
             if not isinstance(self.src, list):
                 self.src = [self.src]
         if self.src is not None:
             self.args = copy.deepcopy(self.src)
 
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        out = super(TestModelParam, self).inst_kwargs
+        if self.src is not None:
+            wd = os.path.dirname(self.src[0])
+            if wd:
+                out.setdefault('working_dir', wd)
+        return out
+        
     def tests_on_not_installed(self):
         r"""Tests for when the driver is not installed."""
         if self.import_cls.is_installed():
@@ -109,6 +120,43 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         r"""Test language version."""
         assert(self.import_cls.language_version())
 
+    def run_model_instance(self, **kwargs):
+        r"""Create a driver for a model and run it."""
+        inst_kwargs = copy.deepcopy(self.inst_kwargs)
+        inst_kwargs.update(kwargs)
+        drv = self.create_instance(kwargs=inst_kwargs)
+        drv.start()
+        drv.wait(False)
+        assert(not drv.errors)
+
+    def test_run_model(self):
+        r"""Test running script used without debug."""
+        self.run_model_instance()
+
+    @unittest.skipIf(platform._is_win, "No valgrind on windows")
+    @unittest.skipIf(tools.which('valgrind') is None,
+                     "Valgrind not installed.")
+    def test_valgrind(self):
+        r"""Test running with valgrind."""
+        valgrind_log = os.path.join(
+            self.working_dir,
+            'valgrind_log_%s.log' % self.uuid.replace('-', '_'))
+        try:
+            self.run_model_instance(with_valgrind=True, with_strace=False,
+                                    valgrind_flags=['--leak-check=full',
+                                                    '--log-file=%s' % valgrind_log])
+        finally:
+            if os.path.isfile(valgrind_log):
+                os.remove(valgrind_log)
+        
+    @unittest.skipIf(platform._is_win or platform._is_mac,
+                     "No strace on Windows or MacOS")
+    @unittest.skipIf(tools.which('strace') is None,
+                     "strace not installed.")
+    def test_strace(self):
+        r"""Test running with strace."""
+        self.run_model_instance(with_valgrind=False, with_strace=True)
+        
     # Tests for code generation
     def run_generated_code(self, lines):
         r"""Write and run generated code."""

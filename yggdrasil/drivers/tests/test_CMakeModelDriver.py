@@ -89,7 +89,7 @@ def test_create_include():
     CMakeModelDriver.compile_dependencies()
     for c, l, lines in testlist:
         out = CMakeConfigure.create_include(None, target, compile_flags=c,
-                                            linker_flags=l)
+                                            linker_flags=l, verbose=True)
         for x in lines:
             try:
                 assert(x in out)
@@ -194,4 +194,8 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
 
 class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
     r"""Test runner for CMakeModelDriver."""
-    pass
+
+    def test_write_wrappers(self):
+        r"""Test write_wrappers method with verbosity and existing
+        include file."""
+        self.instance.write_wrappers(verbose=True)

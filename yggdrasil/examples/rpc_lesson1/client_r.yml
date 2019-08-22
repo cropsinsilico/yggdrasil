@@ -1,0 +1,15 @@
+---
+
+model:
+  name: client
+  language: R
+  args:
+    - ./src/client.R
+    - 3  # Pass the number of iterations that should be performed
+  client_of: server  # Creates an RPC client queue "server_client"
+  outputs: output_log
+
+connections:
+  input: output_log
+  output: client_output.txt
+  in_temp: True

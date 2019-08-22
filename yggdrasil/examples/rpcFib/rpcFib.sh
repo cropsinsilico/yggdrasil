@@ -53,6 +53,12 @@ case $1 in
 	yaml2='rpcFibCli_valgrind.yml'
 	yaml3='rpcFibCliPar_valgrind.yml'
 	;;
+    -r | -R )
+	echo "Running R"
+	yaml1='rpcFibSrv_r.yml'
+	yaml2='rpcFibCli_r.yml'
+	yaml3='rpcFibCliPar_r.yml'
+	;;
     * )
 	echo "Running ", $1
 	yaml=$1

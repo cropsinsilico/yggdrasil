@@ -1,16 +1,38 @@
 import os
 import numpy as np
-import unittest
 from yggdrasil.communication import get_comm
 from yggdrasil.interface import YggInterface
-from yggdrasil.tools import YGG_MSG_EOF, get_YGG_MSG_MAX, YGG_MSG_BUF
+from yggdrasil.tools import (
+    YGG_MSG_EOF, get_YGG_MSG_MAX, YGG_MSG_BUF, is_lang_installed)
 from yggdrasil.components import import_component
 from yggdrasil.drivers import (InputDriver, OutputDriver)
-from yggdrasil.drivers.MatlabModelDriver import MatlabModelDriver
 from yggdrasil.tests import YggTestClassInfo, assert_equal, assert_raises
 
 
 YGG_MSG_MAX = get_YGG_MSG_MAX()
+
+
+class ModelEnv(object):
+    
+    def __init__(self, language=None):
+        new_kw = {'YGG_SUBPROCESS': 'True'}
+        if language is not None:
+            new_kw['YGG_MODEL_LANGUAGE'] = language
+        # Send environment keyword to fake language
+        self.old_kw = {}
+        for k, v in new_kw.items():
+            self.old_kw[k] = os.environ.get(k, None)
+            os.environ[k] = v
+            
+    def __enter__(self):
+        return None
+
+    def __exit__(self, type, value, traceback):
+        for k, v in self.old_kw.items():
+            if v is None:
+                del os.environ[k]
+            else:  # pragma: no cover
+                os.environ[k] = v
 
 
 def test_maxMsgSize():
@@ -32,40 +54,91 @@ def test_init():
     r"""Test error on init."""
     assert_raises(Exception, YggInterface.YggInput, 'error')
     assert_raises(Exception, YggInterface.YggOutput, 'error')
+
+
+def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
+                 input_interface='YggInput', output_interface='YggOutput'):
+    r"""Function to perform simple send/receive between two comms using a
+    language interface that calls the Python interface.
     
+    Args:
+        language (str, optional): Language that should be mimicked for the
+            interface test. Defaults to 'python'.
+        fmt (str, optional): Format string to use for the test. Defaults to
+            '%f\\n%d'.
+        msg (object, optional): Message object that should be used for the
+            test. Defaults to [float(1.0), int(2)].
+        input_interface (str, optional): Name of the interface function/class
+            that should be used for the test. Defaults to 'YggInput'.
+        output_interface (str, optional): Name of the interface function/class
+            that should be used for the test. Defaults to 'YggOutput'.
 
-@unittest.skipIf(not MatlabModelDriver.is_installed(), "Matlab not installed.")
-def test_YggMatlab_class():  # pragma: matlab
-    r"""Test Matlab interface for classes."""
-    name = 'test'
-    # Input
-    drv = InputDriver.InputDriver(name, 'link')
-    drv.start()
-    os.environ.update(drv.env)
-    YggInterface.YggMatlab('YggInput', (name, '%f\\n%d'))
-    drv.terminate()
-    # Output
-    drv = OutputDriver.OutputDriver(name, 'link')
-    drv.start()
-    os.environ.update(drv.env)
-    YggInterface.YggMatlab('YggOutput', (name, '%f\\n%d'))
-    drv.terminate()
+    """
+    name = 'test_%s' % language
+    # Set converter based on language driver
+    ldrv = import_component('model', language)
+    converter = ldrv.python2language
+    if converter is None:
+        def converter(x):
+            return x
+    # Create and start drivers to transport messages
+    odrv = OutputDriver.OutputDriver(name, 'link')
+    odrv.start()
+    os.environ.update(odrv.env)
+    idrv = InputDriver.InputDriver(name, 'link', comm_env=odrv.comm_env)
+    idrv.start()
+    os.environ.update(idrv.env)
+    # Connect and utilize interface under disguise as target language
+    try:
+        with ModelEnv(language=language):
+            # Output
+            o = YggInterface.YggInit(output_interface, (name, fmt))
+            o.send(*msg)
+            o.send_eof()
+            o.close()
+            # Input
+            i = YggInterface.YggInit(input_interface, (name, fmt))
+            assert_equal(i.recv(), (True, converter(msg)))
+            assert_equal(i.recv(), (False, converter(YGG_MSG_EOF)))
+    finally:
+        odrv.terminate()
+        idrv.terminate()
 
 
-@unittest.skipIf(not MatlabModelDriver.is_installed(), "Matlab not installed.")
-def test_YggMatlab_variables():  # pragma: matlab
+def test_YggInit_langauge():
+    r"""Test access to YggInit via languages that call the Python interface."""
+    for language in ['matlab', 'R']:
+        print(language)
+        if not is_lang_installed(language):
+            continue
+        do_send_recv(language=language)
+
+
+def test_YggInit_backwards():
+    r"""Check access to old class names for backwards compat."""
+    do_send_recv(input_interface='CisInput',
+                 output_interface='PsiOutput')
+
+
+def test_YggInit_variables():
     r"""Test Matlab interface for variables."""
-    assert_equal(YggInterface.YggMatlab('YGG_MSG_MAX'), YGG_MSG_MAX)
-    assert_equal(YggInterface.YggMatlab('YGG_MSG_EOF'), YGG_MSG_EOF)
+    assert_equal(YggInterface.YggInit('YGG_MSG_MAX'), YGG_MSG_MAX)
+    assert_equal(YggInterface.YggInit('YGG_MSG_EOF'), YGG_MSG_EOF)
+    assert_equal(YggInterface.YggInit('YGG_MSG_EOF'),
+                 YggInterface.YggInit('CIS_MSG_EOF'))
+    assert_equal(YggInterface.YggInit('YGG_MSG_EOF'),
+                 YggInterface.YggInit('PSI_MSG_EOF'))
 
 
 class TestBase(YggTestClassInfo):
     r"""Test class for interface classes."""
+
+    _mod = 'yggdrasil.interface.YggInterface'
+    
     def __init__(self, *args, **kwargs):
         super(TestBase, self).__init__(*args, **kwargs)
-        self._mod = 'yggdrasil.interface.YggInterface'
         self.name = 'test' + self.uuid
-        self.matlab = False
+        self.language = None
         self.idriver = None
         self.odriver = None
         self.test_comm = None
@@ -134,13 +207,6 @@ class TestBase(YggTestClassInfo):
             return [self.name, self.name + '_link'], {}
         raise Exception('Direction was not set. (%s)', self.direction)  # pragma: debug
 
-    @property
-    def inst_kwargs(self):
-        r"""dict: Arguments for the interface instance."""
-        out = super(TestBase, self).inst_kwargs
-        out['matlab'] = self.matlab
-        return out
-        
     def get_options(self):
         r"""Get testing options."""
         out = {}
@@ -221,6 +287,12 @@ class TestBase(YggTestClassInfo):
         super(TestBase, self).teardown()
         self.cleanup_comms()
 
+    def create_instance(self):
+        r"""Create a new instance of the class."""
+        with ModelEnv(language=self.language):
+            out = super(TestBase, self).create_instance()
+        return out
+        
     def remove_instance(self, inst):
         r"""Remove an instance."""
         inst.is_interface = False
@@ -231,9 +303,11 @@ class TestBase(YggTestClassInfo):
     
 class TestYggInput(TestBase):
     r"""Test basic input to python."""
+
+    _cls = 'YggInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggInput'
         self.direction = 'input'
         if self.__class__ == TestYggInput:
             self.testing_option_kws = {'table_example': True}
@@ -261,16 +335,18 @@ class TestYggInputMatlab(TestYggInput):
     r"""Test basic input to python as passed from matlab."""
     def __init__(self, *args, **kwargs):
         super(TestYggInputMatlab, self).__init__(*args, **kwargs)
-        self.matlab = True
+        self.language = 'matlab'
         self.testing_option_kws = {'table_example': True}
         self._inst_kwargs = {'format_str': self.fmt_str_matlab}
 
 
 class TestYggOutput(TestBase):
     r"""Test basic output to python."""
+
+    _cls = 'YggOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggOutput'
         self.direction = 'output'
         if self.__class__ == TestYggOutput:
             self.testing_option_kws = {'table_example': True}
@@ -306,16 +382,18 @@ class TestYggOutputMatlab(TestYggOutput):
     r"""Test basic output to python as passed from matlab."""
     def __init__(self, *args, **kwargs):
         super(TestYggOutputMatlab, self).__init__(*args, **kwargs)
-        self.matlab = True
+        self.language = 'matlab'
         self.testing_option_kws = {'table_example': True}
         self._inst_kwargs = {'format_str': self.fmt_str_matlab}
 
 
 class TestYggRpcClient(TestYggOutput):
     r"""Test client-side RPC communication with Python."""
+
+    _cls = 'YggRpcClient'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggRpcClient, self).__init__(*args, **kwargs)
-        self._cls = 'YggRpcClient'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ServerComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
@@ -346,15 +424,17 @@ class TestYggRpcClientMatlab(TestYggRpcClient):
     r"""Test client-side RPC communication with Python as passed through Matlab."""
     def __init__(self, *args, **kwargs):
         super(TestYggRpcClientMatlab, self).__init__(*args, **kwargs)
-        self.matlab = True
+        self.language = 'matlab'
         self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
 
 
 class TestYggRpcServer(TestYggInput):
     r"""Test server-side RPC communication with Python."""
+
+    _cls = 'YggRpcServer'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggRpcServer, self).__init__(*args, **kwargs)
-        self._cls = 'YggRpcServer'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ClientComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
@@ -385,25 +465,29 @@ class TestYggRpcServerMatlab(TestYggRpcServer):
     r"""Test server-side RPC communication with Python as passed through Matlab."""
     def __init__(self, *args, **kwargs):
         super(TestYggRpcServerMatlab, self).__init__(*args, **kwargs)
-        self.matlab = True
+        self.language = 'matlab'
         self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
 
 
 # AsciiFile
 class TestYggAsciiFileInput(TestYggInput):
     r"""Test input from an unformatted text file."""
+
+    _cls = 'YggAsciiFileInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiFileInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggAsciiFileInput'
         self.is_file = True
         self.filecomm = 'AsciiFileComm'
 
 
 class TestYggAsciiFileOutput(TestYggOutput):
     r"""Test output to an unformatted text file."""
+
+    _cls = 'YggAsciiFileOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiFileOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggAsciiFileOutput'
         self.is_file = True
         self.filecomm = 'AsciiFileComm'
 
@@ -411,18 +495,22 @@ class TestYggAsciiFileOutput(TestYggOutput):
 # AsciiTable
 class TestYggAsciiTableInput(TestYggAsciiFileInput):
     r"""Test input from an ascii table."""
+
+    _cls = 'YggAsciiTableInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiTableInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggAsciiTableInput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
 
         
 class TestYggAsciiTableOutput(TestYggAsciiFileOutput):
     r"""Test output from an ascii table."""
+
+    _cls = 'YggAsciiTableOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiTableOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggAsciiTableOutput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
         self._inst_args = [self.name, self.fmt_str]
@@ -433,16 +521,18 @@ class TestYggAsciiTableOutputMatlab(TestYggAsciiTableOutput):
     r"""Test output from an ascii table as passed through Matlab."""
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiTableOutputMatlab, self).__init__(*args, **kwargs)
-        self.matlab = True
+        self.language = 'matlab'
         self._inst_args = [self.name, self.fmt_str_matlab]
         
 
 # AsciiTable Array
 class TestYggAsciiArrayInput(TestYggAsciiTableInput):
     r"""Test input from an ASCII table."""
+
+    _cls = 'YggAsciiArrayInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiArrayInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggAsciiArrayInput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
         self.testing_option_kws = {'array_columns': True}
@@ -450,9 +540,11 @@ class TestYggAsciiArrayInput(TestYggAsciiTableInput):
 
 class TestYggAsciiArrayOutput(TestYggAsciiTableOutput):
     r"""Test input from an ASCII table."""
+
+    _cls = 'YggAsciiArrayOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggAsciiArrayOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggAsciiArrayOutput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
         self.testing_option_kws = {'array_columns': True}
@@ -461,18 +553,22 @@ class TestYggAsciiArrayOutput(TestYggAsciiTableOutput):
 # Pickle
 class TestYggPickleInput(TestYggInput):
     r"""Test input from a pickle file."""
+
+    _cls = 'YggPickleInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggPickleInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggPickleInput'
         self.is_file = True
         self.filecomm = 'PickleFileComm'
 
 
 class TestYggPickleOutput(TestYggOutput):
     r"""Test output from a pickle."""
+
+    _cls = 'YggPickleOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggPickleOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggPickleOutput'
         self.is_file = True
         self.filecomm = 'PickleFileComm'
 
@@ -480,9 +576,11 @@ class TestYggPickleOutput(TestYggOutput):
 # Pandas
 class TestYggPandasInput(TestYggInput):
     r"""Test input from a pandas file."""
+
+    _cls = 'YggPandasInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggPandasInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggPandasInput'
         self.is_file = True
         self.filecomm = 'PandasFileComm'
         # self.testing_option_kws = {'as_frames': True}
@@ -490,9 +588,11 @@ class TestYggPandasInput(TestYggInput):
 
 class TestYggPandasOutput(TestYggOutput):
     r"""Test output from a pandas."""
+
+    _cls = 'YggPandasOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggPandasOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggPandasOutput'
         self.is_file = True
         self.filecomm = 'PandasFileComm'
         # self.testing_option_kws = {'as_frames': True}
@@ -501,18 +601,22 @@ class TestYggPandasOutput(TestYggOutput):
 # Ply
 class TestYggPlyInput(TestYggInput):
     r"""Test input from a ply file."""
+
+    _cls = 'YggPlyInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggPlyInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggPlyInput'
         self.is_file = True
         self.filecomm = 'PlyFileComm'
 
 
 class TestYggPlyOutput(TestYggOutput):
     r"""Test output from a ply."""
+
+    _cls = 'YggPlyOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggPlyOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggPlyOutput'
         self.is_file = True
         self.filecomm = 'PlyFileComm'
 
@@ -520,17 +624,21 @@ class TestYggPlyOutput(TestYggOutput):
 # Obj
 class TestYggObjInput(TestYggInput):
     r"""Test input from a obj file."""
+
+    _cls = 'YggObjInput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggObjInput, self).__init__(*args, **kwargs)
-        self._cls = 'YggObjInput'
         self.is_file = True
         self.filecomm = 'ObjFileComm'
 
 
 class TestYggObjOutput(TestYggOutput):
     r"""Test output from a obj."""
+
+    _cls = 'YggObjOutput'
+    
     def __init__(self, *args, **kwargs):
         super(TestYggObjOutput, self).__init__(*args, **kwargs)
-        self._cls = 'YggObjOutput'
         self.is_file = True
         self.filecomm = 'ObjFileComm'

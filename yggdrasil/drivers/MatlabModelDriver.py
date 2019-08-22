@@ -6,11 +6,11 @@ import os
 import psutil
 import warnings
 import weakref
-from yggdrasil import backwards, tools, platform
+from yggdrasil import backwards, tools, platform, serialize
+from yggdrasil.languages import get_language_dir
 from yggdrasil.config import ygg_cfg
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.tools import TimeOut, sleep
-from yggdrasil.languages import get_language_dir
 logger = logging.getLogger(__name__)
 try:  # pragma: matlab
     disable_engine = ygg_cfg.get('matlab', 'disable_engine', 'False').lower()
@@ -27,7 +27,6 @@ except ImportError:  # pragma: no matlab
     _matlab_engine_installed = False
 
 
-_top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
 _top_lang_dir = get_language_dir('matlab')
 _compat_map = {
     'R2015b': ['2.7', '3.3', '3.4'],
@@ -169,8 +168,8 @@ def connect_matlab_engine(matlab_session, first_connect=False):  # pragma: matla
         matlab_engine.eval("YggInterface('YGG_MSG_MAX');", nargout=0,
                            stderr=err)
     except BaseException:
-        matlab_engine.addpath(_top_dir, nargout=0)
-        matlab_engine.addpath(_top_lang_dir, nargout=0)
+        for x in MatlabModelDriver.paths_to_add:
+            matlab_engine.addpath(x, nargout=0)
     matlab_engine.eval("os = py.importlib.import_module('os');", nargout=0)
     if not first_connect:
         if backwards.PY2:
@@ -430,6 +429,11 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     default_interpreter_flags = ['-nodisplay', '-nosplash', '-nodesktop',
                                  '-nojvm', '-batch']
     version_flags = ["fprintf('R%s', version('-release')); exit();"]
+    path_env_variable = 'MATLABPATH'
+    comm_linger = (os.environ.get('YGG_MATLAB_ENGINE', '').lower() == 'true')
+    send_converters = {'pandas': serialize.consolidate_array,
+                       'table': serialize.consolidate_array}
+    recv_converters = {'pandas': 'array'}
     type_map = {
         'int': 'intX',
         'float': 'single, double',
@@ -595,6 +599,9 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 kwargs['for_matlab'] = True
                 out = super(MatlabModelDriver, cls).run_executable(args, **kwargs)
             else:
+                if kwargs.get('debug_flags', None):  # pragma: debug
+                    logger.warn("Debugging via valgrind, strace, etc. disabled "
+                                "for Matlab when using a Matlab shared engine.")
                 assert(kwargs.get('return_process', False))
                 # Add environment variables
                 env = kwargs.get('env', {})
@@ -661,7 +668,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 be set.
 
         """
-        out = super(MatlabModelDriver, cls).configure(cfg)
+        out = InterpretedModelDriver.configure.__func__(cls, cfg)
         opts = {
             'startup_waittime_s': [('The time allowed for a Matlab engine to start'
                                     'before timing out and reporting an error.'),
@@ -741,25 +748,6 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         self.mlengine.addpath(self.model_dir, nargout=0)
         self.debug("Connected to matlab session '%s'" % self.mlsession)
 
-    def set_env(self):
-        r"""Get environment variables that should be set for the model process.
-
-        Returns:
-            dict: Environment variables for the model process.
-
-        """
-        out = super(MatlabModelDriver, self).set_env()
-        path_list = []
-        prev_path = out.pop('MATLABPATH', '')
-        if prev_path:
-            path_list.append(prev_path)
-        for x in [_top_dir, _top_lang_dir, self.model_dir]:
-            if x not in prev_path:
-                path_list.append(x)
-        if path_list:
-            out['MATLABPATH'] = os.pathsep.join(path_list)
-        return out
-        
     def before_start(self):
         r"""Actions to perform before the run loop."""
         kwargs = dict(fname_wrapper=self.model_wrapper)
@@ -848,3 +836,56 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 + "'exit' call which will exit the MATLAB engine "
                 + "such that it cannot be reused. Please replace 'exit' "
                 + "with a return or error.")
+
+    def set_env(self):
+        r"""Get environment variables that should be set for the model process.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(MatlabModelDriver, self).set_env()
+        if self.using_matlab_engine:
+            out['YGG_MATLAB_ENGINE'] = 'True'
+        # TODO: Move the following to InterpretedModelDriver once another
+        # language sets path_env_variable
+        path_list = []
+        prev_path = out.pop(self.path_env_variable, '')
+        if prev_path:
+            path_list.append(prev_path)
+        if isinstance(self.paths_to_add, list):
+            for x in self.paths_to_add:
+                if x not in prev_path:
+                    path_list.append(x)
+        path_list.append(self.model_dir)
+        if path_list:
+            out[self.path_env_variable] = os.pathsep.join(path_list)
+        return out
+        
+    @classmethod
+    def comm_atexit(cls, comm):
+        r"""Operations performed on comm at exit including draining receive.
+        
+        Args:
+            comm (CommBase): Communication object.
+
+        """
+        if comm.direction == 'recv':
+            while comm.recv(timeout=0)[0]:
+                comm.sleep()
+        else:
+            comm.send_eof()
+        comm.linger_close()
+
+    @classmethod
+    def decode_format(cls, format_str):
+        r"""Method for decoding format strings created in this language.
+
+        Args:
+            format_str (str): Encoded format string.
+
+        Returns:
+            str: Decoded format string.
+
+        """
+        return backwards.decode_escape(format_str)

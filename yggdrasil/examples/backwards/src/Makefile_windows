@@ -1,21 +1,21 @@
 IDIR = .
-CC = cl.exe
-LINK = link.exe
-CFLAGS = /I$(IDIR) $(YGGCCFLAGS)
+# CC ?= cl.exe
+# CFLAGS += /I$(IDIR)
+CFLAGS = $(CFLAGS) /I$(IDIR)
 
 SDIR = .
 ODIR = .
 
-LIBS = $(YGGLDFLAGS)
+LIBS = $(LDFLAGS)
 
 .PHONY: all
 all: backwards_modelA backwards_modelB
 
 backwards_modelA: $(ODIR)\backwards_modelA.o
-	$(LINK) /OUT:$@.exe $** $(LIBS)
+	$(CC) /OUT:$@.exe $** /link $(LIBS)
 
 backwards_modelB: $(ODIR)\backwards_modelB.o
-	$(LINK) /OUT:$@.exe $** $(LIBS)
+	$(CC) /OUT:$@.exe $** /link $(LIBS)
 
 {$(SDIR)}.c{$(ODIR)}.o:
 	$(CC) /c $< -Fo$@ $(CFLAGS)

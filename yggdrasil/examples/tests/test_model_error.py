@@ -1,9 +1,9 @@
 import glob
 import os
-from yggdrasil.examples.tests import TestExample
+from yggdrasil.examples.tests import ExampleTstBase
 
 
-class TestExampleModelError(TestExample):
+class TestExampleModelError(ExampleTstBase):
     r"""Test the model_error example."""
 
     example_name = 'model_error'

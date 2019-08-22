@@ -44,7 +44,7 @@ def rm_excl_rule(excl_list, new_rule):
     return excl_list
 
 
-def create_coveragerc(matlab_installed=False, lpy_installed=False):
+def create_coveragerc(installed_languages):
     r"""Create the coveragerc to reflect the OS, Python version, and availability
     of matlab. Parameters from the setup.cfg file will be added. If the
     .coveragerc file already exists, it will be read first before adding setup.cfg
@@ -52,10 +52,8 @@ def create_coveragerc(matlab_installed=False, lpy_installed=False):
     
 
     Args:
-        matlab_installed (bool, optional): Truth of if matlab is installed or not.
-            Defaults to False.
-        lpy_installed (bool, optional): Truth of if lpy is installed or not.
-            Defaults to False.
+        installed_languages (dict): Dictionary of language/boolean key/value
+            pairs indicating optional languages and their state of installation.
 
     Returns:
         bool: True if the file was created/updated successfully, False otherwise.
@@ -63,7 +61,12 @@ def create_coveragerc(matlab_installed=False, lpy_installed=False):
     """
     if HandyConfigParser is None:
         return False
-    covrc = os.path.join(os.path.dirname(__file__), '.coveragerc')
+    debug_msg = 'cwd = %s, os.path.dirname(__file__) = %s' % (
+        os.getcwd(), os.path.dirname(__file__))
+    print(debug_msg)
+    # covdir = os.path.dirname(__file__)
+    covdir = os.getcwd()
+    covrc = os.path.join(covdir, '.coveragerc')
     cp = HandyConfigParser("")
     # Read from existing .coveragerc
     if os.path.isfile(covrc):
@@ -110,20 +113,14 @@ def create_coveragerc(matlab_installed=False, lpy_installed=False):
             excl_list = rm_excl_rule(excl_list, vincl)
         else:
             excl_list = add_excl_rule(excl_list, vincl)
-    # Matlab
-    if matlab_installed:
-        excl_list = add_excl_rule(excl_list, 'pragma: no matlab')
-        excl_list = rm_excl_rule(excl_list, 'pragma: matlab')
-    else:
-        excl_list = add_excl_rule(excl_list, 'pragma: matlab')
-        excl_list = rm_excl_rule(excl_list, 'pragma: no matlab')
-    # LPy
-    if lpy_installed:
-        excl_list = add_excl_rule(excl_list, 'pragma: no lpy')
-        excl_list = rm_excl_rule(excl_list, 'pragma: lpy')
-    else:
-        excl_list = add_excl_rule(excl_list, 'pragma: lpy')
-        excl_list = rm_excl_rule(excl_list, 'pragma: no lpy')
+    # Language specific
+    for k, v in installed_languages.items():
+        if v:
+            excl_list = add_excl_rule(excl_list, 'pragma: no %s' % k)
+            excl_list = rm_excl_rule(excl_list, 'pragma: %s' % k)
+        else:
+            excl_list = add_excl_rule(excl_list, 'pragma: %s' % k)
+            excl_list = rm_excl_rule(excl_list, 'pragma: no %s' % k)
     # Add new rules
     cp.set('report', 'exclude_lines', '\n' + '\n'.join(excl_list))
     # Write
@@ -133,17 +130,14 @@ def create_coveragerc(matlab_installed=False, lpy_installed=False):
 
 
 if __name__ == "__main__":
+    LANG_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                             'yggdrasil', 'languages')
+    sys.path.insert(0, LANG_PATH)
     try:
-        import matlab.engine
-        matlab_installed = True
-    except ImportError:
-        matlab_installed = False
-    try:
-        from openalea import lpy
-        lpy_installed = True
-    except ImportError:
-        lpy_installed = False
-    flag = create_coveragerc(matlab_installed=matlab_installed,
-                             lpy_installed=lpy_installed)
+        import install_languages
+    finally:
+        sys.path.pop(0)
+    installed_languages = install_languages.install_all_languages()
+    flag = create_coveragerc(installed_languages)
     if not flag:
         raise Exception("Failed to create/update converagerc file.")

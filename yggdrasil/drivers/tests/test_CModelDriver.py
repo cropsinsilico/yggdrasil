@@ -58,7 +58,6 @@ class TestCModelDriverNoStart(TestCModelParam,
                                           out=None)
         self.instance.call_linker(out, for_model=True,
                                   working_dir=self.instance.working_dir,
-                                  linker_language='c++',
                                   libtype='static')
 
     def test_parse_arguments(self):

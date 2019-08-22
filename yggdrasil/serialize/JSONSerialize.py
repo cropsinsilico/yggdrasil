@@ -1,6 +1,7 @@
 from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import (
-    indent_char2int, encode_json, decode_json, _use_rapidjson)
+    indent_char2int, encode_json, decode_json, _use_rapidjson,
+    JSONReadableEncoder)
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
@@ -37,7 +38,7 @@ class JSONSerialize(SerializeBase):
         """
         # Convert bytes to str because JSON cannot serialize bytes by default
         args = backwards.as_str(args, recurse=True, allow_pass=True)
-        return encode_json(args, indent=self.indent)
+        return encode_json(args, indent=self.indent, cls=JSONReadableEncoder)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.

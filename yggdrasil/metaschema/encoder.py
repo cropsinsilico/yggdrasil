@@ -154,7 +154,10 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     kwargs['indent'] = indent
     kwargs['sort_keys'] = sort_keys
     if _use_rapidjson:
-        kwargs.setdefault('default', JSONEncoder().default)
+        if 'cls' in kwargs:
+            kwargs.setdefault('default', kwargs.pop('cls')().default)
+        else:
+            kwargs.setdefault('default', JSONEncoder().default)
     else:
         kwargs.setdefault('cls', JSONEncoder)
     if fd is None:

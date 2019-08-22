@@ -1,12 +1,11 @@
 IDIR = .
-CC = gcc
-LINK = g++
-CFLAGS = -I$(IDIR) $(YGGCCFLAGS)
+CC ?= gcc
+CFLAGS += -I$(IDIR)
 
 ODIR = .
 LDIR = .
 
-LIBS = -lm $(YGGLDFLAGS)
+LIBS = -lm $(LDFLAGS)
 
 _DEPS = hellofunc.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
@@ -21,7 +20,7 @@ $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c $(CFLAGS) $< -o $@
 
 gcc_model: $(OBJ)
-	$(LINK) -o $@ $^ $(CFLAGS) $(LIBS)
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 

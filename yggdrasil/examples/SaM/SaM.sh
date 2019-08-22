@@ -31,6 +31,10 @@ case $1 in
 	echo "Running C++"
 	yaml='SaM_cpp.yml'
 	;;
+    -r | -R )
+	echo "Running R"
+	yaml='SaM_r.yml'
+	;;
     * )
 	echo "Running ", $1
 	yaml=$1
