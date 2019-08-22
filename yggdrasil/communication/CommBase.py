@@ -271,6 +271,13 @@ class CommBase(tools.YggClass):
             sent objects. Defaults to None.
         comm (str, optional): The comm that should be created. This only serves
             as a check that the correct class is being created. Defaults to None.
+        condition (str, optional): Conditional expression in terms of the value
+            being received/sent (represented by '%x%') that determines whether or
+            not the value will be returned/sent. Defaults to None and is ignored.
+        condition_function (func, optional): Function that should be used to
+            determine if the value being received/sent should be returned/sent.
+            The function should take the value as input and return a boolean.
+            Defaults to None and is ignored.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -308,6 +315,12 @@ class CommBase(tools.YggClass):
             comm.
         recv_converter (func): Converter that should be used on received objects.
         send_converter (func): Converter that should be used on sent objects.
+        condition (str): Conditional expression in terms of the value being
+            received/sent (represented by '%x%') that determines whether or not
+            the value will be returned/sent.
+        condition_function (func): Function that should be used to determine if
+            the value being received/sent should be returned/sent. The function
+            should take the value as input and return a boolean.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -333,7 +346,9 @@ class CommBase(tools.YggClass):
                                           'items': {'type': 'string'}},
                           'field_units': {'type': 'array',
                                           'items': {'type': 'string'}},
-                          'as_array': {'type': 'boolean', 'default': False}}
+                          'as_array': {'type': 'boolean', 'default': False},
+                          'condition': {'type': 'string'},
+                          'condition_function': {'type': 'function'}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
@@ -474,6 +489,10 @@ class CommBase(tools.YggClass):
                 cls_conv = getattr(self.language_driver, k + 's')
                 v = cls_conv.get(v, None)
             setattr(self, k, v)
+        # Check condition
+        if self.condition and self.condition_function:
+            raise ValueError("Parameters 'condition' and 'condition_function' "
+                             "cannot be used at the same time.")
 
     @staticmethod
     def before_registration(cls):
@@ -977,6 +996,28 @@ class CommBase(tools.YggClass):
                                self.send_converter)
         else:
             return self.send_converter(msg_in)
+
+    def evaluate_condition(self, *msg_in):
+        r"""Evaluate the condition to determine how the message should be
+        handled.
+
+        Args:
+            *msg_in (object): Parts of message being evaluated.
+        
+        Returns:
+            bool: True if the condition evaluates to True, False otherwise.
+
+        """
+        out = True
+        if len(msg_in) == 1:
+            msg_in = msg_in[0]
+        if msg_in != self.eof_msg:
+            if self.condition_function:
+                out = self.condition_function(msg_in)
+            elif self.condition:
+                out = eval(self.condition.replace('%x%', 'msg_in'))
+        assert(isinstance(out, bool))
+        return out
         
     @property
     def empty_obj_recv(self):
@@ -1401,6 +1442,9 @@ class CommBase(tools.YggClass):
             raise RuntimeError("This comm is single use and it was already used.")
         if self.language_driver.language2python is not None:
             args = self.language_driver.language2python(args)
+        if not self.evaluate_condition(*args):
+            # Return True to indicate success because nothing should be done
+            return True
         try:
             ret = self.send_multipart(args, **kwargs)
             if ret:
@@ -1624,6 +1668,9 @@ class CommBase(tools.YggClass):
         except BaseException:
             self.exception('Failed to recv.')
             return (False, None)
+        if flag and (not self.evaluate_condition(msg)):
+            assert(not self.single_use)
+            return self.recv(*args, **kwargs)
         if self.single_use and self._used:
             self.debug('Linger close on single use')
             self.linger_close()

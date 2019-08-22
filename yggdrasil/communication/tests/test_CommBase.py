@@ -332,10 +332,13 @@ class TestCommBase(YggTestClassInfo):
                      n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',
                      reverse_comms=False, send_kwargs=None, recv_kwargs=None,
                      n_send=1, n_recv=1, print_status=False,
-                     close_on_send_eof=None, close_on_recv_eof=None):
+                     close_on_send_eof=None, close_on_recv_eof=None,
+                     no_recv=False, recv_timeout=None):
         r"""Generic send/recv of a message."""
         tkey = 'do_send_recv'
         is_eof = ('eof' in send_meth)
+        if recv_timeout is None:
+            recv_timeout = self.timeout
         if msg_send is None:
             if is_eof:
                 msg_send = self.send_instance.eof_msg
@@ -390,16 +393,17 @@ class TestCommBase(YggTestClassInfo):
             # Wait for messages to be received
             for i in range(n_recv):
                 if not is_eof:
-                    T = recv_instance.start_timeout(self.timeout, key_suffix=tkey)
-                    while ((not T.is_out) and (not recv_instance.is_closed)
-                           and (getattr(recv_instance,
-                                        n_msg_recv_meth) == 0)):  # pragma: debug
-                        recv_instance.sleep()
-                    recv_instance.stop_timeout(key_suffix=tkey)
-                    assert(getattr(recv_instance, n_msg_recv_meth) >= 1)
+                    if not no_recv:
+                        T = recv_instance.start_timeout(recv_timeout, key_suffix=tkey)
+                        while ((not T.is_out) and (not recv_instance.is_closed)
+                               and (getattr(recv_instance,
+                                            n_msg_recv_meth) == 0)):  # pragma: debug
+                            recv_instance.sleep()
+                        recv_instance.stop_timeout(key_suffix=tkey)
+                        assert(getattr(recv_instance, n_msg_recv_meth) >= 1)
                     # IPC nolimit sends multiple messages
                     # self.assert_equal(recv_instance.n_msg_recv, 1)
-                flag, msg_recv0 = frecv_meth(timeout=self.timeout, **recv_kwargs)
+                flag, msg_recv0 = frecv_meth(timeout=recv_timeout, **recv_kwargs)
                 if is_eof and close_on_recv_eof:
                     assert(not flag)
                     assert(recv_instance.is_closed)
@@ -457,6 +461,29 @@ class TestCommBase(YggTestClassInfo):
         else:
             assert(flag)
         assert(not msg_recv)
+
+    def test_send_recv_condition(self):
+        r"""Test send/recv with conditional."""
+        if self.comm in ['CommBase', 'AsyncComm']:
+            return
+        condition = '%x% != 3'
+        
+        def condition_function(x):
+            return (x != 2)
+        
+        self.assert_raises(ValueError, self.import_cls.new_comm,
+                           'test_condition', condition=condition,
+                           condition_function=condition_function)
+        self.send_instance.condition_function = condition_function
+        self.recv_instance.condition = condition
+        self.do_send_recv(msg_send=1, msg_recv=1)
+        self.do_send_recv(msg_send=2,
+                          msg_recv=self.recv_instance.empty_obj_recv,
+                          recv_timeout=self.sleeptime, no_recv=True)
+        self.do_send_recv(msg_send=3,
+                          msg_recv=self.recv_instance.empty_obj_recv,
+                          recv_timeout=5 * self.sleeptime)
+        self.do_send_recv(send_meth='send_eof')
 
     def test_send_recv(self):
         r"""Test send/recv of a small message."""

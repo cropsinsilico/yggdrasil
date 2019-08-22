@@ -182,6 +182,10 @@ class TestZMQCommREQ(TestZMQComm):
 
     socket_type = 'REQ'
 
+    def test_send_recv_condition(self):
+        r"""Test send/recv with conditional."""
+        pass
+    
 
 class TestZMQCommROUTER(TestZMQComm):
     r"""Test for ZMQComm communication class with DEALER/ROUTER socket."""

@@ -27,6 +27,16 @@ definitions:
           - rmq_async
           - zmq
           type: string
+        condition:
+          description: Conditional expression in terms of the value being received/sent
+            (represented by '%x%') that determines whether or not the value will be
+            returned/sent. Defaults to None and is ignored.
+          type: string
+        condition_function:
+          description: Function that should be used to determine if the value being
+            received/sent should be returned/sent. The function should take the value
+            as input and return a boolean. Defaults to None and is ignored.
+          type: function
         datatype:
           default:
             type: bytes
@@ -193,8 +203,8 @@ definitions:
             type: function
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -346,6 +356,16 @@ definitions:
           description: One or more characters indicating a comment. Defaults to '#
             '.
           type: string
+        condition:
+          description: Conditional expression in terms of the value being received/sent
+            (represented by '%x%') that determines whether or not the value will be
+            returned/sent. Defaults to None and is ignored.
+          type: string
+        condition_function:
+          description: Function that should be used to determine if the value being
+            received/sent should be returned/sent. The function should take the value
+            as input and return a boolean. Defaults to None and is ignored.
+          type: function
         datatype:
           description: JSON schema defining the type of object that the serializer
             will be used to serialize/deserialize. Defaults to default_datatype.
@@ -489,8 +509,8 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - name
+      - working_dir
       - filetype
       title: file_base
       type: object
@@ -1122,10 +1142,10 @@ definitions:
             is used.
           type: string
       required:
-      - args
-      - working_dir
       - name
       - language
+      - working_dir
+      - args
       title: model_base
       type: object
     - anyOf:
