@@ -24,9 +24,9 @@ connections:
   - input: outputA  # Connection between model A output & model B input
     outputs:
       - name: inputB1
-        condition: if outputA <= 2
+        condition: if %x% <= 2
       - name: inputB2
-        condition: if outputA > 2
+        condition_function: ./src/conditional_io_modelB.py:condition_function2
   - input: ./Input/input.txt  # Connection between file and model A input
     output: inputA
   - input: outputB1  # Connection between model B, function 1 output and file
