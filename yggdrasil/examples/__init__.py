@@ -5,8 +5,13 @@ import logging
 from yggdrasil import tools, languages, serialize
 
 
-# TODO: Automate example discovery and testing
-ext_map = {'executable': '',
+# TODO: This can be generated from the drivers
+ext_map = {'python': '.py',
+           'matlab': '.m',
+           'r': '.R',
+           'c': '.c',
+           'cpp': '.cpp',
+           'executable': '',
            'make': '.cpp',
            'cmake': '.cpp'}
 for lang in tools.get_supported_lang():
@@ -57,7 +62,7 @@ def register_example(example_dir):
             lang = serialize.process_message(os.path.basename(match), lang_search)[0]
             if lang == 'valgrind':
                 continue
-            lang_avail.append(lang)
+            lang_avail.append(lang.lower())
     lang_avail = tuple(sorted(lang_avail))
     # Get YAML and source files for each language
     out_yml = {}

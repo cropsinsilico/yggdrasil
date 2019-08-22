@@ -452,15 +452,25 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'obj': 'containers.Map',
         'schema': 'containers.Map'}
     function_param = {
+        'input': '{channel} = YggInterface(\'YggInput\', \'{channel_name}\');',
+        'output': '{channel} = YggInterface(\'YggOutput\', \'{channel_name}\');',
+        'recv': '[{flag_var}, {recv_var}] = {channel}.recv();',
+        'send': '{flag_var} = {channel}.send({send_var});',
+        'function_call': '{output_var} = {function_name}({input_var});',
+        'define': '{variable} = {value};',
         'comment': '%',
         'true': 'true',
+        'not': 'not',
         'indent': 2 * ' ',
+        'quote': '\'',
         'print': 'disp(\'{message}\');',
+        'fprintf': 'fprintf(\'{message}\', {variables});',
         'error': 'error(\'{error_msg}\');',
         'block_end': 'end;',
         'if_begin': 'if ({cond})',
         'for_begin': 'for {iter_var} = {iter_begin}:{iter_end}',
         'while_begin': 'while ({cond})',
+        'break': 'break;',
         'try_begin': 'try',
         'try_except': 'catch {error_var}',
         'assign': '{name} = {value};'}
@@ -889,3 +899,21 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
 
         """
         return backwards.decode_escape(format_str)
+
+    @classmethod
+    def prepare_output_variables(cls, vars_list):
+        r"""Concatenate a set of output variables such that it can be passed as
+        a single string to the function_call parameter.
+
+        Args:
+            vars_list (list): List of variable names to concatenate as output
+                from a function call.
+
+        Returns:
+            str: Concatentated variables list.
+
+        """
+        out = super(MatlabModelDriver, cls).prepare_output_variables(vars_list)
+        if isinstance(vars_list, list) and (len(vars_list) > 1):
+            out = '[%s]' % out
+        return out
