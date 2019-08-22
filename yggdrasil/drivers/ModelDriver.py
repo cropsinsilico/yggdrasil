@@ -338,8 +338,6 @@ class ModelDriver(Driver):
             # Write file
             args[0] = os.path.join(model_dir, 'ygg_' + model_base
                                    + self.language_ext[0])
-            print('inputs', self.inputs)
-            print('outputs', self.outputs)
             lines = self.write_model_wrapper(self.model_function_file,
                                              self.function,
                                              inputs=self.inputs,
@@ -1296,7 +1294,7 @@ class ModelDriver(Driver):
                                                     filename=model_file,
                                                     function=model_function))
         out = cls.write_executable(lines, prefix=prefix)
-        print('\n'.join(out))
+        logger.debug('\n'.join(out))
         return out
 
     @classmethod
