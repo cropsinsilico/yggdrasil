@@ -1,0 +1,35 @@
+models:
+  - name: python_modelA
+    language: python
+    args: ./src/conditional_io_modelA.py
+    function: modelA_function
+    inputs: inputA
+    outputs: outputA
+
+  - name: python_modelB1
+    language: python
+    args: ./src/conditional_io_modelB.py
+    function: modelB_function1
+    inputs: inputB1
+    outputs: outputB1
+
+  - name: python_modelB2
+    language: python
+    args: ./src/conditional_io_modelB.py
+    function: modelB_function2
+    inputs: inputB2
+    outputs: outputB2
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    outputs:
+      - name: inputB1
+        condition: if outputA <= 2
+      - name: inputB2
+        condition: if outputA > 2
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: inputA
+  - input: outputB1  # Connection between model B, function 1 output and file
+    output: ./output.txt
+  - input: outputB2  # Connection between model B, function 2 output and file
+    output: ./output.txt
