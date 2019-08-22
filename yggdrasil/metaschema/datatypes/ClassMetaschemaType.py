@@ -1,3 +1,5 @@
+import os
+import sys
 import importlib
 from yggdrasil import backwards
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
@@ -68,7 +70,16 @@ class ClassMetaschemaType(MetaschemaType):
             raise ValueError("Could not parse %s string: %s"
                              % (cls.name, obj))
         mod, fun = pkg_mod[:]
-        modobj = importlib.import_module(mod)
+        moddir, mod = os.path.split(mod)
+        if mod.endswith('.py'):
+            mod = os.path.splitext(mod)[0]
+        try:
+            modobj = importlib.import_module(mod)
+        except ImportError:
+            if not moddir:
+                raise
+            sys.path.append(os.path.abspath(moddir))
+            modobj = importlib.import_module(mod)
         if not hasattr(modobj, fun):
             raise AttributeError("Module %s has no %s %s"
                                  % (modobj, cls.name, fun))

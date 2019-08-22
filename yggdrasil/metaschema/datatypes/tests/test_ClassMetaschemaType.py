@@ -1,3 +1,5 @@
+import os
+import tempfile
 from yggdrasil.tests import assert_raises
 from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
 
@@ -23,8 +25,17 @@ class TestClassMetaschemaType(parent.TestMetaschemaType):
         self._compatible_objects = [(self._value, self._value, None)]
         self._valid_normalize += [('%s:ValidClass' % __name__, ValidClass)]
 
+    def test_module_file(self):
+        r"""Test decoding data that includes the full path to the module file."""
+        _tmpclassfile = os.path.join(tempfile.gettempdir(), 'test_class.py')
+        with open(_tmpclassfile, 'w') as fd:
+            fd.write('class ValidClass2(object):\n    pass\n')
+        out = self.import_cls.decode_data('%s:ValidClass2' % _tmpclassfile, None)
+        self.assert_equal(out.__name__, 'ValidClass2')
+
     def test_decode_data_errors(self):
         r"""Test errors in decode_data."""
         assert_raises(ValueError, self.import_cls.decode_data, 'hello', None)
+        assert_raises(ImportError, self.import_cls.decode_data, 'invalid:invalid', None)
         assert_raises(AttributeError, self.import_cls.decode_data,
                       'yggdrasil:invalid', None)
