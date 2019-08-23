@@ -324,11 +324,7 @@ class ModelDriver(Driver):
                 raise ValueError(("Language %s is not parameterized "
                                   "and so functions cannot be automatically "
                                   "wrapped as a model.") % self.language)
-            self.model_function_file = args[0]
-            if not os.path.isabs(self.model_function_file):
-                self.model_function_file = os.path.normpath(
-                    os.path.join(self.working_dir,
-                                 self.model_function_file))
+            self.model_function_file = self.get_source_file(args)
             if not os.path.isfile(self.model_function_file):
                 raise ValueError("Source file does not exist: '%s'"
                                  % self.model_function_file)
@@ -342,8 +338,6 @@ class ModelDriver(Driver):
             # Write file
             args[0] = os.path.join(model_dir, 'ygg_' + model_base
                                    + self.language_ext[0])
-            print('inputs', self.inputs)
-            print('outputs', self.outputs)
             lines = self.write_model_wrapper(self.model_function_file,
                                              self.function,
                                              inputs=self.inputs,
@@ -738,6 +732,26 @@ class ModelDriver(Driver):
             if not out:
                 break
             out = import_component('model', x).is_language_installed()
+        return out
+
+    def get_source_file(self, args):
+        r"""Determine the source file based on arguments.
+
+        Args:
+            args (list): Arguments provided.
+
+        Returns:
+            str: Full path to source file select.
+
+        """
+        out = args[0]
+        if (((not self.is_source_file(out))
+             and (self.language_ext is not None)
+             and (os.path.splitext(out)[-1]
+                  not in self.get_all_language_ext()))):
+            out = os.path.splitext(out)[0] + self.language_ext[0]
+        if not os.path.isabs(out):
+            out = os.path.normpath(os.path.join(self.working_dir, out))
         return out
 
     @classmethod
@@ -1300,7 +1314,7 @@ class ModelDriver(Driver):
                                                     filename=model_file,
                                                     function=model_function))
         out = cls.write_executable(lines, prefix=prefix)
-        print('\n'.join(out))
+        logger.debug('\n'.join(out))
         return out
 
     @classmethod

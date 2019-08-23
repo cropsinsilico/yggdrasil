@@ -1869,6 +1869,25 @@ class CompiledModelDriver(ModelDriver):
         """
         return self.language
 
+    def get_source_file(self, args):
+        r"""Determine the source file based on arguments.
+
+        Args:
+            args (list): Arguments provided.
+
+        Returns:
+            str: Full path to source file select.
+
+        """
+        out = args[0]
+        if (not self.is_source_file(out)) and self.source_files:
+            if isinstance(self.source_files, list):
+                out = self.source_files[0]
+            else:
+                out = self.source_files
+        out = super(CompiledModelDriver, self).get_source_file([out])
+        return out
+
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
 

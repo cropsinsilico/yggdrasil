@@ -177,17 +177,18 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
     def test_invalid_function_param(self):
         r"""Test errors raise during class creation when parameters are invalid."""
         kwargs = copy.deepcopy(self.inst_kwargs)
+        kwargs['name'] = 'test'
+        kwargs['args'] = ['test']
         kwargs['function'] = 'invalid'
+        kwargs['source_files'] = []
         if self.import_cls.function_param is None:
-            self.assert_raises(ValueError, self.import_cls,
-                               *self.inst_args, **kwargs)
+            self.assert_raises(ValueError, self.import_cls, **kwargs)
         else:
-            self.assert_raises(ValueError, self.import_cls,
-                               *self.inst_args, **kwargs)
-            kwargs.update(function=__file__,
-                          is_server=True)
-            self.assert_raises(NotImplementedError, self.import_cls,
-                               *self.inst_args, **kwargs)
+            kwargs['args'] = ['invalid' + self.import_cls.language_ext[0]]
+            self.assert_raises(ValueError, self.import_cls, **kwargs)
+            kwargs['args'] = [__file__]
+            kwargs['is_server'] = True
+            self.assert_raises(NotImplementedError, self.import_cls, **kwargs)
                                
     def test_get_native_type(self):
         r"""Test translation to native type."""
