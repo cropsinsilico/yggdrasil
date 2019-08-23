@@ -320,6 +320,10 @@ class ModelDriver(Driver):
         self.wrapper_products = []
         # Update for function
         if self.function:
+            if self.function_param is None:
+                raise ValueError(("Language %s is not parameterized "
+                                  "and so functions cannot be automatically "
+                                  "wrapped as a model.") % self.language)
             self.model_function_file = args[0]
             if not os.path.isabs(self.model_function_file):
                 self.model_function_file = os.path.normpath(
@@ -592,7 +596,7 @@ class ModelDriver(Driver):
             out = backwards.as_str(out)
             logger.debug('%s\n%s' % (' '.join(cmd), out))
             return out
-        except (subprocess.CalledProcessError, OSError) as e:
+        except (subprocess.CalledProcessError, OSError) as e:  # pragma: debug
             raise RuntimeError("Could not call command '%s': %s"
                                % (' '.join(cmd), e))
         
@@ -1500,8 +1504,6 @@ class ModelDriver(Driver):
             str: Concatentated variables list.
 
         """
-        if not isinstance(vars_list, list):
-            vars_list = [vars_list]
         name_list = []
         for x in vars_list:
             assert(isinstance(x, dict))

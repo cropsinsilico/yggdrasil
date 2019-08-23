@@ -174,6 +174,21 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             out.append(('flag', self.import_cls.type_map['boolean']))
         return out
 
+    def test_invalid_function_param(self):
+        r"""Test errors raise during class creation when parameters are invalid."""
+        kwargs = copy.deepcopy(self.inst_kwargs)
+        kwargs['function'] = 'invalid'
+        if self.import_cls.function_param is None:
+            self.assert_raises(ValueError, self.import_cls,
+                               *self.inst_args, **kwargs)
+        else:
+            self.assert_raises(ValueError, self.import_cls,
+                               *self.inst_args, **kwargs)
+            kwargs.update(function=__file__,
+                          is_server=True)
+            self.assert_raises(NotImplementedError, self.import_cls,
+                               *self.inst_args, **kwargs)
+                               
     def test_get_native_type(self):
         r"""Test translation to native type."""
         test_vals = self.get_test_types()
@@ -199,6 +214,12 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             self.assert_raises(NotImplementedError,
                                self.import_cls.write_model_wrapper,
                                None, None)
+            self.assert_raises(NotImplementedError,
+                               self.import_cls.write_model_recv,
+                               None, None)
+            self.assert_raises(NotImplementedError,
+                               self.import_cls.write_model_send,
+                               None, None)
         else:
             inputs = [{'name': 'a', 'type': 'bytes', 'outside_loop': True},
                       {'name': 'b', 'type': {'type': 'int', 'precision': 64}},
@@ -209,6 +230,9 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             self.import_cls.write_model_wrapper('test', 'test',
                                                 inputs=inputs,
                                                 outputs=outputs)
+            self.assert_raises(NotImplementedError,
+                               self.import_cls.format_function_param,
+                               'invalid_key')
         
     def test_write_executable(self):
         r"""Test writing an executable."""
