@@ -320,11 +320,11 @@ class ModelDriver(Driver):
         self.wrapper_products = []
         # Update for function
         if self.function:
-            self.model_function_file = args[0]
-            if not os.path.isabs(self.model_function_file):
-                self.model_function_file = os.path.normpath(
-                    os.path.join(self.working_dir,
-                                 self.model_function_file))
+            if self.function_param is None:
+                raise ValueError(("Language %s is not parameterized "
+                                  "and so functions cannot be automatically "
+                                  "wrapped as a model.") % self.language)
+            self.model_function_file = self.get_source_file(args)
             if not os.path.isfile(self.model_function_file):
                 raise ValueError("Source file does not exist: '%s'"
                                  % self.model_function_file)
@@ -590,7 +590,7 @@ class ModelDriver(Driver):
             out = backwards.as_str(out)
             logger.debug('%s\n%s' % (' '.join(cmd), out))
             return out
-        except (subprocess.CalledProcessError, OSError) as e:
+        except (subprocess.CalledProcessError, OSError) as e:  # pragma: debug
             raise RuntimeError("Could not call command '%s': %s"
                                % (' '.join(cmd), e))
         
@@ -732,6 +732,26 @@ class ModelDriver(Driver):
             if not out:
                 break
             out = import_component('model', x).is_language_installed()
+        return out
+
+    def get_source_file(self, args):
+        r"""Determine the source file based on arguments.
+
+        Args:
+            args (list): Arguments provided.
+
+        Returns:
+            str: Full path to source file select.
+
+        """
+        out = args[0]
+        if (((not self.is_source_file(out))
+             and (self.language_ext is not None)
+             and (os.path.splitext(out)[-1]
+                  not in self.get_all_language_ext()))):
+            out = os.path.splitext(out)[0] + self.language_ext[0]
+        if not os.path.isabs(out):
+            out = os.path.normpath(os.path.join(self.working_dir, out))
         return out
 
     @classmethod
@@ -1498,8 +1518,6 @@ class ModelDriver(Driver):
             str: Concatentated variables list.
 
         """
-        if not isinstance(vars_list, list):
-            vars_list = [vars_list]
         name_list = []
         for x in vars_list:
             assert(isinstance(x, dict))
