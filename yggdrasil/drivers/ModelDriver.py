@@ -1322,6 +1322,8 @@ class ModelDriver(Driver):
         if cls.function_param is None:
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
+        if not isinstance(recv_var, list):
+            recv_var = [recv_var]
         recv_var_str = cls.prepare_output_variables(recv_var)
         recv_num = len(recv_var_str.split(','))
         lines = [cls.format_function_param(
@@ -1363,6 +1365,8 @@ class ModelDriver(Driver):
         if cls.function_param is None:
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
+        if not isinstance(send_var, list):
+            send_var = [send_var]
         send_var_str = cls.prepare_input_variables(send_var)
         send_num = len(send_var_str.split(','))
         lines = [cls.format_function_param(
@@ -1500,10 +1504,8 @@ class ModelDriver(Driver):
             vars_list = [vars_list]
         name_list = []
         for x in vars_list:
-            if isinstance(x, dict):
-                name_list.append(x['name'])
-            else:
-                name_list.append(x)
+            assert(isinstance(x, dict))
+            name_list.append(x['name'])
         return ', '.join(name_list)
 
     @classmethod

@@ -582,12 +582,10 @@ class CModelDriver(CompiledModelDriver):
             str: Concatentated variables list.
 
         """
-        if not isinstance(vars_list, list):
-            vars_list = [vars_list]
+        assert(isinstance(vars_list, list))
         new_vars_list = []
         for x in vars_list:
-            if not isinstance(x, dict):
-                x = {'name': x}
+            assert(isinstance(x, dict))
             new_vars_list.append(x)
             if cls.get_native_type(**x) == 'char*':
                 new_vars_list.append({'name': x['name'] + '_length'})
@@ -606,67 +604,5 @@ class CModelDriver(CompiledModelDriver):
             str: Concatentated variables list.
 
         """
-        if not isinstance(vars_list, list):
-            vars_list = [vars_list]
-        new_vars_list = []
-        for x in vars_list:
-            if not isinstance(x, dict):
-                x = {'name': x}
-            new_vars_list.append(x)
         return super(CModelDriver, cls).prepare_output_variables(
-            [dict(y, name='&' + y['name']) for y in new_vars_list])
-
-    # @classmethod
-    # def write_model_send(cls, channel, send_var, **kwargs):
-    #     r"""Write a model send call include checking the return flag.
-
-    #     Args:
-    #         channel (str): Name of variable that the channel being sent to
-    #             was stored in.
-    #         send_var (str): Name of variable(s) that is being sent.
-    #         **kwargs: Additional keyword arguments are passed to the parent
-    #             class's method.
-
-    #     Returns:
-    #         list: Lines required to carry out a send call in this language.
-
-    #     """
-    #     new_send_var = []
-    #     if not isinstance(send_var, list):
-    #         send_var = [send_var]
-    #     for x in send_var:
-    #         if not isinstance(x, dict):
-    #             x = {'name': x}
-    #         new_send_var.append(x)
-    #         if cls.get_native_type(**x) == 'char*':
-    #             new_send_var.append({'name': x['name'] + '_length'})
-    #     return super(CModelDriver, cls).write_model_send(channel, new_send_var,
-    #                                                      **kwargs)
-        
-    # @classmethod
-    # def write_model_recv(cls, channel, recv_var, **kwargs):
-    #     r"""Write a model receive call include checking the return flag.
-
-    #     Args:
-    #         channel (str): Name of variable that the channel being received from
-    #             was stored in.
-    #         recv_var (str): Name of variable(s) that the received variable(s)
-    #             should be stored in.
-    #         **kwargs: Additional keyword arguments are passed to the parent
-    #             class's method.
-
-    #     Returns:
-    #         list: Lines required to carry out a receive call in this language.
-
-    #     """
-    #     new_recv_var = []
-    #     if not isinstance(recv_var, list):
-    #         recv_var = [recv_var]
-    #     for x in recv_var:
-    #         if not isinstance(x, dict):
-    #             x = {'name': x}
-    #         new_recv_var.append(x)
-    #         if cls.get_native_type(**x) == 'char*':
-    #             new_recv_var.append({'name': x['name'] + '_length'})
-    #     return super(CModelDriver, cls).write_model_recv(channel, new_recv_var,
-    #                                                      **kwargs)
+            [dict(y, name='&' + y['name']) for y in vars_list])
