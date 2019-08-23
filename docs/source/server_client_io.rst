@@ -43,7 +43,7 @@ that the model will act as a client of the ``<server_model_name>`` model.
 
 
 One Server, Two Clients
-=======================
+-----------------------
 
 There is no limit on the number of clients that can connect to a single 
 server. In the example below, the server is the same as above. The client 
