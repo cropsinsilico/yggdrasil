@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import logging
 from collections import OrderedDict
-from yggdrasil import serialize, backwards
+from yggdrasil import serialize, backwards, platform
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
 from yggdrasil.drivers.CModelDriver import CModelDriver
@@ -220,3 +220,25 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                       and isinstance(pyobj[n][0], backwards.bytes_type)):
                     pyobj[n] = pyobj[n].apply(backwards.as_str)
         return pyobj
+    
+    @classmethod
+    def write_model_wrapper(cls, model_file, model_function, **kwargs):
+        r"""Return the lines required to wrap a model function as an integrated
+        model.
+
+        Args:
+            model_file (str): Full path to the file containing the model
+                function's declaration.
+            model_function (str): Name of the model function.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            list: Lines of code wrapping the provided model with the necessary
+                code to run it as part of an integration.
+
+        """
+        if platform._is_win:  # pragma: windows
+            model_file = model_file.replace('\\', '/')
+        return super(RModelDriver, cls).write_model_wrapper(
+            model_file, model_function, **kwargs)
