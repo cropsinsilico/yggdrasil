@@ -4,6 +4,7 @@ import uuid
 import atexit
 import threading
 import logging
+import numpy as np
 from yggdrasil import backwards, tools, serialize
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
@@ -1016,6 +1017,8 @@ class CommBase(tools.YggClass):
                 out = self.condition_function(msg_in)
             elif self.condition:
                 out = eval(self.condition.replace('%x%', 'msg_in'))
+            if isinstance(out, np.ndarray):
+                out = bool(out)
         assert(isinstance(out, bool))
         return out
         
@@ -1444,6 +1447,7 @@ class CommBase(tools.YggClass):
             args = self.language_driver.language2python(args)
         if not self.evaluate_condition(*args):
             # Return True to indicate success because nothing should be done
+            self.debug("Sent message skipped based on condition: %.100s", str(args))
             return True
         try:
             ret = self.send_multipart(args, **kwargs)
@@ -1670,6 +1674,7 @@ class CommBase(tools.YggClass):
             return (False, None)
         if flag and (not self.evaluate_condition(msg)):
             assert(not self.single_use)
+            self.debug("Recieved message skipped based on condition: %.100s", str(msg))
             return self.recv(*args, **kwargs)
         if self.single_use and self._used:
             self.debug('Linger close on single use')

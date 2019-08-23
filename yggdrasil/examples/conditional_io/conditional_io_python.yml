@@ -8,14 +8,14 @@ models:
 
   - name: python_modelB1
     language: python
-    args: ./src/conditional_io_modelB.py
+    args: ./src/conditional_io_modelB1.py
     function: modelB_function1
     inputs: inputB1
     outputs: outputB1
 
   - name: python_modelB2
     language: python
-    args: ./src/conditional_io_modelB.py
+    args: ./src/conditional_io_modelB2.py
     function: modelB_function2
     inputs: inputB2
     outputs: outputB2
@@ -24,12 +24,15 @@ connections:
   - input: outputA  # Connection between model A output & model B input
     outputs:
       - name: inputB1
-        condition: if %x% <= 2
+        condition: "%x% <= 2"
       - name: inputB2
-        condition_function: ./src/conditional_io_modelB.py:condition_function2
+        condition_function: ./src/conditional_io_modelB2.py:condition_function2
   - input: ./Input/input.txt  # Connection between file and model A input
     output: inputA
-  - input: outputB1  # Connection between model B, function 1 output and file
+    filetype: table
+  - inputs:
+      - outputB1  # Connection between model B, function 1 output and file
+      - outputB2  # Connection between model B, function 2 output and file
     output: ./output.txt
-  - input: outputB2  # Connection between model B, function 2 output and file
-    output: ./output.txt
+    filetype: table
+    format_str: "%lf"
