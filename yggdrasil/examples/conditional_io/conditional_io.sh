@@ -39,5 +39,5 @@ esac
 
 yggrun $yaml
 
-outfile="${TMPDIR}output_conditional_io.txt"
+outfile="output.txt"
 cat $outfile

@@ -926,6 +926,24 @@ def standardize(instance, keys, is_singular=False, suffixes=None, altkeys=None):
                 instance[k][i] = {'name': instance[k][i]}
 
 
+def normalize_condition_function(cond, working_dir):
+    r"""Normalize condition functions which use relative paths.
+
+    Args:
+        cond (str): Condition function expression.
+        working_dir (str): Full path to working directory that
+            should be used to normalized the condition.
+
+    Returns:
+        str: Normalized condition function.
+
+    """
+    mod_file, func_name = cond.split(':', 1)
+    if mod_file.endswith('.py') and (not os.path.isabs(mod_file)):
+        mod_file = os.path.normpath(os.path.join(working_dir, mod_file))
+    return ':'.join([mod_file, func_name])
+
+
 @SchemaRegistry.register_normalizer(tuple())
 def _normalize_root(normalizer, value, instance, schema):
     r"""Decorate normalizer."""
@@ -947,6 +965,9 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
         for io in ['inputs', 'outputs']:
             for x in instance[io]:
                 x.setdefault('working_dir', instance['working_dir'])
+                if 'condition_function' in x:
+                    x['condition_function'] = normalize_condition_function(
+                        x['condition_function'], instance['working_dir'])
     return instance
 
 
@@ -1051,6 +1072,12 @@ def _normalize_connio_first(normalizer, value, instance, schema):
     if isinstance(instance, dict):
         standardize(instance, ['inputs', 'outputs'], suffixes=['_file', '_files'],
                     altkeys=[['from', 'to']])
+        if instance.get('working_dir', False):
+            for io in ['inputs', 'outputs']:
+                for x in instance[io]:
+                    if 'condition_function' in x:
+                        x['condition_function'] = normalize_condition_function(
+                            x['condition_function'], instance['working_dir'])
         # Handle indexed inputs/outputs
         for io in ['inputs', 'outputs']:
             pruned = []
@@ -1234,13 +1261,14 @@ def _normalize_serializer(normalizer, value, instance, schema):
                                      ('connections', 0, 'outputs', 0, 0)])
 def _normalize_datatype(normalizer, value, instance, schema):
     r"""Normalize the datatype if the type information is in the comm."""
-    if isinstance(instance, dict) and ('datatype' not in instance):
-        type_keys = list(metaschema.get_metaschema()['properties'].keys())
-        # Don't include args in type_keys if driver in the instance
-        if ('driver' in instance) and ('args' in type_keys):
-            type_keys.remove('args')
-        datatype = {}
-        migrate_keys(instance, [datatype], include_key_list=type_keys)
-        if datatype:
-            instance['datatype'] = datatype
+    if isinstance(instance, dict):
+        if ('datatype' not in instance):
+            type_keys = list(metaschema.get_metaschema()['properties'].keys())
+            # Don't include args in type_keys if driver in the instance
+            if ('driver' in instance) and ('args' in type_keys):
+                type_keys.remove('args')
+            datatype = {}
+            migrate_keys(instance, [datatype], include_key_list=type_keys)
+            if datatype:
+                instance['datatype'] = datatype
     return instance

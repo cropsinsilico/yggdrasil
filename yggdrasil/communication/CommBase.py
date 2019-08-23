@@ -1012,7 +1012,7 @@ class CommBase(tools.YggClass):
         out = True
         if len(msg_in) == 1:
             msg_in = msg_in[0]
-        if msg_in != self.eof_msg:
+        if not self.is_eof(msg_in):
             if self.condition_function:
                 out = self.condition_function(msg_in)
             elif self.condition:

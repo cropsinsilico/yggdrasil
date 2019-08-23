@@ -112,8 +112,13 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
 
     @property
     def input_files(self):  # pragma: debug
-        r"""list Input files for the run."""
+        r"""list: Input files for the run."""
         return None
+
+    @property
+    def expected_output_files(self):  # pragma: debug
+        r"""list: Examples of expected output for the run."""
+        return self.input_files
 
     @property
     def output_files(self):
@@ -123,14 +128,12 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     @property
     def results(self):
         r"""list: Results that should be found in the output files."""
-        if self.input_files is None:  # pragma: debug
+        if self.expected_output_files is None:  # pragma: debug
             return None
         out = []
-        for fname in self.input_files:
+        for fname in self.expected_output_files:
             assert(os.path.isfile(fname))
-            with open(fname, 'r') as fd:
-                icont = fd.read()
-            out.append(icont)
+            out.append(self.read_file(fname))
         return out
 
     def check_results(self):

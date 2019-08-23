@@ -28,11 +28,15 @@ connections:
       - name: inputB2
         condition_function: ./src/conditional_io_modelB2.py:condition_function2
   - input: ./Input/input.txt  # Connection between file and model A input
-    output: inputA
+    output:
+      - name: inputA
+      # - column: Mass
     filetype: table
   - inputs:
       - outputB1  # Connection between model B, function 1 output and file
       - outputB2  # Connection between model B, function 2 output and file
     output: ./output.txt
     filetype: table
-    format_str: "%lf"
+    field_names: InputMass,Mass
+    field_units: g,g
+    format_str: "%.1lf\t%.1lf\n"

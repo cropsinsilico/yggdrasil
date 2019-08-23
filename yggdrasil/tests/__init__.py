@@ -608,6 +608,36 @@ class YggTestBase(unittest.TestCase):
             out = '%s: %s' % (self.description_prefix, out)
         return out
 
+    def read_file(self, fname):
+        r"""Read in contents from a file.
+
+        Args:
+            fname (str): Full path to the file that should be read.
+
+        Returns:
+            object: File contents.
+
+        """
+        with open(fname, 'r') as fd:
+            out = fd.read()
+        return out
+
+    def assert_equal_file_contents(self, a, b):
+        r"""Assert that the contents of two files are equivalent.
+
+        Args:
+            a (object): Contents of first file for comparison.
+            b (object): Contents of second file for comparison.
+
+        Raises:
+            AssertionError: If the contents are not equal.
+
+        """
+        if a != b:  # pragma: debug
+            odiff = '\n'.join(list(difflib.Differ().compare(a, b)))
+            raise AssertionError(('File contents do not match expected result.'
+                                  'Diff:\n%s') % odiff)
+
     def check_file_exists(self, fname):
         r"""Check that a file exists.
 
@@ -659,12 +689,8 @@ class YggTestBase(unittest.TestCase):
             result (str): Contents of the file.
 
         """
-        with open(fname, 'r') as fd:
-            ocont = fd.read()
-        if ocont != result:  # pragma: debug
-            odiff = '\n'.join(list(difflib.Differ().compare(ocont, result)))
-            raise AssertionError(('File contents do not match expected result.'
-                                  'Diff:\n%s') % odiff)
+        ocont = self.read_file(fname)
+        self.assert_equal_file_contents(ocont, result)
 
     def check_file(self, fname, result):
         r"""Check that a file exists, is the correct size, and has the correct
