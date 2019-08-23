@@ -15,6 +15,7 @@ Welcome to yggdrasil's documentation!
    getting_started
    formatted_io
    server_client_io
+   autowrap
    yaml
    config
    units
