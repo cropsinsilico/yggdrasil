@@ -184,7 +184,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         if self.import_cls.function_param is None:
             self.assert_raises(ValueError, self.import_cls, **kwargs)
         else:
-            kwargs['args'] = ['invalid' + self.import_cls.language_ext[0]]
+            kwargs['args'] = ['invalid']
             self.assert_raises(ValueError, self.import_cls, **kwargs)
             kwargs['args'] = [__file__]
             kwargs['is_server'] = True
