@@ -62,6 +62,11 @@ class TestFileComm(parent.TestCommBase):
         return out
 
     @unittest.skipIf(True, 'File comm')
+    def test_send_recv_condition(self):
+        r"""Test send/recv with conditional."""
+        pass  # pragma: no cover
+    
+    @unittest.skipIf(True, 'File comm')
     def test_send_recv_nolimit(self):
         r"""Disabled: Test send/recv of a large message."""
         pass  # pragma: no cover
