@@ -1,4 +1,5 @@
 import os
+import copy
 import unittest
 from yggdrasil import platform
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
@@ -39,6 +40,21 @@ class TestCModelDriverNoInit(TestCModelParam,
         env = self.import_cls.update_ld_library_path(env)
         self.assert_equal(env['LD_LIBRARY_PATH'], total)
 
+    def get_test_types(self):
+        r"""Return the list of tuples mapping json type to expected native type."""
+        out = super(TestCModelDriverNoInit, self).get_test_types()
+        for i, (k, v) in enumerate(copy.deepcopy(out)):
+            if v == '*':
+                knew = {'type': k, 'subtype': 'float',
+                        'precision': 64}
+                vnew = 'float64_t*'
+                out[i] = (knew, vnew)
+            elif 'X' in v:
+                knew = {'type': k, 'precision': 64}
+                vnew = v.replace('X', '64')
+                out[i] = (knew, vnew)
+        return out
+    
     def test_write_try_except(self, **kwargs):
         r"""Test writing a try/except block."""
         if self.import_cls.language == 'c':
