@@ -856,7 +856,7 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
-            logger.info('Command: "%s"' % ' '.join(cmd))
+            logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = backwards.as_str(output)
@@ -1881,10 +1881,8 @@ class CompiledModelDriver(ModelDriver):
         """
         out = args[0]
         if (not self.is_source_file(out)) and self.source_files:
-            if isinstance(self.source_files, list):
-                out = self.source_files[0]
-            else:
-                out = self.source_files
+            assert(isinstance(self.source_files, list))
+            out = self.source_files[0]
         out = super(CompiledModelDriver, self).get_source_file([out])
         return out
 
