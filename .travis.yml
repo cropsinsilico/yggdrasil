@@ -350,7 +350,6 @@ jobs:
       if: (tag IS present)
       deploy:
         provider: pypi
-        edge: true
         skip_existing: true
         distributions: sdist bdist_wheel --universal
         user: langmm
