@@ -22,15 +22,17 @@ class TestPandasFileComm_single(TestPandasFileComm):
         r"""Get testing options."""
         nele = 5
         dtype = np.dtype(dict(formats=['float'], names=['f0']))
-        arr = np.zeros((nele, ), dtype)
+        arr1 = np.zeros((nele, ), dtype)
+        arr2 = np.ones((nele, ), dtype)
         out = {'kwargs': {},
-               'contents': (b'f0\n' + 2 * nele * b'0.0\n'),
-               'send': [[arr['f0']], [arr['f0']]],
-               'recv': [[np.hstack([arr, arr])['f0']]],
-               'recv_partial': [[[arr['f0']]], [[np.hstack([arr, arr])['f0']]]],
-               'dict': {'f0': arr['f0']}}
+               'contents': (b'f0\n' + nele * b'0.0\n' + nele * b'1.0\n'),
+               'send': [[arr1['f0']], [arr2['f0']]],
+               'recv': [[np.hstack([arr1, arr2])['f0']]],
+               'recv_partial': [[[arr1['f0']]], [[np.hstack([arr1, arr2])['f0']]]],
+               'dict': {'f0': arr1['f0']},
+               'objects': [[arr1['f0']], [arr2['f0']]]}
         out['msg'] = out['send'][0]
-        out['msg_array'] = arr
+        out['msg_array'] = arr1
         return out
 
     def test_send_dict_default(self):

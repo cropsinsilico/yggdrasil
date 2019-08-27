@@ -110,6 +110,21 @@ class TestServerComm(test_CommBase.TestCommBase):
         self.send_instance.close_in_thread()
         self.recv_instance.close_in_thread()
 
+    def add_filter(self, comm, filter=None):
+        r"""Add a filter to a comm.
+
+        Args:
+            comm (CommBase): Communication instance to add a filter to.
+            filter (FilterBase, optional): Filter class. Defaults to None and is ignored.
+
+        """
+        target = comm
+        if comm.comm_class == 'ServerComm':
+            target = comm.icomm
+        elif comm.comm_class == 'ClientComm':
+            target = comm.ocomm
+        return super(TestServerComm, self).add_filter(target, filter=filter)
+        
     # # This dosn't work for comms that are uni-directional
     # def test_purge_recv(self):
     #     r"""Test purging messages from the client comm."""

@@ -27,16 +27,6 @@ definitions:
           - rmq_async
           - zmq
           type: string
-        condition:
-          description: Conditional expression in terms of the value being received/sent
-            (represented by '%x%') that determines whether or not the value will be
-            returned/sent. Defaults to None and is ignored.
-          type: string
-        condition_function:
-          description: Function that should be used to determine if the value being
-            received/sent should be returned/sent. The function should take the value
-            as input and return a boolean. Defaults to None and is ignored.
-          type: function
         datatype:
           default:
             type: bytes
@@ -62,6 +52,13 @@ definitions:
           items:
             type: string
           type: array
+        filter:
+          description: Callable class that will be used to determine when messages
+            should be sent/received. Defaults to None and is ignored.
+          oneOf:
+          - $ref: '#/definitions/filter'
+          - class: yggdrasil.communication.filters.FilterBase:FilterBase
+            type: instance
         name:
           description: Name used for component in log messages.
           type: string
@@ -79,8 +76,8 @@ definitions:
           - string
       required:
       - commtype
-      - datatype
       - name
+      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -203,8 +200,8 @@ definitions:
             type: function
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -356,16 +353,6 @@ definitions:
           description: One or more characters indicating a comment. Defaults to '#
             '.
           type: string
-        condition:
-          description: Conditional expression in terms of the value being received/sent
-            (represented by '%x%') that determines whether or not the value will be
-            returned/sent. Defaults to None and is ignored.
-          type: string
-        condition_function:
-          description: Function that should be used to determine if the value being
-            received/sent should be returned/sent. The function should take the value
-            as input and return a boolean. Defaults to None and is ignored.
-          type: function
         datatype:
           description: JSON schema defining the type of object that the serializer
             will be used to serialize/deserialize. Defaults to default_datatype.
@@ -424,6 +411,13 @@ definitions:
           - table
           - yaml
           type: string
+        filter:
+          description: Callable class that will be used to determine when messages
+            should be sent/received. Defaults to None and is ignored.
+          oneOf:
+          - $ref: '#/definitions/filter'
+          - class: yggdrasil.communication.filters.FilterBase:FilterBase
+            type: instance
         format_str:
           description: If provided, this string will be used to format messages from
             a list of arguments and parse messages to get a list of arguments in C
@@ -509,8 +503,8 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - working_dir
+      - name
       - filetype
       title: file_base
       type: object
@@ -896,6 +890,81 @@ definitions:
         type: object
     description: Schema for file components.
     title: file
+  filter:
+    allOf:
+    - additionalProperties: false
+      dependencies:
+        driver:
+        - args
+      description: Base schema for all subtypes of filter components.
+      properties:
+        filtertype:
+          enum:
+          - function
+          - statement
+        function:
+          description: The handle for a callable Python object (e.g. function) that
+            should be used to determine if a message should be filtered or a string
+            of the form "<function file>:<function name>" identifying a function where
+            "<function file>" is the module or Python file containing the function
+            and "<function name>" is the name of the function. The function should
+            take the message as input and return a boolean, True if the message should
+            pass through the filter, False if it should not.
+          type: function
+        initial_state:
+          description: Dictionary of initial state variables that should be set when
+            the filter is created.
+          type: object
+        statement:
+          description: Python statement in terms of the message as represented by
+            the string "%x%" that should evaluate to a boolean, True if the message
+            should pass through the filter, False if it should not. The statement
+            should only use a limited set of builtins and the math library (See safe_dict
+            attribute). If more complex relationships are required, use the FunctionFilter
+            class.
+          type: string
+      title: filter_base
+      type: object
+    - anyOf:
+      - additionalProperties: true
+        description: Schema for filter component ['statement'] subtype.
+        properties:
+          filtertype:
+            enum:
+            - statement
+          statement:
+            description: Python statement in terms of the message as represented by
+              the string "%x%" that should evaluate to a boolean, True if the message
+              should pass through the filter, False if it should not. The statement
+              should only use a limited set of builtins and the math library (See
+              safe_dict attribute). If more complex relationships are required, use
+              the FunctionFilter class.
+            type: string
+        required:
+        - statement
+        title: StatementFilter
+        type: object
+      - additionalProperties: true
+        description: Schema for filter component ['function'] subtype.
+        properties:
+          filtertype:
+            enum:
+            - function
+          function:
+            description: The handle for a callable Python object (e.g. function) that
+              should be used to determine if a message should be filtered or a string
+              of the form "<function file>:<function name>" identifying a function
+              where "<function file>" is the module or Python file containing the
+              function and "<function name>" is the name of the function. The function
+              should take the message as input and return a boolean, True if the message
+              should pass through the filter, False if it should not.
+            type: function
+        required:
+        - function
+        title: FunctionFilter
+        type: object
+    description: Schema for filter components.
+    title: filter
   model:
     allOf:
     - additionalProperties: false
@@ -1142,10 +1211,10 @@ definitions:
             is used.
           type: string
       required:
+      - args
+      - working_dir
       - name
       - language
-      - working_dir
-      - args
       title: model_base
       type: object
     - anyOf:

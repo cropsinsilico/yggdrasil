@@ -392,6 +392,7 @@ class YggTestBase(unittest.TestCase):
 
     """
 
+    skip_comm_check = False
     attr_list = list()
 
     def __init__(self, *args, **kwargs):
@@ -519,6 +520,8 @@ class YggTestBase(unittest.TestCase):
                 open file descriptors.
 
         """
+        if self.skip_comm_check:
+            return
         self.set_default_comm()
         self.set_utf8_encoding()
         if self.debug_flag:  # pragma: debug
@@ -546,6 +549,8 @@ class YggTestBase(unittest.TestCase):
                 open file descriptors.
 
         """
+        if self.skip_comm_check:
+            return
         self._teardown_complete = True
         x = tools.YggClass('dummy', timeout=self.timeout, sleeptime=self.sleeptime)
         # Give comms time to close

@@ -161,6 +161,26 @@ class ComponentSchema(object):
         self.schema_subtypes = schema_subtypes
         super(ComponentSchema, self).__init__()
 
+    def identify_subtype(self, doc):
+        r"""Identify the subtype associated with a document by validating it
+        against the schemas for the different subtypes.
+
+        Args:
+            doc (dict): JSON object that conforms to one of the component subtypes.
+
+        Returns:
+            str: Name of the subtype that valdiates the provided document.
+
+        """
+        for subtype in self.subtypes:
+            subtype_schema = self.get_subtype_schema(subtype, unique=True)
+            try:
+                metaschema.validate_instance(doc, subtype_schema)
+                return subtype
+            except ValidationError:
+                pass
+        raise ValueError("Could not determine subtype for document: %s" % doc)
+
     def get_subtype_schema(self, subtype, unique=False, relaxed=False):
         r"""Get the schema for the specified subtype.
 
@@ -171,6 +191,8 @@ class ComponentSchema(object):
                 contain properties that are specific to the specified subtype.
                 If subtype is 'base', these will be properties that are valid
                 for all of the registerd subtypes. Defaults to False.
+            relaxed (bool, optional): If True, the schema will allow additional
+                properties. Defaults to False.
 
         Returns:
             dict: Schema for specified subtype.
@@ -196,7 +218,7 @@ class ComponentSchema(object):
                 out['additionalProperties'] = True
                 if 'required' in out:
                     out['required'] = list(set(out['required'])
-                                           - set(self._base_schema['required']))
+                                           - set(self._base_schema.get('required', [])))
                     if not out['required']:
                         del out['required']
                 for k in self._base_schema['properties'].keys():
@@ -926,16 +948,16 @@ def standardize(instance, keys, is_singular=False, suffixes=None, altkeys=None):
                 instance[k][i] = {'name': instance[k][i]}
 
 
-def normalize_condition_function(cond, working_dir):
-    r"""Normalize condition functions which use relative paths.
+def normalize_filter_function(cond, working_dir):
+    r"""Normalize filter functions which use relative paths.
 
     Args:
-        cond (str): Condition function expression.
+        cond (str): Filter function expression.
         working_dir (str): Full path to working directory that
-            should be used to normalized the condition.
+            should be used to normalized the filter.
 
     Returns:
-        str: Normalized condition function.
+        str: Normalized filter function.
 
     """
     mod_file, func_name = cond.split(':', 1)
@@ -965,9 +987,10 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
         for io in ['inputs', 'outputs']:
             for x in instance[io]:
                 x.setdefault('working_dir', instance['working_dir'])
-                if 'condition_function' in x:
-                    x['condition_function'] = normalize_condition_function(
-                        x['condition_function'], instance['working_dir'])
+                x_filter = x.get('filter', None)
+                if isinstance(x_filter, dict) and ('function' in x_filter):
+                    x['filter']['function'] = normalize_filter_function(
+                        x['filter']['function'], instance['working_dir'])
     return instance
 
 
@@ -1075,9 +1098,10 @@ def _normalize_connio_first(normalizer, value, instance, schema):
         if instance.get('working_dir', False):
             for io in ['inputs', 'outputs']:
                 for x in instance[io]:
-                    if 'condition_function' in x:
-                        x['condition_function'] = normalize_condition_function(
-                            x['condition_function'], instance['working_dir'])
+                    x_filter = x.get('filter', None)
+                    if isinstance(x_filter, dict) and ('function' in x_filter):
+                        x['filter']['function'] = normalize_filter_function(
+                            x['filter']['function'], instance['working_dir'])
         # Handle indexed inputs/outputs
         for io in ['inputs', 'outputs']:
             pruned = []

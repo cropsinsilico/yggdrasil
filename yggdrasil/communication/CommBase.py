@@ -4,11 +4,11 @@ import uuid
 import atexit
 import threading
 import logging
-import numpy as np
 from yggdrasil import backwards, tools, serialize
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
-from yggdrasil.components import import_component
+from yggdrasil.communication.filters.FilterBase import FilterBase
+from yggdrasil.components import import_component, create_component
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
@@ -272,13 +272,9 @@ class CommBase(tools.YggClass):
             sent objects. Defaults to None.
         comm (str, optional): The comm that should be created. This only serves
             as a check that the correct class is being created. Defaults to None.
-        condition (str, optional): Conditional expression in terms of the value
-            being received/sent (represented by '%x%') that determines whether or
-            not the value will be returned/sent. Defaults to None and is ignored.
-        condition_function (func, optional): Function that should be used to
-            determine if the value being received/sent should be returned/sent.
-            The function should take the value as input and return a boolean.
-            Defaults to None and is ignored.
+        filter (:class:.FilterBase, optional): Callable class that will be used to
+            determine when messages should be sent/received. Defaults to None
+            and is ignored.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -316,12 +312,8 @@ class CommBase(tools.YggClass):
             comm.
         recv_converter (func): Converter that should be used on received objects.
         send_converter (func): Converter that should be used on sent objects.
-        condition (str): Conditional expression in terms of the value being
-            received/sent (represented by '%x%') that determines whether or not
-            the value will be returned/sent.
-        condition_function (func): Function that should be used to determine if
-            the value being received/sent should be returned/sent. The function
-            should take the value as input and return a boolean.
+        filter (:class:.FilterBase): Callable class that will be used to determine when
+            messages should be sent/received.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -348,8 +340,9 @@ class CommBase(tools.YggClass):
                           'field_units': {'type': 'array',
                                           'items': {'type': 'string'}},
                           'as_array': {'type': 'boolean', 'default': False},
-                          'condition': {'type': 'string'},
-                          'condition_function': {'type': 'function'}}
+                          'filter': {'oneOf': [{'$ref': '#/definitions/filter'},
+                                               {'type': 'instance',
+                                                'class': FilterBase}]}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
@@ -490,10 +483,13 @@ class CommBase(tools.YggClass):
                 cls_conv = getattr(self.language_driver, k + 's')
                 v = cls_conv.get(v, None)
             setattr(self, k, v)
-        # Check condition
-        if self.condition and self.condition_function:
-            raise ValueError("Parameters 'condition' and 'condition_function' "
-                             "cannot be used at the same time.")
+        # Set filter
+        if isinstance(self.filter, dict):
+            from yggdrasil.schema import get_schema
+            filter_schema = get_schema().get('filter')
+            filter_kws = dict(self.filter,
+                              subtype=filter_schema.identify_subtype(self.filter))
+            self.filter = create_component('filter', **filter_kws)
 
     @staticmethod
     def before_registration(cls):
@@ -535,7 +531,8 @@ class CommBase(tools.YggClass):
         out = {'kwargs': out_seri['kwargs'],
                'send': copy.deepcopy(out_seri['objects']),
                'msg': out_seri['objects'][0],
-               'contents': out_seri['contents']}
+               'contents': out_seri['contents'],
+               'objects': out_seri['objects']}
         out['recv'] = copy.deepcopy(out['send'])
         out['dict'] = seri_cls.object2dict(out['msg'], **out['kwargs'])
         if not out_seri.get('exact_contents', True):
@@ -998,27 +995,22 @@ class CommBase(tools.YggClass):
         else:
             return self.send_converter(msg_in)
 
-    def evaluate_condition(self, *msg_in):
-        r"""Evaluate the condition to determine how the message should be
+    def evaluate_filter(self, *msg_in):
+        r"""Evaluate the filter to determine how the message should be
         handled.
 
         Args:
             *msg_in (object): Parts of message being evaluated.
         
         Returns:
-            bool: True if the condition evaluates to True, False otherwise.
+            bool: True if the filter evaluates to True, False otherwise.
 
         """
         out = True
         if len(msg_in) == 1:
             msg_in = msg_in[0]
-        if not self.is_eof(msg_in):
-            if self.condition_function:
-                out = self.condition_function(msg_in)
-            elif self.condition:
-                out = eval(self.condition.replace('%x%', 'msg_in'))
-            if isinstance(out, np.ndarray):
-                out = bool(out)
+        if self.filter and (not self.is_eof(msg_in)):
+            out = self.filter(msg_in)
         assert(isinstance(out, bool))
         return out
         
@@ -1445,9 +1437,9 @@ class CommBase(tools.YggClass):
             raise RuntimeError("This comm is single use and it was already used.")
         if self.language_driver.language2python is not None:
             args = self.language_driver.language2python(args)
-        if not self.evaluate_condition(*args):
+        if not self.evaluate_filter(*args):
             # Return True to indicate success because nothing should be done
-            self.debug("Sent message skipped based on condition: %.100s", str(args))
+            self.debug("Sent message skipped based on filter: %.100s", str(args))
             return True
         try:
             ret = self.send_multipart(args, **kwargs)
@@ -1672,9 +1664,9 @@ class CommBase(tools.YggClass):
         except BaseException:
             self.exception('Failed to recv.')
             return (False, None)
-        if flag and (not self.evaluate_condition(msg)):
+        if flag and (not self.evaluate_filter(msg)):
             assert(not self.single_use)
-            self.debug("Recieved message skipped based on condition: %.100s", str(msg))
+            self.debug("Recieved message skipped based on filter: %.100s", str(msg))
             return self.recv(*args, **kwargs)
         if self.single_use and self._used:
             self.debug('Linger close on single use')

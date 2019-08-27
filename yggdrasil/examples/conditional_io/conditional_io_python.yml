@@ -24,13 +24,14 @@ connections:
   - input: outputA  # Connection between model A output & model B input
     outputs:
       - name: inputB1
-        condition: "%x% <= 2"
+        filter:
+          statement: "%x% <= 2"
       - name: inputB2
-        condition_function: ./src/conditional_io_modelB2.py:condition_function2
+        filter:
+          function: ./src/conditional_io_modelB2.py:condition_function2
   - input: ./Input/input.txt  # Connection between file and model A input
     output:
       - name: inputA
-      # - column: Mass
     filetype: table
   - inputs:
       - outputB1  # Connection between model B, function 1 output and file

@@ -26,7 +26,8 @@ _comptype2mod = {'serializer': 'serialize',
                  'comm': 'communication',
                  'file': 'communication',
                  'model': 'drivers',
-                 'connection': 'drivers'}
+                 'connection': 'drivers',
+                 'filter': 'communication.filters'}
 # 'datatype': ['metaschema', 'datatypes'],
 # 'compiler': 'drivers',
 # 'linker': 'drivers',
@@ -101,7 +102,7 @@ def import_all_components(comptype):
     """
     # Get module and directory
     mod = copy.deepcopy(_comptype2mod[comptype])
-    moddir = copy.deepcopy(_comptype2mod[comptype])
+    moddir = os.path.join(*copy.deepcopy(_comptype2mod[comptype]).split('.'))
     # The next three lines will be required if there are ever any components
     # nested in multiple directories (e.g. metaschema/datatypes)
     # if isinstance(mod, list):
