@@ -287,6 +287,19 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
         fname = self.src[0]
         tool.get_output_file([fname])
 
+    def test_invalid_function_param(self):
+        r"""Test errors raise during class creation when parameters are invalid."""
+        super(TestCompiledModelDriverNoInit, self).test_invalid_function_param()
+        kwargs = dict(self.inst_kwargs)
+        kwargs['name'] = 'test'
+        kwargs['args'] = ['test']
+        kwargs['function'] = 'invalid'
+        kwargs['source_files'] = []
+        # With source_files
+        if self.import_cls.language_ext:
+            kwargs['source_files'] = ['invalid' + self.import_cls.language_ext[0]]
+        self.assert_raises(ValueError, self.import_cls, **kwargs)
+        
 
 class TestCompiledModelDriverNoStart(TestCompiledModelParam,
                                      parent.TestModelDriverNoStart):

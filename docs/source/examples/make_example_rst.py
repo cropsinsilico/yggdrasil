@@ -158,6 +158,7 @@ rst_examples = ['gs_lesson%d' % x for x in range(1, 5)]
 rst_examples.append('gs_lesson4b')  # Special case
 rst_examples += ['formatted_io%d' % x for x in range(1, 10)]
 rst_examples += ['rpc_lesson%d' % x for x in range(1, 3)]
+rst_examples += ['model_function']
 make_toc_file(rst_examples)
 for k in rst_examples:
     make_rst_file(k)

@@ -113,15 +113,22 @@ class ModelDriver(Driver):
         products (list, optional): Paths to files created by the model that
             should be cleaned up when the model exits. Entries can be absolute
             paths or paths relative to the working directory. Defaults to [].
+        function (str, optional): If provided, an integrated model is
+            created by wrapping the function named here. The function must be
+            located within the file specified by the source file listed in the
+            first argument. If not provided, the model must contain it's own
+            calls to the |yggdrasil| interface.
         source_products (list, optional): Files created by running the model
             that are source files. These files will be removed without checking
             their extension so users should avoid adding files to this list
             unless they are sure they should be deleted. Defaults to [].
         is_server (bool, optional): If True, the model is assumed to be a server
             and an instance of :class:`yggdrasil.drivers.ServerDriver`
-            is started. Defaults to False.
-        client_of (str, list, optional): The names of ne or more servers that
-            this model is a client of. Defaults to empty list.
+            is started. Defaults to False. Use of is_server with function is
+            not currently supported.
+        client_of (str, list, optional): The names of one or more servers that
+            this model is a client of. Defaults to empty list. Use of client_of
+            with function is not currently supported.
         overwrite (bool, optional): If True, any existing model products
             (compilation products, wrapper scripts, etc.) are removed prior to
             the run. If False, the products are not removed. Defaults to True.
@@ -203,6 +210,7 @@ class ModelDriver(Driver):
         wrapper_products (list): Files created in order to wrap the model.
         process (:class:`yggdrasil.tools.YggPopen`): Process used to run
             the model.
+        function (str): The name of the model function that should be wrapped.
         is_server (bool): If True, the model is assumed to be a server and an
             instance of :class:`yggdrasil.drivers.ServerDriver` is
             started.
@@ -244,6 +252,7 @@ class ModelDriver(Driver):
         'working_dir': {'type': 'string'},
         'overwrite': {'type': 'boolean', 'default': True},
         'preserve_cache': {'type': 'boolean', 'default': False},
+        'function': {'type': 'string'},
         'is_server': {'type': 'boolean', 'default': False},
         'client_of': {'type': 'array', 'items': {'type': 'string'},
                       'default': []},
@@ -256,8 +265,8 @@ class ModelDriver(Driver):
                            'default': ['--leak-check=full',
                                        '--show-leak-kinds=all'],  # '-v'
                            'items': {'type': 'string'}}}
-    _schema_excluded_from_class = ['name', 'language', 'args',
-                                   'inputs', 'outputs', 'working_dir']
+    _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
+    # 'inputs', 'outputs', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
     language = None
@@ -300,9 +309,8 @@ class ModelDriver(Driver):
                 self.env[k] = os.environ[k]
         if not self.is_installed():
             raise RuntimeError("%s is not installed" % self.language)
-        # Parse arguments
-        self.debug(str(args))
         self.raw_model_file = None
+        self.model_function_file = None
         self.model_file = None
         self.model_args = []
         self.model_dir = None
@@ -310,6 +318,34 @@ class ModelDriver(Driver):
         self.args = args
         self.modified_files = []
         self.wrapper_products = []
+        # Update for function
+        if self.function:
+            if self.function_param is None:
+                raise ValueError(("Language %s is not parameterized "
+                                  "and so functions cannot be automatically "
+                                  "wrapped as a model.") % self.language)
+            self.model_function_file = self.get_source_file(args)
+            if not os.path.isfile(self.model_function_file):
+                raise ValueError("Source file does not exist: '%s'"
+                                 % self.model_function_file)
+            if self.is_server or self.client_of:
+                raise NotImplementedError("Use of is_server or client_of "
+                                          "parameters not currently supported "
+                                          "when using automated wrapping of "
+                                          "model functions.")
+            model_dir, model_base = os.path.split(self.model_function_file)
+            model_base = os.path.splitext(model_base)[0]
+            # Write file
+            args[0] = os.path.join(model_dir, 'ygg_' + model_base
+                                   + self.language_ext[0])
+            lines = self.write_model_wrapper(self.model_function_file,
+                                             self.function,
+                                             inputs=self.inputs,
+                                             outputs=self.outputs)
+            with open(args[0], 'w') as fd:
+                fd.write('\n'.join(lines))
+        # Parse arguments
+        self.debug(str(args))
         self.parse_arguments(args)
         assert(self.model_file is not None)
         # Remove products
@@ -554,7 +590,7 @@ class ModelDriver(Driver):
             out = backwards.as_str(out)
             logger.debug('%s\n%s' % (' '.join(cmd), out))
             return out
-        except (subprocess.CalledProcessError, OSError) as e:
+        except (subprocess.CalledProcessError, OSError) as e:  # pragma: debug
             raise RuntimeError("Could not call command '%s': %s"
                                % (' '.join(cmd), e))
         
@@ -696,6 +732,26 @@ class ModelDriver(Driver):
             if not out:
                 break
             out = import_component('model', x).is_language_installed()
+        return out
+
+    def get_source_file(self, args):
+        r"""Determine the source file based on arguments.
+
+        Args:
+            args (list): Arguments provided.
+
+        Returns:
+            str: Full path to source file select.
+
+        """
+        out = args[0]
+        if (((not self.is_source_file(out))
+             and (self.language_ext is not None)
+             and (os.path.splitext(out)[-1]
+                  not in self.get_all_language_ext()))):
+            out = os.path.splitext(out)[0] + self.language_ext[0]
+        if not os.path.isabs(out):
+            out = os.path.normpath(os.path.join(self.working_dir, out))
         return out
 
     @classmethod
@@ -1071,6 +1127,9 @@ class ModelDriver(Driver):
         r"""Remove compile executable."""
         if self.overwrite:
             self.remove_products()
+        if self.function and os.path.isfile(self.model_src):
+            assert(os.path.basename(self.model_src).startswith('ygg_'))
+            os.remove(self.model_src)
         self.restore_files()
         super(ModelDriver, self).cleanup()
 
@@ -1092,7 +1151,7 @@ class ModelDriver(Driver):
     #     self.debug('')
     #     self.kill_process()
     #     super(ModelDriver, self).do_terminate()
-                
+
     # Methods for automated model wrapping
     @classmethod
     def run_code(cls, lines, **kwargs):
@@ -1115,7 +1174,6 @@ class ModelDriver(Driver):
             fd.write('\n'.join(lines))
         inst = None
         try:
-            # TODO: Run the code
             assert(os.path.isfile(fname))
             inst = cls(name, [fname], working_dir=working_dir)
             inst.run_model(return_process=False)
@@ -1127,7 +1185,225 @@ class ModelDriver(Driver):
                 os.remove(fname)
             if inst is not None:
                 inst.cleanup()
-                
+
+    @classmethod
+    def format_function_param(cls, key, default=None, **kwargs):
+        r"""Return the formatted version of the specified key.
+
+        Args:
+            key (str): Key in cls.function_param mapping that should be
+                formatted.
+            default (str, optional): Format that should be returned if key
+                is not in cls.function_param. Defaults to None.
+            **kwargs: Additional keyword arguments are used in formatting the
+                request function parameter.
+
+        Returns:
+            str: Formatted string.
+
+        Raises:
+            NotImplementedError: If key is not in cls.function_param and default
+                is not set.
+
+        """
+        if (key not in cls.function_param) and (default is None):
+            raise NotImplementedError(("Language %s dosn't have an entry in "
+                                       "function_param for key '%s'")
+                                      % (cls.language, key))
+        return cls.function_param.get(key, default).format(**kwargs)
+
+    @classmethod
+    def write_model_wrapper(cls, model_file, model_function,
+                            inputs=[], outputs=[]):
+        r"""Return the lines required to wrap a model function as an integrated
+        model.
+
+        Args:
+            model_file (str): Full path to the file containing the model
+                function's declaration.
+            model_function (str): Name of the model function.
+            inputs (list, optional): List of model inputs including types.
+                Defaults to [].
+            outputs (list, optional): List of model outputs including types.
+                Defaults to [].
+            TODO: Control flow to treat inputs/output differently
+
+        Returns:
+            list: Lines of code wrapping the provided model with the necessary
+                code to run it as part of an integration.
+
+        """
+        # TODO: Determine how to encode dependencies between variables in models
+        # TODO: Determine how to group variables
+        # TODO: Allow for input/output of tables with multiple columns at a time
+        if cls.function_param is None:
+            raise NotImplementedError("function_param attribute not set for"
+                                      "language '%s'" % cls.language)
+        lines = []
+        flag_var = 'flag'
+        # Declare variables and flag, then define flag
+        free_vars = []
+        if 'declare' in cls.function_param:
+            lines.append(cls.write_declaration(name=flag_var,
+                                               type='flag',
+                                               requires_freeing=free_vars))
+            for x in inputs + outputs:
+                lines.append(cls.write_declaration(requires_freeing=free_vars, **x))
+        lines.append(cls.format_function_param(
+            'define',
+            variable=flag_var,
+            value=cls.function_param['true']))
+        # Declare/define input and output channels
+        for x in inputs:
+            lines.append(cls.format_function_param(
+                'input',
+                channel=(x['name'] + '_input_channel'),
+                channel_name=x['name']))
+        for x in outputs:
+            lines.append(cls.format_function_param(
+                'output',
+                channel=(x['name'] + '_output_channel'),
+                channel_name=x['name']))
+        # Receive inputs before loop
+        for x in inputs:
+            if x.get('outside_loop', False):
+                lines += cls.write_model_recv(x['name'] + '_input_channel',
+                                              x, flag_var=flag_var)
+        # Loop
+        loop_lines = []
+        # Receive inputs
+        for x in inputs:
+            if not x.get('outside_loop', False):
+                loop_lines += cls.write_model_recv(x['name'] + '_input_channel',
+                                                   x, flag_var=flag_var,
+                                                   allow_failure=True)
+        # Call model
+        loop_lines.append(cls.format_function_param(
+            'function_call', flag_var=flag_var, function_name=model_function,
+            input_var=cls.prepare_input_variables(inputs),
+            output_var=cls.prepare_output_variables(outputs)))
+        # Send outputs
+        for x in outputs:
+            if not x.get('outside_loop', False):
+                loop_lines += cls.write_model_send(x['name'] + '_output_channel',
+                                                   x, flag_var=flag_var)
+        # Add loop in while block
+        flag_cond = cls.format_function_param('flag_cond',
+                                              default='{flag_var}',
+                                              flag_var=flag_var)
+        lines += cls.write_while_loop(flag_cond, loop_lines)
+        # Send outputs after loop
+        for x in outputs:
+            if x.get('outside_loop', False):
+                lines += cls.write_model_send(x['name'] + '_output_channel',
+                                              x, flag_var=flag_var)
+        # Free variables
+        for x in free_vars:
+            lines.append(cls.format_function_param(
+                'free', variable=x))
+        # Wrap as executable with interface & model import
+        prefix = []
+        if 'interface' in cls.function_param:
+            ygglib = cls.interface_library
+            if ygglib in cls.internal_libraries:
+                ygglib = cls.internal_libraries[ygglib]['source']
+            prefix.append(cls.format_function_param('interface',
+                                                    interface_library=ygglib))
+        if 'import' in cls.function_param:
+            prefix.append(cls.format_function_param('import',
+                                                    filename=model_file,
+                                                    function=model_function))
+        out = cls.write_executable(lines, prefix=prefix)
+        logger.debug('\n'.join(out))
+        return out
+
+    @classmethod
+    def write_model_recv(cls, channel, recv_var, flag_var='flag',
+                         allow_failure=False):
+        r"""Write a model receive call include checking the return flag.
+
+        Args:
+            channel (str): Name of variable that the channel being received from
+                was stored in.
+            recv_var (str): Name of variable(s) that the received variable(s)
+                should be stored in.
+            flag_var (str, optional): Name of flag variable that the flag should
+                be stored in. Defaults to 'flag',
+            allow_failure (bool, optional): If True, the returned lines will
+                call a break if the flag is False. Otherwise, the returned
+                lines will issue an error. Defaults to False.
+
+        Returns:
+            list: Lines required to carry out a receive call in this language.
+
+        """
+        if cls.function_param is None:
+            raise NotImplementedError("function_param attribute not set for"
+                                      "language '%s'" % cls.language)
+        if not isinstance(recv_var, list):
+            recv_var = [recv_var]
+        recv_var_str = cls.prepare_output_variables(recv_var)
+        recv_num = len(recv_var_str.split(','))
+        lines = [cls.format_function_param(
+            'recv', flag_var=flag_var, channel=channel, recv_num=recv_num,
+            recv_var=recv_var_str)]
+        flag_cond = '%s (%s)' % (
+            cls.function_param['not'],
+            cls.format_function_param('flag_cond', default='{flag_var}',
+                                      flag_var=flag_var))
+        fail_message = "Could not receive %s." % recv_var_str
+        if allow_failure:
+            fail_message += ' End of input.'
+            if_block = [cls.format_function_param('print', message=fail_message),
+                        cls.function_param.get('break', 'break')]
+        else:
+            if_block = [cls.format_function_param('error', error_msg=fail_message)]
+        lines += cls.write_if_block(flag_cond, if_block)
+        return lines
+        
+    @classmethod
+    def write_model_send(cls, channel, send_var, flag_var='flag',
+                         allow_failure=False):
+        r"""Write a model send call include checking the return flag.
+
+        Args:
+            channel (str): Name of variable that the channel being sent to
+                was stored in.
+            send_var (str): Name of variable(s) that is being sent.
+            flag_var (str, optional): Name of flag variable that the flag should
+                be stored in. Defaults to 'flag',
+            allow_failure (bool, optional): If True, the returned lines will
+                call a break if the flag is False. Otherwise, the returned
+                lines will issue an error. Defaults to False.
+
+        Returns:
+            list: Lines required to carry out a send call in this language.
+
+        """
+        if cls.function_param is None:
+            raise NotImplementedError("function_param attribute not set for"
+                                      "language '%s'" % cls.language)
+        if not isinstance(send_var, list):
+            send_var = [send_var]
+        send_var_str = cls.prepare_input_variables(send_var)
+        send_num = len(send_var_str.split(','))
+        lines = [cls.format_function_param(
+            'send', flag_var=flag_var, channel=channel, send_num=send_num,
+            send_var=send_var_str)]
+        flag_cond = '%s (%s)' % (
+            cls.function_param['not'],
+            cls.format_function_param('flag_cond', default='{flag_var}',
+                                      flag_var=flag_var))
+        fail_message = "Could not send %s." % send_var_str
+        if allow_failure:  # pragma: no cover
+            # This is not particularly useful, but is included for completion
+            if_block = [cls.format_function_param('print', message=fail_message),
+                        cls.function_param.get('break', 'break')]
+        else:
+            if_block = [cls.format_function_param('error', error_msg=fail_message)]
+        lines += cls.write_if_block(flag_cond, if_block)
+        return lines
+        
     @classmethod
     def write_executable(cls, lines, prefix=None, suffix=None):
         r"""Return the lines required to complete a program that will run
@@ -1185,7 +1461,101 @@ class ModelDriver(Driver):
             out.append(cls.function_param['exec_suffix'])
             out.append('')
         return out
-                
+
+    @classmethod
+    def get_native_type(cls, **kwargs):
+        r"""Get the native type.
+
+        Args:
+            type (str, optional): Name of |yggdrasil| extended JSON
+                type or JSONSchema dictionary defining a datatype.
+            **kwargs: Additional keyword arguments may be used in determining
+                the precise declaration that should be used.
+
+        Returns:
+            str: The native type.
+
+        """
+        assert('json_type' not in kwargs)
+        json_type = kwargs.get('type', 'bytes')
+        if isinstance(json_type, dict):
+            type_name = json_type['type']
+        else:
+            type_name = json_type
+        if (type_name == 'flag') and (type_name not in cls.type_map):
+            type_name = 'boolean'
+        return cls.type_map[type_name]
+    
+    @classmethod
+    def write_declaration(cls, name, **kwargs):
+        r"""Return the line required to declare a variable with a certain
+        type.
+
+        Args:
+            name (str): Name of variable being declared.
+            **kwargs: Addition keyword arguments are passed to get_native_type.
+
+        Returns:
+            str: The line declaring the variable.
+
+        """
+        type_name = cls.get_native_type(**kwargs)
+        return cls.format_function_param('declare',
+                                         type_name=type_name,
+                                         variable=name)
+
+    @classmethod
+    def prepare_variables(cls, vars_list):
+        r"""Concatenate a set of input variables such that it can be passed as a
+        single string to the function_call parameter.
+
+        Args:
+            vars_list (list): List of variable dictionaries containing info
+                (e.g. names) that should be used to prepare a string representing
+                input/output to/from a function call.
+
+        Returns:
+            str: Concatentated variables list.
+
+        """
+        name_list = []
+        for x in vars_list:
+            assert(isinstance(x, dict))
+            name_list.append(x['name'])
+        return ', '.join(name_list)
+
+    @classmethod
+    def prepare_input_variables(cls, vars_list):
+        r"""Concatenate a set of input variables such that it can be passed as a
+        single string to the function_call parameter.
+
+        Args:
+            vars_list (list): List of variable dictionaries containing info
+                (e.g. names) that should be used to prepare a string representing
+                input to a function call.
+
+        Returns:
+            str: Concatentated variables list.
+
+        """
+        return cls.prepare_variables(vars_list)
+
+    @classmethod
+    def prepare_output_variables(cls, vars_list):
+        r"""Concatenate a set of output variables such that it can be passed as
+        a single string to the function_call parameter.
+
+        Args:
+            vars_list (list): List of variable dictionaries containing info
+                (e.g. names) that should be used to prepare a string representing
+                output from a function call.
+
+        Returns:
+            str: Concatentated variables list.
+
+        """
+        return cls.prepare_variables(vars_list)
+
     @classmethod
     def write_if_block(cls, cond, block_contents):
         r"""Return the lines required to complete a conditional block.
@@ -1204,7 +1574,7 @@ class ModelDriver(Driver):
                                       "language '%s'" % cls.language)
         out = []
         # Opening for statement line
-        out.append(cls.function_param['if_begin'].format(cond=cond))
+        out.append(cls.format_function_param('if_begin', cond=cond))
         # Indent loop contents
         if not isinstance(block_contents, (list, tuple)):
             block_contents = [block_contents]
@@ -1235,8 +1605,9 @@ class ModelDriver(Driver):
                                       "language '%s'" % cls.language)
         out = []
         # Opening for statement line
-        out.append(cls.function_param['for_begin'].format(
-            iter_var=iter_var, iter_begin=iter_begin, iter_end=iter_end))
+        out.append(cls.format_function_param('for_begin', iter_var=iter_var,
+                                             iter_begin=iter_begin,
+                                             iter_end=iter_end))
         # Indent loop contents
         if not isinstance(loop_contents, (list, tuple)):
             loop_contents = [loop_contents]
@@ -1265,7 +1636,7 @@ class ModelDriver(Driver):
                                       "language '%s'" % cls.language)
         out = []
         # Opening for statement line
-        out.append(cls.function_param['while_begin'].format(cond=cond))
+        out.append(cls.format_function_param('while_begin', cond=cond))
         # Indent loop contents
         if not isinstance(loop_contents, (list, tuple)):
             loop_contents = [loop_contents]
@@ -1311,8 +1682,8 @@ class ModelDriver(Driver):
         # Except block contents
         if not isinstance(except_contents, (list, tuple)):
             except_contents = [except_contents]
-        out.append(cls.function_param['try_except'].format(error_var=error_var,
-                                                           error_type=error_type))
+        out.append(cls.format_function_param('try_except', error_var=error_var,
+                                             error_type=error_type))
         for x in except_contents:
             out.append(cls.function_param['indent'] + x)
         # Close block

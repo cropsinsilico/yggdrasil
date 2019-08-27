@@ -1,3 +1,4 @@
+import os
 import sys
 import importlib
 from yggdrasil import tools
@@ -36,18 +37,22 @@ class PythonModelDriver(InterpretedModelDriver):
         'obj': 'ObjDict',
         'schema': 'dict'}
     function_param = {
-        'interface': 'from yggdrasil.interface import YggInterface',
-        'input': '{channel} = YggInterface.YggInput(\"{channel_name}\")',
-        'output': '{channel} = YggInterface.YggOutput(\"{channel_name}\")',
+        'import_nofile': 'import {function}',
+        'import': 'from {filename} import {function}',
+        'interface': 'import {interface_library} as ygg',
+        'input': '{channel} = ygg.YggInput(\'{channel_name}\')',
+        'output': '{channel} = ygg.YggOutput(\'{channel_name}\')',
         'table_input': ('{channel} = YggInterface.YggAsciiTableInput('
                         '\"{channel_name}\")'),
         'table_output': ('{channel} = YggInterface.YggAsciiTableOutput('
                          '\"{channel_name}\", \"{format_str}\")'),
         'recv': '{flag_var}, {recv_var} = {channel}.recv()',
         'send': '{flag_var} = {channel}.send({send_var})',
+        'function_call': '{output_var} = {function_name}({input_var})',
+        'define': '{variable} = {value}',
+        'comment': '#',
         'true': 'True',
         'not': 'not',
-        'comment': '#',
         'indent': 4 * ' ',
         'quote': '\"',
         'print': 'print(\"{message}\")',
@@ -57,6 +62,7 @@ class PythonModelDriver(InterpretedModelDriver):
         'if_begin': 'if ({cond}):',
         'for_begin': 'for {iter_var} in range({iter_begin}, {iter_end}):',
         'while_begin': 'while ({cond}):',
+        'break': 'break',
         'try_begin': 'try:',
         'try_error_type': 'BaseException',
         'try_except': 'except {error_type} as {error_var}:',
@@ -125,3 +131,32 @@ class PythonModelDriver(InterpretedModelDriver):
             from yggdrasil.communication.RMQComm import check_rmq_server
             out = check_rmq_server()
         return out
+
+    @classmethod
+    def format_function_param(cls, key, default=None, **kwargs):
+        r"""Return the formatted version of the specified key.
+
+        Args:
+            key (str): Key in cls.function_param mapping that should be
+                formatted.
+            default (str, optional): Format that should be returned if key
+                is not in cls.function_param. Defaults to None.
+            **kwargs: Additional keyword arguments are used in formatting the
+                request function parameter.
+
+        Returns:
+            str: Formatted string.
+
+        Raises:
+            NotImplementedError: If key is not in cls.function_param and default
+                is not set.
+
+        """
+        if key == 'import':
+            fname = kwargs.get('filename', None)
+            if fname is None:
+                key = 'import_nofile'
+            else:
+                kwargs['filename'] = os.path.splitext(os.path.basename(fname))[0]
+        kwargs['default'] = default
+        return super(PythonModelDriver, cls).format_function_param(key, **kwargs)

@@ -164,7 +164,77 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             return
         # Write code to a file
         self.import_cls.run_code(lines)
-            
+
+    def get_test_types(self):
+        r"""Return the list of tuples mapping json type to expected native type."""
+        if self.import_cls.type_map is None:
+            return []
+        out = list(self.import_cls.type_map.items())
+        if 'flag' not in self.import_cls.type_map:
+            out.append(('flag', self.import_cls.type_map['boolean']))
+        return out
+
+    def test_invalid_function_param(self):
+        r"""Test errors raise during class creation when parameters are invalid."""
+        kwargs = copy.deepcopy(self.inst_kwargs)
+        kwargs['name'] = 'test'
+        kwargs['args'] = ['test']
+        kwargs['function'] = 'invalid'
+        kwargs['source_files'] = []
+        if self.import_cls.function_param is None:
+            self.assert_raises(ValueError, self.import_cls, **kwargs)
+        else:
+            kwargs['args'] = ['invalid']
+            self.assert_raises(ValueError, self.import_cls, **kwargs)
+            kwargs['args'] = [__file__]
+            kwargs['is_server'] = True
+            self.assert_raises(NotImplementedError, self.import_cls, **kwargs)
+                               
+    def test_get_native_type(self):
+        r"""Test translation to native type."""
+        test_vals = self.get_test_types()
+        for a, b in test_vals:
+            self.assert_equal(
+                self.import_cls.get_native_type(type=a), b)
+            if not isinstance(a, dict):
+                self.assert_equal(
+                    self.import_cls.get_native_type(type={'type': a}), b)
+                
+    def test_write_declaration(self):
+        r"""Test write_declaration for all supported native types."""
+        if (((self.import_cls.function_param is None)
+             or ('declare' not in self.import_cls.function_param))):
+            return
+        test_vals = self.get_test_types()
+        for a, b in test_vals:
+            self.import_cls.write_declaration('test', type=a)
+
+    def test_write_model_wrapper(self):
+        r"""Test writing a model based on yaml parameters."""
+        if self.import_cls.function_param is None:
+            self.assert_raises(NotImplementedError,
+                               self.import_cls.write_model_wrapper,
+                               None, None)
+            self.assert_raises(NotImplementedError,
+                               self.import_cls.write_model_recv,
+                               None, None)
+            self.assert_raises(NotImplementedError,
+                               self.import_cls.write_model_send,
+                               None, None)
+        else:
+            inputs = [{'name': 'a', 'type': 'bytes', 'outside_loop': True},
+                      {'name': 'b', 'type': {'type': 'int', 'precision': 64}},
+                      {'name': 'c', 'type': {'type': 'string', 'precision': 10}}]
+            outputs = [{'name': 'y', 'type': {'type': 'float', 'precision': 32}},
+                       {'name': 'z', 'type': 'bytes', 'outside_loop': True},
+                       {'name': 'x', 'type': {'type': 'string', 'precision': 10}}]
+            self.import_cls.write_model_wrapper('test', 'test',
+                                                inputs=inputs,
+                                                outputs=outputs)
+            self.assert_raises(NotImplementedError,
+                               self.import_cls.format_function_param,
+                               'invalid_key')
+        
     def test_write_executable(self):
         r"""Test writing an executable."""
         if self.import_cls.function_param is None:
@@ -197,7 +267,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             lines = []
             if 'declare' in self.import_cls.function_param:
                 lines.append(self.import_cls.function_param['declare'].format(
-                    type='int', name='x'))
+                    type_name='int', variable='x'))
             cond = self.import_cls.function_param['true']
             block_contents = self.import_cls.function_param['assign'].format(
                 name='x', value='1')
@@ -213,9 +283,9 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             lines = []
             if 'declare' in self.import_cls.function_param:
                 lines.append(self.import_cls.function_param['declare'].format(
-                    type='int', name='i'))
+                    type_name='int', variable='i'))
                 lines.append(self.import_cls.function_param['declare'].format(
-                    type='int', name='x'))
+                    type_name='int', variable='x'))
             loop_contents = self.import_cls.function_param['assign'].format(
                 name='x', value='i')
             lines += self.import_cls.write_for_loop('i', 0, 1, loop_contents)
