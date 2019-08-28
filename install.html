@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>Installation &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -94,17 +94,19 @@
 <li class="toctree-l2"><a class="reference internal" href="#user-defined-rapidjson">User Defined rapidjson</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-on-windows">Additional Steps on Windows</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-matlab-models">Additional Steps for Matlab Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-r-models">Additional Steps for R Models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-rabbitmq-message-passing">Additional Steps for RabbitMQ Message Passing</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
@@ -286,8 +288,18 @@ overhead.</p>
 </div>
 <div class="section" id="additional-steps-for-matlab-models">
 <h2>Additional Steps for Matlab Models<a class="headerlink" href="#additional-steps-for-matlab-models" title="Permalink to this headline">¶</a></h2>
-<p>To run Matlab models, you will need an existing Matlab installation and license.
-While yggdrasil can now run Matlab models via the command line, it is still
+<p>To run Matlab models, you will need an existing Matlab installation and license and
+the <code class="docutils literal notranslate"><span class="pre">matlab</span></code> executable must be on your path (i.e. you can call <code class="docutils literal notranslate"><span class="pre">matlab</span></code>
+from the command line and a Matlab interpreter will open). If not already available on
+the command line, you can enable it by adding the location of the executable to
+your path. The executable is usually located within a ‘bin’ directory within the
+directory that Matlab was installed. On Linux/Mac operating systems, this is done
+using the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export PATH=$PATH:&lt;/PATH/TO/MATLAB/bin/&gt;
+</pre></div>
+</div>
+<p>On Windows, this command should already be available.</p>
+<p>While yggdrasil can now run Matlab models via the command line, it is still
 recommended that you install the Matlab engine for Python if you will be running
 Matlab models with yggdrasil frequently as using the engine reduces the time
 added to model startup by starting Matlab.</p>
@@ -296,7 +308,7 @@ install, but should it fail or if you want to use a non-default version of Matla
 you can also do it manually. Instructions for installing the Matlab engine as a
 Python package can be found on the
 <a class="reference external" href="https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html">Mathworks website</a>. Once you have installed the Matlab engine as a python
-package, you can re-configure yggdrasil by calling <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code>. from the comamnd
+package, you can re-configure yggdrasil by calling <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> from the command
 line.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -307,7 +319,7 @@ If you are using an incompatible version, the instructions above for manually
 installing the Matlab engine as a Python package will fail with an error
 message indicating which versions of Python you can use.</p>
 </div>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 38%" />
 <col style="width: 62%" />
@@ -329,6 +341,24 @@ message indicating which versions of Python you can use.</p>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section" id="additional-steps-for-r-models">
+<h2>Additional Steps for R Models<a class="headerlink" href="#additional-steps-for-r-models" title="Permalink to this headline">¶</a></h2>
+<p>To run R models, you will need to install the
+<a class="reference external" href="https://www.r-project.org/">R interpreter</a> and the R packages
+<a class="reference external" href="https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/">reticulate</a>
+package for calling Python from R and
+<a class="reference external" href="install.packages(&quot;zeallot&quot;)">zeallot</a>.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s2">&quot;reticulate&quot;</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s2">&quot;zeallot&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you have issues installing on MacOS, check to make sure that <code class="docutils literal notranslate"><span class="pre">which</span> <span class="pre">ar</span></code> returns
+the system default (<code class="docutils literal notranslate"><span class="pre">/usr/bin/ar</span></code>). If you have another version of <code class="docutils literal notranslate"><span class="pre">ar</span></code>
+installed (e.g. through homebrew’s binutils), it may cause conflicts.</p>
+</div>
 </div>
 <div class="section" id="additional-steps-for-rabbitmq-message-passing">
 <h2>Additional Steps for RabbitMQ Message Passing<a class="headerlink" href="#additional-steps-for-rabbitmq-message-passing" title="Permalink to this headline">¶</a></h2>

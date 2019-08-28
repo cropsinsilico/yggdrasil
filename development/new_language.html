@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Adding Support for a New Language &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>Adding Support for a New Language &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -92,11 +92,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Development</a><ul class="current">
@@ -113,6 +114,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#from-scratch">From Scratch</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#installation-script-optional">Installation Script [OPTIONAL]</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="new_datatype.html">Defining New Datatypes</a></li>
@@ -208,6 +210,8 @@ developers should not have to write a large amount of code.</p>
 their class by defining the following class attributes:</p>
 <p>and the class method <code class="docutils literal notranslate"><span class="pre">is_library_installed</span></code>, which is used to determine if
 dependencies are installed.</p>
+<p>Model drivers should go in the <code class="docutils literal notranslate"><span class="pre">yggdrasil/drivers</span></code> directory and tests should
+go in the <code class="docutils literal notranslate"><span class="pre">yggdrasil/drivers/tests</span></code> directory.</p>
 <div class="section" id="interpreted-languages">
 <h3>Interpreted Languages<a class="headerlink" href="#interpreted-languages" title="Permalink to this headline">¶</a></h3>
 <p>Additional class attributes specific to interpreted model drivers include:</p>
@@ -245,7 +249,12 @@ The behavior of the archiver is defined by these class attributes:</p>
 <p>The second phase of adding support for a new language is to write the language
 interface. This step is more involved than writing the model driver for the
 language, but the majority of the required development will be in the language
-being added.</p>
+being added. Tools required for language support that are not meant to be
+accessed via the yggdrasil Python package (e.g. the language interface or
+conversion functions) should go in specific language directory under
+<cite>yggdrasil/languages</cite> with a name identifying the languagye
+(e.g. <cite>yggdrasil/languages/MATLAB</cite> for the MATLAB interface contains conversion
+functions and the interface classes/functions written in MATLAB).</p>
 <p>For new languages, developers should first do a review to
 identify existing tools for calling code in one of the languages that yggdrasil
 already supports (e.g. the R interface uses the
@@ -307,7 +316,7 @@ usually straight forward (assuming serialization is implemented), but there
 are some communication mechanisms with require some additional features (e.g.
 ZeroMQ). The table below includes some notes on implementing each of the
 supported communication mechanisms.</p>
-<table class="docutils align-center" id="comm-devnotes-table-rst">
+<table class="docutils align-default" id="comm-devnotes-table-rst">
 <colgroup>
 <col style="width: 3%" />
 <col style="width: 32%" />
@@ -403,6 +412,25 @@ deserialize them.</p></li>
 behavior.</p>
 </div>
 </div>
+</div>
+<div class="section" id="installation-script-optional">
+<h2>Installation Script [OPTIONAL]<a class="headerlink" href="#installation-script-optional" title="Permalink to this headline">¶</a></h2>
+<p>If there are additional steps that should be taken during the installation of
+yggdrasil to allow a language to be supported (e.g. installing dependencies
+that are not covered by a Python package manager), developers can add these
+to a script called <code class="docutils literal notranslate"><span class="pre">install.py</span></code> in the directory they create for their language
+under <code class="docutils literal notranslate"><span class="pre">yggdrasil/languages</span></code>. This file should, at minimum, include a function
+called <code class="docutils literal notranslate"><span class="pre">install</span></code> that dosn’t require any input and returns a boolean indicating
+the success or failuer of the additional installation steps. This function can
+also be used to check for the existance of dependencies so that a warning is
+printed during install to advise the user. In addition to the <code class="docutils literal notranslate"><span class="pre">install</span></code> function
+developer can also set a <code class="docutils literal notranslate"><span class="pre">name_in_pragmas</span></code> variable. This should be a string
+that is used to set coverage pragmas that will be ignored during coverage if
+a language will not be set. (e.g. lines marked by <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">pragma:</span> <span class="pre">matlab</span></code> are
+not covered if MATLAB is not supported while lines marked with <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">pragma:</span> <span class="pre">no</span> <span class="pre">matlab</span></code>
+are not covered if MATLAB is installed). If not set, the lower case version of
+the language directory name is assumed for the pragmas. This does not change the
+behavior of the code, only how the coverage report is generated.</p>
 </div>
 </div>
 

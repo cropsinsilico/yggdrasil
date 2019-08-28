@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>yggdrasil.languages.R package &mdash; yggdrasil 0.10.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.10.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>yggdrasil.languages.R package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/yggdrasil.languages.R.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="yggdrasil-languages-r-package">
+<h1>yggdrasil.languages.R package<a class="headerlink" href="#yggdrasil-languages-r-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-yggdrasil.languages.R.install">
+<span id="yggdrasil-languages-r-install-module"></span><h2>yggdrasil.languages.R.install module<a class="headerlink" href="#module-yggdrasil.languages.R.install" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="yggdrasil.languages.R.install.call_R">
+<code class="sig-prename descclassname">yggdrasil.languages.R.install.</code><code class="sig-name descname">call_R</code><span class="sig-paren">(</span><em class="sig-param">R_cmd</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/R/install.html#call_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.R.install.call_R" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call R commands, checking output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>R_cmd</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – List of R commands to run.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to make_call.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if the call was successful, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.languages.R.install.install">
+<code class="sig-prename descclassname">yggdrasil.languages.R.install.</code><code class="sig-name descname">install</code><span class="sig-paren">(</span><em class="sig-param">args=None</em>, <em class="sig-param">with_sudo=None</em>, <em class="sig-param">skip_requirements=None</em>, <em class="sig-param">update_requirements=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/R/install.html#install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.R.install.install" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempt to install the R interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.Namespace" title="(in Python v3.7)"><em>argparse.Namespace</em></a><em>, </em><em>optional</em>) – Arguments parsed from the
+command line. Default to None and is created from sys.argv.</p></li>
+<li><p><strong>with_sudo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the R installation script will be
+called with sudo. Defaults to None and will be set based on args
+and environment variable YGG_USE_SUDO_FOR_R. Only valid for unix
+style operating systems.</p></li>
+<li><p><strong>skip_requirements</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the requirements will not
+be installed. Defaults to None and is set based on if the flag
+‘–skip-r-requirements’ is in args.</p></li>
+<li><p><strong>update_requirements</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the requirements will be
+updated. Defaults to False. Setting this to True, sets
+skip_requirements to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if install succeded, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.languages.R.install.install_packages">
+<code class="sig-prename descclassname">yggdrasil.languages.R.install.</code><code class="sig-name descname">install_packages</code><span class="sig-paren">(</span><em class="sig-param">package_list</em>, <em class="sig-param">update=False</em>, <em class="sig-param">repos=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/R/install.html#install_packages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.R.install.install_packages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Install R packages from CRAN.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>package_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – One or more R packages that should be
+installed.</p></li>
+<li><p><strong>update</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, existing packages will be removed
+and then re-installed. If False, nothing will be done for existing
+packages. Defaults to False.</p></li>
+<li><p><strong>repos</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Mirror where packages should be installed from.
+Defaults to ‘<a class="reference external" href="http://cloud.r-project.org">http://cloud.r-project.org</a>’.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to call_R.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if call was successful, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.languages.R.install.make_call">
+<code class="sig-prename descclassname">yggdrasil.languages.R.install.</code><code class="sig-name descname">make_call</code><span class="sig-paren">(</span><em class="sig-param">R_cmd</em>, <em class="sig-param">with_sudo=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/R/install.html#make_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.R.install.make_call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call command, checking output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>R_cmd</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – List of command line executable to call and any arguments
+that should be passed to it.</p></li>
+<li><p><strong>with_sudo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the R installation script will be
+called with sudo. Defaults to False. Only valid for unix style
+operating systems.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to subprocess.check_output.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if the call was successful, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.languages.R.install.requirements_from_description">
+<code class="sig-prename descclassname">yggdrasil.languages.R.install.</code><code class="sig-name descname">requirements_from_description</code><span class="sig-paren">(</span><em class="sig-param">fname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/R/install.html#requirements_from_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.R.install.requirements_from_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read R requirements from the Imports &amp; Depends sections of the package
+description.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Full path to the description file. Defaults to
+desc_file.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of R requirements from the Imports &amp; Depends sections.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.languages.R.install.restore_makevars">
+<code class="sig-prename descclassname">yggdrasil.languages.R.install.</code><code class="sig-name descname">restore_makevars</code><span class="sig-paren">(</span><em class="sig-param">makevars</em>, <em class="sig-param">old_makevars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/R/install.html#restore_makevars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.R.install.restore_makevars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restore original makevars environemnt variable and remove temporary file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>makevars</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file where the temporary Makevars file
+was written. If None, nothing is done.</p></li>
+<li><p><strong>old_makevars</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file where the old Makevars file
+is as defined by the environment variable R_MAKEVARS_USER.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.languages.R.install.update_argparser">
+<code class="sig-prename descclassname">yggdrasil.languages.R.install.</code><code class="sig-name descname">update_argparser</code><span class="sig-paren">(</span><em class="sig-param">parser=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/R/install.html#update_argparser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.R.install.update_argparser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update argument parser with language specific arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parser</strong> (<a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.7)"><em>argparse.ArgumentParser</em></a><em>, </em><em>optional</em>) – Existing argument parser
+that should be updated. Default to None and a new argument parser
+will be created.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Argument parser with language specific arguments.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.7)">argparse.ArgumentParser</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.languages.R.install.write_makevars">
+<code class="sig-prename descclassname">yggdrasil.languages.R.install.</code><code class="sig-name descname">write_makevars</code><span class="sig-paren">(</span><em class="sig-param">fname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/R/install.html#write_makevars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.R.install.write_makevars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a makevars file with CC, CFLAGS, etc. values set based on the
+environment variables of the same name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Full path to file where the files should be
+saved. Defaults to os.path.join(“~”, “.R”, “Makevars”).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Full path to file where Makevars was written and the</dt><dd><p>file indicated by the previous value of the R_MAKEVARS_USER
+environment variable. None is returned for either/both if a file is
+not written and/or the environment variable wasn’t set.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-yggdrasil.languages.R">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.languages.R" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -5,6 +5,7 @@ Option             Description                                                  
 ================   ================================================================================   ========   =================================
 args               Argument(s) for running the model on the command line.                                        list                             
 client_of          The names of server models that this model is a client of.                                    list                             
+function           The name of the model function that should be wrapped.                                        str                              
 is_server          If True, the model is assumed to be a server and an instance of                               bool                             
                    :class:`yggdrasil.drivers.ServerDriver` is started.                                                                            
 model_args         Runtime arguments for running the model on the command line.                                  list                             

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Input/Output Drivers &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>Input/Output Drivers &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -92,11 +92,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Advanced</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="serialization.html">Serialization</a></li>
@@ -192,7 +193,7 @@
 <h2>File Input Drivers<a class="headerlink" href="#file-input-drivers" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="yggdrasil.drivers.FileInputDriver.FileInputDriver">
-<em class="property">class </em><code class="descclassname">yggdrasil.drivers.FileInputDriver.</code><code class="descname">FileInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FileInputDriver.html#FileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.FileInputDriver.FileInputDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.FileInputDriver.</code><code class="sig-name descname">FileInputDriver</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FileInputDriver.html#FileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.FileInputDriver.FileInputDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class that sends messages read from a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -210,7 +211,7 @@
 <h2>File Output Drivers<a class="headerlink" href="#file-output-drivers" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="yggdrasil.drivers.FileOutputDriver.FileOutputDriver">
-<em class="property">class </em><code class="descclassname">yggdrasil.drivers.FileOutputDriver.</code><code class="descname">FileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FileOutputDriver.html#FileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.FileOutputDriver.FileOutputDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.FileOutputDriver.</code><code class="sig-name descname">FileOutputDriver</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FileOutputDriver.html#FileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.FileOutputDriver.FileOutputDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to handle output of received messages to a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -228,7 +229,7 @@
 <h2>General Input Drivers<a class="headerlink" href="#general-input-drivers" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="yggdrasil.drivers.InputDriver.InputDriver">
-<em class="property">class </em><code class="descclassname">yggdrasil.drivers.InputDriver.</code><code class="descname">InputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InputDriver.html#InputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InputDriver.InputDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.InputDriver.</code><code class="sig-name descname">InputDriver</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InputDriver.html#InputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InputDriver.InputDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Driver for receiving input from another model’s comm via a local comm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -248,7 +249,7 @@ connect to.</p></li>
 <h2>General Output Drivers<a class="headerlink" href="#general-output-drivers" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="yggdrasil.drivers.OutputDriver.OutputDriver">
-<em class="property">class </em><code class="descclassname">yggdrasil.drivers.OutputDriver.</code><code class="descname">OutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/OutputDriver.html#OutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.OutputDriver.OutputDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.OutputDriver.</code><code class="sig-name descname">OutputDriver</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/OutputDriver.html#OutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.OutputDriver.OutputDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Driver for sending output to another model’s comm via a local comm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -268,19 +269,19 @@ connect to.</p></li>
 <h2>RPC Drivers<a class="headerlink" href="#rpc-drivers" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="yggdrasil.drivers.ClientDriver.ClientDriver">
-<em class="property">class </em><code class="descclassname">yggdrasil.drivers.ClientDriver.</code><code class="descname">ClientDriver</code><span class="sig-paren">(</span><em>model_request_name</em>, <em>request_name=None</em>, <em>comm=None</em>, <em>comm_address=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ClientDriver.html#ClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ClientDriver.ClientDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.ClientDriver.</code><code class="sig-name descname">ClientDriver</code><span class="sig-paren">(</span><em class="sig-param">model_request_name</em>, <em class="sig-param">request_name=None</em>, <em class="sig-param">comm=None</em>, <em class="sig-param">comm_address=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ClientDriver.html#ClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ClientDriver.ClientDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for ClientRequestDriver.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.drivers.ServerDriver.ServerDriver">
-<em class="property">class </em><code class="descclassname">yggdrasil.drivers.ServerDriver.</code><code class="descname">ServerDriver</code><span class="sig-paren">(</span><em>model_request_name</em>, <em>request_name=None</em>, <em>comm=None</em>, <em>comm_address=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ServerDriver.html#ServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ServerDriver.ServerDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.ServerDriver.</code><code class="sig-name descname">ServerDriver</code><span class="sig-paren">(</span><em class="sig-param">model_request_name</em>, <em class="sig-param">request_name=None</em>, <em class="sig-param">comm=None</em>, <em class="sig-param">comm_address=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ServerDriver.html#ServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ServerDriver.ServerDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for ServerRequestDriver.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.drivers.RMQClientDriver.RMQClientDriver">
-<em class="property">class </em><code class="descclassname">yggdrasil.drivers.RMQClientDriver.</code><code class="descname">RMQClientDriver</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/RMQClientDriver.html#RMQClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.RMQClientDriver.RMQClientDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.RMQClientDriver.</code><code class="sig-name descname">RMQClientDriver</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/RMQClientDriver.html#RMQClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.RMQClientDriver.RMQClientDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for handling an RMQ client.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -294,7 +295,7 @@ connect to.</p></li>
 
 <dl class="class">
 <dt id="yggdrasil.drivers.RMQServerDriver.RMQServerDriver">
-<em class="property">class </em><code class="descclassname">yggdrasil.drivers.RMQServerDriver.</code><code class="descname">RMQServerDriver</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/RMQServerDriver.html#RMQServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.RMQServerDriver.RMQServerDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.RMQServerDriver.</code><code class="sig-name descname">RMQServerDriver</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/RMQServerDriver.html#RMQServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.RMQServerDriver.RMQServerDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for handling an RMQ server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests.test_timing &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>yggdrasil.tests.test_timing &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -227,7 +228,7 @@
     <span class="n">platform</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">python_ver</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">comm_type</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">dont_use_perf</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">dont_use_pyperf</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">language</span> <span class="o">=</span> <span class="n">_test_lang</span>
     <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span>
@@ -244,7 +245,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for creating a class instance.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;test_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_name</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span>
                 <span class="s1">&#39;platform&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span> <span class="s1">&#39;python_ver&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">python_ver</span><span class="p">,</span>
-                <span class="s1">&#39;comm_type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_type</span><span class="p">,</span> <span class="s1">&#39;dont_use_perf&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_use_perf</span><span class="p">,</span>
+                <span class="s1">&#39;comm_type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_type</span><span class="p">,</span> <span class="s1">&#39;dont_use_pyperf&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_use_pyperf</span><span class="p">,</span>
                 <span class="s1">&#39;max_errors&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_errors</span><span class="p">}</span>
 
     <span class="nd">@property</span>
@@ -308,7 +309,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">base_msg_size</span>
 
 <div class="viewcode-block" id="TestTimedRun.test_json"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_timing.TestTimedRun.test_json">[docs]</a>    <span class="k">def</span> <span class="nf">test_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test loading/saving perf data as json.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test loading/saving pyperf data as json.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_filename</span><span class="p">()</span>
         <span class="n">old_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_raw_data</span><span class="p">()</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">as_json</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -387,10 +388,10 @@
                       <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">nrep</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nrep</span><span class="p">,</span>
                       <span class="n">time_method</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestTimedRun.test_perfjson_to_pandas"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_timing.TestTimedRun.test_perfjson_to_pandas">[docs]</a>    <span class="k">def</span> <span class="nf">test_perfjson_to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test perfjson_to_pandas.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TestTimedRun.test_pyperfjson_to_pandas"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_timing.TestTimedRun.test_pyperfjson_to_pandas">[docs]</a>    <span class="k">def</span> <span class="nf">test_pyperfjson_to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test pyperfjson_to_pandas.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_filename</span><span class="p">()</span>
-        <span class="n">timing</span><span class="o">.</span><span class="n">perfjson_to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span></div>
+        <span class="n">timing</span><span class="o">.</span><span class="n">pyperfjson_to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestTimedRun.test_fits"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_timing.TestTimedRun.test_fits">[docs]</a>    <span class="k">def</span> <span class="nf">test_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test fits to scaling on one platform.&quot;&quot;&quot;</span>
@@ -453,8 +454,8 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the temporary file if it exists.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">perfscript</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">perfscript</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">pyperfscript</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">pyperfscript</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestTimedRunTemp.setup"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_timing.TestTimedRunTemp.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup the file if it exists and then reload.&quot;&quot;&quot;</span>
@@ -474,9 +475,9 @@
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;overwrite&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="TestTimedRunTemp.test_perf_func"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_timing.TestTimedRunTemp.test_perf_func">[docs]</a>    <span class="k">def</span> <span class="nf">test_perf_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test perf_func.&quot;&quot;&quot;</span>
-        <span class="n">timing</span><span class="o">.</span><span class="n">perf_func</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+<div class="viewcode-block" id="TestTimedRunTemp.test_pyperf_func"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_timing.TestTimedRunTemp.test_pyperf_func">[docs]</a>    <span class="k">def</span> <span class="nf">test_pyperf_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test pyperf_func.&quot;&quot;&quot;</span>
+        <span class="n">timing</span><span class="o">.</span><span class="n">pyperf_func</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestTimedRunTemp.test_run_overwrite"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_timing.TestTimedRunTemp.test_run_overwrite">[docs]</a>    <span class="k">def</span> <span class="nf">test_run_overwrite</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test performing a run twice, the second time with ovewrite.&quot;&quot;&quot;</span>
@@ -488,22 +489,22 @@
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">has_entry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_name</span><span class="p">))</span></div></div>
 
 
-<div class="viewcode-block" id="TestTimedRunTempNoPerf"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_timing.TestTimedRunTempNoPerf">[docs]</a><span class="nd">@long_running</span>
-<span class="k">class</span> <span class="nc">TestTimedRunTempNoPerf</span><span class="p">(</span><span class="n">TestTimedRunTemp</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for the TimedRun class using temporary data without perf.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TestTimedRunTempNoPyperf"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_timing.TestTimedRunTempNoPyperf">[docs]</a><span class="nd">@long_running</span>
+<span class="k">class</span> <span class="nc">TestTimedRunTempNoPyperf</span><span class="p">(</span><span class="n">TestTimedRunTemp</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for the TimedRun class using temporary data without pyperf.&quot;&quot;&quot;</span>
 
     <span class="n">_filename</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># This forces use of standard name with .dat extension</span>
-    <span class="n">dont_use_perf</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">dont_use_pyperf</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">description_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;String prefix to prepend docstr test message with.&quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestTimedRunTempNoPerf</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">description_prefix</span>
-        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39; (w/o perf)&#39;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestTimedRunTempNoPyperf</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">description_prefix</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39; (w/o pyperf)&#39;</span>
         <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="TestTimedRunTempNoPerf.test_perf_func"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_timing.TestTimedRunTempNoPerf.test_perf_func">[docs]</a>    <span class="k">def</span> <span class="nf">test_perf_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test perf_func.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TestTimedRunTempNoPyperf.test_pyperf_func"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_timing.TestTimedRunTempNoPyperf.test_pyperf_func">[docs]</a>    <span class="k">def</span> <span class="nf">test_pyperf_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test pyperf_func.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>
 </pre></div>
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.InterpretedModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>yggdrasil.drivers.InterpretedModelDriver &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -166,9 +167,13 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.drivers.InterpretedModelDriver</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">serialize</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">locate_file</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.ModelDriver</span> <span class="k">import</span> <span class="n">ModelDriver</span>
+
+
+<span class="n">_top_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;../&#39;</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="InterpretedModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver">[docs]</a><span class="k">class</span> <span class="nc">InterpretedModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
@@ -206,6 +211,29 @@
 <span class="sd">        interpreter (str): Name or path to the interpreter that will be used.</span>
 <span class="sd">        interpreter_flags (list): Flags that will be passed to the interpreter</span>
 <span class="sd">            when running a model.</span>
+<span class="sd">        path_env_variable (str): Name of the environment variable containing</span>
+<span class="sd">            path information for the interpreter for this language.</span>
+<span class="sd">        paths_to_add (list): Paths that should be added to the path_env_variable</span>
+<span class="sd">            for this language on the process the model is run in.</span>
+<span class="sd">        comm_atexit (function): Function taking a comm instance as input that</span>
+<span class="sd">            performs any necessary operations during exit. If None, no additional</span>
+<span class="sd">            actions are taken.</span>
+<span class="sd">        comm_linger (bool): If True, interface comms will linger during close.</span>
+<span class="sd">            This should only be required if the language will disreguard Python</span>
+<span class="sd">            threads at exit (e.g. when using a Matlab engine).</span>
+<span class="sd">        decode_format (function: Function decoding format string created in this</span>
+<span class="sd">            language. If None, no additional actions are taken.</span>
+<span class="sd">        python2language (function): Function preparing Python objects for</span>
+<span class="sd">            transfer to this language. If None, no additional actions are taken.</span>
+<span class="sd">        language2python (function): Function preparing objects native to this</span>
+<span class="sd">            language for transfer to Python. If None, no additional actions are</span>
+<span class="sd">            taken.</span>
+<span class="sd">        recv_converters (dict): Mapping between the names of message types (e.g.</span>
+<span class="sd">            &#39;array&#39;, &#39;pandas&#39;) and functions that should be used to prepare such</span>
+<span class="sd">            objects for return when they are received.</span>
+<span class="sd">        send_converters (dict): Mapping between the names of message types (e.g.</span>
+<span class="sd">            &#39;array&#39;, &#39;pandas&#39;) and functions that should be used to prepare such</span>
+<span class="sd">            objects for sending.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -217,6 +245,15 @@
     <span class="n">executable_type</span> <span class="o">=</span> <span class="s1">&#39;interpreter&#39;</span>
     <span class="n">default_interpreter</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">default_interpreter_flags</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">path_env_variable</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">paths_to_add</span> <span class="o">=</span> <span class="p">[</span><span class="n">_top_dir</span><span class="p">]</span>
+    <span class="n">comm_atexit</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">comm_linger</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">decode_format</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">python2language</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">language2python</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">recv_converters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pandas&#39;</span><span class="p">:</span> <span class="s1">&#39;pandas&#39;</span><span class="p">}</span>
+    <span class="n">send_converters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pandas&#39;</span><span class="p">:</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2list</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -249,7 +286,9 @@
                                                      <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ka</span><span class="p">)))</span>
             <span class="c1"># Set default interpreter based on language</span>
             <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">default_interpreter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">default_interpreter</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span></div>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">default_interpreter</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span>
+            <span class="c1"># Add directory containing the interface</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">paths_to_add</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_language_dir</span><span class="p">())</span></div>
                     
 <div class="viewcode-block" id="InterpretedModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
@@ -310,7 +349,7 @@
 
 <div class="viewcode-block" id="InterpretedModelDriver.executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.executable_command">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">exec_type</span><span class="o">=</span><span class="s1">&#39;interpreter&#39;</span><span class="p">,</span> <span class="n">unused_kwargs</span><span class="o">=</span><span class="p">{},</span>
-                           <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                           <span class="n">skip_interpreter_flags</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose a command for running a program in this language with the</span>
 <span class="sd">        provied arguments. If not already present, the interpreter command and</span>
 <span class="sd">        interpreter flags are prepended to the provided arguments.</span>
@@ -322,6 +361,11 @@
 <span class="sd">                returned. If &#39;interpreter&#39;, a command using the interpreter is</span>
 <span class="sd">                returned and if &#39;direct&#39;, the raw args being provided are</span>
 <span class="sd">                returned. Defaults to &#39;interpreter&#39;.</span>
+<span class="sd">            skip_interpreter_flags (bool, optional): If True, interpreter flags</span>
+<span class="sd">                will not be added to the command after the interpreter. Defaults</span>
+<span class="sd">                to False. Interpreter flags will not be added, reguardless of</span>
+<span class="sd">                this keyword, if the first element of args is already an</span>
+<span class="sd">                interpreter.</span>
 <span class="sd">            unused_kwargs (dict, optional): Existing dictionary that unused</span>
 <span class="sd">                keyword arguments should be added to. Defaults to {}.</span>
 <span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
@@ -337,14 +381,31 @@
         <span class="n">ext</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language_ext</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">exec_type</span> <span class="o">==</span> <span class="s1">&#39;interpreter&#39;</span><span class="p">:</span>
-            <span class="c1"># if (((cls.language not in args[0])</span>
-            <span class="k">if</span> <span class="p">(((</span><span class="n">tools</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-                 <span class="ow">or</span> <span class="nb">any</span><span class="p">([</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ext</span><span class="p">]))):</span>
-                <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_interpreter</span><span class="p">()]</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_interpreter_flags</span><span class="p">()</span> <span class="o">+</span> <span class="n">args</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_interpreter</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">new_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_interpreter</span><span class="p">()]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_interpreter_flags</span><span class="p">:</span>
+                    <span class="n">new_args</span> <span class="o">+=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_interpreter_flags</span><span class="p">()</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">new_args</span> <span class="o">+</span> <span class="n">args</span>
         <span class="k">elif</span> <span class="n">exec_type</span> <span class="o">!=</span> <span class="s1">&#39;direct&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid exec_type &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">exec_type</span><span class="p">)</span>
         <span class="n">unused_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">args</span></div>
+
+<div class="viewcode-block" id="InterpretedModelDriver.is_interpreter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.is_interpreter">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_interpreter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a command line argument is an interpreter.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cmd (str): Command that should be checked.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the command is an interpreter, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># (cls.language not in cmd)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">((</span><span class="n">tools</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+               <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">cmd</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language_ext</span><span class="p">])))</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="InterpretedModelDriver.configure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.configure">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
@@ -359,12 +420,29 @@
 <span class="sd">                be set.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">ModelDriver</span><span class="o">.</span><span class="n">configure</span><span class="o">.</span><span class="vm">__func__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
         <span class="c1"># Locate executable</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_language_installed</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
             <span class="n">fpath</span> <span class="o">=</span> <span class="n">locate_file</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language_executable</span><span class="p">())</span>
             <span class="k">if</span> <span class="n">fpath</span><span class="p">:</span>
                 <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;interpreter&#39;</span><span class="p">,</span> <span class="n">fpath</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+    
+<div class="viewcode-block" id="InterpretedModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Environment variables for the model process.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_env</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_env_variable</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">!=</span> <span class="s1">&#39;matlab&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                    <span class="p">(</span><span class="s2">&quot;Language </span><span class="si">%s</span><span class="s2"> sets path_env_variable. &quot;</span>
+                     <span class="s2">&quot;Move part of MatlabModelDriver set_env method &quot;</span>
+                     <span class="s2">&quot;to InterpretedModelDriver in place of this &quot;</span>
+                     <span class="s2">&quot;warning message.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 

@@ -42,8 +42,14 @@ TODO
 * Add datatypes example that is automated for all registered languages and tests sending/receiving all supported datatypes
 * Simplify input arguments to connection drivers to match schema
 * Streamline normalization to speed it up
+* Add automation of example code generation
+* autodoc for R
+* testing for R native functions
+* improve speed of validation
 * Add papers section for listing publication using yggdrasil
 * Split ld off as its own linker
 * Add comm for using files as temporary storage in passing information between models
 * Change cmake to be a C/C++ compiler rather than a separate language with its own driver
 * Add forwarding of format string to forked output
+* Add contributing guide with reference to ``ygginfo``
+* Run connections on separate processes instead of threads

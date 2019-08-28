@@ -1,6 +1,28 @@
 formatted_io9 Example
 =====================
 
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io9/src/formatted_io9_modelB.m
+   :language: matlab
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io9/src/formatted_io9_modelA.m
+   :language: matlab
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io9/formatted_io9_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+
 Python Version
 --------------
 
@@ -23,23 +45,23 @@ Model YAML:
 
 
 
-Matlab Version
---------------
+R Version
+---------
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io9/src/formatted_io9_modelA.m
-   :language: matlab
+.. literalinclude:: /../../yggdrasil/examples/formatted_io9/src/formatted_io9_modelB.R
+   :language: python
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io9/src/formatted_io9_modelB.m
-   :language: matlab
+.. literalinclude:: /../../yggdrasil/examples/formatted_io9/src/formatted_io9_modelA.R
+   :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io9/formatted_io9_matlab.yml
+.. literalinclude:: /../../yggdrasil/examples/formatted_io9/formatted_io9_r.yml
    :language: yaml
    :linenos:
 

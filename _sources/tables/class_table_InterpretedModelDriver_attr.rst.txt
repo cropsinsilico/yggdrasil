@@ -1,8 +1,17 @@
 .. _class_table_InterpretedModelDriver_attr_rst:
 
-=================   ================================================================================   ========   ====
-Option              Description                                                                        Required   Type
-=================   ================================================================================   ========   ====
-interpreter         Name or path to the interpreter that will be used.                                            str 
-interpreter_flags   Flags that will be passed to the interpreter when running a model.                            list
-=================   ================================================================================   ========   ====
+=================   ================================================================================   ========   ========
+Option              Description                                                                        Required   Type    
+=================   ================================================================================   ========   ========
+comm_atexit         Function taking a comm instance as input that performs any necessary operations               function
+                    during exit. If None, no additional actions are taken.                                                
+comm_linger         If True, interface comms will linger during close. This should only be required               bool    
+                    if the language will disreguard Python threads at exit (e.g. when using a Matlab                      
+                    engine).                                                                                              
+interpreter         Name or path to the interpreter that will be used.                                            str     
+interpreter_flags   Flags that will be passed to the interpreter when running a model.                            list    
+path_env_variable   Name of the environment variable containing path information for the interpreter              str     
+                    for this language.                                                                                    
+paths_to_add        Paths that should be added to the path_env_variable for this language on the                  list    
+                    process the model is run in.                                                                          
+=================   ================================================================================   ========   ========

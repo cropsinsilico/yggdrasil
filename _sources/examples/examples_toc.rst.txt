@@ -19,4 +19,5 @@ Examples
    formatted_io9
    rpc_lesson1
    rpc_lesson2
+   model_function
 

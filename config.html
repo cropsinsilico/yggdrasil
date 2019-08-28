@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration Files &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>Configuration Files &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -92,7 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration Files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#debug-options">Debug Options</a></li>
@@ -107,6 +107,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
@@ -205,7 +206,7 @@ These include:</p>
 <li><p><strong>DEBUG:</strong> Print messages logged as debug, info, warning, error, or critical.</p></li>
 </ul>
 <p>The debug options are:</p>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 11%" />
@@ -241,7 +242,7 @@ yggdrasil calls from the models.</p></td>
 <p>Each supported language has a dedicated section in the config file with
 options that control how models of that language will be handled. The
 following options are available to all languages:</p>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 79%" />
@@ -266,7 +267,7 @@ for isolating languages for testing.</p></td>
 </tbody>
 </table>
 <p>Options available for all compiled languages include:</p>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 79%" />
@@ -304,7 +305,7 @@ archiver.</p></td>
 </tbody>
 </table>
 <p>Options available for all interpreted languages include:x</p>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 25%" />
 <col style="width: 75%" />
@@ -334,7 +335,7 @@ use an alternate version than the one identified by yggdrasil, it may
 be necessary for you to manually specify the location of dependency
 headers and/or libraries. These can be set using the following config
 options.</p>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 25%" />
 <col style="width: 75%" />
@@ -366,7 +367,7 @@ headers.</p></td>
 </div>
 <div class="section" id="matlab-options">
 <h3>Matlab Options<a class="headerlink" href="#matlab-options" title="Permalink to this headline">¶</a></h3>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 26%" />
 <col style="width: 74%" />
@@ -407,7 +408,7 @@ used to speedup reporting of the version.</p></td>
 <p>Options in the ‘[RMQ]’ section control the behavior of RabbitMQ connections.
 If the option is left blank, the default RabbitMQ option is used.
 These include:</p>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 14%" />
 <col style="width: 14%" />
@@ -448,7 +449,7 @@ These include:</p>
 <p>Options in the ‘[parallel]’ section control the behavior of parallelization.
 Although, not supported in the current version of yggdrasil, these
 include:</p>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 15%" />
 <col style="width: 11%" />

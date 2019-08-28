@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.examples.tests &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>yggdrasil.examples.tests &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -165,19 +166,47 @@
             
   <h1>Source code for yggdrasil.examples.tests</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">six</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">ComponentMeta</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">runner</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.examples</span> <span class="k">import</span> <span class="n">yamls</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">ext_map</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">YggTestBase</span>
 
 
 <span class="n">_ext2lang</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ext_map</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="n">_test_registry</span> <span class="o">=</span> <span class="p">{}</span>
 
 
-<div class="viewcode-block" id="TestExample"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.TestExample">[docs]</a><span class="k">class</span> <span class="nc">TestExample</span><span class="p">(</span><span class="n">YggTestBase</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">):</span>
+<div class="viewcode-block" id="make_lang_test"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.make_lang_test">[docs]</a><span class="k">def</span> <span class="nf">make_lang_test</span><span class="p">(</span><span class="n">lang</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">itest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_language</span><span class="p">(</span><span class="n">lang</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">itest</span></div>
+
+
+<div class="viewcode-block" id="ExampleMeta"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleMeta">[docs]</a><span class="k">class</span> <span class="nc">ExampleMeta</span><span class="p">(</span><span class="n">ComponentMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dct</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;example_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">():</span>
+                <span class="n">itest_name</span> <span class="o">=</span> <span class="s1">&#39;test_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">l</span>
+                <span class="k">if</span> <span class="n">itest_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dct</span><span class="p">:</span>
+                    <span class="n">itest_func</span> <span class="o">=</span> <span class="n">make_lang_test</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+                    <span class="n">itest_func</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">itest_name</span>
+                    <span class="n">dct</span><span class="p">[</span><span class="n">itest_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">itest_func</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ExampleMeta</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">example_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">global</span> <span class="n">_test_registry</span>
+            <span class="n">_test_registry</span><span class="p">[</span><span class="n">out</span><span class="o">.</span><span class="n">example_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     out = unittest.skipIf(True, &quot;Test uninitialized.&quot;)(out)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="ExampleTstBase"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase">[docs]</a><span class="nd">@six</span><span class="o">.</span><span class="n">add_metaclass</span><span class="p">(</span><span class="n">ExampleMeta</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ExampleTstBase</span><span class="p">(</span><span class="n">YggTestBase</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for running examples.&quot;&quot;&quot;</span>
 
     <span class="n">example_name</span> <span class="o">=</span> <span class="kc">None</span>
@@ -190,7 +219,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">runner</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># self.debug_flag = True</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestExample</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ExampleTstBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">description_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -271,7 +300,7 @@
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">icont</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="TestExample.check_results"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.TestExample.check_results">[docs]</a>    <span class="k">def</span> <span class="nf">check_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ExampleTstBase.check_results"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.check_results">[docs]</a>    <span class="k">def</span> <span class="nf">check_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;This should be overridden with checks for the result.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_files</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
@@ -285,10 +314,10 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
                 <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">fout</span><span class="p">,</span> <span class="o">*</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">check_file_size</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">check_file_size</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">check_file_contents</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestExample.run_example"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.TestExample.run_example">[docs]</a>    <span class="k">def</span> <span class="nf">run_example</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ExampleTstBase.run_example"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.run_example">[docs]</a>    <span class="k">def</span> <span class="nf">run_example</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;This runs an example in the correct language.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaml</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -323,60 +352,28 @@
                 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">makefile</span><span class="p">):</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">makefile</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestExample.cleanup"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.TestExample.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ExampleTstBase.cleanup"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup files created during the test.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yaml</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">fout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_files</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fout</span><span class="p">):</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestExample.test_all"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.TestExample.test_all">[docs]</a>    <span class="k">def</span> <span class="nf">test_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ExampleTstBase.run_language"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.run_language">[docs]</a>    <span class="k">def</span> <span class="nf">run_language</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lang</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run a test for the specified language.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">check_environ_bool</span><span class="p">(</span><span class="s1">&#39;YGG_ENABLE_EXAMPLE_TESTS&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="s2">&quot;Example tests not enabled.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">lang</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ExampleTstBase.test_all"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.test_all">[docs]</a>    <span class="k">def</span> <span class="nf">test_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the version of the example that uses all languages.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_language</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestExample.test_all_nomatlab"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.TestExample.test_all_nomatlab">[docs]</a>    <span class="k">def</span> <span class="nf">test_all_nomatlab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ExampleTstBase.test_all_nomatlab"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.test_all_nomatlab">[docs]</a>    <span class="k">def</span> <span class="nf">test_all_nomatlab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the version of the example that uses all languages.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;all_nomatlab&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div>
-
-<div class="viewcode-block" id="TestExample.test_python"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.TestExample.test_python">[docs]</a>    <span class="k">def</span> <span class="nf">test_python</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the Python version of the example.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;python&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div>
-
-<div class="viewcode-block" id="TestExample.test_c"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.TestExample.test_c">[docs]</a>    <span class="k">def</span> <span class="nf">test_c</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the C version of the example.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;c&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div>
-
-<div class="viewcode-block" id="TestExample.test_cpp"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.TestExample.test_cpp">[docs]</a>    <span class="k">def</span> <span class="nf">test_cpp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the C++ version of the example.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;cpp&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div>
-
-<div class="viewcode-block" id="TestExample.test_make"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.TestExample.test_make">[docs]</a>    <span class="k">def</span> <span class="nf">test_make</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the Make version of the example.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;make&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div>
-
-<div class="viewcode-block" id="TestExample.test_cmake"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.TestExample.test_cmake">[docs]</a>    <span class="k">def</span> <span class="nf">test_cmake</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the CMake version of the example.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;cmake&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div>
-
-<div class="viewcode-block" id="TestExample.test_matlab"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.TestExample.test_matlab">[docs]</a>    <span class="k">def</span> <span class="nf">test_matlab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the Matlab version of the example.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;matlab&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_language</span><span class="p">(</span><span class="s1">&#39;all_nomatlab&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

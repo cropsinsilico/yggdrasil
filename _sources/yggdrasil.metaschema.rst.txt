@@ -6,9 +6,9 @@ Subpackages
 
 .. toctree::
 
-    yggdrasil.metaschema.datatypes
-    yggdrasil.metaschema.properties
-    yggdrasil.metaschema.tests
+   yggdrasil.metaschema.datatypes
+   yggdrasil.metaschema.properties
+   yggdrasil.metaschema.tests
 
 Submodules
 ----------
@@ -17,23 +17,23 @@ yggdrasil.metaschema.encoder module
 -----------------------------------
 
 .. automodule:: yggdrasil.metaschema.encoder
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.metaschema.normalizer module
 --------------------------------------
 
 .. automodule:: yggdrasil.metaschema.normalizer
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 
 Module contents
 ---------------
 
 .. automodule:: yggdrasil.metaschema
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

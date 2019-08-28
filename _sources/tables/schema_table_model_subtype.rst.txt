@@ -3,6 +3,7 @@
 ==========   ================================================================================   =======
 Language     Description                                                                        Aliases
 ==========   ================================================================================   =======
+R            Model is written in R.                                                             ['r']  
 c            Model is written in C.                                                                    
 c++          Model is written in C++.                                                           ['cpp']
 cmake        Model is written in C/C++ and has a CMake build system.                                   

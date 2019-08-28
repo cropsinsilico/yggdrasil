@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.languages &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>yggdrasil.languages &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
@@ -165,6 +166,7 @@
             
   <h1>Source code for yggdrasil.languages</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
 
 
 <span class="n">_lang_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
@@ -193,6 +195,32 @@
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">idir</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">idir</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not determine directory for the language: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">lang</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_language_ext"><a class="viewcode-back" href="../../yggdrasil.languages.html#yggdrasil.languages.get_language_ext">[docs]</a><span class="k">def</span> <span class="nf">get_language_ext</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the file extension associated with the requirested language.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lang (str): Programming language that extension should be returned for.</span>
+<span class="sd">        default (str, optional): Extension that should be returned if no</span>
+<span class="sd">            extensions are registered for the language. Defaults to None and</span>
+<span class="sd">            an error will be raised if there are not any extensions associated</span>
+<span class="sd">            with the language.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The most common extension associated with the specified language.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If there are not any executables associated with a language.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+    <span class="n">all_ext</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">get_language_ext</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">all_ext</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">default</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No extension associated with language: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">lang</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">all_ext</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 </pre></div>
 
            </div>

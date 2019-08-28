@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to yggdrasil’s documentation! &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>Welcome to yggdrasil’s documentation! &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -91,11 +91,12 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
@@ -178,6 +179,7 @@
 <li class="toctree-l2"><a class="reference internal" href="install.html#user-defined-rapidjson">User Defined rapidjson</a></li>
 <li class="toctree-l2"><a class="reference internal" href="install.html#additional-steps-on-windows">Additional Steps on Windows</a></li>
 <li class="toctree-l2"><a class="reference internal" href="install.html#additional-steps-for-matlab-models">Additional Steps for Matlab Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#additional-steps-for-r-models">Additional Steps for R Models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="install.html#additional-steps-for-rabbitmq-message-passing">Additional Steps for RabbitMQ Message Passing</a></li>
 </ul>
 </li>
@@ -203,9 +205,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="server_client_io.html#one-server-one-client">One Server, One Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="yaml.html#model-options">Model Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="yaml.html#communication-options">Communication Options</a></li>
@@ -226,6 +229,11 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html#tips-for-debugging">Tips for Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html#possible-errors">Possible Errors</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="examples/gs_lesson1.html">gs_lesson1 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/gs_lesson2.html">gs_lesson2 Example</a></li>
@@ -243,6 +251,7 @@
 <li class="toctree-l2"><a class="reference internal" href="examples/formatted_io9.html">formatted_io9 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/rpc_lesson1.html">rpc_lesson1 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/rpc_lesson2.html">rpc_lesson2 Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/model_function.html">model_function Example</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a><ul>

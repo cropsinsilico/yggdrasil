@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests.test_CompiledModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_CompiledModelDriver &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -387,6 +388,18 @@
         <span class="n">deps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_order</span><span class="p">(</span><span class="n">deps</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="TestCompiledModelDriverNoInit.test_get_flags"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompiledModelDriverNoInit.test_get_flags">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_flags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_flags.&quot;&quot;&quot;</span>
+        <span class="n">compiler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">compiler</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">compiler</span><span class="o">.</span><span class="n">combine_with_linker</span>
+                 <span class="ow">or</span> <span class="n">compiler</span><span class="o">.</span><span class="n">no_separate_linking</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">compiler</span><span class="p">,</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="n">invalid_kw</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                   <span class="n">unused_kwargs</span><span class="o">=</span><span class="p">{},</span>
+                                                   <span class="n">libraries</span><span class="o">=</span><span class="p">[]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_flags</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="TestCompiledModelDriverNoInit.test_get_linker_flags"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompiledModelDriverNoInit.test_get_linker_flags">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_linker_flags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_linker_flags.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;archiver&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
@@ -441,8 +454,21 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_output_file.&quot;&quot;&quot;</span>
         <span class="n">tool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">src</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">tool</span><span class="o">.</span><span class="n">get_output_file</span><span class="p">([</span><span class="n">fname</span><span class="p">])</span></div></div>
+        <span class="n">tool</span><span class="o">.</span><span class="n">get_output_file</span><span class="p">([</span><span class="n">fname</span><span class="p">])</span></div>
 
+<div class="viewcode-block" id="TestCompiledModelDriverNoInit.test_invalid_function_param"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompiledModelDriverNoInit.test_invalid_function_param">[docs]</a>    <span class="k">def</span> <span class="nf">test_invalid_function_param</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test errors raise during class creation when parameters are invalid.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestCompiledModelDriverNoInit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_invalid_function_param</span><span class="p">()</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;invalid&#39;</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;source_files&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># With source_files</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">language_ext</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;source_files&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;invalid&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">language_ext</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        
 
 <div class="viewcode-block" id="TestCompiledModelDriverNoStart"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompiledModelDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestCompiledModelDriverNoStart</span><span class="p">(</span><span class="n">TestCompiledModelParam</span><span class="p">,</span>
                                      <span class="n">parent</span><span class="o">.</span><span class="n">TestModelDriverNoStart</span><span class="p">):</span>

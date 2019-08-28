@@ -1,6 +1,28 @@
 formatted_io8 Example
 =====================
 
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io8/src/formatted_io8_modelB.m
+   :language: matlab
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io8/src/formatted_io8_modelA.m
+   :language: matlab
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io8/formatted_io8_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+
 Python Version
 --------------
 
@@ -23,23 +45,23 @@ Model YAML:
 
 
 
-Matlab Version
---------------
+R Version
+---------
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io8/src/formatted_io8_modelA.m
-   :language: matlab
+.. literalinclude:: /../../yggdrasil/examples/formatted_io8/src/formatted_io8_modelB.R
+   :language: python
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io8/src/formatted_io8_modelB.m
-   :language: matlab
+.. literalinclude:: /../../yggdrasil/examples/formatted_io8/src/formatted_io8_modelA.R
+   :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io8/formatted_io8_matlab.yml
+.. literalinclude:: /../../yggdrasil/examples/formatted_io8/formatted_io8_r.yml
    :language: yaml
    :linenos:
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tools &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>yggdrasil.tools &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
@@ -260,6 +261,57 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">valid_values</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">get_conda_prefix</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the conda path prefix for the current environment.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Full path to the directory prefix used for the current conda</span>
+<span class="sd">            environment if one exits. If conda cannot be located, None is</span>
+<span class="sd">            returned.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">conda_prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CONDA_PREFIX&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="c1"># This part should be enabled if the conda base enviroment dosn&#39;t have</span>
+    <span class="c1"># CONDA_PREFIX set. Older version of conda behaved this way so it is</span>
+    <span class="c1"># possible that a future release will as well.</span>
+    <span class="c1"># if not conda_prefix:</span>
+    <span class="c1">#     conda_prefix = which(&#39;conda&#39;)</span>
+    <span class="c1">#     if conda_prefix is not None:</span>
+    <span class="c1">#         conda_prefix = os.path.dirname(os.path.dirname(conda_prefix))</span>
+    <span class="k">return</span> <span class="n">conda_prefix</span>
+
+
+<span class="k">def</span> <span class="nf">get_conda_env</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the name of the current conda environment.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Name of the current conda environment if one is activated. If a</span>
+<span class="sd">            conda environment is not activated, None is returned.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CONDA_DEFAULT_ENV&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_subprocess_language</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the language of the calling process.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Name of the programming language responsible for the subprocess.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_MODEL_LANGUAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;python&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_subprocess_language_driver</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the driver for the langauge of the calling process.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ModelDriver: Class used to handle running a model of the process language.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">get_subprocess_language</span><span class="p">())</span>
+
+
 <span class="k">def</span> <span class="nf">is_subprocess</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the current process is a subprocess.</span>
 
@@ -296,6 +348,10 @@
 <span class="sd">        str: Path to executable if it can be located. Otherwise, None.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">program</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.exe&#39;</span><span class="p">)):</span>  <span class="c1"># pragma: windows</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">which</span><span class="p">(</span><span class="n">program</span> <span class="o">+</span> <span class="s1">&#39;.exe&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">out</span>
     <span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
         <span class="k">def</span> <span class="nf">is_exe</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">)</span>
@@ -358,6 +414,10 @@
     <span class="n">out</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subtypes</span>
     <span class="k">if</span> <span class="s1">&#39;c++&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
         <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;c++&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s1">&#39;cpp&#39;</span>
+    <span class="c1"># if &#39;R&#39; in out:</span>
+    <span class="c1">#     out[out.index(&#39;R&#39;)] = &#39;r&#39;</span>
+    <span class="k">if</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s1">&#39;R&#39;</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">out</span><span class="p">))</span>
 
 
@@ -847,6 +907,24 @@
     <span class="k">def</span> <span class="nf">ygg_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of the class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ygg_class</span>
+
+    <span class="k">def</span> <span class="nf">language_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">languages</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Only do info debug message if the language is one of those specified.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">languages</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="n">languages</span><span class="p">]</span>
+        <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">get_subprocess_language</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_log</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">interface_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Only do info debug message if is interface.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_subprocess</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_log</span>
 
     <span class="k">def</span> <span class="nf">debug_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn on debugging.&quot;&quot;&quot;</span>

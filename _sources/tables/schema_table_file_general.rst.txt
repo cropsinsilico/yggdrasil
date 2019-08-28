@@ -26,7 +26,7 @@ is_series           boolean                  X          If True, input/output wi
                                                         index of the file. Defaults to False.                                           
 name                string                              Name used for component in log messages.                                        
 recv_converter      ['function', 'string']   X          Converter that should be used on received objects. Defaults to None.            
-send_converter      function                 X          Converter that should be used on sent objects. Defaults to None.                
+send_converter      ['function', 'string']   X          Converter that should be used on sent objects. Defaults to None.                
 wait_for_creation   float                    X          Time (in seconds) that should be waited before opening for the file to be       
                                                         created if it dosn't exist. Defaults to 0 s and file will attempt to be opened  
                                                         immediately.                                                                    

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.languages.Python package &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>yggdrasil.languages.Python package &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
@@ -176,8 +177,24 @@
 <div class="section" id="module-yggdrasil.languages.Python.YggInterface">
 <span id="yggdrasil-languages-python-ygginterface-module"></span><h2>yggdrasil.languages.Python.YggInterface module<a class="headerlink" href="#module-yggdrasil.languages.Python.YggInterface" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
+<dt id="yggdrasil.languages.Python.YggInterface.InterfaceComm">
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">InterfaceComm</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">comm_class=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#InterfaceComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.InterfaceComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short hand for initializing a default comm for use as an interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue.</p></li>
+<li><p><strong>comm_class</strong> (<a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase" title="yggdrasil.communication.CommBase.CommBase"><em>CommBase</em></a><em>, </em><em>optional</em>) – Communication class that should be
+used. Defaults to DefaultComm if not provided.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to DefaultComm.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggAsciiArrayInput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggAsciiArrayInput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiArrayInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiArrayInput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggAsciiArrayInput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiArrayInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiArrayInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling table-like formatted input as arrays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -198,7 +215,7 @@ received from.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggAsciiArrayOutput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggAsciiArrayOutput</code><span class="sig-paren">(</span><em>name</em>, <em>fmt</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiArrayOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiArrayOutput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggAsciiArrayOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">fmt</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiArrayOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiArrayOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling table-like formatted output as arrays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -220,7 +237,7 @@ should be formated. This should include the newline character.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggAsciiFileInput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggAsciiFileInput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiFileInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiFileInput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggAsciiFileInput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiFileInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiFileInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for generic ASCII input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -241,7 +258,7 @@ received from.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggAsciiFileOutput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggAsciiFileOutput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiFileOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiFileOutput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggAsciiFileOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiFileOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiFileOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for generic ASCII output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -261,7 +278,7 @@ received from.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggAsciiTableInput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggAsciiTableInput</code><span class="sig-paren">(</span><em>name</em>, <em>as_array=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiTableInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiTableInput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggAsciiTableInput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">as_array=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiTableInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiTableInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling table-like formatted input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -285,7 +302,7 @@ entries. Default to False.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggAsciiTableOutput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggAsciiTableOutput</code><span class="sig-paren">(</span><em>name</em>, <em>fmt</em>, <em>as_array=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggAsciiTableOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">fmt</em>, <em class="sig-param">as_array=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling table-like formatted output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -309,8 +326,29 @@ False.</p></li>
 </dd></dl>
 
 <dl class="function">
+<dt id="yggdrasil.languages.Python.YggInterface.YggInit">
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggInit</code><span class="sig-paren">(</span><em class="sig-param">_type</em>, <em class="sig-param">args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggInit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggInit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short interface to identify functions called by another language.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of class that should be returned.</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – Additional arguments that should be passed to class
+initializer.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of the requested class.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>obj</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggInput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggInput</code><span class="sig-paren">(</span><em>name</em>, <em>format_str=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggInput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggInput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">format_str=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling input from a message queue.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -334,29 +372,8 @@ objects. Defaults to None and raw string messages are returned.</p></li>
 </dd></dl>
 
 <dl class="function">
-<dt id="yggdrasil.languages.Python.YggInterface.YggMatlab">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggMatlab</code><span class="sig-paren">(</span><em>_type</em>, <em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggMatlab" title="Permalink to this definition">¶</a></dt>
-<dd><p>Short interface to identify functions called by Matlab.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of class that should be returned.</p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – Additional arguments that should be passed to class
-initializer.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>An instance of the requested class.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>obj</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggObjInput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggObjInput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggObjInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggObjInput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggObjInput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggObjInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggObjInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling Obj input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -377,7 +394,7 @@ received from.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggObjOutput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggObjOutput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggObjOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggObjOutput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggObjOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggObjOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggObjOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling Obj output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -397,7 +414,7 @@ received from.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggOutput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggOutput</code><span class="sig-paren">(</span><em>name</em>, <em>format_str=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggOutput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">format_str=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling output to a message queue.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -422,7 +439,7 @@ and raw string messages are sent.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggPandasInput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggPandasInput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPandasInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPandasInput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggPandasInput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPandasInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPandasInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling Pandas input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -443,7 +460,7 @@ received from.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggPandasOutput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggPandasOutput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPandasOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPandasOutput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggPandasOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPandasOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPandasOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling pandasd output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -463,7 +480,7 @@ received from.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggPickleInput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggPickleInput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPickleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPickleInput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggPickleInput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPickleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPickleInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling pickled input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -484,7 +501,7 @@ received from.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggPickleOutput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggPickleOutput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPickleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPickleOutput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggPickleOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPickleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPickleOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling pickled output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -504,7 +521,7 @@ received from.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggPlyInput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggPlyInput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPlyInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPlyInput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggPlyInput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPlyInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPlyInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling Ply input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -525,7 +542,7 @@ received from.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggPlyOutput">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggPlyOutput</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPlyOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPlyOutput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggPlyOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPlyOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPlyOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling Ply output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -545,7 +562,7 @@ received from.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggRpcClient">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggRpcClient</code><span class="sig-paren">(</span><em>name</em>, <em>outfmt='%s'</em>, <em>infmt='%s'</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggRpcClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggRpcClient" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggRpcClient</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">outfmt='%s'</em>, <em class="sig-param">infmt='%s'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggRpcClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggRpcClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling requests and response to an RPC Server from a
 client.</p>
 <dl class="field-list simple">
@@ -566,7 +583,7 @@ messages received from the response queue. Defautls to ‘%s’.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggRpcServer">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">YggRpcServer</code><span class="sig-paren">(</span><em>name</em>, <em>infmt='%s'</em>, <em>outfmt='%s'</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggRpcServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggRpcServer" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggRpcServer</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">infmt='%s'</em>, <em class="sig-param">outfmt='%s'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggRpcServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggRpcServer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling requests and response for an RPC Server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -586,39 +603,192 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.bufMsgSize">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">bufMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#bufMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.bufMsgSize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">bufMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#bufMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.bufMsgSize" title="Permalink to this definition">¶</a></dt>
 <dd><p>int: Buffer size for average message.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.eof_msg">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">eof_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#eof_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.eof_msg" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">eof_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#eof_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.eof_msg" title="Permalink to this definition">¶</a></dt>
 <dd><p>str: Message signalling end of file.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.maxMsgSize">
-<code class="descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="descname">maxMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#maxMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.maxMsgSize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">maxMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#maxMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.maxMsgSize" title="Permalink to this definition">¶</a></dt>
 <dd><p>int: The maximum message size.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-yggdrasil.languages.Python.test_CisInterface">
+<span id="yggdrasil-languages-python-test-cisinterface-module"></span><h2>yggdrasil.languages.Python.test_CisInterface module<a class="headerlink" href="#module-yggdrasil.languages.Python.test_CisInterface" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisAsciiArrayInput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisAsciiArrayInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisAsciiArrayInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayInput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisAsciiArrayOutput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisAsciiArrayOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisAsciiArrayOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayOutput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisAsciiFileInput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisAsciiFileInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisAsciiFileInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileInput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisAsciiFileOutput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisAsciiFileOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisAsciiFileOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileOutput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisAsciiTableInput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisAsciiTableInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisAsciiTableInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableInput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisAsciiTableOutput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisAsciiTableOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisAsciiTableOutputMatlab">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisAsciiTableOutputMatlab</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisAsciiTableOutputMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutputMatlab" title="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutputMatlab"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutputMatlab</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisInput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggInput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisInputMatlab">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisInputMatlab</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisInputMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInputMatlab" title="yggdrasil.languages.Python.test_YggInterface.TestYggInputMatlab"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggInputMatlab</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisObjInput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisObjInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisObjInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggObjInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggObjInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggObjInput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisObjOutput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisObjOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisObjOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggObjOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggObjOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggObjOutput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisOutput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggOutput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisOutputMatlab">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisOutputMatlab</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisOutputMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutputMatlab" title="yggdrasil.languages.Python.test_YggInterface.TestYggOutputMatlab"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggOutputMatlab</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisPandasInput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisPandasInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisPandasInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPandasInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggPandasInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggPandasInput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisPandasOutput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisPandasOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisPandasOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPandasOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggPandasOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggPandasOutput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisPickleInput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisPickleInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisPickleInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPickleInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggPickleInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggPickleInput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisPickleOutput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisPickleOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisPickleOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPickleOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggPickleOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggPickleOutput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisPlyInput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisPlyInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisPlyInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPlyInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggPlyInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggPlyInput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisPlyOutput">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisPlyOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisPlyOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPlyOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggPlyOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggPlyOutput</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisRpcClient">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisRpcClient</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisRpcClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient" title="yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisRpcClientMatlab">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisRpcClientMatlab</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisRpcClientMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClientMatlab" title="yggdrasil.languages.Python.test_YggInterface.TestYggRpcClientMatlab"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggRpcClientMatlab</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisRpcServer">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisRpcServer</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisRpcServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer" title="yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.languages.Python.test_CisInterface.TestCisRpcServerMatlab">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_CisInterface.</code><code class="sig-name descname">TestCisRpcServerMatlab</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.languages.Python.test_CisInterface.TestCisRpcServerMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServerMatlab" title="yggdrasil.languages.Python.test_YggInterface.TestYggRpcServerMatlab"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggRpcServerMatlab</span></code></a></p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-yggdrasil.languages.Python.test_YggInterface">
 <span id="yggdrasil-languages-python-test-ygginterface-module"></span><h2>yggdrasil.languages.Python.test_YggInterface module<a class="headerlink" href="#module-yggdrasil.languages.Python.test_YggInterface" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="yggdrasil.languages.Python.test_YggInterface.ModelEnv">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">ModelEnv</code><span class="sig-paren">(</span><em class="sig-param">language=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#ModelEnv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.ModelEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestBase">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestBase</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="yggdrasil.tests.html#yggdrasil.tests.YggTestClassInfo" title="yggdrasil.tests.YggTestClassInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.YggTestClassInfo</span></code></a></p>
 <p>Test class for interface classes.</p>
 <dl class="method">
+<dt id="yggdrasil.languages.Python.test_YggInterface.TestBase.create_instance">
+<code class="sig-name descname">create_instance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestBase.create_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.create_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new instance of the class.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestBase.get_options">
-<code class="descname">get_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestBase.get_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.get_options" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestBase.get_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.get_options" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get testing options.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestBase.idriver_args">
-<code class="descname">idriver_args</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.idriver_args" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">idriver_args</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.idriver_args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Input driver arguments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -627,9 +797,9 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestBase.idriver_class">
-<code class="descname">idriver_class</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.idriver_class" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">idriver_class</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.idriver_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Input driver class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -638,20 +808,9 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="yggdrasil.languages.Python.test_YggInterface.TestBase.inst_kwargs">
-<code class="descname">inst_kwargs</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.inst_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Arguments for the interface instance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="attribute">
+<dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestBase.messages">
-<code class="descname">messages</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.messages" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">messages</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.messages" title="Permalink to this definition">¶</a></dt>
 <dd><p>Messages that should be sent/received.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -660,9 +819,9 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestBase.odriver_args">
-<code class="descname">odriver_args</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.odriver_args" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">odriver_args</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.odriver_args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output driver arguments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -671,9 +830,9 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestBase.odriver_class">
-<code class="descname">odriver_class</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.odriver_class" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">odriver_class</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.odriver_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output driver class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -684,19 +843,19 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 
 <dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestBase.remove_instance">
-<code class="descname">remove_instance</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestBase.remove_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.remove_instance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_instance</code><span class="sig-paren">(</span><em class="sig-param">inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestBase.remove_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.remove_instance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove an instance.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestBase.setup">
-<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.setup" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start driver and instance.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestBase.teardown">
-<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestBase.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.teardown" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestBase.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestBase.teardown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stop the driver.</p>
 </dd></dl>
 
@@ -704,61 +863,61 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayInput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggAsciiArrayInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiArrayInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggAsciiArrayInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiArrayInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableInput</span></code></a></p>
 <p>Test input from an ASCII table.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayOutput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggAsciiArrayOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiArrayOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggAsciiArrayOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiArrayOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiArrayOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput</span></code></a></p>
 <p>Test input from an ASCII table.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileInput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggAsciiFileInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiFileInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggAsciiFileInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiFileInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggInput</span></code></a></p>
 <p>Test input from an unformatted text file.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileOutput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggAsciiFileOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiFileOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggAsciiFileOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiFileOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggOutput</span></code></a></p>
 <p>Test output to an unformatted text file.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableInput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggAsciiTableInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiTableInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggAsciiTableInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiTableInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileInput</span></code></a></p>
 <p>Test input from an ascii table.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggAsciiTableOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggAsciiTableOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggAsciiFileOutput</span></code></a></p>
 <p>Test output from an ascii table.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutputMatlab">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggAsciiTableOutputMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiTableOutputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutputMatlab" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggAsciiTableOutputMatlab</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggAsciiTableOutputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutputMatlab" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggAsciiTableOutput</span></code></a></p>
 <p>Test output from an ascii table as passed through Matlab.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggInput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestBase" title="yggdrasil.languages.Python.test_YggInterface.TestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestBase</span></code></a></p>
 <p>Test basic input to python.</p>
 <dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggInput.test_msg">
-<code class="descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggInput.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInput.test_msg" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggInput.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInput.test_msg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test sending/receiving message.</p>
 </dd></dl>
 
@@ -766,33 +925,33 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggInputMatlab">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggInputMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggInputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInputMatlab" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggInputMatlab</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggInputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInputMatlab" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggInput</span></code></a></p>
 <p>Test basic input to python as passed from matlab.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggObjInput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggObjInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggObjInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggObjInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggObjInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggObjInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggObjInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggInput</span></code></a></p>
 <p>Test input from a obj file.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggObjOutput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggObjOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggObjOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggObjOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggObjOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggObjOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggObjOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggOutput</span></code></a></p>
 <p>Test output from a obj.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggOutput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestBase" title="yggdrasil.languages.Python.test_YggInterface.TestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestBase</span></code></a></p>
 <p>Test basic output to python.</p>
 <dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggOutput.test_msg">
-<code class="descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggOutput.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutput.test_msg" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggOutput.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutput.test_msg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test sending/receiving message.</p>
 </dd></dl>
 
@@ -800,61 +959,61 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggOutputMatlab">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggOutputMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggOutputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutputMatlab" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggOutputMatlab</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggOutputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutputMatlab" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggOutput</span></code></a></p>
 <p>Test basic output to python as passed from matlab.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggPandasInput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggPandasInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggPandasInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPandasInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggPandasInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggPandasInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPandasInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggInput</span></code></a></p>
 <p>Test input from a pandas file.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggPandasOutput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggPandasOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggPandasOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPandasOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggPandasOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggPandasOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPandasOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggOutput</span></code></a></p>
 <p>Test output from a pandas.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggPickleInput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggPickleInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggPickleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPickleInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggPickleInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggPickleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPickleInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggInput</span></code></a></p>
 <p>Test input from a pickle file.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggPickleOutput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggPickleOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggPickleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPickleOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggPickleOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggPickleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPickleOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggOutput</span></code></a></p>
 <p>Test output from a pickle.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggPlyInput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggPlyInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggPlyInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPlyInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggPlyInput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggPlyInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPlyInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggInput</span></code></a></p>
 <p>Test input from a ply file.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggPlyOutput">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggPlyOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggPlyOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPlyOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggPlyOutput</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggPlyOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggPlyOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggOutput</span></code></a></p>
 <p>Test output from a ply.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggRpcClient</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggRpcClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggRpcClient</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggRpcClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggOutput" title="yggdrasil.languages.Python.test_YggInterface.TestYggOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggOutput</span></code></a></p>
 <p>Test client-side RPC communication with Python.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.idriver_class">
-<code class="descname">idriver_class</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.idriver_class" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">idriver_class</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.idriver_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Input driver class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -863,9 +1022,9 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.odriver_class">
-<code class="descname">odriver_class</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.odriver_class" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">odriver_class</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.odriver_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output driver class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -876,7 +1035,7 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 
 <dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.test_msg">
-<code class="descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggRpcClient.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.test_msg" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggRpcClient.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.test_msg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test sending/receiving message.</p>
 </dd></dl>
 
@@ -884,19 +1043,19 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggRpcClientMatlab">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggRpcClientMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggRpcClientMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClientMatlab" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggRpcClientMatlab</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggRpcClientMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClientMatlab" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient" title="yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient</span></code></a></p>
 <p>Test client-side RPC communication with Python as passed through Matlab.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggRpcServer</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggRpcServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggRpcServer</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggRpcServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggInput" title="yggdrasil.languages.Python.test_YggInterface.TestYggInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggInput</span></code></a></p>
 <p>Test server-side RPC communication with Python.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.idriver_class">
-<code class="descname">idriver_class</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.idriver_class" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">idriver_class</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.idriver_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Input driver class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -905,9 +1064,9 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.odriver_class">
-<code class="descname">odriver_class</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.odriver_class" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">odriver_class</code><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.odriver_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output driver class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -918,7 +1077,7 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 
 <dl class="method">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.test_msg">
-<code class="descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggRpcServer.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.test_msg" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggRpcServer.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.test_msg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test sending/receiving message.</p>
 </dd></dl>
 
@@ -926,44 +1085,73 @@ message sent to the response queue. Defautls to ‘%s’.</p></li>
 
 <dl class="class">
 <dt id="yggdrasil.languages.Python.test_YggInterface.TestYggRpcServerMatlab">
-<em class="property">class </em><code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">TestYggRpcServerMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggRpcServerMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServerMatlab" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">TestYggRpcServerMatlab</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#TestYggRpcServerMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServerMatlab" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer" title="yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer</span></code></a></p>
 <p>Test server-side RPC communication with Python as passed through Matlab.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="yggdrasil.languages.Python.test_YggInterface.test_YggMatlab_class">
-<code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">test_YggMatlab_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_YggMatlab_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_YggMatlab_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test Matlab interface for classes.</p>
+<dt id="yggdrasil.languages.Python.test_YggInterface.do_send_recv">
+<code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">do_send_recv</code><span class="sig-paren">(</span><em class="sig-param">language='python', fmt='%f\\n%d', msg=[1.0, 2], input_interface='YggInput', output_interface='YggOutput'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#do_send_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.do_send_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to perform simple send/receive between two comms using a
+language interface that calls the Python interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Language that should be mimicked for the
+interface test. Defaults to ‘python’.</p></li>
+<li><p><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string to use for the test. Defaults to
+‘%f\n%d’.</p></li>
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a><em>, </em><em>optional</em>) – Message object that should be used for the
+test. Defaults to [float(1.0), int(2)].</p></li>
+<li><p><strong>input_interface</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of the interface function/class
+that should be used for the test. Defaults to ‘YggInput’.</p></li>
+<li><p><strong>output_interface</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of the interface function/class
+that should be used for the test. Defaults to ‘YggOutput’.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="yggdrasil.languages.Python.test_YggInterface.test_YggMatlab_variables">
-<code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">test_YggMatlab_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_YggMatlab_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_YggMatlab_variables" title="Permalink to this definition">¶</a></dt>
+<dt id="yggdrasil.languages.Python.test_YggInterface.test_YggInit_backwards">
+<code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">test_YggInit_backwards</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_YggInit_backwards"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_YggInit_backwards" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check access to old class names for backwards compat.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.languages.Python.test_YggInterface.test_YggInit_langauge">
+<code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">test_YggInit_langauge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_YggInit_langauge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_YggInit_langauge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test access to YggInit via languages that call the Python interface.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.languages.Python.test_YggInterface.test_YggInit_variables">
+<code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">test_YggInit_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_YggInit_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_YggInit_variables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test Matlab interface for variables.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.test_YggInterface.test_bufMsgSize">
-<code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">test_bufMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_bufMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_bufMsgSize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">test_bufMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_bufMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_bufMsgSize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test buf message size.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.test_YggInterface.test_eof_msg">
-<code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">test_eof_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_eof_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_eof_msg" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">test_eof_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_eof_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_eof_msg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test eof message signal.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.test_YggInterface.test_init">
-<code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_init" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test error on init.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.test_YggInterface.test_maxMsgSize">
-<code class="descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="descname">test_maxMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_maxMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_maxMsgSize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.test_YggInterface.</code><code class="sig-name descname">test_maxMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/test_YggInterface.html#test_maxMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.test_YggInterface.test_maxMsgSize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test max message size.</p>
 </dd></dl>
 

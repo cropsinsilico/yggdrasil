@@ -6,12 +6,12 @@ Subpackages
 
 .. toctree::
 
-    yggdrasil.examples.tests
+   yggdrasil.examples.tests
 
 Module contents
 ---------------
 
 .. automodule:: yggdrasil.examples
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

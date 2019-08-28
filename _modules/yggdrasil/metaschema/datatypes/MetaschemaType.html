@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes.MetaschemaType &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.MetaschemaType &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -610,7 +611,7 @@
 
 <div class="viewcode-block" id="MetaschemaType.check_encoded"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.check_encoded">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">check_encoded</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                      <span class="n">typedef_validated</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                      <span class="n">typedef_validated</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata_validated</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Checks if the metadata for an encoded object matches the type</span>
 <span class="sd">        definition.</span>
 
@@ -626,18 +627,22 @@
 <span class="sd">            typedef_validated (bool, optional): If True, the type definition</span>
 <span class="sd">                is taken as already having been validated and will not be</span>
 <span class="sd">                validated again during the encoding process. Defaults to False.</span>
+<span class="sd">            metadata_validated (bool, optional): If True, the metadata definition</span>
+<span class="sd">                is taken as already having been valdiated and will not be</span>
+<span class="sd">                validated again. Defaults to False.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if the metadata matches the type definition, False</span>
 <span class="sd">                otherwise.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">validate_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">raise_errors</span><span class="p">:</span>
-                <span class="k">raise</span>
-            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">metadata_validated</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">validate_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">raise_errors</span><span class="p">:</span>
+                    <span class="k">raise</span>
+                <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">typedef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">typedef_validated</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>

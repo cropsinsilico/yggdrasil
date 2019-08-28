@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
@@ -165,17 +166,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <table class="docutils align-center" id="datatype-mapping-table-rst">
+  <table class="docutils align-default" id="datatype-mapping-table-rst">
 <colgroup>
-<col style="width: 6%" />
-<col style="width: 11%" />
-<col style="width: 21%" />
-<col style="width: 15%" />
-<col style="width: 15%" />
-<col style="width: 33%" />
+<col style="width: 5%" />
+<col style="width: 19%" />
+<col style="width: 9%" />
+<col style="width: 17%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 27%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Schema</p></th>
+<th class="head"><p>R</p></th>
 <th class="head"><p>C</p></th>
 <th class="head"><p>C++</p></th>
 <th class="head"><p>Matlab</p></th>
@@ -185,6 +188,7 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>1darray</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">mat</span></code></p></td>
@@ -192,6 +196,7 @@
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>array</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">vector_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">std::vector&lt;void*&gt;</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">cell</span></code></p></td>
@@ -200,6 +205,7 @@
 still under development.</p></td>
 </tr>
 <tr class="row-even"><td><p>boolean</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">logical</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">logical</span></code></p></td>
@@ -207,6 +213,7 @@ still under development.</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>bytes</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">(utf-8)</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">(utf-8)</span></code></p></td>
@@ -214,6 +221,7 @@ still under development.</p></td>
 <td><p>Precision X is preserved.</p></td>
 </tr>
 <tr class="row-even"><td><p>complex</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">complex</span></code></p></td>
@@ -221,6 +229,7 @@ still under development.</p></td>
 <td><p>Precision X is preserved.</p></td>
 </tr>
 <tr class="row-odd"><td><p>float</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">floatX_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">floatX_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">single,</span> <span class="pre">double</span></code></p></td>
@@ -228,6 +237,7 @@ still under development.</p></td>
 <td><p>Precision X is preserved.</p></td>
 </tr>
 <tr class="row-even"><td><p>int</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">integer,</span> <span class="pre">bit64::integer64</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">intX</span></code></p></td>
@@ -235,6 +245,7 @@ still under development.</p></td>
 <td><p>Precision X is preserved.</p></td>
 </tr>
 <tr class="row-odd"><td><p>ndarray</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">mat</span></code></p></td>
@@ -242,6 +253,7 @@ still under development.</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>null</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">NaN</span></code></p></td>
@@ -253,10 +265,12 @@ still under development.</p></td>
 <td></td>
 <td></td>
 <td></td>
+<td></td>
 <td><p>This covers the JSON default for
 floating point or integer values.</p></td>
 </tr>
 <tr class="row-even"><td><p>obj</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ObjDict</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
@@ -264,6 +278,7 @@ floating point or integer values.</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>object</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">map_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">std::map&lt;char*,void*&gt;</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
@@ -272,6 +287,7 @@ floating point or integer values.</p></td>
 still under development.</p></td>
 </tr>
 <tr class="row-even"><td><p>ply</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PlyDict</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
@@ -283,11 +299,13 @@ still under development.</p></td>
 <td></td>
 <td></td>
 <td></td>
+<td></td>
 <td><p>yggdrasil defines scalars as an
 umbrella type encompassing int, uint,
 float, bytes, and unicode.</p></td>
 </tr>
 <tr class="row-even"><td><p>schema</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">map_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">MetaschemaType</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
@@ -295,6 +313,7 @@ float, bytes, and unicode.</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>string</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">character</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
@@ -302,6 +321,7 @@ float, bytes, and unicode.</p></td>
 <td><p>Encoding dependent on JSON library.</p></td>
 </tr>
 <tr class="row-even"><td><p>uint</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">integer</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">uintX</span></code></p></td>
@@ -309,6 +329,7 @@ float, bytes, and unicode.</p></td>
 <td><p>Precision X is preserved.</p></td>
 </tr>
 <tr class="row-odd"><td><p>unicode</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>

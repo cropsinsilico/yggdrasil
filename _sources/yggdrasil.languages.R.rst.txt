@@ -1,0 +1,22 @@
+yggdrasil.languages.R package
+=============================
+
+Submodules
+----------
+
+yggdrasil.languages.R.install module
+------------------------------------
+
+.. automodule:: yggdrasil.languages.R.install
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.languages.R
+   :members:
+   :undoc-members:
+   :show-inheritance:

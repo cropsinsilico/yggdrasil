@@ -1,0 +1,459 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>yggdrasil.languages.install_languages &mdash; yggdrasil 0.10.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.10.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../languages.html">yggdrasil.languages</a> &raquo;</li>
+        
+      <li>yggdrasil.languages.install_languages</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yggdrasil.languages.install_languages</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="n">lang_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="is_path"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.is_path">[docs]</a><span class="k">def</span> <span class="nf">is_path</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a path is valid in a case-sensitive manner.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fpath (str): Full path to be tested.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the path exists, False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pdir</span><span class="p">,</span> <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">base</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">pdir</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="is_file"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.is_file">[docs]</a><span class="k">def</span> <span class="nf">is_file</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a file is valid in a case-sensitive manner.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fname (str): Full file path to be tested.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the file exists, False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">is_path</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="is_dir"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.is_dir">[docs]</a><span class="k">def</span> <span class="nf">is_dir</span><span class="p">(</span><span class="n">fdir</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a directory is valid in a case-sensitive manner.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fdir (str): Full directory path to be tested.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the directory exists, False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">fdir</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">is_path</span><span class="p">(</span><span class="n">fdir</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_language_directories"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.get_language_directories">[docs]</a><span class="k">def</span> <span class="nf">get_language_directories</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get language directories.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Language directories.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lang_dirs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lang_dir</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lang_dirs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">base</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;__pycache__&#39;</span><span class="p">,</span> <span class="s1">&#39;tests&#39;</span><span class="p">]:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="import_language_install"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.import_language_install">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">import_language_install</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">no_import</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Temporarily import a language installation script.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        language (str): Name of language that installation script should be</span>
+<span class="sd">            imported for.</span>
+<span class="sd">        no_import (bool, optional): If True, yggdrasil will not be imported.</span>
+<span class="sd">            Defaults to False.</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        module: Language installation module.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lang_dir</span><span class="p">,</span> <span class="n">language</span><span class="p">,</span> <span class="s1">&#39;install.py&#39;</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">no_import</span> <span class="ow">or</span> <span class="n">is_dir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lang_dir</span><span class="p">,</span> <span class="n">language</span><span class="p">))):</span>
+            <span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="k">import</span> <span class="n">get_language_dir</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">get_language_dir</span><span class="p">(</span><span class="n">language</span><span class="p">))</span>
+            <span class="k">with</span> <span class="n">import_language_install</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">no_import</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">install</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">install</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lang_dir</span><span class="p">,</span> <span class="n">language</span><span class="p">))</span>
+            <span class="kn">import</span> <span class="nn">install</span>
+            <span class="k">yield</span> <span class="n">install</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">install</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">install</span>
+            <span class="k">if</span> <span class="s1">&#39;install&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s1">&#39;install&#39;</span><span class="p">]</span>
+            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="update_argparser"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.update_argparser">[docs]</a><span class="k">def</span> <span class="nf">update_argparser</span><span class="p">(</span><span class="n">parser</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_import</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">from_setup</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">arglist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update argument parser with language specific arguments.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        parser (argparse.ArgumentParser, optional): Existing argument parser</span>
+<span class="sd">            that should be updated. Default to None and a new argument parser</span>
+<span class="sd">            will be created.</span>
+<span class="sd">        language (str, optional): Language that argument parser should be</span>
+<span class="sd">            updated with options for. Defaults to None and all language options</span>
+<span class="sd">            will be added.</span>
+<span class="sd">        no_import (bool, optional): If True, yggdrasil will not be imported.</span>
+<span class="sd">            Defaults to None and will be set based on sys.argv.</span>
+<span class="sd">        from_setup (bool, optional): If True, the function is being called from</span>
+<span class="sd">            setup.py and the positional arguments should not be parsed and</span>
+<span class="sd">            unrecognized arguments will be ignored. Defaults to False.</span>
+<span class="sd">        arglist (list, optional): List of arguments to parse. Defaults to</span>
+<span class="sd">            None and sys.argv is used.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        argparse.ArgumentParser: Argument parser with language specific arguments.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">arglist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">arglist</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">no_import</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">from_setup</span><span class="p">:</span>
+        <span class="n">no_import</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">all_languages</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">get_language_directories</span><span class="p">()]</span>
+    <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+            <span class="s2">&quot;Run the installation scripts for one or more languages.&quot;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--no-import&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t import the yggdrasil package in &#39;</span>
+                                  <span class="s1">&#39;calling the installation script.&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">from_setup</span><span class="p">:</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+                                <span class="n">choices</span><span class="o">=</span><span class="p">([</span><span class="s1">&#39;all&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">all_languages</span><span class="p">),</span>
+                                <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span>
+                                <span class="n">default</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
+                                <span class="n">help</span><span class="o">=</span><span class="s1">&#39;One or more languages to install.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;-h&#39;</span> <span class="ow">in</span> <span class="n">arglist</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;--help&#39;</span> <span class="ow">in</span> <span class="n">arglist</span><span class="p">)</span> <span class="ow">or</span> <span class="n">from_setup</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">no_import</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">no_import</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">language</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">language</span> <span class="o">=</span> <span class="n">get_language_directories</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">arglist</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">no_import</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">no_import</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">no_import</span>
+        <span class="k">if</span> <span class="n">language</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;all&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="p">):</span>
+                <span class="n">language</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">language</span> <span class="o">=</span> <span class="n">all_languages</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">language</span> <span class="o">=</span> <span class="p">[</span><span class="n">language</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">ilang</span> <span class="ow">in</span> <span class="n">language</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">import_language_install</span><span class="p">(</span><span class="n">ilang</span><span class="p">,</span> <span class="n">no_import</span><span class="o">=</span><span class="n">no_import</span><span class="p">)</span> <span class="k">as</span> <span class="n">install</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">install</span><span class="p">,</span> <span class="s1">&#39;update_argparser&#39;</span><span class="p">):</span>
+                <span class="n">parser</span> <span class="o">=</span> <span class="n">install</span><span class="o">.</span><span class="n">update_argparser</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">parser</span></div>
+
+
+<div class="viewcode-block" id="install_language"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.install_language">[docs]</a><span class="k">def</span> <span class="nf">install_language</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">results</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_import</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">arglist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call install for a specific language.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        language (str): Name of language that should be checked.</span>
+<span class="sd">        results (dict, optional): Dictionary where result (whether or not the</span>
+<span class="sd">            language is installed) should be logged. Defaults to None and is</span>
+<span class="sd">            initialized to an empty dict.</span>
+<span class="sd">        no_import (bool, optional): If True, yggdrasil will not be imported.</span>
+<span class="sd">            Defaults to None and is set based on the value parsed from</span>
+<span class="sd">            arglist.</span>
+<span class="sd">        args (argparse.Namespace, optional): Arguments parsed from the</span>
+<span class="sd">            command line. Default to None and is created.</span>
+<span class="sd">        arglist (list, optional): List of arguments to parse. Defaults to</span>
+<span class="sd">            None and sys.argv is used.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">update_argparser</span><span class="p">(</span><span class="n">no_import</span><span class="o">=</span><span class="n">no_import</span><span class="p">,</span>
+                                <span class="n">arglist</span><span class="o">=</span><span class="n">arglist</span><span class="p">)</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">arglist</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">no_import</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">no_import</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">no_import</span>
+    <span class="k">if</span> <span class="n">results</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">with</span> <span class="n">import_language_install</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">no_import</span><span class="o">=</span><span class="n">no_import</span><span class="p">)</span> <span class="k">as</span> <span class="n">install</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">install</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Nothing to be done for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">language</span><span class="p">)</span>
+            <span class="n">name_in_pragmas</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">name_in_pragmas</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name_in_pragmas</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">install</span><span class="p">,</span> <span class="s1">&#39;name_in_pragmas&#39;</span><span class="p">,</span> <span class="n">language</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">install</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">name_in_pragmas</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;Could not complete installation for </span><span class="si">{lang}</span><span class="s2">. &quot;</span>
+                       <span class="s2">&quot;</span><span class="si">{lang}</span><span class="s2"> support will be disabled.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="n">language</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Language </span><span class="si">%s</span><span class="s2"> installed.&quot;</span> <span class="o">%</span> <span class="n">language</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="install_all_languages"><a class="viewcode-back" href="../../../yggdrasil.languages.html#yggdrasil.languages.install_languages.install_all_languages">[docs]</a><span class="k">def</span> <span class="nf">install_all_languages</span><span class="p">(</span><span class="n">from_setup</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">arglist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call install.py for all languages that have one and return a dictionary</span>
+<span class="sd">    mapping from language name to the installation state (True if install was</span>
+<span class="sd">    successful, False otherwise).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        from_setup (bool, optional): If True, the function is being called from</span>
+<span class="sd">            setup.py and the positional arguments should not be parsed and</span>
+<span class="sd">            unrecognized arguments will be ignored. Defaults to False.</span>
+<span class="sd">        arglist (list, optional): List of arguments to parse. Defaults to</span>
+<span class="sd">            None and sys.argv is used.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to each call to</span>
+<span class="sd">            install_language.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Mapping from language name to boolean describing installation</span>
+<span class="sd">            success.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">update_argparser</span><span class="p">(</span>
+            <span class="n">from_setup</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">no_import</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;no_import&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="n">arglist</span><span class="o">=</span><span class="n">arglist</span><span class="p">)</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">arglist</span><span class="p">)</span>
+    <span class="n">installed_languages</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">ilang</span> <span class="ow">in</span> <span class="n">get_language_directories</span><span class="p">():</span>
+        <span class="n">install_language</span><span class="p">(</span><span class="n">ilang</span><span class="p">,</span> <span class="n">installed_languages</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">installed_languages</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">install_all_languages</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

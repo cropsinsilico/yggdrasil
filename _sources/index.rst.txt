@@ -15,10 +15,12 @@ Welcome to yggdrasil's documentation!
    getting_started
    formatted_io
    server_client_io
+   autowrap
    yaml
    config
    units
    c_format_strings
+   debugging
    examples/examples_toc
    advanced/index
    development/index

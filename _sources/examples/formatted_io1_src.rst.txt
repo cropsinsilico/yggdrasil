@@ -1,10 +1,10 @@
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io1/src/formatted_io1_modelA.py
+.. literalinclude:: /../../yggdrasil/examples/formatted_io1/src/formatted_io1_modelB.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io1/src/formatted_io1_modelB.py
+.. literalinclude:: /../../yggdrasil/examples/formatted_io1/src/formatted_io1_modelA.py
    :language: python
    :linenos:
 

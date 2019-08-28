@@ -6,13 +6,26 @@ Subpackages
 
 .. toctree::
 
-    yggdrasil.languages.Python
-    yggdrasil.languages.tests
+   yggdrasil.languages.Python
+   yggdrasil.languages.R
+   yggdrasil.languages.tests
+
+Submodules
+----------
+
+yggdrasil.languages.install\_languages module
+---------------------------------------------
+
+.. automodule:: yggdrasil.languages.install_languages
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------
 
 .. automodule:: yggdrasil.languages
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

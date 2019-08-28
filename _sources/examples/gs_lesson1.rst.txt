@@ -1,42 +1,6 @@
 gs_lesson1 Example
 ==================
 
-Python Version
---------------
-
-Model Code:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/src/gs_lesson1.py
-   :language: python
-   :linenos:
-
-
-Model YAML:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/gs_lesson1_python.yml
-   :language: yaml
-   :linenos:
-
-
-
-Matlab Version
---------------
-
-Model Code:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/src/gs_lesson1.m
-   :language: matlab
-   :linenos:
-
-
-Model YAML:
-
-.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/gs_lesson1_matlab.yml
-   :language: yaml
-   :linenos:
-
-
-
 C Version
 ---------
 
@@ -68,6 +32,60 @@ Model Code:
 Model YAML:
 
 .. literalinclude:: /../../yggdrasil/examples/gs_lesson1/gs_lesson1_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/src/gs_lesson1.m
+   :language: matlab
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/gs_lesson1_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+
+Python Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/src/gs_lesson1.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/gs_lesson1_python.yml
+   :language: yaml
+   :linenos:
+
+
+
+R Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/src/gs_lesson1.R
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson1/gs_lesson1_r.yml
    :language: yaml
    :linenos:
 

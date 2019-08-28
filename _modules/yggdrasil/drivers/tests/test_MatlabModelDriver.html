@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests.test_MatlabModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_MatlabModelDriver &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -187,15 +188,14 @@
     <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_matlab_running</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="test_matlab_not_installed"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_MatlabModelDriver.test_matlab_not_installed">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(),</span>
+<div class="viewcode-block" id="test_matlab_not_installed"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_MatlabModelDriver.test_matlab_not_installed">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">_matlab_engine_installed</span><span class="p">,</span>
                  <span class="s2">&quot;Matlab installed.&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">test_matlab_not_installed</span><span class="p">():</span>  <span class="c1"># pragma: no matlab</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that errors are raised when Matlab is not installed.&quot;&quot;&quot;</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">start_matlab_engine</span><span class="p">)</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">stop_matlab_engine</span><span class="p">,</span>
                   <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">MatlabProcess</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">MatlabProcess</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="test_matlab_runner"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_MatlabModelDriver.test_matlab_runner">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">MatlabModelDriver</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(),</span>

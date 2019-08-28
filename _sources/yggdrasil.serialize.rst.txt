@@ -6,7 +6,7 @@ Subpackages
 
 .. toctree::
 
-    yggdrasil.serialize.tests
+   yggdrasil.serialize.tests
 
 Submodules
 ----------
@@ -15,111 +15,111 @@ yggdrasil.serialize.AsciiMapSerialize module
 --------------------------------------------
 
 .. automodule:: yggdrasil.serialize.AsciiMapSerialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.serialize.AsciiTableSerialize module
 ----------------------------------------------
 
 .. automodule:: yggdrasil.serialize.AsciiTableSerialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.serialize.DefaultSerialize module
 -------------------------------------------
 
 .. automodule:: yggdrasil.serialize.DefaultSerialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.serialize.DirectSerialize module
 ------------------------------------------
 
 .. automodule:: yggdrasil.serialize.DirectSerialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.serialize.FunctionalSerialize module
 ----------------------------------------------
 
 .. automodule:: yggdrasil.serialize.FunctionalSerialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.serialize.JSONSerialize module
 ----------------------------------------
 
 .. automodule:: yggdrasil.serialize.JSONSerialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.serialize.MatSerialize module
 ---------------------------------------
 
 .. automodule:: yggdrasil.serialize.MatSerialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.serialize.ObjSerialize module
 ---------------------------------------
 
 .. automodule:: yggdrasil.serialize.ObjSerialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.serialize.PandasSerialize module
 ------------------------------------------
 
 .. automodule:: yggdrasil.serialize.PandasSerialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.serialize.PickleSerialize module
 ------------------------------------------
 
 .. automodule:: yggdrasil.serialize.PickleSerialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.serialize.PlySerialize module
 ---------------------------------------
 
 .. automodule:: yggdrasil.serialize.PlySerialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.serialize.SerializeBase module
 ----------------------------------------
 
 .. automodule:: yggdrasil.serialize.SerializeBase
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 yggdrasil.serialize.YAMLSerialize module
 ----------------------------------------
 
 .. automodule:: yggdrasil.serialize.YAMLSerialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 
 Module contents
 ---------------
 
 .. automodule:: yggdrasil.serialize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

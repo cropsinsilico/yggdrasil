@@ -121,7 +121,18 @@ from the command line or by setting the appropriate config options manually.
 Additional Steps for Matlab Models
 ----------------------------------
 
-To run Matlab models, you will need an existing Matlab installation and license. 
+To run Matlab models, you will need an existing Matlab installation and license and 
+the ``matlab`` executable must be on your path (i.e. you can call ``matlab`` 
+from the command line and a Matlab interpreter will open). If not already available on 
+the command line, you can enable it by adding the location of the executable to 
+your path. The executable is usually located within a 'bin' directory within the 
+directory that Matlab was installed. On Linux/Mac operating systems, this is done 
+using the command::
+
+  $ export PATH=$PATH:</PATH/TO/MATLAB/bin/>
+
+On Windows, this command should already be available.
+
 While |yggdrasil| can now run Matlab models via the command line, it is still
 recommended that you install the Matlab engine for Python if you will be running
 Matlab models with |yggdrasil| frequently as using the engine reduces the time 
@@ -132,7 +143,7 @@ install, but should it fail or if you want to use a non-default version of Matla
 you can also do it manually. Instructions for installing the Matlab engine as a
 Python package can be found on the 
 `Mathworks website <https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html>`_. Once you have installed the Matlab engine as a python
-package, you can re-configure |yggdrasil| by calling ``yggconfig``. from the comamnd
+package, you can re-configure |yggdrasil| by calling ``yggconfig`` from the command
 line.
 
 .. note::
@@ -152,6 +163,23 @@ R2017b            2.7, 3.3, 3.4, 3.5, 3.6
 ==============    =======================
 
 
+Additional Steps for R Models
+-----------------------------
+
+To run R models, you will need to install the 
+`R interpreter <https://www.r-project.org/>`_ and the R packages 
+`reticulate <https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/>`_ 
+package for calling Python from R and 
+`zeallot <install.packages("zeallot")>`_.::
+
+  > install.packages("reticulate")
+  > install.packages("zeallot")
+
+.. note::
+   If you have issues installing on MacOS, check to make sure that ``which ar`` returns
+   the system default (``/usr/bin/ar``). If you have another version of ``ar``
+   installed (e.g. through homebrew's binutils), it may cause conflicts.
+   
 Additional Steps for RabbitMQ Message Passing
 ---------------------------------------------
 

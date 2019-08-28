@@ -1,10 +1,22 @@
 yggdrasil.languages.tests package
 =================================
 
+Submodules
+----------
+
+yggdrasil.languages.tests.test\_install\_languages module
+---------------------------------------------------------
+
+.. automodule:: yggdrasil.languages.tests.test_install_languages
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 Module contents
 ---------------
 
 .. automodule:: yggdrasil.languages.tests
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

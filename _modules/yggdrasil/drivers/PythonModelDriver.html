@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -166,7 +167,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.drivers.PythonModelDriver</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.InterpretedModelDriver</span> <span class="k">import</span> <span class="n">InterpretedModelDriver</span>
@@ -181,7 +183,6 @@
     <span class="n">default_interpreter</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span>
     <span class="n">interface_library</span> <span class="o">=</span> <span class="s1">&#39;yggdrasil.interface.YggInterface&#39;</span>
     <span class="c1"># supported_comms = [&#39;ipc&#39;, &#39;zmq&#39;, &#39;rmq&#39;]</span>
-    <span class="n">supported_comms</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_comm</span><span class="p">()</span>
     <span class="n">supported_comm_options</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;ipc&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;platforms&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;MacOS&#39;</span><span class="p">,</span> <span class="s1">&#39;Linux&#39;</span><span class="p">],</span>
                 <span class="s1">&#39;libraries&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;sysv_ipc&#39;</span><span class="p">]},</span>
@@ -205,15 +206,32 @@
         <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="s1">&#39;ObjDict&#39;</span><span class="p">,</span>
         <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">}</span>
     <span class="n">function_param</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;import_nofile&#39;</span><span class="p">:</span> <span class="s1">&#39;import </span><span class="si">{function}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;import&#39;</span><span class="p">:</span> <span class="s1">&#39;from </span><span class="si">{filename}</span><span class="s1"> import </span><span class="si">{function}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="s1">&#39;import </span><span class="si">{interface_library}</span><span class="s1"> as ygg&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = ygg.YggInput(</span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = ygg.YggOutput(</span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;table_input&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = YggInterface.YggAsciiTableInput(&#39;</span>
+                        <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="si">{channel_name}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;table_output&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = YggInterface.YggAsciiTableOutput(&#39;</span>
+                         <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="si">{channel_name}</span><span class="se">\&quot;</span><span class="s1">, </span><span class="se">\&quot;</span><span class="si">{format_str}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{flag_var}</span><span class="s1">, </span><span class="si">{recv_var}</span><span class="s1"> = </span><span class="si">{channel}</span><span class="s1">.recv()&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{flag_var}</span><span class="s1"> = </span><span class="si">{channel}</span><span class="s1">.send(</span><span class="si">{send_var}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;function_call&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{output_var}</span><span class="s1"> = </span><span class="si">{function_name}</span><span class="s1">(</span><span class="si">{input_var}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;define&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{variable}</span><span class="s1"> = </span><span class="si">{value}</span><span class="s1">&#39;</span><span class="p">,</span>
         <span class="s1">&#39;comment&#39;</span><span class="p">:</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
         <span class="s1">&#39;true&#39;</span><span class="p">:</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;not&#39;</span><span class="p">:</span> <span class="s1">&#39;not&#39;</span><span class="p">,</span>
         <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">4</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span><span class="p">,</span>
+        <span class="s1">&#39;quote&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="s1">&#39;</span><span class="p">,</span>
         <span class="s1">&#39;print&#39;</span><span class="p">:</span> <span class="s1">&#39;print(</span><span class="se">\&quot;</span><span class="si">{message}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;fprintf&#39;</span><span class="p">:</span> <span class="s1">&#39;print(</span><span class="se">\&quot;</span><span class="si">{message}</span><span class="se">\&quot;</span><span class="s1"> % (</span><span class="si">{variables}</span><span class="s1">))&#39;</span><span class="p">,</span>
         <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;raise Exception(&quot;</span><span class="si">{error_msg}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;block_end&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="s1">&#39;if_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;if (</span><span class="si">{cond}</span><span class="s1">):&#39;</span><span class="p">,</span>
         <span class="s1">&#39;for_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;for </span><span class="si">{iter_var}</span><span class="s1"> in range(</span><span class="si">{iter_begin}</span><span class="s1">, </span><span class="si">{iter_end}</span><span class="s1">):&#39;</span><span class="p">,</span>
         <span class="s1">&#39;while_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;while (</span><span class="si">{cond}</span><span class="s1">):&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;break&#39;</span><span class="p">:</span> <span class="s1">&#39;break&#39;</span><span class="p">,</span>
         <span class="s1">&#39;try_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;try:&#39;</span><span class="p">,</span>
         <span class="s1">&#39;try_error_type&#39;</span><span class="p">:</span> <span class="s1">&#39;BaseException&#39;</span><span class="p">,</span>
         <span class="s1">&#39;try_except&#39;</span><span class="p">:</span> <span class="s1">&#39;except </span><span class="si">{error_type}</span><span class="s1"> as </span><span class="si">{error_var}</span><span class="s1">:&#39;</span><span class="p">,</span>
@@ -222,6 +240,13 @@
         <span class="s1">&#39;exec_suffix&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;if __name__ == &quot;__main__&quot;:</span><span class="se">\n</span><span class="s1">&#39;</span>
                         <span class="s1">&#39;    main()&#39;</span><span class="p">)}</span>
 
+<div class="viewcode-block" id="PythonModelDriver.finalize_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.finalize_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">finalize_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed after a class has been fully</span>
+<span class="sd">        initialized and registered.&quot;&quot;&quot;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">supported_comms</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_comm</span><span class="p">()</span>
+        <span class="n">InterpretedModelDriver</span><span class="o">.</span><span class="n">finalize_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></div>
+        
 <div class="viewcode-block" id="PythonModelDriver.is_language_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_language_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_language_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
@@ -274,7 +299,36 @@
         <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq_async&#39;</span><span class="p">]):</span>
             <span class="kn">from</span> <span class="nn">yggdrasil.communication.RMQComm</span> <span class="k">import</span> <span class="n">check_rmq_server</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">check_rmq_server</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">out</span></div></div>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="PythonModelDriver.format_function_param"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.format_function_param">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">format_function_param</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the formatted version of the specified key.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): Key in cls.function_param mapping that should be</span>
+<span class="sd">                formatted.</span>
+<span class="sd">            default (str, optional): Format that should be returned if key</span>
+<span class="sd">                is not in cls.function_param. Defaults to None.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are used in formatting the</span>
+<span class="sd">                request function parameter.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Formatted string.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotImplementedError: If key is not in cls.function_param and default</span>
+<span class="sd">                is not set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;import&#39;</span><span class="p">:</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;import_nofile&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PythonModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">format_function_param</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
@@ -165,7 +166,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <table class="docutils align-center" id="schema-table-serializer-specific-rst">
+  <table class="docutils align-default" id="schema-table-serializer-specific-rst">
 <colgroup>
 <col style="width: 13%" />
 <col style="width: 12%" />
@@ -197,7 +198,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘map’, ‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘map’, ‘pandas’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>dont_write_header</p></td>
 <td><p>boolean</p></td>
@@ -221,20 +222,20 @@ in order to serialize non-bytes objects.</p></td>
 <td><p>array</p></td>
 <td><p>The names of fields in the format string. If not provided, names are set based
 on the order of the fields in the format string.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>field_units</p></td>
 <td><p>array</p></td>
 <td><p>The units of fields in the format string. If not provided, all fields are
 assumed to be dimensionless.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 </tr>
 <tr class="row-even"><td><p>format_str</p></td>
 <td><p>string</p></td>
 <td><p>If provided, this string will be used to format messages from a list of
 arguments and parse messages to get a list of arguments in C printf/scanf style.
 Defaults to None and messages are assumed to already be bytes.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>func_deserialize</p></td>
 <td><p>function</p></td>
@@ -254,7 +255,7 @@ serialization for encoded_datatype will be used.</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
-<td><p>[‘yaml’, ‘json’]</p></td>
+<td><p>[‘json’, ‘yaml’]</p></td>
 </tr>
 <tr class="row-even"><td><p>sort_keys</p></td>
 <td><p>boolean</p></td>
@@ -266,7 +267,7 @@ to True.</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 </tr>
 </tbody>
 </table>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Server/Client I/O &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>Server/Client I/O &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="YAML Files" href="yaml.html" />
+    <link rel="next" title="Autowrapping Model Functions" href="autowrap.html" />
     <link rel="prev" title="Formatted I/O" href="formatted_io.html" /> 
 </head>
 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -93,13 +93,15 @@
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Server/Client I/O</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#one-server-one-client">One Server, One Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#one-server-two-clients">One Server, Two Clients</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
@@ -461,9 +463,8 @@ that the model will act as a client of the <code class="docutils literal notrans
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/rpc_lesson1.html">Example in other languages</a>)</p>
 </div>
-</div>
 <div class="section" id="one-server-two-clients">
-<h1>One Server, Two Clients<a class="headerlink" href="#one-server-two-clients" title="Permalink to this headline">¶</a></h1>
+<h2>One Server, Two Clients<a class="headerlink" href="#one-server-two-clients" title="Permalink to this headline">¶</a></h2>
 <p>There is no limit on the number of clients that can connect to a single
 server. In the example below, the server is the same as above. The client
 code is also essentially the same except that it has been modified to take
@@ -764,9 +765,10 @@ source code.</p>
 <p>(<a class="reference external" href="examples/rpc_lesson2.html">Example in other languages</a>)</p>
 <p>During runtime, request messages from both clients will be routed to the
 server model which will process the requests in the order they are received.</p>
-<div class="admonition-todo admonition" id="index-0">
+<div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Todo</p>
 <p>Section on having multiple servers.</p>
+</div>
 </div>
 </div>
 
@@ -778,7 +780,7 @@ server model which will process the requests in the order they are received.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="yaml.html" class="btn btn-neutral float-right" title="YAML Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="autowrap.html" class="btn btn-neutral float-right" title="Autowrapping Model Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="formatted_io.html" class="btn btn-neutral float-left" title="Formatted I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

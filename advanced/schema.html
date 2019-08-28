@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>YAML Validation Schema &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>YAML Validation Schema &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -92,11 +92,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Advanced</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="serialization.html">Serialization</a></li>
@@ -2011,7 +2012,105 @@ defining a run.</p>
 1823
 1824
 1825
-1826</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+1826
+1827
+1828
+1829
+1830
+1831
+1832
+1833
+1834
+1835
+1836
+1837
+1838
+1839
+1840
+1841
+1842
+1843
+1844
+1845
+1846
+1847
+1848
+1849
+1850
+1851
+1852
+1853
+1854
+1855
+1856
+1857
+1858
+1859
+1860
+1861
+1862
+1863
+1864
+1865
+1866
+1867
+1868
+1869
+1870
+1871
+1872
+1873
+1874
+1875
+1876
+1877
+1878
+1879
+1880
+1881
+1882
+1883
+1884
+1885
+1886
+1887
+1888
+1889
+1890
+1891
+1892
+1893
+1894
+1895
+1896
+1897
+1898
+1899
+1900
+1901
+1902
+1903
+1904
+1905
+1906
+1907
+1908
+1909
+1910
+1911
+1912
+1913
+1914
+1915
+1916
+1917
+1918
+1919
+1920
+1921
+1922
+1923
+1924</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="nt">definitions</span><span class="p">:</span>
   <span class="nt">comm</span><span class="p">:</span>
     <span class="nt">allOf</span><span class="p">:</span>
@@ -2077,7 +2176,9 @@ defining a run.</p>
         <span class="nt">send_converter</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Converter that should be used on sent objects. Defaults to</span>
             <span class="l l-Scalar l-Scalar-Plain">None.</span>
-          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+          <span class="nt">type</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
       <span class="nt">required</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">commtype</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">datatype</span>
@@ -2466,7 +2567,9 @@ defining a run.</p>
         <span class="nt">send_converter</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Converter that should be used on sent objects. Defaults to</span>
             <span class="l l-Scalar l-Scalar-Plain">None.</span>
-          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+          <span class="nt">type</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">serializer</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span>
             <span class="nt">seritype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">direct</span>
@@ -2498,9 +2601,9 @@ defining a run.</p>
             <span class="l l-Scalar l-Scalar-Plain">is used.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
       <span class="nt">required</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">filetype</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">working_dir</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">filetype</span>
       <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">file_base</span>
       <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
     <span class="p p-Indicator">-</span> <span class="nt">anyOf</span><span class="p">:</span>
@@ -2906,8 +3009,9 @@ defining a run.</p>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">client_of</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
-          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The names of ne or more servers that this model is a client</span>
-            <span class="l l-Scalar l-Scalar-Plain">of. Defaults to empty list.</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The names of one or more servers that this model is a client</span>
+            <span class="l l-Scalar l-Scalar-Plain">of. Defaults to empty list. Use of client_of with function is not currently</span>
+            <span class="l l-Scalar l-Scalar-Plain">supported.</span>
           <span class="nt">items</span><span class="p">:</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
@@ -2934,6 +3038,34 @@ defining a run.</p>
         <span class="nt">driver</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;[DEPRECATED]</span><span class="nv"> </span><span class="s">Name</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">driver</span><span class="nv"> </span><span class="s">class</span><span class="nv"> </span><span class="s">that</span><span class="nv"> </span><span class="s">should</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">used.&#39;</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">env_compiler</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CC</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Environment variable where the compiler executable should be</span>
+            <span class="l l-Scalar l-Scalar-Plain">stored for use within the Makefile. Defaults to &#39;CC&#39;.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">env_compiler_flags</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CFLAGS</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Environment variable where the compiler flags should be stored</span>
+            <span class="l l-Scalar l-Scalar-Plain">(including those required to compile against the |yggdrasil| interface).</span>
+            <span class="l l-Scalar l-Scalar-Plain">Defaults to &#39;CFLAGS&#39;.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">env_linker</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CC</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Environment variable where the linker executable should be</span>
+            <span class="l l-Scalar l-Scalar-Plain">stored for use within the Makefile. Defaults to &#39;CC&#39;.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">env_linker_flags</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">LDFLAGS</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Environment variable where the linker flags should be stored</span>
+            <span class="l l-Scalar l-Scalar-Plain">(including those required to link against the |yggdrasil| interface).</span>
+            <span class="l l-Scalar l-Scalar-Plain">Defaults to &#39;LDFLAGS&#39;.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">function</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If provided, an integrated model is created by wrapping the</span>
+            <span class="l l-Scalar l-Scalar-Plain">function named here. The function must be located within the file specified</span>
+            <span class="l l-Scalar l-Scalar-Plain">by the source file listed in the first argument. If not provided, the</span>
+            <span class="l l-Scalar l-Scalar-Plain">model must contain it&#39;s own calls to the |yggdrasil| interface.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">inputs</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model inputs described as comm objects.</span>
@@ -2959,11 +3091,13 @@ defining a run.</p>
           <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, the model is assumed to be a server and an instance</span>
             <span class="l l-Scalar l-Scalar-Plain">of :class:`yggdrasil.drivers.ServerDriver` is started. Defaults to False.</span>
+            <span class="l l-Scalar l-Scalar-Plain">Use of is_server with function is not currently supported.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
         <span class="nt">language</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The programming language that the model is written in.</span>
           <span class="nt">enum</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cmake</span>
@@ -2973,6 +3107,7 @@ defining a run.</p>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">make</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">r</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">linker</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Command or path to executable that should be used to link the</span>
@@ -3062,7 +3197,9 @@ defining a run.</p>
             <span class="l l-Scalar l-Scalar-Plain">file. It can be relative to working_dir or absolute.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">strace_flags</span><span class="p">:</span>
-          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+          <span class="nt">default</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">-e</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">trace=memory</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags to pass to strace (or dtrace). Defaults to [].</span>
           <span class="nt">items</span><span class="p">:</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
@@ -3078,6 +3215,7 @@ defining a run.</p>
         <span class="nt">valgrind_flags</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">--leak-check=full</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">--show-leak-kinds=all</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags to pass to valgrind. Defaults to [].</span>
           <span class="nt">items</span><span class="p">:</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
@@ -3096,8 +3234,8 @@ defining a run.</p>
             <span class="l l-Scalar l-Scalar-Plain">is used.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
       <span class="nt">required</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">working_dir</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">args</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">working_dir</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">language</span>
       <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_base</span>
@@ -3170,6 +3308,28 @@ defining a run.</p>
             <span class="nt">items</span><span class="p">:</span>
               <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+          <span class="nt">env_compiler</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CC</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Environment variable where the compiler executable should</span>
+              <span class="l l-Scalar l-Scalar-Plain">be stored for use within the Makefile. Defaults to &#39;CC&#39;.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">env_compiler_flags</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CFLAGS</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Environment variable where the compiler flags should be stored</span>
+              <span class="l l-Scalar l-Scalar-Plain">(including those required to compile against the |yggdrasil| interface).</span>
+              <span class="l l-Scalar l-Scalar-Plain">Defaults to &#39;CFLAGS&#39;.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">env_linker</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CC</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Environment variable where the linker executable should be</span>
+              <span class="l l-Scalar l-Scalar-Plain">stored for use within the Makefile. Defaults to &#39;CC&#39;.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">env_linker_flags</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">LDFLAGS</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Environment variable where the linker flags should be stored</span>
+              <span class="l l-Scalar l-Scalar-Plain">(including those required to link against the |yggdrasil| interface).</span>
+              <span class="l l-Scalar l-Scalar-Plain">Defaults to &#39;LDFLAGS&#39;.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
           <span class="nt">language</span><span class="p">:</span>
             <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
             <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is written in C/C++ and has a Makefile for compilation.</span>
@@ -3213,7 +3373,75 @@ defining a run.</p>
             <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Make target that should be built to create the model executable.</span>
               <span class="l l-Scalar l-Scalar-Plain">Defaults to None.</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">target_language</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Language that the target is written in. Defaults to None</span>
+              <span class="l l-Scalar l-Scalar-Plain">and will be set based on the source files provided.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MakeModelDriver</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;python&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">interpreter</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Name or path of interpreter executable that should be used</span>
+              <span class="l l-Scalar l-Scalar-Plain">to run the model. If not provided, the interpreter will be determined</span>
+              <span class="l l-Scalar l-Scalar-Plain">based on configuration options for the language (if present) and the</span>
+              <span class="l l-Scalar l-Scalar-Plain">default_interpreter class attribute.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">interpreter_flags</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags that should be passed to the interpreter when running</span>
+              <span class="l l-Scalar l-Scalar-Plain">the model. If not provided, the flags are determined based on configuration</span>
+              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present) and the default_interpreter_flags</span>
+              <span class="l l-Scalar l-Scalar-Plain">class attribute.</span>
+            <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is written in Python.</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">skip_interpreter</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, no interpreter will be added to the arguments. This</span>
+              <span class="l l-Scalar l-Scalar-Plain">should only be used for subclasses that will not be invoking the model</span>
+              <span class="l l-Scalar l-Scalar-Plain">via the command line. Defaults to False.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;lpy&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">interpreter</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Name or path of interpreter executable that should be used</span>
+              <span class="l l-Scalar l-Scalar-Plain">to run the model. If not provided, the interpreter will be determined</span>
+              <span class="l l-Scalar l-Scalar-Plain">based on configuration options for the language (if present) and the</span>
+              <span class="l l-Scalar l-Scalar-Plain">default_interpreter class attribute.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">interpreter_flags</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags that should be passed to the interpreter when running</span>
+              <span class="l l-Scalar l-Scalar-Plain">the model. If not provided, the flags are determined based on configuration</span>
+              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present) and the default_interpreter_flags</span>
+              <span class="l l-Scalar l-Scalar-Plain">class attribute.</span>
+            <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is an LPy system.</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">lpy</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">skip_interpreter</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, no interpreter will be added to the arguments. This</span>
+              <span class="l l-Scalar l-Scalar-Plain">should only be used for subclasses that will not be invoking the model</span>
+              <span class="l l-Scalar l-Scalar-Plain">via the command line. Defaults to False.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">LPyModelDriver</span>
         <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
       <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
         <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;matlab&#39;] subtype.</span>
@@ -3298,6 +3526,39 @@ defining a run.</p>
         <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CPPModelDriver</span>
         <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
       <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;R&#39;, &#39;r&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">interpreter</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Name or path of interpreter executable that should be used</span>
+              <span class="l l-Scalar l-Scalar-Plain">to run the model. If not provided, the interpreter will be determined</span>
+              <span class="l l-Scalar l-Scalar-Plain">based on configuration options for the language (if present) and the</span>
+              <span class="l l-Scalar l-Scalar-Plain">default_interpreter class attribute.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">interpreter_flags</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags that should be passed to the interpreter when running</span>
+              <span class="l l-Scalar l-Scalar-Plain">the model. If not provided, the flags are determined based on configuration</span>
+              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present) and the default_interpreter_flags</span>
+              <span class="l l-Scalar l-Scalar-Plain">class attribute.</span>
+            <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is written in R.</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">r</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">skip_interpreter</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, no interpreter will be added to the arguments. This</span>
+              <span class="l l-Scalar l-Scalar-Plain">should only be used for subclasses that will not be invoking the model</span>
+              <span class="l l-Scalar l-Scalar-Plain">via the command line. Defaults to False.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RModelDriver</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
         <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;cmake&#39;] subtype.</span>
         <span class="nt">properties</span><span class="p">:</span>
           <span class="nt">builddir</span><span class="p">:</span>
@@ -3378,70 +3639,6 @@ defining a run.</p>
             <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ExecutableModelDriver</span>
-        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
-      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;python&#39;] subtype.</span>
-        <span class="nt">properties</span><span class="p">:</span>
-          <span class="nt">interpreter</span><span class="p">:</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Name or path of interpreter executable that should be used</span>
-              <span class="l l-Scalar l-Scalar-Plain">to run the model. If not provided, the interpreter will be determined</span>
-              <span class="l l-Scalar l-Scalar-Plain">based on configuration options for the language (if present) and the</span>
-              <span class="l l-Scalar l-Scalar-Plain">default_interpreter class attribute.</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-          <span class="nt">interpreter_flags</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags that should be passed to the interpreter when running</span>
-              <span class="l l-Scalar l-Scalar-Plain">the model. If not provided, the flags are determined based on configuration</span>
-              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present) and the default_interpreter_flags</span>
-              <span class="l l-Scalar l-Scalar-Plain">class attribute.</span>
-            <span class="nt">items</span><span class="p">:</span>
-              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-          <span class="nt">language</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is written in Python.</span>
-            <span class="nt">enum</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-          <span class="nt">skip_interpreter</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, no interpreter will be added to the arguments. This</span>
-              <span class="l l-Scalar l-Scalar-Plain">should only be used for subclasses that will not be invoking the model</span>
-              <span class="l l-Scalar l-Scalar-Plain">via the command line. Defaults to False.</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
-        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
-        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
-      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;lpy&#39;] subtype.</span>
-        <span class="nt">properties</span><span class="p">:</span>
-          <span class="nt">interpreter</span><span class="p">:</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Name or path of interpreter executable that should be used</span>
-              <span class="l l-Scalar l-Scalar-Plain">to run the model. If not provided, the interpreter will be determined</span>
-              <span class="l l-Scalar l-Scalar-Plain">based on configuration options for the language (if present) and the</span>
-              <span class="l l-Scalar l-Scalar-Plain">default_interpreter class attribute.</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-          <span class="nt">interpreter_flags</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags that should be passed to the interpreter when running</span>
-              <span class="l l-Scalar l-Scalar-Plain">the model. If not provided, the flags are determined based on configuration</span>
-              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present) and the default_interpreter_flags</span>
-              <span class="l l-Scalar l-Scalar-Plain">class attribute.</span>
-            <span class="nt">items</span><span class="p">:</span>
-              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-          <span class="nt">language</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is an LPy system.</span>
-            <span class="nt">enum</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">lpy</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-          <span class="nt">skip_interpreter</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, no interpreter will be added to the arguments. This</span>
-              <span class="l l-Scalar l-Scalar-Plain">should only be used for subclasses that will not be invoking the model</span>
-              <span class="l l-Scalar l-Scalar-Plain">via the command line. Defaults to False.</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
-        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">LPyModelDriver</span>
         <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
     <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model components.</span>
     <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>

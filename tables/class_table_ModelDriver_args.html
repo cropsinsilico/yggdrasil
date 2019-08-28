@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
@@ -165,7 +166,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <table class="docutils align-center" id="class-table-modeldriver-args-rst">
+  <table class="docutils align-default" id="class-table-modeldriver-args-rst">
 <colgroup>
 <col style="width: 13%" />
 <col style="width: 70%" />
@@ -188,28 +189,37 @@ executable.</p></td>
 <td><p>str or list</p></td>
 </tr>
 <tr class="row-odd"><td><p>client_of</p></td>
-<td><p>The names of ne or more servers that this model is a client of. Defaults to
-empty list.</p></td>
+<td><p>The names of one or more servers that this model is a client of. Defaults to
+empty list. Use of client_of with function is not currently supported.</p></td>
 <td></td>
 <td><p>str, list</p></td>
 </tr>
-<tr class="row-even"><td><p>is_server</p></td>
+<tr class="row-even"><td><p>function</p></td>
+<td><p>If provided, an integrated model is created by wrapping the function named here.
+The function must be located within the file specified by the source file listed
+in the first argument. If not provided, the model must contain it’s own calls to
+the yggdrasil interface.</p></td>
+<td></td>
+<td><p>str</p></td>
+</tr>
+<tr class="row-odd"><td><p>is_server</p></td>
 <td><p>If True, the model is assumed to be a server and an instance of
-<a class="reference internal" href="../yggdrasil.drivers.html#module-yggdrasil.drivers.ServerDriver" title="yggdrasil.drivers.ServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code></a> is started. Defaults to False.</p></td>
+<a class="reference internal" href="../yggdrasil.drivers.html#module-yggdrasil.drivers.ServerDriver" title="yggdrasil.drivers.ServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code></a> is started. Defaults to False. Use of
+is_server with function is not currently supported.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>model_index</p></td>
+<tr class="row-even"><td><p>model_index</p></td>
 <td><p>Index of model in list of models being run. Defaults to 0.</p></td>
 <td></td>
 <td><p>int</p></td>
 </tr>
-<tr class="row-even"><td><p>name</p></td>
+<tr class="row-odd"><td><p>name</p></td>
 <td><p>Driver name.</p></td>
 <td><p>X</p></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td><p>overwrite</p></td>
+<tr class="row-even"><td><p>overwrite</p></td>
 <td><p>If True, any existing model products (compilation products, wrapper scripts,
 etc.) are removed prior to the run. If False, the products are not removed.
 Defaults to True. Setting this to False can improve the performance,
@@ -220,43 +230,43 @@ or not products are removed after a run.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-even"><td><p>preserve_cache</p></td>
+<tr class="row-odd"><td><p>preserve_cache</p></td>
 <td><p>If True model products will be kept following the run, otherwise all products
 will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>products</p></td>
+<tr class="row-even"><td><p>products</p></td>
 <td><p>Paths to files created by the model that should be cleaned up when the model
 exits. Entries can be absolute paths or paths relative to the working directory.
 Defaults to [].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>source_products</p></td>
+<tr class="row-odd"><td><p>source_products</p></td>
 <td><p>Files created by running the model that are source files. These files will be
 removed without checking their extension so users should avoid adding files to
 this list unless they are sure they should be deleted. Defaults to [].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td><p>strace_flags</p></td>
+<tr class="row-even"><td><p>strace_flags</p></td>
 <td><p>Flags to pass to strace (or dtrace). Defaults to [].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>valgrind_flags</p></td>
+<tr class="row-odd"><td><p>valgrind_flags</p></td>
 <td><p>Flags to pass to valgrind. Defaults to [].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td><p>with_strace</p></td>
+<tr class="row-even"><td><p>with_strace</p></td>
 <td><p>If True, the command is run with strace (on Linux) or dtrace (on MacOS).
 Defaults to False.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-even"><td><p>with_valgrind</p></td>
+<tr class="row-odd"><td><p>with_valgrind</p></td>
 <td><p>If True, the command is run with valgrind. Defaults to False.</p></td>
 <td></td>
 <td><p>bool</p></td>

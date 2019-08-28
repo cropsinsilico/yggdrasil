@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
@@ -165,7 +166,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <table class="docutils align-center" id="class-table-modeldriver-attr-rst">
+  <table class="docutils align-default" id="class-table-modeldriver-attr-rst">
 <colgroup>
 <col style="width: 12%" />
 <col style="width: 58%" />
@@ -190,85 +191,90 @@
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>is_server</p></td>
+<tr class="row-even"><td><p>function</p></td>
+<td><p>The name of the model function that should be wrapped.</p></td>
+<td></td>
+<td><p>str</p></td>
+</tr>
+<tr class="row-odd"><td><p>is_server</p></td>
 <td><p>If True, the model is assumed to be a server and an instance of
 <a class="reference internal" href="../yggdrasil.drivers.html#module-yggdrasil.drivers.ServerDriver" title="yggdrasil.drivers.ServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code></a> is started.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>model_args</p></td>
+<tr class="row-even"><td><p>model_args</p></td>
 <td><p>Runtime arguments for running the model on the command line.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>model_file</p></td>
+<tr class="row-odd"><td><p>model_file</p></td>
 <td><p>Full path to the model executable or interpretable script.</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td><p>model_index</p></td>
+<tr class="row-even"><td><p>model_index</p></td>
 <td><p>Index of model in list of models being run.</p></td>
 <td></td>
 <td><p>int</p></td>
 </tr>
-<tr class="row-even"><td><p>model_src</p></td>
+<tr class="row-odd"><td><p>model_src</p></td>
 <td><p>Full path to the model source code. For interpreted languages, this will be the
 same as model_file.</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td><p>modified_files</p></td>
+<tr class="row-even"><td><p>modified_files</p></td>
 <td><p>List of pairs of originals and copies of files that should be restored during
 cleanup.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>overwrite</p></td>
+<tr class="row-odd"><td><p>overwrite</p></td>
 <td><p>If True, any existing compilation products will be overwritten by compilation
 and cleaned up following the run. Otherwise, existing products will be used and
 will remain after the run.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>process</p></td>
+<tr class="row-even"><td><p>process</p></td>
 <td><p>Process used to run the model.</p></td>
 <td></td>
 <td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggPopen</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>products</p></td>
+<tr class="row-odd"><td><p>products</p></td>
 <td><p>Files created by running the model. This includes compilation products such as
 executables and/or object files.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td><p>source_products</p></td>
+<tr class="row-even"><td><p>source_products</p></td>
 <td><p>Files created by running the model that are source files. These files will be
 removed without checking their extension so users should avoid adding files to
 this list unless they are sure they should be deleted.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>strace_flags</p></td>
+<tr class="row-odd"><td><p>strace_flags</p></td>
 <td><p>Flags to pass to strace/dtrace.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td><p>valgrind_flags</p></td>
+<tr class="row-even"><td><p>valgrind_flags</p></td>
 <td><p>Flags to pass to valgrind.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>with_strace</p></td>
+<tr class="row-odd"><td><p>with_strace</p></td>
 <td><p>If True, the command is run with strace or dtrace.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>with_valgrind</p></td>
+<tr class="row-even"><td><p>with_valgrind</p></td>
 <td><p>If True, the command is run with valgrind.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-even"><td><p>wrapper_products</p></td>
+<tr class="row-odd"><td><p>wrapper_products</p></td>
 <td><p>Files created in order to wrap the model.</p></td>
 <td></td>
 <td><p>list</p></td>

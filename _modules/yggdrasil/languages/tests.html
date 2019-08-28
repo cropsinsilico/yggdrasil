@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.languages.tests &mdash; yggdrasil 0.9.0 documentation</title>
+  <title>yggdrasil.languages.tests &mdash; yggdrasil 0.10.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.9.0
+                0.10.0
               </div>
             
           
@@ -90,11 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -166,7 +167,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.languages.tests</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">languages</span><span class="p">,</span> <span class="n">tools</span>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">languages</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_raises</span>
 
 
@@ -179,6 +180,17 @@
         <span class="k">if</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">test_skip</span><span class="p">:</span>
             <span class="k">continue</span>
         <span class="n">languages</span><span class="o">.</span><span class="n">get_language_dir</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_get_language_ext"><a class="viewcode-back" href="../../../yggdrasil.languages.tests.html#yggdrasil.languages.tests.test_get_language_ext">[docs]</a><span class="k">def</span> <span class="nf">test_get_language_ext</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the get_language_ext method.&quot;&quot;&quot;</span>
+    <span class="n">test_lang</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">test_lang</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">lang</span> <span class="o">==</span> <span class="s1">&#39;executable&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">):</span>
+            <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">languages</span><span class="o">.</span><span class="n">get_language_ext</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+            <span class="n">languages</span><span class="o">.</span><span class="n">get_language_ext</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">languages</span><span class="o">.</span><span class="n">get_language_ext</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

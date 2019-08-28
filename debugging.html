@@ -1,0 +1,335 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Debugging &mdash; yggdrasil 0.10.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples/examples_toc.html" />
+    <link rel="prev" title="C-Style Format Strings" href="c_format_strings.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.10.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Debugging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tips-for-debugging">Tips for Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#possible-errors">Possible Errors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#matlab-errors">Matlab Errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#c-errors">C++ Errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#r-errors">R Errors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Debugging</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/debugging.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="debugging">
+<span id="debugging-rst"></span><h1>Debugging<a class="headerlink" href="#debugging" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="tips-for-debugging">
+<h2>Tips for Debugging<a class="headerlink" href="#tips-for-debugging" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p><em>Check for known errors.</em> The list below includes several errors that have
+already been encountered by yggdrasil users and the method used to solve
+the issue.</p></li>
+<li><p><em>Turn on debugging log messages.</em> This will increase the number of log
+messages greatly and help you track down any issues. Debug messages can be
+enabled by setting the <code class="docutils literal notranslate"><span class="pre">ygg</span></code> and <code class="docutils literal notranslate"><span class="pre">client</span></code> debug options in your config
+file to <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> (see <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a> for details
+on the location of the user config file and additional logging options).</p></li>
+<li><p><em>Trace the flow of data.</em> Use the debug messages to trace the flow of data
+from one model to the next and determine where the failure is occuring.</p></li>
+<li><p><em>Check |yggdrasil| summary.</em> yggdrasil includes a command line utility,
+<code class="docutils literal notranslate"><span class="pre">ygginfo</span></code> that will print out relevent information about yggdrasil, the
+languages it supports, and the operating system. This information can be
+useful for running down conflicting dependencies or determining why
+yggdrasil thinks a language is or isn’t install. Additional information
+about the system can be display by adding the <code class="docutils literal notranslate"><span class="pre">--verbose</span></code> flag, including
+the current conda environment information (if you are using a conda
+environment) and informaiton about the current R installation (if R is
+installed). This information should be included in any Github issues opened
+related to bugs in order to help us assist you.</p></li>
+</ol>
+</div>
+<div class="section" id="possible-errors">
+<h2>Possible Errors<a class="headerlink" href="#possible-errors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="matlab-errors">
+<h3>Matlab Errors<a class="headerlink" href="#matlab-errors" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>The MATLAB model hangs for a long time during startup and then times out.
+- <em>Possible Cause:</em> If MATLAB has trouble accessing the license server, it</p>
+<blockquote>
+<div><p>can hang for a long time during startup. yggdrasil has a config parameter
+that controls how long it will wait for MATLAB to start. If it takes longer
+than that amount of time, it will kill the process and report an error. To
+solve this issue, verify that you have access to the MATLAB license server
+(e.g. an internet connection and, if appropriate, the correct VPN). If you
+do (i.e. you can start the MATLAB application independent of yggdrasil),
+increase the <code class="docutils literal notranslate"><span class="pre">startup_waittime_s</span></code> config parameter described
+<a class="reference internal" href="config.html#config-rst"><span class="std std-ref">here</span></a>.</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="c-errors">
+<h3>C++ Errors<a class="headerlink" href="#c-errors" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>The received message size is always 0, but the message is not empty.
+- <em>Possible Cause:</em> Some C++ compilers will incorrectly pass the <code class="docutils literal notranslate"><span class="pre">size_t</span></code></p>
+<blockquote>
+<div><p>reference such that it is copied and set to zero as it is passed. This can
+be solved by using <code class="docutils literal notranslate"><span class="pre">strlen</span></code> to get the actual size of the received string.</p>
+</div></blockquote>
+</li>
+<li><p>You are sending/receiving from/into a character array (e.g. <code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">x[100];</span></code>),
+and the received message is always empty even through the received message
+size may or may not be 0.
+- <em>Possible Cause:</em> Some C++ compilers will incorrectly pass the reference to</p>
+<blockquote>
+<div><p>the character array such that is is copied and, therefore, not assigned to
+during the receive call. This can be solved by dynamically allocated a
+variable on heap (e.g. <code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">\*x</span> <span class="pre">=</span> <span class="pre">(char\*)malloc(100)</span></code>), just be sure to
+free the variable at the end.</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="r-errors">
+<h3>R Errors<a class="headerlink" href="#r-errors" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>You get an error message along the lines of:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ImportError: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.20&#39; not found
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Possible Causes:</em> This error usually results from a conflict in the shared libraries
+available during R calls to Python as handled through the
+<a class="reference external" href="https://rstudio.github.io/reticulate/">reticulate</a> package. The <code class="docutils literal notranslate"><span class="pre">reticulate</span></code>
+development team is aware of this (see
+<a class="reference external" href="https://github.com/rstudio/reticulate/issues/428">this</a> issue and the issues it
+references), but has not yet taken steps to address it as of writing this
+(2019/06/20). This error is most likely to occur if you are using a <code class="docutils literal notranslate"><span class="pre">conda</span></code>
+environment to manage yggdrasil, but are using a version of R that was not
+installed via <code class="docutils literal notranslate"><span class="pre">conda</span></code>. One remedy is to install R using <code class="docutils literal notranslate"><span class="pre">conda</span></code> (e.g.
+<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">r-base</span></code>). Another solution is to install the missing shared
+library on your local machine (i.e. outside the conda environment) so that it is
+available when using R.</p></li>
+</ul>
+</li>
+<li><p>You get a segfault when calling one of the Python object methods.
+- <em>Possible Cause:</em> The Python and R packages are using different C/C++ libraries.</p>
+<blockquote>
+<div><p>This can result from using conda to manage the Python packages, but using a
+version of R and R packages that were installed outside the conda environment
+using locally installed versions of the libraries. As above, one solution is to
+use <code class="docutils literal notranslate"><span class="pre">conda</span></code> to install R and the R dependencies.</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="examples/examples_toc.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="c_format_strings.html" class="btn btn-neutral float-left" title="C-Style Format Strings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
