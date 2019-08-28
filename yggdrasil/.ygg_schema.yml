@@ -53,30 +53,45 @@ definitions:
             type: string
           type: array
         filter:
+          $ref: '#/definitions/filter'
           description: Callable class that will be used to determine when messages
             should be sent/received. Defaults to None and is ignored.
-          oneOf:
-          - $ref: '#/definitions/filter'
-          - class: yggdrasil.communication.filters.FilterBase:FilterBase
-            type: instance
         name:
           description: Name used for component in log messages.
           type: string
         recv_converter:
           description: Converter that should be used on received objects. Defaults
             to None.
-          type:
-          - function
-          - string
+          oneOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              oneOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
         send_converter:
           description: Converter that should be used on sent objects. Defaults to
             None.
-          type:
-          - function
-          - string
+          oneOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              oneOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
       required:
-      - commtype
       - name
+      - commtype
       - datatype
       title: comm_base
       type: object
@@ -412,12 +427,9 @@ definitions:
           - yaml
           type: string
         filter:
+          $ref: '#/definitions/filter'
           description: Callable class that will be used to determine when messages
             should be sent/received. Defaults to None and is ignored.
-          oneOf:
-          - $ref: '#/definitions/filter'
-          - class: yggdrasil.communication.filters.FilterBase:FilterBase
-            type: instance
         format_str:
           description: If provided, this string will be used to format messages from
             a list of arguments and parse messages to get a list of arguments in C
@@ -463,15 +475,33 @@ definitions:
         recv_converter:
           description: Converter that should be used on received objects. Defaults
             to None.
-          type:
-          - function
-          - string
+          oneOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              oneOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
         send_converter:
           description: Converter that should be used on sent objects. Defaults to
             None.
-          type:
-          - function
-          - string
+          oneOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              oneOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
         serializer:
           default:
             seritype: direct
@@ -503,9 +533,9 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - name
       - filetype
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -900,6 +930,7 @@ definitions:
       properties:
         filtertype:
           enum:
+          - direct
           - function
           - statement
         function:
@@ -919,13 +950,20 @@ definitions:
           description: Python statement in terms of the message as represented by
             the string "%x%" that should evaluate to a boolean, True if the message
             should pass through the filter, False if it should not. The statement
-            should only use a limited set of builtins and the math library (See safe_dict
-            attribute). If more complex relationships are required, use the FunctionFilter
-            class.
+            should only use a limited set of builtins and the math library (See yggdrasil.tools.safe_eval).
+            If more complex relationships are required, use the FunctionFilter class.
           type: string
       title: filter_base
       type: object
     - anyOf:
+      - additionalProperties: true
+        description: Schema for filter component ['direct'] subtype.
+        properties:
+          filtertype:
+            enum:
+            - direct
+        title: DirectFilter
+        type: object
       - additionalProperties: true
         description: Schema for filter component ['statement'] subtype.
         properties:
@@ -937,8 +975,8 @@ definitions:
               the string "%x%" that should evaluate to a boolean, True if the message
               should pass through the filter, False if it should not. The statement
               should only use a limited set of builtins and the math library (See
-              safe_dict attribute). If more complex relationships are required, use
-              the FunctionFilter class.
+              yggdrasil.tools.safe_eval). If more complex relationships are required,
+              use the FunctionFilter class.
             type: string
         required:
         - statement
@@ -1211,10 +1249,10 @@ definitions:
             is used.
           type: string
       required:
-      - args
-      - working_dir
       - name
       - language
+      - args
+      - working_dir
       title: model_base
       type: object
     - anyOf:
@@ -1996,6 +2034,144 @@ definitions:
         type: object
     description: Schema for serializer components.
     title: serializer
+  transform:
+    allOf:
+    - additionalProperties: false
+      dependencies:
+        driver:
+        - args
+      description: Base schema for all subtypes of transform components.
+      properties:
+        function:
+          description: The handle for a callable Python object (e.g. function) that
+            should be used to transform messages or a string of the form "<function
+            file>:<function name>" identifying a function where "<function file>"
+            is the module or Python file containing the function and "<function name>"
+            is the name of the function. The function should take the message as input
+            and return the transformed message.
+          type: function
+        initial_state:
+          description: Dictionary of initial state variables that should be set when
+            the transform is created.
+          type: object
+        map:
+          additionalProperties:
+            type: string
+          description: A mapping from original field name to new field names.
+          type: object
+        original_order:
+          description: The original order of fields that should be used for selecting
+            from lists/tuples.
+          items:
+            type: string
+          type: array
+        selected:
+          description: A list of fields that should be selected.
+          items:
+            type: string
+          type: array
+        serializer:
+          $ref: '#/definitions/serializer'
+          description: Serializer that should be used to information on parts of the
+            transformation.
+        statement:
+          description: Python statement in terms of the message as represented by
+            the string "%x%" that should evaluate to the transformed message. The
+            statement should only use a limited set of builtins and the math library
+            (See yggdrasil.tools.safe_eval). If more complex relationships are required,
+            use the FunctionTransform class.
+          type: string
+        transformtype:
+          enum:
+          - direct
+          - function
+          - map_fields
+          - select_fields
+          - statement
+      title: transform_base
+      type: object
+    - anyOf:
+      - additionalProperties: true
+        description: Schema for transform component ['select_fields'] subtype.
+        properties:
+          original_order:
+            description: The original order of fields that should be used for selecting
+              from lists/tuples.
+            items:
+              type: string
+            type: array
+          selected:
+            description: A list of fields that should be selected.
+            items:
+              type: string
+            type: array
+          transformtype:
+            enum:
+            - select_fields
+        required:
+        - selected
+        title: SelectFieldsTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['function'] subtype.
+        properties:
+          function:
+            description: The handle for a callable Python object (e.g. function) that
+              should be used to transform messages or a string of the form "<function
+              file>:<function name>" identifying a function where "<function file>"
+              is the module or Python file containing the function and "<function
+              name>" is the name of the function. The function should take the message
+              as input and return the transformed message.
+            type: function
+          transformtype:
+            enum:
+            - function
+        required:
+        - function
+        title: FunctionTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['statement'] subtype.
+        properties:
+          statement:
+            description: Python statement in terms of the message as represented by
+              the string "%x%" that should evaluate to the transformed message. The
+              statement should only use a limited set of builtins and the math library
+              (See yggdrasil.tools.safe_eval). If more complex relationships are required,
+              use the FunctionTransform class.
+            type: string
+          transformtype:
+            enum:
+            - statement
+        required:
+        - statement
+        title: StatementTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['direct'] subtype.
+        properties:
+          transformtype:
+            enum:
+            - direct
+        title: DirectTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['map_fields'] subtype.
+        properties:
+          map:
+            additionalProperties:
+              type: string
+            description: A mapping from original field name to new field names.
+            type: object
+          transformtype:
+            enum:
+            - map_fields
+        required:
+        - map
+        title: MapFieldsTransform
+        type: object
+    description: Schema for transform components.
+    title: transform
 description: Schema for yggdrasil YAML input files.
 properties:
   models:

@@ -27,7 +27,8 @@ _comptype2mod = {'serializer': 'serialize',
                  'file': 'communication',
                  'model': 'drivers',
                  'connection': 'drivers',
-                 'filter': 'communication.filters'}
+                 'filter': 'communication.filters',
+                 'transform': 'communication.transforms'}
 # 'datatype': ['metaschema', 'datatypes'],
 # 'compiler': 'drivers',
 # 'linker': 'drivers',
@@ -353,6 +354,11 @@ class ComponentMeta(type):
                     in ['true', '1']):
                 cls.after_registration(cls)
                 cls.finalize_registration(cls)
+        # Set base class
+        if (((not getattr(cls, '_schema_base_class', None))
+             and cls._schema_type
+             and (cls.__name__ != 'ComponentBase'))):
+            cls._schema_base_class = cls.__name__
         return cls
     
     # def __getattribute__(cls, key):
@@ -452,7 +458,9 @@ class ComponentBase(object):
         # Parse keyword arguments using schema
         if (comptype is not None) and (subtype is not None):
             from yggdrasil.schema import get_schema
-            s = get_schema().get_component_schema(comptype, subtype, relaxed=True)
+            s = get_schema().get_component_schema(
+                comptype, subtype, relaxed=True,
+                allow_instance_definitions=True)
             props = list(s['properties'].keys())
             if not skip_component_schema_normalization:
                 from yggdrasil import metaschema

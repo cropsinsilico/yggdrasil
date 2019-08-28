@@ -32,7 +32,7 @@ class FilterBase(ComponentBase):
             bool: True if the message will pass through the filter, False otherwise.
 
         """
-        return True
+        raise NotImplementedError
 
     def __call__(self, x):
         r"""Call filter on the provided message.
@@ -60,4 +60,4 @@ class FilterBase(ComponentBase):
                 pass/fail for those keywords.
         
         """
-        return []
+        return [{'error': [(1, NotImplementedError)]}]

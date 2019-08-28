@@ -1,21 +1,21 @@
 from yggdrasil.tests import YggTestClass
 
 
-class TestFilterBase(YggTestClass):
-    r"""Test for FilterBase communication flass."""
+class TestTransformBase(YggTestClass):
+    r"""Test for TransformBase communication flass."""
 
-    filter = 'FilterBase'
+    transform = 'TransformBase'
     skip_comm_check = True
     
     @property
     def cls(self):
         r"""str: Communication class."""
-        return self.filter
+        return self.transform
 
     @property
     def mod(self):
         r"""str: Absolute module import."""
-        return 'yggdrasil.communication.filters.%s' % self.cls
+        return 'yggdrasil.communication.transforms.%s' % self.cls
 
     @property
     def inst_kwargs(self):
@@ -26,13 +26,12 @@ class TestFilterBase(YggTestClass):
             out = opt[0].get('kwargs', {})
         return out
 
-    def test_filter(self):
-        r"""Test filter."""
+    def test_transform(self):
+        r"""Test transform."""
         for x in self.get_options():
             inst = self.import_cls(**x.get('kwargs', {}))
-            for msg in x.get('pass', []):
-                self.assert_equal(inst(msg), True)
-            for msg in x.get('fail', []):
-                self.assert_equal(inst(msg), False)
-            for msg, err in x.get('error', []):
-                self.assert_raises(err, inst, msg)
+            for msg_in, msg_out in x.get('in/out', []):
+                if isinstance(msg_out, type(BaseException)):
+                    self.assert_raises(msg_out, inst, msg_in)
+                else:
+                    self.assert_equal(inst(msg_in), msg_out)

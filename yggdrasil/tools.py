@@ -13,6 +13,7 @@ import signal
 import atexit
 import uuid as uuid_gen
 import subprocess
+import importlib
 from yggdrasil import platform
 from yggdrasil import backwards
 from yggdrasil.components import import_component, ComponentBase
@@ -478,6 +479,57 @@ def sleep(interval):
                 break
     else:
         time.sleep(interval)
+
+
+def safe_eval(statement, **kwargs):
+    r"""Run eval with a limited set of builtins and Python libraries/functions.
+
+    Args:
+        statement (str): Statement that should be evaluated.
+        **kwargs: Additional keyword arguments are variables that are made available
+            to the statement during evaluation.
+
+    Returns:
+        object: Result of the eval.
+
+    """
+    from yggdrasil import units
+    safe_dict = {}
+    _safe_lists = {'math': ['acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
+                            'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor', 'fmod',
+                            'frexp', 'hypot', 'ldexp', 'log', 'log10', 'modf', 'pi',
+                            'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh'],
+                   'builtins': ['abs', 'any', 'bool', 'bytes', 'float', 'int', 'len',
+                                'list', 'map', 'max', 'min', 'repr', 'set', 'str',
+                                'sum', 'tuple', 'type'],
+                   'numpy': ['array', 'int8', 'int16', 'int32', 'int64',
+                             'uint8', 'uint16', 'uint32', 'uint64',
+                             'float16', 'float32', 'float64']}
+    _no_eval_class = {}
+    if units._use_unyt:
+        _safe_lists['unyt.array'] = ['unyt_quantity', 'unyt_array']
+    else:
+        safe_dict['Quantity'] = units._unit_quantity
+        _no_eval_class['Quantity'] = 'Quantity'
+    for mod_name, func_list in _safe_lists.items():
+        mod = importlib.import_module(mod_name)
+        for func in func_list:
+            safe_dict[func] = getattr(mod, func)
+    safe_dict.update(kwargs)
+    # The following replaces <Class Name(a, b)> style reprs with calls to classes
+    # identified in self._no_eval_class
+    # regex = r'<([^<>]+)\(([^\(\)]+)\)>'
+    # while True:
+    #     match = re.search(regex, statement)
+    #     if not match:
+    #         break
+    #     cls_repl = self._no_eval_class.get(match.group(1), False)
+    #     if not cls_repl:
+    #         raise ValueError("Expression '%s' in '%s' is not eval friendly."
+    #                          % (match.group(0), statement))
+    #     statement = statement.replace(match.group(0),
+    #                                   '%s(%s)' % (cls_repl, match.group(2)), 1)
+    return eval(statement, {"__builtins__": None}, safe_dict)
 
 
 def eval_kwarg(x):

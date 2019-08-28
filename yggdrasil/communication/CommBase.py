@@ -7,7 +7,6 @@ import logging
 from yggdrasil import backwards, tools, serialize
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
-from yggdrasil.communication.filters.FilterBase import FilterBase
 from yggdrasil.components import import_component, create_component
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
@@ -333,16 +332,26 @@ class CommBase(tools.YggClass):
                                                        'that should be used.')},
                           'datatype': {'type': 'schema',
                                        'default': {'type': 'bytes'}},
-                          'recv_converter': {'type': ['function', 'string']},
-                          'send_converter': {'type': ['function', 'string']},
+                          'recv_converter': {'oneOf': [
+                              {'$ref': '#/definitions/transform'},
+                              {'type': ['function', 'string']},
+                              {'type': 'array',
+                               'items': {'oneOf': [
+                                   {'$ref': '#/definitions/transform'},
+                                   {'type': ['function', 'string']}]}}]},
+                          'send_converter': {'oneOf': [
+                              {'$ref': '#/definitions/transform'},
+                              {'type': ['function', 'string']},
+                              {'type': 'array',
+                               'items': {'oneOf': [
+                                   {'$ref': '#/definitions/transform'},
+                                   {'type': ['function', 'string']}]}}]},
                           'field_names': {'type': 'array',
                                           'items': {'type': 'string'}},
                           'field_units': {'type': 'array',
                                           'items': {'type': 'string'}},
                           'as_array': {'type': 'boolean', 'default': False},
-                          'filter': {'oneOf': [{'$ref': '#/definitions/filter'},
-                                               {'type': 'instance',
-                                                'class': FilterBase}]}}
+                          'filter': {'$ref': '#/definitions/filter'}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
@@ -476,12 +485,16 @@ class CommBase(tools.YggClass):
             self.serializer = seri_cls(**seri_kws)
         # Set send/recv converter based on the serializer
         for k in ['recv_converter', 'send_converter']:
-            v = getattr(self, k, None)
-            if v is None:
-                v = getattr(self.serializer, k, None)
-            if isinstance(v, str):
-                cls_conv = getattr(self.language_driver, k + 's')
-                v = cls_conv.get(v, None)
+            v = getattr(self, k, [])
+            if not v:
+                v = getattr(self.serializer, k, [])
+            if v:
+                if not isinstance(v, list):
+                    v = [v]
+                for iv in v:
+                    if isinstance(iv, str):
+                        cls_conv = getattr(self.language_driver, k + 's')
+                        iv = cls_conv.get(iv, None)
             setattr(self, k, v)
         # Set filter
         if isinstance(self.filter, dict):
@@ -960,22 +973,24 @@ class CommBase(tools.YggClass):
             object: Converted message.
  
         """
-        if (self.recv_converter is None):
-            return msg_in
-        elif isinstance(self.recv_converter, str):
-            if self.recv_converter in ['array', 'pandas']:
-                # These are referenced by string since they require the
-                # serializer customized with information from the received
-                # message(s) (e.g. column names).
-                msg_out = self.serializer.consolidate_array(msg_in)
-                if self.recv_converter == 'pandas':
-                    msg_out = serialize.numpy2pandas(msg_out)
-                return msg_out
-            else:  # pragma: debug
-                raise RuntimeError("Unrecognized recv_converter string: '%s'" %
-                                   self.recv_converter)
-        else:
-            return self.recv_converter(msg_in)
+        if self.recv_converter:
+            self.debug("Applying converters to received message.")
+        msg_out = msg_in
+        for iconv in self.recv_converter:
+            if isinstance(iconv, str):
+                if iconv in ['array', 'pandas']:
+                    # These are referenced by string since they require the
+                    # serializer customized with information from the received
+                    # message(s) (e.g. column names).
+                    msg_out = self.serializer.consolidate_array(msg_out)
+                    if self.recv_converter == 'pandas':
+                        msg_out = serialize.numpy2pandas(msg_out)
+                else:  # pragma: debug
+                    raise RuntimeError("Unrecognized recv_converter string: '%s'" %
+                                       iconv)
+            else:
+                msg_out = iconv(msg_out)
+        return msg_out
 
     def apply_send_converter(self, msg_in):
         r"""Apply send converter.
@@ -987,13 +1002,16 @@ class CommBase(tools.YggClass):
             object: Converted message.
  
         """
-        if (self.send_converter is None):
-            return msg_in
-        elif isinstance(self.send_converter, str):  # pragma: debug
-            raise RuntimeError("Unrecognized send_converter string: '%s'." %
-                               self.send_converter)
-        else:
-            return self.send_converter(msg_in)
+        if self.send_converter:
+            self.debug("Applying converters to message being sent.")
+        msg_out = msg_in
+        for iconv in self.send_converter:
+            if isinstance(iconv, str):  # pragma: debug
+                raise RuntimeError("Unrecognized send_converter string: '%s'." %
+                                   iconv)
+            else:
+                msg_out = iconv(msg_out)
+        return msg_out
 
     def evaluate_filter(self, *msg_in):
         r"""Evaluate the filter to determine how the message should be
@@ -1627,9 +1645,7 @@ class CommBase(tools.YggClass):
         if self.is_eof(msg_):
             flag = self.on_recv_eof()
             msg = msg_
-        elif ((self.recv_converter is not None)
-              and (not header.get('incomplete', False))):
-            self.debug("Converting message")
+        elif not header.get('incomplete', False):
             msg = self.apply_recv_converter(msg_)
         else:
             msg = msg_

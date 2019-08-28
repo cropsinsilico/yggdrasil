@@ -82,6 +82,7 @@ class FileComm(CommBase.CommBase):
     _schema_excluded_from_inherit = ['commtype', 'datatype', 'read_meth',
                                      'serializer']
     _schema_excluded_from_class_validation = ['serializer']
+    _schema_base_class = None
     _default_serializer = 'direct'
     _default_extension = '.txt'
     is_file = True

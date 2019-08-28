@@ -181,7 +181,8 @@ class ComponentSchema(object):
                 pass
         raise ValueError("Could not determine subtype for document: %s" % doc)
 
-    def get_subtype_schema(self, subtype, unique=False, relaxed=False):
+    def get_subtype_schema(self, subtype, unique=False, relaxed=False,
+                           allow_instance=False):
         r"""Get the schema for the specified subtype.
 
         Args:
@@ -193,6 +194,9 @@ class ComponentSchema(object):
                 for all of the registerd subtypes. Defaults to False.
             relaxed (bool, optional): If True, the schema will allow additional
                 properties. Defaults to False.
+            allow_instance (bool, optional): If True, the returned schema will
+                validate instances of this component in addition to documents
+                describing a component. Defaults to False.
 
         Returns:
             dict: Schema for specified subtype.
@@ -228,9 +232,12 @@ class ComponentSchema(object):
                     del out['properties']
         if relaxed:
             out['additionalProperties'] = True
+        if allow_instance:
+            out = {'oneOf': [out, {'type': 'instance',
+                                   'class': self.base_subtype_class}]}
         return out
 
-    def get_schema(self, relaxed=False):
+    def get_schema(self, relaxed=False, allow_instance=False):
         r"""Get the schema defining this component.
 
         Args:
@@ -238,6 +245,9 @@ class ComponentSchema(object):
                 definitions it includes) are relaxed to allow for objects with
                 objects with additional properties to pass validation. Defaults
                 to False.
+            allow_instance (bool, optional): If True, the returned schema will
+                validate instances of this component in addition to documents
+                describing a component. Defaults to False.
 
         Returns:
             dict: Schema for this component.
@@ -249,6 +259,10 @@ class ComponentSchema(object):
                'allOf': [self.get_subtype_schema('base', relaxed=relaxed),
                          {'anyOf': [self.get_subtype_schema(x, unique=True)
                                     for x in self._storage.keys()]}]}
+        if allow_instance:
+            out['oneOf'] = [out.pop('allOf'),
+                            {'type': 'instance',
+                             'class': self.base_subtype_class}]
         return out
 
     @property
@@ -364,6 +378,19 @@ class ComponentSchema(object):
             for iv in v:
                 out[iv] = k
         return out
+
+    @property
+    def base_subtype_class(self):
+        r"""ComponentClass: Base class for the subtype."""
+        if not getattr(self, '_base_subtype_class', None):
+            from yggdrasil.components import import_component
+            keys = list(self.subtype2class.values())
+            comp = import_component(self.schema_type, keys[0],
+                                    without_schema=True)
+            self._base_subtype_class = import_component(self.schema_type,
+                                                        comp._schema_base_class,
+                                                        without_schema=True)
+        return self._base_subtype_class
 
     @property
     def default_subtype(self):
@@ -525,7 +552,7 @@ class SchemaRegistry(object):
         r"""Return a component schema from the registry."""
         return self._storage.get(k, *args, **kwargs)
 
-    def get_definitions(self, relaxed=False):
+    def get_definitions(self, relaxed=False, allow_instance=False):
         r"""Get schema definitions for the registered components.
 
         Args:
@@ -533,6 +560,9 @@ class SchemaRegistry(object):
                 definitions it includes) are relaxed to allow for objects with
                 objects with additional properties to pass validation. Defaults
                 to False.
+            allow_instance (bool, optional): If True, the returned definitions will
+                validate instances of the components in addition to documents
+                describing components. Defaults to False.
 
         Returns:
             dict: Schema defintiions for each of the registered components.
@@ -543,7 +573,7 @@ class SchemaRegistry(object):
         else:
             cache_key = 'definitions'
         if cache_key not in self._cache:
-            out = {k: v.get_schema(relaxed=relaxed)
+            out = {k: v.get_schema(relaxed=relaxed, allow_instance=allow_instance)
                    for k, v in self._storage.items()}
             for k in self.required_components:
                 out.setdefault(k, {'type': 'string'})
@@ -713,7 +743,8 @@ class SchemaRegistry(object):
             return False
         return True
 
-    def get_component_schema(self, comp_name, subtype=None, relaxed=False):
+    def get_component_schema(self, comp_name, subtype=None, relaxed=False,
+                             allow_instance=False, allow_instance_definitions=False):
         r"""Get the schema for a certain component.
 
         Args:
@@ -725,6 +756,14 @@ class SchemaRegistry(object):
                 definitions it includes) are relaxed to allow for objects with
                 objects with additional properties to pass validation. Defaults
                 to False.
+            allow_instance (bool, optional): If True, the returned schema will
+                validate instances of this component in addition to documents
+                describing a component. Defaults to False.
+            allow_instance_definitions (bool, optional): If True, the definitions
+                in the returned schema will allow for instances of the components.
+                Defaults to False.
+            **kwargs: Additonal keyword arguments are paseed to get_schema or
+                get_subtype_schema for the selected component type.
 
         Returns:
             dict: Schema for the specified component.
@@ -733,11 +772,13 @@ class SchemaRegistry(object):
         if comp_name not in self._storage:  # pragma: debug
             raise ValueError("Unrecognized component: %s" % comp_name)
         if subtype is None:
-            out = self._storage[comp_name].get_schema(relaxed=relaxed)
+            out = self._storage[comp_name].get_schema(
+                relaxed=relaxed, allow_instance=allow_instance)
         else:
-            out = self._storage[comp_name].get_subtype_schema(subtype,
-                                                              relaxed=relaxed)
-        out['definitions'] = self.get_definitions(relaxed=relaxed)
+            out = self._storage[comp_name].get_subtype_schema(
+                subtype, relaxed=relaxed, allow_instance=allow_instance)
+        out['definitions'] = self.get_definitions(
+            relaxed=relaxed, allow_instance=allow_instance_definitions)
         return out
 
     def get_component_keys(self, comp_name):
@@ -948,16 +989,24 @@ def standardize(instance, keys, is_singular=False, suffixes=None, altkeys=None):
                 instance[k][i] = {'name': instance[k][i]}
 
 
-def normalize_filter_function(cond, working_dir):
-    r"""Normalize filter functions which use relative paths.
+def normalize_instance(normalizer, value, instance, schema):
+    r"""Creates an instance from the JSON document."""
+    from yggdrasil.components import create_component
+    if isinstance(instance, dict):
+        instance = create_component(schema['title'], **instance)
+    return instance
+
+
+def normalize_function_file(cond, working_dir):
+    r"""Normalize functions which use relative paths.
 
     Args:
-        cond (str): Filter function expression.
+        cond (str): Function expression.
         working_dir (str): Full path to working directory that
-            should be used to normalized the filter.
+            should be used to normalized the function path.
 
     Returns:
-        str: Normalized filter function.
+        str: Normalized function expression.
 
     """
     mod_file, func_name = cond.split(':', 1)
@@ -989,7 +1038,7 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
                 x.setdefault('working_dir', instance['working_dir'])
                 x_filter = x.get('filter', None)
                 if isinstance(x_filter, dict) and ('function' in x_filter):
-                    x['filter']['function'] = normalize_filter_function(
+                    x['filter']['function'] = normalize_function_file(
                         x['filter']['function'], instance['working_dir'])
     return instance
 
@@ -1100,7 +1149,7 @@ def _normalize_connio_first(normalizer, value, instance, schema):
                 for x in instance[io]:
                     x_filter = x.get('filter', None)
                     if isinstance(x_filter, dict) and ('function' in x_filter):
-                        x['filter']['function'] = normalize_filter_function(
+                        x['filter']['function'] = normalize_function_file(
                             x['filter']['function'], instance['working_dir'])
         # Handle indexed inputs/outputs
         for io in ['inputs', 'outputs']:
