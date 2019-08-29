@@ -7,8 +7,8 @@ class TransformBase(ComponentBase):
     Args:
         initial_state (dict, optional): Dictionary of initial state variables
             that should be set when the transform is created.
-        serializer (yggdrasil.serialize.SerializeBase, optional): Serializer
-            that should be used to information on parts of the transformation.
+        original_datatype (dict, optional): Datatype associated with expected
+            messages. Defaults to None.
 
     """
 
@@ -16,24 +16,51 @@ class TransformBase(ComponentBase):
     _schema_type = 'transform'
     _schema_subtype_key = 'transformtype'
     _schema_properties = {'initial_state': {'type': 'object'},
-                          'serializer': {'$ref': '#/definitions/serializer'}}
+                          'original_datatype': {'type': 'schema'}}
 
     def __init__(self, *args, **kwargs):
         self._state = {}
         super(TransformBase, self).__init__(*args, **kwargs)
         if self.initial_state:
             self._state = self.initial_state
+        if self.original_datatype:
+            self.set_original_datatype(self.original_datatype)
 
-    def set_serializer(self, serializer):
-        r"""Set serializer if not already set.
+    def set_original_datatype(self, datatype):
+        r"""Set datatype.
 
         Args:
-            serializer (yggdrasil.serialize.SerializeBase): Serializer to add
-                to class for use with aspects of the transformation.
+            datatype (dict): Datatype.
 
         """
-        if not self.serializer:
-            self.serializer = serializer
+        self.validate_datatype(datatype)
+        self.original_datatype = datatype
+        self.transformed_datatype = self.transform_datatype(self.original_datatype)
+
+    def validate_datatype(self, datatype):
+        r"""Assert that the provided datatype is valid for this transformation.
+        
+        Args:
+            datatype (dict): Datatype to validate.
+
+        Raises:
+            AssertionError: If the datatype is not valid.
+
+        """
+        pass
+        
+    def transform_datatype(self, datatype):
+        r"""Determine the datatype that will result from applying the transform
+        to the supplied datatype.
+
+        Args:
+            datatype (dict): Datatype to transform.
+
+        Returns:
+            dict: Transformed datatype.
+
+        """
+        return datatype
 
     def evaluate_transform(self, x, no_copy=False):
         r"""Call transform on the provided message.

@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 
 
@@ -9,6 +10,9 @@ class SelectFieldsTransform(TransformBase):
         selected (list): A list of fields that should be selected.
         original_order (list, optional): The original order of fields that
             should be used for selecting from lists/tuples.
+        single_as_scalar (bool, optional): If True and only a single field
+            is selected, the transformed messages will be scalars rather
+            than arrays with single elements. Defaults to False.
 
     """
     _transformtype = 'select_fields'
@@ -16,8 +20,76 @@ class SelectFieldsTransform(TransformBase):
     _schema_properties = {'selected': {'type': 'array',
                                        'items': {'type': 'string'}},
                           'original_order': {'type': 'array',
-                                             'items': {'type': 'string'}}}
+                                             'items': {'type': 'string'}},
+                          'single_as_scalar': {'type': 'boolean',
+                                               'default': False}}
 
+    def set_original_datatype(self, datatype):
+        r"""Set datatype.
+
+        Args:
+            datatype (dict): Datatype.
+
+        """
+        super(SelectFieldsTransform, self).set_original_datatype(datatype)
+        if not self.original_order:
+            if datatype['type'] == 'array':
+                self.original_order = [x.get('title', 'f%d' % i) for i, x in
+                                       enumerate(self.original_datatype['items'])]
+            elif datatype['type'] == 'object':
+                self.original_order = list(datatype['properties'].keys())
+
+    @property
+    def as_single(self):
+        r"""bool: True if there is a single element to return."""
+        return (self.single_as_scalar and (len(self.selected) == 1))
+
+    def validate_datatype(self, datatype):
+        r"""Assert that the provided datatype is valid for this transformation.
+        
+        Args:
+            datatype (dict): Datatype to validate.
+
+        Raises:
+            AssertionError: If the datatype is not valid.
+
+        """
+        assert(datatype.get('type', None) in ['array', 'object'])
+        
+    def transform_datatype(self, datatype):
+        r"""Determine the datatype that will result from applying the transform
+        to the supplied datatype.
+
+        Args:
+            datatype (dict): Datatype to transform.
+
+        Returns:
+            dict: Transformed datatype.
+
+        """
+        if (((datatype.get('type', None) == 'array')
+             and isinstance(datatype.get('items', None), list))):
+            order = [x.get('title', 'f%d' % i) for i, x in enumerate(datatype['items'])]
+            if self.as_single:
+                datatype = copy.deepcopy(datatype['items'][
+                    order.index(self.selected[0])])
+            else:
+                datatype = copy.deepcopy(datatype)
+                datatype['items'] = [datatype['items'][order.index(k)]
+                                     for k in self.selected]
+        elif (((datatype.get('type', None) == 'array')
+               and isinstance(datatype.get('items', None), dict)
+               and self.as_single)):
+            datatype = copy.deepcopy(datatype['items'])
+        elif datatype.get('type', None) == 'object':
+            if self.as_single:
+                datatype = copy.deepcopy(datatype['properties'][self.selected[0]])
+            else:
+                datatype = copy.deepcopy(datatype)
+                datatype['properties'] = {k: datatype['properties'][k]
+                                          for k in self.selected}
+        return datatype
+    
     def evaluate_transform(self, x, no_copy=False):
         r"""Call transform on the provided message.
 
@@ -33,17 +105,28 @@ class SelectFieldsTransform(TransformBase):
         """
         out = x
         if isinstance(x, dict):
-            out = type(x)([(k, x[k]) for k in self.selected])
+            if self.as_single:
+                out = x[self.selected[0]]
+            else:
+                out = type(x)([(k, x[k]) for k in self.selected])
         elif isinstance(x, (list, tuple)):
             if not self.original_order:
                 raise ValueError("The original order of the fields must be "
                                  "provided for list/tuple objects.")
-            out = type(x)([x[self.original_order.index(k)]
-                           for k in self.selected])
+            if self.as_single:
+                out = x[self.original_order.index(self.selected[0])]
+            else:
+                out = type(x)([x[self.original_order.index(k)]
+                               for k in self.selected])
         elif isinstance(x, np.ndarray):
-            out = x[self.selected]
+            if self.as_single:
+                out = x[self.selected[0]]
+            else:
+                out = x[self.selected]
         else:
             raise TypeError("Cannot select fields from object of type '%s'" % type(x))
+        if not no_copy:
+            out = copy.deepcopy(out)
         return out
     
     @classmethod

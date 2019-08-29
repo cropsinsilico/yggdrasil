@@ -173,7 +173,7 @@ class ComponentSchema(object):
 
         """
         for subtype in self.subtypes:
-            subtype_schema = self.get_subtype_schema(subtype, unique=True)
+            subtype_schema = self.get_subtype_schema(subtype)
             try:
                 metaschema.validate_instance(doc, subtype_schema)
                 return subtype
@@ -383,13 +383,10 @@ class ComponentSchema(object):
     def base_subtype_class(self):
         r"""ComponentClass: Base class for the subtype."""
         if not getattr(self, '_base_subtype_class', None):
-            from yggdrasil.components import import_component
+            from yggdrasil.components import get_component_base_class
             keys = list(self.subtype2class.values())
-            comp = import_component(self.schema_type, keys[0],
-                                    without_schema=True)
-            self._base_subtype_class = import_component(self.schema_type,
-                                                        comp._schema_base_class,
-                                                        without_schema=True)
+            self._base_subtype_class = get_component_base_class(
+                self.schema_type, subtype=keys[0], without_schema=True)
         return self._base_subtype_class
 
     @property

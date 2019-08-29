@@ -1,22 +1,22 @@
 models:
-  - name: python_modelA
-    language: python
-    args: ./src/conditional_io_modelA.py
-    function: modelA_function
+  - name: matlab_modelA
+    language: matlab
+    args: ./src/conditional_io_modelA.m
+    function: conditional_io_modelA
     inputs: inputA
     outputs: outputA
 
-  - name: python_modelB1
-    language: python
-    args: ./src/conditional_io_modelB1.py
-    function: modelB_function1
+  - name: matlab_modelB1
+    language: matlab
+    args: ./src/conditional_io_modelB1.m
+    function: conditional_io_modelB1
     inputs: inputB1
     outputs: outputB1
 
-  - name: python_modelB2
-    language: python
-    args: ./src/conditional_io_modelB2.py
-    function: modelB_function2
+  - name: matlab_modelB2
+    language: matlab
+    args: ./src/conditional_io_modelB2.m
+    function: conditional_io_modelB2
     inputs: inputB2
     outputs: outputB2
 

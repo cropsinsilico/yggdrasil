@@ -1,21 +1,21 @@
 models:
-  - name: python_modelA
-    language: python
-    args: ./src/conditional_io_modelA.py
+  - name: R_modelA
+    language: R
+    args: ./src/conditional_io_modelA.R
     function: modelA_function
     inputs: inputA
     outputs: outputA
 
-  - name: python_modelB1
-    language: python
-    args: ./src/conditional_io_modelB1.py
+  - name: R_modelB1
+    language: R
+    args: ./src/conditional_io_modelB1.R
     function: modelB_function1
     inputs: inputB1
     outputs: outputB1
 
-  - name: python_modelB2
-    language: python
-    args: ./src/conditional_io_modelB2.py
+  - name: R_modelB2
+    language: R
+    args: ./src/conditional_io_modelB2.R
     function: modelB_function2
     inputs: inputB2
     outputs: outputB2

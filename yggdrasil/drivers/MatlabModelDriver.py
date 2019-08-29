@@ -3,6 +3,7 @@ import uuid as uuid_gen
 import logging
 from datetime import datetime
 import os
+import copy
 import psutil
 import warnings
 import weakref
@@ -405,6 +406,9 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         name (str): Driver name.
         args (str or list): Argument(s) for running the model in matlab.
             Generally, this should be the full path to a Matlab script.
+        use_symunit (bool, optional): If True, input/output variables with
+            units will be represented in Matlab using symunit. Defaults to
+            False.
         **kwargs: Additional keyword arguments are passed to parent class's
             __init__ method.
 
@@ -423,6 +427,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     """
 
     _schema_subtype_description = ('Model is written in Matlab.')
+    _schema_properties = {
+        'use_symunit': {'type': 'boolean', 'default': False}}
     language = 'matlab'
     language_ext = '.m'
     base_languages = ['python']
@@ -468,6 +474,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'error': 'error(\'{error_msg}\');',
         'block_end': 'end;',
         'if_begin': 'if ({cond})',
+        'if_elif': 'elseif ({cond})',
+        'if_else': 'else',
         'for_begin': 'for {iter_var} = {iter_begin}:{iter_end}',
         'while_begin': 'while ({cond})',
         'break': 'break;',
@@ -855,6 +863,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
 
         """
         out = super(MatlabModelDriver, self).set_env()
+        if self.use_symunit:
+            out['YGG_MATLAB_SYMUNIT'] = 'True'
         if self.using_matlab_engine:
             out['YGG_MATLAB_ENGINE'] = 'True'
         # TODO: Move the following to InterpretedModelDriver once another
@@ -900,6 +910,40 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         """
         return backwards.decode_escape(format_str)
 
+    @classmethod
+    def write_function_call(cls, function_name, inputs=[], outputs=[], **kwargs):
+        r"""Write a function call.
+
+        Args:
+            function_name (str): Name of the function being called.
+            inputs (list, optional): List of inputs to the function.
+                Defaults to [].
+            outputs (list, optional): List of outputs from the function.
+                Defaults to [].
+            **kwargs: Additional keyword arguments are passed to
+                cls.format_function_param.
+
+        Returns:
+            list: Lines completing the function call.
+
+        """
+        if len(outputs) != 1:
+            out = super(MatlabModelDriver, cls).write_function_call(
+                function_name=function_name, inputs=inputs,
+                outputs=outputs, **kwargs)
+        else:
+            cellout = copy.deepcopy(outputs)
+            cellout[0]['name'] = "[%s{:}]" % outputs[0]['name']
+            out = cls.write_if_block(
+                "nargout(@%s) > 1" % function_name,
+                ["%s = cell(1, nargout(@%s));" % (outputs[0]['name'],
+                                                  function_name)]
+                + super(MatlabModelDriver, cls).write_function_call(
+                    function_name, inputs=inputs, outputs=cellout, **kwargs),
+                super(MatlabModelDriver, cls).write_function_call(
+                    function_name, inputs=inputs, outputs=outputs, **kwargs))
+        return out
+        
     @classmethod
     def prepare_output_variables(cls, vars_list):
         r"""Concatenate a set of output variables such that it can be passed as

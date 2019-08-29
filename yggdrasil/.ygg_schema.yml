@@ -90,9 +90,9 @@ definitions:
                 - string
             type: array
       required:
-      - name
-      - commtype
       - datatype
+      - commtype
+      - name
       title: comm_base
       type: object
     - anyOf:
@@ -212,7 +212,9 @@ definitions:
             messages are passed directly. This can also be a list of functions/strings
             that will be called on the messages in the order they are provided.
           items:
-            type: function
+            oneOf:
+            - type: function
+            - $ref: '#/definitions/transform'
           type: array
       required:
       - inputs
@@ -533,9 +535,9 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - filetype
       - working_dir
+      - name
       title: file_base
       type: object
     - anyOf:
@@ -1227,6 +1229,11 @@ definitions:
           description: Language that the target is written in. Defaults to None and
             will be set based on the source files provided.
           type: string
+        use_symunit:
+          default: false
+          description: If True, input/output variables with units will be represented
+            in Matlab using symunit. Defaults to False.
+          type: boolean
         valgrind_flags:
           default:
           - --leak-check=full
@@ -1249,10 +1256,10 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - language
       - args
       - working_dir
+      - name
       title: model_base
       type: object
     - anyOf:
@@ -1487,6 +1494,11 @@ definitions:
             description: If True, no interpreter will be added to the arguments. This
               should only be used for subclasses that will not be invoking the model
               via the command line. Defaults to False.
+            type: boolean
+          use_symunit:
+            default: false
+            description: If True, input/output variables with units will be represented
+              in Matlab using symunit. Defaults to False.
             type: boolean
         title: MatlabModelDriver
         type: object
@@ -2059,6 +2071,9 @@ definitions:
             type: string
           description: A mapping from original field name to new field names.
           type: object
+        original_datatype:
+          description: Datatype associated with expected messages. Defaults to None.
+          type: schema
         original_order:
           description: The original order of fields that should be used for selecting
             from lists/tuples.
@@ -2070,10 +2085,12 @@ definitions:
           items:
             type: string
           type: array
-        serializer:
-          $ref: '#/definitions/serializer'
-          description: Serializer that should be used to information on parts of the
-            transformation.
+        single_as_scalar:
+          default: false
+          description: If True and only a single field is selected, the transformed
+            messages will be scalars rather than arrays with single elements. Defaults
+            to False.
+          type: boolean
         statement:
           description: Python statement in terms of the message as represented by
             the string "%x%" that should evaluate to the transformed message. The
@@ -2105,6 +2122,12 @@ definitions:
             items:
               type: string
             type: array
+          single_as_scalar:
+            default: false
+            description: If True and only a single field is selected, the transformed
+              messages will be scalars rather than arrays with single elements. Defaults
+              to False.
+            type: boolean
           transformtype:
             enum:
             - select_fields

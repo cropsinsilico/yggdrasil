@@ -1278,10 +1278,8 @@ class ModelDriver(Driver):
                                                    x, flag_var=flag_var,
                                                    allow_failure=True)
         # Call model
-        loop_lines.append(cls.format_function_param(
-            'function_call', flag_var=flag_var, function_name=model_function,
-            input_var=cls.prepare_input_variables(inputs),
-            output_var=cls.prepare_output_variables(outputs)))
+        loop_lines += cls.write_function_call(
+            model_function, inputs=inputs, outputs=outputs, flag_var=flag_var)
         # Send outputs
         for x in outputs:
             if not x.get('outside_loop', False):
@@ -1403,6 +1401,28 @@ class ModelDriver(Driver):
             if_block = [cls.format_function_param('error', error_msg=fail_message)]
         lines += cls.write_if_block(flag_cond, if_block)
         return lines
+
+    @classmethod
+    def write_function_call(cls, function_name, inputs=[], outputs=[], **kwargs):
+        r"""Write a function call.
+
+        Args:
+            function_name (str): Name of the function being called.
+            inputs (list, optional): List of inputs to the function.
+                Defaults to [].
+            outputs (list, optional): List of outputs from the function.
+                Defaults to [].
+            **kwargs: Additional keyword arguments are passed to
+                cls.format_function_param.
+
+        Returns:
+            list: Lines completing the function call.
+
+        """
+        kwargs.setdefault('input_var', cls.prepare_input_variables(inputs))
+        kwargs.setdefault('output_var', cls.prepare_output_variables(outputs))
+        return [cls.format_function_param(
+            'function_call', function_name=function_name, **kwargs)]
         
     @classmethod
     def write_executable(cls, lines, prefix=None, suffix=None):
@@ -1557,13 +1577,16 @@ class ModelDriver(Driver):
         return cls.prepare_variables(vars_list)
 
     @classmethod
-    def write_if_block(cls, cond, block_contents):
+    def write_if_block(cls, cond, block_contents, else_block_contents=False):
         r"""Return the lines required to complete a conditional block.
 
         Args:
             cond (str): Conditional that should determine block execution.
             block_contents (list): Lines of code that should be executed inside
                 the block.
+            else_block_contents (list, optional): Lines of code that should be
+                executed inside the else clause of the block. Defaults to False
+                if not provided and an else clause is omitted.
 
         Returns:
             list: Lines of code performing conditional execution of a block.
@@ -1573,13 +1596,25 @@ class ModelDriver(Driver):
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
         out = []
-        # Opening for statement line
-        out.append(cls.format_function_param('if_begin', cond=cond))
-        # Indent loop contents
-        if not isinstance(block_contents, (list, tuple)):
+        if not isinstance(cond, list):
+            cond = [cond]
             block_contents = [block_contents]
-        for x in block_contents:
-            out.append(cls.function_param['indent'] + x)
+        assert(len(cond) == len(block_contents))
+        for i, (icond, iblock_contents) in enumerate(zip(cond, block_contents)):
+            if i == 0:
+                out.append(cls.format_function_param('if_begin', cond=icond))
+            else:
+                out.append(cls.format_functioN_param('if_elif', cond=icond))
+            if not isinstance(iblock_contents, (list, tuple)):
+                iblock_contents = [iblock_contents]
+            for x in iblock_contents:
+                out.append(cls.function_param['indent'] + x)
+        if else_block_contents:
+            out.append(cls.format_function_param('if_else'))
+            if not isinstance(else_block_contents, (list, tuple)):
+                else_block_contents = [else_block_contents]
+            for x in else_block_contents:
+                out.append(cls.function_param['indent'] + x)
         # Close block
         out.append(cls.function_param.get('if_end',
                                           cls.function_param['block_end']))

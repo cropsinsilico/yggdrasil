@@ -17,6 +17,29 @@ class MapFieldsTransform(TransformBase):
     _schema_properties = {'map': {'type': 'object',
                                   'additionalProperties': {'type': 'string'}}}
 
+    def transform_datatype(self, datatype):
+        r"""Determine the datatype that will result from applying the transform
+        to the supplied datatype.
+
+        Args:
+            datatype (dict): Datatype to transform.
+
+        Returns:
+            dict: Transformed datatype.
+
+        """
+        if (((datatype.get('type', None) == 'array')
+             and isinstance(datatype.get('items', None), list))):
+            datatype = copy.deepcopy(datatype)
+            for i, x in enumerate(datatype['items']):
+                if x.get('title', 'f%d' % i) in self.map:
+                    x['title'] = self.map[x['title']]
+        elif datatype.get('type', None) == 'object':
+            datatype = copy.deepcopy(datatype)
+            for kold, knew in self.map.items():
+                datatype['properties'][kold] = datatype['properties'].pop(knew)
+        return datatype
+    
     def evaluate_transform(self, x, no_copy=False):
         r"""Call transform on the provided message.
 

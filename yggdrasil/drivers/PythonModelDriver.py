@@ -60,6 +60,8 @@ class PythonModelDriver(InterpretedModelDriver):
         'error': 'raise Exception("{error_msg}")',
         'block_end': '',
         'if_begin': 'if ({cond}):',
+        'if_elif': 'elif ({cond}):',
+        'if_else': 'else:',
         'for_begin': 'for {iter_var} in range({iter_begin}, {iter_end}):',
         'while_begin': 'while ({cond}):',
         'break': 'break',

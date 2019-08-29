@@ -308,6 +308,8 @@ class CModelDriver(CompiledModelDriver):
         'error': 'printf(\"{error_msg}\\n\"); return -1;',
         'block_end': '}',
         'if_begin': 'if ({cond}) {{',
+        'if_elif': '}} else if ({cond}) {{',
+        'if_else': '}} else {{',
         'for_begin': ('for ({iter_var} = {iter_begin}; {iter_var} < {iter_end}; '
                       '{iter_var}++) {{'),
         'while_begin': 'while ({cond}) {{',
