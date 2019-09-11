@@ -225,13 +225,18 @@ public:
     MetaschemaType::update(new_info);
     ScalarMetaschemaType* new_info_scalar = (ScalarMetaschemaType*)new_info;
     if (strcmp(subtype_, new_info_scalar->subtype()) != 0) {
-      ygglog_throw_error("ScalarMetaschemaType::update: Cannot update subtype %s to subtype %s.",
+      ygglog_throw_error("ScalarMetaschemaType::update: Cannot update subtype from %s to subtype %s.",
     			 subtype_, new_info_scalar->subtype());
     }
     if (precision_ != new_info_scalar->precision()) {
-      if ((strcmp(type(), "1darray") == 0) || (strcmp(type(), "ndarray") == 0)
-	  || (strcmp(subtype(), "float") != 0) || (precision_ != 32)) {
-	ygglog_throw_error("ScalarMetaschemaType::update: Cannot update precision %ld to %ld.",
+      if (_variable_precision) {
+	set_precision(new_info_scalar->precision());
+	printf("New precision = %ld\n", precision_);
+      } else if ((strcmp(type(), "1darray") == 0) ||
+		 (strcmp(type(), "ndarray") == 0) ||
+		 (strcmp(subtype(), "float") != 0) ||
+		 (precision_ != 32)) {
+	ygglog_throw_error("ScalarMetaschemaType::update: Cannot update precision rom %ld to %ld.",
 			 precision_, new_info_scalar->precision());
       } else {
       	if (cast_precision_ == 0) {
@@ -575,12 +580,17 @@ public:
 	// }
       } else {
 	size_t *arg_siz = &nbytes_expected;
+	if (allow_realloc) {
+	  arg_siz[0] = 0;
+	}
 	skip_terminal = true;
 	if ((cast_precision_ != 0) && (cast_precision_ != precision_)) {
 	  try {
 	    decoded_len = cast_bytes(subtype_, precision_, cast_precision_,
 	  			     &decoded_bytes, decoded_len);
-	    arg_siz[0] = decoded_len;
+	    if (!(allow_realloc)) {
+	      arg_siz[0] = decoded_len;
+	    }
 	  } catch(...) {
 	    ygglog_error("ScalarMetaschemaType::decode_data: Cannot cast subtype '%s' and precision %ld to precision %ld.",
 	  		 subtype_, precision_, cast_precision_);

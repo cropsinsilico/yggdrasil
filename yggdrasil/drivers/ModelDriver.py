@@ -1270,7 +1270,11 @@ class ModelDriver(Driver):
                     for x in re.finditer(cls.format_function_param('%s_def_regex' % io),
                                          out[io]):
                         igrp = x.groupdict()
+                        for k in list(igrp.keys()):
+                            if igrp[k] is None:
+                                del igrp[k]
                         if 'native_type' in igrp:
+                            igrp['native_type'] = igrp['native_type'].strip()
                             igrp['datatype'] = cls.get_json_type(igrp['native_type'])
                         new_val.append(igrp)
                     out[io] = new_val
@@ -1317,6 +1321,17 @@ class ModelDriver(Driver):
                     for io in ['inputs', 'outputs']}
         # Move variables if outputs in inputs
         if cls.outputs_in_inputs:
+            if ((len(inputs) + len(outputs)) == len(info['inputs'])):
+                for i, vdict in enumerate(info['inputs'][:len(inputs)]):
+                    if inputs[i].get('vars', False):
+                        assert(inputs[i]['vars'] == [vdict['name']])
+                    else:
+                        inputs[i]['vars'] = [vdict['name']]
+                for i, vdict in enumerate(info['inputs'][len(inputs):]):
+                    if outputs[i].get('vars', False):
+                        assert(outputs[i]['vars'] == [vdict['name']])
+                    else:
+                        outputs[i]['vars'] = [vdict['name']]
             for x in outputs:
                 for i, v in enumerate(x.get('vars', [])):
                     if v in info_map['inputs']:
@@ -1346,6 +1361,9 @@ class ModelDriver(Driver):
                         x['datatype'] = {
                             'type': 'array',
                             'items': [v['datatype'] for v in x['vars']]}
+                    for v in x['vars']:
+                        if 'native_type' not in v:
+                            v['native_type'] = cls.get_native_type(**v)
 
     @classmethod
     def write_model_wrapper(cls, model_file, model_function,

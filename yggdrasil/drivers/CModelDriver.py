@@ -291,8 +291,7 @@ class CModelDriver(CompiledModelDriver):
                   '\"{channel_name}\", {channel_type});'),
         'output': ('yggOutput_t {channel} = yggOutputType('
                    '\"{channel_name}\", {channel_type});'),
-        # 'recv_function': 'yggRecvRealloc',
-        'recv_function': 'yggRecv',
+        'recv_function': 'yggRecvRealloc',
         'send_function': 'yggSend',
         'not_flag_cond': '{flag_var} < 0',
         'flag_cond': '{flag_var} >= 0',
@@ -322,11 +321,13 @@ class CModelDriver(CompiledModelDriver):
         'exec_prefix': '#include <stdbool.h>',
         'free': 'if ({variable} != NULL) free({variable});',
         'function_def_regex': (r'(?P<flag_type>.+?)\s*{function_name}\s*'
-                               r'\((?P<inputs>.*?)\)\s*\{{'),
-        'inputs_def_regex': (r'\s*(?P<native_type>.+?(?:\s*\*+)?)\s+'
-                             r'(?P<name>.+?)\s*(?:,|$)'),
-        'outputs_def_regex': (r'\s*(?P<native_type>.+?(?:\s*\*+)?)*\s+'
-                              r'(?P<name>.+?)\s*(?:,|$)')}
+                               r'\((?P<inputs>(?:[^)])*?)\)\s*\{{'),
+        'inputs_def_regex': (r'\s*(?P<native_type>(?:[^\s\*])+(\s+)?'
+                             r'(?P<ptr>\*+)?)(?(ptr)(?(1)(?:\s*)|(?:\s+)))'
+                             r'(?P<name>.+?)\s*(?:,|$)(?:\n)?'),
+        'outputs_def_regex': (r'\s*(?P<native_type>(?:[^\s\*])+(\s+)?'
+                              r'(?P<ptr>\*+)?)(?(ptr)(?(1)(?:\s*)|(?:\s+)))'
+                              r'(?P<name>.+?)\s*(?:,|$)(?:\n)?')}
     outputs_in_inputs = True
     include_channel_obj = True
     is_typed = True
@@ -500,6 +501,29 @@ class CModelDriver(CompiledModelDriver):
         return out
     
     @classmethod
+    def update_io_from_function(cls, model_file, model_function,
+                                inputs=[], outputs=[]):
+        r"""Update inputs/outputs from the function definition.
+
+        Args:
+            model_file (str): Full path to the file containing the model
+                function's declaration.
+            model_function (str): Name of the model function.
+            inputs (list, optional): List of model inputs including types.
+                Defaults to [].
+            outputs (list, optional): List of model outputs including types.
+                Defaults to [].
+
+        """
+        super(CModelDriver, cls).update_io_from_function(
+            model_file, model_function, inputs=inputs, outputs=outputs)
+        for x in inputs:
+            for v in x['vars']:
+                if (((v['native_type'] != 'char*')
+                     and ('Realloc' in cls.function_param['recv_function']))):
+                    v['allow_realloc'] = True
+        
+    @classmethod
     def input2output(cls, var):
         r"""Perform conversion necessary to turn a variable extracted from a
         function definition from an input to an output.
@@ -515,8 +539,10 @@ class CModelDriver(CompiledModelDriver):
         if out['native_type'] != out.get('native_type_cast', out['native_type']):
             out['native_type'] = out['native_type_cast']
             del out['native_type_cast']
-        if out['native_type'].endswith('*'):
-            out['native_type'] = out['native_type'][:-1].strip()
+        if out.get('ptr', ''):
+            assert(out['native_type'].endswith('*'))
+            out['ptr'] = out['ptr'][:-1]
+            out['native_type'] = out['native_type'][:-1]
             out['datatype'] = cls.get_json_type(out['native_type'])
         return out
         
@@ -537,12 +563,12 @@ class CModelDriver(CompiledModelDriver):
         out = super(CModelDriver, cls).get_native_type(**kwargs)
         if not ((out == '*') or ('X' in out) or (out == 'float')):
             return out
-        json_type = kwargs.get('datatype', 'bytes')
+        json_type = kwargs.get('datatype', {'type': 'bytes'})
         assert(isinstance(json_type, dict))
         if out == '*':
             json_subtype = copy.deepcopy(json_type)
             json_subtype['type'] = json_subtype.pop('subtype')
-            out = cls.get_native_type(type=json_subtype) + '*'
+            out = cls.get_native_type(datatype=json_subtype) + '*'
         elif 'X' in out:
             precision = json_type['precision']
             out = out.replace('X', str(precision))
@@ -573,6 +599,7 @@ class CModelDriver(CompiledModelDriver):
             grp['type'] = grp['type'].replace(grp['precision'], 'X')
         if grp['type'] == 'char':
             out['type'] = 'bytes'
+            out['precision'] = 0
         else:
             if grp['type'] == 'double':
                 grp['type'] = 'float'
@@ -639,12 +666,13 @@ class CModelDriver(CompiledModelDriver):
                 this language.
 
         """
-        new_inputs = []
-        for x in inputs:
-            if 'native_type_cast' in x:
-                x = copy.deepcopy(x)
-                x['name'] = '(%s)%s' % (x['native_type_cast'], x['name'])
-            new_inputs.append(x)
+        new_inputs = copy.deepcopy(inputs)
+        for x in new_inputs:
+            for v in x['vars']:
+                if v.get('allow_realloc', False):
+                    v['name'] = '*' + v['name']
+                if 'native_type_cast' in v:
+                    v['name'] = '(%s)(%s)' % (v['native_type_cast'], v['name'])
         return super(CModelDriver, cls).write_model_function_call(
             model_function, flag_var, new_inputs, outputs)
         
@@ -663,11 +691,14 @@ class CModelDriver(CompiledModelDriver):
         """
         orig_name = name
         type_name = cls.get_native_type(**kwargs)
+        if kwargs.get('allow_realloc', False):
+            type_name += '*'
+            kwargs['native_type'] = type_name
         if type_name.endswith('*'):
             kwargs.get('requires_freeing', []).append(name)
             name = '%s = NULL' % name
         out = super(CModelDriver, cls).write_declaration(name, **kwargs)
-        if type_name == 'char*':
+        if type_name.replace(' ', '') == 'char*':
             length_name = orig_name + '_length = 0'
             length_type = {'type': 'uint', 'precision': 64}
             out += ' ' + cls.write_declaration(length_name,
@@ -697,7 +728,7 @@ class CModelDriver(CompiledModelDriver):
             else:
                 assert(isinstance(x, dict))
                 new_vars_list.append(x)
-                if cls.get_native_type(**x) == 'char*':
+                if cls.get_native_type(**x).replace(' ', '') == 'char*':
                     new_vars_list.append({'name': x['name'] + '_length'})
         return super(CModelDriver, cls).prepare_variables(new_vars_list)
             
@@ -792,9 +823,13 @@ class CModelDriver(CompiledModelDriver):
             keys['units'] = datatype.get('units', '')
         else:
             fmt = 'get_scalar_type(\"{subtype}\", {precision}, \"{units}\")'
-            keys = {k: datatype[k] for k in ['precision']}
+            keys = {}
             keys['subtype'] = datatype.get('subtype', datatype['type'])
             keys['units'] = datatype.get('units', '')
+            if keys['subtype'] in ['bytes']:
+                keys['precision'] = datatype.get('precision', 0)
+            else:
+                keys['precision'] = datatype['precision']
             typename = 'scalar'
         if as_seri:
             def_line = ('seri_t* %s = init_serializer(\"%s\", %s);'

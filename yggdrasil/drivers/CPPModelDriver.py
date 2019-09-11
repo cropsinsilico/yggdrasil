@@ -71,8 +71,7 @@ class CPPModelDriver(CModelDriver):
         CModelDriver.function_param,
         input='YggInput {channel}(\"{channel_name}\", {channel_type});',
         output='YggOutput {channel}(\"{channel_name}\", {channel_type});',
-        # recv_function='{channel}.recvRealloc',
-        recv_function='{channel}.recv',
+        recv_function='{channel}.recvRealloc',
         send_function='{channel}.send',
         exec_prefix=('#include <iostream>\n'
                      '#include <exception>\n'),
@@ -81,9 +80,11 @@ class CPPModelDriver(CModelDriver):
         try_error_type='const std::exception&',
         try_except='}} catch ({error_type} {error_var}) {{',
         function_def_regex=(r'(?P<flag_type>.+?)\s*{function_name}\s*'
-                            r'\((?P<inputs>.*?)(?:,\s*(?P<outputs>.*?&.*?))\)\s*\{{'),
-        outputs_def_regex=(r'\s*(?P<native_type>.+?(?:\s*\*+)?)\s*'
-                           r'(?P<ref>&)\s*(?P<name>.+?)\s*(?:,|$)'))
+                            r'\((?P<inputs>(?:[^)&])*?)'
+                            r'(?:,\s*(?P<outputs>(?:[^)])*?&(?:[^)])*?))?\)\s*\{{'),
+        outputs_def_regex=(r'\s*(?P<native_type>.+?)(\s+)?'
+                           r'(?P<ref>&)(?(1)(?:\s*)|(?:\s+))'
+                           r'(?P<name>.+?)\s*(?:,|$)(?:\n)?'))
     include_arg_count = True
     include_channel_obj = False
     
