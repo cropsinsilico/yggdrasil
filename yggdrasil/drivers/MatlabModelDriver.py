@@ -3,7 +3,6 @@ import uuid as uuid_gen
 import logging
 from datetime import datetime
 import os
-import copy
 import psutil
 import warnings
 import weakref
@@ -458,15 +457,21 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'obj': 'containers.Map',
         'schema': 'containers.Map'}
     function_param = {
+        'istype': 'isa({variable}, \'{type}\')',
+        'len': 'length({variable})',
+        'index': '{variable}{{{index}}}',
+        'first_index': 1,
         'input': '{channel} = YggInterface(\'YggInput\', \'{channel_name}\');',
         'output': '{channel} = YggInterface(\'YggOutput\', \'{channel_name}\');',
-        'recv': '[{flag_var}, {recv_var}] = {channel}.recv();',
-        'send': '{flag_var} = {channel}.send({send_var});',
-        'function_call': '{output_var} = {function_name}({input_var});',
+        'recv_function': '{channel}.recv',
+        'send_function': '{channel}.send',
+        'multiple_outputs': '[{outputs}]',
         'define': '{variable} = {value};',
+        'eol': ';',
         'comment': '%',
         'true': 'true',
         'not': 'not',
+        'and': '&&',
         'indent': 2 * ' ',
         'quote': '\'',
         'print': 'disp(\'{message}\');',
@@ -481,7 +486,11 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'break': 'break;',
         'try_begin': 'try',
         'try_except': 'catch {error_var}',
-        'assign': '{name} = {value};'}
+        'assign': '{name} = {value};',
+        'function_def_regex': (r'function *(\[ *)?(?P<outputs>.*?)(?(1)\]) *'
+                               r'= {function_name} *\((?P<inputs>(?:.|\n)*?)\)'),
+        'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:(?:,(?: *... *\n)?)|$)',
+        'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
 
     def __init__(self, name, args, **kwargs):
         self.using_matlab_engine = _matlab_engine_installed
@@ -909,55 +918,3 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
 
         """
         return backwards.decode_escape(format_str)
-
-    @classmethod
-    def write_function_call(cls, function_name, inputs=[], outputs=[], **kwargs):
-        r"""Write a function call.
-
-        Args:
-            function_name (str): Name of the function being called.
-            inputs (list, optional): List of inputs to the function.
-                Defaults to [].
-            outputs (list, optional): List of outputs from the function.
-                Defaults to [].
-            **kwargs: Additional keyword arguments are passed to
-                cls.format_function_param.
-
-        Returns:
-            list: Lines completing the function call.
-
-        """
-        if len(outputs) != 1:
-            out = super(MatlabModelDriver, cls).write_function_call(
-                function_name=function_name, inputs=inputs,
-                outputs=outputs, **kwargs)
-        else:
-            cellout = copy.deepcopy(outputs)
-            cellout[0]['name'] = "[%s{:}]" % outputs[0]['name']
-            out = cls.write_if_block(
-                "nargout(@%s) > 1" % function_name,
-                ["%s = cell(1, nargout(@%s));" % (outputs[0]['name'],
-                                                  function_name)]
-                + super(MatlabModelDriver, cls).write_function_call(
-                    function_name, inputs=inputs, outputs=cellout, **kwargs),
-                super(MatlabModelDriver, cls).write_function_call(
-                    function_name, inputs=inputs, outputs=outputs, **kwargs))
-        return out
-        
-    @classmethod
-    def prepare_output_variables(cls, vars_list):
-        r"""Concatenate a set of output variables such that it can be passed as
-        a single string to the function_call parameter.
-
-        Args:
-            vars_list (list): List of variable names to concatenate as output
-                from a function call.
-
-        Returns:
-            str: Concatentated variables list.
-
-        """
-        out = super(MatlabModelDriver, cls).prepare_output_variables(vars_list)
-        if isinstance(vars_list, list) and (len(vars_list) > 1):
-            out = '[%s]' % out
-        return out

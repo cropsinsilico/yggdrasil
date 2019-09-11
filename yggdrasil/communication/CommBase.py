@@ -274,6 +274,10 @@ class CommBase(tools.YggClass):
         filter (:class:.FilterBase, optional): Callable class that will be used to
             determine when messages should be sent/received. Defaults to None
             and is ignored.
+        is_default (bool, optional): If True, this comm was created to handle
+            all input/output variables to/from a model. Defaults to False. This
+            variable is used internally and should not be set explicitly in
+            the YAML.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -346,12 +350,15 @@ class CommBase(tools.YggClass):
                                'items': {'oneOf': [
                                    {'$ref': '#/definitions/transform'},
                                    {'type': ['function', 'string']}]}}]},
+                          'vars': {'type': 'array',
+                                   'items': {'type': 'string'}},
                           'field_names': {'type': 'array',
                                           'items': {'type': 'string'}},
                           'field_units': {'type': 'array',
                                           'items': {'type': 'string'}},
                           'as_array': {'type': 'boolean', 'default': False},
-                          'filter': {'$ref': '#/definitions/filter'}}
+                          'filter': {'$ref': '#/definitions/filter'},
+                          'is_default': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
@@ -562,21 +569,27 @@ class CommBase(tools.YggClass):
                 out[k] = copy.deepcopy(out_seri[k])
         return out
 
-    def get_status_message(self, nindent=0):
+    def get_status_message(self, nindent=0, extra_lines=None):
         r"""Return lines composing a status message.
         
         Args:
             nindent (int, optional): Number of tabs that should be used to
                 indent each line. Defaults to 0.
+            extra_lines (list, optional): Additional lines that should be
+                added to the beginning of the default print message. Defaults to
+                empty list if not provided.
                 
         Returns:
             tuple(list, prefix): Lines composing the status message and the
                 prefix string used for the last message.
 
         """
+        if extra_lines is None:
+            extra_lines = []
         prefix = nindent * '\t'
         lines = ['', '%s%s:' % (prefix, self.name)]
         prefix += '\t'
+        lines += ['%s%s' % (prefix, x) for x in extra_lines]
         lines += ['%s%-15s: %s' % (prefix, 'address', self.address),
                   '%s%-15s: %s' % (prefix, 'direction', self.direction),
                   '%s%-15s: %s' % (prefix, 'open', self.is_open),
@@ -983,7 +996,7 @@ class CommBase(tools.YggClass):
                     # serializer customized with information from the received
                     # message(s) (e.g. column names).
                     msg_out = self.serializer.consolidate_array(msg_out)
-                    if self.recv_converter == 'pandas':
+                    if iconv == 'pandas':
                         msg_out = serialize.numpy2pandas(msg_out)
                 else:  # pragma: debug
                     raise RuntimeError("Unrecognized recv_converter string: '%s'" %

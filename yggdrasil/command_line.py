@@ -184,6 +184,22 @@ def yggrun():
     print('')
 
 
+def yggclean():
+    r"""Cleanup dependency files."""
+    from yggdrasil.tools import get_supported_lang
+    from yggdrasil.components import import_component
+    parser = argparse.ArgumentParser(
+        description='Remove dependency libraries compiled by yggdrasil.')
+    parser.add_argument('language', nargs='*', default=[],
+                        help=('One or more languages to clean up '
+                              'dependencies for.'))
+    args = parser.parse_args()
+    if (len(args.language) == 0) or ('all' in args.language):
+        args.language = get_supported_lang()
+    for l in args.language:
+        import_component('model', l).cleanup_dependencies()
+
+
 def yggcc():
     r"""Compile C/C++ program."""
     from yggdrasil.drivers import CModelDriver

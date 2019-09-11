@@ -77,6 +77,22 @@ public:
     return out;
   }
   /*!
+    @brief Update the type object with info from another type object.
+    @param[in] new_info MetaschemaType* type object.
+   */
+  void update(MetaschemaType* new_info) {
+    MetaschemaType::update(new_info);
+    JSONArrayMetaschemaType* new_info_array = (JSONArrayMetaschemaType*)new_info;
+    if (nitems() != new_info_array->nitems()) {
+      ygglog_throw_error("JSONArrayMetaschemaType::update: Cannot update array with %ld elements from an array with %ld elements.",
+			 nitems(), new_info_array->nitems());
+    }
+    size_t i;
+    for (i = 0; i < items_.size(); i++) {
+      items_[i]->update(new_info_array->items()[i]);
+    }
+  }
+  /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */

@@ -48,7 +48,13 @@ class FilterBase(ComponentBase):
         if isinstance(out, np.ndarray):
             assert(out.dtype == bool)
             out = bool(out.all())
-        assert(isinstance(out, bool))
+        elif isinstance(out, np.bool_):
+            out = bool(out)
+        try:
+            assert(isinstance(out, bool))
+        except AssertionError:  # pragma: debug
+            print(out, type(out))
+            raise
         return out
 
     @classmethod

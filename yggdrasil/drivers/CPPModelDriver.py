@@ -69,20 +69,23 @@ class CPPModelDriver(CModelDriver):
         schema='MetaschemaType')
     function_param = dict(
         CModelDriver.function_param,
-        input='YggInput {channel}(\"{channel_name}\");',
-        output='YggOutput {channel}(\"{channel_name}\");',
-        table_input='YggAsciiTableInput {channel}(\"{channel_name}\");',
-        table_output=('YggAsciiTableOutput {channel}(\"{channel_name}\", '
-                      '\"{format_str}\");'),
-        recv='{flag_var} = {channel}.recvRealloc({recv_num}, {recv_var});',
-        send='{flag_var} = {channel}.send({send_num}, {send_var});',
+        input='YggInput {channel}(\"{channel_name}\", {channel_type});',
+        output='YggOutput {channel}(\"{channel_name}\", {channel_type});',
+        # recv_function='{channel}.recvRealloc',
+        recv_function='{channel}.recv',
+        send_function='{channel}.send',
         exec_prefix=('#include <iostream>\n'
                      '#include <exception>\n'),
-        # print='std::cout << "{message}" << std::endl;',
         error='throw \"{error_msg}\";',
         try_begin='try {',
         try_error_type='const std::exception&',
-        try_except='}} catch ({error_type} {error_var}) {{')
+        try_except='}} catch ({error_type} {error_var}) {{',
+        function_def_regex=(r'(?P<flag_type>.+?)\s*{function_name}\s*'
+                            r'\((?P<inputs>.*?)(?:,\s*(?P<outputs>.*?&.*?))\)\s*\{{'),
+        outputs_def_regex=(r'\s*(?P<native_type>.+?(?:\s*\*+)?)\s*'
+                           r'(?P<ref>&)\s*(?P<name>.+?)\s*(?:,|$)'))
+    include_arg_count = True
+    include_channel_obj = False
     
     @staticmethod
     def after_registration(cls):
@@ -140,3 +143,46 @@ class CPPModelDriver(CModelDriver):
         kwargs.update(error_var=error_var, error_type=error_type)
         return super(CPPModelDriver, cls).write_try_except(
             try_contents, except_contents, **kwargs)
+
+    @classmethod
+    def input2output(cls, var):
+        r"""Perform conversion necessary to turn a variable extracted from a
+        function definition from an input to an output.
+
+        Args:
+            var (dict): Variable definition.
+
+        Returns:
+            dict: Updated variable definition.
+
+        """
+        if var['name'].startswith('&'):
+            var['name'] = var['name'][1:]
+        elif var['native_type'].endswith('&'):
+            var['native_type'] = var['native_type'][:-1]
+        else:
+            return super(CPPModelDriver, cls).input2output(var)
+        return super(CModelDriver, cls).input2output(var)
+
+    @classmethod
+    def prepare_output_variables(cls, vars_list, in_inputs=False):
+        r"""Concatenate a set of output variables such that it can be passed as
+        a single string to the function_call parameter.
+
+        Args:
+            vars_list (list): List of variable names to concatenate as output
+                from a function call.
+            in_inputs (bool, optional): If True, the output variables should
+                be formated to be included as input variables. Defaults to
+                False.
+
+        Returns:
+            str: Concatentated variables list.
+
+        """
+        if in_inputs:
+            vars_list = copy.deepcopy(vars_list)
+            for y in vars_list:
+                if not y.get('ref', False):
+                    y['name'] = '&' + y['name']
+        return super(CModelDriver, cls).prepare_output_variables(vars_list)

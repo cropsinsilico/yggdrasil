@@ -3,41 +3,46 @@ models:
     language: c
     args: ./src/conditional_io_modelA.c
     function: modelA_function
-    inputs: inputA
-    outputs: outputA
+    outputs:
+      - name: c_modelA:output
+        vars:
+          - out_val
 
   - name: c_modelB1
     language: c
     args: ./src/conditional_io_modelB1.c
     function: modelB_function1
-    inputs: inputB1
-    outputs: outputB1
+    outputs:
+      - name: c_modelB1:output
+        vars:
+          - in_val_copy
+          - out_val
 
   - name: c_modelB2
     language: c
     args: ./src/conditional_io_modelB2.c
     function: modelB_function2
-    inputs: inputB2
-    outputs: outputB2
+    outputs:
+      - name: c_modelB2:output
+        vars:
+          - in_val_copy
+          - out_val
 
 connections:
-  - input: outputA  # Connection between model A output & model B input
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: c_modelA:input
+    filetype: table
+  - input: c_modelA:output  # Connection between model A output & model B input
     outputs:
-      - name: inputB1
+      - name: c_modelB1:input
         filter:
           statement: "%x% <= 2"
-      - name: inputB2
+      - name: c_modelB2:input
         filter:
           function: ./src/conditional_io_modelB2.py:condition_function2
-  - input: ./Input/input.txt  # Connection between file and model A input
-    output: inputA
-    filetype: table
-    translator:
-      - selected: Mass
-        single_as_scalar: True
   - inputs:
-      - outputB1  # Connection between model B, function 1 output and file
-      - outputB2  # Connection between model B, function 2 output and file
+      - c_modelB1:output  # Connection between model B, function 1 output and file
+      - c_modelB2:output  # Connection between model B, function 2 output and file
     output: ./output.txt
     filetype: table
     field_names: InputMass,Mass

@@ -9,6 +9,7 @@
 #include "../tools.h"
 #include "../serialize/base64.h"
 #include "MetaschemaType.h"
+#include "JSONArrayMetaschemaType.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -25,6 +26,48 @@ typedef float _Complex complex_float;
 typedef double _Complex complex_double;
 typedef long double _Complex complex_long_double;
 #endif
+
+
+size_t cast_bytes(const char *subtype,
+		  const size_t from_precision, const size_t to_precision,
+		  unsigned char **bytes, const size_t nbytes) {
+  if (((nbytes * to_precision) % from_precision) != 0) {
+    ygglog_throw_error("cast_bytes: Cannot cast %ld bytes from precision %ld to %ld.",
+		       nbytes, from_precision, to_precision);
+  }
+  bool raise_error = false;
+  size_t nbytes_new = nbytes*to_precision/from_precision;
+  if (strcmp(subtype, "float") == 0) {
+    if (from_precision == 32) {
+      float* tmp_val1 = (float*)(bytes[0]);
+      if (to_precision == 64) {
+  	double tmp_val2 = (double)(tmp_val1[0]);
+  	bytes[0] = (unsigned char*)realloc(bytes[0], sizeof(double));
+  	memcpy(bytes[0], &tmp_val2, sizeof(double));
+      } else {
+  	raise_error = true;
+      }
+    } else if (from_precision == 64) {
+      double* tmp_val1 = (double*)(bytes[0]);
+      if (to_precision == 32) {
+  	float tmp_val2 = (float)(tmp_val1[0]);
+  	bytes[0] = (unsigned char*)realloc(bytes[0], sizeof(float));
+  	memcpy(bytes[0], &tmp_val2, sizeof(float));
+      } else {
+  	raise_error = true;
+      }
+    } else {
+      raise_error = true;
+    }
+  } else {
+    raise_error = true;
+  }
+  if (raise_error) {
+    ygglog_throw_error("cast_bytes: Cannot change precision of %s type with precision %d to %d.",
+		       subtype, from_precision, to_precision);
+  }
+  return nbytes_new;
+};
 
 
 /*!
@@ -44,7 +87,8 @@ public:
   ScalarMetaschemaType(const char *subtype, const size_t precision,
 		       const char *units="") :
     MetaschemaType("scalar"), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
-    precision_(precision), units_((const char*)malloc(STRBUFF)) {
+    precision_(precision), units_((const char*)malloc(STRBUFF)),
+    cast_precision_(0) {
     if (precision_ == 0)
       _variable_precision = true;
     else
@@ -166,6 +210,45 @@ public:
    */
   const size_t nbytes() {
     return nbits() / 8;
+  }
+  /*!
+    @brief Update the type object with info from another type object.
+    @param[in] new_info MetaschemaType* type object.
+   */
+  void update(MetaschemaType* new_info) {
+    if ((strcmp(new_info->type(), "array") == 0)
+	&& (((JSONArrayMetaschemaType*)new_info)->nitems() == 1)) {
+      
+      update(((JSONArrayMetaschemaType*)new_info)->items()[0]);
+      return;
+    }
+    MetaschemaType::update(new_info);
+    ScalarMetaschemaType* new_info_scalar = (ScalarMetaschemaType*)new_info;
+    if (strcmp(subtype_, new_info_scalar->subtype()) != 0) {
+      ygglog_throw_error("ScalarMetaschemaType::update: Cannot update subtype %s to subtype %s.",
+    			 subtype_, new_info_scalar->subtype());
+    }
+    if (precision_ != new_info_scalar->precision()) {
+      if ((strcmp(type(), "1darray") == 0) || (strcmp(type(), "ndarray") == 0)
+	  || (strcmp(subtype(), "float") != 0) || (precision_ != 32)) {
+	ygglog_throw_error("ScalarMetaschemaType::update: Cannot update precision %ld to %ld.",
+			 precision_, new_info_scalar->precision());
+      } else {
+      	if (cast_precision_ == 0) {
+      	  cast_precision_ = precision_;
+      	}
+	size_t *precision_modifier = const_cast<size_t*>(&precision_);
+	*precision_modifier = new_info_scalar->precision();
+      }
+    }
+    if (strlen(units_) == 0) {
+      update_units(new_info_scalar->units());
+    } else if (strlen(new_info_scalar->units()) == 0) {
+      // do nothing
+    } else if (strcmp(units_, new_info_scalar->units()) != 0) {
+      ygglog_throw_error("ScalarMetaschemaType::update: Cannot update units %s to %s.",
+    			 units_, new_info_scalar->units());
+    }
   }
   /*!
     @brief Update the instance's type.
@@ -426,6 +509,9 @@ public:
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
+    if ((data.IsArray()) && (data.Size() == 1)) {
+      data = data[0];
+    }
     if (!(data.IsString())) {
       ygglog_error("ScalarMetaschemaType::decode_data: Raw data is not a string.");
       return false;
@@ -490,6 +576,19 @@ public:
       } else {
 	size_t *arg_siz = &nbytes_expected;
 	skip_terminal = true;
+	if ((cast_precision_ != 0) && (cast_precision_ != precision_)) {
+	  try {
+	    decoded_len = cast_bytes(subtype_, precision_, cast_precision_,
+	  			     &decoded_bytes, decoded_len);
+	    arg_siz[0] = decoded_len;
+	  } catch(...) {
+	    ygglog_error("ScalarMetaschemaType::decode_data: Cannot cast subtype '%s' and precision %ld to precision %ld.",
+	  		 subtype_, precision_, cast_precision_);
+	    free(decoded_bytes);
+	    return false;
+	  }
+	}
+	// ygglog_info("arg_siz = %ld", *arg_siz);
 	int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
 				 p, *arg_siz, allow_realloc, skip_terminal);
 	if (ret < 0) {
@@ -510,6 +609,7 @@ private:
   const size_t precision_;
   const char *units_;
   bool _variable_precision;
+  size_t cast_precision_;
 };
 
 
@@ -567,6 +667,15 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
    */
   const size_t nelements() {
     return length_;
+  }
+  /*!
+    @brief Update the type object with info from another type object.
+    @param[in] new_info MetaschemaType* type object.
+   */
+  void update(MetaschemaType* new_info) {
+    ScalarMetaschemaType::update(new_info);
+    OneDArrayMetaschemaType* new_info_oned = (OneDArrayMetaschemaType*)new_info;
+    set_length(new_info_oned->get_length());
   }
   /*!
     @brief Update the instance's length.
@@ -685,6 +794,22 @@ public:
       }
     }
     return nelements;
+  }
+  /*!
+    @brief Update the type object with info from another type object.
+    @param[in] new_info MetaschemaType* type object.
+   */
+  void update(MetaschemaType* new_info) {
+    ScalarMetaschemaType::update(new_info);
+    NDArrayMetaschemaType* new_info_nd = (NDArrayMetaschemaType*)new_info;
+    if (ndim() != new_info_nd->ndim()) {
+      ygglog_throw_error("NDArrayMetaschemaType::update: Cannot update ND array with %ld dimensions to %ld dimensions.",
+			 ndim(), new_info_nd->ndim());
+    }
+    size_t i;
+    for (i = 0; i < ndim(); i++) {
+      shape_[i] = new_info_nd->shape()[i];
+    }
   }
   /*!
     @brief Encode the type's properties in a JSON string.

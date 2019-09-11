@@ -453,6 +453,7 @@ extern "C" {
 	MetaschemaType* base = (MetaschemaType*)type;
 	const char* new_type = base->type();
 	if (strcmp(new_type, type_name) != 0) {
+	  ygglog_debug("type_from_void: discovered type '%s'.", new_type);
 	  return type_from_void(new_type, type);
 	} else {
 	  ygglog_error("type_from_void: No handler for type '%s'.", type_name);
@@ -626,6 +627,28 @@ extern "C" {
     }
   }
 
+  int update_from_void(char* name1, void* info1,
+		       const char* name2, void* info2) {
+    try {
+      MetaschemaType *type1 = type_from_void(name1, info1);
+      if (type1 == NULL) {
+	ygglog_error("update_from_void: Could not recover type for updated.");
+	return -1;
+      }
+      MetaschemaType *type2 = type_from_void(name2, info2);
+      if (type2 == NULL) {
+	ygglog_error("update_from_void: Could not recover type to update from.");
+	return -1;
+      }
+      type1->update(type2);
+      strcpy(name1, type1->type());
+    } catch (...) {
+      ygglog_error("update_from_void: C++ exception thrown.");
+      return -1;
+    }
+    return 0;
+  }
+  
   int update_precision_from_void(const char* name, void* info,
 				 const size_t new_precision) {
     try {

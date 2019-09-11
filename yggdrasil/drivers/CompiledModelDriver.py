@@ -2691,6 +2691,7 @@ class CompiledModelDriver(ModelDriver):
     @classmethod
     def compile_dependencies(cls, **kwargs):
         r"""Compile any required internal libraries, including the interface."""
+        kwargs.setdefault('products', [])
         base_libraries = []
         for x in cls.base_languages:
             base_cls = import_component('model', x)
@@ -2702,6 +2703,14 @@ class CompiledModelDriver(ModelDriver):
             dep_order = cls.get_dependency_order(cls.interface_library)
             for k in dep_order[::-1]:
                 cls.call_compiler(k, **kwargs)
+
+    @classmethod
+    def cleanup_dependencies(cls, products=None):
+        r"""Cleanup dependencies."""
+        if products is None:
+            products = []
+        cls.compile_dependencies(dry_run=True, products=products)
+        super(CompiledModelDriver, cls).cleanup_dependencies(products=products)
 
     def compile_model(self, source_files=None, skip_interface_flags=False,
                       **kwargs):

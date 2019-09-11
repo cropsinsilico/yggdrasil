@@ -36,6 +36,15 @@ public:
   YggInput(const char *name, const char *fmt) : _pi(yggInputFmt(name, fmt)) {}
 
   /*!
+    @brief Constructor for YggIntput with explicit datatype.
+    @param[in] name constant character pointer to name of input queue. This
+    should be the argument to an input driver in the yaml specification file.
+    @param[in] seri_info Pointer to a MetaschemaType data structure
+    containing type information.
+   */
+  YggInput(const char *name, void *seri_info) : _pi(yggInputType(name, seri_info)) {}
+
+  /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
   void _destroy_pi() { ygg_free(&_pi); }
@@ -163,6 +172,15 @@ public:
     @param[in] fmt character pointer to format string for formatting variables.
    */
   YggOutput(const char *name, const char *fmt) : _pi(yggOutputFmt(name, fmt)) {}
+
+  /*!
+    @brief Constructor for YggOutput with explicit datatype.
+    @param[in] name constant character pointer to name of output queue. This
+    should be the argument to an output driver in the yaml specification file.
+    @param[in] seri_info Pointer to a MetaschemaType data structure
+    containing type information.
+   */
+  YggOutput(const char *name, void *seri_info) : _pi(yggOutputType(name, seri_info)) {}
 
   /*! @brief Empty constructor for inheritance. */
   YggOutput(yggOutput_t x) : _pi(x) {}

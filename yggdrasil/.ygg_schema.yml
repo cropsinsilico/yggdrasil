@@ -56,6 +56,12 @@ definitions:
           $ref: '#/definitions/filter'
           description: Callable class that will be used to determine when messages
             should be sent/received. Defaults to None and is ignored.
+        is_default:
+          default: false
+          description: If True, this comm was created to handle all input/output variables
+            to/from a model. Defaults to False. This variable is used internally and
+            should not be set explicitly in the YAML.
+          type: boolean
         name:
           description: Name used for component in log messages.
           type: string
@@ -89,9 +95,13 @@ definitions:
                 - function
                 - string
             type: array
+        vars:
+          items:
+            type: string
+          type: array
       required:
-      - datatype
       - commtype
+      - datatype
       - name
       title: comm_base
       type: object
@@ -217,8 +227,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -450,6 +460,12 @@ definitions:
           type:
           - string
           - int
+        is_default:
+          default: false
+          description: If True, this comm was created to handle all input/output variables
+            to/from a model. Defaults to False. This variable is used internally and
+            should not be set explicitly in the YAML.
+          type: boolean
         is_series:
           default: false
           description: If True, input/output will be done to a series of files. If
@@ -524,6 +540,10 @@ definitions:
           description: If True, the astropy package will be used to serialize/deserialize
             table. Defaults to False.
           type: boolean
+        vars:
+          items:
+            type: string
+          type: array
         wait_for_creation:
           default: 0.0
           description: Time (in seconds) that should be waited before opening for
@@ -535,9 +555,9 @@ definitions:
             is used.
           type: string
       required:
-      - filetype
       - working_dir
       - name
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1084,7 +1104,8 @@ definitions:
             model must contain it's own calls to the |yggdrasil| interface.
           type: string
         inputs:
-          default: []
+          default:
+          - name: default
           description: Model inputs described as comm objects.
           items:
             $ref: '#/definitions/comm'
@@ -1155,7 +1176,8 @@ definitions:
           description: Name used for component in log messages.
           type: string
         outputs:
-          default: []
+          default:
+          - name: default
           description: Model outputs described as comm objects.
           items:
             $ref: '#/definitions/comm'
@@ -1257,9 +1279,9 @@ definitions:
           type: string
       required:
       - language
-      - args
       - working_dir
       - name
+      - args
       title: model_base
       type: object
     - anyOf:

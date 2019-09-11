@@ -1020,7 +1020,9 @@ def _normalize_root(normalizer, value, instance, schema):
     if getattr(normalizer, 'iodict', None) is None:
         normalizer.iodict = {'inputs': {}, 'outputs': {}, 'connections': [],
                              'input_drivers': [], 'output_drivers': [], 'pairs': [],
-                             'inputs_extra': {}, 'outputs_extra': {}}
+                             'inputs_extra': {}, 'outputs_extra': {},
+                             'models': {},
+                             'aliases': {'inputs': {}, 'outputs': {}}}
     standardize(instance, ['models', 'connections'])
     return instance
 
@@ -1028,10 +1030,18 @@ def _normalize_root(normalizer, value, instance, schema):
 @SchemaRegistry.register_normalizer(('models', 0))
 def _normalize_modelio_first(normalizer, value, instance, schema):
     r"""Normalizes set of model inputs/outputs before each input/output is normalized."""
+    iodict = getattr(normalizer, 'iodict', None)
     if isinstance(instance, dict):
         standardize(instance, ['inputs', 'outputs'])
+        prefix = '%s:' % instance['name']
         for io in ['inputs', 'outputs']:
+            if len(instance[io]) == 0:
+                instance[io] = [{'name': io[:-1], 'is_default': True}]
             for x in instance[io]:
+                if not x['name'].startswith(prefix):
+                    if iodict is not None:
+                        iodict['aliases'][io][x['name']] = prefix + x['name']
+                    x['name'] = prefix + x['name']
                 x.setdefault('working_dir', instance['working_dir'])
                 x_filter = x.get('filter', None)
                 if isinstance(x_filter, dict) and ('function' in x_filter):
@@ -1153,8 +1163,8 @@ def _normalize_connio_first(normalizer, value, instance, schema):
             pruned = []
             pruned_names = []
             for x in instance[io]:
-                if (':' in x['name']) and (not os.path.isabs(x['name'])):
-                    name = x['name'].split(':')[0]
+                if ('::' in x['name']) and (not os.path.isabs(x['name'])):
+                    name = x['name'].split('::')[0]
                     x['name'] = name
                 if x['name'] not in pruned_names:
                     pruned_names.append(x['name'])
@@ -1170,6 +1180,8 @@ def _normalize_connio_first(normalizer, value, instance, schema):
             target_files = []
             for io in ['inputs', 'outputs']:
                 for x in instance[io]:
+                    if x['name'] in iodict['aliases'][opp_map[io]]:
+                        x['name'] = iodict['aliases'][opp_map[io]][x['name']]
                     y = iodict['%s_extra' % opp_map[io]].get(x['name'], None)
                     if y is None:
                         target_files.append(x)

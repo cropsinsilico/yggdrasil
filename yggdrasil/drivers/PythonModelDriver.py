@@ -39,6 +39,9 @@ class PythonModelDriver(InterpretedModelDriver):
     function_param = {
         'import_nofile': 'import {function}',
         'import': 'from {filename} import {function}',
+        'istype': 'isinstance({variable}, {type})',
+        'len': 'len({variable})',
+        'index': '{variable}[{index}]',
         'interface': 'import {interface_library} as ygg',
         'input': '{channel} = ygg.YggInput(\'{channel_name}\')',
         'output': '{channel} = ygg.YggOutput(\'{channel_name}\')',
@@ -46,13 +49,14 @@ class PythonModelDriver(InterpretedModelDriver):
                         '\"{channel_name}\")'),
         'table_output': ('{channel} = YggInterface.YggAsciiTableOutput('
                          '\"{channel_name}\", \"{format_str}\")'),
-        'recv': '{flag_var}, {recv_var} = {channel}.recv()',
-        'send': '{flag_var} = {channel}.send({send_var})',
-        'function_call': '{output_var} = {function_name}({input_var})',
+        'recv_function': '{channel}.recv',
+        'send_function': '{channel}.send',
+        'multiple_outputs': '[{outputs}]',
         'define': '{variable} = {value}',
         'comment': '#',
         'true': 'True',
         'not': 'not',
+        'and': 'and',
         'indent': 4 * ' ',
         'quote': '\"',
         'print': 'print(\"{message}\")',
@@ -71,7 +75,14 @@ class PythonModelDriver(InterpretedModelDriver):
         'assign': '{name} = {value}',
         'exec_begin': 'def main():',
         'exec_suffix': ('if __name__ == "__main__":\n'
-                        '    main()')}
+                        '    main()'),
+        'function_def_regex': (r'\n?( *)def +{function_name}'
+                               r' *\((?P<inputs>(?:.|\n)*?)\) *:'
+                               r'(?:(?:\1(?:    )+(?!return).*\n)|(?: *\n))*'
+                               r'(?:\1(?:    )+'
+                               r'return *(\()?(?P<outputs>.*?)(?(3)\)))?'),
+        'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)',
+        'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
 
     @staticmethod
     def finalize_registration(cls):

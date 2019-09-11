@@ -747,11 +747,6 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
 	return -1;
       }
     } else if ((x.is_file == 0) && (strlen(head.type) > 0) && (head.serializer_info != NULL)) {
-      if (strcmp(head.type, upseri->type) != 0) {
-	ygglog_error("comm_recv_multipart(%s): Current type ('%s') dosn't match header type ('%s')",
-		     head.type, upseri->type);
-	return -1;
-      }
       ret = update_serializer(upseri, head.type, head.serializer_info);
       if (ret != 0) {
 	ygglog_error("comm_recv_multipart(%s): Error updating existing serializer.", x.name);

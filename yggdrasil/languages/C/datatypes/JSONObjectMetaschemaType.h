@@ -44,11 +44,32 @@ public:
     }
   }
   /*!
+    @brief Get number of items in type.
+    @returns size_t Number of items in type.
+   */
+  size_t nitems() { return properties_.size(); }
+  /*!
     @brief Get types for properties.
     @returns std::map<const char*, MetaschemaType*, strcomp> Map from property
     names to types.
    */
   std::map<const char*, MetaschemaType*, strcomp> properties() { return properties_; }
+  /*!
+    @brief Update the type object with info from another type object.
+    @param[in] new_info MetaschemaType* type object.
+   */
+  void update(MetaschemaType* new_info) {
+    MetaschemaType::update(new_info);
+    JSONObjectMetaschemaType* new_info_obj = (JSONObjectMetaschemaType*)new_info;
+    if (nitems() != new_info_obj->nitems()) {
+      ygglog_throw_error("JSONObjectMetaschemaType::update: Cannot update object with %ld elements from an object with %ld elements.",
+			 nitems(), new_info_obj->nitems());
+    }
+    std::map<const char*, MetaschemaType*, strcomp>::iterator it;
+    for (it = properties_.begin(); it != properties_.end(); it++) {
+      it->second->update(new_info_obj->properties()[it->first]);
+    }
+  }
   /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.

@@ -107,20 +107,15 @@ int update_serializer(seri_t *s, const char* type, void *info) {
     ygglog_error("update_serializer: Pointer to serializer is NULL.");
     return -1;
   }
-  // Free before transfering information
-  free_serializer(s);
-  if ((strlen(type) == 0) && (info != NULL)) {
-    MetaschemaType* new_info = type_from_void(type, info);
-    if (new_info == NULL) {
-      ygglog_error("update_serializer: Error getting type.");
-      return -1;
-    }
-    const char* new_type = get_type_name(new_info);
-    strncpy(s->type, new_type, COMMBUFFSIZ);
-    s->info = new_info;
-  } else {
+  if (s->info == NULL) {
     strncpy(s->type, type, COMMBUFFSIZ);
     s->info = info;
+  } else if (info != NULL) {
+    // Version using class method
+    if (update_from_void(s->type, s->info, type, info) != 0) {
+      ygglog_error("update_serializer: Error updating type.");
+      return -1;
+    }
   }
   return 0;
 };

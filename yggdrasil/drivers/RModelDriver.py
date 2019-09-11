@@ -1,3 +1,4 @@
+import re
 import numpy as np
 import pandas as pd
 import logging
@@ -58,6 +59,10 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'schema': 'list'}
     function_param = {
         'import': 'source(\"{filename}\")',
+        'istype': 'is({variable}, \"{type}\")',
+        'len': 'length({variable})',
+        'index': '{variable}[[{index}]]',
+        'first_index': 1,
         'interface': 'library(yggdrasil)',
         'input': '{channel} <- YggInterface(\"YggInput\", \"{channel_name}\")',
         'output': '{channel} <- YggInterface(\"YggOutput\", \"{channel_name}\")',
@@ -65,12 +70,13 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                         '\"{channel_name}\")'),
         'table_output': ('{channel} <- YggInterface(\"YggAsciiTableOutput\", '
                          '\"{channel_name}\", \"{format_str}\")'),
-        'recv': 'c({flag_var}, {recv_var}) %<-% {channel}$recv()',
-        'send': '{flag_var} <- {channel}$send({send_var})',
-        'function_call': '{output_var} <- {function_name}({input_var})',
+        'recv_function': '{channel}$recv',
+        'send_function': '{channel}$send',
+        'multiple_outputs': 'c({outputs})',
         'define': '{variable} <- {value}',
         'true': 'TRUE',
         'not': '!',
+        'and': '&&',
         'comment': '#',
         'indent': 2 * ' ',
         'quote': '\"',
@@ -86,7 +92,16 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'try_begin': 'tryCatch({',
         'try_except': '}}, error = function({error_var}) {{',
         'try_end': '})',
-        'assign': '{name} <- {value}'}
+        'assign': '{name} <- {value}',
+        'assign_mult': '{name} %<-% {value}',
+        'function_def_regex': (r'{function_name} *(?:(?:\<-)|(?:=)) *function'
+                               r'\((?P<inputs>(?:.|\n)*?)\)\s*\{{'
+                               r'(?:.*?\n?)*?'
+                               r'(?:return\((list\()?'
+                               r'(?P<outputs>(?:.|\n)*?)(?(2)\))\)'
+                               r'(?:.*?\n?)*?)?\}}'),
+        'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)',
+        'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
 
     @classmethod
     def is_library_installed(cls, lib, **kwargs):
@@ -244,3 +259,47 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             model_file = model_file.replace('\\', '/')
         return super(RModelDriver, cls).write_model_wrapper(
             model_file, model_function, **kwargs)
+        
+    @classmethod
+    def parse_function_definition(cls, model_file, model_function,
+                                  contents=None, match=None):
+        r"""Get information about the inputs & outputs to a model from its
+        defintition if possible.
+
+        Args:
+            model_file (str): Full path to the file containing the model
+                function's declaration.
+            model_function (str): Name of the model function.
+            contents (str, optional): String containing the function definition.
+                If not provided, the function definition is read from model_file.
+            match (re.Match, optional): Match object for the function regex. If
+                not provided, a search is performed using function_def_regex.
+
+        Returns:
+            dict: Parameters extracted from the function definitions.
+
+        """
+        # Match brackets to determine where function defintion is
+        if (contents is None) and (match is None):
+            with open(model_file, 'r') as fd:
+                contents = fd.read()
+            function_regex = cls.format_function_param(
+                'function_def_regex', function_name=model_function)
+            match = re.search(function_regex, contents)
+            if match:
+                contents = match.group(0)
+                counts = {'{': 0, '}': 0}
+                first_zero = 0
+                for x in re.finditer(r'[\{\}]', contents):
+                    counts[x.group(0)] += 1
+                    if (counts['{'] > 0) and (counts['{'] == counts['}']):
+                        first_zero = x.span(0)[1]
+                        break
+                if first_zero == 0:
+                    match = None
+                    contents = None
+                elif first_zero != len(contents):
+                    match = None
+                    contents = contents[:first_zero]
+        return super(RModelDriver, cls).parse_function_definition(
+            model_file, model_function, contents=contents, match=match)

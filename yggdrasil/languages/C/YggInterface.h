@@ -16,6 +16,7 @@ extern "C" {
 #define yggOutput_t comm_t
 #define yggInput_t comm_t
 #define ygg_free free_comm
+#define yggComm init_comm
 
 //==============================================================================
 /*!
@@ -40,6 +41,36 @@ extern "C" {
 */
 //==============================================================================
 
+/*!
+  @brief Constructor for yggOutput_t structure with explicit data type.
+  Create a yggOutput_t structure based on a provided name that is used to
+  locate a particular comm address stored in the environment variable name
+  and a structure definining the datatype of outgoing messages for the queue.
+  @param[in] name constant character pointer to name of queue.
+  @param[in] seri_info Pointer to a MetaschemaType data structure containing
+  type information.
+  @returns yggOutput_t output queue structure.
+ */
+static inline
+yggOutput_t yggOutputType(const char *name, void *seri_info) {
+  return init_comm(name, "send", _default_comm, seri_info);
+};
+
+/*!
+  @brief Constructor for yggInput_t structure with explicit data type.
+  Create a yggInput_t structure based on a provided name that is used to
+  locate a particular comm address stored in the environment variable name and
+  a structure defining the expected datatype of received messages.
+  @param[in] name constant character pointer to name of queue.
+  @param[in] seri_info Pointer to a MetaschemaType data structure containing
+  type information.
+  @returns yggInput_t input queue structure.
+ */
+static inline
+yggInput_t yggInputType(const char *name, void *seri_info) {
+  return init_comm(name, "recv", _default_comm, seri_info);
+};
+  
 /*!
   @brief Constructor for yggOutput_t structure with format.
   Create a yggOutput_t structure based on a provided name that is used to

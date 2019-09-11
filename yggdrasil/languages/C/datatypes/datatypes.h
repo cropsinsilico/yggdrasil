@@ -340,6 +340,17 @@ MetaschemaType* copy_from_void(const char* name, const void* info);
 
 
 /*!
+  @brief Wrapper for updating a type object with information from another.
+  @param[in] name1 char* Name of the type for the object that should be updated.
+  @param[in] info1 void* Pointer to type object that should be updated.
+  @param[in] name2 char* Name of the type that should be updated from.
+  @param[in] info2 void* Pointer to the type object that should be updated from.
+  @returns: int 0 if successfull, -1 if there was an error.
+*/
+int update_from_void(char* name1, void* info1,
+		     const char* name2, void* info2);
+  
+/*!
   @brief Wrapper for updating the precision of a bytes or unicode scalar type.
   @param[in] name char* Name of the type.
   @param[in] info void* Pointer to type class.

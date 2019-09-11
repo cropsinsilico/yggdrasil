@@ -1,7 +1,9 @@
 import os
+import re
 import copy
 import shutil
 import subprocess
+import numpy as np
 from collections import OrderedDict
 from yggdrasil import platform, tools, backwards
 from yggdrasil.drivers.CompiledModelDriver import (
@@ -265,7 +267,7 @@ class CModelDriver(CompiledModelDriver):
                       'include_dirs': []}}
     type_map = {
         'int': 'intX_t',
-        'float': 'floatX_t',
+        'float': 'float',
         'string': 'char*',
         'array': 'vector_t',
         'object': 'map_t',
@@ -283,24 +285,25 @@ class CModelDriver(CompiledModelDriver):
         'flag': 'int'}
     function_param = {
         'import': '#include \"{filename}\"',
+        'index': '{variable}[{index}]',
         'interface': '#include \"{interface_library}\"',
-        'input': 'yggInput_t {channel} = yggInput(\"{channel_name}\");',
-        'output': 'yggOutput_t {channel} = yggOutput(\"{channel_name}\");',
-        'table_input': ('yggInput_t {channel} = yggAsciiTableInput('
-                        '\"{channel_name}\");'),
-        'table_output': ('yggOutput_t {channel} = yggAsciiTableOutput('
-                         '\"{channel_name}\", \"{format_str}\");'),
-        'recv': '{flag_var} = yggRecvRealloc({channel}, {recv_var});',
-        'send': '{flag_var} = yggSend({channel}, {send_var});',
+        'input': ('yggInput_t {channel} = yggInputType('
+                  '\"{channel_name}\", {channel_type});'),
+        'output': ('yggOutput_t {channel} = yggOutputType('
+                   '\"{channel_name}\", {channel_type});'),
+        # 'recv_function': 'yggRecvRealloc',
+        'recv_function': 'yggRecv',
+        'send_function': 'yggSend',
+        'not_flag_cond': '{flag_var} < 0',
         'flag_cond': '{flag_var} >= 0',
         # Model functions should return non-zero integer codes to indicate errors
-        'function_call': '{flag_var} = {function_name}({input_var}, {output_var});',
         'declare': '{type_name} {variable};',
         'define': '{variable} = {value};',
         'assign': '{name} = {value};',
         'comment': '//',
         'true': '1',
         'not': '!',
+        'and': '&&',
         'indent': 2 * ' ',
         'quote': '\"',
         'print': 'printf(\"{message}\\n\");',
@@ -317,7 +320,16 @@ class CModelDriver(CompiledModelDriver):
         'exec_begin': 'int main() {',
         'exec_end': '  return 0;\n}',
         'exec_prefix': '#include <stdbool.h>',
-        'free': 'if ({variable} != NULL) free({variable});'}
+        'free': 'if ({variable} != NULL) free({variable});',
+        'function_def_regex': (r'(?P<flag_type>.+?)\s*{function_name}\s*'
+                               r'\((?P<inputs>.*?)\)\s*\{{'),
+        'inputs_def_regex': (r'\s*(?P<native_type>.+?(?:\s*\*+)?)\s+'
+                             r'(?P<name>.+?)\s*(?:,|$)'),
+        'outputs_def_regex': (r'\s*(?P<native_type>.+?(?:\s*\*+)?)*\s+'
+                              r'(?P<name>.+?)\s*(?:,|$)')}
+    outputs_in_inputs = True
+    include_channel_obj = True
+    is_typed = True
 
     @staticmethod
     def after_registration(cls):
@@ -488,6 +500,27 @@ class CModelDriver(CompiledModelDriver):
         return out
     
     @classmethod
+    def input2output(cls, var):
+        r"""Perform conversion necessary to turn a variable extracted from a
+        function definition from an input to an output.
+
+        Args:
+            var (dict): Variable definition.
+
+        Returns:
+            dict: Updated variable definition.
+
+        """
+        out = super(CModelDriver, cls).input2output(var)
+        if out['native_type'] != out.get('native_type_cast', out['native_type']):
+            out['native_type'] = out['native_type_cast']
+            del out['native_type_cast']
+        if out['native_type'].endswith('*'):
+            out['native_type'] = out['native_type'][:-1].strip()
+            out['datatype'] = cls.get_json_type(out['native_type'])
+        return out
+        
+    @classmethod
     def get_native_type(cls, **kwargs):
         r"""Get the native type.
 
@@ -502,9 +535,9 @@ class CModelDriver(CompiledModelDriver):
 
         """
         out = super(CModelDriver, cls).get_native_type(**kwargs)
-        if not ((out == '*') or ('X' in out)):
+        if not ((out == '*') or ('X' in out) or (out == 'float')):
             return out
-        json_type = kwargs.get('type', 'bytes')
+        json_type = kwargs.get('datatype', 'bytes')
         assert(isinstance(json_type, dict))
         if out == '*':
             json_subtype = copy.deepcopy(json_type)
@@ -513,6 +546,53 @@ class CModelDriver(CompiledModelDriver):
         elif 'X' in out:
             precision = json_type['precision']
             out = out.replace('X', str(precision))
+        elif out == 'float':
+            if json_type['precision'] == 64:
+                out = 'double'
+        return out
+        
+    @classmethod
+    def get_json_type(cls, native_type=None):
+        r"""Get the JSON type from the native language type.
+
+        Args:
+            native_type (str, optional): The native language type. Defaults
+                to None.
+
+        Returns:
+            str, dict: The JSON type.
+
+        """
+        if native_type is None:
+            return super(CModelDriver, cls).get_json_type(native_type)
+        out = {}
+        regex_var = r'(?P<type>.+?(?P<precision>\d*)(?:_t)?)\s*(?P<pointer>\**)'
+        grp = re.fullmatch(regex_var, native_type).groupdict()
+        if grp.get('precision', False):
+            out['precision'] = int(grp['precision'])
+            grp['type'] = grp['type'].replace(grp['precision'], 'X')
+        if grp['type'] == 'char':
+            out['type'] = 'bytes'
+        else:
+            if grp['type'] == 'double':
+                grp['type'] = 'float'
+                out['precision'] = 8 * 8
+            elif grp['type'] == 'float':
+                out['precision'] = 4 * 8
+            elif grp['type'] in ['int', 'uint']:
+                grp['type'] += 'X_t'
+                out['precision'] = 8 * np.dtype('intc').itemsize
+            out['type'] = super(CModelDriver, cls).get_json_type(grp['type'])
+        if grp.get('pointer', False):
+            nptr = len(grp['pointer'])
+            if grp['type'] == 'char':
+                nptr -= 1
+            if nptr > 0:
+                out['subtype'] = out['type']
+                if nptr == 1:
+                    out['type'] = '1darray'
+                else:
+                    out['type'] = 'ndarray'
         return out
         
     @classmethod
@@ -544,6 +624,31 @@ class CModelDriver(CompiledModelDriver):
         return super(CModelDriver, cls).format_function_param(key, **kwargs)
     
     @classmethod
+    def write_model_function_call(cls, model_function, flag_var, inputs, outputs):
+        r"""Write lines necessary to call the model function.
+
+        Args:
+            model_function (str): Handle of the model function that should be
+                called.
+            flag_var (str): Name of variable that should be used as a flag.
+            inputs (list): List of dictionaries describing inputs to the model.
+            outputs (list): List of dictionaries describing outputs from the model.
+
+        Returns:
+            list: Lines required to carry out a call to a model function in
+                this language.
+
+        """
+        new_inputs = []
+        for x in inputs:
+            if 'native_type_cast' in x:
+                x = copy.deepcopy(x)
+                x['name'] = '(%s)%s' % (x['native_type_cast'], x['name'])
+            new_inputs.append(x)
+        return super(CModelDriver, cls).write_model_function_call(
+            model_function, flag_var, new_inputs, outputs)
+        
+    @classmethod
     def write_declaration(cls, name, **kwargs):
         r"""Return the line required to declare a variable with a certain
         type.
@@ -561,13 +666,12 @@ class CModelDriver(CompiledModelDriver):
         if type_name.endswith('*'):
             kwargs.get('requires_freeing', []).append(name)
             name = '%s = NULL' % name
-            # TODO: Handle *
         out = super(CModelDriver, cls).write_declaration(name, **kwargs)
         if type_name == 'char*':
             length_name = orig_name + '_length = 0'
             length_type = {'type': 'uint', 'precision': 64}
             out += ' ' + cls.write_declaration(length_name,
-                                               type=length_type)
+                                               datatype=length_type)
         return out
         
     @classmethod
@@ -584,27 +688,148 @@ class CModelDriver(CompiledModelDriver):
             str: Concatentated variables list.
 
         """
-        assert(isinstance(vars_list, list))
+        if not isinstance(vars_list, list):
+            vars_list = [vars_list]
         new_vars_list = []
         for x in vars_list:
-            assert(isinstance(x, dict))
-            new_vars_list.append(x)
-            if cls.get_native_type(**x) == 'char*':
-                new_vars_list.append({'name': x['name'] + '_length'})
+            if isinstance(x, str):
+                new_vars_list.append(x)
+            else:
+                assert(isinstance(x, dict))
+                new_vars_list.append(x)
+                if cls.get_native_type(**x) == 'char*':
+                    new_vars_list.append({'name': x['name'] + '_length'})
         return super(CModelDriver, cls).prepare_variables(new_vars_list)
             
     @classmethod
-    def prepare_output_variables(cls, vars_list):
+    def prepare_output_variables(cls, vars_list, in_inputs=False):
         r"""Concatenate a set of output variables such that it can be passed as
         a single string to the function_call parameter.
 
         Args:
             vars_list (list): List of variable names to concatenate as output
                 from a function call.
+            in_inputs (bool, optional): If True, the output variables should
+                be formated to be included as input variables. Defaults to
+                False.
 
         Returns:
             str: Concatentated variables list.
 
         """
-        return super(CModelDriver, cls).prepare_output_variables(
-            [dict(y, name='&' + y['name']) for y in vars_list])
+        if in_inputs:
+            vars_list = [dict(y, name='&' + y['name']) for y in vars_list]
+        return super(CModelDriver, cls).prepare_output_variables(vars_list)
+
+    @classmethod
+    def write_native_type_definition(cls, name, datatype, as_seri=False,
+                                     requires_freeing=None, no_decl=False):
+        r"""Get lines declarining the data type within the language.
+
+        Args:
+            name (str): Name of variable that definition should be stored in.
+            datatype (dict): Type definition.
+            as_seri (bool, optional): If True, the type variable is wrapped as
+                a serialization structure. Defaults to False.
+            requires_freeing (list, optional): List that variables requiring
+                freeing should be appended to. Defaults to None.
+            no_decl (bool, optional): If True, the variable is defined without
+                declaring it (assumes that variable has already been declared).
+                Defaults to False.
+
+        Returns:
+            list: Lines required to define a type definition.
+
+        """
+        out = []
+        fmt = None
+        keys = {}
+        typename = datatype['type']
+        if datatype['type'] == 'array':
+            assert(isinstance(datatype['items'], list))
+            keys['nitems'] = len(datatype['items'])
+            keys['items'] = '%s_items' % name
+            fmt = 'get_json_array_type({nitems}, {items})'
+            out += [('MetaschemaType** %s = '
+                     '(MetaschemaType**)malloc(%d*sizeof(MetaschemaType*));')
+                    % (keys['items'], keys['nitems'])]
+            for i, x in enumerate(datatype['items']):
+                out += cls.write_native_type_definition(
+                    '%s_items[%d]' % (name, i), x,
+                    requires_freeing=requires_freeing, no_decl=True)
+            assert(isinstance(requires_freeing, list))
+            requires_freeing += [keys['items']]
+        elif datatype['type'] == 'object':
+            assert(isinstance(datatype['properties'], dict))
+            keys['nitems'] = len(datatype['properties'])
+            keys['keys'] = '%s_keys' % name
+            keys['values'] = '%s_vals' % name
+            fmt = 'get_json_object_type({nitems}, {keys}, {values})'
+            out += [('MetaschemaType** %s = '
+                     '(MetaschemaType**)malloc(%d*sizeof(MetaschemaType*));')
+                    % (keys['values'], keys['nitems']),
+                    ('char** %s = (char**)malloc(%d*sizeof(char*));')
+                    % (keys['keys'], keys['nitems'])]
+            for i, (k, v) in enumerate(datatype['properties'].items()):
+                out += ['%s[%d] = \"%s\"' % (keys['keys'], i, k)]
+                out += cls.write_native_type_definition(
+                    '%s[%d]' % (keys['values'], i), v,
+                    requires_freeing=requires_freeing)
+            assert(isinstance(requires_freeing, list))
+            requires_freeing += [keys['values'], keys['keys']]
+        elif datatype['type'] in ['ply', 'obj']:
+            fmt = 'get_%s_type()' % datatype['type']
+        elif datatype['type'] == '1darray':
+            fmt = ('get_1darray_type(\"{subtype}\", {precision}, {length}, '
+                   '\"{units}\")')
+            keys = {k: datatype[k] for k in ['subtype', 'precision', 'length']}
+            keys['units'] = datatype.get('units', '')
+        elif datatype['type'] in ['1darray', 'ndarray']:
+            fmt = ('get_ndarray_type(\"{subtype}\", {precision}, {ndim}, {shape}, '
+                   '\"{units}\")')
+            keys = {k: datatype[k] for k in ['subtype', 'precision', 'shape']}
+            keys['ndim'] = len(keys['shape'])
+            keys['units'] = datatype.get('units', '')
+        else:
+            fmt = 'get_scalar_type(\"{subtype}\", {precision}, \"{units}\")'
+            keys = {k: datatype[k] for k in ['precision']}
+            keys['subtype'] = datatype.get('subtype', datatype['type'])
+            keys['units'] = datatype.get('units', '')
+            typename = 'scalar'
+        if as_seri:
+            def_line = ('seri_t* %s = init_serializer(\"%s\", %s);'
+                        % (name, typename, fmt.format(**keys)))
+        else:
+            def_line = '%s = %s;' % (name, fmt.format(**keys))
+            if not no_decl:
+                def_line = 'MetaschemaType* ' + def_line
+        out.append(def_line)
+        return out
+
+    @classmethod
+    def write_channel_def(cls, key, datatype=None, requires_freeing=None,
+                          **kwargs):
+        r"""Write an channel declaration/definition.
+
+        Args:
+            key (str): Entry in cls.function_param that should be used.
+            datatype (dict, optional): Data type associated with the channel.
+                Defaults to None and is ignored.
+            requires_freeing (list, optional): List that variables requiring
+                freeing should be appended to. Defaults to None.
+            **kwargs: Additional keyword arguments are passed as parameters
+                to format_function_param.
+
+        Returns:
+            list: Lines required to declare and define an output channel.
+
+        """
+        out = []
+        if (datatype is not None) and ('{channel_type}' in cls.function_param[key]):
+            kwargs['channel_type'] = '%s_type' % kwargs['channel']
+            out += cls.write_native_type_definition(
+                kwargs['channel_type'], datatype,
+                requires_freeing=requires_freeing)
+        out += super(CModelDriver, cls).write_channel_def(key, datatype=datatype,
+                                                          **kwargs)
+        return out

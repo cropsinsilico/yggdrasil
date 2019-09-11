@@ -159,6 +159,19 @@ public:
    */
   const int type_code() { return type_code_; }
   /*!
+    @brief Update the type object with info from another type object.
+    @param[in] new_info MetaschemaType* type object.
+   */
+  virtual void update(MetaschemaType* new_info) {
+    if (new_info == NULL) {
+      ygglog_throw_error("MetaschemaType::update: New type information is NULL.");
+    }
+    if (strcmp(type_, new_info->type()) != 0) {
+      ygglog_throw_error("MetaschemaType::update: Cannot update type %s to type %s.",
+			 type_, new_info->type());
+    }
+  }
+  /*!
     @brief Update the instance's type.
     @param[in] new_type const char * String for new type.
    */
