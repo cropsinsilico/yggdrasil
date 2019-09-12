@@ -115,10 +115,16 @@ def parse_yaml(files):
             existing = parse_component(yml, k[:-1], existing=existing)
     # Make sure that I/O channels initialized
     for io in ['input', 'output']:
+        remove = []
         for k, v in existing[io].items():
             if 'driver' not in v:
-                raise RuntimeError("No driver established for %s channel %s" % (
-                    io, k))
+                if v.get('is_default', False):
+                    remove.append(k)
+                else:
+                    raise RuntimeError("No driver established for %s channel %s" % (
+                        io, k))
+        for k in remove:
+            existing[io].pop(k)
     # Link io drivers back to models
     existing = link_model_io(existing)
     # print('drivers')
