@@ -514,10 +514,12 @@ def safe_eval(statement, **kwargs):
     for mod_name, func_list in _safe_lists.items():
         if (mod_name == 'builtins') and backwards.PY2:  # pragma: Python 2
             mod = __builtins__
+            for func in func_list:
+                safe_dict[func] = mod[func]
         else:
             mod = importlib.import_module(mod_name)
-        for func in func_list:
-            safe_dict[func] = getattr(mod, func)
+            for func in func_list:
+                safe_dict[func] = getattr(mod, func)
     safe_dict.update(kwargs)
     # The following replaces <Class Name(a, b)> style reprs with calls to classes
     # identified in self._no_eval_class
