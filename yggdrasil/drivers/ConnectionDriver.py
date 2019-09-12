@@ -1,6 +1,5 @@
 """Module for funneling messages from one comm to another."""
 import os
-import copy
 import numpy as np
 import threading
 from yggdrasil import backwards
@@ -22,8 +21,12 @@ class ConnectionDriver(Driver):
 
     Args:
         name (str): Name that should be used to set names of input/output comms.
-        icomm_kws (dict, optional): Keyword arguments for the input communicator.
-        ocomm_kws (dict, optional): Keyword arguments for the output communicator.
+        inputs (list, optional): One or more dictionaries containing keyword
+            arguments for constructing input communicators. Defaults to an
+            empty dictionary if not provided.
+        outputs (list, optional): One or more dictionaries containing keyword
+            arguments for constructing output communicators. Defaults to an
+            empty dictionary if not provided.
         translator (str, func, optional): Function or string specifying function
             that should be used to translate messages from the input communicator
             before passing them to the output communicator. If a string, the
@@ -72,7 +75,7 @@ class ConnectionDriver(Driver):
     _schema_subtype_default = 'default'
     _schema_required = ['inputs', 'outputs']
     _schema_properties = {
-        'connection_type': {'type': 'string'},  # 'default': 'default'},
+        'connection_type': {'type': 'string'},
         'inputs': {'type': 'array', 'minItems': 1,
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                        {'$ref': '#/definitions/file'}]},
@@ -145,14 +148,12 @@ class ConnectionDriver(Driver):
                    self.icomm.name, self.icomm.address,
                    self.ocomm.name, self.ocomm.address)
 
-    def _init_single_comm(self, name, io, comm_kws, **kwargs):
+    def _init_single_comm(self, io, comm_list, **kwargs):
         r"""Parse keyword arguments for input/output comm."""
         self.debug("Creating %s comm", io)
         s = get_schema()
-        if comm_kws is None:
-            comm_kws = dict()
-        else:
-            comm_kws = copy.deepcopy(comm_kws)
+        comm_kws = dict()
+        assert(isinstance(comm_list, list))
         if io == 'input':
             direction = 'recv'
             comm_type = self._icomm_type
@@ -167,23 +168,21 @@ class ConnectionDriver(Driver):
         comm_kws['direction'] = direction
         comm_kws['dont_open'] = True
         comm_kws['reverse_names'] = True
-        comm_kws.setdefault('comm', {'comm': comm_type})
-        assert(name == self.name)
-        comm_kws.setdefault('name', name)
-        if not isinstance(comm_kws['comm'], list):
-            comm_kws['comm'] = [comm_kws['comm']]
-        for i, x in enumerate(comm_kws['comm']):
+        comm_kws['name'] = self.name
+        if not comm_list:
+            comm_list.append({'comm': comm_type})
+        for i, x in enumerate(comm_list):
             if x is None:
-                comm_kws['comm'][i] = dict()
+                comm_list[i] = dict()
             elif not isinstance(x, dict):
-                comm_kws['comm'][i] = dict(comm=x)
-            comm_kws['comm'][i].setdefault('comm', comm_type)
+                comm_list[i] = dict(comm=x)
+            comm_list[i].setdefault('comm', comm_type)
         any_files = False
         all_files = True
         if not touches_model:
             comm_kws['no_suffix'] = True
             ikws = []
-            for x in comm_kws['comm']:
+            for x in comm_list:
                 icomm_cls = import_component('comm', x['comm'])
                 if icomm_cls.is_file:
                     any_files = True
@@ -199,6 +198,7 @@ class ConnectionDriver(Driver):
                 comm_kws['env'] = kwargs.pop('comm_env')
         if any_files and (io == 'input'):
             kwargs.setdefault('timeout_send_1st', 60)
+        comm_kws['comm'] = comm_list
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
@@ -208,11 +208,11 @@ class ConnectionDriver(Driver):
             self.comm_env.update(getattr(self, attr_comm).opp_comms)
         return kwargs
 
-    def _init_comms(self, name, icomm_kws=None, ocomm_kws=None, **kwargs):
+    def _init_comms(self, name, **kwargs):
         r"""Parse keyword arguments for input/output comms."""
-        kwargs = self._init_single_comm(name, 'input', icomm_kws, **kwargs)
+        kwargs = self._init_single_comm('input', self.inputs, **kwargs)
         try:
-            kwargs = self._init_single_comm(name, 'output', ocomm_kws, **kwargs)
+            kwargs = self._init_single_comm('output', self.outputs, **kwargs)
         except BaseException:
             self.icomm.close()
             raise
