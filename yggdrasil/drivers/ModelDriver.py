@@ -1317,7 +1317,7 @@ class ModelDriver(Driver):
                 Defaults to [].
 
         """
-        if os.path.isfile(model_file):
+        if isinstance(model_file, str) and os.path.isfile(model_file):
             info = cls.parse_function_definition(model_file, model_function)
         else:
             info = {"inputs": [], "outputs": []}
