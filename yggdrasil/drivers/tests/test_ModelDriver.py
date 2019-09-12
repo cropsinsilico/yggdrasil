@@ -195,10 +195,10 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         test_vals = self.get_test_types()
         for a, b in test_vals:
             self.assert_equal(
-                self.import_cls.get_native_type(type=a), b)
+                self.import_cls.get_native_type(datatype=a), b)
             if not isinstance(a, dict):
                 self.assert_equal(
-                    self.import_cls.get_native_type(type={'type': a}), b)
+                    self.import_cls.get_native_type(datatype={'type': a}), b)
                 
     def test_write_declaration(self):
         r"""Test write_declaration for all supported native types."""
@@ -207,7 +207,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             return
         test_vals = self.get_test_types()
         for a, b in test_vals:
-            self.import_cls.write_declaration('test', type=a)
+            self.import_cls.write_declaration('test', datatype=a)
 
     def test_write_model_wrapper(self):
         r"""Test writing a model based on yaml parameters."""
@@ -222,12 +222,17 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                                self.import_cls.write_model_send,
                                None, None)
         else:
-            inputs = [{'name': 'a', 'type': 'bytes', 'outside_loop': True},
-                      {'name': 'b', 'type': {'type': 'int', 'precision': 64}},
-                      {'name': 'c', 'type': {'type': 'string', 'precision': 10}}]
-            outputs = [{'name': 'y', 'type': {'type': 'float', 'precision': 32}},
-                       {'name': 'z', 'type': 'bytes', 'outside_loop': True},
-                       {'name': 'x', 'type': {'type': 'string', 'precision': 10}}]
+            inputs = [
+                {'name': 'a', 'datatype': 'bytes', 'outside_loop': True},
+                {'name': 'b', 'datatype': {'type': 'int', 'precision': 64}},
+                {'name': 'c', 'datatype': {'type': 'string', 'precision': 10}}]
+            outputs = [
+                {'name': 'y', 'datatype': {'type': 'float', 'precision': 32}},
+                {'name': 'z', 'datatype': 'bytes', 'outside_loop': True},
+                {'name': 'x', 'datatype': {'type': 'string', 'precision': 10}}]
+            for iovar in [inputs, outputs]:
+                for x in iovar:
+                    x['name'] = 'test:' + x['name']
             self.import_cls.write_model_wrapper('test', 'test',
                                                 inputs=inputs,
                                                 outputs=outputs)

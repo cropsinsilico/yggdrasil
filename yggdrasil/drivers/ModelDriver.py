@@ -1317,7 +1317,10 @@ class ModelDriver(Driver):
                 Defaults to [].
 
         """
-        info = cls.parse_function_definition(model_file, model_function)
+        if os.path.isfile(model_file):
+            info = cls.parse_function_definition(model_file, model_function)
+        else:
+            info = {"inputs": [], "outputs": []}
         info_map = {io: OrderedDict([(x['name'], x) for x in info.get(io, [])])
                     for io in ['inputs', 'outputs']}
         # Move variables if outputs in inputs
@@ -1353,6 +1356,11 @@ class ModelDriver(Driver):
                 if 'vars' not in x:
                     x['vars'] = [copy.deepcopy(x)]
                     x['vars'][0]['name'] = x['name'].split(':', 1)[1]
+                for v in x['vars']:
+                    if isinstance(v.get('datatype', None), str):
+                        v['datatype'] = {'type': v['datatype']}
+                if isinstance(x.get('datatype', None), str):
+                    x['datatype'] = {'type': x['datatype']}
             # Update datatypes
             if cls.is_typed:
                 for x in io_var:

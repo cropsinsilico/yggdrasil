@@ -46,8 +46,8 @@ class TestCModelDriverNoInit(TestCModelParam,
         for i, (k, v) in enumerate(copy.deepcopy(out)):
             if v == '*':
                 knew = {'type': k, 'subtype': 'float',
-                        'precision': 64}
-                vnew = 'float64_t*'
+                        'precision': 32}
+                vnew = 'float*'
                 out[i] = (knew, vnew)
             elif 'X' in v:
                 knew = {'type': k, 'precision': 64}

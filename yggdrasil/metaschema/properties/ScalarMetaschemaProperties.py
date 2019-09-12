@@ -160,7 +160,7 @@ class PrecisionMetaschemaProperty(MetaschemaProperty):
         r"""Normalization for the 'precision' scalar property in a schema."""
         if cls.name in schema:
             return schema
-        subtype = schema.get('subtype', None)
+        subtype = schema.get('subtype', schema.get('type'))
         if subtype in ['float', 'int', 'uint']:
             schema.setdefault(cls.name, int(64))
         elif subtype in ['complex']:

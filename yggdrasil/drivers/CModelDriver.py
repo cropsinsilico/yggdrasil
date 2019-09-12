@@ -267,7 +267,7 @@ class CModelDriver(CompiledModelDriver):
                       'include_dirs': []}}
     type_map = {
         'int': 'intX_t',
-        'float': 'float',
+        'float': 'double',
         'string': 'char*',
         'array': 'vector_t',
         'object': 'map_t',
@@ -561,7 +561,7 @@ class CModelDriver(CompiledModelDriver):
 
         """
         out = super(CModelDriver, cls).get_native_type(**kwargs)
-        if not ((out == '*') or ('X' in out) or (out == 'float')):
+        if not ((out == '*') or ('X' in out) or (out == 'double')):
             return out
         from yggdrasil.metaschema.datatypes import get_type_class
         json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
@@ -577,9 +577,9 @@ class CModelDriver(CompiledModelDriver):
         elif 'X' in out:
             precision = json_type['precision']
             out = out.replace('X', str(precision))
-        elif out == 'float':
-            if json_type['precision'] == 64:
-                out = 'double'
+        elif out == 'double':
+            if json_type['precision'] == 32:
+                out = 'float'
         return out
         
     @classmethod
