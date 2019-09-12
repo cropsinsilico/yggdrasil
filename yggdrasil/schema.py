@@ -1042,7 +1042,8 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
                     if iodict is not None:
                         iodict['aliases'][io][x['name']] = prefix + x['name']
                     x['name'] = prefix + x['name']
-                x.setdefault('working_dir', instance['working_dir'])
+                if not x.get('is_default', False):
+                    x.setdefault('working_dir', instance['working_dir'])
                 x_filter = x.get('filter', None)
                 if isinstance(x_filter, dict) and ('function' in x_filter):
                     x['filter']['function'] = normalize_function_file(
