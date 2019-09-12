@@ -986,6 +986,7 @@ class ModelDriver(Driver):
         env['YGG_SUBPROCESS'] = "True"
         env['YGG_MODEL_INDEX'] = str(self.model_index)
         env['YGG_MODEL_LANGUAGE'] = self.language
+        env['YGG_MODEL_NAME'] = self.name
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):

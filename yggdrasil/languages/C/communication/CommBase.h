@@ -129,6 +129,7 @@ static inline
 comm_t* init_comm_base(const char *name, const char *direction,
 		       const comm_type t, void *seri_info) {
   char full_name[COMM_NAME_SIZE];
+  char *model_name = NULL;
   char *address = NULL;
   if (name != NULL) {
     strncpy(full_name, name, COMM_NAME_SIZE);
@@ -138,9 +139,19 @@ comm_t* init_comm_base(const char *name, const char *direction,
       else if (is_recv(direction))
 	strcat(full_name, "_IN");
     }
+    model_name = getenv("YGG_MODEL_NAME");
     address = getenv(full_name);
-    ygglog_debug("init_comm_base: full_name = %s, address = %s",
-		 full_name, address);
+    if ((address == NULL) && (model_name != NULL)) {
+      char prefix[COMM_NAME_SIZE];
+      snprintf(prefix, COMM_NAME_SIZE, "%s:", model_name);
+      if (strncmp(prefix, full_name, strlen(prefix)) != 0) {
+	strcat(prefix, full_name);
+	strcpy(full_name, prefix);
+	address = getenv(full_name);
+      }
+    }
+    ygglog_debug("init_comm_base: model_name = %s, full_name = %s, address = %s",
+		 model_name, full_name, address);
   }
   comm_t *ret = new_comm_base(address, direction, t, seri_info);
   if (ret == NULL) {

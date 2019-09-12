@@ -390,7 +390,12 @@ class CommBase(tools.YggClass):
         self._name = name + suffix
         if address is None:
             if self.name not in os.environ:
-                raise RuntimeError('Cannot see %s in env.' % self.name)
+                model_name = os.environ.get('YGG_MODEL_NAME', '')
+                prefix = '%s:' % model_name
+                if model_name and (not self.name.startswith(prefix)):
+                    self._name = prefix + self.name
+                if self.name not in os.environ:
+                    raise RuntimeError('Cannot see %s in env.' % self.name)
             self.address = os.environ[self.name]
         else:
             self.address = address
