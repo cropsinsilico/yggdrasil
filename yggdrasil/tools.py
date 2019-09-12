@@ -512,7 +512,10 @@ def safe_eval(statement, **kwargs):
         safe_dict['Quantity'] = units._unit_quantity
         _no_eval_class['Quantity'] = 'Quantity'
     for mod_name, func_list in _safe_lists.items():
-        mod = importlib.import_module(mod_name)
+        if (mod_name == 'builtins') and backwards.PY2:  # pragma: Python 2
+            mod = __builtins__
+        else:
+            mod = importlib.import_module(mod_name)
         for func in func_list:
             safe_dict[func] = getattr(mod, func)
     safe_dict.update(kwargs)
