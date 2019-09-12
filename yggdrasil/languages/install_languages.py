@@ -133,7 +133,7 @@ def update_argparser(parser=None, language=None, no_import=None,
 
     """
     if arglist is None:
-        arglist = sys.argv
+        arglist = sys.argv[1:]
     if (no_import is None) and from_setup:
         no_import = True
     all_languages = [x.lower() for x in get_language_directories()]
