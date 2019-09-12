@@ -93,6 +93,6 @@ class TestDefaultSerialize_type(TestDefaultSerialize):
                'empty': b'',
                'objects': [float(x) for x in range(5)],
                'extra_kwargs': {},
-               'typedef': {'type': 'float'},
+               'typedef': {'type': 'float', 'precision': 64},
                'dtype': None}
         return out
