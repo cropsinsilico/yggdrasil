@@ -1,5 +1,6 @@
 """Module for funneling messages from one comm to another."""
 import os
+import copy
 import numpy as np
 import threading
 from yggdrasil import backwards
@@ -198,7 +199,7 @@ class ConnectionDriver(Driver):
                 comm_kws['env'] = kwargs.pop('comm_env')
         if any_files and (io == 'input'):
             kwargs.setdefault('timeout_send_1st', 60)
-        comm_kws['comm'] = comm_list
+        comm_kws['comm'] = copy.deepcopy(comm_list)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
