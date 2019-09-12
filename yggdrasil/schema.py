@@ -1039,9 +1039,12 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
                 instance[io] = [{'name': io[:-1], 'is_default': True}]
             for x in instance[io]:
                 if not x['name'].startswith(prefix):
+                    new_name = prefix + x['name']
                     if iodict is not None:
-                        iodict['aliases'][io][x['name']] = prefix + x['name']
-                    x['name'] = prefix + x['name']
+                        iodict['aliases'][io][x['name']] = new_name
+                        if x.get('is_default', False):
+                            iodict['aliases'][io][instance['name']] = new_name
+                    x['name'] = new_name
                 if not x.get('is_default', False):
                     x.setdefault('working_dir', instance['working_dir'])
                 x_filter = x.get('filter', None)
