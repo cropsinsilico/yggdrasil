@@ -563,7 +563,9 @@ class CModelDriver(CompiledModelDriver):
         out = super(CModelDriver, cls).get_native_type(**kwargs)
         if not ((out == '*') or ('X' in out) or (out == 'float')):
             return out
-        json_type = kwargs.get('datatype', {'type': 'bytes'})
+        json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
+        if isinstance(json_type, str):
+            json_type = {'type': json_type}
         assert(isinstance(json_type, dict))
         if out == '*':
             json_subtype = copy.deepcopy(json_type)
