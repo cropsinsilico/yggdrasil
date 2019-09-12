@@ -3,7 +3,8 @@ from __future__ import print_function
 from yggdrasil.tools import print_encoded
 from yggdrasil.interface.YggInterface import (
     YggAsciiFileInput, YggAsciiFileOutput,
-    YggAsciiTableInput, YggAsciiTableOutput)
+    YggAsciiTableInput, YggAsciiTableOutput,
+    YggAsciiArrayInput, YggAsciiArrayOutput)
 
     
 if __name__ == '__main__':
@@ -16,10 +17,9 @@ if __name__ == '__main__':
     out_table = YggAsciiTableOutput('outputPy_table',
                                     '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n')
     # Input & output from a table as an array
-    in_array = YggAsciiTableInput('inputPy_array', as_array=True)
-    out_array = YggAsciiTableOutput('outputPy_array',
-                                    '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n',
-                                    as_array=True)
+    in_array = YggAsciiArrayInput('inputPy_array')
+    out_array = YggAsciiArrayOutput('outputPy_array',
+                                    '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n')
 
     # Read lines from ASCII text file until end of file is reached.
     # As each line is received, it is then sent to the output ASCII file.

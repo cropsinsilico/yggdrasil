@@ -503,10 +503,14 @@ class CommBase(tools.YggClass):
             if v:
                 if not isinstance(v, list):
                     v = [v]
-                for iv in v:
+                oldv = v
+                v = []
+                for iv in oldv:
                     if isinstance(iv, str):
                         cls_conv = getattr(self.language_driver, k + 's')
                         iv = cls_conv.get(iv, None)
+                    if iv is not None:
+                        v.append(iv)
             setattr(self, k, v)
         # Set filter
         if isinstance(self.filter, dict):
