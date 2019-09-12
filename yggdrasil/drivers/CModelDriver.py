@@ -563,10 +563,13 @@ class CModelDriver(CompiledModelDriver):
         out = super(CModelDriver, cls).get_native_type(**kwargs)
         if not ((out == '*') or ('X' in out) or (out == 'float')):
             return out
+        from yggdrasil.metaschema.datatypes import get_type_class
         json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
         if isinstance(json_type, str):
             json_type = {'type': json_type}
         assert(isinstance(json_type, dict))
+        json_type = get_type_class(json_type['type']).normalize_definition(
+            json_type)
         if out == '*':
             json_subtype = copy.deepcopy(json_type)
             json_subtype['type'] = json_subtype.pop('subtype')
