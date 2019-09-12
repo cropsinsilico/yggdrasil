@@ -28,48 +28,6 @@ typedef long double _Complex complex_long_double;
 #endif
 
 
-size_t cast_bytes(const char *subtype,
-		  const size_t from_precision, const size_t to_precision,
-		  unsigned char **bytes, const size_t nbytes) {
-  if (((nbytes * to_precision) % from_precision) != 0) {
-    ygglog_throw_error("cast_bytes: Cannot cast %ld bytes from precision %ld to %ld.",
-		       nbytes, from_precision, to_precision);
-  }
-  bool raise_error = false;
-  size_t nbytes_new = nbytes*to_precision/from_precision;
-  if (strcmp(subtype, "float") == 0) {
-    if (from_precision == 32) {
-      float* tmp_val1 = (float*)(bytes[0]);
-      if (to_precision == 64) {
-  	double tmp_val2 = (double)(tmp_val1[0]);
-  	bytes[0] = (unsigned char*)realloc(bytes[0], sizeof(double));
-  	memcpy(bytes[0], &tmp_val2, sizeof(double));
-      } else {
-  	raise_error = true;
-      }
-    } else if (from_precision == 64) {
-      double* tmp_val1 = (double*)(bytes[0]);
-      if (to_precision == 32) {
-  	float tmp_val2 = (float)(tmp_val1[0]);
-  	bytes[0] = (unsigned char*)realloc(bytes[0], sizeof(float));
-  	memcpy(bytes[0], &tmp_val2, sizeof(float));
-      } else {
-  	raise_error = true;
-      }
-    } else {
-      raise_error = true;
-    }
-  } else {
-    raise_error = true;
-  }
-  if (raise_error) {
-    ygglog_throw_error("cast_bytes: Cannot change precision of %s type with precision %d to %d.",
-		       subtype, from_precision, to_precision);
-  }
-  return nbytes_new;
-};
-
-
 /*!
   @brief Base class for scalar type definition.
 
@@ -87,13 +45,12 @@ public:
   ScalarMetaschemaType(const char *subtype, const size_t precision,
 		       const char *units="") :
     MetaschemaType("scalar"), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
-    precision_(precision), units_((const char*)malloc(STRBUFF)),
-    cast_precision_(0) {
+    precision_(precision), units_((const char*)malloc(STRBUFF)), cast_precision_(0) {
     if (precision_ == 0)
       _variable_precision = true;
     else
       _variable_precision = false;
-    update_subtype(subtype);
+    update_subtype(subtype, true);
     update_units(units);
   }
   /*!
@@ -103,7 +60,7 @@ public:
    */
   ScalarMetaschemaType(const rapidjson::Value &type_doc) :
     MetaschemaType(type_doc), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
-    precision_(0), units_((const char*)malloc(STRBUFF)) {
+    precision_(0), units_((const char*)malloc(STRBUFF)), cast_precision_(0) {
     switch (type_code()) {
     case T_1DARRAY:
     case T_NDARRAY:
@@ -115,10 +72,10 @@ public:
       if (!(type_doc["subtype"].IsString())) {
 	ygglog_throw_error("ScalarMetaschemaType: 'subtype' value must be a string.");
       }
-      update_subtype(type_doc["subtype"].GetString());
+      update_subtype(type_doc["subtype"].GetString(), true);
       break;
     default:
-      update_subtype(type());
+      update_subtype(type(), true);
       update_type("scalar");
     }
     // Precision
@@ -126,8 +83,7 @@ public:
       ygglog_throw_error("ScalarMetaschemaType: Precision missing.");
     if (!(type_doc["precision"].IsInt()))
       ygglog_throw_error("ScalarMetaschemaType: Precision must be integer.");
-    size_t *precision_modifier = const_cast<size_t*>(&precision_);
-    *precision_modifier = (size_t)(type_doc["precision"].GetInt());
+    set_precision(type_doc["precision"].GetInt(), true);
     // Units
     if (type_doc.HasMember("units")) {
       if (!type_doc["units"].IsString())
@@ -224,36 +180,14 @@ public:
     }
     MetaschemaType::update(new_info);
     ScalarMetaschemaType* new_info_scalar = (ScalarMetaschemaType*)new_info;
-    if (strcmp(subtype_, new_info_scalar->subtype()) != 0) {
-      ygglog_throw_error("ScalarMetaschemaType::update: Cannot update subtype from %s to subtype %s.",
-    			 subtype_, new_info_scalar->subtype());
+    update_subtype(new_info_scalar->subtype());
+    if ((strcmp(type(), "scalar") == 0) &&
+	((strcmp(subtype(), "bytes") == 0) ||
+	 (strcmp(subtype(), "unicode") == 0))) {
+      _variable_precision = true;
     }
-    if (precision_ != new_info_scalar->precision()) {
-      if (_variable_precision) {
-	set_precision(new_info_scalar->precision());
-	printf("New precision = %ld\n", precision_);
-      } else if ((strcmp(type(), "1darray") == 0) ||
-		 (strcmp(type(), "ndarray") == 0) ||
-		 (strcmp(subtype(), "float") != 0) ||
-		 (precision_ != 32)) {
-	ygglog_throw_error("ScalarMetaschemaType::update: Cannot update precision rom %ld to %ld.",
-			 precision_, new_info_scalar->precision());
-      } else {
-      	if (cast_precision_ == 0) {
-      	  cast_precision_ = precision_;
-      	}
-	size_t *precision_modifier = const_cast<size_t*>(&precision_);
-	*precision_modifier = new_info_scalar->precision();
-      }
-    }
-    if (strlen(units_) == 0) {
-      update_units(new_info_scalar->units());
-    } else if (strlen(new_info_scalar->units()) == 0) {
-      // do nothing
-    } else if (strcmp(units_, new_info_scalar->units()) != 0) {
-      ygglog_throw_error("ScalarMetaschemaType::update: Cannot update units %s to %s.",
-    			 units_, new_info_scalar->units());
-    }
+    set_precision(new_info_scalar->precision());
+    update_units(new_info_scalar->units());
   }
   /*!
     @brief Update the instance's type.
@@ -269,7 +203,11 @@ public:
     @brief Update the instance's subtype.
     @param[in] new_subtype const char * String for new subtype.
    */
-  void update_subtype(const char* new_subtype) {
+  void update_subtype(const char* new_subtype, bool force=false) {
+    if ((!(force)) && (strcmp(subtype_, new_subtype) != 0)) {
+      ygglog_throw_error("ScalarMetaschemaType::update_subtype: Cannot update subtype from %s to subtype %s.",
+    			 subtype_, new_subtype);
+    }
     char **subtype_modifier = const_cast<char**>(&subtype_);
     strncpy(*subtype_modifier, new_subtype, STRBUFF);
     int* subtype_code_modifier = const_cast<int*>(&subtype_code_);
@@ -279,7 +217,17 @@ public:
     @brief Update the instance's units.
     @param[in] new_units const char * String for new units.
    */
-  void update_units(const char* new_units) {
+  void update_units(const char* new_units, bool force=false) {
+    if ((!(force)) && (strcmp(units_, new_units) != 0)) {
+      if (strlen(new_units) == 0) {
+	return;
+      } else if (strlen(units_) == 0) {
+	// pass
+      } else {
+	ygglog_throw_error("ScalarMetaschemaType::update_units: Cannot update units %s to %s.",
+			   units_, new_units);
+      }
+    }
     char **units_modifier = const_cast<char**>(&units_);
     strncpy(*units_modifier, new_units, STRBUFF);
   }
@@ -287,12 +235,35 @@ public:
     @brief Update the instance's precision.
     @param[in] new_precision size_t New precision.
    */
-  void set_precision(const size_t new_precision) {
-    if ((strcmp(subtype_, "bytes") != 0) && (strcmp(subtype_, "unicode") != 0)) {
-      ygglog_throw_error("ScalarMetaschemaType::set_precision: Variable precision only allowed for bytes and unicode, not '%s'.", subtype_);
+  void set_precision(const size_t new_precision, bool force=false) {
+    if (precision_ != new_precision) {
+      if (!(force)) {
+	if (precision_ == 0) {
+	  // Pass
+	} else if (_variable_precision) {
+	  // Pass
+	} else if ((strcmp(subtype(), "float") == 0) &&
+	    ((precision_ == 32) || (precision_ == 64)) &&
+	    ((new_precision == 32) || (new_precision == 64)) &&
+	    (strcmp(type(), "1darray") != 0) &&
+	    (strcmp(type(), "ndarray") != 0)) {
+	  if (cast_precision_ == 0) {
+	    cast_precision_ = precision_;
+	  }
+	} else {
+	  ygglog_throw_error("ScalarMetaschemaType::set_precision: Cannot update precision from %ld to %ld for %s of subtype %s.",
+			     precision_, new_precision, type(), subtype());
+	}
+      }
+      size_t *precision_modifier = const_cast<size_t*>(&precision_);
+      *precision_modifier = new_precision;
     }
-    size_t *precision_modifier = const_cast<size_t*>(&precision_);
-    *precision_modifier = new_precision;
+    // if ((strcmp(subtype_, "bytes") != 0) &&
+    // 	(strcmp(subtype_, "unicode") != 0)) {
+    //   ygglog_throw_error("ScalarMetaschemaType::set_precision: Variable precision only allowed for bytes and unicode, not '%s'.", subtype_);
+    // }
+    // size_t *precision_modifier = const_cast<size_t*>(&precision_);
+    // *precision_modifier = new_precision;
   }
   /*!
     @brief Get the number of arguments expected to be filled/used by the type.
@@ -586,8 +557,8 @@ public:
 	skip_terminal = true;
 	if ((cast_precision_ != 0) && (cast_precision_ != precision_)) {
 	  try {
-	    decoded_len = cast_bytes(subtype_, precision_, cast_precision_,
-	  			     &decoded_bytes, decoded_len);
+	    decoded_len = cast_bytes(&decoded_bytes, decoded_len);
+	  			     
 	    if (!(allow_realloc)) {
 	      arg_siz[0] = decoded_len;
 	    }
@@ -611,6 +582,47 @@ public:
     }
     free(decoded_bytes);
     return true;
+  }
+  
+  size_t cast_bytes(unsigned char **bytes, const size_t nbytes) {
+    bool raise_error = false;
+    size_t from_precision = precision_;
+    size_t to_precision = cast_precision_;
+    if (((nbytes * to_precision) % from_precision) != 0) {
+      ygglog_throw_error("cast_bytes: Cannot cast %ld bytes from precision %ld to %ld.",
+			 nbytes, from_precision, to_precision);
+    }
+    size_t nbytes_new = nbytes*to_precision/from_precision;
+    if (strcmp(subtype(), "float") == 0) {
+      if (from_precision == 32) {
+	float* tmp_val1 = (float*)(bytes[0]);
+	if (to_precision == 64) {
+	  double tmp_val2 = (double)(tmp_val1[0]);
+	  bytes[0] = (unsigned char*)realloc(bytes[0], sizeof(double));
+	  memcpy(bytes[0], &tmp_val2, sizeof(double));
+	} else {
+	  raise_error = true;
+	}
+      } else if (from_precision == 64) {
+	double* tmp_val1 = (double*)(bytes[0]);
+	if (to_precision == 32) {
+	  float tmp_val2 = (float)(tmp_val1[0]);
+	  bytes[0] = (unsigned char*)realloc(bytes[0], sizeof(float));
+	  memcpy(bytes[0], &tmp_val2, sizeof(float));
+	} else {
+	  raise_error = true;
+	}
+      } else {
+	raise_error = true;
+      }
+    } else {
+      raise_error = true;
+    }
+    if (raise_error) {
+      ygglog_throw_error("cast_bytes: Cannot change precision of %s type with precision %d to %d.",
+			 subtype(), from_precision, to_precision);
+    }
+    return nbytes_new;
   }
   
 private:

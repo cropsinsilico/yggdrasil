@@ -95,7 +95,8 @@ public:
     @brief Constructor for MetaschemaType.
     @param[in] type const character pointer to the name of the type.
    */
-  MetaschemaType(const char* type) : type_((const char*)malloc(100)), type_code_(-1) {
+  MetaschemaType(const char* type) :
+    type_((const char*)malloc(100)), type_code_(-1), updated_(false) {
     update_type(type);
   }
   /*!
@@ -103,7 +104,8 @@ public:
     @param[in] type_doc rapidjson::Value rapidjson object containing the type
     definition from a JSON encoded header.
    */
-  MetaschemaType(const rapidjson::Value &type_doc) : type_((const char*)malloc(100)), type_code_(-1) {
+  MetaschemaType(const rapidjson::Value &type_doc) :
+    type_((const char*)malloc(100)), type_code_(-1), updated_(false) {
     if (!(type_doc.IsObject()))
       ygglog_throw_error("MetaschemaType: Parsed document is not an object.");
     if (!(type_doc.HasMember("type")))
@@ -170,6 +172,7 @@ public:
       ygglog_throw_error("MetaschemaType::update: Cannot update type %s to type %s.",
 			 type_, new_info->type());
     }
+    updated_ = true;
   }
   /*!
     @brief Update the instance's type.
@@ -551,6 +554,7 @@ public:
 private:
   const char *type_;
   const int type_code_;
+  bool updated_;
 };
 
 #endif /*METASCHEMA_TYPE_H_*/
