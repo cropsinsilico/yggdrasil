@@ -1,3 +1,4 @@
+import re
 import numpy as np
 import logging
 from yggdrasil import backwards
@@ -24,6 +25,28 @@ if _use_unyt:
 else:
     _unit_quantity = _ureg_pint.Quantity
     _unit_array = _ureg_pint.Quantity
+
+
+def convert_R_unit_string(r_str):
+    r"""Convert R unit string to string that the Python package can
+    understand.
+
+    Args:
+        r_str (str): R units string to convert.
+
+    Returns:
+        str: Converted string.
+
+    """
+    out = []
+    regex = r'(?P<name>[A-Za-z]+)(?P<exp>-?[0-9]*)(?: |$)'
+    for x in re.finditer(regex, r_str):
+        xdict = x.groupdict()
+        if xdict['exp']:
+            out.append('{name}**{exp}'.format(**xdict))
+        else:
+            out.append(xdict['name'])
+    return ' '.join(out)
 
 
 def has_units(obj):

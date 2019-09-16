@@ -42,6 +42,7 @@ requirements:
     - r-bit64
     - r-r6
     - r-reticulate
+    - r-units
     - r-zeallot
     - scipy
     - six

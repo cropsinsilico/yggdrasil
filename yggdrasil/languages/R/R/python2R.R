@@ -25,6 +25,13 @@ python2R <- function(pyobj) {
       x <- python2R(call_python_method(pyobj, 'get', k))
       out[[reticulate::py_to_r(k)]] <- x
     }
+  } else if (is(pyobj, "pint.quantity.Quantity")
+             || is(pyobj, "unyt.array.unyt_quantity")
+             || is(pyobj, "unyt.array.unyt_array")) {
+    ygg_units <- reticulate::import('yggdrasil.units', convert=FALSE)
+    robj_data <- python2R(ygg_units$get_data(pyobj))
+    robj_units <- python2R(ygg_units$get_units(pyobj))
+    out <- units::set_units(robj_data, robj_units, mode="standard")
   } else if (is(pyobj, "numpy.uint")) {
     out <- uint_to_R(pyobj)
   } else if (is(pyobj, "numpy.float32")) {

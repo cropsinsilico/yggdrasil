@@ -78,3 +78,10 @@ class TestUnits(YggTestBase):
         assert(not units.are_compatible('cm', 'invalid'))
         assert(units.are_compatible('d', 'hr'))
         assert(units.are_compatible('hr', 'd'))
+
+    def test_convert_R_unit_string(self):
+        r"""Test convert_R_unit_string."""
+        pairs = [('g', 'g'), ('g2', 'g**2'),
+                 ('g2 km s-2', 'g**2 km s**-2')]
+        for x, y in pairs:
+            self.assert_equal(units.convert_R_unit_string(x), y)
