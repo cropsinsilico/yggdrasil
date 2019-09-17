@@ -60,7 +60,6 @@ class CCompilerBase(CompilerBase):
     r"""Base class for C compilers."""
     languages = ['c']
     default_executable_env = 'CC'
-    # TODO: Additional flags environment variables?
     default_flags_env = 'CFLAGS'
     default_flags = ['-g', '-Wall']
     # GCC & CLANG have similar call patterns
@@ -88,9 +87,6 @@ class CCompilerBase(CompilerBase):
             cls.linker_attributes = dict(cls.linker_attributes,
                                          search_path_flags=['-Xlinker', '--verbose'],
                                          search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
-        # if cls.get_conda_prefix is not None:
-        #     cls.default_flags += ['-I%s' % get_language_dir('c'),
-        #                           "-include", "glibc_version_fix.h"]
         CompilerBase.before_registration(cls)
 
     @classmethod
@@ -229,8 +225,6 @@ class MSVCArchiver(ArchiverBase):
     output_key = '/OUT:%s'
     
 
-# _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
-# _incl_interface = os.path.join(_top_dir, 'interface')
 _top_lang_dir = get_language_dir('c')
 _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
@@ -264,7 +258,6 @@ class CModelDriver(CompiledModelDriver):
                  'language': 'c'}}
     internal_libraries = {
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
-                # 'directory': _incl_interface,
                 'linker_language': 'c++',  # Some dependencies are C++
                 'internal_dependencies': ['datatypes', 'regex'],
                 'external_dependencies': ['rapidjson'],
@@ -318,7 +311,6 @@ class CModelDriver(CompiledModelDriver):
         'send_function': 'yggSend',
         'not_flag_cond': '{flag_var} < 0',
         'flag_cond': '{flag_var} >= 0',
-        # Model functions should return non-zero integer codes to indicate errors
         'declare': '{type_name} {variable};',
         'define': '{variable} = {value};',
         'assign': '{name} = {value};',
