@@ -1384,7 +1384,7 @@ class LinkerBase(CompilationToolBase):
                     '%s_flags' % cls.tooltype, '%s_language' % cls.tooltype,
                     'libraries', 'library_dirs', 'library_libs', 'library_flags']
         kws_both = ['overwrite', 'products', 'allow_error', 'dry_run',
-                    'working_dir']
+                    'working_dir', 'env']
         kws_link += add_kws_link
         kws_both += add_kws_both
         kwargs_link = {}

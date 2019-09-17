@@ -9,6 +9,7 @@ from yggdrasil import platform, tools, backwards
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, ArchiverBase)
 from yggdrasil.languages import get_language_dir
+from yggdrasil.config import ygg_cfg
 
 
 _default_internal_libtype = 'object'
@@ -32,6 +33,9 @@ def get_OSX_SYSROOT():
         except BaseException:  # pragma: debug
             xcode_dir = None
         fname_try = []
+        cfg_sdkroot = ygg_cfg.get('c', 'macos_sdkroot', None)
+        if cfg_sdkroot:
+            fname_try.append(cfg_sdkroot)
         if xcode_dir is not None:
             fname_base = os.path.join(xcode_dir, 'Platforms',
                                       'MacOSX.platform', 'Developer',
@@ -89,6 +93,25 @@ class CCompilerBase(CompilerBase):
         #                           "-include", "glibc_version_fix.h"]
         CompilerBase.before_registration(cls)
 
+    @classmethod
+    def set_env(cls, *args, **kwargs):
+        r"""Set environment variables required for compilation.
+
+        Args:
+            *args: Arguments are passed to the parent class's method.
+            **kwargs: Keyword arguments  are passed to the parent class's
+                method.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(CCompilerBase, cls).set_env(*args, **kwargs)
+        if _osx_sysroot is not None:
+            out['CONDA_BUILD_SYSROOT'] = _osx_sysroot
+            out['SDKROOT'] = _osx_sysroot
+        return out
+    
     @classmethod
     def call(cls, args, **kwargs):
         r"""Call the compiler with the provided arguments. For |yggdrasil| C
@@ -380,12 +403,30 @@ class CModelDriver(CompiledModelDriver):
                     cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
         
     @classmethod
-    def configure(cls, cfg):
+    def update_config_argparser(cls, parser):
+        r"""Add arguments for configuration options specific to this
+        language.
+
+        Args:
+            parser (argparse.ArgumentParser): Parser to add arguments to.
+
+        """
+        super(CModelDriver, cls).update_config_argparser(parser)
+        if platform._is_mac and (cls.language == 'c'):
+            parser.add_argument('--macos-sdkroot', '--sdkroot',
+                                help=('The full path to the MacOS SDK '
+                                      'that should be used.'))
+        
+    @classmethod
+    def configure(cls, cfg, macos_sdkroot=None):
         r"""Add configuration options for this language. This includes locating
         any required external libraries and setting option defaults.
 
         Args:
             cfg (YggConfigParser): Config class that options should be set for.
+            macos_sdkroot (str, optional): Full path to the root directory for
+                the MacOS SDK that should be used. Defaults to None and is
+                ignored.
 
         Returns:
             list: Section, option, description tuples for options that could not
@@ -400,6 +441,11 @@ class CModelDriver(CompiledModelDriver):
         if (rjlib is not None) and os.path.isfile(rjlib):
             cfg.set(cls._language, 'rapidjson_include',
                     os.path.dirname(os.path.dirname(rjlib)))
+        if macos_sdkroot is not None:
+            if not os.path.isdir(macos_sdkroot):  # pragma: debug
+                raise ValueError("Path to MacOS SDK root directory "
+                                 "does not exist: %s." % macos_sdkroot)
+            cfg.set(cls._language, 'macos_sdkroot', macos_sdkroot)
         return out
 
     @classmethod

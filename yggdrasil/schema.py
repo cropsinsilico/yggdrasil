@@ -471,7 +471,7 @@ class ComponentSchema(object):
             if 'required' in self._base_schema:
                 self._base_schema['required'] = list(
                     set(self._base_schema['required'])
-                    & set(new_schema['required']))
+                    & set(new_schema.get('required', [])))
                 if not self._base_schema['required']:  # pragma: no cover
                     del self._base_schema['required']
             prop_overlap = list(
