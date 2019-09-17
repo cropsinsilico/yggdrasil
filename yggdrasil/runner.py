@@ -1,7 +1,5 @@
 """This module provides tools for running models using yggdrasil."""
 import sys
-import logging
-# import atexit
 import os
 import time
 import signal
@@ -18,23 +16,6 @@ COLOR_TRACE = '\033[30;43;22m'
 COLOR_NORMAL = '\033[0m'
 
 
-# def setup_ygg_logging(prog, level=None):
-#     r"""Set the log lovel based on environment variable 'YGG_DEBUG'. If the
-#     variable is not set, the log level is set to 'NOTSET'.
-
-#     Args:
-#         prog (str): Name to prepend log messages with.
-#         level (str, optional): String specifying the logging level. Defaults
-#             to None and the environment variable 'YGG_DEBUG' is used.
-
-#     """
-#     if level is None:
-#         level = ygg_cfg.get('debug', 'ygg', 'NOTSET')
-#     logLevel = eval('logging.' + level)
-#     logging.basicConfig(level=logLevel, stream=sys.stdout, format=COLOR_TRACE +
-#                         prog + ': %(message)s' + COLOR_NORMAL)
-
-
 class YggRunner(YggClass):
     r"""This class handles the orchestration of starting the model and
     IO drivers, monitoring their progress, and cleaning up on exit.
@@ -42,8 +23,9 @@ class YggRunner(YggClass):
     Arguments:
         modelYmls (list): List of paths to yaml files specifying the models
             that should be run.
-        namespace (str): Name that should be used to uniquely identify any RMQ
-            exchange.
+        namespace (str, optional): Name that should be used to uniquely
+            identify any RMQ exchange. Defaults to the value in the config
+            file.
         host (str, optional): Name of the host that the models will be launched
             from. Defaults to None.
         rank (int, optional): Rank of this set of models if run in parallel.
@@ -71,10 +53,14 @@ class YggRunner(YggClass):
     ..todo:: namespace, host, and rank do not seem strictly necessary.
 
     """
-    def __init__(self, modelYmls, namespace, host=None, rank=0,
+    def __init__(self, modelYmls, namespace=None, host=None, rank=0,
                  ygg_debug_level=None, rmq_debug_level=None,
                  ygg_debug_prefix=None):
         super(YggRunner, self).__init__('runner')
+        if namespace is None:
+            namespace = ygg_cfg.get('rmq', 'namespace', False)
+        if not namespace:  # pragma: debug
+            raise Exception('rmq:namespace not set in config file')
         self.namespace = namespace
         self.host = host
         self.rank = rank
@@ -87,10 +73,8 @@ class YggRunner(YggClass):
         self._outputchannels = {}
         self._old_handlers = {}
         self.error_flag = False
-        # Setup logging
-        # if ygg_debug_prefix is None:
-        #     ygg_debug_prefix = namespace
-        # setup_ygg_logging(ygg_debug_prefix, level=ygg_debug_level)
+        self.debug("Running in %s with path %s namespace %s rank %d",
+                   os.getcwd(), sys.path, namespace, rank)
         # Update environment based on config
         cfg_environment()
         # Parse yamls
@@ -102,9 +86,6 @@ class YggRunner(YggClass):
             self._outputchannels[x['args']] = x
         for x in self.inputdrivers.values():
             self._inputchannels[x['args']] = x
-        # print(pformat(self.inputdrivers), pformat(self.outputdrivers),
-        #       pformat(self.modeldrivers))
-        # atexit.register(self.cleanup)
 
     def pprint(self, *args):
         r"""Print with color."""
@@ -123,12 +104,9 @@ class YggRunner(YggClass):
         if elapsed < 5:
             self.pprint('* %76s *' % 'Interrupted twice within 5 seconds: shutting down')
             self.pprint(80 * '*')
-            # signal.siginterrupt(signal.SIGTERM, True)
-            # signal.siginterrupt(signal.SIGINT, True)
             self.debug("Terminating models and closing all channels")
             self.terminate()
             self.pprint(80 * '*')
-            # self.sleep(5)
             return 1
         else:
             self.pprint('* %76s *' % 'Interrupted: Displaying channel summary')
@@ -373,7 +351,6 @@ class YggRunner(YggClass):
                 assert(d.was_loop)
                 assert(not d.errors)
             # Start models
-            # self.sleep(1)  # on windows comms can take a while start
             for driver in self.modeldrivers.values():
                 self.debug("Starting driver %s", driver['name'])
                 d = driver['instance']
@@ -468,16 +445,12 @@ class YggRunner(YggClass):
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""
         self.debug('')
-        # self.closeChannels(force_stop=True)
-        # self.debug('Stop models')
         for driver in self.all_drivers:
             if 'instance' in driver:
                 self.debug('Stop %s', driver['name'])
                 driver['instance'].terminate()
                 # Terminate should ensure instance not alive
                 assert(not driver['instance'].is_alive())
-                # if driver['instance'].is_alive():
-                #     driver['instance'].join()
         self.debug('Returning')
 
     def cleanup(self):
@@ -521,10 +494,6 @@ class YggRunner(YggClass):
             if 'instance' in drv:
                 driver = drv['instance']
                 assert(not driver.is_alive())
-                # self.debug("Join %s", drv['name'])
-                # if driver.is_alive():
-                #     driver.join()
-                # self.debug("Join %s done", drv['name'])
         self.debug('Returning')
 
         
@@ -545,10 +514,6 @@ def get_runner(models, **kwargs):
 
     """
     # Get environment variables
-    logger = logging.getLogger(__name__)
-    namespace = kwargs.pop('namespace', ygg_cfg.get('rmq', 'namespace', False))
-    if not namespace:  # pragma: debug
-        raise Exception('rmq:namespace not set in config file')
     rank = os.environ.get('PARALLEL_SEQ', '0')
     host = socket.gethostname()
     os.environ['YGG_RANK'] = rank
@@ -556,7 +521,5 @@ def get_runner(models, **kwargs):
     rank = int(rank)
     kwargs.update(rank=rank, host=host)
     # Run
-    logger.debug("Running in %s with path %s namespace %s rank %d",
-                 os.getcwd(), sys.path, namespace, rank)
-    yggRunner = YggRunner(models, namespace, **kwargs)
+    yggRunner = YggRunner(models, **kwargs)
     return yggRunner
