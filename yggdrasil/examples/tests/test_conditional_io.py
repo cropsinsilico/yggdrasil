@@ -38,7 +38,9 @@ class TestExampleConditionalIO(ExampleTstBase):
                              address=fname, direction='recv',
                              as_array=True, recv_converter='pandas')
         msg = x.recv_array()[1]
-        return msg.sort_values(by=['InputMass']).reset_index(drop=True)
+        if msg is not None:
+            msg = msg.sort_values(by=['InputMass']).reset_index(drop=True)
+        return msg
 
     def assert_equal_file_contents(self, a, b):
         r"""Assert that the contents of two files are equivalent.
