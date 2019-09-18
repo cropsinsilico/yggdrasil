@@ -51,7 +51,8 @@ class JSONSerialize(SerializeBase):
 
         """
         out = decode_json(msg)
-        out = backwards.as_str(out, recurse=True, allow_pass=True)
+        if backwards.PY2:  # pragma: Python 2
+            out = backwards.as_str(out, recurse=True, allow_pass=True)
         return out
 
     @classmethod

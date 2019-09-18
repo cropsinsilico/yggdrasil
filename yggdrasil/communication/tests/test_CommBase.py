@@ -7,6 +7,13 @@ from yggdrasil.communication.filters.StatementFilter import StatementFilter
 from yggdrasil.communication.filters.FunctionFilter import FunctionFilter
 
 
+def my_repr(x):
+    if backwards.PY2 and isinstance(x, dict):  # pragma: Python 2
+        return '{' + ', '.join('%r: %r' % i for i in sorted(x.iteritems())) + '}'
+    else:
+        return repr(x)
+
+
 def test_registry():
     r"""Test registry of comm."""
     comm_class = 'CommBase'
@@ -524,9 +531,9 @@ class TestCommBase(YggTestClassInfo):
         """
         if direction == 'recv':
             msg = self.map_sent2recv(msg)
-            
+
         def fcond(x):
-            return (repr(x) != repr(msg))
+            return (my_repr(x) != my_repr(msg))
         return FunctionFilter(function=fcond)
 
     def setup_filters(self):
