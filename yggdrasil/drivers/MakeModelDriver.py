@@ -3,7 +3,6 @@ from collections import OrderedDict
 from yggdrasil import components, backwards, platform
 from yggdrasil.drivers.CompiledModelDriver import CompilerBase
 from yggdrasil.drivers.BuildModelDriver import BuildModelDriver
-from yggdrasil.drivers.CModelDriver import CModelDriver
 
 
 class MakeCompiler(CompilerBase):
@@ -369,10 +368,4 @@ class MakeModelDriver(BuildModelDriver):
                       'env_linker', 'env_linker_flags']:
                 kwargs['compile_kwargs'][k] = getattr(self, k)
         out = super(MakeModelDriver, self).set_env(**kwargs)
-        if not kwargs.get('for_compile', False):
-            if hasattr(self.target_language_driver, 'update_ld_library_path'):
-                self.target_language_driver.update_ld_library_path(out)
-            # C++ may also need the C libraries
-            if self.target_language == 'c++':
-                out = CModelDriver.update_ld_library_path(out)
         return out

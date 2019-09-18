@@ -174,6 +174,7 @@ class BuildModelDriver(CompiledModelDriver):
                 method.
 
         """
+        self.target_language_driver.compile_dependencies()
         kwargs['working_dir'] = self.compile_working_dir
         return super(BuildModelDriver, self).compile_model(**kwargs)
         
@@ -182,3 +183,23 @@ class BuildModelDriver(CompiledModelDriver):
         if (self.model_file is not None) and os.path.isfile(self.model_file):
             self.compile_model(target='clean')
         super(BuildModelDriver, self).cleanup()
+
+    def set_env(self, **kwargs):
+        r"""Get environment variables that should be set for the model process.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(BuildModelDriver, self).set_env(**kwargs)
+        if kwargs.get('for_compile', False):
+            compiler = self.target_language_driver.get_tool('compiler')
+            out = compiler.set_env(existing=out)
+        else:
+            if hasattr(self.target_language_driver, 'update_ld_library_path'):
+                self.target_language_driver.update_ld_library_path(out)
+        return out

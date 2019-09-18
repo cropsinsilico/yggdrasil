@@ -761,22 +761,3 @@ class CMakeModelDriver(BuildModelDriver):
                     'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
                     % os.environ['MACOSX_DEPLOYMENT_TARGET'])
         return out
-    
-    def set_env(self, **kwargs):
-        r"""Get environment variables that should be set for the model process.
-
-        Args:
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
-
-        Returns:
-            dict: Environment variables for the model process.
-
-        """
-        out = super(CMakeModelDriver, self).set_env(**kwargs)
-        if hasattr(self.target_language_driver, 'update_ld_library_path'):
-            self.target_language_driver.update_ld_library_path(out)
-        # C++ may also need the C libraries
-        if self.target_language == 'c++':
-            out = CModelDriver.CModelDriver.update_ld_library_path(out)
-        return out

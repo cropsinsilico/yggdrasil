@@ -106,6 +106,9 @@ class CCompilerBase(CompilerBase):
         if _osx_sysroot is not None:
             out['CONDA_BUILD_SYSROOT'] = _osx_sysroot
             out['SDKROOT'] = _osx_sysroot
+            grp = re.search(r'MacOSX(?P<target>[0-9]+\.[0-9]+)',
+                            _osx_sysroot).groupdict()
+            out['MACOSX_DEPLOYMENT_TARGET'] = grp['target']
         return out
     
     @classmethod
@@ -441,30 +444,6 @@ class CModelDriver(CompiledModelDriver):
         return out
 
     @classmethod
-    def update_compiler_kwargs(cls, skip_sysroot=False, **kwargs):
-        r"""Update keyword arguments supplied to the compiler get_flags method
-        for various options.
-
-        Args:
-            skip_sysroot (bool, optional): If True, the isysroot flag will
-                not be added. Defaults to False.
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
-
-        Returns:
-            dict: Keyword arguments for a get_flags method providing compiler
-                flags.
-
-        """
-        out = super(CModelDriver, cls).update_compiler_kwargs(**kwargs)
-        if (not skip_sysroot) and (_osx_sysroot is not None):
-            out['isysroot'] = _osx_sysroot
-            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', False):
-                out['mmacosx-version-min'] = os.environ[
-                    'MACOSX_DEPLOYMENT_TARGET']
-        return out
-        
-    @classmethod
     def call_linker(cls, obj, language=None, **kwargs):
         r"""Link several object files to create an executable or library (shared
         or static), checking for errors.
@@ -636,7 +615,11 @@ class CModelDriver(CompiledModelDriver):
             return super(CModelDriver, cls).get_json_type(native_type)
         out = {}
         regex_var = r'(?P<type>.+?(?P<precision>\d*)(?:_t)?)\s*(?P<pointer>\**)'
-        grp = re.fullmatch(regex_var, native_type).groupdict()
+        if backwards.PY2:  # pragma: Python 2
+            grp = re.search(r'^' + regex_var + r'$',
+                            native_type).groupdict()
+        else:
+            grp = re.fullmatch(regex_var, native_type).groupdict()
         if grp.get('precision', False):
             out['precision'] = int(grp['precision'])
             grp['type'] = grp['type'].replace(grp['precision'], 'X')
@@ -645,9 +628,9 @@ class CModelDriver(CompiledModelDriver):
             out['precision'] = 0
         else:
             if grp['type'] == 'double':
-                grp['type'] = 'float'
                 out['precision'] = 8 * 8
             elif grp['type'] == 'float':
+                grp['type'] = 'double'
                 out['precision'] = 4 * 8
             elif grp['type'] in ['int', 'uint']:
                 grp['type'] += 'X_t'

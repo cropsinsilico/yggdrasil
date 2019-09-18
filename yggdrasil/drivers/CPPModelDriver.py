@@ -113,6 +113,21 @@ class CPPModelDriver(CModelDriver):
             cls.get_language_dir())
         cls.internal_libraries = internal_libs
 
+    def set_env(self, **kwargs):
+        r"""Get environment variables that should be set for the model process.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(CPPModelDriver, self).set_env(**kwargs)
+        out = CModelDriver.update_ld_library_path(out)
+        return out
+        
     @classmethod
     def write_try_except(cls, try_contents, except_contents, error_var='e',
                          error_type=None, **kwargs):
