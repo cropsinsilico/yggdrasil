@@ -51,7 +51,7 @@ public:
     else
       _variable_precision = false;
     update_subtype(subtype, true);
-    update_units(units);
+    update_units(units, true);
   }
   /*!
     @brief Constructor for ScalarMetaschemaType from a JSON type defintion.
@@ -88,9 +88,9 @@ public:
     if (type_doc.HasMember("units")) {
       if (!type_doc["units"].IsString())
 	ygglog_throw_error("ScalarMetaschemaType: Units must be a string.");
-      update_units(type_doc["units"].GetString());
+      update_units(type_doc["units"].GetString(), true);
     } else {
-      update_units("");
+      update_units("", true);
     }
     // Set variable
     if (precision_ == 0)
