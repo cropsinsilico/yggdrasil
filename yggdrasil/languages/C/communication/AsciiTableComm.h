@@ -116,11 +116,11 @@ int free_ascii_table_comm(comm_t *x) {
 
 /*!
   @brief Get number of messages in the comm.
-  @param[in] x comm_t Communicator to check.
+  @param[in] x comm_t* Communicator to check.
   @returns int Number of messages.
  */
 static inline
-int ascii_table_comm_nmsg(const comm_t x) {
+int ascii_table_comm_nmsg(const comm_t* x) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
   x;
@@ -133,27 +133,27 @@ int ascii_table_comm_nmsg(const comm_t x) {
   @brief Send a message to the comm.
   Send a message smaller than PSI_MSG_MAX bytes to an output comm. If the
   message is larger, it will not be sent.
-  @param[in] x comm_t structure that comm should be sent to.
+  @param[in] x comm_t* structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
   @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int ascii_table_comm_send(const comm_t x, const char *data, const size_t len) {
+int ascii_table_comm_send(const comm_t* x, const char *data, const size_t len) {
   if (is_eof(data))
     return 0;
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
   len;
 #endif
-  asciiTable_t *table = (asciiTable_t*)x.handle;
+  asciiTable_t *table = (asciiTable_t*)(x->handle);
   return at_writeline_full(table[0], data);
 };
 
 /*!
   @brief Receive a message from an input comm.
   Receive a message smaller than PSI_MSG_MAX bytes from an input comm.
-  @param[in] x comm_t structure that message should be sent to.
+  @param[in] x comm_t* structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
   @param[in] len const size_t length of the allocated message buffer in bytes.
@@ -163,9 +163,9 @@ int ascii_table_comm_send(const comm_t x, const char *data, const size_t len) {
   message if message was received.
  */
 static inline
-int ascii_table_comm_recv(const comm_t x, char **data, const size_t len,
+int ascii_table_comm_recv(const comm_t* x, char **data, const size_t len,
 			  const int allow_realloc) {
-  asciiTable_t *table = (asciiTable_t*)x.handle;
+  asciiTable_t *table = (asciiTable_t*)(x->handle);
   return at_readline_full_realloc(table[0], data, len, allow_realloc);
 };
 

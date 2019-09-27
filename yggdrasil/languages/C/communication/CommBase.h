@@ -23,6 +23,7 @@ typedef enum comm_enum comm_type;
  */
 typedef struct comm_t {
   comm_type type; //!< Comm type.
+  void *other;
   char name[COMM_NAME_SIZE]; //!< Comm name.
   char address[COMM_ADDRESS_SIZE]; //!< Comm address.
   char direction[COMM_DIR_SIZE]; //!< send or recv for direction messages will go.
@@ -42,6 +43,14 @@ typedef struct comm_t {
   int is_file; //!< Flag specifying if the comm connects directly to a file.
   int is_work_comm; //!< Flag specifying if comm is a temporary work comm.
 } comm_t;
+
+
+void display_other(comm_t *x) {
+  if (x->other != NULL) {
+    comm_t* other = (comm_t*)(x->other);
+    printf("type(%s) = %d\n", other->name, (int)(other->type));
+  }
+}
 
 
 /*!
@@ -85,6 +94,7 @@ static inline
 comm_t empty_comm_base() {
   comm_t ret;
   ret.type = NULL_COMM;
+  ret.other = NULL;
   ret.name[0] = '\0';
   ret.address[0] = '\0';
   ret.direction[0] = '\0';
@@ -240,7 +250,7 @@ comm_t* init_comm_base(const char *name, const char *direction,
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int comm_base_send(const comm_t x, const char *data, const size_t len) {
+int comm_base_send(const comm_t *x, const char *data, const size_t len) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
   x;
@@ -250,7 +260,7 @@ int comm_base_send(const comm_t x, const char *data, const size_t len) {
   // Make sure you arn't sending a message that is too big
   if (len > YGG_MSG_MAX) {
     ygglog_error("comm_base_send(%s): message too large for single packet (YGG_MSG_MAX=%d, len=%d)",
-		 x.name, YGG_MSG_MAX, len);
+		 x->name, YGG_MSG_MAX, len);
     return -1;
   }
   return 0;

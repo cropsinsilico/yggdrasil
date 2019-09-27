@@ -14,8 +14,8 @@
   an IPC queue.
  */
 class YggInput {
-  yggInput_t _pi;
 public:
+  yggInput_t _pi;
 
   /*!
     @brief Constructor for YggInput.
@@ -47,7 +47,7 @@ public:
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
-  void _destroy_pi() { ygg_free(&_pi); }
+  void _destroy_pi() { ygg_free(_pi); }
   
   /*!
     @brief Destructor for YggInput.
@@ -187,7 +187,7 @@ public:
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
-  void _destroy_pi() { ygg_free(&_pi); }
+  void _destroy_pi() { ygg_free(_pi); }
   
   /*!
     @brief Destructor for YggOutput.
@@ -284,7 +284,7 @@ public:
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
-  void _destroy_pi() { ygg_free(&_pi); }
+  void _destroy_pi() { ygg_free(_pi); }
   
   /*!
     @brief Destructor for YggRpc.

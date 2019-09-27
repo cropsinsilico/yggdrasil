@@ -38,9 +38,9 @@ typedef struct zmq_reply_t {
 
 // Forward declarations
 static inline
-int zmq_comm_nmsg(const comm_t x);
+int zmq_comm_nmsg(const comm_t *x);
 static inline
-int zmq_comm_recv(const comm_t x, char **data, const size_t len,
+int zmq_comm_recv(const comm_t *x, char **data, const size_t len,
 		  const int allow_realloc);
 
 
@@ -567,8 +567,8 @@ int free_zmq_comm(comm_t *x) {
     if (_ygg_error_flag == 0) {
       size_t data_len = 100;
       char *data = (char*)malloc(data_len);
-      while (zmq_comm_nmsg(*x) > 0) {
-        ret = zmq_comm_recv(*x, &data, data_len, 1);
+      while (zmq_comm_nmsg(x) > 0) {
+        ret = zmq_comm_recv(x, &data, data_len, 1);
         if (ret < 0) {
           if (ret == -2) {
             x->recv_eof[0] = 1;
@@ -604,11 +604,11 @@ int free_zmq_comm(comm_t *x) {
   @returns int Number of messages. -1 indicates an error.
  */
 static inline
-int zmq_comm_nmsg(const comm_t x) {
+int zmq_comm_nmsg(const comm_t *x) {
   int out = 0;
-  if (is_recv(x.direction)) {
-    if (x.handle != NULL) {
-      zsock_t *s = (zsock_t*)(x.handle);
+  if (is_recv(x->direction)) {
+    if (x->handle != NULL) {
+      zsock_t *s = (zsock_t*)(x->handle);
       zpoller_t *poller = zpoller_new(s, NULL);
       if (poller == NULL) {
 	ygglog_error("zmq_comm_nmsg: Could not create poller");
@@ -628,19 +628,19 @@ int zmq_comm_nmsg(const comm_t x) {
       zpoller_destroy(&poller);
     }
   } else {
-    /* if (x.last_send[0] != 0) { */
+    /* if (x->last_send[0] != 0) { */
     /*   time_t now; */
     /*   time(&now); */
-    /*   double elapsed = difftime(now, x.last_send[0]); */
+    /*   double elapsed = difftime(now, x->last_send[0]); */
     /*   if (elapsed > _wait_send_t) */
     /* 	out = 0; */
     /*   else */
     /* 	out = 1; */
     /* } */
-    zmq_reply_t *zrep = (zmq_reply_t*)(x.reply);
+    zmq_reply_t *zrep = (zmq_reply_t*)(x->reply);
     if (zrep != NULL) {
       ygglog_debug("zmq_comm_nmsg(%s): nmsg = %d, nrep = %d",
-		   x.name, zrep->n_msg, zrep->n_rep);
+		   x->name, zrep->n_msg, zrep->n_rep);
       out = zrep->n_msg - zrep->n_rep;
     }
   }
@@ -651,50 +651,50 @@ int zmq_comm_nmsg(const comm_t x) {
   @brief Send a message to the comm.
   Send a message smaller than YGG_MSG_MAX bytes to an output comm. If the
   message is larger, it will not be sent.
-  @param[in] x comm_t structure that comm should be sent to.
+  @param[in] x comm_t* structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
   @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
-  ygglog_debug("zmq_comm_send(%s): %d bytes", x.name, len);
+int zmq_comm_send(const comm_t *x, const char *data, const size_t len) {
+  ygglog_debug("zmq_comm_send(%s): %d bytes", x->name, len);
   if (comm_base_send(x, data, len) == -1)
     return -1;
-  zsock_t *s = (zsock_t*)(x.handle);
+  zsock_t *s = (zsock_t*)(x->handle);
   if (s == NULL) {
-    ygglog_error("zmq_comm_send(%s): socket handle is NULL", x.name);
+    ygglog_error("zmq_comm_send(%s): socket handle is NULL", x->name);
     return -1;
   }
   int new_len = 0;
-  char *new_data = check_reply_send(&x, data, (int)len, &new_len);
+  char *new_data = check_reply_send(x, data, (int)len, &new_len);
   if (new_data == NULL) {
-    ygglog_error("zmq_comm_send(%s): Adding reply address failed.", x.name);
+    ygglog_error("zmq_comm_send(%s): Adding reply address failed.", x->name);
     return -1;
   }
   zframe_t *f = zframe_new(new_data, new_len);
   int ret = -1;
   if (f == NULL) {
-    ygglog_error("zmq_comm_send(%s): frame handle is NULL", x.name);
+    ygglog_error("zmq_comm_send(%s): frame handle is NULL", x->name);
   } else {
     ret = zframe_send(&f, s, 0);
     if (ret < 0) {
-      ygglog_error("zmq_comm_send(%s): Error in zframe_send", x.name);
+      ygglog_error("zmq_comm_send(%s): Error in zframe_send", x->name);
       zframe_destroy(&f);
     }
   }
   // Get reply
   if (ret >= 0) {
-    ret = do_reply_send(&x);
+    ret = do_reply_send(x);
     if (ret < 0) {
       if (ret == -2) {
-	ygglog_error("zmq_comm_send(%s): EOF received", x.name);
+	ygglog_error("zmq_comm_send(%s): EOF received", x->name);
       } else {
-	ygglog_error("zmq_comm_send(%s): Error in do_reply_send", x.name);
+	ygglog_error("zmq_comm_send(%s): Error in do_reply_send", x->name);
       }
     }
   }
-  ygglog_debug("zmq_comm_send(%s): returning %d", x.name, ret);
+  ygglog_debug("zmq_comm_send(%s): returning %d", x->name, ret);
   free(new_data);
   return ret;
 };
@@ -702,7 +702,7 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
 /*!
   @brief Receive a message from an input comm.
   Receive a message smaller than YGG_MSG_MAX bytes from an input comm.
-  @param[in] x comm_t structure that message should be sent to.
+  @param[in] x comm_t* structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
   @param[in] len const size_t length of the allocated message buffer in bytes.
@@ -712,13 +712,13 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
   message if message was received.
  */
 static inline
-int zmq_comm_recv(const comm_t x, char **data, const size_t len,
+int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
 		  const int allow_realloc) {
   int ret = -1;
-  ygglog_debug("zmq_comm_recv(%s)", x.name);
-  zsock_t *s = (zsock_t*)(x.handle);
+  ygglog_debug("zmq_comm_recv(%s)", x->name);
+  zsock_t *s = (zsock_t*)(x->handle);
   if (s == NULL) {
-    ygglog_error("zmq_comm_recv(%s): socket handle is NULL", x.name);
+    ygglog_error("zmq_comm_recv(%s): socket handle is NULL", x->name);
     return ret;
   }
   while (1) {
@@ -726,13 +726,13 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
     if (nmsg < 0) return ret;
     else if (nmsg > 0) break;
     else {
-      ygglog_debug("zmq_comm_recv(%s): no messages, sleep", x.name);
+      ygglog_debug("zmq_comm_recv(%s): no messages, sleep", x->name);
       usleep(YGG_SLEEP_TIME);
     }
   }
   zframe_t *out = zframe_recv(s);
   if (out == NULL) {
-    ygglog_debug("zmq_comm_recv(%s): did not receive", x.name);
+    ygglog_debug("zmq_comm_recv(%s): did not receive", x->name);
     return ret;
   }
   // Realloc and copy data
@@ -741,16 +741,16 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   if (len_recv > len) {
     if (allow_realloc) {
       ygglog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.",
-		   x.name, len, len_recv);
+		   x->name, len, len_recv);
       (*data) = (char*)realloc(*data, len_recv);
       if (*data == NULL) {
-	ygglog_error("zmq_comm_recv(%s): failed to realloc buffer.", x.name);
+	ygglog_error("zmq_comm_recv(%s): failed to realloc buffer.", x->name);
 	zframe_destroy(&out);
 	return -1;
       }
     } else {
       ygglog_error("zmq_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
-		   x.name, len, len_recv);
+		   x->name, len, len_recv);
       zframe_destroy(&out);
       return -((int)(len_recv - 1));
     }
@@ -762,17 +762,17 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   /*
   if (strlen(*data) != ret) {
     ygglog_error("zmq_comm_recv(%s): Size of string (%d) doesn't match expected (%d)",
-		 x.name, strlen(*data), ret);
+		 x->name, strlen(*data), ret);
     return -1;
   }
   */
   // Check reply
-  ret = check_reply_recv(&x, *data, ret);
+  ret = check_reply_recv(x, *data, ret);
   if (ret < 0) {
-    ygglog_error("zmq_comm_recv(%s): failed to check for reply socket.", x.name);
+    ygglog_error("zmq_comm_recv(%s): failed to check for reply socket.", x->name);
     return ret;
   }
-  ygglog_debug("zmq_comm_recv(%s): returning %d", x.name, ret);
+  ygglog_debug("zmq_comm_recv(%s): returning %d", x->name, ret);
   return ret;
 };
 
@@ -823,11 +823,11 @@ int init_zmq_comm(comm_t *comm) {
 
 /*!
   @brief Get number of messages in the comm.
-  @param[in] x comm_t Communicator to check.
+  @param[in] x comm_t* Communicator to check.
   @returns int Number of messages. -1 indicates an error.
  */
 static inline
-int zmq_comm_nmsg(const comm_t x) {
+int zmq_comm_nmsg(const comm_t* x) {
   zmq_install_error();
   return -1;
 };
@@ -836,13 +836,13 @@ int zmq_comm_nmsg(const comm_t x) {
   @brief Send a message to the comm.
   Send a message smaller than YGG_MSG_MAX bytes to an output comm. If the
   message is larger, it will not be sent.
-  @param[in] x comm_t structure that comm should be sent to.
+  @param[in] x comm_t* structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
   @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
+int zmq_comm_send(const comm_t* x, const char *data, const size_t len) {
   zmq_install_error();
   return -1;
 };
@@ -850,7 +850,7 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
 /*!
   @brief Receive a message from an input comm.
   Receive a message smaller than YGG_MSG_MAX bytes from an input comm.
-  @param[in] x comm_t structure that message should be sent to.
+  @param[in] x comm_t* structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
   @param[in] len const size_t length of the allocated message buffer in bytes.
@@ -860,7 +860,7 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
   message if message was received.
  */
 static inline
-int zmq_comm_recv(const comm_t x, char **data, const size_t len,
+int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
 		  const int allow_realloc) {
   zmq_install_error();
   return -1;

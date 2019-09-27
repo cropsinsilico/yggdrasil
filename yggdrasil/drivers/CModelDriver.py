@@ -806,9 +806,9 @@ class CModelDriver(CompiledModelDriver):
             assert(isinstance(datatype['items'], list))
             keys['nitems'] = len(datatype['items'])
             keys['items'] = '%s_items' % name
-            fmt = 'get_json_array_type({nitems}, {items})'
-            out += [('MetaschemaType** %s = '
-                     '(MetaschemaType**)malloc(%d*sizeof(MetaschemaType*));')
+            fmt = 'create_dtype_json_array({nitems}, {items})'
+            out += [('dtype_t** %s = '
+                     '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
                     % (keys['items'], keys['nitems'])]
             for i, x in enumerate(datatype['items']):
                 out += cls.write_native_type_definition(
@@ -821,9 +821,9 @@ class CModelDriver(CompiledModelDriver):
             keys['nitems'] = len(datatype['properties'])
             keys['keys'] = '%s_keys' % name
             keys['values'] = '%s_vals' % name
-            fmt = 'get_json_object_type({nitems}, {keys}, {values})'
-            out += [('MetaschemaType** %s = '
-                     '(MetaschemaType**)malloc(%d*sizeof(MetaschemaType*));')
+            fmt = 'create_dtype_json_object({nitems}, {keys}, {values})'
+            out += [('dtype_t** %s = '
+                     '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
                     % (keys['values'], keys['nitems']),
                     ('char** %s = (char**)malloc(%d*sizeof(char*));')
                     % (keys['keys'], keys['nitems'])]
@@ -835,20 +835,20 @@ class CModelDriver(CompiledModelDriver):
             assert(isinstance(requires_freeing, list))
             requires_freeing += [keys['values'], keys['keys']]
         elif datatype['type'] in ['ply', 'obj']:
-            fmt = 'get_%s_type()' % datatype['type']
+            fmt = 'create_dtype_%s()' % datatype['type']
         elif datatype['type'] == '1darray':
-            fmt = ('get_1darray_type(\"{subtype}\", {precision}, {length}, '
+            fmt = ('create_dtype_1darray(\"{subtype}\", {precision}, {length}, '
                    '\"{units}\")')
             keys = {k: datatype[k] for k in ['subtype', 'precision', 'length']}
             keys['units'] = datatype.get('units', '')
         elif datatype['type'] in ['1darray', 'ndarray']:
-            fmt = ('get_ndarray_type(\"{subtype}\", {precision}, {ndim}, {shape}, '
+            fmt = ('create_dtype_ndarray(\"{subtype}\", {precision}, {ndim}, {shape}, '
                    '\"{units}\")')
             keys = {k: datatype[k] for k in ['subtype', 'precision', 'shape']}
             keys['ndim'] = len(keys['shape'])
             keys['units'] = datatype.get('units', '')
         else:
-            fmt = 'get_scalar_type(\"{subtype}\", {precision}, \"{units}\")'
+            fmt = 'create_dtype_scalar(\"{subtype}\", {precision}, \"{units}\")'
             keys = {}
             keys['subtype'] = datatype.get('subtype', datatype['type'])
             keys['units'] = datatype.get('units', '')
@@ -863,7 +863,7 @@ class CModelDriver(CompiledModelDriver):
         else:
             def_line = '%s = %s;' % (name, fmt.format(**keys))
             if not no_decl:
-                def_line = 'MetaschemaType* ' + def_line
+                def_line = 'dtype_t* ' + def_line
         out.append(def_line)
         return out
 

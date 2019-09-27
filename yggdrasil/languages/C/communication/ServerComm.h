@@ -100,36 +100,36 @@ int free_server_comm(comm_t *x) {
 
 /*!
   @brief Get number of messages in the comm.
-  @param[in] x comm_t Communicator to check.
+  @param[in] x comm_t* Communicator to check.
   @returns int Number of messages. -1 indicates an error.
  */
 static inline
-int server_comm_nmsg(const comm_t x) {
-  comm_t *handle = (comm_t*)(x.handle);
-  int ret = default_comm_nmsg(*handle);
+int server_comm_nmsg(const comm_t* x) {
+  comm_t *handle = (comm_t*)(x->handle);
+  int ret = default_comm_nmsg(handle);
   return ret;
 };
 
 /*!
   @brief Send a message to the comm.
-  @param[in] x comm_t structure that comm should be sent to.
+  @param[in] x comm_t* structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
   @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int server_comm_send(const comm_t x, const char *data, const size_t len) {
-  ygglog_debug("server_comm_send(%s): %d bytes", x.name, len);
-  if (x.info == NULL) {
-    ygglog_error("server_comm_send(%s): no response comm registered", x.name);
+int server_comm_send(const comm_t* x, const char *data, const size_t len) {
+  ygglog_debug("server_comm_send(%s): %d bytes", x->name, len);
+  if (x->info == NULL) {
+    ygglog_error("server_comm_send(%s): no response comm registered", x->name);
     return -1;
   }
-  comm_t **res_comm = (comm_t**)(x.info);
+  comm_t **res_comm = (comm_t**)(x->info);
   if (res_comm[0] == NULL) {
-    ygglog_error("server_comm_send(%s): no response comm registered", x.name);
+    ygglog_error("server_comm_send(%s): no response comm registered", x->name);
     return -1;
   }
-  int ret = default_comm_send((*res_comm)[0], data, len);
+  int ret = default_comm_send(res_comm[0], data, len);
   // Wait for msg to be received?
   free_default_comm(res_comm[0]);
   free_comm_base(res_comm[0]);
@@ -140,7 +140,7 @@ int server_comm_send(const comm_t x, const char *data, const size_t len) {
 
 /*!
   @brief Receive a message from an input comm.
-  @param[in] x comm_t structure that message should be sent to.
+  @param[in] x comm_t* structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
   @param[in] len const size_t length of the allocated message buffer in bytes.
@@ -150,14 +150,14 @@ int server_comm_send(const comm_t x, const char *data, const size_t len) {
   message if message was received.
  */
 static inline
-int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_realloc) {
-  ygglog_debug("server_comm_recv(%s)", x.name);
-  if (x.handle == NULL) {
-    ygglog_error("server_comm_recv(%s): no request comm registered", x.name);
+int server_comm_recv(comm_t* x, char **data, const size_t len, const int allow_realloc) {
+  ygglog_debug("server_comm_recv(%s)", x->name);
+  if (x->handle == NULL) {
+    ygglog_error("server_comm_recv(%s): no request comm registered", x->name);
     return -1;
   }
-  comm_t *req_comm = (comm_t*)(x.handle);
-  int ret = default_comm_recv(*req_comm, data, len, allow_realloc);
+  comm_t *req_comm = (comm_t*)(x->handle);
+  int ret = default_comm_recv(req_comm, data, len, allow_realloc);
   if (ret < 0) {
     return ret;
   }
@@ -169,7 +169,7 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
   // Initialize new comm from received address
   comm_head_t head = parse_comm_header(*data, ret);
   if (!(head.valid)) {
-    ygglog_error("server_comm_recv(%s): Error parsing header.", x.name);
+    ygglog_error("server_comm_recv(%s): Error parsing header.", x->name);
     return -1;
   }
   // Return EOF
@@ -179,23 +179,23 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
   }
   // If there is not a response address
   if (strlen(head.response_address) == 0) {
-    ygglog_error("server_comm_recv(%s): No response address in message.", x.name);
+    ygglog_error("server_comm_recv(%s): No response address in message.", x->name);
     return -1;
   }
-  strcpy(x.address, head.id);
-  dtype_t *dtype_copy = copy_dtype(x.datatype);
+  strcpy(x->address, head.id);
+  dtype_t *dtype_copy = copy_dtype(x->datatype);
   if (dtype_copy == NULL) {
     ygglog_error("server_comm_recv(%s): Failed to create dtype_copy.");
     return -1;
   }
-  comm_t **res_comm = (comm_t**)(x.info);
+  comm_t **res_comm = (comm_t**)(x->info);
   res_comm[0] = new_comm_base(head.response_address, "send", _default_comm,
 			      dtype_copy);
   /* sprintf(res_comm[0]->name, "server_response.%s", res_comm[0]->address); */
   int newret;
   newret = init_default_comm(res_comm[0]);
   if (newret < 0) {
-    ygglog_error("server_comm_recv(%s): Could not initialize response comm.", x.name);
+    ygglog_error("server_comm_recv(%s): Could not initialize response comm.", x->name);
     return newret;
   }
   res_comm[0]->sent_eof[0] = 1;
