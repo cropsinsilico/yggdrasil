@@ -14,6 +14,16 @@
 #include "rapidjson/stringbuffer.h"
 
 
+#define CSafe(x)  \
+  try		  \
+    {		  \
+      x;	  \
+    }		  \
+  catch(...)	  \
+    {		  \
+      ygglog_error("C++ exception thrown.");	\
+    }
+
 // C++ functions
 MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
   if (!(type_doc.IsObject()))
@@ -33,7 +43,7 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
     case T_NULL:
     case T_NUMBER:
     case T_STRING:
-      return (new MetaschemaType(type_doc));
+      return new MetaschemaType(type_doc);
       // Enhanced types
     case T_ARRAY: {
       if (!(type_doc.HasMember("items")))
@@ -45,7 +55,7 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
       for (i = 0; i < (size_t)(type_doc["items"].Size()); i++) {
 	items.push_back(type_from_doc(type_doc["items"][i]));
       }
-      return (new JSONArrayMetaschemaType(items));
+      return new JSONArrayMetaschemaType(items);
     }
     case T_OBJECT: {
       if (!(type_doc.HasMember("properties")))
@@ -56,15 +66,15 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
       for (rapidjson::Value::ConstMemberIterator itr = type_doc.MemberBegin(); itr != type_doc.MemberEnd(); ++itr) {
 	properties[itr->name.GetString()] = type_from_doc(itr->value);
       }
-      return (new JSONObjectMetaschemaType(properties));
-      // Non-standard types
+      return new JSONObjectMetaschemaType(properties);
     }
+      // Non-standard types
     case T_DIRECT:
-      return (new DirectMetaschemaType(type_doc));
+      return new DirectMetaschemaType(type_doc);
     case T_1DARRAY:
-      return (new OneDArrayMetaschemaType(type_doc));
+      return new OneDArrayMetaschemaType(type_doc);
     case T_NDARRAY:
-      return (new NDArrayMetaschemaType(type_doc));
+      return new NDArrayMetaschemaType(type_doc);
     case T_SCALAR:
     case T_FLOAT:
     case T_UINT:
@@ -72,11 +82,11 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
     case T_COMPLEX:
     case T_BYTES:
     case T_UNICODE:
-      return (new ScalarMetaschemaType(type_doc));
+      return new ScalarMetaschemaType(type_doc);
     case T_PLY:
-      return (new PlyMetaschemaType(type_doc));
+      return new PlyMetaschemaType(type_doc);
     case T_OBJ:
-      return (new ObjMetaschemaType(type_doc));
+      return new ObjMetaschemaType(type_doc);
     }
   }
   ygglog_throw_error("Could not find class from doc for type '%s'.", type);
@@ -150,330 +160,450 @@ bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
   return true;
 };
 
+JSONArrayMetaschemaType* create_dtype_format_class(const char *format_str,
+						   const int as_array = 0) {
+  std::vector<MetaschemaType*> items;
+  // Loop over string
+  int mres;
+  size_t sind, eind, beg = 0, end;
+  char ifmt[FMT_LEN];
+  char re_fmt[FMT_LEN];
+  char re_fmt_eof[FMT_LEN];
+  sprintf(re_fmt, "%%[^%s%s ]+[%s%s ]", "\t", "\n", "\t", "\n");
+  sprintf(re_fmt_eof, "%%[^%s%s ]+", "\t", "\n");
+  size_t iprecision = 0;
+  while (beg < strlen(format_str)) {
+    char isubtype[FMT_LEN] = "";
+    mres = find_match(re_fmt, format_str + beg, &sind, &eind);
+    if (mres < 0) {
+      ygglog_throw_error("create_dtype_format_class: find_match returned %d", mres);
+    } else if (mres == 0) {
+      // Make sure its not just a format string with no newline
+      mres = find_match(re_fmt_eof, format_str + beg, &sind, &eind);
+      if (mres <= 0) {
+	beg++;
+	continue;
+      }
+    }
+    beg += sind;
+    end = beg + (eind - sind);
+    strncpy(ifmt, format_str + beg, end-beg);
+    ifmt[end-beg] = '\0';
+    // String
+    if (find_match("%.*s", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "bytes", FMT_LEN); // or unicode
+      mres = regex_replace_sub(ifmt, FMT_LEN,
+			       "%(\\.)?([[:digit:]]*)s(.*)", "$2", 0);
+      iprecision = 8 * atoi(ifmt);
+      // Complex
+#ifdef _WIN32
+    } else if (find_match("(%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
+#else
+    } else if (find_match("(\%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
+#endif
+      strncpy(isubtype, "complex", FMT_LEN);
+      iprecision = 8 * 2 * sizeof(double);
+    }
+    // Floats
+    else if (find_match("%.*[fFeEgG]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "float", FMT_LEN);
+      iprecision = 8 * sizeof(double);
+      /* } else if (find_match("%.*l[fFeEgG]", ifmt, &sind, &eind)) { */
+      /*   isubtype = "float"; */
+      /*   iprecision = 8 * sizeof(double); */
+      /* } else if (find_match("%.*[fFeEgG]", ifmt, &sind, &eind)) { */
+      /*   isubtype = "float"; */
+      /*   iprecision = 8 * sizeof(float); */
+    }
+    // Integers
+    else if (find_match("%.*hh[id]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "int", FMT_LEN);
+      iprecision = 8 * sizeof(char);
+    } else if (find_match("%.*h[id]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "int", FMT_LEN);
+      iprecision = 8 * sizeof(short);
+    } else if (find_match("%.*ll[id]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "int", FMT_LEN);
+      iprecision = 8 * sizeof(long long);
+    } else if (find_match("%.*l64[id]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "int", FMT_LEN);
+      iprecision = 8 * sizeof(long long);
+    } else if (find_match("%.*l[id]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "int", FMT_LEN);
+      iprecision = 8 * sizeof(long);
+    } else if (find_match("%.*[id]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "int", FMT_LEN);
+      iprecision = 8 * sizeof(int);
+    }
+    // Unsigned integers
+    else if (find_match("%.*hh[uoxX]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "uint", FMT_LEN);
+      iprecision = 8 * sizeof(unsigned char);
+    } else if (find_match("%.*h[uoxX]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "uint", FMT_LEN);
+      iprecision = 8 * sizeof(unsigned short);
+    } else if (find_match("%.*ll[uoxX]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "uint", FMT_LEN);
+      iprecision = 8 * sizeof(unsigned long long);
+    } else if (find_match("%.*l64[uoxX]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "uint", FMT_LEN);
+      iprecision = 8 * sizeof(unsigned long long);
+    } else if (find_match("%.*l[uoxX]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "uint", FMT_LEN);
+      iprecision = 8 * sizeof(unsigned long);
+    } else if (find_match("%.*[uoxX]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "uint", FMT_LEN);
+      iprecision = 8 * sizeof(unsigned int);
+    } else {
+      ygglog_throw_error("create_dtype_format_class: Could not parse format string: %s", ifmt);
+    }
+    ygglog_debug("isubtype = %s, iprecision = %lu, ifmt = %s",
+		 isubtype, iprecision, ifmt);
+    if (as_array == 1) {
+      items.push_back(new OneDArrayMetaschemaType(isubtype, iprecision, 0));
+    } else {
+      items.push_back(new ScalarMetaschemaType(isubtype, iprecision, ""));
+    }
+    beg = end;
+  }
+  JSONArrayMetaschemaType* out = new JSONArrayMetaschemaType(items, format_str);
+  return out;
+};
+
+
+void init_dtype_class(dtype_t *dtype, MetaschemaType* type_class) {
+  if (dtype == NULL) {
+    ygglog_throw_error("init_dtype_class: data type structure is NULL.");
+  } else if (dtype->obj != NULL) {
+    ygglog_throw_error("init_dtype_class: Data type class already set.");
+  } else if (strlen(dtype->type) != 0) {
+    ygglog_throw_error("init_dtype_class: Data type string already set.");
+  }
+  dtype->obj = type_class;
+  strncpy(dtype->type, type_class->type(), COMMBUFFSIZ);
+};
+
+
+int destroy_dtype_class_safe(MetaschemaType *type_class) {
+  if (type_class != NULL) {
+    try {
+      delete type_class;
+    } catch (...) {
+      ygglog_error("destroy_dtype_class_safe: C++ exception thrown.");
+      return -1;
+    }
+  }
+  return 0;
+};
+
+
+dtype_t* create_dtype(MetaschemaType* type_class=NULL) {
+  dtype_t* out = NULL;
+  out = (dtype_t*)malloc(sizeof(dtype_t));
+  if (out == NULL) {
+    ygglog_throw_error("create_dtype: Failed to malloc for datatype.");
+  }
+  out->type[0] = '\0';
+  out->obj = NULL;
+  if (type_class != NULL) {
+    try {
+      init_dtype_class(out, type_class);
+    } catch (...) {
+      free(out);
+      ygglog_throw_error("create_dtype: Failed to initialized data type structure with class information.");
+    }
+  }
+  return out;
+};
+
+  
+MetaschemaType* dtype2class(const dtype_t* dtype) {
+  if (dtype == NULL) {
+    ygglog_throw_error("dtype2class: Pointer to data structure is NULL.");
+  } else if (dtype->obj == NULL) {
+    ygglog_throw_error("dtype2class: C++ data type structure is NULL.");
+  }
+  std::map<const char*, int, strcomp> type_map = get_type_map();
+  std::map<const char*, int, strcomp>::iterator it = type_map.find(dtype->type);
+  if (it != type_map.end()) {
+    switch (it->second) {
+    case T_BOOLEAN:
+    case T_INTEGER:
+    case T_NULL:
+    case T_NUMBER:
+    case T_STRING:
+      return static_cast<MetaschemaType*>(dtype->obj);
+    case T_ARRAY:
+      return static_cast<JSONArrayMetaschemaType*>(dtype->obj);
+    case T_OBJECT:
+      return static_cast<JSONObjectMetaschemaType*>(dtype->obj);
+    case T_DIRECT:
+      return static_cast<DirectMetaschemaType*>(dtype->obj);
+    case T_1DARRAY:
+      return static_cast<OneDArrayMetaschemaType*>(dtype->obj);
+    case T_NDARRAY:
+      return static_cast<NDArrayMetaschemaType*>(dtype->obj);
+    case T_SCALAR:
+    case T_FLOAT:
+    case T_UINT:
+    case T_INT:
+    case T_COMPLEX:
+    case T_BYTES:
+    case T_UNICODE:
+      return static_cast<ScalarMetaschemaType*>(dtype->obj);
+    case T_PLY:
+      return static_cast<PlyMetaschemaType*>(dtype->obj);
+    case T_OBJ:
+      return static_cast<ObjMetaschemaType*>(dtype->obj);
+    case T_ASCII_TABLE:
+      return static_cast<AsciiTableMetaschemaType*>(dtype->obj);
+    }
+  } else {
+    ygglog_throw_error("dtype2class: No handler for type '%s'.", dtype->type);
+  }
+  return NULL;
+};
+
 
 // C exposed functions
 extern "C" {
 
-  const char* get_type_name(MetaschemaType* type_class) {
-    if (type_class == NULL) {
-      return "";
-    }
+  const char* dtype_name(dtype_t* type_struct) {
     try {
+      MetaschemaType* type_class = dtype2class(type_struct);
       return type_class->type();
     } catch(...) {
-      ygglog_error("get_type_name: C++ exception thrown.");
+      ygglog_error("dtype_name: C++ exception thrown.");
+      return NULL;
+    }
+  }
+
+  const char* dtype_subtype(dtype_t* type_struct) {
+    try {
+      if (strcmp(type_struct->type, "scalar") != 0) {
+	ygglog_throw_error("dtype_subtype: Only scalars have subtype.");
+      }
+      ScalarMetaschemaType* scalar_class = static_cast<ScalarMetaschemaType*>(type_struct->obj);
+      return scalar_class->subtype();
+    } catch(...) {
+      ygglog_error("dtype_subtype: C++ exception thrown.");
       return "";
     }
   }
 
-  const char* get_type_subtype(MetaschemaType* type_class) {
+  const size_t dtype_precision(dtype_t* type_struct) {
     try {
-      if (strcmp(type_class->type(), "scalar") != 0) {
-	ygglog_error("get_type_subtype: Only scalars have subtype.");
-	return "";
+      if (strcmp(type_struct->type, "scalar") != 0) {
+	ygglog_throw_error("dtype_precision: Only scalars have precision.");
       }
-      ScalarMetaschemaType* scalar_class = (ScalarMetaschemaType*)type_class;
-      return scalar_class->subtype();
-    } catch(...) {
-      ygglog_error("get_type_subtype: C++ exception thrown.");
-      return "";
-    }
-  };
-
-  const size_t get_type_precision(MetaschemaType* type_class) {
-    try {
-      if (strcmp(type_class->type(), "scalar") != 0) {
-	ygglog_error("get_type_precision: Only scalars have precision.");
-	return 0;
-      }
-      ScalarMetaschemaType* scalar_class = (ScalarMetaschemaType*)type_class;
+      ScalarMetaschemaType* scalar_class = static_cast<ScalarMetaschemaType*>(type_struct->obj);
       return scalar_class->precision();
     } catch(...) {
-      ygglog_error("get_type_precision: C++ exception thrown.");
+      ygglog_error("dtype_precision: C++ exception thrown.");
       return 0;
     }
   };
 
-  MetaschemaType* get_direct_type() {
+  int set_dtype_name(dtype_t *dtype, const char* name) {
+    if (dtype == NULL) {
+      ygglog_error("set_dtype_name: data type structure is NULL.");
+      return -1;
+    }
+    strncpy(dtype->type, name, COMMBUFFSIZ);
+    return 0;
+  }
+
+  dtype_t* init_dtype(dtype_t *dtype) {
     try {
-      return (new DirectMetaschemaType()); 
+      if (dtype == NULL) {
+	return create_dtype();
+      } else if ((dtype->obj != NULL) && (strlen(dtype->type) == 0)){
+	int ret = set_dtype_name(dtype, dtype_name(dtype));
+	if (ret != 0) {
+	  ygglog_throw_error("init_dtype: Failed to set data type name.");
+	}
+      }
+    } catch (...) {
+      ygglog_error("init_dtype: C++ exception thrown.");
+      return NULL;
+    }
+    return dtype;
+  }
+
+  int destroy_dtype(dtype_t *dtype) {
+    int ret = 0;
+    if (dtype != NULL) {
+      if (dtype->obj != NULL) {
+	try {
+	  MetaschemaType *type_class = dtype2class(dtype);
+	  ret = destroy_dtype_class_safe(type_class);
+	} catch (...) {
+	  ygglog_error("destroy_dtype: C++ exception thrown in dtype2class.");
+	  ret = -1;
+	}
+      }
+      free(dtype);
+    }
+    return ret;
+  }
+
+  // dtype_t* create_dtype_empty() {
+  //   dtype_t* out = NULL;
+  //   out = (dtype_t*)malloc(sizeof(dtype_t));
+  //   if (out == NULL) {
+  //     ygglog_error("create_dtype_empty: Failed to malloc for datatype.");
+  //     return NULL;
+  //   }
+  //   out->type[0] = '\0';
+  //   out->obj = NULL;
+  //   return out;
+  // }
+
+  dtype_t* create_dtype_direct() {
+    DirectMetaschemaType* obj = NULL;
+    try {
+      obj = new DirectMetaschemaType();
+      return create_dtype(obj);
     } catch(...) {
-      ygglog_error("get_direct_type: Failed to create type.");
+      ygglog_error("create_dtype_direct: C++ exception thrown.");
+      CSafe(delete obj);
       return NULL;
     }
   }
 
-  MetaschemaType* get_scalar_type(const char* subtype, const size_t precision,
-				  const char* units) {
+  dtype_t* create_dtype_scalar(const char* subtype, const size_t precision,
+			       const char* units) {
+    ScalarMetaschemaType* obj = NULL;
     try {
-      return (new ScalarMetaschemaType(subtype, precision, units));
+      obj = new ScalarMetaschemaType(subtype, precision, units);
+      return create_dtype(obj);
     } catch(...) {
-      ygglog_error("get_scalar_type: Failed to create type.");
+      ygglog_error("create_dtype_scalar: C++ exception thrown.");
+      CSafe(delete obj);
       return NULL;
     }
   }
 
-  MetaschemaType* get_1darray_type(const char* subtype, const size_t precision,
-				   const size_t length, const char* units) {
+  dtype_t* create_dtype_format(const char *format_str,
+			       const int as_array = 0) {
+    JSONArrayMetaschemaType* obj = NULL;
     try {
-      return (new OneDArrayMetaschemaType(subtype, precision, length, units));
+      obj = create_dtype_format_class(format_str, as_array);
+      return create_dtype(obj);
     } catch(...) {
-      ygglog_error("get_1darray_type: Failed to create type.");
+      ygglog_error("create_dtype_format: C++ exception thrown.");
+      CSafe(delete obj);
       return NULL;
     }
   }
 
-  MetaschemaType* get_ndarray_type(const char* subtype, const size_t precision,
-				   const size_t ndim, const size_t* shape,
-				   const char* units) {
+  dtype_t* create_dtype_1darray(const char* subtype, const size_t precision,
+				const size_t length, const char* units) {
+    OneDArrayMetaschemaType* obj = NULL;
+    try {
+      obj = new OneDArrayMetaschemaType(subtype, precision, length, units);
+      return create_dtype(obj);
+    } catch(...) {
+      ygglog_error("create_dtype_1darray: C++ exception thrown.");
+      CSafe(delete obj);
+      return NULL;
+    }
+  }
+
+  dtype_t* create_dtype_ndarray(const char* subtype, const size_t precision,
+				const size_t ndim, const size_t* shape,
+				const char* units) {
+    NDArrayMetaschemaType* obj = NULL;
     try {
       std::vector<size_t> shape_vec;
       size_t i;
       for (i = 0; i < ndim; i++) {
 	shape_vec.push_back(shape[i]);
       }
-      return (new NDArrayMetaschemaType(subtype, precision, shape_vec, units));
+      obj = new NDArrayMetaschemaType(subtype, precision, shape_vec, units);
+      return create_dtype(obj);
     } catch(...) {
-      ygglog_error("get_ndarray_type: Failed to create type.");
+      ygglog_error("create_dtype_ndarray: C++ exception thrown.");
+      CSafe(delete obj);
       return NULL;
     }
   }
-  MetaschemaType* get_json_array_type(const size_t nitems, MetaschemaType** items){
+  dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items){
+    JSONArrayMetaschemaType* obj = NULL;
     try {
       std::vector<MetaschemaType*> items_vec;
       size_t i;
       for (i = 0; i < nitems; i++) {
-	items_vec.push_back(items[i]);
+	MetaschemaType* iitem = dtype2class(items[i]);
+	items_vec.push_back(iitem);
       }
-      return (new JSONArrayMetaschemaType(items_vec));
+      obj = new JSONArrayMetaschemaType(items_vec);
+      return create_dtype(obj);
     } catch(...) {
-      ygglog_error("get_json_array_type: Failed to create type.");
+      ygglog_error("create_dtype_json_array: C++ exception thrown.");
+      CSafe(delete obj);
       return NULL;
     }
   }
-  MetaschemaType* get_json_object_type(const size_t nitems, const char** keys,
-				       MetaschemaType** values) {
+  dtype_t* create_dtype_json_object(const size_t nitems, const char** keys,
+				    dtype_t** values) {
+    JSONObjectMetaschemaType* obj = NULL;
     try {
       std::map<const char*, MetaschemaType*, strcomp> properties;
       size_t i;
       for (i = 0; i < nitems; i++) {
-	properties[keys[i]] = values[i];
+	MetaschemaType* iitem = dtype2class(values[i]);
+	properties[keys[i]] = iitem;
       }
-      return (new JSONObjectMetaschemaType(properties));
+      obj = new JSONObjectMetaschemaType(properties);
+      return create_dtype(obj);
     } catch(...) {
-      ygglog_error("get_json_object_type: Failed to create type.");
+      ygglog_error("create_dtype_json_object: C++ exception thrown.");
+      CSafe(delete obj);
       return NULL;
     }
   }
-  MetaschemaType* get_ply_type() { 
+  dtype_t* create_dtype_ply() {
+    PlyMetaschemaType* obj = NULL;
     try {
-      return (new PlyMetaschemaType()); 
+      obj = new PlyMetaschemaType();
+      return create_dtype(obj);
     } catch(...) {
-      ygglog_error("get_ply_type: Failed to create type.");
+      ygglog_error("create_dtype_ply: C++ exception thrown.");
+      CSafe(delete obj);
       return NULL;
     }
   }
-  MetaschemaType* get_obj_type() { 
+  dtype_t* create_dtype_obj() {
+    ObjMetaschemaType* obj = NULL;
     try {
-      return (new ObjMetaschemaType()); 
+      obj = new ObjMetaschemaType();
+      return create_dtype(obj);
     } catch(...) {
-      ygglog_error("get_obj_type: Failed to create type.");
+      ygglog_error("create_dtype_obj: C++ exception thrown.");
+      CSafe(delete obj);
       return NULL;
     }
   }
-  MetaschemaType* get_ascii_table_type(const char *format_str, const int as_array) {
+  dtype_t* create_dtype_ascii_table(const char *format_str, const int as_array) {
+    AsciiTableMetaschemaType* obj = NULL;
     try {
-      return (new AsciiTableMetaschemaType(format_str, as_array)); 
+      obj = new AsciiTableMetaschemaType(format_str, as_array);
+      return create_dtype(obj);
     } catch(...) {
-      ygglog_error("get_ascii_table_type: Failed to create type.");
+      ygglog_error("create_dtype_ascii_table: C++ exception thrown.");
+      CSafe(delete obj);
       return NULL;
     }
   }
-  MetaschemaType* get_format_type(const char *format_str,
-				  const int as_array = 0) {
-    try {
-      std::vector<MetaschemaType*> items;
-      // Loop over string
-      int mres;
-      size_t sind, eind, beg = 0, end;
-      char ifmt[FMT_LEN];
-      char re_fmt[FMT_LEN];
-      char re_fmt_eof[FMT_LEN];
-      sprintf(re_fmt, "%%[^%s%s ]+[%s%s ]", "\t", "\n", "\t", "\n");
-      sprintf(re_fmt_eof, "%%[^%s%s ]+", "\t", "\n");
-      size_t iprecision = 0;
-      while (beg < strlen(format_str)) {
-	char isubtype[FMT_LEN] = "";
-	mres = find_match(re_fmt, format_str + beg, &sind, &eind);
-	if (mres < 0) {
-	  ygglog_throw_error("get_format_type: find_match returned %d", mres);
-	} else if (mres == 0) {
-	  // Make sure its not just a format string with no newline
-	  mres = find_match(re_fmt_eof, format_str + beg, &sind, &eind);
-	  if (mres <= 0) {
-	    beg++;
-	    continue;
-	  }
-	}
-	beg += sind;
-	end = beg + (eind - sind);
-	strncpy(ifmt, format_str + beg, end-beg);
-	ifmt[end-beg] = '\0';
-	// String
-	if (find_match("%.*s", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "bytes", FMT_LEN); // or unicode
-	  mres = regex_replace_sub(ifmt, FMT_LEN,
-				   "%(\\.)?([[:digit:]]*)s(.*)", "$2", 0);
-	  iprecision = 8 * atoi(ifmt);
-	  // Complex
-#ifdef _WIN32
-	} else if (find_match("(%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
-#else
-	} else if (find_match("(\%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
-#endif
-	  strncpy(isubtype, "complex", FMT_LEN);
-	  iprecision = 8 * 2 * sizeof(double);
-	}
-	// Floats
-	else if (find_match("%.*[fFeEgG]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "float", FMT_LEN);
-	  iprecision = 8 * sizeof(double);
-	  /* } else if (find_match("%.*l[fFeEgG]", ifmt, &sind, &eind)) { */
-	  /*   isubtype = "float"; */
-	  /*   iprecision = 8 * sizeof(double); */
-	  /* } else if (find_match("%.*[fFeEgG]", ifmt, &sind, &eind)) { */
-	  /*   isubtype = "float"; */
-	  /*   iprecision = 8 * sizeof(float); */
-	}
-	// Integers
-	else if (find_match("%.*hh[id]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "int", FMT_LEN);
-	  iprecision = 8 * sizeof(char);
-	} else if (find_match("%.*h[id]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "int", FMT_LEN);
-	  iprecision = 8 * sizeof(short);
-	} else if (find_match("%.*ll[id]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "int", FMT_LEN);
-	  iprecision = 8 * sizeof(long long);
-	} else if (find_match("%.*l64[id]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "int", FMT_LEN);
-	  iprecision = 8 * sizeof(long long);
-	} else if (find_match("%.*l[id]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "int", FMT_LEN);
-	  iprecision = 8 * sizeof(long);
-	} else if (find_match("%.*[id]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "int", FMT_LEN);
-	  iprecision = 8 * sizeof(int);
-	}
-	// Unsigned integers
-	else if (find_match("%.*hh[uoxX]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "uint", FMT_LEN);
-	  iprecision = 8 * sizeof(unsigned char);
-	} else if (find_match("%.*h[uoxX]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "uint", FMT_LEN);
-	  iprecision = 8 * sizeof(unsigned short);
-	} else if (find_match("%.*ll[uoxX]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "uint", FMT_LEN);
-	  iprecision = 8 * sizeof(unsigned long long);
-	} else if (find_match("%.*l64[uoxX]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "uint", FMT_LEN);
-	  iprecision = 8 * sizeof(unsigned long long);
-	} else if (find_match("%.*l[uoxX]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "uint", FMT_LEN);
-	  iprecision = 8 * sizeof(unsigned long);
-	} else if (find_match("%.*[uoxX]", ifmt, &sind, &eind)) {
-	  strncpy(isubtype, "uint", FMT_LEN);
-	  iprecision = 8 * sizeof(unsigned int);
-	} else {
-	  ygglog_throw_error("get_format_type: Could not parse format string: %s", ifmt);
-	}
-  ygglog_debug("isubtype = %s, iprecision = %lu, ifmt = %s",
-               isubtype, iprecision, ifmt);
-	if (as_array == 1) {
-	  items.push_back(new OneDArrayMetaschemaType(isubtype, iprecision, 0));
-	} else {
-	  items.push_back(new ScalarMetaschemaType(isubtype, iprecision, ""));
-	}
-	beg = end;
-      }
-      MetaschemaType* out = new JSONArrayMetaschemaType(items, format_str);
-      //printf("from format\n");
-      //out->display();
-      return out;
-    } catch(...) {
-      ygglog_error("get_format_type: Failed to create type from format.");
-      return NULL;
-    }
-  }
-  
-  MetaschemaType* type_from_void(const char *type_name, const void *type) {
-    try {
-      if (type == NULL) {
-	return NULL;
-      }
-      std::map<const char*, int, strcomp> type_map = get_type_map();
-      std::map<const char*, int, strcomp>::iterator it = type_map.find(type_name);
-      if (it != type_map.end()) {
-	switch (it->second) {
-	case T_BOOLEAN:
-	case T_INTEGER:
-	case T_NULL:
-	case T_NUMBER:
-	case T_STRING:
-	  return (MetaschemaType*)type;
-	case T_ARRAY:
-	  return (JSONArrayMetaschemaType*)type;
-	case T_OBJECT:
-	  return (JSONObjectMetaschemaType*)type;
-	case T_DIRECT:
-	  return (DirectMetaschemaType*)type;
-	case T_1DARRAY:
-	  return (OneDArrayMetaschemaType*)type;
-	case T_NDARRAY:
-	  return (NDArrayMetaschemaType*)type;
-	case T_SCALAR:
-	case T_FLOAT:
-	case T_UINT:
-	case T_INT:
-	case T_COMPLEX:
-	case T_BYTES:
-	case T_UNICODE:
-	  return (ScalarMetaschemaType*)type;
-	case T_PLY:
-	  return (PlyMetaschemaType*)type;
-	case T_OBJ:
-	  return (ObjMetaschemaType*)type;
-	case T_ASCII_TABLE:
-	  return (AsciiTableMetaschemaType*)type;
-	}
-      }
-      if (strcmp(type_name, "format") == 0) {
-	return get_format_type((char*)type);
-      } else {
-	MetaschemaType* base = (MetaschemaType*)type;
-	const char* new_type = base->type();
-	if (strcmp(new_type, type_name) != 0) {
-	  ygglog_debug("type_from_void: discovered type '%s'.", new_type);
-	  return type_from_void(new_type, type);
-	} else {
-	  ygglog_error("type_from_void: No handler for type '%s'.", type_name);
-	  return NULL;
-	}
-      }
-    } catch(...) {
-      ygglog_error("type_from_void: C++ exception.");
-      return NULL;
-    }
-  }
-
   int format_comm_header(const comm_head_t head, char *buf, const size_t buf_siz) {
     try {
       // Header
       rapidjson::StringBuffer head_buf;
       rapidjson::Writer<rapidjson::StringBuffer> head_writer(head_buf);
       head_writer.StartObject();
-      if (head.serializer_info != NULL) {
-	MetaschemaType* type = type_from_void(head.type, head.serializer_info);
+      if (head.dtype != NULL) {
+	MetaschemaType* type = dtype2class(head.dtype);
 	if (!(type->encode_type_prop(&head_writer))) {
 	  return -1;
 	}
@@ -555,21 +685,19 @@ extern "C" {
       head_doc.Parse(head, headsiz);
       if (!(head_doc.IsObject()))
 	ygglog_throw_error("parse_comm_header: Parsed header document is not an object.");
-      MetaschemaType* type;
+      dtype_t* dtype;
       if (head_doc.HasMember("type")) {
-	type = type_from_doc(head_doc);
+	dtype = create_dtype(type_from_doc(head_doc));
       } else {
-	type = get_direct_type();
+	dtype = create_dtype_direct();
       }
-      strncpy(out.type, type->type(), COMMBUFFSIZ);
-      out.serializer_info = (void*)type;
+      out.dtype = dtype;
       if (!(update_header_from_doc(out, head_doc))) {
 	ygglog_error("parse_comm_header: Error updating header from JSON doc.");
 	out.valid = 0;
-	strncpy(out.type, "", COMMBUFFSIZ);
-	out.serializer_info = NULL;
+	destroy_dtype(out.dtype);
+	out.dtype = NULL;
 	free(head);
-	delete(type);
 	return out;
       }
       return out;
@@ -582,165 +710,111 @@ extern "C" {
     }
   }
 
-  void* get_ascii_table_from_void(const char* name, const void* info) {
-    if (info == NULL) {
-      return NULL;
-    }
+  void* dtype_ascii_table(const dtype_t* dtype) {
     try {
-      AsciiTableMetaschemaType *type = (AsciiTableMetaschemaType*)type_from_void(name, info);
-      if (type == NULL) {
-	return NULL;
-      }
-      return (void*)(type->table());
+      AsciiTableMetaschemaType *table_type = dynamic_cast<AsciiTableMetaschemaType*>(dtype2class(dtype));
+      return (void*)(table_type->table());
     } catch (...) {
-      ygglog_error("get_ascii_table_from_void: C++ exception thrown.");
+      ygglog_error("dtype_ascii_table: C++ exception thrown.");
       return NULL;
     }
   }
 
-  const char* get_type_name_from_void(const char* name, const void* info) {
-    try {
-      MetaschemaType *type = type_from_void(name, info);
-      if (type == NULL) {
-	return NULL;
-      }
-      return type->type();
-    } catch(...) {
-      ygglog_error("get_type_name_from_void: C++ exception thrown.");
+  dtype_t* copy_dtype(const dtype_t* dtype) {
+    if (dtype == NULL) {
       return NULL;
     }
-  }
-    
-  MetaschemaType* copy_from_void(const char* name, const void* info) {
-    if (info == NULL) {
-      return NULL;
-    }
+    dtype_t* out = NULL;
     try {
-      MetaschemaType *type = type_from_void(name, info);
+      MetaschemaType *type = dtype2class(dtype);
       if (type == NULL) {
-	return NULL;
+	ygglog_throw_error("copy_dtype: Could not recover the type class.");
       }
-      return type->copy();
+      out = create_dtype(type->copy());
+      return out;
     } catch (...) {
-      ygglog_error("copy_from_void: C++ exception thrown.");
+      ygglog_error("copy_dtype: C++ exception thrown.");
+      destroy_dtype(out);
       return NULL;
     }
   }
 
-  int update_from_void(char* name1, void* info1,
-		       const char* name2, void* info2) {
+  int update_dtype(dtype_t* dtype1, dtype_t* dtype2) {
     try {
-      MetaschemaType *type1 = type_from_void(name1, info1);
-      if (type1 == NULL) {
-	ygglog_error("update_from_void: Could not recover type for updated.");
-	return -1;
+      if ((dtype2 == NULL) || (dtype2->obj == NULL)) {
+	ygglog_throw_error("update_dtype: Could not recover type to update from.");
+      } else if (dtype1 == NULL) {
+	ygglog_throw_error("update_dtype: Could not recover type for update.");
+      } else if (dtype1->obj == NULL) {
+	MetaschemaType *type2 = dtype2class(dtype2);
+	MetaschemaType *type1 = type2->copy();
+	dtype1->obj = type1;
+	strcpy(dtype1->type, type1->type());
+      } else {
+	MetaschemaType *type1 = dtype2class(dtype1);
+	MetaschemaType *type2 = dtype2class(dtype2);
+	type1->update(type2);
+	strcpy(dtype1->type, type1->type());
       }
-      MetaschemaType *type2 = type_from_void(name2, info2);
-      if (type2 == NULL) {
-	ygglog_error("update_from_void: Could not recover type to update from.");
-	return -1;
-      }
-      type1->update(type2);
-      strcpy(name1, type1->type());
     } catch (...) {
-      ygglog_error("update_from_void: C++ exception thrown.");
+      ygglog_error("update_dtype: C++ exception thrown.");
       return -1;
     }
     return 0;
   }
   
-  int update_precision_from_void(const char* name, void* info,
-				 const size_t new_precision) {
+  int update_precision_dtype(const dtype_t* dtype,
+			     const size_t new_precision) {
     try {
-      MetaschemaType *type = type_from_void(name, info);
-      if (type == NULL) {
-	ygglog_error("update_precision_from_void: Could not recover type.");
-	return -1;
+      if (strcmp(dtype->type, "scalar") != 0) {
+	ygglog_throw_error("update_precision_dtype: Can only update precision for bytes or unicode scalars.");
       }
-      if (strcmp(type->type(), "scalar") != 0) {
-	ygglog_throw_error("update_precision_from_void: Can only update precision for bytes or unicode scalars.");
-      }
-      ScalarMetaschemaType *scalar_type = (ScalarMetaschemaType*)type;
-      scalar_type->set_precision(new_precision);
+      ScalarMetaschemaType *type = dynamic_cast<ScalarMetaschemaType*>(dtype2class(dtype));
+      type->set_precision(new_precision);
     } catch (...) {
-      ygglog_error("update_precision_from_void: C++ exception thrown.");
+      ygglog_error("update_precision_dtype: C++ exception thrown.");
       return -1;
     }
     return 0;
   }
 
-  int free_type_from_void(const char* name, void* info) {
-    if (info != NULL) {
-      try {
-	MetaschemaType *type = type_from_void(name, info);
-	if (type == NULL) {
-	  ygglog_error("free_type_from_void: Could not recover type.");
-	  return -1;
-	}
-	delete type;
-      } catch (...) {
-	ygglog_error("free_type_from_void: C++ exception thrown.");
-	return -1;
-      }
-    }
-    return 0;
-  }
-
-  int deserialize_from_void(const char* name, const void* info,
-			    const char *buf, const size_t buf_siz,
-			    const int allow_realloc, size_t *nargs, va_list_t ap) {
+  int deserialize_dtype(const dtype_t *dtype, const char *buf, const size_t buf_siz,
+			const int allow_realloc, size_t *nargs, va_list_t ap) {
     try {
-      MetaschemaType* type = type_from_void(name, info);
-      if (type == NULL) {
-	ygglog_error("deserialize_from_void: Failed to get type from void.");
-	return -1;
-      }
+      MetaschemaType* type = dtype2class(dtype);
       return type->deserialize(buf, buf_siz, allow_realloc, nargs, ap);
     } catch (...) {
-      ygglog_error("deserialize_from_void: C++ exception thrown.");
+      ygglog_error("deserialize_dtype: C++ exception thrown.");
       return -1;
     }
   }
 
-  int serialize_from_void(const char* name, const void* info,
-			  char **buf, size_t *buf_siz,
-			  const int allow_realloc, size_t *nargs, va_list_t ap) {
+  int serialize_dtype(const dtype_t *dtype, char **buf, size_t *buf_siz,
+		      const int allow_realloc, size_t *nargs, va_list_t ap) {
     try {
-      MetaschemaType* type = type_from_void(name, info);
-      if (type == NULL) {
-	ygglog_error("serialize_from_void: Failed to get type from void.");
-	return -1;
-      }
+      MetaschemaType* type = dtype2class(dtype);
       return type->serialize(buf, buf_siz, allow_realloc, nargs, ap);
     } catch (...) {
-      ygglog_error("serialize_from_void: C++ exception thrown.");
+      ygglog_error("serialize_dtype: C++ exception thrown.");
       return -1;
     }
   }
 
-  void display_from_void(const char* name, const void* info) {
+  void display_dtype(const dtype_t *dtype) {
     try {
-      MetaschemaType* type = type_from_void(name, info);
-      if (type == NULL) {
-	ygglog_error("display_from_void: Failed to get type from void.");
-	return;
-      }
+      MetaschemaType* type = dtype2class(dtype);
       type->display();
     } catch(...) {
-      ygglog_error("display_from_void: C++ exception thrown.");
+      ygglog_error("display_dtype: C++ exception thrown.");
     }
   }
 
-  size_t nargs_exp_from_void(const char* name, const void* info) {
+  size_t nargs_exp_dtype(const dtype_t *dtype) {
     try {
-      MetaschemaType* type = type_from_void(name, info);
-      if (type == NULL) {
-	ygglog_error("nargs_exp_from_void: Failed to get type from void.");
-	return 0;
-      }
+      MetaschemaType* type = dtype2class(dtype);
       return type->nargs_exp();
     } catch(...) {
-      ygglog_error("nargs_exp_from_void: C++ exception thrown.");
+      ygglog_error("nargs_exp_dtype: C++ exception thrown.");
     }
     return 0;
   }

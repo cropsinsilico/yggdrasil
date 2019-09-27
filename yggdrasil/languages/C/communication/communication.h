@@ -4,7 +4,6 @@
 
 #include "../tools.h"
 #include "../datatypes/datatypes.h"
-#include "../serialize/serialize.h"
 #include "CommBase.h"
 #include "IPCComm.h"
 #include "ZMQComm.h"
@@ -215,13 +214,13 @@ int init_comm_type(comm_t *x) {
   @param[in] direction Direction that messages will go through the comm.
   Values include "recv" and "send".
   @param[in] t comm_type Type of comm that should be created.
-  @param[in] seri_info Pointer to info for the serializer (e.g. format string).
+  @param[in] datatype dtype_t* Pointer to data type structure.
   @returns comm_t Comm structure.
  */
 static
 comm_t new_comm(char *address, const char *direction,
-		const comm_type t, void *seri_info) {
-  comm_t *ret = new_comm_base(address, direction, t, seri_info);
+		const comm_type t, dtype_t* datatype) {
+  comm_t *ret = new_comm_base(address, direction, t, datatype);
   if (ret == NULL) {
     ygglog_error("new_comm: Could not initialize base.");
     return empty_comm_base();
@@ -257,21 +256,21 @@ comm_t new_comm(char *address, const char *direction,
   @param[in] direction Direction that messages will go through the comm.
   Values include "recv" and "send".
   @param[in] t comm_type Type of comm that should be created.
-  @param[in] seri_info Pointer to info for the serializer (e.g. format string).
+  @param[in] datatype dtype_t* Pointer to data type structure.
   @returns comm_t Comm structure.
  */
 static
 comm_t init_comm(const char *name, const char *direction,
-		 const comm_type t, void *seri_info) {
+		 const comm_type t, dtype_t *datatype) {
   ygglog_debug("init_comm: Initializing comm.");
 #ifdef _WIN32
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
   _set_abort_behavior(0,_WRITE_ABORT_MSG);
 #endif
-  if ((seri_info == NULL) && (strcmp(direction, "send") == 0)) {
-    seri_info = (void*)get_scalar_type("bytes", 0, "");
+  if ((datatype == NULL) && (strcmp(direction, "send") == 0)) {
+    datatype = create_dtype_scalar("bytes", 0, "");
   }
-  comm_t *ret = init_comm_base(name, direction, t, seri_info);
+  comm_t *ret = init_comm_base(name, direction, t, datatype);
   if (ret == NULL) {
     ygglog_error("init_comm(%s): Could not initialize base.", name);
     return empty_comm_base();
@@ -309,18 +308,18 @@ static
 comm_t init_comm_format(const char *name, const char *direction,
 			const comm_type t, const char *format_str,
 			const int as_array) {
-  void *seri_info = NULL;
+  dtype_t* datatype = NULL;
   if (format_str == NULL) {
     if (strcmp(direction, "recv") == 0) {
-      seri_info = NULL; // It will be set on receiving a message
+      datatype = NULL; // It will be set on receiving a message
     } else {
-      seri_info = NULL;
+      datatype = NULL;
     }
   } else {
-    seri_info = (void*)get_format_type(format_str, as_array);
+    datatype = create_dtype_format(format_str, as_array);
   }
-  comm_t out = init_comm(name, direction, t, seri_info);
-  if ((format_str != NULL) && (seri_info == NULL)) {
+  comm_t out = init_comm(name, direction, t, datatype);
+  if ((format_str != NULL) && (datatype == NULL)) {
     ygglog_error("init_comm_format: Failed to create type from format_str.");
     out.valid = 0;
   }
@@ -417,18 +416,16 @@ comm_head_t comm_send_multipart_header(const comm_t x, const char * data,
   sprintf(head.id, "%d", rand());
   head.multipart = 1;
   head.valid = 1;
-  // Add serializer information to header on first send
-  //if ((x.used[0] == 0) && (x.is_file == 0)) {
+  // Add datatype information to header
   if (x.is_file == 0) {
-    seri_t *serializer;
+    dtype_t *datatype;
     if (x.type == CLIENT_COMM) {
       comm_t *req_comm = (comm_t*)(x.handle);
-      serializer = req_comm->serializer;
+      datatype = req_comm->datatype;
     } else {
-      serializer = x.serializer;
+      datatype = x.datatype;
     }
-    strcpy(head.type, serializer->type);
-    head.serializer_info = serializer->info;
+    head.dtype = datatype;
   }
   const comm_t *x0;
   if (x.type == SERVER_COMM) {
@@ -493,8 +490,6 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
     return -1;
   }
   // Try to send body in header
-  // printf("sending\n");
-  // display_from_void(x.serializer->type, x.serializer->info);
   if (len < (x.maxMsgSize - x.msgBufSize)) {
     headlen = format_comm_header(head, headbuf, headbuf_len);
     if (headlen < 0) {
@@ -730,31 +725,29 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       x.recv_eof[0] = 1;
       return -2;
     }
-    // Get serializer information from header on first recv
-    seri_t *upseri;
+    // Get datatype information from header on first recv
+    dtype_t *updtype;
     if (x.type == SERVER_COMM) {
       comm_t *handle = (comm_t*)(x.handle);
-      upseri = handle->serializer;
+      updtype = handle->datatype;
     } else {
-      upseri = x.serializer;
+      updtype = x.datatype;
     }
-    if ((x.used[0] == 0) && (x.is_file == 0) && (upseri->info == NULL)) {
-      ygglog_debug("comm_recv_multipart(%s): Updating serializer type to '%s'",
-		   x.name, head.type);
-      ret = update_serializer(upseri, head.type, head.serializer_info);
+    if ((x.used[0] == 0) && (x.is_file == 0) && (updtype->obj == NULL)) {
+      ygglog_debug("comm_recv_multipart(%s): Updating datatype to '%s'",
+		   x.name, head.dtype->type);
+      ret = update_dtype(updtype, head.dtype);
       if (ret != 0) {
-	ygglog_error("comm_recv_multipart(%s): Error updating serializer.", x.name);
+	ygglog_error("comm_recv_multipart(%s): Error updating datatype.", x.name);
 	return -1;
       }
-    } else if ((x.is_file == 0) && (strlen(head.type) > 0) && (head.serializer_info != NULL)) {
-      ret = update_serializer(upseri, head.type, head.serializer_info);
+    } else if ((x.is_file == 0) && (head.dtype != NULL)) {
+      ret = update_dtype(updtype, head.dtype);
       if (ret != 0) {
-	ygglog_error("comm_recv_multipart(%s): Error updating existing serializer.", x.name);
+	ygglog_error("comm_recv_multipart(%s): Error updating existing datatype.", x.name);
 	return -1;
       }
     }
-    // printf("receiving\n");
-    // display_from_void(x.serializer->type, x.serializer->info);
     if (head.multipart) {
       // Return early if header contained entire message
       if (head.size == head.bodysiz) {
@@ -960,15 +953,13 @@ int vcommSend(const comm_t x, size_t nargs, va_list_t ap) {
     ygglog_error("vcommSend(%s): Failed to alloc buffer", x.name);
     return -1;
   }
-  seri_t *serializer = x.serializer;
+  dtype_t *datatype = x.datatype;
   if (x.type == CLIENT_COMM) {
     comm_t *handle = (comm_t*)(x.handle);
-    serializer = handle->serializer;
+    datatype = handle->datatype;
   }
-  /* ygglog_info("name = %s\n", x.name); */
-  /* display_from_void(serializer->type, serializer->info); */
   size_t nargs_orig = nargs;
-  ret = serialize(*serializer, &buf, &buf_siz, 1, &nargs, ap);
+  ret = serialize_dtype(datatype, &buf, &buf_siz, 1, &nargs, ap);
   if (ret < 0) {
     ygglog_error("vcommSend(%s): serialization error", x.name);
     free(buf);
@@ -1047,12 +1038,12 @@ int vcommRecv(const comm_t x, const int allow_realloc, size_t nargs, va_list_t a
   }
   ygglog_debug("vcommRecv(%s): comm_recv returns %d: %.10s...", x.name, ret, buf);
   // Deserialize message
-  seri_t *serializer = x.serializer;
+  dtype_t *datatype = x.datatype;
   if (x.type == SERVER_COMM) {
     comm_t *handle = (comm_t*)(x.handle);
-    serializer = handle->serializer;
+    datatype = handle->datatype;
   }
-  ret = deserialize(*serializer, buf, ret, allow_realloc, &nargs, ap);
+  ret = deserialize_dtype(datatype, buf, ret, allow_realloc, &nargs, ap);
   if (ret < 0) {
     ygglog_error("vcommRecv(%s): error deserializing message (ret=%d)",
 		 x.name, ret);

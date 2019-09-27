@@ -48,17 +48,17 @@ int init_client_comm(comm_t *comm) {
     return init_default_comm(comm);
   }
   // Called to initialize/create client comm
-  void *seri_out = (void*)get_format_type(comm->direction, 0);
-  if (seri_out == NULL) {
-    ygglog_error("init_client_comm: Failed to create output serializer.");
+  dtype_t *dtype_out = create_dtype_format(comm->direction, 0);
+  if (dtype_out == NULL) {
+    ygglog_error("init_client_comm: Failed to create output datatype.");
     return -1;
   }
   comm_t *handle;
   if (strlen(comm->name) == 0) {
-    handle = new_comm_base(comm->address, "send", _default_comm, seri_out);
+    handle = new_comm_base(comm->address, "send", _default_comm, dtype_out);
     sprintf(handle->name, "client_request.%s", comm->address);
   } else {
-    handle = init_comm_base(comm->name, "send", _default_comm, seri_out);
+    handle = init_comm_base(comm->name, "send", _default_comm, dtype_out);
   }
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
@@ -196,9 +196,8 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
     head.valid = 0;
     return head;
   }
-  void *seri_copy = (void*)copy_from_void(x.serializer->type,
-					  x.serializer->info);
-  res_comm[0][ncomm] = new_comm_base(NULL, "recv", _default_comm, seri_copy);
+  dtype_t * dtype_copy = copy_dtype(x.datatype);
+  res_comm[0][ncomm] = new_comm_base(NULL, "recv", _default_comm, dtype_copy);
   int ret = new_default_address(res_comm[0][ncomm]);
   if (ret < 0) {
     ygglog_error("client_response_header(%s): could not create response comm", x.name);

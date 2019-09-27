@@ -38,17 +38,17 @@ int init_server_comm(comm_t *comm) {
     return init_default_comm(comm);
   }
   // Called to initialize/create server comm
-  void *seri_in = (void*)get_format_type(comm->direction, 0);
-  if (seri_in == NULL) {
-    ygglog_error("init_server_comm: Failed to create seri_in.");
+  dtype_t *dtype_in = create_dtype_format(comm->direction, 0);
+  if (dtype_in == NULL) {
+    ygglog_error("init_server_comm: Failed to create dtype_in.");
     return -1;
   }
   comm_t *handle;
   if (strlen(comm->name) == 0) {
-    handle = new_comm_base(comm->address, "recv", _default_comm, seri_in);
+    handle = new_comm_base(comm->address, "recv", _default_comm, dtype_in);
     sprintf(handle->name, "server_request.%s", comm->address);
   } else {
-    handle = init_comm_base(comm->name, "recv", _default_comm, seri_in);
+    handle = init_comm_base(comm->name, "recv", _default_comm, dtype_in);
   }
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
@@ -183,14 +183,14 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
     return -1;
   }
   strcpy(x.address, head.id);
-  void *seri_copy = (void*)copy_from_void(x.serializer->type, x.serializer->info);
-  if (seri_copy == NULL) {
-    ygglog_error("server_comm_recv(%s): Failed to create seri_copy.");
+  dtype_t *dtype_copy = copy_dtype(x.datatype);
+  if (dtype_copy == NULL) {
+    ygglog_error("server_comm_recv(%s): Failed to create dtype_copy.");
     return -1;
   }
   comm_t **res_comm = (comm_t**)(x.info);
   res_comm[0] = new_comm_base(head.response_address, "send", _default_comm,
-			      seri_copy);
+			      dtype_copy);
   /* sprintf(res_comm[0]->name, "server_response.%s", res_comm[0]->address); */
   int newret;
   newret = init_default_comm(res_comm[0]);

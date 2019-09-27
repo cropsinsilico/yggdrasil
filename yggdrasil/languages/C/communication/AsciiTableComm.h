@@ -26,8 +26,7 @@ int init_ascii_table_comm(comm_t *comm) {
   comm->type = ASCII_TABLE_COMM;
   strcpy(comm->address, comm->name);
   // Initialize table as handle
-  asciiTable_t *handle = (asciiTable_t*)(get_ascii_table_from_void(comm->serializer->type,
-								   comm->serializer->info));
+  asciiTable_t *handle = (asciiTable_t*)(dtype_ascii_table(comm->datatype));
   if (handle == NULL) {
     ygglog_error("init_ascii_table_comm: Could not get table.");
     return -1;

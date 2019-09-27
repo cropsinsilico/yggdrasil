@@ -47,13 +47,12 @@ extern "C" {
   locate a particular comm address stored in the environment variable name
   and a structure definining the datatype of outgoing messages for the queue.
   @param[in] name constant character pointer to name of queue.
-  @param[in] seri_info Pointer to a MetaschemaType data structure containing
-  type information.
+  @param[in] datatype Pointer to a dtype_t data structure containing type informaiton.
   @returns yggOutput_t output queue structure.
  */
 static inline
-yggOutput_t yggOutputType(const char *name, void *seri_info) {
-  return init_comm(name, "send", _default_comm, seri_info);
+yggOutput_t yggOutputType(const char *name, dtype_t *datatype) {
+  return init_comm(name, "send", _default_comm, datatype);
 };
 
 /*!
@@ -62,13 +61,12 @@ yggOutput_t yggOutputType(const char *name, void *seri_info) {
   locate a particular comm address stored in the environment variable name and
   a structure defining the expected datatype of received messages.
   @param[in] name constant character pointer to name of queue.
-  @param[in] seri_info Pointer to a MetaschemaType data structure containing
-  type information.
+  @param[in] datatype Pointer to a dtype_t data structure containing type informaiton.
   @returns yggInput_t input queue structure.
  */
 static inline
-yggInput_t yggInputType(const char *name, void *seri_info) {
-  return init_comm(name, "recv", _default_comm, seri_info);
+yggInput_t yggInputType(const char *name, dtype_t *datatype) {
+  return init_comm(name, "recv", _default_comm, datatype);
 };
   
 /*!
@@ -466,8 +464,7 @@ int vrpcCallBase(const yggRpc_t rpc, const int allow_realloc,
   
   // pack the args and call
   comm_t *send_comm = (comm_t*)(rpc.handle);
-  size_t send_nargs = nargs_exp_from_void(send_comm->serializer->type,
-					  send_comm->serializer->info);
+  size_t send_nargs = nargs_exp_dtype(send_comm->datatype);
   sret = vcommSend(rpc, send_nargs, ap);
   if (sret < 0) {
     ygglog_error("vrpcCall: vcommSend error: ret %d: %s", sret, strerror(errno));
@@ -750,8 +747,8 @@ comm_t yggAsciiArrayInput(const char *name) {
  */
 static inline
 comm_t yggPlyOutput(const char *name) {
-  comm_t out = init_comm(name, "send", _default_comm, get_ply_type());
-  if ((out.valid) && (out.serializer->info == NULL)) {
+  comm_t out = init_comm(name, "send", _default_comm, create_dtype_ply());
+  if ((out.valid) && (out.datatype->obj == NULL)) {
     out.valid = 0;
   }
   return out;
@@ -812,8 +809,8 @@ comm_t yggPlyInput(const char *name) {
  */
 static inline
 comm_t yggObjOutput(const char *name) {
-  comm_t out = init_comm(name, "send", _default_comm, get_obj_type());
-  if ((out.valid) && (out.serializer->info == NULL)) {
+  comm_t out = init_comm(name, "send", _default_comm, create_dtype_obj());
+  if ((out.valid) && (out.datatype->obj == NULL)) {
     out.valid = 0;
   }
   return out;

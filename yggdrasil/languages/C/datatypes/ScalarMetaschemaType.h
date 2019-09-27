@@ -46,6 +46,12 @@ public:
 		       const char *units="") :
     MetaschemaType("scalar"), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
     precision_(precision), units_((const char*)malloc(STRBUFF)), cast_precision_(0) {
+    if (subtype_ == NULL) {
+      ygglog_throw_error("ScalarMetaschemaType: Failed to malloc subtype.");
+    }
+    if (units_ == NULL) {
+      ygglog_throw_error("ScalarMetaschemaType: Failed to malloc units.");
+    }
     if (precision_ == 0)
       _variable_precision = true;
     else
@@ -61,6 +67,12 @@ public:
   ScalarMetaschemaType(const rapidjson::Value &type_doc) :
     MetaschemaType(type_doc), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
     precision_(0), units_((const char*)malloc(STRBUFF)), cast_precision_(0) {
+    if (subtype_ == NULL) {
+      ygglog_throw_error("ScalarMetaschemaType: Failed to malloc subtype.");
+    }
+    if (units_ == NULL) {
+      ygglog_throw_error("ScalarMetaschemaType: Failed to malloc units.");
+    }
     switch (type_code()) {
     case T_1DARRAY:
     case T_NDARRAY:
@@ -102,7 +114,7 @@ public:
     @brief Destructor for ScalarMetaschemaType.
     Free the type string malloc'd during constructor.
    */
-  ~ScalarMetaschemaType() {
+  virtual ~ScalarMetaschemaType() {
     free((char*)subtype_);
     free((char*)units_);
   }
@@ -172,14 +184,15 @@ public:
     @param[in] new_info MetaschemaType* type object.
    */
   void update(MetaschemaType* new_info) {
-    if ((strcmp(new_info->type(), "array") == 0)
-	&& (((JSONArrayMetaschemaType*)new_info)->nitems() == 1)) {
-      
-      update(((JSONArrayMetaschemaType*)new_info)->items()[0]);
-      return;
+    if (strcmp(new_info->type(), "array") == 0) {
+      JSONArrayMetaschemaType* new_info_array = dynamic_cast<JSONArrayMetaschemaType*>(new_info);
+      if (new_info_array->nitems() == 1) {
+	update(new_info_array->items()[0]);
+	return;
+      }
     }
     MetaschemaType::update(new_info);
-    ScalarMetaschemaType* new_info_scalar = (ScalarMetaschemaType*)new_info;
+    ScalarMetaschemaType* new_info_scalar = dynamic_cast<ScalarMetaschemaType*>(new_info);
     update_subtype(new_info_scalar->subtype());
     if ((strcmp(type(), "scalar") == 0) &&
 	((strcmp(subtype(), "bytes") == 0) ||
@@ -269,7 +282,7 @@ public:
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
-  size_t nargs_exp() {
+  virtual size_t nargs_exp() override {
     switch (subtype_code_) {
     case T_BYTES:
     case T_UNICODE: {
@@ -316,6 +329,11 @@ public:
     // TODO: case by case for scalar types
     size_t bytes_precision = nbytes();
     unsigned char* arg = (unsigned char*)malloc(bytes_precision + 1);
+    if (arg == NULL) {
+      ygglog_error("ScalarMetaschemaType::encode_data: Failed to malloc for %lu bytes.",
+		   bytes_precision + 1);
+      return false;
+    }
     if ((strcmp(type(), "1darray") == 0) || (strcmp(type(), "ndarray") == 0)) {
       if (nelements() == 0) {
 	ygglog_error("ScalarMetaschemaType::encode_data: Array types require the number of elements be non-zero.");
@@ -329,11 +347,6 @@ public:
 	memcpy(arg, arg0, bytes_precision);
       }
     } else {
-      if (arg == NULL) {
-	ygglog_error("ScalarMetaschemaType::encode_data: Failed to malloc for %lu bytes.",
-		     bytes_precision + 1);
-	return false;
-      }
       switch (subtype_code_) {
       case T_INT: {
 	switch (precision_) {
@@ -599,7 +612,11 @@ public:
 	if (to_precision == 64) {
 	  double tmp_val2 = (double)(tmp_val1[0]);
 	  bytes[0] = (unsigned char*)realloc(bytes[0], sizeof(double));
-	  memcpy(bytes[0], &tmp_val2, sizeof(double));
+	  if (bytes[0] == NULL) {
+	    raise_error = true;
+	  } else {
+	    memcpy(bytes[0], &tmp_val2, sizeof(double));
+	  }
 	} else {
 	  raise_error = true;
 	}
@@ -608,7 +625,11 @@ public:
 	if (to_precision == 32) {
 	  float tmp_val2 = (float)(tmp_val1[0]);
 	  bytes[0] = (unsigned char*)realloc(bytes[0], sizeof(float));
-	  memcpy(bytes[0], &tmp_val2, sizeof(float));
+	  if (bytes[0] == NULL) {
+	    raise_error = true;
+	  } else {
+	    memcpy(bytes[0], &tmp_val2, sizeof(float));
+	  }
 	} else {
 	  raise_error = true;
 	}
