@@ -1,0 +1,31 @@
+models:
+  - name: python_modelA
+    language: python
+    args: ./src/split_and_merge_modelA.py
+    function: model_functionA
+
+  - name: python_modelB1
+    language: python
+    args: ./src/split_and_merge_modelB1.py
+    function: model_functionB1
+
+  - name: python_modelB2
+    language: python
+    args: ./src/split_and_merge_modelB2.py
+    function: model_functionB2
+
+connections:
+  # Connection between file and model A input
+  - input: ./Input/input.txt
+    output: python_modelA:x
+    filetype: table
+  # Connection between model A output & model B1 input
+  - input: <python_modelA::a, python_modelA::b>
+    output: <python_modelB1::a, python_modelB1::b>
+  # Connection between model A output & model B2 input
+  - input: <python_modelA::b, python_modelA::c>
+    output: <python_modelB1::b, python_modelB1::c>
+  # Connection between models B1 and B2 output and file
+  - input: <python_modelA::a, python_modelA::b, python_modelA::c, python_modelB1::out, python_modelB2::out>
+    output: ./output.txt
+    filetype: table
