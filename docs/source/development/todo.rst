@@ -53,3 +53,4 @@ TODO
 * Add forwarding of format string to forked output
 * Add contributing guide with reference to ``ygginfo``
 * Run connections on separate processes instead of threads
+* Assign meanings to error codes and implement across languages

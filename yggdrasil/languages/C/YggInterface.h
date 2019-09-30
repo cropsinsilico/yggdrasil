@@ -13,8 +13,8 @@ extern "C" {
 #endif
 
 /*! @brief Aliases to preserve names of original structures. */
-#define yggOutput_t comm_t
-#define yggInput_t comm_t
+#define yggOutput_t comm_t*
+#define yggInput_t comm_t*
 #define ygg_free free_comm
 #define yggComm init_comm
 
@@ -47,13 +47,12 @@ extern "C" {
   locate a particular comm address stored in the environment variable name
   and a structure definining the datatype of outgoing messages for the queue.
   @param[in] name constant character pointer to name of queue.
-  @param[in] seri_info Pointer to a MetaschemaType data structure containing
-  type information.
+  @param[in] datatype Pointer to a dtype_t data structure containing type informaiton.
   @returns yggOutput_t output queue structure.
  */
 static inline
-yggOutput_t yggOutputType(const char *name, void *seri_info) {
-  return init_comm(name, "send", _default_comm, seri_info);
+yggOutput_t yggOutputType(const char *name, dtype_t *datatype) {
+  return init_comm(name, "send", _default_comm, datatype);
 };
 
 /*!
@@ -62,13 +61,12 @@ yggOutput_t yggOutputType(const char *name, void *seri_info) {
   locate a particular comm address stored in the environment variable name and
   a structure defining the expected datatype of received messages.
   @param[in] name constant character pointer to name of queue.
-  @param[in] seri_info Pointer to a MetaschemaType data structure containing
-  type information.
+  @param[in] datatype Pointer to a dtype_t data structure containing type informaiton.
   @returns yggInput_t input queue structure.
  */
 static inline
-yggInput_t yggInputType(const char *name, void *seri_info) {
-  return init_comm(name, "recv", _default_comm, seri_info);
+yggInput_t yggInputType(const char *name, dtype_t *datatype) {
+  return init_comm(name, "recv", _default_comm, datatype);
 };
   
 /*!
@@ -169,7 +167,7 @@ int ygg_send_eof(const yggOutput_t yggQ) {
   message if message was received.
  */
 static inline
-int ygg_recv(const yggInput_t yggQ, char *data, const size_t len){
+int ygg_recv(yggInput_t yggQ, char *data, const size_t len){
   char* temp = NULL;
   int ret = -1;
   size_t len_used = len;
@@ -228,7 +226,7 @@ int ygg_send_nolimit_eof(const yggOutput_t yggQ) {
   message if message was received.
  */
 static inline
-int ygg_recv_nolimit(const yggInput_t yggQ, char **data, const size_t len){
+int ygg_recv_nolimit(yggInput_t yggQ, char **data, const size_t len){
   int ret = -1;
   size_t len_used = 0; // Send 0 to indicate data can be realloced
   int nargs_used = commRecvRealloc(yggQ, data, &len_used);
@@ -347,7 +345,7 @@ int ygg_recv_nolimit(const yggInput_t yggQ, char **data, const size_t len){
   Contains information required to coordinate sending/receiving 
   response/requests from/to an RPC server/client.
  */
-#define yggRpc_t comm_t
+#define yggRpc_t comm_t*
 
 /*!
   @brief Constructor for client side RPC structure.
@@ -360,7 +358,7 @@ int ygg_recv_nolimit(const yggInput_t yggQ, char **data, const size_t len){
   @return yggRpc_t structure with provided info.
  */
 static inline
-comm_t yggRpcClient(const char *name, const char *outFormat, const char *inFormat){
+comm_t* yggRpcClient(const char *name, const char *outFormat, const char *inFormat){
   return init_comm_format(name, outFormat, CLIENT_COMM, inFormat, 0);
 };
 
@@ -375,7 +373,7 @@ comm_t yggRpcClient(const char *name, const char *outFormat, const char *inForma
   @return yggRpc_t structure with provided info.
  */
 static inline
-comm_t yggRpcServer(const char *name, const char *inFormat, const char *outFormat){
+comm_t* yggRpcServer(const char *name, const char *inFormat, const char *outFormat){
   return init_comm_format(name, inFormat, SERVER_COMM, outFormat, 0);
 };
 
@@ -455,7 +453,7 @@ comm_t yggRpcServer(const char *name, const char *inFormat, const char *outForma
   success.
  */
 static inline
-int vrpcCallBase(const yggRpc_t rpc, const int allow_realloc,
+int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
 		 size_t nargs, va_list_t ap) {
   int sret, rret;
   rret = 0;
@@ -465,9 +463,8 @@ int vrpcCallBase(const yggRpc_t rpc, const int allow_realloc,
   va_copy(op.va, ap.va);
   
   // pack the args and call
-  comm_t *send_comm = (comm_t*)(rpc.handle);
-  size_t send_nargs = nargs_exp_from_void(send_comm->serializer->type,
-					  send_comm->serializer->info);
+  comm_t *send_comm = (comm_t*)(rpc->handle);
+  size_t send_nargs = nargs_exp_dtype(send_comm->datatype);
   sret = vcommSend(rpc, send_nargs, ap);
   if (sret < 0) {
     ygglog_error("vrpcCall: vcommSend error: ret %d: %s", sret, strerror(errno));
@@ -512,7 +509,7 @@ int vrpcCallBase(const yggRpc_t rpc, const int allow_realloc,
   success.
  */
 static inline
-int nrpcCallBase(const yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
+int nrpcCallBase(yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
   int ret;
   va_list_t ap;
   va_start(ap.va, nargs);
@@ -532,7 +529,7 @@ int nrpcCallBase(const yggRpc_t rpc, const int allow_realloc, size_t nargs, ...)
 
   Input Usage:
       1. One-time: Create file interface by providing a channel name.
-	    comm_t fin = yggAsciiFileInput("file_channel");
+	    comm_t* fin = yggAsciiFileInput("file_channel");
       2. Prepare: Get pointer for line.
             char *line;
       3. Receive each line, terminating when receive returns -1 (EOF or channel
@@ -547,7 +544,7 @@ int nrpcCallBase(const yggRpc_t rpc, const int allow_realloc, size_t nargs, ...)
 
   Output Usage:
       1. One-time: Create file interface by providing a channel name.
-	    comm_t fout = yggAsciiFileOutput("file_channel");
+	    comm_t* fout = yggAsciiFileOutput("file_channel");
       2. Send lines to the file. If return value is not 0, the send was not
           succesfull.
             int ret;
@@ -559,28 +556,28 @@ int nrpcCallBase(const yggRpc_t rpc, const int allow_realloc, size_t nargs, ...)
 //==============================================================================
 
 /*! @brief Definitions for file sturctures. */
-#define yggAsciiFileInput_t comm_t
-#define yggAsciiFileOutput_t comm_t
+#define yggAsciiFileInput_t comm_t*
+#define yggAsciiFileOutput_t comm_t*
 
 /*!
   @brief Constructor for AsciiFile output comm to channel.
   @param[in] name constant character pointer to name of an output channel.
-  @returns comm_t for line-by-line output to a file or channel.
+  @returns comm_t* for line-by-line output to a file or channel.
  */
 static inline
-comm_t yggAsciiFileOutput(const char *name) {
-  comm_t out = init_comm(name, "send", _default_comm, NULL);
+comm_t* yggAsciiFileOutput(const char *name) {
+  comm_t* out = init_comm(name, "send", _default_comm, NULL);
   return out;
 };
 
 /*!
   @brief Constructor for AsciiFile input comm from channel.
   @param[in] name constant character pointer to name of an input channel.
-  @returns comm_t for line-by-line input from a file or channel.
+  @returns comm_t* for line-by-line input from a file or channel.
  */
 static inline
-comm_t yggAsciiFileInput(const char *name) {
-  comm_t out = init_comm(name, "recv", _default_comm, NULL);
+comm_t* yggAsciiFileInput(const char *name) {
+  comm_t* out = init_comm(name, "recv", _default_comm, NULL);
   return out;
 };
 
@@ -596,7 +593,7 @@ comm_t yggAsciiFileInput(const char *name) {
 
   Input by Row Usage:
       1. One-time: Create file interface by providing a channel name.
-	    comm_t fin = yggAsciiTableInput("file_channel");
+	    comm_t* fin = yggAsciiTableInput("file_channel");
       2. Prepare: Allocate space for variables in row (the format in this
          example is "%5s %d %f\n" like the output example below).
 	    char a[5];
@@ -613,7 +610,7 @@ comm_t yggAsciiFileInput(const char *name) {
   Output by Row Usage:
       1. One-time: Create file interface by providing a channel name and a
          format string for rows.
-	    comm_t fout = yggAsciiTableOutput("file_channel", "%5s %d %f\n");
+	    comm_t* fout = yggAsciiTableOutput("file_channel", "%5s %d %f\n");
       2. Send rows to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
             int ret;
@@ -625,7 +622,7 @@ comm_t yggAsciiFileInput(const char *name) {
 
   Input by Array Usage:
       1. One-time: Create file interface by providing a channel name.
-	    comm_t fin = yggAsciiArrayInput("file_channel");
+	    comm_t* fin = yggAsciiArrayInput("file_channel");
       2. Prepare: Declare pointers for table columns (they will be allocated by
          the interface once the number of rows is known).
 	    char *aCol;
@@ -643,7 +640,7 @@ comm_t yggAsciiFileInput(const char *name) {
   Output by Array Usage:
       1. One-time: Create file interface by providing a channel name and a
          format string for rows.
-	    comm_t fout = yggAsciiArrayOutput("file_channel", "%5s %d %f\n");
+	    comm_t* fout = yggAsciiArrayOutput("file_channel", "%5s %d %f\n");
       2. Send columns to the file by providing pointers (or arrays). Formatting
          is handled by the interface. If return value is not 0, the send was not
 	 succesful.
@@ -656,30 +653,30 @@ comm_t yggAsciiFileInput(const char *name) {
 //==============================================================================
 
 /*! @brief Definitions for table sturctures. */
-#define yggAsciiTableInput_t comm_t
-#define yggAsciiTableOutput_t comm_t
-#define yggAsciiArrayInput_t comm_t
-#define yggAsciiArrayOutput_t comm_t
+#define yggAsciiTableInput_t comm_t*
+#define yggAsciiTableOutput_t comm_t*
+#define yggAsciiArrayInput_t comm_t*
+#define yggAsciiArrayOutput_t comm_t*
 
 /*!
   @brief Constructor for table output comm to an output channel.
   @param[in] name constant character pointer to output channel name.
   @param[in] format_str character pointer to format string that should be used
   to format rows into table lines.
-  @returns comm_t output structure.
+  @returns comm_t* output structure.
  */
 static inline
-comm_t yggAsciiTableOutput(const char *name, const char *format_str) {
+comm_t* yggAsciiTableOutput(const char *name, const char *format_str) {
   return init_comm_format(name, "send", _default_comm, format_str, 0);
 };
 
 /*!
   @brief Constructor for AsciiTable input comm from an input channel.
   @param[in] name constant character pointer to input channel name.
-  @returns comm_t input structure.
+  @returns comm_t* input structure.
  */
 static inline
-comm_t yggAsciiTableInput(const char *name) {
+comm_t* yggAsciiTableInput(const char *name) {
   return init_comm(name, "recv", _default_comm, NULL);
 };
 
@@ -688,20 +685,20 @@ comm_t yggAsciiTableInput(const char *name) {
   @param[in] name constant character pointer to an output channel name.
   @param[in] format_str character pointer to format string that should be used
   to format rows into table lines.
-  @returns comm_t output structure.
+  @returns comm_t* output structure.
  */
 static inline
-comm_t yggAsciiArrayOutput(const char *name, const char *format_str) {
+comm_t* yggAsciiArrayOutput(const char *name, const char *format_str) {
   return init_comm_format(name, "send", _default_comm, format_str, 1);
 };
 
 /*!
   @brief Constructor for AsciiTable input comm with array input.
   @param[in] name constant character pointer to an input channel name.
-  @returns comm_t input structure.
+  @returns comm_t* input structure.
  */
 static inline
-comm_t yggAsciiArrayInput(const char *name) {
+comm_t* yggAsciiArrayInput(const char *name) {
   return yggAsciiTableInput(name);
 };
 
@@ -714,7 +711,7 @@ comm_t yggAsciiArrayInput(const char *name) {
 
   Input Usage:
       1. One-time: Create file interface by providing a channel name.
-	    comm_t fin = yggPlyInput("file_channel");  // channel
+	    comm_t* fin = yggPlyInput("file_channel");  // channel
       2. Prepare: Allocate ply structure.
             ply_t p;
       3. Receive each structure, terminating when receive returns -1 (EOF or channel
@@ -727,7 +724,7 @@ comm_t yggAsciiArrayInput(const char *name) {
 
   Output by Usage:
       1. One-time: Create file interface by providing a channel name.
-	    comm_t fout = yggPlyOutput("file_channel");  // channel
+	    comm_t* fout = yggPlyOutput("file_channel");  // channel
       2. Send structure to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
             int ret;
@@ -740,19 +737,19 @@ comm_t yggAsciiArrayInput(const char *name) {
 //==============================================================================
 
 /*! @brief Definitions for ply structures. */
-#define yggPlyInput_t comm_t
-#define yggPlyOutput_t comm_t
+#define yggPlyInput_t comm_t*
+#define yggPlyOutput_t comm_t*
 
 /*!
   @brief Constructor for ply output comm to an output channel.
   @param[in] name constant character pointer to output channel name.
-  @returns comm_t output structure.
+  @returns comm_t* output structure.
  */
 static inline
-comm_t yggPlyOutput(const char *name) {
-  comm_t out = init_comm(name, "send", _default_comm, get_ply_type());
-  if ((out.valid) && (out.serializer->info == NULL)) {
-    out.valid = 0;
+comm_t* yggPlyOutput(const char *name) {
+  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_ply());
+  if ((out->valid) && (out->datatype->obj == NULL)) {
+    out->valid = 0;
   }
   return out;
 };
@@ -760,10 +757,10 @@ comm_t yggPlyOutput(const char *name) {
 /*!
   @brief Constructor for ply input comm from an input channel.
   @param[in] name constant character pointer to input channel name.
-  @returns comm_t input structure.
+  @returns comm_t* input structure.
  */
 static inline
-comm_t yggPlyInput(const char *name) {
+comm_t* yggPlyInput(const char *name) {
   return init_comm(name, "recv", _default_comm, NULL);
 };
 
@@ -776,7 +773,7 @@ comm_t yggPlyInput(const char *name) {
 
   Input Usage:
       1. One-time: Create file interface by providing a channel name.
-	    comm_t fin = yggObjInput("file_channel");  // channel
+	    comm_t* fin = yggObjInput("file_channel");  // channel
       2. Prepare: Allocate obj structure.
             obj_t p;
       3. Receive each structure, terminating when receive returns -1 (EOF or channel
@@ -789,7 +786,7 @@ comm_t yggPlyInput(const char *name) {
 
   Output by Usage:
       1. One-time: Create file interface by providing a channel name.
-	    comm_t fout = yggObjOutput("file_channel");  // channel
+	    comm_t* fout = yggObjOutput("file_channel");  // channel
       2. Send structure to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
             int ret;
@@ -802,19 +799,19 @@ comm_t yggPlyInput(const char *name) {
 //==============================================================================
 
 /*! @brief Definitions for obj structures. */
-#define yggObjInput_t comm_t
-#define yggObjOutput_t comm_t
+#define yggObjInput_t comm_t*
+#define yggObjOutput_t comm_t*
 
 /*!
   @brief Constructor for obj output comm to an output channel.
   @param[in] name constant character pointer to output channel name.
-  @returns comm_t output structure.
+  @returns comm_t* output structure.
  */
 static inline
-comm_t yggObjOutput(const char *name) {
-  comm_t out = init_comm(name, "send", _default_comm, get_obj_type());
-  if ((out.valid) && (out.serializer->info == NULL)) {
-    out.valid = 0;
+comm_t* yggObjOutput(const char *name) {
+  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_obj());
+  if ((out->valid) && (out->datatype->obj == NULL)) {
+    out->valid = 0;
   }
   return out;
 };
@@ -822,10 +819,10 @@ comm_t yggObjOutput(const char *name) {
 /*!
   @brief Constructor for obj input comm from an input channel.
   @param[in] name constant character pointer to input channel name.
-  @returns comm_t input structure.
+  @returns comm_t* input structure.
  */
 static inline
-comm_t yggObjInput(const char *name) {
+comm_t* yggObjInput(const char *name) {
   return init_comm(name, "recv", _default_comm, NULL);
 };
 

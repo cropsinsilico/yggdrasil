@@ -1,7 +1,7 @@
 import os
 import sys
 import importlib
-from yggdrasil import backwards
+from yggdrasil import backwards, platform
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
@@ -66,6 +66,8 @@ class ClassMetaschemaType(MetaschemaType):
         if not isinstance(obj, backwards.string_types):
             return obj
         pkg_mod = obj.split(':')
+        if (len(pkg_mod) == 3) and platform._is_win:  # pragma: windows
+            pkg_mod = [pkg_mod[0] + ':' + pkg_mod[1], pkg_mod[2]]
         if len(pkg_mod) != 2:
             raise ValueError("Could not parse %s string: %s"
                              % (cls.name, obj))
@@ -79,6 +81,8 @@ class ClassMetaschemaType(MetaschemaType):
             if not moddir:
                 raise
             sys.path.append(os.path.abspath(moddir))
+            if platform._is_win:  # pragma: windows
+                print('path', obj, pkg_mod, os.path.abspath(moddir), mod)
             modobj = importlib.import_module(mod)
         if not hasattr(modobj, fun):
             raise AttributeError("Module %s has no %s %s"

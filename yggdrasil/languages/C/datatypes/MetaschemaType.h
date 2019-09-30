@@ -123,7 +123,7 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new MetaschemaType instance with the same data.
    */
-  MetaschemaType* copy() { return (new MetaschemaType(type_)); }
+  virtual MetaschemaType* copy() { return (new MetaschemaType(type_)); }
   /*!
     @brief Print information about the type to stdout.
   */

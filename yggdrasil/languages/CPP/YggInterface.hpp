@@ -14,8 +14,8 @@
   an IPC queue.
  */
 class YggInput {
-  yggInput_t _pi;
 public:
+  yggInput_t _pi;
 
   /*!
     @brief Constructor for YggInput.
@@ -39,15 +39,15 @@ public:
     @brief Constructor for YggIntput with explicit datatype.
     @param[in] name constant character pointer to name of input queue. This
     should be the argument to an input driver in the yaml specification file.
-    @param[in] seri_info Pointer to a MetaschemaType data structure
+    @param[in] datatype Pointer to a dtype_t data structure containing type informaiton.
     containing type information.
    */
-  YggInput(const char *name, void *seri_info) : _pi(yggInputType(name, seri_info)) {}
+  YggInput(const char *name, dtype_t *datatype) : _pi(yggInputType(name, datatype)) {}
 
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
-  void _destroy_pi() { ygg_free(&_pi); }
+  void _destroy_pi() { ygg_free(_pi); }
   
   /*!
     @brief Destructor for YggInput.
@@ -177,10 +177,9 @@ public:
     @brief Constructor for YggOutput with explicit datatype.
     @param[in] name constant character pointer to name of output queue. This
     should be the argument to an output driver in the yaml specification file.
-    @param[in] seri_info Pointer to a MetaschemaType data structure
-    containing type information.
+    @param[in] datatype Pointer to a dtype_t data structure containing type informaiton.
    */
-  YggOutput(const char *name, void *seri_info) : _pi(yggOutputType(name, seri_info)) {}
+  YggOutput(const char *name, dtype_t *datatype) : _pi(yggOutputType(name, datatype)) {}
 
   /*! @brief Empty constructor for inheritance. */
   YggOutput(yggOutput_t x) : _pi(x) {}
@@ -188,7 +187,7 @@ public:
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
-  void _destroy_pi() { ygg_free(&_pi); }
+  void _destroy_pi() { ygg_free(_pi); }
   
   /*!
     @brief Destructor for YggOutput.
@@ -285,7 +284,7 @@ public:
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
-  void _destroy_pi() { ygg_free(&_pi); }
+  void _destroy_pi() { ygg_free(_pi); }
   
   /*!
     @brief Destructor for YggRpc.

@@ -202,7 +202,7 @@ def parse_model(yml, existing):
     yml['driver'] = _lang2driver[yml.pop('language')]
     # Add server driver
     if yml.get('is_server', False):
-        srv = {'name': yml['name'],
+        srv = {'name': '%s:%s' % (yml['name'], yml['name']),
                'commtype': 'default',
                'datatype': {'type': 'bytes'},
                'driver': 'ServerDriver',
@@ -215,7 +215,7 @@ def parse_model(yml, existing):
         srv_names = yml['client_of']
         yml['client_of'] = srv_names
         for srv in srv_names:
-            cli = {'name': '%s_%s' % (srv, yml['name']),
+            cli = {'name': '%s:%s_%s' % (yml['name'], srv, yml['name']),
                    'commtype': 'default',
                    'datatype': {'type': 'bytes'},
                    'driver': 'ClientDriver',

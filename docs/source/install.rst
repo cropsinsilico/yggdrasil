@@ -18,13 +18,21 @@ install |yggdrasil| and all of its dependencies in your active
 conda environment from the ``conda-forge`` channel.
 
 
+Development Installation
+------------------------
+
+If you would like to contribute to |yggdrasil|, instructions on setting up a development environment can be found :ref:`here <dev_env_rst>`.
+
+
+.. _manual_install_rst:
+
 Manual Installation
 -------------------
 
 .. note::
    Before installing |yggdrasil| from ``pip`` or the cloned repository, you 
-   should install the non-Python dependencies, particularly the
-   ZeroMQ C and C++ libraries (see below).
+   should manually install the non-Python dependencies, particularly the
+   ZeroMQ C and C++ libraries and R packages (see below).
 
 If you do not want to use conda, |yggdrasil| can also be installed 
 from either `PyPI <https://pypi.org/project/yggdrasil-framework/>`_ 
@@ -167,16 +175,20 @@ Additional Steps for R Models
 -----------------------------
 
 To run R models, you will need to install the 
-`R interpreter <https://www.r-project.org/>`_ and the R packages 
-`reticulate <https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/>`_ 
-package for calling Python from R and 
-`zeallot <install.packages("zeallot")>`_.::
+`R interpreter <https://www.r-project.org/>`_. If you installed |yggdrasil| using conda, this will be installed for you, but if you are not using conda, you will need to install this yourself.
+
+Even if you install the R interpreter yourself, |yggdrasil| will attempt to install the R dependencies it needs via `CRAN <https://cran.r-project.org/>`_ when it is installed. If this fails, you may need to install these yourself from within the R interpreter. |yggdrasil|'s R dependencies include `reticulate <https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/>`_ for calling Python from R, `zeallot <https://cran.r-project.org/web/packages/zeallot/index.html>`_ for allowing assignment of output to multiple variables, `units <https://cran.r-project.org/web/packages/units/index.html>`_ for tracking physical units in R, `bit64 <https://cran.r-project.org/web/packages/bit64/index.html>`_ for 64bit integers, and `R6 <https://cran.r-project.org/web/packages/R6/index.html>`_ for creating interface classes with teardown methods.
+
+These packages can by installed from CRAN from the R interpreter.::
 
   > install.packages("reticulate")
   > install.packages("zeallot")
+  > install.packages("units")
+  > install.packages("bit64")
+  > install.packages("R6")
 
 .. note::
-   If you have issues installing on MacOS, check to make sure that ``which ar`` returns
+   If you have issues installing R packages on MacOS, check to make sure that ``which ar`` returns
    the system default (``/usr/bin/ar``). If you have another version of ``ar``
    installed (e.g. through homebrew's binutils), it may cause conflicts.
    
@@ -185,7 +197,7 @@ Additional Steps for RabbitMQ Message Passing
 
 RabbitMQ connections allow messages to be passed between models when the
 models are not running on the same machine. To use these connections, 
-the framework must have access to a
+the framework you must install the `pika <https://pika.readthedocs.io/en/stable/>`_ Python package and have access to a 
 RabbitMQ server. If you have access to an existing RabbitMQ server,
 the information for that server be provided via the |yggdrasil|
 config file (See

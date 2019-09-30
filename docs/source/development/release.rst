@@ -16,7 +16,7 @@ Release Steps
    $ git push origin [BRANCH]
 
 #. [on branch/fork] Make sure all CI tests pass (`travis <https://travis-ci.org/cropsinsilico/yggdrasil>`_, `appveyor <https://ci.appveyor.com/project/langmm/yggdrasil>`_).::
-#. [on branch/fork] Update docs to reflect new features and make sure they build locally::
+#. [on branch/fork] Update docs to reflect new features and make sure they build locally (you will need to install ``doxygen`` and the requirements listed in ``requirements_documentation.txt`` to build the docs).::
 
    $ cd docs
    $ make autodoc

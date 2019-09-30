@@ -1384,7 +1384,7 @@ class LinkerBase(CompilationToolBase):
                     '%s_flags' % cls.tooltype, '%s_language' % cls.tooltype,
                     'libraries', 'library_dirs', 'library_libs', 'library_flags']
         kws_both = ['overwrite', 'products', 'allow_error', 'dry_run',
-                    'working_dir']
+                    'working_dir', 'env']
         kws_link += add_kws_link
         kws_both += add_kws_both
         kwargs_link = {}
@@ -2663,6 +2663,26 @@ class CompiledModelDriver(ModelDriver):
                     out.append((k_lang, opt, desc))
         return out
 
+    @classmethod
+    def set_env_compiler(cls, compiler=None, **kwargs):
+        r"""Get environment variables that should be set for the compilation
+        process.
+
+        Args:
+            compiler (CompilerBase, optional): Compiler that set_env shoudl
+                be called for. If not provided, the default compiler for
+                this language will be used.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        if compiler is None:
+            compiler = cls.get_tool('compiler')
+        return compiler.set_env(**kwargs)
+
     def set_env(self, for_compile=False, compile_kwargs=None, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
@@ -2683,9 +2703,10 @@ class CompiledModelDriver(ModelDriver):
             if compile_kwargs is None:
                 compile_kwargs = {}
             compiler = self.get_tool_instance('compiler')
-            out = compiler.set_env(existing=out,
-                                   logging_level=self.logger.getEffectiveLevel(),
-                                   **compile_kwargs)
+            out = self.set_env_compiler(
+                compiler=compiler, existing=out,
+                logging_level=self.logger.getEffectiveLevel(),
+                **compile_kwargs)
         return out
         
     @classmethod
@@ -2791,6 +2812,8 @@ class CompiledModelDriver(ModelDriver):
         if dont_build is not None:
             kwargs['dont_link'] = dont_build
         language = kwargs.pop('compiler_language', language)
+        if 'env' not in kwargs:
+            kwargs['env'] = cls.set_env_compiler()
         # Compile using another driver if the language dosn't match
         if (language is not None) and (language != cls.language):
             drv = import_component('model', language)

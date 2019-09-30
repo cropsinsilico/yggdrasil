@@ -16,7 +16,10 @@ extern "C" {
 
 
 /*! @brief C-friendly definition of MetaschemaType. */
-typedef struct MetaschemaType MetaschemaType;
+typedef struct dtype_t {
+  char type[COMMBUFFSIZ]; //!< Type name
+  void *obj; //!< MetaschemaType Pointer
+} dtype_t;
 
 
 /*! @brief Header information passed by comms for multipart messages. */
@@ -41,40 +44,53 @@ typedef struct comm_head_t {
   char field_units[COMMBUFFSIZ]; //!< String containing field units.
   int as_array; //!< 1 if messages will be serialized arrays.
   //
-  char type[COMMBUFFSIZ]; //!< Type name
-  void *serializer_info; //!< JSON type
+  dtype_t* dtype; //!< Type structure.
 } comm_head_t;
 
 
 /*!
   @brief Get the name of the type from the class.
-  @param[in] type_class MetaschemaType* Type structure/class.
+  @param[in] type_class dtype_t* Type structure/class.
   @returns const char* Type name.
 */
-const char* get_type_name(MetaschemaType* type_class);
+const char* dtype_name(dtype_t* type_class);
 
 
 /*!
   @brief Get the subtype of the type.
-  @param[in] type_class MetaschemaType* Type structure/class.
+  @param[in] type_class dtype_t* Type structure/class.
   @returns const char* The subtype of the class, "" if there is an error.
 */
-const char* get_type_subtype(MetaschemaType* type_class);
+const char* dtype_subtype(dtype_t* type_class);
 
 
 /*!
   @brief Get the precision of the type.
-  @param[in] type_class MetaschemaType* Type structure/class.
+  @param[in] type_class dtype_t* Type structure/class.
   @returns const size_t The precision of the class, 0 if there is an error.
 */
-const size_t get_type_precision(MetaschemaType* type_class);
+const size_t dtype_precision(dtype_t* type_class);
+
+/*!
+  @brief Initialize a datatype structure including setting the type string.
+  @param[in] dtype dtype_t* Type structure/class.
+  @returns dtype_t* Initialized type structure/class.
+*/
+dtype_t* init_dtype(dtype_t *dtype);
+  
+
+/* /\*! */
+/*   @brief Construct and empty type object. */
+/*   @returns dtype_t* Type structure/class. */
+/* *\/ */
+/* dtype_t* create_dtype_empty(); */
 
 
 /*!
   @brief Construct a Direct type object.
-  @returns MetaschemaType* Type structure/class.
+  @returns dtype_t* Type structure/class.
 */
-MetaschemaType* get_direct_type();
+dtype_t* create_dtype_direct();
 
 
 /*!
@@ -82,10 +98,10 @@ MetaschemaType* get_direct_type();
   @param[in] subtype char* Name of the scalar subtype (e.g. int, uint, float, bytes).
   @param[in] precision size_t Precision of the scalar in bits.
   @param[in] units char* Units for scalar. (e.g. "cm", "g", "" for unitless)
-  @returns MetaschemaType* Type structure/class.
+  @returns dtype_t* Type structure/class.
 */
-MetaschemaType* get_scalar_type(const char* subtype, const size_t precision,
-				const char* units);
+dtype_t* create_dtype_scalar(const char* subtype, const size_t precision,
+			     const char* units);
 
 
 /*!
@@ -94,10 +110,10 @@ MetaschemaType* get_scalar_type(const char* subtype, const size_t precision,
   @param[in] precision size_t Precision of the array in bits.
   @param[in] length size_t Number of elements in the array.
   @param[in] units char* Units for array elements. (e.g. "cm", "g", "" for unitless)
-  @returns MetaschemaType* Type structure/class.
+  @returns dtype_t* Type structure/class.
 */
-MetaschemaType* get_1darray_type(const char* subtype, const size_t precision,
-				 const size_t length, const char* units);
+dtype_t* create_dtype_1darray(const char* subtype, const size_t precision,
+			      const size_t length, const char* units);
 
 
 /*!
@@ -109,52 +125,52 @@ MetaschemaType* get_1darray_type(const char* subtype, const size_t precision,
   @param[in] shape size_t* Pointer to array where each element is the size of the
   array in that dimension.
   @param[in] units char* Units for array elements. (e.g. "cm", "g", "" for unitless)
-  @returns MetaschemaType* Type structure/class.
+  @returns dtype_t* Type structure/class.
 */
-MetaschemaType* get_ndarray_type(const char* subtype, const size_t precision,
-				 const size_t ndim, const size_t* shape,
-				 const char* units);
+dtype_t* create_dtype_ndarray(const char* subtype, const size_t precision,
+			      const size_t ndim, const size_t* shape,
+			      const char* units);
 
 /*!
   @brief Construct a JSON array type object.
   @param[in] nitems size_t Number of types in items.
-  @param[in] items MetaschemaType** Pointer to array of types describing the array
+  @param[in] items dtype_t** Pointer to array of types describing the array
   elements.
-  @returns MetaschemaType* Type structure/class.
+  @returns dtype_t* Type structure/class.
 */
-MetaschemaType* get_json_array_type(const size_t nitems, MetaschemaType** items);
+dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items);
 
 
 /*!
   @brief Construct a JSON object type object.
   @param[in] nitems size_t Number of keys/types in keys and values.
   @param[in] keys char** Pointer to array of keys for each type.
-  @param[in] values MetaschemaType** Pointer to array of types describing the values
+  @param[in] values dtype_t** Pointer to array of types describing the values
   for each key.
-  @returns MetaschemaType* Type structure/class.
+  @returns dtype_t* Type structure/class.
 */
-MetaschemaType* get_json_object_type(const size_t nitems, const char** keys,
-				     MetaschemaType** values);
+dtype_t* create_dtype_json_object(const size_t nitems, const char** keys,
+				  dtype_t** values);
 
 /*!
   @brief Construct a Ply type object.
-  @returns MetaschemaType* Type structure/class.
+  @returns dtype_t* Type structure/class.
 */
-MetaschemaType* get_ply_type();
+dtype_t* create_dtype_ply();
 
 
 /*!
   @brief Construct a Obj type object.
-  @returns MetaschemaType* Type structure/class.
+  @returns dtype_t* Type structure/class.
 */
-MetaschemaType* get_obj_type();
+dtype_t* create_dtype_obj();
 
 
 /*!
   @brief Construct an AsciiTable type object.
-  @returns MetaschemaType* Type structure/class.
+  @returns dtype_t* Type structure/class.
 */
-MetaschemaType* get_ascii_table_type(const char *format_str, const int as_array);
+dtype_t* create_dtype_ascii_table(const char *format_str, const int as_array);
 
 
 /*!
@@ -164,19 +180,16 @@ MetaschemaType* get_ascii_table_type(const char *format_str, const int as_array)
   the resulting type.
   @param[in] as_array int If 1, the types will be arrays. Otherwise they will be
   scalars.
-  @returns MetaschemaType* Type structure/class.
+  @returns dtype_t* Type structure/class.
 */
-MetaschemaType* get_format_type(const char *format_str, const int as_array);
-
+dtype_t* create_dtype_format(const char *format_str, const int as_array);
 
 /*!
-  @brief Construct a type object based on the type name and a pointer cast to void*.
-  @param[in] type_name char* Name of the type represented.
-  @param[in] type void* Pointer to location where type information is stored.
-  @returns MetaschemaType* Type structure/class.
- */
-MetaschemaType* type_from_void(const char *type_name, const void *type);
-
+  @brief Wrapper for freeing MetaschemaType class wrapper struct.
+  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
+  @returns: int 0 if free was successfull, -1 if there was an error.
+*/
+int destroy_dtype(dtype_t* dtype);
 
 /*!
   @brief Initialize a header struct.
@@ -219,8 +232,7 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
   out.format_str[0] = '\0';
   out.as_array = 0;
   // Parameters used for type
-  out.type[0] = '\0';
-  out.serializer_info = NULL;
+  out.dtype = NULL;
   return out;
 };
 
@@ -313,66 +325,41 @@ comm_head_t parse_comm_header(const char *buf, const size_t buf_siz);
 
 
 /*!
-  @brief Get the ascii table data structure from void.
-  @param[in] name char* Name of the type.
-  @param[in] info void* Pointer to type class.
+  @brief Get the ascii table data structure.
+  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
   @returns: void* Cast pointer to ascii table.
 */
-void* get_ascii_table_from_void(const char* name, const void* info);
+void* dtype_ascii_table(const dtype_t* dtype);
 
 
 /*!
-  @brief Get the type name from pointer cast as void*.
-  @param[in] name char* Name of the type.
-  @param[in] info void* Pointer to type class.
-  @returns: const char * Name of type class.
+  @brief Get a copy of a type structure.
+  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
+  @returns: dtype_t* Type class.
 */
-const char* get_type_name_from_void(const char* name, const void* info);
-
-
-/*!
-  @brief Get a copy of the type from pointer cast as void*.
-  @param[in] name char* Name of the type.
-  @param[in] info void* Pointer to type class.
-  @returns: MetaschemaType* Type class.
-*/
-MetaschemaType* copy_from_void(const char* name, const void* info);
+dtype_t* copy_dtype(const dtype_t* dtype);
 
 
 /*!
   @brief Wrapper for updating a type object with information from another.
-  @param[in] name1 char* Name of the type for the object that should be updated.
-  @param[in] info1 void* Pointer to type object that should be updated.
-  @param[in] name2 char* Name of the type that should be updated from.
-  @param[in] info2 void* Pointer to the type object that should be updated from.
+  @param[in] dtype1 dtype_t* Wrapper struct for C++ Metaschema type class that should be updated.
+  @param[in] dtype2 dtype_t* Wrapper struct for C++ Metaschema type class that should be updated from.
   @returns: int 0 if successfull, -1 if there was an error.
 */
-int update_from_void(char* name1, void* info1,
-		     const char* name2, void* info2);
+int update_dtype(dtype_t* dtype1, dtype_t* dtype2);
   
 /*!
   @brief Wrapper for updating the precision of a bytes or unicode scalar type.
-  @param[in] name char* Name of the type.
-  @param[in] info void* Pointer to type class.
+  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
   @param[in] new_precision size_t New precision.
   @returns: int 0 if free was successfull, -1 if there was an error.
 */
-int update_precision_from_void(const char* name, void* info,
-			       const size_t new_precision);
+int update_precision_dtype(const dtype_t* dtype,
+			   const size_t new_precision);
 
 /*!
-  @brief Wrapper for freeing MetaschemaType class from pointer cast as void*
-  @param[in] name char* Name of the type.
-  @param[in] info void* Pointer to type class.
-  @returns: int 0 if free was successfull, -1 if there was an error.
-*/
-int free_type_from_void(const char* name, void* info);
-
-
-/*!
-  @brief Wrapper for deserializing from a data type cast as void*.
-  @param[in] name char* Name of the type.
-  @param[in] info void* Pointer to type class.
+  @brief Wrapper for deserializing from a data type.
+  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
   @param[in] buf character pointer to serialized message.
   @param[in] buf_siz size_t Size of buf.
   @param[in] allow_realloc int If 1, variables being filled are assumed to be
@@ -383,15 +370,13 @@ int free_type_from_void(const char* name, void* info);
   @param[in] ap va_list Arguments to be parsed from message.
   returns: int The number of populated arguments. -1 indicates an error.
 */
-int deserialize_from_void(const char* name, const void* info,
-			  const char *buf, const size_t buf_siz,
-			  const int allow_realloc, size_t *nargs, va_list_t ap);
+int deserialize_dtype(const dtype_t *dtype, const char *buf, const size_t buf_siz,
+		      const int allow_realloc, size_t *nargs, va_list_t ap);
 
 
 /*!
-  @brief Wrapper for serializing from a data type cast as void*.
-  @param[in] name char* Name of the type.
-  @param[in] info void* Pointer to type class.
+  @brief Wrapper for serializing from a data type.
+  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
   @param[in] buf character pointer to pointer to memory where serialized message
   should be stored.
   @param[in] buf_siz size_t Size of memory allocated to buf.
@@ -401,25 +386,22 @@ int deserialize_from_void(const char* name, const void* info,
   @param[in] ap va_list Arguments to be formatted.
   returns: int The length of the serialized message or -1 if there is an error.
 */
-int serialize_from_void(const char* name, const void* info,
-			char **buf, size_t *buf_siz,
-			const int allow_realloc, size_t *nargs, va_list_t ap);
+int serialize_dtype(const dtype_t *dtype, char **buf, size_t *buf_siz,
+		    const int allow_realloc, size_t *nargs, va_list_t ap);
 
 
 /*!
   @brief Wrapper for displaying a data type.
-  @param[in] name char* Name of the type.
-  @param[in] info void* Pointer to type class.
+  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
 */
-void display_from_void(const char* name, const void* info);
+void display_dtype(const dtype_t *dtype);
 
 
 /*!
   @brief Wrapper for determining how many arguments a data type expects.
-  @param[in] name char* Name of the type.
-  @param[in] info void* Pointer to type class.
+  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
 */
-size_t nargs_exp_from_void(const char* name, const void* info);
+size_t nargs_exp_dtype(const dtype_t *dtype);
 
 
 

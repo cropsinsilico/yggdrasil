@@ -53,7 +53,10 @@ class YAMLSerialize(JSONSerialize):
             obj: Deserialized Python object.
 
         """
-        return decode_yaml(msg)
+        out = decode_yaml(msg)
+        if backwards.PY2:  # pragma: Python 2
+            out = backwards.as_str(out, recurse=True, allow_pass=True)
+        return out
 
     @classmethod
     def get_testing_options(cls, **kwargs):

@@ -9,6 +9,7 @@ from yggdrasil import platform, tools, backwards
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, ArchiverBase)
 from yggdrasil.languages import get_language_dir
+from yggdrasil.config import ygg_cfg
 
 
 _default_internal_libtype = 'object'
@@ -32,6 +33,9 @@ def get_OSX_SYSROOT():
         except BaseException:  # pragma: debug
             xcode_dir = None
         fname_try = []
+        cfg_sdkroot = ygg_cfg.get('c', 'macos_sdkroot', None)
+        if cfg_sdkroot:
+            fname_try.append(cfg_sdkroot)
         if xcode_dir is not None:
             fname_base = os.path.join(xcode_dir, 'Platforms',
                                       'MacOSX.platform', 'Developer',
@@ -56,7 +60,6 @@ class CCompilerBase(CompilerBase):
     r"""Base class for C compilers."""
     languages = ['c']
     default_executable_env = 'CC'
-    # TODO: Additional flags environment variables?
     default_flags_env = 'CFLAGS'
     default_flags = ['-g', '-Wall']
     # GCC & CLANG have similar call patterns
@@ -84,11 +87,31 @@ class CCompilerBase(CompilerBase):
             cls.linker_attributes = dict(cls.linker_attributes,
                                          search_path_flags=['-Xlinker', '--verbose'],
                                          search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
-        # if cls.get_conda_prefix is not None:
-        #     cls.default_flags += ['-I%s' % get_language_dir('c'),
-        #                           "-include", "glibc_version_fix.h"]
         CompilerBase.before_registration(cls)
 
+    @classmethod
+    def set_env(cls, *args, **kwargs):
+        r"""Set environment variables required for compilation.
+
+        Args:
+            *args: Arguments are passed to the parent class's method.
+            **kwargs: Keyword arguments  are passed to the parent class's
+                method.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(CCompilerBase, cls).set_env(*args, **kwargs)
+        if _osx_sysroot is not None:
+            out['CONDA_BUILD_SYSROOT'] = _osx_sysroot
+            out['SDKROOT'] = _osx_sysroot
+            print("SDKROOT", _osx_sysroot)
+            grp = re.search(r'MacOSX(?P<target>[0-9]+\.[0-9]+)',
+                            _osx_sysroot).groupdict()
+            out['MACOSX_DEPLOYMENT_TARGET'] = grp['target']
+        return out
+    
     @classmethod
     def call(cls, args, **kwargs):
         r"""Call the compiler with the provided arguments. For |yggdrasil| C
@@ -206,8 +229,6 @@ class MSVCArchiver(ArchiverBase):
     output_key = '/OUT:%s'
     
 
-# _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
-# _incl_interface = os.path.join(_top_dir, 'interface')
 _top_lang_dir = get_language_dir('c')
 _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
@@ -241,7 +262,6 @@ class CModelDriver(CompiledModelDriver):
                  'language': 'c'}}
     internal_libraries = {
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
-                # 'directory': _incl_interface,
                 'linker_language': 'c++',  # Some dependencies are C++
                 'internal_dependencies': ['datatypes', 'regex'],
                 'external_dependencies': ['rapidjson'],
@@ -295,7 +315,6 @@ class CModelDriver(CompiledModelDriver):
         'send_function': 'yggSend',
         'not_flag_cond': '{flag_var} < 0',
         'flag_cond': '{flag_var} >= 0',
-        # Model functions should return non-zero integer codes to indicate errors
         'declare': '{type_name} {variable};',
         'define': '{variable} = {value};',
         'assign': '{name} = {value};',
@@ -380,12 +399,30 @@ class CModelDriver(CompiledModelDriver):
                     cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
         
     @classmethod
-    def configure(cls, cfg):
+    def update_config_argparser(cls, parser):
+        r"""Add arguments for configuration options specific to this
+        language.
+
+        Args:
+            parser (argparse.ArgumentParser): Parser to add arguments to.
+
+        """
+        super(CModelDriver, cls).update_config_argparser(parser)
+        if platform._is_mac and (cls.language == 'c'):
+            parser.add_argument('--macos-sdkroot', '--sdkroot',
+                                help=('The full path to the MacOS SDK '
+                                      'that should be used.'))
+        
+    @classmethod
+    def configure(cls, cfg, macos_sdkroot=None):
         r"""Add configuration options for this language. This includes locating
         any required external libraries and setting option defaults.
 
         Args:
             cfg (YggConfigParser): Config class that options should be set for.
+            macos_sdkroot (str, optional): Full path to the root directory for
+                the MacOS SDK that should be used. Defaults to None and is
+                ignored.
 
         Returns:
             list: Section, option, description tuples for options that could not
@@ -400,32 +437,13 @@ class CModelDriver(CompiledModelDriver):
         if (rjlib is not None) and os.path.isfile(rjlib):
             cfg.set(cls._language, 'rapidjson_include',
                     os.path.dirname(os.path.dirname(rjlib)))
+        if macos_sdkroot is not None:
+            if not os.path.isdir(macos_sdkroot):  # pragma: debug
+                raise ValueError("Path to MacOS SDK root directory "
+                                 "does not exist: %s." % macos_sdkroot)
+            cfg.set(cls._language, 'macos_sdkroot', macos_sdkroot)
         return out
 
-    @classmethod
-    def update_compiler_kwargs(cls, skip_sysroot=False, **kwargs):
-        r"""Update keyword arguments supplied to the compiler get_flags method
-        for various options.
-
-        Args:
-            skip_sysroot (bool, optional): If True, the isysroot flag will
-                not be added. Defaults to False.
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
-
-        Returns:
-            dict: Keyword arguments for a get_flags method providing compiler
-                flags.
-
-        """
-        out = super(CModelDriver, cls).update_compiler_kwargs(**kwargs)
-        if (not skip_sysroot) and (_osx_sysroot is not None):
-            out['isysroot'] = _osx_sysroot
-            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', False):
-                out['mmacosx-version-min'] = os.environ[
-                    'MACOSX_DEPLOYMENT_TARGET']
-        return out
-        
     @classmethod
     def call_linker(cls, obj, language=None, **kwargs):
         r"""Link several object files to create an executable or library (shared
@@ -598,7 +616,11 @@ class CModelDriver(CompiledModelDriver):
             return super(CModelDriver, cls).get_json_type(native_type)
         out = {}
         regex_var = r'(?P<type>.+?(?P<precision>\d*)(?:_t)?)\s*(?P<pointer>\**)'
-        grp = re.fullmatch(regex_var, native_type).groupdict()
+        if backwards.PY2:  # pragma: Python 2
+            grp = re.search(r'^' + regex_var + r'$',
+                            native_type).groupdict()
+        else:
+            grp = re.fullmatch(regex_var, native_type).groupdict()
         if grp.get('precision', False):
             out['precision'] = int(grp['precision'])
             grp['type'] = grp['type'].replace(grp['precision'], 'X')
@@ -607,9 +629,9 @@ class CModelDriver(CompiledModelDriver):
             out['precision'] = 0
         else:
             if grp['type'] == 'double':
-                grp['type'] = 'float'
                 out['precision'] = 8 * 8
             elif grp['type'] == 'float':
+                grp['type'] = 'double'
                 out['precision'] = 4 * 8
             elif grp['type'] in ['int', 'uint']:
                 grp['type'] += 'X_t'
@@ -785,9 +807,9 @@ class CModelDriver(CompiledModelDriver):
             assert(isinstance(datatype['items'], list))
             keys['nitems'] = len(datatype['items'])
             keys['items'] = '%s_items' % name
-            fmt = 'get_json_array_type({nitems}, {items})'
-            out += [('MetaschemaType** %s = '
-                     '(MetaschemaType**)malloc(%d*sizeof(MetaschemaType*));')
+            fmt = 'create_dtype_json_array({nitems}, {items})'
+            out += [('dtype_t** %s = '
+                     '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
                     % (keys['items'], keys['nitems'])]
             for i, x in enumerate(datatype['items']):
                 out += cls.write_native_type_definition(
@@ -800,9 +822,9 @@ class CModelDriver(CompiledModelDriver):
             keys['nitems'] = len(datatype['properties'])
             keys['keys'] = '%s_keys' % name
             keys['values'] = '%s_vals' % name
-            fmt = 'get_json_object_type({nitems}, {keys}, {values})'
-            out += [('MetaschemaType** %s = '
-                     '(MetaschemaType**)malloc(%d*sizeof(MetaschemaType*));')
+            fmt = 'create_dtype_json_object({nitems}, {keys}, {values})'
+            out += [('dtype_t** %s = '
+                     '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
                     % (keys['values'], keys['nitems']),
                     ('char** %s = (char**)malloc(%d*sizeof(char*));')
                     % (keys['keys'], keys['nitems'])]
@@ -814,20 +836,20 @@ class CModelDriver(CompiledModelDriver):
             assert(isinstance(requires_freeing, list))
             requires_freeing += [keys['values'], keys['keys']]
         elif datatype['type'] in ['ply', 'obj']:
-            fmt = 'get_%s_type()' % datatype['type']
+            fmt = 'create_dtype_%s()' % datatype['type']
         elif datatype['type'] == '1darray':
-            fmt = ('get_1darray_type(\"{subtype}\", {precision}, {length}, '
+            fmt = ('create_dtype_1darray(\"{subtype}\", {precision}, {length}, '
                    '\"{units}\")')
             keys = {k: datatype[k] for k in ['subtype', 'precision', 'length']}
             keys['units'] = datatype.get('units', '')
         elif datatype['type'] in ['1darray', 'ndarray']:
-            fmt = ('get_ndarray_type(\"{subtype}\", {precision}, {ndim}, {shape}, '
+            fmt = ('create_dtype_ndarray(\"{subtype}\", {precision}, {ndim}, {shape}, '
                    '\"{units}\")')
             keys = {k: datatype[k] for k in ['subtype', 'precision', 'shape']}
             keys['ndim'] = len(keys['shape'])
             keys['units'] = datatype.get('units', '')
         else:
-            fmt = 'get_scalar_type(\"{subtype}\", {precision}, \"{units}\")'
+            fmt = 'create_dtype_scalar(\"{subtype}\", {precision}, \"{units}\")'
             keys = {}
             keys['subtype'] = datatype.get('subtype', datatype['type'])
             keys['units'] = datatype.get('units', '')
@@ -842,7 +864,7 @@ class CModelDriver(CompiledModelDriver):
         else:
             def_line = '%s = %s;' % (name, fmt.format(**keys))
             if not no_decl:
-                def_line = 'MetaschemaType* ' + def_line
+                def_line = 'dtype_t* ' + def_line
         out.append(def_line)
         return out
 

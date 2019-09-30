@@ -4,16 +4,16 @@ import shutil
 import logging
 from collections import OrderedDict
 from yggdrasil import platform, components
-from yggdrasil.drivers.CompiledModelDriver import (
-    CompilerBase, LinkerBase)
-from yggdrasil.drivers.BuildModelDriver import BuildModelDriver
+from yggdrasil.drivers.CompiledModelDriver import LinkerBase
+from yggdrasil.drivers.BuildModelDriver import (
+    BuildModelDriver, BuildToolBase)
 from yggdrasil.drivers import CModelDriver
 
 
 logger = logging.getLogger(__name__)
 
 
-class CMakeConfigure(CompilerBase):
+class CMakeConfigure(BuildToolBase):
     r"""CMake configuration tool."""
     toolname = 'cmake'
     languages = ['cmake', 'c', 'c++']
@@ -38,7 +38,7 @@ class CMakeConfigure(CompilerBase):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
-        CompilerBase.before_registration(cls)
+        BuildToolBase.before_registration(cls)
         if platform._is_win:  # pragma: windows
             if platform._is_64bit:
                 cls.default_flags.append('-DCMAKE_GENERATOR_PLATFORM=x64')
@@ -760,23 +760,4 @@ class CMakeModelDriver(BuildModelDriver):
                 out['definitions'].append(
                     'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
                     % os.environ['MACOSX_DEPLOYMENT_TARGET'])
-        return out
-    
-    def set_env(self, **kwargs):
-        r"""Get environment variables that should be set for the model process.
-
-        Args:
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
-
-        Returns:
-            dict: Environment variables for the model process.
-
-        """
-        out = super(CMakeModelDriver, self).set_env(**kwargs)
-        if hasattr(self.target_language_driver, 'update_ld_library_path'):
-            self.target_language_driver.update_ld_library_path(out)
-        # C++ may also need the C libraries
-        if self.target_language == 'c++':
-            out = CModelDriver.CModelDriver.update_ld_library_path(out)
         return out
