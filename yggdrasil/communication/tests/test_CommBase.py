@@ -515,7 +515,7 @@ class TestCommBase(YggTestClassInfo):
         if isinstance(msg, backwards.string_types):
             statement = '%x% != ' + repr(msg)
         else:
-            statement = 'repr(%x%) != "' + repr(msg) + '"'
+            statement = 'repr(%x%) != r"' + repr(msg) + '"'
         return StatementFilter(statement=statement)
 
     def get_filter_function(self, msg, direction):
