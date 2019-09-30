@@ -438,7 +438,7 @@ class YggRunner(YggClass):
             srv['clients'].remove(model['name'])
             # Stop server if there are not any more clients
             if len(srv['clients']) == 0:
-                iod = self.inputdrivers[srv_name]
+                iod = self.inputdrivers['%s:%s' % (srv_name, srv_name)]
                 iod['instance'].on_client_exit()
                 srv['instance'].stop()
 
