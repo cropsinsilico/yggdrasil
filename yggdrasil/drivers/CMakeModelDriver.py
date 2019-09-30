@@ -4,16 +4,16 @@ import shutil
 import logging
 from collections import OrderedDict
 from yggdrasil import platform, components
-from yggdrasil.drivers.CompiledModelDriver import (
-    CompilerBase, LinkerBase)
-from yggdrasil.drivers.BuildModelDriver import BuildModelDriver
+from yggdrasil.drivers.CompiledModelDriver import LinkerBase
+from yggdrasil.drivers.BuildModelDriver import (
+    BuildModelDriver, BuildToolBase)
 from yggdrasil.drivers import CModelDriver
 
 
 logger = logging.getLogger(__name__)
 
 
-class CMakeConfigure(CompilerBase):
+class CMakeConfigure(BuildToolBase):
     r"""CMake configuration tool."""
     toolname = 'cmake'
     languages = ['cmake', 'c', 'c++']
@@ -38,7 +38,7 @@ class CMakeConfigure(CompilerBase):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
-        CompilerBase.before_registration(cls)
+        BuildToolBase.before_registration(cls)
         if platform._is_win:  # pragma: windows
             if platform._is_64bit:
                 cls.default_flags.append('-DCMAKE_GENERATOR_PLATFORM=x64')
