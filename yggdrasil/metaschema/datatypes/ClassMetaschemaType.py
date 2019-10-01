@@ -81,8 +81,6 @@ class ClassMetaschemaType(MetaschemaType):
             if not moddir:
                 raise
             sys.path.append(os.path.abspath(moddir))
-            if platform._is_win:  # pragma: windows
-                print('path', obj, pkg_mod, os.path.abspath(moddir), mod)
             modobj = importlib.import_module(mod)
         if not hasattr(modobj, fun):
             raise AttributeError("Module %s has no %s %s"
