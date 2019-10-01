@@ -95,13 +95,17 @@ before_install:
       pip uninstall -y numpy
       pip uninstall -y matplotlib
       conda info -a
-      
+
+      echo "TRAVIS_OS_NAME = ${TRAVIS_OS_NAME}"
       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
         # Install older Mac SDK so that conda llvm (7) can be used
         # https://github.com/conda-forge/mpi-feedstock/issues/4
         export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-10.9}
         export CONDA_BUILD_SYSROOT="$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk"
         export SDKROOT=${CONDA_BUILD_SYSROOT}
+	echo "MACOSX_DEPLOYMENT_TARGET = ${MACOSX_DEPLOYMENT_TARGET}"
+	echo "CONDA_BUILD_SYSROOT = ${CONDA_BUILD_SYSROOT}"
+	echo "SDKROOT = ${SDKROOT}"
 
         if [[ ! -d ${CONDA_BUILD_SYSROOT} || "$OSX_FORCE_SDK_DOWNLOAD" == "1" ]]; then
           echo "Downloading ${MACOSX_DEPLOYMENT_TARGET} sdk to ${CONDA_BUILD_SYSROOT}"
