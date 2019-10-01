@@ -9,6 +9,8 @@ from yggdrasil.drivers.CompiledModelDriver import (
 class BuildToolBase(CompilerBase):
     r"""Base class for build tools."""
 
+    is_build_tool = True
+
     @classmethod
     def get_default_target_language(cls):
         r"""Determine the default target language for the build tool.

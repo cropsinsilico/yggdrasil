@@ -313,7 +313,7 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
             old_tools[k] = getattr(self.instance, '%s_tool' % k, None)
         # Compile with each compiler
         for k, v in self.import_cls.get_available_tools('compiler').items():
-            if not v.is_installed():
+            if (not v.is_installed()) or getattr(v, 'is_build_tool', False):
                 continue
             setattr(self.instance, 'compiler_tool', v)
             setattr(self.instance, 'linker_tool', v.linker())
