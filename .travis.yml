@@ -103,9 +103,9 @@ before_install:
         export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-10.9}
         export CONDA_BUILD_SYSROOT="$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk"
         export SDKROOT=${CONDA_BUILD_SYSROOT}
-	echo "MACOSX_DEPLOYMENT_TARGET = ${MACOSX_DEPLOYMENT_TARGET}"
-	echo "CONDA_BUILD_SYSROOT = ${CONDA_BUILD_SYSROOT}"
-	echo "SDKROOT = ${SDKROOT}"
+        echo "MACOSX_DEPLOYMENT_TARGET = ${MACOSX_DEPLOYMENT_TARGET}"
+        echo "CONDA_BUILD_SYSROOT = ${CONDA_BUILD_SYSROOT}"
+        echo "SDKROOT = ${SDKROOT}"
 
         if [[ ! -d ${CONDA_BUILD_SYSROOT} || "$OSX_FORCE_SDK_DOWNLOAD" == "1" ]]; then
           echo "Downloading ${MACOSX_DEPLOYMENT_TARGET} sdk to ${CONDA_BUILD_SYSROOT}"
