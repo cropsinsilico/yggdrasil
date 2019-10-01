@@ -1,10 +1,7 @@
-from yggdrasil.communication import CommBase, get_comm
-from yggdrasil.communication.ForkComm import get_comm_name
-# , _address_sep
-from yggdrasil.components import import_component
+from yggdrasil.communication import MultiComm
 
 
-class CompComm(CommBase.CommBase):
+class CompComm(MultiComm.MultiComm):
     r"""Class for receiving/sending composite messages from/to multiple comms.
 
     Args:
@@ -19,92 +16,23 @@ class CompComm(CommBase.CommBase):
 
     """
 
-    _dont_register = True
+    _schema_properties = {'concatenate': {'type': 'boolean', 'default': False}}
     
-    def __init__(self, name, comm=None, **kwargs):
-        self.comm_list = []
-        self.recv_backlog = []
-        address = kwargs.pop('address', None)
-        if (comm in [None, 'CompComm']):
-            if isinstance(address, list):
-                ncomm = len(address)
-            else:
-                ncomm = 0
-            comm = [None for i in range(ncomm)]
-        assert(isinstance(comm, list))
-        ncomm = len(comm)
-        for i in range(ncomm):
-            if comm[i] is None:
-                comm[i] = {}
-            if comm[i].get('name', None) is None:
-                comm[i]['name'] = get_comm_name(name, i)
-        if isinstance(address, list):
-            assert(len(address) == ncomm)
-            for i in range(ncomm):
-                comm[i]['address'] = address[i]
-        for i in range(ncomm):
-            ikw = dict(**kwargs)
-            ikw.update(**comm[i])
-            iname = ikw.pop('name')
-            self.comm_list.append(get_comm(iname, **ikw))
-            self.recv_backlog.append([])
-        if ncomm > 0:
-            kwargs['address'] = [x.address for x in self.comm_list]
-        kwargs['comm'] = 'CompComm'
-        super(CompComm, self).__init__(name, **kwargs)
-        assert(not self.single_use)
-        assert(not self.is_server)
-        assert(not self.is_client)
-
-    def printStatus(self, nindent=0):
-        r"""Print status of the communicator."""
-        super(CompComm, self).printStatus(nindent=nindent)
-        for x, fields in zip(self.comm_list, self.comm_fields):
-            extra_lines = ['%-15s: %s' % ('fields', fields)]
-            x.printStatus(nindent=nindent + 1, extra_lines=extra_lines)
-
-    def __len__(self):
-        return len(self.comm_list)
-
+    def __init__(self, *args, **kwargs):
+        kwargs['composite'] = True
+        super(CompComm, self).__init__(*args, **kwargs)
+        self.recv_backlog = [[] for _ in range(len(self))]
+        assert(self.composite)
+        
     @property
-    def maxMsgSize(self):
-        r"""int: Maximum size of a single message that should be sent."""
-        return min([x.maxMsgSize for x in self.comm_list])
-
-    @classmethod
-    def new_comm_kwargs(cls, name, *args, **kwargs):
-        r"""Get keyword arguments for new comm."""
-        if 'address' not in kwargs:
-            addresses = []
-            comm = kwargs.get('comm', None)
-            ncomm = kwargs.pop('ncomm', 0)
-            if comm is None:
-                comm = [None for i in range(ncomm)]
-            assert(isinstance(comm, list))
-            ncomm = len(comm)
-            for i in range(ncomm):
-                x = comm[i]
-                if x is None:
-                    x = {}
-                iname = x.pop('name', get_comm_name(name, i))
-                icls = import_component('comm', x.get('comm', None))
-                _, ickw = icls.new_comm_kwargs(iname, **x)
-                ickw['name'] = iname
-                comm[i] = ickw
-                addresses.append(ickw['address'])
-            kwargs['comm'] = comm
-            kwargs['address'] = addresses
-        args = tuple([name] + list(args))
-        return args, kwargs
-
-    @property
-    def opp_comms(self):
-        r"""dict: Name/address pairs for opposite comms."""
-        out = super(CompComm, self).opp_comms
-        out.pop(self.name)
-        for x in self.comm_list:
-            out.update(**x.opp_comms)
-        return out
+    def empty_obj_recv(self):
+        r"""obj: Empty message object."""
+        if self.serializer.initialized:
+            emsg, _ = self.deserialize(self.empty_bytes_msg)
+        else:
+            emsg = []
+        emsg = self.apply_recv_converter(emsg)
+        return emsg
 
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
@@ -115,30 +43,28 @@ class CompComm(CommBase.CommBase):
 
         """
         kwargs = super(CompComm, self).opp_comm_kwargs()
-        kwargs['comm'] = [x.opp_comm_kwargs() for x in self.comm_list]
+        kwargs['concatenate'] = self.concatenate
         return kwargs
+        
+    def get_field_names(self):
+        r"""Determine the field names associated with messages that will
+        be sent/received by this comm.
 
-    def bind(self):
-        r"""Bind in place of open."""
-        for x in self.comm_list:
-            x.bind()
+        Returns:
+            list: Field names.
 
-    def open(self):
-        r"""Open the connection."""
-        for x in self.comm_list:
-            x.open()
-
-    def close(self, *args, **kwargs):
-        r"""Close the connection."""
-        for x in self.comm_list:
-            x.close(*args, **kwargs)
-
-    def close_in_thread(self, *args, **kwargs):  # pragma: debug
-        r"""In a new thread, close the comm when it is empty."""
-        # for x in self.comm_list:
-        #     x.close_in_thread(*args, **kwargs)
-        raise Exception("CompComm should not be closed in thread.")
-
+        """
+        out = []
+        for i, x in enumerate(self.comm_list):
+            iout = x.get_field_names()
+            if iout is None:
+                continue
+            if self.concatenate:
+                out += iout
+            else:
+                out.append(iout)
+        return out
+        
     @property
     def is_open(self):
         r"""bool: True if the connection is open."""
@@ -148,39 +74,10 @@ class CompComm(CommBase.CommBase):
         return True
 
     @property
-    def is_confirmed_send(self):
-        r"""bool: True if all sent messages have been confirmed."""
-        for x in self.comm_list:
-            if not x.is_confirmed_send:  # pragma: debug
-                return False
-        return True
-
-    @property
-    def is_confirmed_recv(self):
-        r"""bool: True if all received messages have been confirmed."""
-        for x in self.comm_list:
-            if not x.is_confirmed_recv:  # pragma: debug
-                return False
-        return True
-
-    def confirm_send(self, noblock=False):
-        r"""Confirm that sent message was received."""
-        for x in self.comm_list:
-            if not x.confirm_send(noblock=noblock):  # pragma: debug
-                return False
-        return True
-
-    def confirm_recv(self, noblock=False):
-        r"""Confirm that message was received."""
-        for x in self.comm_list:
-            if not x.confirm_recv(noblock=noblock):  # pragma: debug
-                return False
-        return True
-
-    @property
     def n_msg_recv(self):
         r"""int: The number of incoming messages in the connection."""
-        return max([x.n_msg_recv for x in self.comm_list])
+        return max([x.n_msg_recv + len(backlog) for x, backlog
+                    in zip(self.comm_list, self.recv_backlog)])
 
     @property
     def n_msg_send(self):
@@ -197,27 +94,47 @@ class CompComm(CommBase.CommBase):
         r"""int: The number of outgoing messages in the connection to drain."""
         return max([x.n_msg_send_drain for x in self.comm_list])
 
-    def send(self, *args, **kwargs):
+    def update_serializer_from_components(self):
+        r"""Update the serializer datatype to reflect the datatypes
+        of the component comm serializers."""
+        if not self.serializer.initialized:
+            datatype = {'type': 'array',
+                        'items': [x.serializer.typedef for
+                                  x in self.comm_list]}
+            self.serializer.update_serializer(datatype=datatype)
+        
+    def send_multipart(self, msg, **kwargs):
         r"""Send a message.
 
         Args:
-            *args: All arguments are assumed to be part of the message.
+            msg (obj): Message to be sent.
             **kwargs: All keywords arguments are passed to comm _send method.
 
         Returns:
             bool: Success or failure of send.
 
         """
-        if (len(args) == 1) and self.is_eof(args[0]):
-            args = tuple([(x.eof_msg, ) for x in self.comm_list])
-        assert(len(args) == len(self))
-        for x, iargs in zip(self.comm_list, args):
-            out = x.send(*iargs, **kwargs)
+        header_kwargs = kwargs.get('header_kwargs', {})
+        for k in ['field_names', 'key_order']:
+            header_kwargs.pop(k, None)
+        kwargs['header_kwargs'] = header_kwargs
+        is_single = (len(msg) == 1)
+        if is_single:
+            msg = msg[0]
+        msg = self.apply_send_converter(msg)
+        if self.is_eof(msg):
+            msg = tuple([(x.eof_msg, ) for x in self.comm_list])
+        assert(len(msg) == len(self))
+        for x, imsg in zip(self.comm_list, msg):
+            if not isinstance(imsg, (list, tuple)):
+                imsg = (imsg, )
+            out = x.send(*imsg, **kwargs)
             if not out:
                 return out
+        self.update_serializer_from_components()
         return out
 
-    def recv(self, *args, **kwargs):
+    def recv_multipart(self, *args, **kwargs):
         r"""Receive a message.
 
         Args:
@@ -238,7 +155,7 @@ class CompComm(CommBase.CommBase):
         all_out = False
         out = [(False, None) for _ in range(len(self))]
         from_backlog = [False for _ in range(len(self))]
-        while ((not T.is_out) or first_comm) and self.is_open and (not all_out):
+        while ((not T.is_out) or first_comm) and (not all_out):
             for i in range(len(self)):
                 if out[i][1] is None:
                     if self.recv_backlog[i]:
@@ -250,18 +167,21 @@ class CompComm(CommBase.CommBase):
                             flag, msg = x.recv(*args, **kwargs)
                             if x.is_eof(msg) or (not x.is_empty_recv(msg)):
                                 out[i] = (flag, msg)
+                        else:
+                            break
             first_comm = False
-            all_out = all([x is not None for x in out])
+            all_out = all([x[1] is not None for x in out])
             if not all_out:
                 self.sleep()
         self.stop_timeout(key_suffix='recv:forkd')
-        if any([x is None for x in out]):
+        if any([x[1] is None for x in out]):
             # Put unused messages in backlog
             for i in range(len(self)):
-                if from_backlog[i]:
-                    self.recv_backlog[i].insert(0, out[i])
-                else:
-                    self.recv_backlog[i].append(out[i])
+                if out[i][1] is not None:
+                    if from_backlog[i]:
+                        self.recv_backlog[i].insert(0, out[i])
+                    else:
+                        self.recv_backlog[i].append(out[i])
             if self.is_closed:
                 self.debug('Comm closed')
                 out = (False, None)
@@ -274,7 +194,8 @@ class CompComm(CommBase.CommBase):
                     raise RuntimeError("EOF not received from all comms.")
                 out = (self.on_recv_eof(), self.eof_msg)
             else:
-                out = (True, [x[1] for x in out])
+                out = (True, self.apply_recv_converter([x[1] for x in out]))
+                self.update_serializer_from_components()
         return out
 
     def purge(self):
@@ -282,3 +203,31 @@ class CompComm(CommBase.CommBase):
         super(CompComm, self).purge()
         for x in self.comm_list:
             x.purge()
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                send (list): List of objects to send to test file.
+                recv (list): List of objects that will be received from a test
+                    file that was sent the messages in 'send'.
+                contents (bytes): Bytes contents of test file created by sending
+                    the messages in 'send'.
+
+        """
+        kwargs.setdefault('table_example', True)
+        kwargs.setdefault('include_oldkws', True)
+        out = super(CompComm, cls).get_testing_options(**kwargs)
+        out['kwargs']['ncomm'] = len(out['msg'])
+        out['kwargs'].pop('format_str', None)
+        out['kwargs']['composite'] = True
+        out['kwargs']['concatenate'] = True
+        return out

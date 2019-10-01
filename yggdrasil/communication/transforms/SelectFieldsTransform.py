@@ -90,6 +90,19 @@ class SelectFieldsTransform(TransformBase):
                                           for k in self.selected}
         return datatype
     
+    def transform_field_names(self, field_names):
+        r"""Determine the field names that will result from applying the
+        transform to the supplied field_names.
+        
+        Args:
+            field_names (list): Field names to transform.
+
+        Returns:
+            list: Transformed field names.
+
+        """
+        return copy.deepcopy(self.selected)
+        
     def evaluate_transform(self, x, no_copy=False):
         r"""Call transform on the provided message.
 

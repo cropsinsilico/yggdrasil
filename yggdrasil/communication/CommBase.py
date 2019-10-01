@@ -671,7 +671,7 @@ class CommBase(tools.YggClass):
     def comm_class(self):
         r"""str: Name of communication class."""
         # TODO: Change this to return self._commtype
-        if self._comm_class is None:
+        if getattr(self, '_comm_class', None) is None:
             if getattr(self, '_is_error_class', False):
                 name_cls = self.__class__.__bases__[0]
             else:
@@ -995,6 +995,8 @@ class CommBase(tools.YggClass):
             object: Converted message.
  
         """
+        if self.is_eof(msg_in):
+            return msg_in
         if self.recv_converter:
             self.debug("Applying converters to received message.")
         msg_out = msg_in
@@ -1024,6 +1026,8 @@ class CommBase(tools.YggClass):
             object: Converted message.
  
         """
+        if self.is_eof(msg_in):
+            return msg_in
         if self.send_converter:
             self.debug("Applying converters to message being sent.")
         msg_out = msg_in
@@ -1300,6 +1304,23 @@ class CommBase(tools.YggClass):
         return c
 
     # SERIALIZATION/DESERIALIZATION METHODS
+    def get_field_names(self):
+        r"""Determine the field names associated with messages that will
+        be sent/received by this comm.
+
+        Returns:
+            list: Field names.
+
+        """
+        out = self.serializer.get_field_names()
+        if self.direction == 'recv':
+            for iconv in self.recv_converter:
+                if hasattr(iconv, 'transform_field_names'):
+                    out = iconv.transform_field_names()
+        else:
+            pass
+        return out
+
     def serialize(self, *args, **kwargs):
         r"""Serialize a message using the associated serializer."""
         # Don't send metadata for files
@@ -1437,7 +1458,7 @@ class CommBase(tools.YggClass):
             return False, self.empty_bytes_msg, work_comm
         if len(msg) == 1:
             msg = msg[0]
-        if isinstance(msg, backwards.bytes_type) and (msg == self.eof_msg):
+        if self.is_eof(msg):
             flag, msg_s = self.on_send_eof()
         else:
             flag = True
@@ -1804,7 +1825,7 @@ class CommBase(tools.YggClass):
             kwargs.setdefault('key_order', kwargs.pop('field_order'))
         if 'key_order' in kwargs:
             metadata['key_order'] = kwargs.pop('key_order')
-        metadata.setdefault('key_order', self.serializer.get_field_names())
+        metadata.setdefault('key_order', self.get_field_names())
         if (((metadata['key_order'] is None)
              and isinstance(args_dict, dict)
              and (len(args_dict) <= 1))):
@@ -1839,11 +1860,11 @@ class CommBase(tools.YggClass):
         if flag and (not self.is_eof(msg)):
             if self.serializer.typedef['type'] == 'array':
                 metadata = copy.deepcopy(self._last_header)
-                # if metadata is None:
-                #     metadata = {}
+                if metadata is None:
+                    metadata = {}
                 if key_order is not None:
                     metadata['key_order'] = key_order
-                metadata.setdefault('key_order', self.serializer.get_field_names())
+                metadata.setdefault('key_order', self.get_field_names())
                 msg_dict = JSONObjectMetaschemaType.coerce_type(msg, **metadata)
             else:
                 msg_dict = {'f0': msg}

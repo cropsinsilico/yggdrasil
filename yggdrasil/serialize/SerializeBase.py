@@ -348,20 +348,26 @@ class SerializeBase(tools.YggClass):
         """
         if getattr(self, 'field_names', None) is not None:
             out = self.field_names
-        elif self.typedef['type'] != 'array':
+        elif (((not self.initialized)
+               and self.extra_kwargs.get('field_names', None))):
+            out = self.extra_kwargs['field_names']
+        elif self.typedef['type'] == 'array':
+            if isinstance(self.typedef['items'], dict):  # pragma: debug
+                raise Exception("Variable number of items not yet supported.")
+            elif isinstance(self.typedef['items'], list):
+                out = []
+                any_names = False
+                for i, x in enumerate(self.typedef['items']):
+                    out.append(x.get('title', 'f%d' % i))
+                    if len(x.get('title', '')) > 0:
+                        any_names = True
+                # Don't use field names if they are all defaults
+                if not any_names:
+                    out = None
+        elif 'title' in self.typedef:
+            out = [self.typedef['title']]
+        else:
             out = None
-        elif isinstance(self.typedef['items'], dict):  # pragma: debug
-            raise Exception("Variable number of items not yet supported.")
-        elif isinstance(self.typedef['items'], list):
-            out = []
-            any_names = False
-            for i, x in enumerate(self.typedef['items']):
-                out.append(x.get('title', 'f%d' % i))
-                if len(x.get('title', '')) > 0:
-                    any_names = True
-            # Don't use field names if they are all defaults
-            if not any_names:
-                out = None
         if (out is not None):
             if as_bytes:
                 out = [backwards.as_bytes(x) for x in out]
@@ -385,6 +391,9 @@ class SerializeBase(tools.YggClass):
             return None
         if getattr(self, 'field_units', None) is not None:
             out = self.field_units
+        elif (((not self.initialized)
+               and self.extra_kwargs.get('field_units', None))):
+            out = self.extra_kwargs['field_units']
         elif isinstance(self.typedef['items'], dict):  # pragma: debug
             raise Exception("Variable number of items not yet supported.")
         elif isinstance(self.typedef['items'], list):
@@ -558,7 +567,7 @@ class SerializeBase(tools.YggClass):
             if v is None:
                 continue
             # Check status
-            if ((k != 'format_str') and (typedef.get('type', None) != 'array')):
+            if ((k != 'format_str') and (typedef.get('type', None) is None)):
                 continue
             # Key specific changes to type
             if k == 'format_str':
@@ -600,16 +609,21 @@ class SerializeBase(tools.YggClass):
                     tk = 'title'
                 else:
                     tk = 'units'
-                if isinstance(typedef['items'], dict):
-                    typedef['items'] = [copy.deepcopy(typedef['items'])
-                                        for _ in range(len(v))]
-                assert(len(v) == len(typedef.get('items', [])))
-                # if len(v) != len(typedef.get('items', [])):
-                #     warnings.warn('%d %ss provided, but only %d items in typedef.'
-                #                   % (len(v), k, len(typedef.get('items', []))))
-                #     continue
+                if typedef['type'] == 'array':
+                    if isinstance(typedef['items'], dict):
+                        typedef['items'] = [copy.deepcopy(typedef['items'])
+                                            for _ in range(len(v))]
+                    items = typedef.get('items', [])
+                elif typedef['type'] == 'object':
+                    items = list(typedef.get('properties', {}).values())
+                else:
+                    items = [typedef]
+                if len(v) != len(items):  # pragma: debug
+                    warnings.warn('%d %ss provided, but only %d items in typedef (%s).'
+                                  % (len(v), k, len(items), typedef['type']))
+                    continue
                 all_updated = True
-                for iv, itype in zip(v, typedef.get('items', [])):
+                for iv, itype in zip(v, items):
                     if tk in itype:
                         all_updated = False
                     itype.setdefault(tk, iv)

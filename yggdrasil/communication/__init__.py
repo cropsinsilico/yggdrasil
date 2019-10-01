@@ -36,13 +36,17 @@ def determine_suffix(no_suffix=False, reverse_names=False,
     return suffix
 
 
-def new_comm(name, comm=None, **kwargs):
+def new_comm(name, comm=None, composite=False, **kwargs):
     r"""Return a new communicator, creating necessary components for
     communication (queues, sockets, channels, etc.).
 
     Args:
         name (str): Communicator name.
-        comm (str, optional): Name of communicator class.
+        comm (str, list, optional): Name of communicator class.
+        composite (bool, optional): If True and a list of comms is
+            provided, a CompComm object will be returned. If False
+            and a list of comms is provided, a ForkComm object will be
+            returned. Defaults to False.
         **kwargs: Additional keyword arguments are passed to communicator
             class method new_comm.
 
@@ -54,10 +58,13 @@ def new_comm(name, comm=None, **kwargs):
         if len(comm) == 1:
             kwargs.update(comm[0])
             kwargs.setdefault('name', name)
-            return new_comm(**kwargs)
+            return new_comm(composite=composite, **kwargs)
         else:
             kwargs['comm'] = comm
-            comm = 'ForkComm'
+            if composite:
+                comm = 'CompComm'
+            else:
+                comm = 'ForkComm'
     comm_cls = import_component('comm', comm)
     if comm in ['DefaultComm', 'default']:
         commtype = kwargs.pop('commtype', 'default')
