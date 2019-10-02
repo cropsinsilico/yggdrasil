@@ -81,7 +81,10 @@ class CPPModelDriver(CModelDriver):
         try_except='}} catch ({error_type} {error_var}) {{',
         function_def_regex=(r'(?P<flag_type>.+?)\s*{function_name}\s*'
                             r'\((?P<inputs>(?:[^)&])*?)'
-                            r'(?:,\s*(?P<outputs>(?:[^)])*?&(?:[^)])*?))?\)\s*\{{'),
+                            r'(?:,\s*(?P<outputs>(?:[^)])*?&(?:[^)])*?))?\)\s*\{{'
+                            r'(?:.*?\n?)*?'
+                            r'(?:return +(?P<flag_var>.+?)?;'
+                            r'(?:.*?\n?)*?)?\}}'),
         outputs_def_regex=(r'\s*(?P<native_type>.+?)(\s+)?'
                            r'(?P<ref>&)(?(1)(?:\s*)|(?:\s+))'
                            r'(?P<name>.+?)\s*(?:,|$)(?:\n)?'))
@@ -181,13 +184,17 @@ class CPPModelDriver(CModelDriver):
         return super(CModelDriver, cls).input2output(var)
 
     @classmethod
-    def prepare_output_variables(cls, vars_list, in_inputs=False):
+    def prepare_output_variables(cls, vars_list, in_definition=False,
+                                 in_inputs=False):
         r"""Concatenate a set of output variables such that it can be passed as
         a single string to the function_call parameter.
 
         Args:
             vars_list (list): List of variable names to concatenate as output
                 from a function call.
+            in_definition (bool, optional): If True, the returned sequence
+                will be of the format required for specifying output
+                variables in a function definition. Defaults to False.
             in_inputs (bool, optional): If True, the output variables should
                 be formated to be included as input variables. Defaults to
                 False.
@@ -197,8 +204,18 @@ class CPPModelDriver(CModelDriver):
 
         """
         if in_inputs:
-            vars_list = copy.deepcopy(vars_list)
-            for y in vars_list:
-                if not y.get('ref', False):
-                    y['name'] = '&' + y['name']
-        return super(CModelDriver, cls).prepare_output_variables(vars_list)
+            if in_definition:
+                vars_list = [dict(y, name='&' + y['name'])
+                             for y in vars_list]
+            else:
+                vars_list = copy.deepcopy(vars_list)
+                for y in vars_list:
+                    if not y.get('ref', False):
+                        y['name'] = '&' + y['name']
+        else:
+            # If the output is a True output and not passed as an input
+            # parameter, then the output should not include the type
+            # information that is added if in_definition is True.
+            in_definition = False
+        return super(CModelDriver, cls).prepare_output_variables(
+            vars_list, in_definition=in_definition, in_inputs=in_inputs)

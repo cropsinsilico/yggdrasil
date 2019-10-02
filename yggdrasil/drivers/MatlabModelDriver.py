@@ -477,7 +477,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'print': 'disp(\'{message}\');',
         'fprintf': 'fprintf(\'{message}\', {variables});',
         'error': 'error(\'{error_msg}\');',
-        'block_end': 'end;',
+        'block_end': 'end',
         'if_begin': 'if ({cond})',
         'if_elif': 'elseif ({cond})',
         'if_else': 'else',
@@ -487,6 +487,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'try_begin': 'try',
         'try_except': 'catch {error_var}',
         'assign': '{name} = {value};',
+        'functions_defined_last': True,
+        'function_def_begin': 'function {output_var} = {function_name}({input_var})',
         'function_def_regex': (r'function *(\[ *)?(?P<outputs>.*?)(?(1)\]) *'
                                r'= {function_name} *\((?P<inputs>(?:.|\n)*?)\)'),
         'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:(?:,(?: *... *\n)?)|$)',
@@ -560,6 +562,25 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 fd.write('\n'.join(lines))
             logger.debug("Wrote wrapper to: %s" % fname)
 
+    @classmethod
+    def run_code(cls, lines, **kwargs):
+        r"""Run code by first writing it as an executable and then calling
+        the driver.
+
+        Args:
+            lines (list): Lines of code to be wrapped as an executable.
+            **kwargs: Additional keyword arguments are passed to the
+                write_executable method.
+
+        """
+        kwargs.setdefault('process_kwargs', {})
+        if not kwargs['process_kwargs'].get('dont_wrap_error', False):
+            lines = cls.write_error_wrapper(
+                None, lines,
+                matlab_engine=kwargs.get('matlab_engine', None))
+            kwargs['process_kwargs']['dont_wrap_error'] = True
+        return super(MatlabModelDriver, cls).run_code(lines, **kwargs)
+        
     @classmethod
     def run_executable(cls, args, dont_wrap_error=False, fname_wrapper=None,
                        matlab_engine=None, **kwargs):

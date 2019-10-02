@@ -76,6 +76,8 @@ class PythonModelDriver(InterpretedModelDriver):
         'exec_begin': 'def main():',
         'exec_suffix': ('if __name__ == "__main__":\n'
                         '    main()'),
+        'function_def_begin': 'def {function_name}({input_var}):',
+        'return': 'return {output_var}',
         'function_def_regex': (r'\n?( *)def +{function_name}'
                                r' *\((?P<inputs>(?:.|\n)*?)\) *:'
                                r'(?:(?:\1(?:    )+(?!return).*\n)|(?: *\n))*'

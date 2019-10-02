@@ -1176,14 +1176,24 @@ class ModelDriver(Driver):
         source_products = self.source_products + self.wrapper_products
         remove_products(products, source_products, timer_class=self)
             
+    @classmethod
+    def cleanup_dependencies(cls, products=[]):
+        r"""Cleanup dependencies."""
+        for x in products:
+            if os.path.isfile(x):
+                print("Removing %s" % x)
+                os.remove(x)
+                
     # Methods for automated model wrapping
     @classmethod
-    def run_code(cls, lines, **kwargs):
+    def run_code(cls, lines, process_kwargs={}, **kwargs):
         r"""Run code by first writing it as an executable and then calling
         the driver.
 
         Args:
             lines (list): Lines of code to be wrapped as an executable.
+            process_kwargs (dict, optional): Keyword arguments that should
+                be passed to run_model. Defaults to {}.
             **kwargs: Additional keyword arguments are passed to the
                 write_executable method.
 
@@ -1200,7 +1210,7 @@ class ModelDriver(Driver):
         try:
             assert(os.path.isfile(fname))
             inst = cls(name, [fname], working_dir=working_dir)
-            inst.run_model(return_process=False)
+            inst.run_model(return_process=False, **process_kwargs)
         except BaseException:  # pragma: debug
             logger.error('Failed generated code:\n%s' % '\n'.join(lines))
             raise
@@ -1238,7 +1248,8 @@ class ModelDriver(Driver):
 
     @classmethod
     def parse_function_definition(cls, model_file, model_function,
-                                  contents=None, match=None):
+                                  contents=None, match=None,
+                                  expected_outputs=[], outputs_in_inputs=None):
         r"""Get information about the inputs & outputs to a model from its
         defintition if possible.
 
@@ -1250,11 +1261,22 @@ class ModelDriver(Driver):
                 If not provided, the function definition is read from model_file.
             match (re.Match, optional): Match object for the function regex. If
                 not provided, a search is performed using function_def_regex.
+            expected_outputs (list, optional): List of names or variable
+                information dictionaries for outputs that are expected
+                to be extracted from the function's definition. This
+                variable is only used if outputs_in_inputs is True and
+                outputs are not extracted from the function's defintion
+                using the regex for this language. Defaults to [].
+            outputs_in_inputs (bool, optional): If True, the outputs are
+                presented in the function definition as inputs. Defaults
+                to False.
 
         Returns:
             dict: Parameters extracted from the function definitions.
 
         """
+        if outputs_in_inputs is None:
+            outputs_in_inputs = cls.outputs_in_inputs
         out = {}
         if match or ('function_def_regex' in cls.function_param):
             if not match:
@@ -1288,6 +1310,17 @@ class ModelDriver(Driver):
                             igrp['datatype'] = cls.get_json_type(igrp['native_type'])
                         new_val.append(igrp)
                     out[io] = new_val
+        if outputs_in_inputs and expected_outputs and (not out.get('outputs', False)):
+            input_map = {x['name']: x for x in out['inputs']}
+            out['outputs'] = []
+            for o in expected_outputs:
+                if isinstance(o, dict):
+                    o = o['name']
+                if o not in input_map:  # pragma: debug
+                    raise ValueError(("Could not locate output variable "
+                                      "%s in input variables.") % o)
+                out['outputs'].append(cls.input2output(input_map[o]))
+                out['inputs'].remove(input_map[o])
         return out
 
     @classmethod
@@ -1313,7 +1346,8 @@ class ModelDriver(Driver):
     
     @classmethod
     def update_io_from_function(cls, model_file, model_function,
-                                inputs=[], outputs=[]):
+                                inputs=[], outputs=[], contents=None,
+                                outputs_in_inputs=None):
         r"""Update inputs/outputs from the function definition.
 
         Args:
@@ -1324,16 +1358,25 @@ class ModelDriver(Driver):
                 Defaults to [].
             outputs (list, optional): List of model outputs including types.
                 Defaults to [].
+            contents (str, optional): Contents of file to parse rather than
+                re-reading the file. Defaults to None and is ignored.
+            outputs_in_inputs (bool, optional): If True, the outputs are
+                presented in the function definition as inputs. Defaults
+                to False.
 
         """
-        if isinstance(model_file, str) and os.path.isfile(model_file):
-            info = cls.parse_function_definition(model_file, model_function)
+        if outputs_in_inputs is None:
+            outputs_in_inputs = cls.outputs_in_inputs
+        if (((isinstance(model_file, str) and os.path.isfile(model_file))
+             or (contents is not None))):
+            info = cls.parse_function_definition(model_file, model_function,
+                                                 contents=contents)
         else:
             info = {"inputs": [], "outputs": []}
         info_map = {io: OrderedDict([(x['name'], x) for x in info.get(io, [])])
                     for io in ['inputs', 'outputs']}
         # Move variables if outputs in inputs
-        if cls.outputs_in_inputs:
+        if outputs_in_inputs:
             if ((len(inputs) + len(outputs)) == len(info['inputs'])):
                 for i, vdict in enumerate(info['inputs'][:len(inputs)]):
                     if inputs[i].get('vars', False):
@@ -1353,7 +1396,7 @@ class ModelDriver(Driver):
         for io, io_var in zip(['inputs', 'outputs'], [inputs, outputs]):
             for x in io_var:
                 x['channel_name'] = x['name']
-                x['channel'] = (x['name'].split(':', 1)[1]
+                x['channel'] = (x['name'].split(':', 1)[-1]
                                 + '_%s_channel' % io[:-1])
                 for i, v in enumerate(x.get('vars', [])):
                     if v in info_map[io]:
@@ -1364,7 +1407,7 @@ class ModelDriver(Driver):
             for x in io_var:
                 if 'vars' not in x:
                     x['vars'] = [copy.deepcopy(x)]
-                    x['vars'][0]['name'] = x['name'].split(':', 1)[1]
+                    x['vars'][0]['name'] = x['name'].split(':', 1)[-1]
                 for v in x['vars']:
                     if isinstance(v.get('datatype', None), str):
                         v['datatype'] = {'type': v['datatype']}
@@ -1503,7 +1546,8 @@ class ModelDriver(Driver):
         return out
 
     @classmethod
-    def write_model_function_call(cls, model_function, flag_var, inputs, outputs):
+    def write_model_function_call(cls, model_function, flag_var, inputs, outputs,
+                                  outputs_in_inputs=None):
         r"""Write lines necessary to call the model function.
 
         Args:
@@ -1512,22 +1556,22 @@ class ModelDriver(Driver):
             flag_var (str): Name of variable that should be used as a flag.
             inputs (list): List of dictionaries describing inputs to the model.
             outputs (list): List of dictionaries describing outputs from the model.
+            outputs_in_inputs (bool, optional): If True, the outputs are
+                presented in the function definition as inputs. Defaults
+                to False.
 
         Returns:
             list: Lines required to carry out a call to a model function in
                 this language.
 
         """
-        if cls.outputs_in_inputs:
-            func_inputs = (cls.channels2vars(inputs)
-                           + [cls.prepare_output_variables(
-                               cls.channels2vars(outputs), in_inputs=True)])
-            func_outputs = [flag_var]
-        else:
-            func_inputs = cls.channels2vars(inputs)
-            func_outputs = cls.channels2vars(outputs)
+        if outputs_in_inputs is None:
+            outputs_in_inputs = cls.outputs_in_inputs
+        func_inputs = cls.channels2vars(inputs)
+        func_outputs = cls.channels2vars(outputs)
         out = cls.write_function_call(
-            model_function, inputs=func_inputs, outputs=func_outputs)
+            model_function, inputs=func_inputs, outputs=func_outputs,
+            flag_var=flag_var, outputs_in_inputs=outputs_in_inputs)
         return out
 
     @classmethod
@@ -1638,8 +1682,101 @@ class ModelDriver(Driver):
         return lines
 
     @classmethod
+    def write_function_def(cls, function_name, inputs=[], outputs=[],
+                           input_var=None, output_var=None,
+                           function_contents=[],
+                           dont_declare_output=False,
+                           outputs_in_inputs=False, **kwargs):
+        r"""Write a function definition.
+
+        Args:
+            function_name (str): Name fo the function being defined.
+            inputs (list, optional): List of inputs to the function.
+                Defaults to []. Ignored if input_var provided.
+            outputs (list, optional): List of outputs from the function.
+                Defaults to []. If not provided, no return call is
+                added to the function body. Ignored if output_var
+                provided.
+            input_var (str, optional): Full string specifying input in
+                the function definition. If not provided, this will be
+                created based on the contents of the inputs variable.
+            output_var (str, optional): Full string specifying output in
+                the function definition. If not provided, this will be
+                created based on the contents of the outputs variable.
+            function_contents (list, optional): List of lines comprising
+                the body of the function. Defaults to [].
+            dont_declare_output (bool, list, optional): If True, it is assumed
+                that any output variables are declared (for languages
+                that required declaration) in the function_contents.
+                If a list, only output variables that are not in the list
+                will be declared. Defaults to False.
+            outputs_in_inputs (bool, optional): If True, the outputs are
+                presented in the function definition as inputs. Defaults
+                to False.
+            **kwargs: Additional keyword arguments are passed to
+                cls.format_function_param.
+
+        Returns:
+            list: Lines completing the function call.
+
+        Raises:
+            NotImplementedError: If the function_param attribute for the
+                class is not defined.
+
+        """
+        if cls.function_param is None:
+            raise NotImplementedError("function_param attribute not set for"
+                                      "language '%s'" % cls.language)
+        out = []
+        flag_var = {}
+        if input_var is None:
+            input_var = cls.prepare_input_variables(
+                inputs, in_definition=True)
+        if output_var is None:
+            output_var = cls.prepare_output_variables(
+                outputs, in_inputs=outputs_in_inputs, in_definition=True)
+        if outputs_in_inputs:
+            input_var = cls.prepare_input_variables(
+                [input_var, output_var])
+            flag_var = kwargs.get('flag_var', 'flag')
+            if isinstance(flag_var, str):
+                flag_var = {'name': flag_var}
+            flag_var.setdefault('datatype', 'flag')
+            flag_var.setdefault('value', cls.function_param['true'])
+            outputs = [flag_var]
+            output_var = cls.prepare_output_variables(outputs)
+        out.append(cls.format_function_param(
+            'function_def_begin', function_name=function_name,
+            input_var=input_var, output_var=output_var, **kwargs))
+        if 'declare' in cls.function_param:
+            decl_outputs = []
+            if isinstance(dont_declare_output, list):
+                for o in outputs:
+                    if o['name'] not in dont_declare_output:
+                        decl_outputs.append(o)
+            elif not dont_declare_output:
+                decl_outputs = outputs
+            for o in decl_outputs:
+                out.append(cls.function_param['indent']
+                           + cls.write_declaration(**o))
+        if outputs_in_inputs:
+            out.append(cls.function_param['indent']
+                       + cls.format_function_param(
+                           'assign', **flag_var))
+        for x in function_contents:
+            out.append(cls.function_param['indent'] + x)
+        if output_var and ('return' in cls.function_param):
+            out.append(cls.function_param['indent']
+                       + cls.format_function_param(
+                           'return', output_var=output_var))
+        out.append(cls.function_param.get(
+            'function_def_end', cls.function_param['block_end']))
+        return out
+
+    @classmethod
     def write_function_call(cls, function_name, inputs=[], outputs=[],
-                            include_arg_count=False, **kwargs):
+                            include_arg_count=False,
+                            outputs_in_inputs=False, **kwargs):
         r"""Write a function call.
 
         Args:
@@ -1651,6 +1788,9 @@ class ModelDriver(Driver):
             include_arg_count (bool, optional): If True, the count of input
                 arguments is included as the first argument. Defaults to
                 False.
+            outputs_in_inputs (bool, optional): If True, the outputs are
+                presented in the function definition as inputs. Defaults
+                to False.
             **kwargs: Additional keyword arguments are passed to
                 cls.format_function_param.
 
@@ -1658,8 +1798,13 @@ class ModelDriver(Driver):
             list: Lines completing the function call.
 
         """
+
+        if outputs_in_inputs:
+            inputs = inputs + [cls.prepare_output_variables(
+                outputs, in_inputs=outputs_in_inputs)]
+            outputs = [kwargs.get('flag_var', 'flag')]
         if 'output_var' in kwargs:
-            nout = cls.split_variables(kwargs['output_var'])
+            nout = len(cls.split_variables(kwargs['output_var']))
         else:
             nout = len(outputs)
         kwargs.setdefault('input_var', cls.prepare_input_variables(inputs))
@@ -1682,7 +1827,8 @@ class ModelDriver(Driver):
         return out
         
     @classmethod
-    def write_executable(cls, lines, prefix=None, suffix=None):
+    def write_executable(cls, lines, prefix=None, suffix=None,
+                         function_definitions=None):
         r"""Return the lines required to complete a program that will run
         the provided lines.
 
@@ -1693,6 +1839,9 @@ class ModelDriver(Driver):
                 include statements).
             suffix (list, optional): Lines of code that should follow the
                 wrapped code. Defaults to None and is ignored.
+            function_definitions (list, optional): Lines of code defining
+                functions that will beused by the code contained in lines.
+                Defaults to None and is ignored.
 
         Returns:
             lines: Lines of code wrapping the provided lines with the
@@ -1712,6 +1861,10 @@ class ModelDriver(Driver):
             if not isinstance(prefix, (list, tuple)):
                 prefix = [prefix]
             out += prefix
+            out.append('')
+        if (((not cls.function_param.get('functions_defined_last', False))
+             and (function_definitions is not None))):
+            out += function_definitions
             out.append('')
         # Add code with begin/end book ends
         if ((('exec_begin' in cls.function_param)
@@ -1736,6 +1889,10 @@ class ModelDriver(Driver):
         if ((('exec_suffix' in cls.function_param)
              and (cls.function_param['exec_suffix'] not in lines))):
             out.append(cls.function_param['exec_suffix'])
+            out.append('')
+        if (((cls.function_param.get('functions_defined_last', False))
+             and (function_definitions is not None))):
+            out += function_definitions
             out.append('')
         return out
 
@@ -1814,6 +1971,23 @@ class ModelDriver(Driver):
                                          variable=name)
 
     @classmethod
+    def write_assign_to_output(cls, outputs_in_inputs=False, **kwargs):
+        r"""Write lines assigning a value to an output variable.
+
+        Args:
+            outputs_in_inputs (bool, optional): If True, outputs are passed
+                as input parameters. In some languages, this means that a
+                pointer or reference is passed (e.g. C) and so the assignment
+                should be to the memory indicated rather than the variable.
+                Defaults to False.
+
+        Returns:
+            list: Lines achieving assignment.
+
+        """
+        return [cls.format_function_param('assign', **kwargs)]
+
+    @classmethod
     def write_expand_single_element(cls, output_var):
         r"""Write lines allowing extraction of the only element from a single
         element array as a stand-alone variable if the variable is an array
@@ -1880,7 +2054,7 @@ class ModelDriver(Driver):
         return out
 
     @classmethod
-    def prepare_variables(cls, vars_list):
+    def prepare_variables(cls, vars_list, in_definition=False):
         r"""Concatenate a set of input variables such that it can be passed as a
         single string to the function_call parameter.
 
@@ -1888,6 +2062,9 @@ class ModelDriver(Driver):
             vars_list (list): List of variable dictionaries containing info
                 (e.g. names) that should be used to prepare a string representing
                 input/output to/from a function call.
+            in_definition (bool, optional): If True, the returned sequence
+                will be of the format required for specifying variables
+                in a function definition. Defaults to False.
 
         Returns:
             str: Concatentated variables list.
@@ -1905,7 +2082,7 @@ class ModelDriver(Driver):
         return ', '.join(name_list)
 
     @classmethod
-    def prepare_input_variables(cls, vars_list):
+    def prepare_input_variables(cls, vars_list, in_definition=False):
         r"""Concatenate a set of input variables such that it can be passed as a
         single string to the function_call parameter.
 
@@ -1913,15 +2090,19 @@ class ModelDriver(Driver):
             vars_list (list): List of variable dictionaries containing info
                 (e.g. names) that should be used to prepare a string representing
                 input to a function call.
+            in_definition (bool, optional): If True, the returned sequence
+                will be of the format required for specifying input
+                variables in a function definition. Defaults to False.
 
         Returns:
             str: Concatentated variables list.
 
         """
-        return cls.prepare_variables(vars_list)
+        return cls.prepare_variables(vars_list, in_definition=in_definition)
 
     @classmethod
-    def prepare_output_variables(cls, vars_list, in_inputs=False):
+    def prepare_output_variables(cls, vars_list, in_definition=False,
+                                 in_inputs=False):
         r"""Concatenate a set of output variables such that it can be passed as
         a single string to the function_call parameter.
 
@@ -1929,6 +2110,9 @@ class ModelDriver(Driver):
             vars_list (list): List of variable dictionaries containing info
                 (e.g. names) that should be used to prepare a string representing
                 output from a function call.
+            in_definition (bool, optional): If True, the returned sequence
+                will be of the format required for specifying output
+                variables in a function definition. Defaults to False.
             in_inputs (bool, optional): If True, the output variables should
                 be formated to be included as input variables. Defaults to
                 False.
@@ -1937,7 +2121,7 @@ class ModelDriver(Driver):
             str: Concatentated variables list.
 
         """
-        out = cls.prepare_variables(vars_list)
+        out = cls.prepare_variables(vars_list, in_definition=in_definition)
         if ((('multiple_outputs' in cls.function_param)
              and isinstance(vars_list, list) and (len(vars_list) > 1))):
             out = cls.format_function_param('multiple_outputs', outputs=out)
@@ -2092,11 +2276,3 @@ class ModelDriver(Driver):
         out.append(cls.function_param.get('try_end',
                                           cls.function_param['block_end']))
         return out
-
-    @classmethod
-    def cleanup_dependencies(cls, products=[]):
-        r"""Cleanup dependencies."""
-        for x in products:
-            if os.path.isfile(x):
-                print("Removing %s" % x)
-                os.remove(x)

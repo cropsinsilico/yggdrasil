@@ -158,12 +158,12 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         self.run_model_instance(with_valgrind=False, with_strace=True)
         
     # Tests for code generation
-    def run_generated_code(self, lines):
+    def run_generated_code(self, lines, **kwargs):
         r"""Write and run generated code."""
         if not self.import_cls.is_installed():
             return
         # Write code to a file
-        self.import_cls.run_code(lines)
+        self.import_cls.run_code(lines, **kwargs)
 
     def get_test_types(self):
         r"""Return the list of tuples mapping json type to expected native type."""
@@ -263,6 +263,60 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         lines = [self.import_cls.function_param['error'].format(error_msg=error_msg)]
         assert_raises(RuntimeError, self.import_cls.run_code, lines)
 
+    def test_write_function_def(self, inputs=None, outputs=None,
+                                outputs_in_inputs=None):
+        r"""Test writing and running a function definition."""
+        if self.import_cls.function_param is None:
+            self.assert_raises(NotImplementedError,
+                               self.import_cls.write_function_def, None)
+        else:
+            if inputs is None:
+                inputs = [{'name': 'x', 'value': 1.0,
+                           'datatype': {'type': 'float',
+                                        'precision': 32,
+                                        'units': 'cm'}}]
+            if outputs is None:
+                outputs = [{'name': 'y',
+                            'datatype': {'type': 'float',
+                                         'precision': 32,
+                                         'units': 'cm'}}]
+            if outputs_in_inputs is None:
+                outputs_in_inputs = self.import_cls.outputs_in_inputs
+            flag_var = {'name': 'flag',
+                        'datatype': 'flag',
+                        'value': self.import_cls.function_param['true']}
+            function_contents = self.import_cls.write_assign_to_output(
+                name='y', value='x',
+                outputs_in_inputs=outputs_in_inputs)
+            definition = self.import_cls.write_function_def(
+                'test_function', inputs=inputs, outputs=outputs,
+                function_contents=function_contents,
+                flag_var=flag_var, outputs_in_inputs=outputs_in_inputs)
+            lines = []
+            if 'declare' in self.import_cls.function_param:
+                for x in inputs + outputs:
+                    lines.append(self.import_cls.write_declaration(**x))
+                if outputs_in_inputs:
+                    lines.append(self.import_cls.write_declaration(**flag_var))
+            for x in inputs:
+                lines.append(self.import_cls.format_function_param(
+                    'assign', **x))
+            if outputs_in_inputs:
+                lines.append(self.import_cls.format_function_param(
+                    'assign', **flag_var))
+            parsed = self.import_cls.parse_function_definition(
+                None, 'test_function', contents='\n'.join(definition),
+                outputs_in_inputs=outputs_in_inputs,
+                expected_outputs=outputs)
+            inputs = parsed['inputs']
+            outputs = parsed['outputs']
+            lines += self.import_cls.write_function_call(
+                'test_function', flag_var=flag_var,
+                inputs=inputs, outputs=outputs,
+                outputs_in_inputs=outputs_in_inputs)
+            self.run_generated_code(lines,
+                                    function_definitions=definition)
+            
     def test_write_if_block(self):
         r"""Test writing an if block."""
         if self.import_cls.function_param is None:

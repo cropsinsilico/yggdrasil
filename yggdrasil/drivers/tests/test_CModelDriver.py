@@ -62,6 +62,19 @@ class TestCModelDriverNoInit(TestCModelParam,
                                None, None)
         else:
             super(TestCModelDriverNoInit, self).test_write_try_except(**kwargs)
+
+    def test_write_function_def_single(self):
+        r"""Test writing and running a function definition."""
+        inputs = [{'name': 'x', 'value': 1.0,
+                   'datatype': {'type': 'float',
+                                'precision': 32,
+                                'units': 'cm'}}]
+        outputs = [{'name': 'y',
+                    'datatype': {'type': 'float',
+                                 'precision': 32,
+                                 'units': 'cm'}}]
+        self.test_write_function_def(inputs=inputs, outputs=outputs,
+                                     outputs_in_inputs=False)
         
     
 class TestCModelDriverNoStart(TestCModelParam,

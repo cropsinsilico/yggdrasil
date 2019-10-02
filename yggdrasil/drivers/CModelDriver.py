@@ -339,8 +339,13 @@ class CModelDriver(CompiledModelDriver):
         'exec_end': '  return 0;\n}',
         'exec_prefix': '#include <stdbool.h>',
         'free': 'if ({variable} != NULL) free({variable});',
+        'function_def_begin': '{output_type} {function_name}({input_var}) {{',
+        'return': 'return {output_var};',
         'function_def_regex': (r'(?P<flag_type>.+?)\s*{function_name}\s*'
-                               r'\((?P<inputs>(?:[^)])*?)\)\s*\{{'),
+                               r'\((?P<inputs>(?:[^)])*?)\)\s*\{{'
+                               r'(?:.*?\n?)*?'
+                               r'(?:return +(?P<flag_var>.+?)?;'
+                               r'(?:.*?\n?)*?)?\}}'),
         'inputs_def_regex': (r'\s*(?P<native_type>(?:[^\s\*])+(\s+)?'
                              r'(?P<ptr>\*+)?)(?(ptr)(?(1)(?:\s*)|(?:\s+)))'
                              r'(?P<name>.+?)\s*(?:,|$)(?:\n)?'),
@@ -519,8 +524,34 @@ class CModelDriver(CompiledModelDriver):
         return out
     
     @classmethod
+    def parse_function_definition(cls, model_file, model_function, **kwargs):
+        r"""Get information about the inputs & outputs to a model from its
+        defintition if possible.
+
+        Args:
+            model_file (str): Full path to the file containing the model
+                function's declaration.
+            model_function (str): Name of the model function.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Parameters extracted from the function definitions.
+
+        """
+        out = super(CModelDriver, cls).parse_function_definition(
+            model_file, model_function, **kwargs)
+        if not kwargs.get('outputs_in_inputs', cls.outputs_in_inputs):
+            assert(not out.get('outputs', []))
+            flag_output = {'name': out.pop('flag_var'),
+                           'native_type': out.pop('flag_type').strip()}
+            flag_output['datatype'] = cls.get_json_type(flag_output['native_type'])
+            out['outputs'] = [flag_output]
+        return out
+        
+    @classmethod
     def update_io_from_function(cls, model_file, model_function,
-                                inputs=[], outputs=[]):
+                                inputs=[], outputs=[], contents=None):
         r"""Update inputs/outputs from the function definition.
 
         Args:
@@ -531,10 +562,13 @@ class CModelDriver(CompiledModelDriver):
                 Defaults to [].
             outputs (list, optional): List of model outputs including types.
                 Defaults to [].
+            contents (str, optional): Contents of file to parse rather than
+                re-reading the file. Defaults to None and is ignored.
 
         """
         super(CModelDriver, cls).update_io_from_function(
-            model_file, model_function, inputs=inputs, outputs=outputs)
+            model_file, model_function, inputs=inputs,
+            outputs=outputs, contents=contents)
         for x in inputs:
             for v in x['vars']:
                 if (((v['native_type'] != 'char*')
@@ -678,7 +712,8 @@ class CModelDriver(CompiledModelDriver):
         return super(CModelDriver, cls).format_function_param(key, **kwargs)
     
     @classmethod
-    def write_model_function_call(cls, model_function, flag_var, inputs, outputs):
+    def write_model_function_call(cls, model_function, flag_var,
+                                  inputs, outputs, **kwargs):
         r"""Write lines necessary to call the model function.
 
         Args:
@@ -687,6 +722,8 @@ class CModelDriver(CompiledModelDriver):
             flag_var (str): Name of variable that should be used as a flag.
             inputs (list): List of dictionaries describing inputs to the model.
             outputs (list): List of dictionaries describing outputs from the model.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             list: Lines required to carry out a call to a model function in
@@ -701,7 +738,7 @@ class CModelDriver(CompiledModelDriver):
                 if 'native_type_cast' in v:
                     v['name'] = '(%s)(%s)' % (v['native_type_cast'], v['name'])
         return super(CModelDriver, cls).write_model_function_call(
-            model_function, flag_var, new_inputs, outputs)
+            model_function, flag_var, new_inputs, outputs, **kwargs)
         
     @classmethod
     def write_declaration(cls, name, **kwargs):
@@ -733,7 +770,7 @@ class CModelDriver(CompiledModelDriver):
         return out
         
     @classmethod
-    def prepare_variables(cls, vars_list):
+    def prepare_variables(cls, vars_list, in_definition=False):
         r"""Concatenate a set of input variables such that it can be passed as a
         single string to the function_call parameter.
 
@@ -741,6 +778,9 @@ class CModelDriver(CompiledModelDriver):
             vars_list (list): List of variable dictionaries containing info
                 (e.g. names) that should be used to prepare a string representing
                 input/output to/from a function call.
+            in_definition (bool, optional): If True, the returned sequence
+                will be of the format required for specifying variables
+                in a function definition. Defaults to False.
 
         Returns:
             str: Concatentated variables list.
@@ -757,16 +797,26 @@ class CModelDriver(CompiledModelDriver):
                 new_vars_list.append(x)
                 if cls.get_native_type(**x).replace(' ', '') == 'char*':
                     new_vars_list.append({'name': x['name'] + '_length'})
-        return super(CModelDriver, cls).prepare_variables(new_vars_list)
+        if in_definition:
+            new_vars_list = [
+                dict(x, name='%s %s' % (
+                    cls.get_native_type(**x), x['name']))
+                for x in new_vars_list]
+        return super(CModelDriver, cls).prepare_variables(
+            new_vars_list, in_definition=in_definition)
             
     @classmethod
-    def prepare_output_variables(cls, vars_list, in_inputs=False):
+    def prepare_output_variables(cls, vars_list, in_definition=False,
+                                 in_inputs=False):
         r"""Concatenate a set of output variables such that it can be passed as
         a single string to the function_call parameter.
 
         Args:
             vars_list (list): List of variable names to concatenate as output
                 from a function call.
+            in_definition (bool, optional): If True, the returned sequence
+                will be of the format required for specifying output
+                variables in a function definition. Defaults to False.
             in_inputs (bool, optional): If True, the output variables should
                 be formated to be included as input variables. Defaults to
                 False.
@@ -776,13 +826,67 @@ class CModelDriver(CompiledModelDriver):
 
         """
         if in_inputs:
-            vars_list = [dict(y, name='&' + y['name']) for y in vars_list]
-        return super(CModelDriver, cls).prepare_output_variables(vars_list)
+            if in_definition:
+                vars_list = [dict(y, name='*' + y['name'])
+                             for y in vars_list]
+            else:
+                vars_list = [dict(y, name='&' + y['name'])
+                             for y in vars_list]
+        else:
+            # If the output is a True output and not passed as an input
+            # parameter, then the output should not include the type
+            # information that is added if in_definition is True.
+            in_definition = False
+        return super(CModelDriver, cls).prepare_output_variables(
+            vars_list, in_definition=in_definition, in_inputs=in_inputs)
 
+    @classmethod
+    def write_function_def(cls, function_name, **kwargs):
+        r"""Write a function definition.
+
+        Args:
+            function_name (str): Name fo the function being defined.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: Lines completing the function call.
+
+        Raises:
+            ValueError: If outputs_in_inputs is not True and more than
+                one output variable is specified.
+
+        """
+        output_type = None
+        if kwargs.get('outputs_in_inputs', False):
+            output_type = cls.get_native_type(datatype='flag')
+        else:
+            if 'output_var' in kwargs:
+                outputs = cls.split_variables(kwargs['output_var'])
+            else:
+                outputs = kwargs.get('outputs', [])
+            nout = len(outputs)
+            if nout == 0:
+                output_type = 'void'
+            elif nout == 1:
+                output = outputs[0]
+                if isinstance(output, str):
+                    output = re.search(cls.format_function_param(
+                        'output_def_regex'), output).groupdict()
+                    output_type = output['native_type']
+                else:
+                    output_type = cls.get_native_type(**output)
+            else:
+                raise ValueError("C does not support more than one "
+                                 "output variable.")
+        kwargs['output_type'] = output_type
+        return super(CModelDriver, cls).write_function_def(
+            function_name, **kwargs)
+        
     @classmethod
     def write_native_type_definition(cls, name, datatype, as_seri=False,
                                      requires_freeing=None, no_decl=False):
-        r"""Get lines declarining the data type within the language.
+        r"""Get lines declaring the data type within the language.
 
         Args:
             name (str): Name of variable that definition should be stored in.
@@ -895,3 +999,23 @@ class CModelDriver(CompiledModelDriver):
         out += super(CModelDriver, cls).write_channel_def(key, datatype=datatype,
                                                           **kwargs)
         return out
+
+    @classmethod
+    def write_assign_to_output(cls, outputs_in_inputs=False, **kwargs):
+        r"""Write lines assigning a value to an output variable.
+
+        Args:
+            outputs_in_inputs (bool, optional): If True, outputs are passed
+                as input parameters. In some languages, this means that a
+                pointer or reference is passed (e.g. C) and so the assignment
+                should be to the memory indicated rather than the variable.
+                Defaults to False.
+
+        Returns:
+            list: Lines achieving assignment.
+
+        """
+        if outputs_in_inputs and ('name' in kwargs) and (cls.language != 'c++'):
+            kwargs['name'] = '%s[0]' % kwargs['name']
+        return super(CModelDriver, cls).write_assign_to_output(
+            outputs_in_inputs=outputs_in_inputs, **kwargs)

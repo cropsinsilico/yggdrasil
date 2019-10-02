@@ -3,7 +3,6 @@ import os
 import sys
 import copy
 import logging
-import traceback
 import subprocess
 import argparse
 
@@ -174,14 +173,7 @@ def yggrun():
                         help='One or more yaml specification files.')
     args = parser.parse_args()
     prog = sys.argv[0].split(os.path.sep)[-1]
-    yggRunner = runner.get_runner(args.yamlfile, ygg_debug_prefix=prog)
-    try:
-        yggRunner.run()
-        yggRunner.debug("runner returns, exiting")
-    except Exception as ex:
-        yggRunner.pprint("yggrun exception: %s" % type(ex))
-        print(traceback.format_exc())
-    print('')
+    runner.run(args.yamlfile, ygg_debug_prefix=prog)
 
 
 def yggclean():

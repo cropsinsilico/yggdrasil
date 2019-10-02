@@ -94,6 +94,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'try_end': '})',
         'assign': '{name} <- {value}',
         'assign_mult': '{name} %<-% {value}',
+        'function_def_begin': '{function_name} <- function({input_var}) {{',
+        'return': 'return({output_var})',
         'function_def_regex': (r'{function_name} *(?:(?:\<-)|(?:=)) *function'
                                r'\((?P<inputs>(?:.|\n)*?)\)\s*\{{'
                                r'(?:.*?\n?)*?'
@@ -262,7 +264,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         
     @classmethod
     def parse_function_definition(cls, model_file, model_function,
-                                  contents=None, match=None):
+                                  contents=None, match=None, **kwargs):
         r"""Get information about the inputs & outputs to a model from its
         defintition if possible.
 
@@ -274,6 +276,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 If not provided, the function definition is read from model_file.
             match (re.Match, optional): Match object for the function regex. If
                 not provided, a search is performed using function_def_regex.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             dict: Parameters extracted from the function definitions.
@@ -302,4 +306,5 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                     match = None
                     contents = contents[:first_zero]
         return super(RModelDriver, cls).parse_function_definition(
-            model_file, model_function, contents=contents, match=match)
+            model_file, model_function, contents=contents,
+            match=match, **kwargs)
