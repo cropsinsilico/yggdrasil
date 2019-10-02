@@ -106,7 +106,6 @@ class CCompilerBase(CompilerBase):
         if _osx_sysroot is not None:
             out['CONDA_BUILD_SYSROOT'] = _osx_sysroot
             out['SDKROOT'] = _osx_sysroot
-            print("SDKROOT", _osx_sysroot)
             grp = re.search(r'MacOSX(?P<target>[0-9]+\.[0-9]+)?',
                             _osx_sysroot).groupdict()
             if grp['target']:
