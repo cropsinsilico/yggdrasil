@@ -69,6 +69,7 @@ class MakeCompiler(BuildToolBase):
     no_separate_linking = True
     default_archiver = False
     linker_attributes = {'executable_ext': ''}
+    build_language = 'make'
     
     @staticmethod
     def before_registration(cls):

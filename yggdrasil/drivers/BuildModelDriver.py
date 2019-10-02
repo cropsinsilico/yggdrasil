@@ -10,6 +10,7 @@ class BuildToolBase(CompilerBase):
     r"""Base class for build tools."""
 
     is_build_tool = True
+    build_language = None
 
     @classmethod
     def get_default_target_language(cls):
@@ -21,8 +22,11 @@ class BuildToolBase(CompilerBase):
             str: Name of the default target language.
 
         """
+        build_language = cls.build_language
+        if build_language is None:
+            build_language = cls.toolname
         for x in cls.languages:
-            if x != cls.toolname:
+            if x != build_language:
                 return x
         raise ValueError("Could not determine a default target language "
                          "for build tool '%s'" % cls.toolname)
