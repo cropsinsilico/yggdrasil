@@ -322,6 +322,10 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             lines += self.import_cls.write_try_except(try_contents,
                                                       except_contents, **kwargs)
             self.run_generated_code(lines)
+
+    def test_cleanup_dependencies(self):
+        r"""Test cleanup_dependencies method."""
+        self.import_cls.cleanup_dependencies()
     
 
 class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
