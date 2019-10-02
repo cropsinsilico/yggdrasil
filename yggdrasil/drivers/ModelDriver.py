@@ -10,13 +10,11 @@ import uuid
 import tempfile
 from collections import OrderedDict
 from pprint import pformat
-from yggdrasil import platform, tools, backwards, languages, serialize
+from yggdrasil import platform, tools, backwards, languages
 from yggdrasil.config import ygg_cfg, locate_file, update_language_config
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from threading import Event
-from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-    definition2dtype)
 try:
     from Queue import Queue, Empty
 except ImportError:
@@ -1501,23 +1499,6 @@ class ModelDriver(Driver):
             list: Lines required to declare and define an output channel.
 
         """
-        if isinstance(datatype, dict):
-            if key in ['input', 'output']:
-                key_type = '%s_%s' % (key, datatype['type'])
-                if key_type in cls.function_param:
-                    key = key_type
-            if ((('{format_str}' in cls.function_param.get(key, ''))
-                 and ('format_str' not in kwargs))):
-                if datatype['type'] in ['string', 'bytes']:
-                    kwargs['format_str'] = '%s'
-                else:
-                    assert(datatype['type'] == 'array')
-                    assert(isinstance(datatype['items'], list))
-                    fmts = [serialize.nptype2cformat(definition2dtype(x))
-                            for x in datatype['items']]
-                    kwargs['format_str'] = backwards.as_str(
-                        serialize.table2format(fmts=fmts, newline=b'',
-                                               comment=b''))
         out = [cls.format_function_param(key, **kwargs)]
         return out
 
