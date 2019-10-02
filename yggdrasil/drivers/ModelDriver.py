@@ -1639,7 +1639,6 @@ class ModelDriver(Driver):
 
     @classmethod
     def write_function_call(cls, function_name, inputs=[], outputs=[],
-                            expand_single_outputs=False,
                             include_arg_count=False, **kwargs):
         r"""Write a function call.
 
@@ -1649,10 +1648,6 @@ class ModelDriver(Driver):
                 Defaults to [].
             outputs (list, optional): List of outputs from the function.
                 Defaults to [].
-            expand_single_outputs (bool, optional): If True and a single
-                output is expected, additional logic will be included to
-                extract the single element of an array as a stand alone
-                variable. Defaults to False.
             include_arg_count (bool, optional): If True, the count of input
                 arguments is included as the first argument. Defaults to
                 False.
@@ -1684,9 +1679,6 @@ class ModelDriver(Driver):
         else:
             out = [cls.format_function_param(
                 'assign', name=kwargs['output_var'], value=call_str)]
-        # Check if single element should be expanded
-        if expand_single_outputs and (len(outputs) == 1):
-            out += cls.write_expand_single_element(kwargs['output_var'])
         return out
         
     @classmethod
