@@ -77,6 +77,47 @@ enable_long_tests = tools.check_environ_bool("YGG_ENABLE_LONG_TESTS")
 skip_extra_examples = tools.check_environ_bool("YGG_SKIP_EXTRA_EXAMPLES")
 
 
+def requires_language(language, installed=True):
+    r"""Decorator factroy for marking tests that require a specific
+    language.
+
+    Args:
+        language (str): Language that is required for the test being
+            decorated.
+        installed (bool, optional): If True, the returned decorator will
+            skip the decorated test when the language is not installed.
+            If False, the returned decorator will skip the decorated test
+            when the language is not installed. For any other values,
+            the test will only be skipped if tests for the specified
+            language are disabled by setting YGG_TEST_LANGUAGE to
+            another language. Defaults to True.
+
+    Returns:
+        function: Decorator for test.
+
+    """
+    drv = import_component('model', language)
+    test_language = os.environ.get('YGG_TEST_LANGUAGE', None).lower()
+    
+    def wrapper(function):
+        skips = []
+        if installed is True:
+            skips.append(unittest.skipIf(not drv.is_installed(),
+                                         "%s not installed"))
+        elif installed is False:
+            skips.append(unittest.skipIf(drv.is_installed(),
+                                         "%s installed"))
+        skips.append(unittest.skipIf(
+            (test_language is not None)
+            and (test_language != drv.language.lower()),
+            "Test for language %s not enabled." % drv.language))
+        for s in skips:
+            function = s(function)
+        return function
+    
+    return wrapper
+
+
 # Wrapped class to allow handling of arrays
 class WrappedTestCase(unittest.TestCase):  # pragma: no cover
     def __init__(self, *args, **kwargs):

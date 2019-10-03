@@ -89,6 +89,11 @@ class TestModelParam(parent.TestParam):
                 self.__class__._flag_tests_on_not_installed = True
             raise unittest.SkipTest("'%s' not installed."
                                     % self.import_cls.language)
+        if os.environ.get('YGG_TEST_LANGUAGE', None):  # pragma: debug
+            if (((os.environ['YGG_TEST_LANGUAGE'].lower()
+                  != self.import_cls.language.lower()))):
+                raise unittest.SkipTest("Tests for language %s not enabled"
+                                        % self.import_cls.language)
         super(TestModelParam, self).setup(*args, **kwargs)
 
 

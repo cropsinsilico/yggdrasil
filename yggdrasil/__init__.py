@@ -5,6 +5,7 @@ import os
 import sys
 import glob
 import logging
+import argparse
 import subprocess
 import importlib
 from ._version import get_versions
@@ -66,9 +67,7 @@ def expand_and_add(path, path_list, dir_list):  # pragma: no cover
     return 0
 
 
-def run_tsts(verbose=True, nocapture=True, stop=True,
-             nologcapture=True, withcoverage=True,
-             withexamples=False):  # pragma: no cover
+def run_tsts(**kwargs):  # pragma: no cover
     r"""Run tests for the package. Relative paths are interpreted to be
     relative to the package root directory.
 
@@ -86,32 +85,76 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             which invokes coverage. Defaults to True.
         withexamples (bool, optional): If True, example testing will be
             enabled. Defaults to False.
+        language (str, optional): Language to test. Defaults to None
+            and all languages will be tested.
 
     """
-    if _test_package is None:
-        raise RuntimeError("Could not locate test runner pytest or nose.")
-    elif _test_package_name == 'pytest':
-        test_cmd = 'pytest'
-    elif _test_package_name == 'nose':
-        test_cmd = 'nosetests'
-    else:
-        raise RuntimeError("Unsupported test package: '%s'" % _test_package_name)
+    if '-h' not in sys.argv:
+        if _test_package is None:
+            raise RuntimeError("Could not locate test runner pytest or nose.")
+        elif _test_package_name == 'pytest':
+            test_cmd = 'pytest'
+        elif _test_package_name == 'nose':
+            test_cmd = 'nosetests'
+        else:
+            raise RuntimeError("Unsupported test package: '%s'"
+                               % _test_package_name)
+    parser = argparse.ArgumentParser(
+        description='Run yggdrasil tests.')
+    arguments = [
+        (['withcoverage', 'with-coverage'], ['nocover', 'no-cover'],
+         True, {'help': 'Record coverage during tests.'}),
+        (['withexamples', 'with-examples'], ['noexamples', 'no-examples'],
+         False, {'help': 'Run example tests when encountered.'}),
+        (['verbose', 'v'], ['quiet'],
+         True, {'help': ('Increase verbosity of output from '
+                         'the test runner.')}),
+        (['nocapture', 's'], ['capture'],
+         True, {'help': 'Don\'t capture output from tests.'}),
+        (['stop', 'x'], ['dontstop', 'dont-stop'],
+         True, {'help': 'Stop after first test failure.'}),
+        (['nologcapture'], ['logcapture'],
+         True, {'help': ('Don\'t capture output from log '
+                         'messages generated during tests.')})]
+    for pos_dest, neg_dest, default, kws in arguments:
+        dest = pos_dest[0]
+        for x in [pos_dest, neg_dest]:
+            for i, y in enumerate(x):
+                if len(y) == 1:
+                    x[i] = '-' + y
+                else:
+                    x[i] = '--' + y
+        if kwargs.get(dest, default):
+            if kws['help'].startswith('Don\'t'):
+                kws['help'].split('Don\'t', 1)[-1]
+                kws['help'] = kws['help'].replace(
+                    kws['help'][0], kws['help'][0].upper(), 1)
+            else:
+                kws['help'] = kws['help'].replace(
+                    kws['help'][0], kws['help'][0].lower(), 1)
+                kws['help'] = 'Don\'t ' + kws['help']
+            parser.add_argument(*neg_dest, action='store_false',
+                                dest=dest, **kws)
+        else:
+            parser.add_argument(*pos_dest, action='store_true',
+                                dest=dest, **kws)
+                                
+    parser.add_argument('--language', default=None,
+                        help='Language that should be tested.')
+    args, extra_argv = parser.parse_known_args()
     initial_dir = os.getcwd()
     package_dir = os.path.dirname(os.path.abspath(__file__))
     error_code = 0
+    # Separate out paths from options
     argv = [test_cmd]
     test_paths = []
     opt_val = 0
-    for x in sys.argv:
+    for x in extra_argv:
         if opt_val > 0:
             argv.append(x)
             opt_val -= 1
         elif x.endswith('yggtest'):
             pass
-        elif x == '--nocover':
-            withcoverage = False
-        elif x in ['--withexamples', '--with-examples']:
-            withexamples = True
         elif x.startswith('-'):
             argv.append(x)
             if (_test_package_name == 'pytest') and (x in ['-c']):
@@ -120,15 +163,15 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             test_paths.append(x)
     if _test_package_name == 'nose':
         argv += ['--detailed-errors', '--exe']
-    if verbose:
+    if args.verbose:
         argv.append('-v')
-    if nocapture:
+    if args.nocapture:
         argv.append('-s')
-    if stop:
+    if args.stop:
         argv.append('-x')
-    if nologcapture and (_test_package_name == 'nose'):
+    if args.nologcapture and (_test_package_name == 'nose'):
         argv.append('--nologcapture')
-    if withcoverage:
+    if args.withcoverage:
         if _test_package_name == 'nose':
             argv.append('--with-coverage')
             argv.append('--cover-package=yggdrasil')
@@ -144,16 +187,26 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             if not expand_and_add(x, expanded_test_paths,
                                   [package_dir, os.getcwd()]):
                 expanded_test_paths.append(x)
-    if withexamples:
-        old_with_examples = os.environ.get('YGG_ENABLE_EXAMPLE_TESTS', None)
-        os.environ['YGG_ENABLE_EXAMPLE_TESTS'] = 'True'
     argv += expanded_test_paths
     # Run test command and perform cleanup before logging any errors
     logger.info("Running %s from %s", argv, os.getcwd())
+    old_env = {}
     try:
         # Set env
-        old_skip_norm = os.environ.get('YGG_SKIP_COMPONENT_VALIDATION', None)
-        if old_skip_norm is None:
+        if args.withexamples:
+            old_env['YGG_ENABLE_EXAMPLE_TESTS'] = os.environ.get(
+                'YGG_ENABLE_EXAMPLE_TESTS', None)
+            os.environ['YGG_ENABLE_EXAMPLE_TESTS'] = 'True'
+        if args.language:
+            from yggdrasil.components import import_component
+            drv = import_component('model', args.language)
+            args.language = drv.language.lower()
+            old_env['YGG_TEST_LANGUAGE'] = os.environ.get(
+                'YGG_TEST_LANGUAGE', None)
+            os.environ['YGG_TEST_LANGUAGE'] = args.language
+        old_env['YGG_SKIP_COMPONENT_VALIDATION'] = os.environ.get(
+            'YGG_SKIP_COMPONENT_VALIDATION', None)
+        if old_env['YGG_SKIP_COMPONENT_VALIDATION'] is None:
             os.environ['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
         error_code = subprocess.call(argv)
     except BaseException:
@@ -161,13 +214,11 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
         error_code = -1
     finally:
         os.chdir(initial_dir)
-        if old_skip_norm is None:
-            del os.environ['YGG_SKIP_COMPONENT_VALIDATION']
-        if withexamples:
-            if old_with_examples is None:
-                del os.environ['YGG_ENABLE_EXAMPLE_TESTS']
+        for k, v in old_env.items():
+            if v is None:
+                del os.environ[k]
             else:
-                os.environ['YGG_ENABLE_EXAMPLE_TESTS'] = old_with_examples
+                os.environ[k] = v
     return error_code
 
 
