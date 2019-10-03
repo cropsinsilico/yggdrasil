@@ -292,6 +292,19 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                 'test_function', inputs=inputs, outputs=outputs,
                 function_contents=function_contents,
                 flag_var=flag_var, outputs_in_inputs=outputs_in_inputs)
+            parsed = self.import_cls.parse_function_definition(
+                None, 'test_function', contents='\n'.join(definition),
+                outputs_in_inputs=outputs_in_inputs,
+                expected_outputs=outputs)
+            self.assert_equal(len(parsed['inputs']), len(inputs))
+            self.assert_equal(len(parsed['outputs']), len(outputs))
+            for xp, x0 in zip(parsed['inputs'], inputs):
+                assert(xp['name'] == x0['name'])
+                x0.update(xp)
+            for xp, x0 in zip(parsed['outputs'], outputs):
+                assert(xp['name'] == x0['name'])
+                x0.update(xp)
+            # Lines required to set up the function call
             lines = []
             if 'declare' in self.import_cls.function_param:
                 for x in inputs + outputs:
@@ -304,12 +317,6 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             if outputs_in_inputs:
                 lines.append(self.import_cls.format_function_param(
                     'assign', **flag_var))
-            parsed = self.import_cls.parse_function_definition(
-                None, 'test_function', contents='\n'.join(definition),
-                outputs_in_inputs=outputs_in_inputs,
-                expected_outputs=outputs)
-            inputs = parsed['inputs']
-            outputs = parsed['outputs']
             lines += self.import_cls.write_function_call(
                 'test_function', flag_var=flag_var,
                 inputs=inputs, outputs=outputs,

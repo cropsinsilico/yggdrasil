@@ -79,10 +79,10 @@ class PythonModelDriver(InterpretedModelDriver):
         'function_def_begin': 'def {function_name}({input_var}):',
         'return': 'return {output_var}',
         'function_def_regex': (r'\n?( *)def +{function_name}'
-                               r' *\((?P<inputs>(?:.|\n)*?)\) *:'
-                               r'(?:(?:\1(?:    )+(?!return).*\n)|(?: *\n))*'
+                               r' *\((?P<inputs>(?:.|\n)*?)\)? *:'
+                               r'(?P<body>(?:\1(?:    )+(?!return).*\n)|(?: *\n))*'
                                r'(?:\1(?:    )+'
-                               r'return *(\()?(?P<outputs>.*?)(?(3)\)))?'),
+                               r'return *(?P<outputs>.*)?)?'),
         'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)',
         'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
 
