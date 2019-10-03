@@ -182,28 +182,6 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             comm.linger_close()
 
     @classmethod
-    def language2python(cls, robj):
-        r"""Prepare an R object for serialization in Python.
-
-        Args:
-           robj (object): Python object prepared in R.
-
-        Returns:
-            object: Python object in a form that is serialization friendly.
-
-        """
-        logger.debug("language2python: %s, %s" % (robj, type(robj)))
-        if isinstance(robj, tuple):
-            return tuple([cls.language2python(x) for x in robj])
-        elif isinstance(robj, list):
-            return [cls.language2python(x) for x in robj]
-        elif isinstance(robj, dict):
-            return {k: cls.language2python(v) for k, v in robj.items()}
-        elif isinstance(robj, backwards.string_types):
-            return backwards.as_bytes(robj)
-        return robj
-
-    @classmethod
     def python2language(cls, pyobj):
         r"""Prepare a python object for transformation in R.
 
@@ -220,13 +198,13 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         elif isinstance(pyobj, list):
             return [cls.python2language(x) for x in pyobj]
         elif isinstance(pyobj, OrderedDict):
-            return OrderedDict([(backwards.as_str(k), cls.python2language(v))
+            return OrderedDict([(cls.python2language(k),
+                                 cls.python2language(v))
                                 for k, v in pyobj.items()])
         elif isinstance(pyobj, dict):
-            return {backwards.as_str(k): cls.python2language(v)
+            return {cls.python2language(k): cls.python2language(v)
                     for k, v in pyobj.items()}
-        elif isinstance(pyobj, tuple(list(backwards.string_types)
-                                     + [np.string_])):
+        elif isinstance(pyobj, np.string_):
             return backwards.as_str(pyobj)
         elif isinstance(pyobj, pd.DataFrame):
             # R dosn't have int64 and will cast 64bit ints as floats if passed

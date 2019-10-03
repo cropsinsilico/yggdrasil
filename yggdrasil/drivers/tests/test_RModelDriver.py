@@ -20,28 +20,15 @@ class TestRModelDriverNoInit(TestRModelParam,
             self.import_cls.is_library_installed('invalid_unicorn'),
             False)
 
-    def test_language2python(self):
-        r"""Test language2python."""
-        test_vars = [('hello', b'hello'),
-                     (b'hello', b'hello'),
-                     (u'hello', b'hello'),
-                     (('hello', ), (b'hello', )),
-                     (['hello'], [b'hello']),
-                     ({'a': 'hello'}, {'a': b'hello'})]
-        for a, b in test_vars:
-            self.assert_equal(self.import_cls.language2python(a), b)
-
     def test_python2language(self):
         r"""Test python2language."""
-        test_vars = [('hello', 'hello'),
-                     (b'hello', 'hello'),
-                     (u'hello', 'hello'),
-                     (np.string_('hello'), 'hello'),
-                     ((b'hello', ), ('hello', )),
-                     ([b'hello'], ['hello']),
-                     ({b'a': b'hello'}, {'a': 'hello'}),
-                     (OrderedDict([(b'a', b'hello')]),
-                      OrderedDict([('a', 'hello')]))]
+        test_vars = [(np.string_('hello'), 'hello'),
+                     ((np.string_('hello'), ), ('hello', )),
+                     ([np.string_('hello')], ['hello']),
+                     ({np.string_('hello'): np.string_('hello')},
+                      {'hello': 'hello'}),
+                     (OrderedDict([(np.string_('hello'), np.string_('hello'))]),
+                      OrderedDict([('hello', 'hello')]))]
         test_vars.append((
             pd.DataFrame.from_dict({'a': np.zeros(5, dtype='int64'),
                                     'b': np.ones(5, dtype=bytes)}),

@@ -298,7 +298,7 @@ def install(args=None, with_sudo=None, skip_requirements=None,
         logger.info("Built R interface.")
         # Install package
         package_name = 'yggdrasil_0.1.tar.gz'
-        R_call = ("install.packages(\"%s\", "
+        R_call = ("install.packages(\"%s\", verbose=TRUE,"
                   "repos=NULL, type=\"source\")") % package_name
         if not call_R([R_call], **kwargs):
             logger.error("Error installing R interface from the built package.")
