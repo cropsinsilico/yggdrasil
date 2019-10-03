@@ -1466,8 +1466,7 @@ class ModelDriver(Driver):
                     lines.append(cls.write_declaration(
                         requires_freeing=free_vars, **v))
         lines.append(cls.format_function_param(
-            'define',
-            variable=flag_var,
+            'assign', name=flag_var,
             value=cls.function_param['true']))
         # Declare/define input and output channels
         for x in inputs:
@@ -1497,6 +1496,11 @@ class ModelDriver(Driver):
             if not x.get('outside_loop', False):
                 loop_lines += cls.write_model_send(x['channel'],
                                                    x, flag_var=flag_var)
+        # Add break if there are not any inputs
+        if not inputs:
+            loop_lines.append(cls.format_function_param(
+                'assign', name=flag_var,
+                value=cls.function_param['false']))
         # Add loop in while block
         flag_cond = cls.format_function_param('flag_cond',
                                               default='{flag_var}',
