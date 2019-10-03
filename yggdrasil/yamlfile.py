@@ -123,7 +123,13 @@ def parse_yaml(files):
                 else:
                     raise RuntimeError("No driver established for %s channel %s" % (
                         io, k))
+        # Remove unused default channels
         for k in remove:
+            for m in existing[io][k]['model_driver']:
+                for i, x in enumerate(existing['model'][m][io + 's']):
+                    if x['name'] == k:
+                        existing['model'][m][io + 's'].pop(i)
+                        break
             existing[io].pop(k)
     # Link io drivers back to models
     existing = link_model_io(existing)
