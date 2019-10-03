@@ -2,6 +2,7 @@ import six
 import copy
 import uuid
 import pprint
+import importlib
 import jsonschema
 from yggdrasil import backwards, tools
 from yggdrasil.metaschema import (get_metaschema, get_validator, encoder,
@@ -734,3 +735,36 @@ class MetaschemaType(object):
             obj = self.decode(metadata, data, self._typedef,
                               typedef_validated=True, dont_check=dont_check)
         return obj, metadata
+
+    # TESTING METHODS
+    @classmethod
+    def import_test_class(cls):
+        r"""Import the test class for this class.
+
+        Returns:
+            class: Test class for this class.
+
+        """
+        mod = importlib.import_module(cls.get_test_module())
+        cls = cls.get_test_class()
+        return getattr(mod, cls)
+    
+    @classmethod
+    def get_test_class(cls):
+        r"""Determine the test class for the class.
+
+        Returns:
+            str: Name of the test class for this class.
+
+        """
+        return 'Test%s' % cls.__name__
+    
+    @classmethod
+    def get_test_module(cls):
+        r"""Determine the test module for the class.
+
+        Returns:
+            str: Full Python "path" to module containing the test class.
+
+        """
+        return '%s.tests.test_%s' % tuple(cls.__module__.rsplit('.', 1))
