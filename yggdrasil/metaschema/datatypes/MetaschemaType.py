@@ -745,9 +745,9 @@ class MetaschemaType(object):
             class: Test class for this class.
 
         """
-        mod = importlib.import_module(cls.get_test_module())
-        cls = cls.get_test_class()
-        return getattr(mod, cls)
+        tmod = importlib.import_module(cls.get_test_module())
+        tcls = cls.get_test_class()
+        return getattr(tmod, tcls)
     
     @classmethod
     def get_test_class(cls):

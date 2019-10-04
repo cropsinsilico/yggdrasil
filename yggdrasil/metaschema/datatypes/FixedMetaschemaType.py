@@ -289,13 +289,3 @@ class FixedMetaschemaType(MetaschemaType):
             kwargs = self.__class__.typedef_base2fixed(kwargs)
         out = super(FixedMetaschemaType, self).update_typedef(**kwargs)
         return out
-
-    @classmethod
-    def get_test_module(cls):
-        r"""Determine the test module for the class.
-
-        Returns:
-            str: Full Python "path" to module containing the test class.
-
-        """
-        return cls.base().get_test_module()
