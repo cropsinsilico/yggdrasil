@@ -43,6 +43,8 @@ R2python <- function(robj, not_bytes=FALSE) {
     out <- ygg_back$as_str(reticulate::r_to_py(robj))
   } else if (is(robj, "data.frame")) {
     out <- reticulate::r_to_py(robj)
+  } else if (is.na(robj)) {
+    out <- reticulate::r_to_py(NULL)
   } else {
     # print("Default handling for class:")
     # print(class(robj))

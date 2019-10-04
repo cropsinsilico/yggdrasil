@@ -67,6 +67,13 @@ class TestExampleTypes(ExampleTstBase):
         # Write the model
         function_contents = drv.write_assign_to_output(
             name='y', value='x', outputs_in_inputs=drv.outputs_in_inputs)
+        function_contents.append(
+            drv.format_function_param('print', message='IN MODEL'))
+        if 'print_object' in drv.function_param:
+            function_contents += [
+                drv.format_function_param('print_object',
+                                          object=x['name'])
+                for x in inputs]
         lines = drv.write_function_def(
             'model', function_contents=function_contents,
             inputs=inputs, outputs=outputs, outputs_in_inputs=drv.outputs_in_inputs)

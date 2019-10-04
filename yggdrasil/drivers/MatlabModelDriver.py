@@ -474,6 +474,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'and': '&&',
         'indent': 2 * ' ',
         'quote': '\'',
+        'print_object': 'disp({object});',
         'print': 'disp(\'{message}\');',
         'fprintf': 'fprintf(\'{message}\', {variables});',
         'error': 'error(\'{error_msg}\');',
@@ -645,7 +646,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         try:
             if matlab_engine is None:
                 kwargs['for_matlab'] = True
-                out = super(MatlabModelDriver, cls).run_executable(args, **kwargs)
+                out = InterpretedModelDriver.run_executable.__func__(
+                    cls, args, **kwargs)
             else:
                 if kwargs.get('debug_flags', None):  # pragma: debug
                     logger.warn("Debugging via valgrind, strace, etc. disabled "
@@ -723,7 +725,9 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                                    '10'],
             'version': ['The version (release number) of installed Matlab.', ''],
             'matlabroot': ['The path to the default installation of matlab.', '']}
-        if cfg.get(cls.language, 'disable', 'False').lower() != 'true':
+        if ((cfg.get(cls.language, 'disable', 'False').lower() != 'true'
+             and (not (cfg.has_option(cls.language, 'matlabroot')
+                       and cfg.has_option(cls.language, 'version'))))):
             try:
                 opts['matlabroot'][1], opts['version'][1] = cls.get_matlab_info()
             except RuntimeError:  # pragma: no matlab

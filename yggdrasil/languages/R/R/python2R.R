@@ -82,6 +82,8 @@ python2R <- function(pyobj) {
         out <- reticulate::py_to_r(pyobj)
       }
     }
+  } else if (is(pyobj, "python.builtin.NoneType")) {
+    out <- NA
   } else {
     # print("Default handling for class:")
     # print(class(pyobj))
