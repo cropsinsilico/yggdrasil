@@ -255,6 +255,17 @@ def get_supported_lang():
     return list(set(out))
 
 
+def get_supported_type():
+    r"""Get a list of the data types that are supported by yggdrasil.
+
+    Returns:
+        list: The names of data types supported by yggdrasil.
+
+    """
+    from yggdrasil.metaschema.datatypes import get_registered_types
+    return list(get_registered_types().keys())
+
+
 def get_supported_comm():
     r"""Get a list of the communication mechanisms supported by yggdrasil.
 

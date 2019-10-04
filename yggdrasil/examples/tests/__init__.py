@@ -4,8 +4,9 @@ import uuid
 import unittest
 import tempfile
 import shutil
+import itertools
 from yggdrasil.components import ComponentMeta
-from yggdrasil import runner, tools, platform
+from yggdrasil import runner, tools, platform, backwards
 from yggdrasil.examples import yamls, source, ext_map
 from yggdrasil.tests import YggTestBase
 
@@ -14,19 +15,39 @@ _ext2lang = {v: k for k, v in ext_map.items()}
 _test_registry = {}
 
 
-def make_lang_test(lang):
+def make_iter_test(**kwargs):
     def itest(self):
-        self.run_language(lang.lower())
+        self.run_iteration(**kwargs)
     return itest
 
 
 class ExampleMeta(ComponentMeta):
+
     def __new__(cls, name, bases, dct):
+        iter_lists = []
+        iter_keys = []
+        test_name_fmt = 'test'
+        iter_over = dct['iter_over']
+        for x in iter_over:
+            test_name_fmt += '_%s'
+            if x in ['language', 'lang']:
+                iter_lists.append(tools.get_supported_lang()
+                                  + ['all', 'all_nomatlab'])
+                iter_keys.append('language')
+            elif x in ['comm']:
+                iter_lists.append(tools.get_supported_comm())
+                iter_keys.append('comm')
+            elif x in ['type', 'types']:
+                iter_lists.append(tools.get_supported_type())
+                iter_keys.append('datatype')
+            else:  # pragma: debug
+                raise ValueError("Unsupported iter dimension: %s" % x)
         if dct.get('example_name', None) is not None:
-            for l in tools.get_supported_lang():
-                itest_name = 'test_%s' % l
+            for x in itertools.product(*iter_lists):
+                itest_name = backwards.as_str(test_name_fmt % x)
                 if itest_name not in dct:
-                    itest_func = make_lang_test(l)
+                    itest_func = make_iter_test(**{k: v for k, v in
+                                                   zip(iter_keys, x)})
                     itest_func.__name__ = itest_name
                     dct[itest_name] = itest_func
         out = super(ExampleMeta, cls).__new__(cls, name, bases, dct)
@@ -45,6 +66,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     example_name = None
     expects_error = False
     env = {}
+    iter_over = ['language']
 
     def __init__(self, *args, **kwargs):
         tools.YggClass.__init__(self, self.example_name)
@@ -195,22 +217,17 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                 if os.path.isfile(fout):
                     os.remove(fout)
 
-    def run_language(self, lang):
-        r"""Run a test for the specified language."""
+    def run_iteration(self, language=None, datatype=None, comm=None):
+        r"""Run a test for the specified parameters."""
         if not tools.check_environ_bool('YGG_ENABLE_EXAMPLE_TESTS'):
             raise unittest.SkipTest("Example tests not enabled.")
         if os.environ.get('YGG_TEST_LANGUAGE', None):  # pragma: debug
-            if os.environ['YGG_TEST_LANGUAGE'] != lang:
+            if (((os.environ['YGG_TEST_LANGUAGE'] != language)
+                 and (language is not None))):
                 raise unittest.SkipTest("Tests for language %s not enabled."
-                                        % lang)
-        self.language = lang
+                                        % language)
+        self.language = language
+        self.datatype = datatype
         self.run_example()
         self.language = None
-
-    def test_all(self):
-        r"""Test the version of the example that uses all languages."""
-        self.run_language('all')
-
-    def test_all_nomatlab(self):
-        r"""Test the version of the example that uses all languages."""
-        self.run_language('all_nomatlab')
+        self.datatype = None
