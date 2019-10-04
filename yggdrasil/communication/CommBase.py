@@ -269,6 +269,12 @@ class CommBase(tools.YggClass):
             received objects. Defaults to None.
         send_converter (func, optional): Converter that should be used on
             sent objects. Defaults to None.
+        vars (list, optional): Names of variables to be sent/received by
+            this comm. Defaults to [].
+        length_map (dict, optional): Map from pointer variable names to
+
+            the names of variables where their length will be stored.
+            Defaults to {}.
         comm (str, optional): The comm that should be created. This only serves
             as a check that the correct class is being created. Defaults to None.
         filter (:class:.FilterBase, optional): Callable class that will be used to
@@ -352,6 +358,9 @@ class CommBase(tools.YggClass):
                                    {'type': ['function', 'string']}]}}]},
                           'vars': {'type': 'array',
                                    'items': {'type': 'string'}},
+                          'length_map': {
+                              'type': 'object',
+                              'additionalProperties': {'type': 'string'}},
                           'field_names': {'type': 'array',
                                           'items': {'type': 'string'}},
                           'field_units': {'type': 'array',

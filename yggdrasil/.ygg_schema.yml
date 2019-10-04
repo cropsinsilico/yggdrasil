@@ -54,14 +54,14 @@ definitions:
           type: array
         filter:
           $ref: '#/definitions/filter'
-          description: Callable class that will be used to determine when messages
-            should be sent/received. Defaults to None and is ignored.
         is_default:
           default: false
-          description: If True, this comm was created to handle all input/output variables
-            to/from a model. Defaults to False. This variable is used internally and
-            should not be set explicitly in the YAML.
           type: boolean
+        length_map:
+          additionalProperties:
+            type: string
+          description: Map from pointer variable names to
+          type: object
         name:
           description: Name used for component in log messages.
           type: string
@@ -96,6 +96,8 @@ definitions:
                 - string
             type: array
         vars:
+          description: Names of variables to be sent/received by this comm. Defaults
+            to [].
           items:
             type: string
           type: array
@@ -227,8 +229,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -440,8 +442,6 @@ definitions:
           type: string
         filter:
           $ref: '#/definitions/filter'
-          description: Callable class that will be used to determine when messages
-            should be sent/received. Defaults to None and is ignored.
         format_str:
           description: If provided, this string will be used to format messages from
             a list of arguments and parse messages to get a list of arguments in C
@@ -462,9 +462,6 @@ definitions:
           - int
         is_default:
           default: false
-          description: If True, this comm was created to handle all input/output variables
-            to/from a model. Defaults to False. This variable is used internally and
-            should not be set explicitly in the YAML.
           type: boolean
         is_series:
           default: false
@@ -473,6 +470,11 @@ definitions:
             each output will be to a new file in the series. The addressed is assumed
             to contain a format for the index of the file. Defaults to False.
           type: boolean
+        length_map:
+          additionalProperties:
+            type: string
+          description: Map from pointer variable names to
+          type: object
         name:
           description: Name used for component in log messages.
           type: string
@@ -541,6 +543,8 @@ definitions:
             table. Defaults to False.
           type: boolean
         vars:
+          description: Names of variables to be sent/received by this comm. Defaults
+            to [].
           items:
             type: string
           type: array
@@ -555,9 +559,9 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
-      - name
       - filetype
+      - name
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1278,62 +1282,13 @@ definitions:
             is used.
           type: string
       required:
-      - language
       - working_dir
-      - name
       - args
+      - name
+      - language
       title: model_base
       type: object
     - anyOf:
-      - additionalProperties: true
-        description: Schema for model component ['c'] subtype.
-        properties:
-          compiler:
-            description: Command or path to executable that should be used to compile
-              the model. If not provided, the compiler will be determined based on
-              configuration options for the language (if present) and the registered
-              compilers that are available on the current operating system.
-            type: string
-          compiler_flags:
-            default: []
-            description: Flags that should be passed to the compiler during compilation.
-              If nto provided, the compiler flags will be determined based on configuration
-              options for the language (if present), the compiler defaults, and the
-              default_compiler_flags class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in C.
-            enum:
-            - c
-            type: string
-          linker:
-            description: Command or path to executable that should be used to link
-              the model. If not provided, the linker will be determined based on configuration
-              options for the language (if present) and the registered linkers that
-              are available on the current operating system
-            type: string
-          linker_flags:
-            default: []
-            description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
-              options for the language (if present), the linker defaults, and the
-              default_linker_flags class attribute.
-            items:
-              type: string
-            type: array
-          source_files:
-            default: []
-            description: Source files that should be compiled into an executable.
-              Defaults to an empty list and the driver will search for a source file
-              based on the model executable (the first model argument).
-            items:
-              type: string
-            type: array
-        title: CModelDriver
-        type: object
       - additionalProperties: true
         description: Schema for model component ['make'] subtype.
         properties:
@@ -1523,6 +1478,55 @@ definitions:
               in Matlab using symunit. Defaults to False.
             type: boolean
         title: MatlabModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['c'] subtype.
+        properties:
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in C.
+            enum:
+            - c
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+        title: CModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['c++', 'cpp'] subtype.
