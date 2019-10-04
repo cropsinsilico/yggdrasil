@@ -37,23 +37,25 @@ class TestJSONObjectMetaschemaType(parent.TestMetaschemaType):
     _mod = 'JSONObjectMetaschemaType'
     _cls = 'JSONObjectMetaschemaType'
 
-    def __init__(self, *args, **kwargs):
-        super(TestJSONObjectMetaschemaType, self).__init__(*args, **kwargs)
-        self._value = {}
-        self._fulldef = {'type': self.import_cls.name,
-                         'properties': {}}
-        self._typedef = {'properties': {}}
+    @staticmethod
+    def after_class_creation(cls):
+        r"""Actions to be taken during class construction."""
+        parent.TestMetaschemaType.after_class_creation(cls)
+        cls._value = {}
+        cls._fulldef = {'type': cls.get_import_cls().name,
+                        'properties': {}}
+        cls._typedef = {'properties': {}}
         for i, k in zip(range(container_utils._count), 'abcdefg'):
-            self._value[k] = container_utils._vallist[i]
-            self._fulldef['properties'][k] = container_utils._deflist[i]
-            self._typedef['properties'][k] = container_utils._typedef[i]
-        self._valid_encoded = [self._fulldef]
-        self._valid_decoded = [self._value]
-        self._invalid_encoded += [
-            {'type': self._fulldef['type'],
-             'properties': {'a': self._fulldef['properties']['a']}}]
-        self._invalid_encoded.append(copy.deepcopy(self._fulldef))
-        del self._invalid_encoded[-1]['properties']['a']['type']
-        self._invalid_encoded.append(copy.deepcopy(self._fulldef))
-        self._invalid_encoded[-1]['properties']['a']['type'] = 'invalid'
-        self._compatible_objects = [(self._value, self._value, None)]
+            cls._value[k] = container_utils._vallist[i]
+            cls._fulldef['properties'][k] = container_utils._deflist[i]
+            cls._typedef['properties'][k] = container_utils._typedef[i]
+        cls._valid_encoded = [cls._fulldef]
+        cls._valid_decoded = [cls._value]
+        cls._invalid_encoded += [
+            {'type': cls._fulldef['type'],
+             'properties': {'a': cls._fulldef['properties']['a']}}]
+        cls._invalid_encoded.append(copy.deepcopy(cls._fulldef))
+        del cls._invalid_encoded[-1]['properties']['a']['type']
+        cls._invalid_encoded.append(copy.deepcopy(cls._fulldef))
+        cls._invalid_encoded[-1]['properties']['a']['type'] = 'invalid'
+        cls._compatible_objects = [(cls._value, cls._value, None)]

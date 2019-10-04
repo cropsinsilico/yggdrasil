@@ -15,15 +15,18 @@ class TestClassMetaschemaType(parent.TestMetaschemaType):
     _mod = 'ClassMetaschemaType'
     _cls = 'ClassMetaschemaType'
 
-    def __init__(self, *args, **kwargs):
-        super(TestClassMetaschemaType, self).__init__(*args, **kwargs)
-        self._value = ValidClass
-        self._valid_encoded = [self.typedef]
-        self._valid_decoded = [self._value, object]
-        self._invalid_encoded = [{}]
-        self._invalid_decoded = ['hello']
-        self._compatible_objects = [(self._value, self._value, None)]
-        self._valid_normalize += [('%s:ValidClass' % __name__, ValidClass)]
+    @staticmethod
+    def after_class_creation(cls):
+        r"""Actions to be taken during class construction."""
+        parent.TestMetaschemaType.after_class_creation(cls)
+        cls._value = ValidClass
+        cls._valid_encoded = [dict(cls._typedef,
+                                   type=cls.get_import_cls().name)]
+        cls._valid_decoded = [cls._value, object]
+        cls._invalid_encoded = [{}]
+        cls._invalid_decoded = ['hello']
+        cls._compatible_objects = [(cls._value, cls._value, None)]
+        cls._valid_normalize += [('%s:ValidClass' % __name__, ValidClass)]
 
     def test_module_file(self):
         r"""Test decoding data that includes the full path to the module file."""

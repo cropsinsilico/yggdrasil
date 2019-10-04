@@ -1,3 +1,4 @@
+import six
 import numpy as np
 import copy
 import pprint
@@ -6,31 +7,40 @@ from yggdrasil.metaschema.datatypes import MetaschemaTypeError, YGG_MSG_HEAD
 from yggdrasil.tests import YggTestClassInfo
 
 
+class TstMetaschemaTypeMeta(type):
+    r"""Meta class for setting up test information."""
+
+    def __new__(meta, name, bases, class_dict):
+        attr = dict(_explicit=False,
+                    _empty_msg=b'',
+                    _typedef={},
+                    _invalid_validate=[None],
+                    _valid_encoded=[],
+                    _invalid_encoded=[{}],
+                    _valid_decoded=['nothing'],
+                    _invalid_decoded=[],
+                    _compatible_objects=[],
+                    _encode_type_kwargs={},
+                    _encode_data_kwargs={},
+                    _valid_normalize=[(None, None)])
+        attr.update(class_dict)
+        cls = type.__new__(meta, name, bases, attr)
+        cls.after_class_creation(cls)
+        return cls
+    
+
+@six.add_metaclass(TstMetaschemaTypeMeta)
 class TestMetaschemaType(YggTestClassInfo):
     r"""Test class for MetaschemaType class."""
 
+    _mod_base = 'yggdrasil.metaschema.datatypes'
     _mod = 'MetaschemaType'
     _cls = 'MetaschemaType'
-    _explicit = False
 
-    def __init__(self, *args, **kwargs):
-        super(TestMetaschemaType, self).__init__(*args, **kwargs)
-        self._empty_msg = b''
-        self._typedef = {}
-        self._invalid_validate = [None]
-        self._valid_encoded = []
-        self._invalid_encoded = [{}]
-        self._valid_decoded = ['nothing']
-        self._invalid_decoded = []
-        self._compatible_objects = []
-        self._encode_type_kwargs = {}
-        self._encode_data_kwargs = {}
-        self._valid_normalize = [(None, None)]
-
-    @property
-    def mod(self):
-        r"""str: Absolute name of module containing class to be tested."""
-        return 'yggdrasil.metaschema.datatypes.%s' % self._mod
+    @staticmethod
+    def after_class_creation(cls):
+        r"""Actions to be taken during class construction."""
+        pass
 
     @property
     def typedef(self):

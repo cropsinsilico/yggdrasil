@@ -756,6 +756,7 @@ class YggTestClass(YggTestBase):
     r"""Test class for a YggClass."""
 
     testing_option_kws = {}
+    _mod_base = None
     _mod = None
     _cls = None
     skip_init = False
@@ -799,7 +800,10 @@ class YggTestClass(YggTestBase):
     @property
     def mod(self):
         r"""str: Absolute name of module containing class to be tested."""
-        return self._mod
+        out = self._mod
+        if self._mod_base is not None:
+            out = self._mod_base + '.' + out
+        return out
 
     @property
     def inst_args(self):
@@ -811,6 +815,20 @@ class YggTestClass(YggTestBase):
         r"""dict: Keyword arguments for creating a class instance."""
         out = self._inst_kwargs
         return out
+
+    @classmethod
+    def get_import_cls(cls):
+        r"""Import the tested class from its module"""
+        if cls._mod is None:
+            raise Exception("No module registered.")
+        if cls._cls is None:
+            raise Exception("No class registered.")
+        mod_tot = cls._mod
+        if cls._mod_base is not None:
+            mod_tot = cls._mod_base + '.' + mod_tot
+        mod = importlib.import_module(mod_tot)
+        cls = getattr(mod, cls._cls)
+        return cls
 
     @property
     def import_cls(self):

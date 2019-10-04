@@ -22,16 +22,19 @@ class TestInstanceMetaschemaType(parent.TestMetaschemaType):
     _mod = 'InstanceMetaschemaType'
     _cls = 'InstanceMetaschemaType'
 
-    def __init__(self, *args, **kwargs):
-        super(TestInstanceMetaschemaType, self).__init__(*args, **kwargs)
-        self._typedef.update({'class': ValidClass,
-                              'args': {'a': {'type': 'int'},
-                                       'b': {'type': 'int'}}})
+    @staticmethod
+    def after_class_creation(cls):
+        r"""Actions to be taken during class construction."""
+        parent.TestMetaschemaType.after_class_creation(cls)
+        cls._typedef.update({'class': ValidClass,
+                             'args': {'a': {'type': 'int'},
+                                      'b': {'type': 'int'}}})
         # '%s:ValidClass' % __name__
-        self._value = ValidClass(0, 1)
-        self._valid_encoded = [self.typedef]
-        self._valid_decoded = [self._value]
-        self._invalid_encoded = [{}]
-        self._invalid_decoded = [int(1), 'hello']
-        self._invalid_validate += [InvalidClass()]
-        self._compatible_objects = [(self._value, self._value, None)]
+        value = ValidClass(0, 1)
+        cls._valid_encoded = [dict(cls._typedef,
+                                   type=cls.get_import_cls().name)]
+        cls._valid_decoded = [value]
+        cls._invalid_encoded = [{}]
+        cls._invalid_decoded = [int(1), 'hello']
+        cls._invalid_validate += [InvalidClass()]
+        cls._compatible_objects = [(value, value, None)]

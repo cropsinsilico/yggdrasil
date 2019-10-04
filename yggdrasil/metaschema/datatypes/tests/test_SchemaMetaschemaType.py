@@ -8,26 +8,28 @@ class TestSchemaMetaschemaType(parent.TestJSONObjectMetaschemaType):
     _mod = 'SchemaMetaschemaType'
     _cls = 'SchemaMetaschemaType'
 
-    def __init__(self, *args, **kwargs):
-        super(TestSchemaMetaschemaType, self).__init__(*args, **kwargs)
-        self._value = self._fulldef
-        self._fulldef = {'type': 'schema'}
-        self._typedef = {'type': 'schema'}
-        self._valid_encoded = [self._fulldef]
-        self._valid_decoded = [self._value]
-        self._invalid_validate = [None]
-        self._invalid_decoded = [{}]
-        self._invalid_encoded = [{}]
-        self._compatible_objects = [(self._value, self._value, None)]
-        self._valid_normalize += [('float', {'type': 'float',
-                                             'precision': 64}),
-                                  ({'units': 'g'}, {'units': 'g',
-                                                    'type': 'scalar',
-                                                    'subtype': 'float',
-                                                    'precision': 64}),
-                                  ({'title': 'a'}, {'title': 'a'}),
-                                  ({'title': 'a', 'units': 'g'},
-                                   {'title': 'a', 'units': 'g',
-                                    'type': 'scalar', 'subtype': 'float',
-                                    'precision': 64}),
-                                  ({}, {})]
+    @staticmethod
+    def after_class_creation(cls):
+        r"""Actions to be taken during class construction."""
+        parent.TestJSONObjectMetaschemaType.after_class_creation(cls)
+        cls._value = cls._fulldef
+        cls._fulldef = {'type': 'schema'}
+        cls._typedef = {'type': 'schema'}
+        cls._valid_encoded = [cls._fulldef]
+        cls._valid_decoded = [cls._value]
+        cls._invalid_validate = [None]
+        cls._invalid_decoded = [{}]
+        cls._invalid_encoded = [{}]
+        cls._compatible_objects = [(cls._value, cls._value, None)]
+        cls._valid_normalize += [('float', {'type': 'float',
+                                            'precision': 64}),
+                                 ({'units': 'g'}, {'units': 'g',
+                                                   'type': 'scalar',
+                                                   'subtype': 'float',
+                                                   'precision': 64}),
+                                 ({'title': 'a'}, {'title': 'a'}),
+                                 ({'title': 'a', 'units': 'g'},
+                                  {'title': 'a', 'units': 'g',
+                                   'type': 'scalar', 'subtype': 'float',
+                                   'precision': 64}),
+                                 ({}, {})]
