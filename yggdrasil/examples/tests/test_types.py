@@ -66,7 +66,8 @@ class TestExampleTypes(ExampleTstBase):
         outputs = [{'name': 'y', 'datatype': testtype}]
         # Write the model
         function_contents = drv.write_assign_to_output(
-            name='y', value='x', outputs_in_inputs=drv.outputs_in_inputs)
+            outputs[0], inputs[0],
+            outputs_in_inputs=drv.outputs_in_inputs)
         function_contents.append(
             drv.format_function_param('print', message='IN MODEL'))
         if 'print_object' in drv.function_param:
@@ -78,8 +79,6 @@ class TestExampleTypes(ExampleTstBase):
             'model', function_contents=function_contents,
             inputs=inputs, outputs=outputs, outputs_in_inputs=drv.outputs_in_inputs)
         with open(modelfile, 'w') as fd:
-            print(modelfile)
-            print('\n'.join(lines))
             fd.write('\n'.join(lines))
         os.environ['TEST_LANGUAGE'] = language
         os.environ['TEST_LANGUAGE_EXT'] = language_ext
@@ -95,11 +94,3 @@ class TestExampleTypes(ExampleTstBase):
         self._output_files = [self.setup_model(self.language,
                                                self.datatype)]
         super(TestExampleTypes, self).run_example()
-        
-    # def run_language(self, lang, dtype):
-    #     r"""Run a test for the specified language."""
-    #     self.datatype = dtype
-    #     self._output_files = [self.setup_model(lang, dtype)]
-    #     super(TestExampleTypes, self).run_language(lang)
-    #     self.datatype = None
-    #     self._output_files = []

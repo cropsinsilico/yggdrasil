@@ -1186,6 +1186,12 @@ definitions:
           items:
             $ref: '#/definitions/comm'
           type: array
+        outputs_in_inputs:
+          description: If True, outputs from wrapped model functions are passed by
+            pointer as inputs for modification and the return value will be a flag.
+            If False, outputs are limited to return values. Defaults to the value
+            of the class attribute outputs_in_inputs.
+          type: boolean
         overwrite:
           default: true
           description: If True, any existing model products (compilation products,

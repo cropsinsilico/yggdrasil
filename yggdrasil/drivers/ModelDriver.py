@@ -150,6 +150,11 @@ class ModelDriver(Driver):
         valgrind_flags (list, optional): Flags to pass to valgrind. Defaults to [].
         model_index (int, optional): Index of model in list of models being run.
             Defaults to 0.
+        outputs_in_inputs (bool, optional): If True, outputs from wrapped model
+            functions are passed by pointer as inputs for modification and the
+            return value will be a flag. If False, outputs are limited to
+            return values. Defaults to the value of the class attribute
+            outputs_in_inputs.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -277,7 +282,8 @@ class ModelDriver(Driver):
         'valgrind_flags': {'type': 'array',
                            'default': ['--leak-check=full',
                                        '--show-leak-kinds=all'],  # '-v'
-                           'items': {'type': 'string'}}}
+                           'items': {'type': 'string'}},
+        'outputs_in_inputs': {'type': 'boolean'}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     # 'inputs', 'outputs', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
@@ -306,6 +312,7 @@ class ModelDriver(Driver):
     _library_cache = {}
 
     def __init__(self, name, args, model_index=0, **kwargs):
+        self.model_outputs_in_inputs = kwargs.pop('outputs_in_inputs', None)
         super(ModelDriver, self).__init__(name, **kwargs)
         # Setup process things
         self.model_process = None
@@ -359,10 +366,10 @@ class ModelDriver(Driver):
             # Write file
             args[0] = os.path.join(model_dir, 'ygg_' + model_base
                                    + self.language_ext[0])
-            lines = self.write_model_wrapper(self.model_function_file,
-                                             self.function,
-                                             inputs=self.inputs,
-                                             outputs=self.outputs)
+            lines = self.write_model_wrapper(
+                self.model_function_file, self.function,
+                inputs=self.inputs, outputs=self.outputs,
+                outputs_in_inputs=self.model_outputs_in_inputs)
             with open(args[0], 'w') as fd:
                 fd.write('\n'.join(lines))
         # Parse arguments
@@ -1221,7 +1228,8 @@ class ModelDriver(Driver):
                 inst.cleanup()
 
     @classmethod
-    def format_function_param(cls, key, default=None, **kwargs):
+    def format_function_param(cls, key, default=None,
+                              replacement=None, **kwargs):
         r"""Return the formatted version of the specified key.
 
         Args:
@@ -1229,6 +1237,8 @@ class ModelDriver(Driver):
                 formatted.
             default (str, optional): Format that should be returned if key
                 is not in cls.function_param. Defaults to None.
+            replacement (str, optional): Format that should be used instead
+                of the one in cls.function_param. Defaults to None.
             **kwargs: Additional keyword arguments are used in formatting the
                 request function parameter.
 
@@ -1240,11 +1250,15 @@ class ModelDriver(Driver):
                 is not set.
 
         """
-        if (key not in cls.function_param) and (default is None):
-            raise NotImplementedError(("Language %s dosn't have an entry in "
-                                       "function_param for key '%s'")
-                                      % (cls.language, key))
-        return cls.function_param.get(key, default).format(**kwargs)
+        if replacement is not None:
+            fmt = replacement
+        else:
+            if (key not in cls.function_param) and (default is None):
+                raise NotImplementedError(("Language %s dosn't have an entry in "
+                                           "function_param for key '%s'")
+                                          % (cls.language, key))
+            fmt = cls.function_param.get(key, default)
+        return fmt.format(**kwargs)
 
     @classmethod
     def parse_function_definition(cls, model_file, model_function,
@@ -1306,7 +1320,7 @@ class ModelDriver(Driver):
                             if igrp[k] is None:
                                 del igrp[k]
                         if 'native_type' in igrp:
-                            igrp['native_type'] = igrp['native_type'].strip()
+                            igrp['native_type'] = igrp['native_type'].replace(' ', '')
                             igrp['datatype'] = cls.get_json_type(igrp['native_type'])
                         new_val.append(igrp)
                     out[io] = new_val
@@ -1321,6 +1335,17 @@ class ModelDriver(Driver):
                                       "%s in input variables.") % o)
                 out['outputs'].append(cls.input2output(input_map[o]))
                 out['inputs'].remove(input_map[o])
+        if out.get('flag_var', None):
+            flag_var = {'name': out.pop('flag_var'),
+                        'datatype': {'type': 'flag'}}
+            if out.get('flag_type', None):
+                flag_var['native_type'] = out.pop('flag_type').replace(' ', '')
+                flag_var['datatype'] = cls.get_json_type(flag_var['native_type'])
+            if outputs_in_inputs:
+                out['flag_var'] = flag_var
+            else:
+                assert(not out.get('outputs', []))
+                out['outputs'] = [flag_var]
         return out
 
     @classmethod
@@ -1343,7 +1368,7 @@ class ModelDriver(Driver):
             else:
                 variables.append(x)
         return variables
-    
+
     @classmethod
     def update_io_from_function(cls, model_file, model_function,
                                 inputs=[], outputs=[], contents=None,
@@ -1364,6 +1389,10 @@ class ModelDriver(Driver):
                 presented in the function definition as inputs. Defaults
                 to False.
 
+        Returns:
+            dict, None: Flag variable used by the model. If None, the
+                model does not use a flag variable.
+
         """
         if outputs_in_inputs is None:
             outputs_in_inputs = cls.outputs_in_inputs
@@ -1375,9 +1404,14 @@ class ModelDriver(Driver):
             info = {"inputs": [], "outputs": []}
         info_map = {io: OrderedDict([(x['name'], x) for x in info.get(io, [])])
                     for io in ['inputs', 'outputs']}
+        # Determine flag variable
+        flag_var = None
+        if info.get('flag_var', None):
+            flag_var = dict(info['flag_var'], name='model_flag')
         # Move variables if outputs in inputs
         if outputs_in_inputs:
-            if ((len(inputs) + len(outputs)) == len(info['inputs'])):
+            if ((((len(inputs) + len(outputs)) == len(info['inputs']))
+                 and (len(info['outputs']) == 0))):
                 for i, vdict in enumerate(info['inputs'][:len(inputs)]):
                     if inputs[i].get('vars', False):
                         assert(inputs[i]['vars'] == [vdict['name']])
@@ -1413,22 +1447,41 @@ class ModelDriver(Driver):
                         v['datatype'] = {'type': v['datatype']}
                 if isinstance(x.get('datatype', None), str):
                     x['datatype'] = {'type': x['datatype']}
+            # Check for user defined length variables and add flag to
+            # length variables
+            for x in io_var:
+                if 'length_map' in x:
+                    var_map = {v['name']: v for v in x['vars']}
+                    for k, v in x['length_map'].items():
+                        var_map[k]['length_var'] = v
+                for v in x['vars']:
+                    if 'length_var' in v:
+                        v['length_var'] = info_map[io][v['length_var']]
+                        v['length_var']['is_length_var'] = True
+                    else:
+                        v['length_var'] = False
             # Update datatypes
             if cls.is_typed:
                 for x in io_var:
-                    if (len(x['vars']) == 1):
-                        x['datatype'] = x['vars'][0]['datatype']
+                    non_length = []
+                    for v in x['vars']:
+                        if not v.get('is_length_var', False):
+                            non_length.append(v)
+                    if (len(non_length) == 1):
+                        x['datatype'] = non_length[0]['datatype']
                     else:
                         x['datatype'] = {
                             'type': 'array',
-                            'items': [v['datatype'] for v in x['vars']]}
+                            'items': [v['datatype'] for v in non_length]}
                     for v in x['vars']:
                         if 'native_type' not in v:
                             v['native_type'] = cls.get_native_type(**v)
+        return flag_var
 
     @classmethod
     def write_model_wrapper(cls, model_file, model_function,
-                            inputs=[], outputs=[]):
+                            inputs=[], outputs=[],
+                            outputs_in_inputs=None):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -1440,6 +1493,9 @@ class ModelDriver(Driver):
                 Defaults to [].
             outputs (list, optional): List of model outputs including types.
                 Defaults to [].
+            outputs_in_inputs (bool, optional): If True, the outputs are
+                presented in the function definition as inputs. Defaults
+                to the class attribute outputs_in_inputs.
 
         Returns:
             list: Lines of code wrapping the provided model with the necessary
@@ -1451,22 +1507,28 @@ class ModelDriver(Driver):
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
         lines = []
-        flag_var = 'flag'
+        flag_var = {'name': 'flag', 'datatype': {'type': 'flag'}}
+        if outputs_in_inputs is None:
+            outputs_in_inputs = cls.outputs_in_inputs
         # Update types based on the function definition for typed languages
-        cls.update_io_from_function(model_file, model_function,
-                                    inputs=inputs, outputs=outputs)
+        model_flag = cls.update_io_from_function(
+            model_file, model_function,
+            inputs=inputs, outputs=outputs,
+            outputs_in_inputs=outputs_in_inputs)
         # Declare variables and flag, then define flag
         free_vars = []
         if 'declare' in cls.function_param:
-            lines.append(cls.write_declaration(name=flag_var,
-                                               datatype={'type': 'flag'},
-                                               requires_freeing=free_vars))
+            lines += cls.write_declaration(flag_var,
+                                           requires_freeing=free_vars)
+            if model_flag:
+                lines += cls.write_declaration(
+                    model_flag, requires_freeing=free_vars)
             for x in inputs + outputs:
                 for v in x.get('vars', [x]):
-                    lines.append(cls.write_declaration(
-                        requires_freeing=free_vars, **v))
+                    lines += cls.write_declaration(
+                        v, requires_freeing=free_vars)
         lines.append(cls.format_function_param(
-            'assign', name=flag_var,
+            'assign', name=flag_var['name'],
             value=cls.function_param['true']))
         # Declare/define input and output channels
         for x in inputs:
@@ -1478,43 +1540,42 @@ class ModelDriver(Driver):
         # Receive inputs before loop
         for x in inputs:
             if x.get('outside_loop', False):
-                lines += cls.write_model_recv(x['channel'],
-                                              x, flag_var=flag_var)
+                lines += cls.write_model_recv(x['channel'], x,
+                                              flag_var=flag_var)
         # Loop
         loop_lines = []
         # Receive inputs
         for x in inputs:
             if not x.get('outside_loop', False):
-                loop_lines += cls.write_model_recv(x['channel'],
-                                                   x, flag_var=flag_var,
+                loop_lines += cls.write_model_recv(x['channel'], x,
+                                                   flag_var=flag_var,
                                                    allow_failure=True)
         # Call model
-        loop_lines += cls.write_model_function_call(model_function, flag_var,
-                                                    inputs, outputs)
+        loop_lines += cls.write_model_function_call(
+            model_function, model_flag, inputs, outputs)
         # Send outputs
         for x in outputs:
             if not x.get('outside_loop', False):
-                loop_lines += cls.write_model_send(x['channel'],
-                                                   x, flag_var=flag_var)
+                loop_lines += cls.write_model_send(x['channel'], x,
+                                                   flag_var=flag_var)
         # Add break if there are not any inputs
         if not inputs:
             loop_lines.append(cls.format_function_param(
-                'assign', name=flag_var,
+                'assign', name=flag_var['name'],
                 value=cls.function_param['false']))
         # Add loop in while block
         flag_cond = cls.format_function_param('flag_cond',
                                               default='{flag_var}',
-                                              flag_var=flag_var)
+                                              flag_var=flag_var['name'])
         lines += cls.write_while_loop(flag_cond, loop_lines)
         # Send outputs after loop
         for x in outputs:
             if x.get('outside_loop', False):
-                lines += cls.write_model_send(x['channel'],
-                                              x, flag_var=flag_var)
+                lines += cls.write_model_send(x['channel'], x,
+                                              flag_var=flag_var)
         # Free variables
         for x in free_vars:
-            lines.append(cls.format_function_param(
-                'free', variable=x))
+            lines += cls.write_free(x)
         # Wrap as executable with interface & model import
         prefix = []
         if 'interface' in cls.function_param:
@@ -1551,7 +1612,8 @@ class ModelDriver(Driver):
 
     @classmethod
     def write_model_function_call(cls, model_function, flag_var, inputs, outputs,
-                                  outputs_in_inputs=None):
+                                  outputs_in_inputs=None, on_failure=None,
+                                  format_not_flag_cond=None, format_flag_cond=None):
         r"""Write lines necessary to call the model function.
 
         Args:
@@ -1562,7 +1624,25 @@ class ModelDriver(Driver):
             outputs (list): List of dictionaries describing outputs from the model.
             outputs_in_inputs (bool, optional): If True, the outputs are
                 presented in the function definition as inputs. Defaults
-                to False.
+                to the class attribute outputs_in_inputs.
+            on_failure (list, optional): Lines to be executed if the model
+                call fails. Defaults to an error message. This variable
+                is only used if flag_var is not None and outputs_in_inputs
+                is True.
+            format_not_flag_cond (str, optional): Format string that produces
+                a conditional expression that evaluates to False when the
+                model flag indicates a failure. Defaults to None and the
+                class's value for 'not_flag_cond' in function_param is used
+                if it exists. If it does not exist, format_flag_cond is used.
+            format_flag_cond (str, optional): Format string that produces
+                a conditional expression that evaluates to True when the
+                model flag indicates a success. Defaults to None and the
+                defaults class's value for 'flag_cond' in function_param is
+                used if it exists. If it does not exist, the flag is
+                directly evaluated as if it were a boolean.
+
+checking if the model flag indicates
+                a failure
 
         Returns:
             list: Lines required to carry out a call to a model function in
@@ -1573,9 +1653,26 @@ class ModelDriver(Driver):
             outputs_in_inputs = cls.outputs_in_inputs
         func_inputs = cls.channels2vars(inputs)
         func_outputs = cls.channels2vars(outputs)
+        if isinstance(flag_var, dict):
+            flag_var = flag_var['name']
         out = cls.write_function_call(
             model_function, inputs=func_inputs, outputs=func_outputs,
             flag_var=flag_var, outputs_in_inputs=outputs_in_inputs)
+        if flag_var and outputs_in_inputs:
+            if (not format_flag_cond) and ('not_flag_cond' in cls.function_param):
+                flag_cond = cls.format_function_param(
+                    'not_flag_cond', flag_var=flag_var,
+                    replacement=format_not_flag_cond)
+            else:
+                flag_cond = '%s (%s)' % (
+                    cls.function_param['not'],
+                    cls.format_function_param(
+                        'flag_cond', default='{flag_var}', flag_var=flag_var,
+                        replacement=format_flag_cond))
+            if on_failure is None:
+                on_failure = [cls.format_function_param(
+                    'error', error_msg="Model call failed.")]
+            out += cls.write_if_block(flag_cond, on_failure)
         return out
 
     @classmethod
@@ -1605,7 +1702,10 @@ class ModelDriver(Driver):
         if not isinstance(recv_var, str):
             recv_var_par = cls.channels2vars(recv_var)
             recv_var_str = cls.prepare_output_variables(
-                recv_var_par, in_inputs=cls.outputs_in_inputs)
+                recv_var_par, in_inputs=cls.outputs_in_inputs,
+                for_yggdrasil=True)
+        if isinstance(flag_var, dict):
+            flag_var = flag_var['name']
         if cls.outputs_in_inputs:
             inputs = [recv_var_str]
             outputs = [flag_var]
@@ -1627,7 +1727,7 @@ class ModelDriver(Driver):
                                           flag_var=flag_var))
         fail_message = "Could not receive %s." % recv_var_str
         if allow_failure:
-            fail_message += ' End of input.'
+            fail_message = 'End of input from %s.' % recv_var_str
             if_block = [cls.format_function_param('print', message=fail_message),
                         cls.function_param.get('break', 'break')]
         else:
@@ -1664,7 +1764,10 @@ class ModelDriver(Driver):
         send_var_str = send_var
         if not isinstance(send_var_str, str):
             send_var_par = cls.channels2vars(send_var)
-            send_var_str = cls.prepare_input_variables(send_var_par)
+            send_var_str = cls.prepare_input_variables(
+                send_var_par, for_yggdrasil=True)
+        if isinstance(flag_var, dict):
+            flag_var = flag_var['name']
         if cls.include_channel_obj:
             send_var_str = [channel, send_var_str]
         lines = cls.write_function_call(
@@ -1752,6 +1855,7 @@ class ModelDriver(Driver):
         out.append(cls.format_function_param(
             'function_def_begin', function_name=function_name,
             input_var=input_var, output_var=output_var, **kwargs))
+        free_vars = []
         if 'declare' in cls.function_param:
             decl_outputs = []
             if isinstance(dont_declare_output, list):
@@ -1761,14 +1865,19 @@ class ModelDriver(Driver):
             elif not dont_declare_output:
                 decl_outputs = outputs
             for o in decl_outputs:
-                out.append(cls.function_param['indent']
-                           + cls.write_declaration(**o))
+                out += [cls.function_param['indent'] + x for
+                        x in cls.write_declaration(
+                            o, requires_freeing=free_vars)]
         if outputs_in_inputs:
             out.append(cls.function_param['indent']
                        + cls.format_function_param(
                            'assign', **flag_var))
         for x in function_contents:
             out.append(cls.function_param['indent'] + x)
+        for x in free_vars:
+            out.append(cls.function_param['indent']
+                       + cls.format_function_param(
+                           'free', variable=x))
         if output_var and ('return' in cls.function_param):
             out.append(cls.function_param['indent']
                        + cls.format_function_param(
@@ -1915,6 +2024,19 @@ class ModelDriver(Driver):
         return var
 
     @classmethod
+    def requires_length_var(var):
+        r"""Determine if a variable requires a separate length variable.
+
+        Args:
+            var (dict): Dictionary of variable properties.
+
+        Returns:
+            bool: True if a length variable is required, False otherwise.
+
+        """
+        return False
+    
+    @classmethod
     def get_native_type(cls, **kwargs):
         r"""Get the native type.
 
@@ -1957,28 +2079,82 @@ class ModelDriver(Driver):
         return cls.get_inverse_type_map()[native_type]
     
     @classmethod
-    def write_declaration(cls, name, **kwargs):
-        r"""Return the line required to declare a variable with a certain
+    def write_declaration(cls, var, value=None, requires_freeing=None):
+        r"""Return the lines required to declare a variable with a certain
         type.
 
         Args:
-            name (str): Name of variable being declared.
-            **kwargs: Addition keyword arguments are passed to get_native_type.
+            var (dict, str): Name or information dictionary for the variable
+                being declared.
+            value (str, optional): Value that should be assigned to the
+                variable after it is declared.
+            requires_freeing (list, optional): Existing list that variables
+                requiring freeing should be appended to. Defaults to None
+                and is ignored.
 
         Returns:
-            str: The line declaring the variable.
+            list: The lines declaring the variable.
 
         """
-        type_name = cls.get_native_type(**kwargs)
-        return cls.format_function_param('declare',
+        if isinstance(var, str):
+            var = {'name': var}
+        type_name = cls.get_native_type(**var)
+        out = [cls.format_function_param('declare',
                                          type_name=type_name,
-                                         variable=name)
+                                         variable=var['name'])]
+        if (value is None) and isinstance(var.get('datatype', False), dict):
+            init_type = 'init_%s' % var['datatype']['type']
+            free_type = 'free_%s' % var['datatype']['type']
+            if init_type in cls.function_param:
+                assert(free_type in cls.function_param)
+                value = cls.function_param[init_type]
+                if requires_freeing is not None:
+                    requires_freeing.append(var)
+        if value is not None:
+            out.append(cls.format_function_param(
+                'assign', name=var['name'], value=value))
+        return out
 
     @classmethod
-    def write_assign_to_output(cls, outputs_in_inputs=False, **kwargs):
+    def write_free(cls, var, **kwargs):
+        r"""Return the lines required to free a variable with a certain type.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being declared.
+            **kwargs: Additional keyword arguments are passed to format_function_param.
+
+        Returns:
+            list: The lines freeing the variable.
+
+        """
+        if isinstance(var, str):
+            var = {'name': var}
+        if var.get('dont_free', False):
+            return []
+        if ((isinstance(var.get('datatype', False), dict)
+             and (('free_%s' % var['datatype']['type'])
+                  in cls.function_param))):
+            out = [cls.format_function_param(
+                'free_%s' % var['datatype']['type'],
+                variable=var['name'], **kwargs)]
+        else:
+            out = [cls.format_function_param(
+                'free', variable=var['name'], **kwargs)]
+        return out
+
+    @classmethod
+    def write_assign_to_output(cls, dst_var, src_var, copy=False,
+                               outputs_in_inputs=False, **kwargs):
         r"""Write lines assigning a value to an output variable.
 
         Args:
+            dst_var (str, dict): Name or information dictionary for
+                variable being assigned to.
+            src_var (str, dict): Name or information dictionary for
+                value being assigned to dst_var.
+            copy (bool, optional): If True, the assigned value is copied
+                during assignment. Defaults to False.
             outputs_in_inputs (bool, optional): If True, outputs are passed
                 as input parameters. In some languages, this means that a
                 pointer or reference is passed (e.g. C) and so the assignment
@@ -1989,7 +2165,26 @@ class ModelDriver(Driver):
             list: Lines achieving assignment.
 
         """
-        return [cls.format_function_param('assign', **kwargs)]
+        datatype = None
+        if isinstance(dst_var, dict):
+            kwargs['name'] = dst_var['name']
+            datatype = dst_var['datatype']
+        else:
+            kwargs['name'] = dst_var
+        if isinstance(src_var, dict):
+            kwargs['value'] = src_var['name']
+            datatype = src_var['datatype']
+        else:
+            kwargs['value'] = src_var
+        if copy:
+            if ((isinstance(datatype, dict)
+                 and ('copy_' + datatype['type'] in cls.function_param))):
+                return [cls.format_function_param(
+                    'copy_' + datatype['type'], **kwargs)]
+            else:
+                return [cls.format_function_param('assign_copy', **kwargs)]
+        else:
+            return [cls.format_function_param('assign', **kwargs)]
 
     @classmethod
     def write_expand_single_element(cls, output_var):
@@ -2058,7 +2253,8 @@ class ModelDriver(Driver):
         return out
 
     @classmethod
-    def prepare_variables(cls, vars_list, in_definition=False):
+    def prepare_variables(cls, vars_list, in_definition=False,
+                          for_yggdrasil=False):
         r"""Concatenate a set of input variables such that it can be passed as a
         single string to the function_call parameter.
 
@@ -2069,6 +2265,9 @@ class ModelDriver(Driver):
             in_definition (bool, optional): If True, the returned sequence
                 will be of the format required for specifying variables
                 in a function definition. Defaults to False.
+            for_yggdrasil (bool, optional): If True, the variables will be
+                prepared in the formated expected by calls to yggdarsil
+                send/recv methods. Defaults to False.
 
         Returns:
             str: Concatentated variables list.
@@ -2086,7 +2285,8 @@ class ModelDriver(Driver):
         return ', '.join(name_list)
 
     @classmethod
-    def prepare_input_variables(cls, vars_list, in_definition=False):
+    def prepare_input_variables(cls, vars_list, in_definition=False,
+                                for_yggdrasil=False):
         r"""Concatenate a set of input variables such that it can be passed as a
         single string to the function_call parameter.
 
@@ -2097,16 +2297,20 @@ class ModelDriver(Driver):
             in_definition (bool, optional): If True, the returned sequence
                 will be of the format required for specifying input
                 variables in a function definition. Defaults to False.
+            for_yggdrasil (bool, optional): If True, the variables will be
+                prepared in the formated expected by calls to yggdarsil
+                send/recv methods. Defaults to False.
 
         Returns:
             str: Concatentated variables list.
 
         """
-        return cls.prepare_variables(vars_list, in_definition=in_definition)
+        return cls.prepare_variables(vars_list, in_definition=in_definition,
+                                     for_yggdrasil=for_yggdrasil)
 
     @classmethod
     def prepare_output_variables(cls, vars_list, in_definition=False,
-                                 in_inputs=False):
+                                 in_inputs=False, for_yggdrasil=False):
         r"""Concatenate a set of output variables such that it can be passed as
         a single string to the function_call parameter.
 
@@ -2120,12 +2324,16 @@ class ModelDriver(Driver):
             in_inputs (bool, optional): If True, the output variables should
                 be formated to be included as input variables. Defaults to
                 False.
+            for_yggdrasil (bool, optional): If True, the variables will be
+                prepared in the formated expected by calls to yggdarsil
+                send/recv methods. Defaults to False.
 
         Returns:
             str: Concatentated variables list.
 
         """
-        out = cls.prepare_variables(vars_list, in_definition=in_definition)
+        out = cls.prepare_variables(vars_list, in_definition=in_definition,
+                                    for_yggdrasil=for_yggdrasil)
         if ((('multiple_outputs' in cls.function_param)
              and isinstance(vars_list, list) and (len(vars_list) > 1))):
             out = cls.format_function_param('multiple_outputs', outputs=out)

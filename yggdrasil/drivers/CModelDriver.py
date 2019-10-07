@@ -316,7 +316,14 @@ class CModelDriver(CompiledModelDriver):
         'not_flag_cond': '{flag_var} < 0',
         'flag_cond': '{flag_var} >= 0',
         'declare': '{type_name} {variable};',
+        'init_ply': 'init_ply()',
+        'init_obj': 'init_obj()',
+        'copy_ply': '{name} = copy_ply({value});',
+        'copy_obj': '{name} = copy_obj({value});',
+        'free_ply': 'free_ply({variable});',
+        'free_obj': 'free_obj({variable});',
         'assign': '{name} = {value};',
+        'assign_copy': 'memcpy({name}, {value}, {N}*sizeof({native_type}));',
         'comment': '//',
         'true': '1',
         'false': '0',
@@ -338,7 +345,7 @@ class CModelDriver(CompiledModelDriver):
         'exec_begin': 'int main() {',
         'exec_end': '  return 0;\n}',
         'exec_prefix': '#include <stdbool.h>',
-        'free': 'if ({variable} != NULL) free({variable});',
+        'free': 'if ({variable} != NULL) {{ free({variable}); {variable} = NULL; }}',
         'function_def_begin': '{output_type} {function_name}({input_var}) {{',
         'return': 'return {output_var};',
         'function_def_regex': (r'(?P<flag_type>.+?)\s*{function_name}\s*'
@@ -541,17 +548,49 @@ class CModelDriver(CompiledModelDriver):
         """
         out = super(CModelDriver, cls).parse_function_definition(
             model_file, model_function, **kwargs)
-        if not kwargs.get('outputs_in_inputs', cls.outputs_in_inputs):
+        outputs_in_inputs = kwargs.get('outputs_in_inputs', cls.outputs_in_inputs)
+        if not outputs_in_inputs:
             assert(not out.get('outputs', []))
-            flag_output = {'name': out.pop('flag_var'),
-                           'native_type': out.pop('flag_type').strip()}
+            flag_output = {
+                'name': out.pop('flag_var'),
+                'native_type': out.pop('flag_type').replace(' ', '')}
             flag_output['datatype'] = cls.get_json_type(flag_output['native_type'])
             out['outputs'] = [flag_output]
+        # Check for length variables
+        for io in ['inputs', 'outputs']:
+            io_map = {x['name']: x for x in out.get(io, [])}
+            for i, x in enumerate(out.get(io, [])):
+                if ((cls.requires_length_var(x)
+                     and ((x['name'] + '_length') in io_map))):
+                    x['length_var'] = x['name'] + '_length'
+            # Check for outputs
+            if outputs_in_inputs and (io == 'inputs'):
+                move = []
+                move_flags = {}
+                for x in out.get('inputs', []):
+                    if x.get('ptr', []) and (x['native_type'] != 'char*'):
+                        move.append(x)
+                        if x.get('length_var', False):
+                            move_flags[x['name']] = x['length_var']
+                if move:
+                    out.setdefault('outputs', [])
+                    move_names = [x['name'] for x in move]
+                    for k, v in move_flags.items():
+                        if v not in move_names:
+                            raise Exception(  # pragma: debug
+                                ("The length variable '%s' for array "
+                                 "variable '%s' was not converted "
+                                 "to output while '%s' was.")
+                                % (v, k, k))
+                    for x in move:
+                        out['outputs'].append(cls.input2output(x))
+                        out['inputs'].remove(x)
         return out
         
     @classmethod
     def update_io_from_function(cls, model_file, model_function,
-                                inputs=[], outputs=[], contents=None):
+                                inputs=[], outputs=[], contents=None,
+                                outputs_in_inputs=None):
         r"""Update inputs/outputs from the function definition.
 
         Args:
@@ -564,16 +603,40 @@ class CModelDriver(CompiledModelDriver):
                 Defaults to [].
             contents (str, optional): Contents of file to parse rather than
                 re-reading the file. Defaults to None and is ignored.
+            outputs_in_inputs (bool, optional): If True, the outputs are
+                presented in the function definition as inputs. Defaults
+                to False.
+
+        Returns:
+            dict, None: Flag variable used by the model. If None, the
+                model does not use a flag variable.
 
         """
-        super(CModelDriver, cls).update_io_from_function(
+        flag_var = super(CModelDriver, cls).update_io_from_function(
             model_file, model_function, inputs=inputs,
-            outputs=outputs, contents=contents)
+            outputs=outputs, contents=contents,
+            outputs_in_inputs=outputs_in_inputs)
+        # Add length_vars if missing for use by yggdrasil
+        for x in inputs:
+            for v in x['vars']:
+                if cls.requires_length_var(v) and (not v.get('length_var', False)):
+                    v['length_var'] = {'name': v['name'] + '_length',
+                                       'datatype': {'type': 'uint',
+                                                    'precision': 64},
+                                       'is_length_var': True,
+                                       'dependent': True}
+        for x in outputs:
+            for v in x['vars']:
+                if cls.requires_length_var(v) and (not v.get('length_var', False)):
+                    v['length_var'] = 'strlen(%s)' % v['name']
+        # Flag input variables for reallocation
         for x in inputs:
             for v in x['vars']:
                 if (((v['native_type'] != 'char*')
+                     and (not v.get('is_length_var', False))
                      and ('Realloc' in cls.function_param['recv_function']))):
                     v['allow_realloc'] = True
+        return flag_var
         
     @classmethod
     def input2output(cls, var):
@@ -598,6 +661,24 @@ class CModelDriver(CompiledModelDriver):
             out['datatype'] = cls.get_json_type(out['native_type'])
         return out
         
+    @classmethod
+    def requires_length_var(cls, var):
+        r"""Determine if a variable requires a separate length variable.
+
+        Args:
+            var (dict): Dictionary of variable properties.
+
+        Returns:
+            bool: True if a length variable is required, False otherwise.
+
+        """
+        if ((isinstance(var, dict)
+             and ((cls.get_native_type(**var) == 'char*')
+                  or var.get('datatype', {}).get(
+                      'type', var.get('type', None)) in ['1darray']))):
+            return True
+        return False
+    
     @classmethod
     def get_native_type(cls, **kwargs):
         r"""Get the native type.
@@ -632,7 +713,7 @@ class CModelDriver(CompiledModelDriver):
         elif out == 'double':
             if json_type['precision'] == 32:
                 out = 'float'
-        return out
+        return out.replace(' ', '')
         
     @classmethod
     def get_json_type(cls, native_type=None):
@@ -741,36 +822,69 @@ class CModelDriver(CompiledModelDriver):
             model_function, flag_var, new_inputs, outputs, **kwargs)
         
     @classmethod
-    def write_declaration(cls, name, **kwargs):
-        r"""Return the line required to declare a variable with a certain
+    def write_declaration(cls, var, **kwargs):
+        r"""Return the lines required to declare a variable with a certain
         type.
 
         Args:
-            name (str): Name of variable being declared.
-            **kwargs: Addition keyword arguments are passed to get_native_type.
+            var (dict, str): Name or information dictionary for the variable
+                being declared.
+            **kwargs: Addition keyword arguments are passed to the parent
+                class's method.
 
         Returns:
-            str: The line declaring the variable.
+            list: The lines declaring the variable.
 
         """
-        orig_name = name
-        type_name = cls.get_native_type(**kwargs)
-        if kwargs.get('allow_realloc', False):
+        if isinstance(var, str):
+            var = {'name': var}
+        type_name = cls.get_native_type(**var)
+        if var.get('allow_realloc', False):
             type_name += '*'
-            kwargs['native_type'] = type_name
+            var = dict(var, native_type=type_name)
         if type_name.endswith('*'):
-            kwargs.get('requires_freeing', []).append(name)
-            name = '%s = NULL' % name
-        out = super(CModelDriver, cls).write_declaration(name, **kwargs)
-        if type_name.replace(' ', '') == 'char*':
-            length_name = orig_name + '_length = 0'
-            length_type = {'type': 'uint', 'precision': 64}
-            out += ' ' + cls.write_declaration(length_name,
-                                               datatype=length_type)
+            kwargs.get('requires_freeing', []).append(var)
+            kwargs.setdefault('value', 'NULL')
+        elif var.get('is_length_var', False):
+            kwargs.setdefault('value', '0')
+        out = super(CModelDriver, cls).write_declaration(var, **kwargs)
+        if ((isinstance(var.get('length_var', None), dict)
+             and var['length_var'].get('dependent', False))):
+            out += cls.write_declaration(var['length_var'])
         return out
         
     @classmethod
-    def prepare_variables(cls, vars_list, in_definition=False):
+    def write_free(cls, var, **kwargs):
+        r"""Return the lines required to free a variable with a certain type.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being declared.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            list: The lines freeing the variable.
+
+        """
+        out = []
+        if isinstance(var, str):
+            var = {'name': var}
+        if ((isinstance(var.get('datatype', False), dict)
+             and (('free_%s' % var['datatype']['type'])
+                  in cls.function_param))):
+            if var.get('allow_realloc', False):
+                out += super(CModelDriver, cls).write_free(
+                    var, **kwargs)
+                var = {'name': var['name']}
+            else:
+                var = dict(var, name=('&' + var['name']))
+        out += super(CModelDriver, cls).write_free(var, **kwargs)
+        return out
+        
+    @classmethod
+    def prepare_variables(cls, vars_list, in_definition=False,
+                          for_yggdrasil=False):
         r"""Concatenate a set of input variables such that it can be passed as a
         single string to the function_call parameter.
 
@@ -781,6 +895,9 @@ class CModelDriver(CompiledModelDriver):
             in_definition (bool, optional): If True, the returned sequence
                 will be of the format required for specifying variables
                 in a function definition. Defaults to False.
+            for_yggdrasil (bool, optional): If True, the variables will be
+                prepared in the formated expected by calls to yggdarsil
+                send/recv methods. Defaults to False.
 
         Returns:
             str: Concatentated variables list.
@@ -794,20 +911,38 @@ class CModelDriver(CompiledModelDriver):
                 new_vars_list.append(x)
             else:
                 assert(isinstance(x, dict))
+                if for_yggdrasil and x.get('is_length_var', False):
+                    continue
                 new_vars_list.append(x)
-                if cls.get_native_type(**x).replace(' ', '') == 'char*':
-                    new_vars_list.append({'name': x['name'] + '_length'})
+                if for_yggdrasil and isinstance(x.get('length_var', False), (dict, str)):
+                    if x['name'].startswith('*'):
+                        new_vars_list.append(
+                            dict(x['length_var'],
+                                 name='*' + x['length_var']['name']))
+                    elif x['name'].startswith('&'):
+                        new_vars_list.append(
+                            dict(x['length_var'],
+                                 name='&' + x['length_var']['name']))
+                    else:
+                        new_vars_list.append(x['length_var'])
         if in_definition:
-            new_vars_list = [
-                dict(x, name='%s %s' % (
-                    cls.get_native_type(**x), x['name']))
-                for x in new_vars_list]
+            new_vars_list2 = []
+            for x in new_vars_list:
+                if x['name'].startswith('*'):
+                    name = '%s%s* %s' % tuple(
+                        [cls.get_native_type(**x)]
+                        + x['name'].rsplit('*', 1))
+                else:
+                    name = '%s %s' % (cls.get_native_type(**x), x['name'])
+                new_vars_list2.append(dict(x, name=name))
+            new_vars_list = new_vars_list2
         return super(CModelDriver, cls).prepare_variables(
-            new_vars_list, in_definition=in_definition)
-            
+            new_vars_list, in_definition=in_definition,
+            for_yggdrasil=for_yggdrasil)
+    
     @classmethod
     def prepare_output_variables(cls, vars_list, in_definition=False,
-                                 in_inputs=False):
+                                 in_inputs=False, for_yggdrasil=False):
         r"""Concatenate a set of output variables such that it can be passed as
         a single string to the function_call parameter.
 
@@ -820,6 +955,9 @@ class CModelDriver(CompiledModelDriver):
             in_inputs (bool, optional): If True, the output variables should
                 be formated to be included as input variables. Defaults to
                 False.
+            for_yggdrasil (bool, optional): If True, the variables will be
+                prepared in the formated expected by calls to yggdarsil
+                send/recv methods. Defaults to False.
 
         Returns:
             str: Concatentated variables list.
@@ -838,14 +976,18 @@ class CModelDriver(CompiledModelDriver):
             # information that is added if in_definition is True.
             in_definition = False
         return super(CModelDriver, cls).prepare_output_variables(
-            vars_list, in_definition=in_definition, in_inputs=in_inputs)
+            vars_list, in_definition=in_definition, in_inputs=in_inputs,
+            for_yggdrasil=for_yggdrasil)
 
     @classmethod
-    def write_function_def(cls, function_name, **kwargs):
+    def write_function_def(cls, function_name, dont_add_lengths=False,
+                           **kwargs):
         r"""Write a function definition.
 
         Args:
             function_name (str): Name fo the function being defined.
+            dont_add_lengths (bool, optional): If True, length variables
+                are not added for arrays. Defaults to False.
             **kwargs: Additional keyword arguments are passed to the
                 parent class's method.
 
@@ -857,6 +999,21 @@ class CModelDriver(CompiledModelDriver):
                 one output variable is specified.
 
         """
+        if not dont_add_lengths:
+            for io in ['input', 'output']:
+                if io + '_var' in kwargs:
+                    io_var = cls.split_variables(kwargs.pop(io + '_var'))
+                else:
+                    io_var = kwargs.get(io + 's', [])
+                for x in io_var:
+                    if cls.requires_length_var(x):
+                        x['length_var'] = {
+                            'name': x['name'] + '_length',
+                            'datatype': {'type': 'uint',
+                                         'precision': 64},
+                            'is_length_var': True}
+                        io_var.append(x['length_var'])
+                kwargs[io + 's'] = io_var
         output_type = None
         if kwargs.get('outputs_in_inputs', False):
             output_type = cls.get_native_type(datatype='flag')
@@ -1001,21 +1158,59 @@ class CModelDriver(CompiledModelDriver):
         return out
 
     @classmethod
-    def write_assign_to_output(cls, outputs_in_inputs=False, **kwargs):
+    def write_assign_to_output(cls, dst_var, src_var,
+                               outputs_in_inputs=False,
+                               dont_add_lengths=False, **kwargs):
         r"""Write lines assigning a value to an output variable.
 
         Args:
+            dst_var (str, dict): Name or information dictionary for
+                variable being assigned to.
+            src_var (str, dict): Name or information dictionary for
+                value being assigned to dst_var.
             outputs_in_inputs (bool, optional): If True, outputs are passed
                 as input parameters. In some languages, this means that a
                 pointer or reference is passed (e.g. C) and so the assignment
                 should be to the memory indicated rather than the variable.
                 Defaults to False.
+            dont_add_lengths (bool, optional): If True, length variables
+                are not added for arrays. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             list: Lines achieving assignment.
 
         """
-        if outputs_in_inputs and ('name' in kwargs) and (cls.language != 'c++'):
-            kwargs['name'] = '%s[0]' % kwargs['name']
-        return super(CModelDriver, cls).write_assign_to_output(
-            outputs_in_inputs=outputs_in_inputs, **kwargs)
+        out = []
+        if cls.requires_length_var(dst_var):
+            if not dont_add_lengths:
+                dst_var_length = dst_var['name'] + '_length'
+                src_var_length = src_var['name'] + '_length'
+                out += cls.write_assign_to_output(
+                    dst_var_length, src_var_length,
+                    outputs_in_inputs=outputs_in_inputs)
+            else:
+                src_var_length = 'strlen(%s)' % src_var['name']
+            src_var_dtype = cls.get_native_type(**src_var).rsplit('*', 1)[0]
+            out += cls.write_assign_to_output(
+                dst_var['name'],
+                '({native_type}*)malloc({N}*sizeof({native_type}))'.format(
+                    native_type=src_var_dtype, N=src_var_length),
+                outputs_in_inputs=outputs_in_inputs)
+            kwargs.update(copy=True, native_type=src_var_dtype,
+                          N=src_var_length)
+        if outputs_in_inputs and (cls.language != 'c++'):
+            if isinstance(dst_var, dict):
+                dst_var = dict(dst_var,
+                               name='%s[0]' % dst_var['name'])
+                if ((isinstance(dst_var['datatype'], dict)
+                     and ('copy_' + dst_var['datatype']['type']
+                          in cls.function_param))):
+                    kwargs['copy'] = True
+            else:
+                dst_var = '%s[0]' % dst_var
+        out += super(CModelDriver, cls).write_assign_to_output(
+            dst_var, src_var, outputs_in_inputs=outputs_in_inputs,
+            **kwargs)
+        return out

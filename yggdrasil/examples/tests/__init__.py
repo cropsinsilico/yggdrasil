@@ -202,13 +202,15 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                 assert(self.runner.error_flag)
             else:
                 assert(not self.runner.error_flag)
-            self.check_results()
-            self.cleanup()
-            # Remove copied makefile
-            if self.language == 'make':
-                makefile = os.path.join(self.yamldir, 'src', 'Makefile')
-                if os.path.isfile(makefile):
-                    os.remove(makefile)
+            try:
+                self.check_results()
+            finally:
+                self.cleanup()
+                # Remove copied makefile
+                if self.language == 'make':
+                    makefile = os.path.join(self.yamldir, 'src', 'Makefile')
+                    if os.path.isfile(makefile):
+                        os.remove(makefile)
 
     def cleanup(self):
         r"""Cleanup files created during the test."""
