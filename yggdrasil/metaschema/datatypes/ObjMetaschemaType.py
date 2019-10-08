@@ -25,13 +25,13 @@ _default_property_order = {
     'normals': ['i', 'j', 'k'],
     'texcoords': ['u', 'v', 'w'],
     'points': 'vertex_indices',
-    'lines': ['vertex_index', 'texcoord_index'],
-    'faces': ['vertex_index', 'texcoord_index', 'normal_index'],
+    'lines': ('vertex_index', 'texcoord_index'),
+    'faces': ('vertex_index', 'texcoord_index', 'normal_index'),
     'curves': ['starting_param', 'ending_param', ['vertex_indices']],
     'curve2Ds': 'param_indices',
     'surfaces': ['starting_param_u', 'ending_param_u',
                  'starting_param_v', 'ending_param_v',
-                 {'vertex_indices': ['vertex_index', 'texcoord_index', 'normal_index']}]}
+                 {'vertex_indices': ('vertex_index', 'texcoord_index', 'normal_index')}]}
 _index_properties = ['vertex_indices', 'vertex_index', 'texcoord_index',
                      'normal_index', 'param_indices']
 _default_property_formats = {}
@@ -493,7 +493,7 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
         if isinstance(values, (list, tuple)):
             if not isinstance(order, (list, tuple)):
                 out = [cls._decode_object_property(v, order) for v in values]
-            elif (len(values) > 0) and ('/' in values[0]):
+            elif (len(values) > 0) and ('/' in values[0]) or isinstance(order, tuple):
                 out = [cls._decode_object_property(v, order) for v in values]
             else:
                 out = {}
@@ -518,11 +518,13 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                 if order in _index_properties:
                     # Subtract 1 from indexes because .obj is not zero indexed
                     out -= 1
-            else:
-                assert('/' in values)
+            elif '/' in values:
                 subvalues = values.split('/')
+                assert(isinstance(order, tuple))
                 assert(len(order) == len(subvalues))
-                out = cls._decode_object_property(subvalues, order)
+                out = cls._decode_object_property(subvalues, list(order))
+            else:
+                out = cls._decode_object_property([values], [order[0]])
         return out
 
     @classmethod

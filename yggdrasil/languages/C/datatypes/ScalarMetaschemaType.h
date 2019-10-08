@@ -122,11 +122,11 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new ScalarMetaschemaType instance with the same data.
    */
-  ScalarMetaschemaType* copy() { return (new ScalarMetaschemaType(subtype_, precision_, units_)); }
+  ScalarMetaschemaType* copy() override { return (new ScalarMetaschemaType(subtype_, precision_, units_)); }
   /*!
     @brief Print information about the type to stdout.
   */
-  void display() {
+  void display() override {
     MetaschemaType::display();
     printf("%-15s = %s\n", "subtype", subtype_);
     printf("%-15s = %d\n", "subtype_code", subtype_code_);
@@ -183,7 +183,7 @@ public:
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
-  void update(MetaschemaType* new_info) {
+  void update(MetaschemaType* new_info) override {
     if (strcmp(new_info->type(), "array") == 0) {
       JSONArrayMetaschemaType* new_info_array = dynamic_cast<JSONArrayMetaschemaType*>(new_info);
       if (new_info_array->nitems() == 1) {
@@ -206,7 +206,7 @@ public:
     @brief Update the instance's type.
     @param[in] new_type const char * String for new type.
    */
-  void update_type(const char* new_type) {
+  void update_type(const char* new_type) override {
     MetaschemaType::update_type(new_type);
     if (strcmp(type(), "scalar") == 0) {
       _variable_precision = false;
@@ -300,7 +300,7 @@ public:
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @returns bool true if the encoding was successful, false otherwise.
    */
-  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
+  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) override {
     if (!MetaschemaType::encode_type_prop(writer)) { return false; }
     writer->Key("subtype");
     writer->String(subtype_, strlen(subtype_));
@@ -325,7 +325,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   size_t *nargs, va_list_t &ap) {
+		   size_t *nargs, va_list_t &ap) override {
     // TODO: case by case for scalar types
     size_t bytes_precision = nbytes();
     unsigned char* arg = (unsigned char*)malloc(bytes_precision + 1);
@@ -497,7 +497,7 @@ public:
     @returns bool true if the data was successfully decoded, false otherwise.
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
-		   size_t *nargs, va_list_t &ap) {
+		   size_t *nargs, va_list_t &ap) override {
     if ((data.IsArray()) && (data.Size() == 1)) {
       data = data[0];
     }
@@ -694,13 +694,13 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @brief Create a copy of the type.
     @returns pointer to new OneDArrayMetaschemaType instance with the same data.
    */
-  OneDArrayMetaschemaType* copy() {
+  OneDArrayMetaschemaType* copy() override {
     return (new OneDArrayMetaschemaType(subtype(), precision(), length_, units()));
   }
   /*!
     @brief Print information about the type to stdout.
   */
-  void display() {
+  void display() override {
     ScalarMetaschemaType::display();
     printf("%-15s = %lu\n", "length", length_);
   }
@@ -708,14 +708,14 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @brief Get the number of elements in the type.
     @returns size_t Number of elements.
    */
-  const size_t nelements() {
+  const size_t nelements() override {
     return length_;
   }
   /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
-  void update(MetaschemaType* new_info) {
+  void update(MetaschemaType* new_info) override {
     ScalarMetaschemaType::update(new_info);
     OneDArrayMetaschemaType* new_info_oned = (OneDArrayMetaschemaType*)new_info;
     set_length(new_info_oned->get_length());
@@ -724,7 +724,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @brief Update the instance's length.
     @param[in] new_length size_t New length.
    */
-  void set_length(size_t new_length) {
+  void set_length(size_t new_length) override {
     size_t* length_modifier = const_cast<size_t*>(&length_);
     *length_modifier = new_length;
   }
@@ -732,7 +732,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @brief Get type length.
     @returns size_t Number of elements in the array.
   */
-  size_t get_length() {
+  size_t get_length() override {
     size_t out = length_;
     return out;
   }
@@ -741,7 +741,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @returns bool true if the encoding was successful, false otherwise.
    */
-  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
+  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) override {
     if (!(ScalarMetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key("length");
     writer->Int(length_);
@@ -796,13 +796,13 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new NDArrayMetaschemaType instance with the same data.
    */
-  NDArrayMetaschemaType* copy() {
+  NDArrayMetaschemaType* copy() override {
     return (new NDArrayMetaschemaType(subtype(), precision(), shape(), units()));
   }
   /*!
     @brief Print information about the type to stdout.
   */
-  void display() {
+  void display() override {
     ScalarMetaschemaType::display();
     printf("%-15s = [ ", "shape");
     if (ndim() > 0) {
@@ -828,7 +828,7 @@ public:
     @brief Get the number of elements in the type.
     @returns size_t Number of elements.
    */
-  const size_t nelements() {
+  const size_t nelements() override {
     size_t nelements = 0;
     if (ndim() > 0) {
       size_t i;
@@ -842,7 +842,7 @@ public:
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
-  void update(MetaschemaType* new_info) {
+  void update(MetaschemaType* new_info) override {
     ScalarMetaschemaType::update(new_info);
     NDArrayMetaschemaType* new_info_nd = (NDArrayMetaschemaType*)new_info;
     if (ndim() != new_info_nd->ndim()) {
@@ -859,7 +859,7 @@ public:
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @returns bool true if the encoding was successful, false otherwise.
    */
-  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
+  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) override {
     if (!(ScalarMetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key("shape");
     writer->StartArray();

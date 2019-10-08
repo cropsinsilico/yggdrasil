@@ -8,6 +8,7 @@ from yggdrasil import backwards, tools, serialize
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
 from yggdrasil.components import import_component, create_component
+from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
@@ -439,6 +440,7 @@ class CommBase(tools.YggClass):
         self._bound = False
         self._last_send = None
         self._last_recv = None
+        self._type_errors = []
         self._timeout_drain = False
         self._server_class = CommServer
         self._server_kwargs = {}
@@ -1496,6 +1498,13 @@ class CommBase(tools.YggClass):
                 self._used = True
                 if self.serializer.initialized:
                     self._send_serializer = False
+        except MetaschemaTypeError as e:
+            self._type_errors.append(e)
+            try:
+                self.exception('Failed to send: %.100s.', str(args))
+            except ValueError:  # pragma: debug
+                self.exception('Failed to send (unyt array in message)')
+            return False
         except BaseException:
             # Handle error caused by calling repr on unyt array that isn't float64
             try:

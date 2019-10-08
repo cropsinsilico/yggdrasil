@@ -239,11 +239,10 @@ int alloc_ply(ply_t *p, int nvert, int nface, int nedge, int do_vert_color, int 
   @brief Copy a ply structure.
   @param[in] src ply_t Ply structure that should be copied.
   @returns Copy of ply structure.
-  @returns int 0 if succesful, -1 otherwise.
 */
 static inline
 ply_t copy_ply(ply_t src) {
-  int i, j;
+  int i;
   int do_vert_color = 0, do_edge_color = 0;
   if (src.vertex_colors != NULL) {
     do_vert_color = 1;

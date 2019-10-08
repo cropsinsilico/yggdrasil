@@ -76,93 +76,369 @@ public:
     msg_len = msg_len + ilen;
     // Add vertex information
     int i, j;
-    for (i = 0; i < p.nvert; i++) {
-      while (true) {
-	if (p.vertex_colors != NULL) {
-	  ilen = snprintf(buf + msg_len, buf_size - msg_len, "v %f %f %f %d %d %d\n",
-			  p.vertices[i][0], p.vertices[i][1], p.vertices[i][2],
-			  p.vertex_colors[i][0], p.vertex_colors[i][1], p.vertex_colors[i][2]);
-	} else {
-	  ilen = snprintf(buf + msg_len, buf_size - msg_len, "v %f %f %f\n",
-			  p.vertices[i][0], p.vertices[i][1], p.vertices[i][2]);
-	}
-	if (ilen < 0) {
-	  ygglog_error("ObjMetaschemaType::encode_data: Error formatting vertex %d.", i);
-	  return false;
-	} else if (ilen >= (buf_size - msg_len)) {
-	  buf_size = buf_size + ilen + 1;
-	  buf = (char*)realloc(buf, buf_size);
-	} else {
-	  break;
-	}
+    if (p.vertices == NULL) {
+      if (p.nvert > 0) {
+	ygglog_error("ObjMetaschemaType::encode_data: There are %d vertices, but the vector is NULL.", p.nvert);
+	return false;
       }
-      msg_len = msg_len + ilen;
+    } else {
+      for (i = 0; i < p.nvert; i++) {
+	while (true) {
+	  ilen = snprintf(buf + msg_len, buf_size - msg_len, "v %f %f %f",
+			  p.vertices[i][0], p.vertices[i][1], p.vertices[i][2]);
+	  if (ilen < 0) {
+	    ygglog_error("ObjMetaschemaType::encode_data: Error formatting vertex %d.", i);
+	    return false;
+	  } else if (ilen >= (buf_size - msg_len)) {
+	    buf_size = buf_size + ilen + 1;
+	    buf = (char*)realloc(buf, buf_size);
+	  } else {
+	    break;
+	  }
+	}
+	msg_len = msg_len + ilen;
+	// Vertex Colors
+	if (p.vertex_colors != NULL) {
+	  while (true) {
+	    ilen = snprintf(buf + msg_len, buf_size - msg_len, " %d %d %d",
+			    p.vertex_colors[i][0], p.vertex_colors[i][1], p.vertex_colors[i][2]);
+	    if (ilen < 0) {
+	      ygglog_error("ObjMetaschemaType::encode_data: Error formatting vertex color %d.", i);
+	      return false;
+	    } else if (ilen >= (buf_size - msg_len)) {
+	      buf_size = buf_size + ilen + 1;
+	      buf = (char*)realloc(buf, buf_size);
+	    } else {
+	      break;
+	    }
+	  }
+	  msg_len = msg_len + ilen;
+	}
+	// Optional weight
+	while (true) {
+	  if (p.vertices[i][3] != 1.0) {
+	    ilen = snprintf(buf + msg_len, buf_size - msg_len, " %f\n",
+			    p.vertices[i][3]);
+	  } else {
+	    ilen = snprintf(buf + msg_len, buf_size - msg_len, "\n");
+	  }
+	  if (ilen < 0) {
+	    ygglog_error("ObjMetaschemaType::encode_data: Error formatting vertex weight %d.", i);
+	    return false;
+	  } else if (ilen >= (buf_size - msg_len)) {
+	    buf_size = buf_size + ilen + 1;
+	    buf = (char*)realloc(buf, buf_size);
+	  } else {
+	    break;
+	  }
+	}
+	msg_len = msg_len + ilen;
+      }
     }
     // Add texcoord information
-    for (i = 0; i < p.ntexc; i++) {
-      while (true) {
-	ilen = snprintf(buf + msg_len, buf_size - msg_len, "vt %f %f\n",
-			p.texcoords[i][0], p.texcoords[i][1]);
-	if (ilen < 0) {
-	  ygglog_error("ObjMetaschemaType::encode_data: Error formatting texcoord %d.", i);
-	  return false;
-	} else if (ilen >= (buf_size - msg_len)) {
-	  buf_size = buf_size + ilen + 1;
-	  buf = (char*)realloc(buf, buf_size);
-	} else {
-	  break;
-	}
+    if (p.texcoords == NULL) {
+      if (p.ntexc > 0) {
+	ygglog_error("ObjMetaschemaType::encode_data: There are %d texcoords, but the vector is NULL.", p.ntexc);
+	return false;
       }
-      msg_len = msg_len + ilen;
+    } else {
+      for (i = 0; i < p.ntexc; i++) {
+	while (true) {
+	  if ((p.texcoords[i][1] == 0.0) && (p.texcoords[i][2] == 0.0)) {
+	    ilen = snprintf(buf + msg_len, buf_size - msg_len, "vt %f\n",
+			    p.texcoords[i][0]);
+	  } else if (p.texcoords[i][2] == 0.0) {
+	    ilen = snprintf(buf + msg_len, buf_size - msg_len, "vt %f %f\n",
+			    p.texcoords[i][0], p.texcoords[i][1]);
+	  } else {
+	    ilen = snprintf(buf + msg_len, buf_size - msg_len, "vt %f %f %f\n",
+			    p.texcoords[i][0], p.texcoords[i][1], p.texcoords[i][2]);
+	  }
+	  if (ilen < 0) {
+	    ygglog_error("ObjMetaschemaType::encode_data: Error formatting texcoord %d.", i);
+	    return false;
+	  } else if (ilen >= (buf_size - msg_len)) {
+	    buf_size = buf_size + ilen + 1;
+	    buf = (char*)realloc(buf, buf_size);
+	  } else {
+	    break;
+	  }
+	}
+	msg_len = msg_len + ilen;
+      }
     }
     // Add normal information
-    for (i = 0; i < p.nnorm; i++) {
-      while (true) {
-	ilen = snprintf(buf + msg_len, buf_size - msg_len, "vn %f %f %f\n",
-			p.normals[i][0], p.normals[i][1], p.normals[i][2]);
-	if (ilen < 0) {
-	  ygglog_error("ObjMetaschemaType::encode_data: Error formatting normal %d.", i);
-	  return false;
-	} else if (ilen >= (buf_size - msg_len)) {
-	  buf_size = buf_size + ilen + 1;
-	  buf = (char*)realloc(buf, buf_size);
-	} else {
-	  break;
-	}
+    if (p.normals == NULL) {
+      if (p.nnorm > 0) {
+	ygglog_error("ObjMetaschemaType::encode_data: There are %d normals, but the vector is NULL.", p.nnorm);
+	return false;
       }
-      msg_len = msg_len + ilen;
+    } else {
+      for (i = 0; i < p.nnorm; i++) {
+	while (true) {
+	  ilen = snprintf(buf + msg_len, buf_size - msg_len, "vn %f %f %f\n",
+			  p.normals[i][0], p.normals[i][1], p.normals[i][2]);
+	  if (ilen < 0) {
+	    ygglog_error("ObjMetaschemaType::encode_data: Error formatting normal %d.", i);
+	    return false;
+	  } else if (ilen >= (buf_size - msg_len)) {
+	    buf_size = buf_size + ilen + 1;
+	    buf = (char*)realloc(buf, buf_size);
+	  } else {
+	    break;
+	  }
+	}
+	msg_len = msg_len + ilen;
+      }
+    }
+    // Add param information
+    if (p.params == NULL) {
+      if (p.nparam > 0) {
+	ygglog_error("ObjMetaschemaType::encode_data: There are %d params, but the vector is NULL.", p.nparam);
+	return false;
+      }
+    } else {
+      for (i = 0; i < p.nparam; i++) {
+	while (true) {
+	  if (p.params[i][2] == 1.0) {
+	    ilen = snprintf(buf + msg_len, buf_size - msg_len, "vp %f %f\n",
+			    p.params[i][0], p.params[i][1]);
+	  } else {
+	    ilen = snprintf(buf + msg_len, buf_size - msg_len, "vp %f %f %f\n",
+			    p.params[i][0], p.params[i][1], p.params[i][2]);
+	  }
+	  if (ilen < 0) {
+	    ygglog_error("ObjMetaschemaType::encode_data: Error formatting param %d.", i);
+	    return false;
+	  } else if (ilen >= (buf_size - msg_len)) {
+	    buf_size = buf_size + ilen + 1;
+	    buf = (char*)realloc(buf, buf_size);
+	  } else {
+	    break;
+	  }
+	}
+	msg_len = msg_len + ilen;
+      }
+    }
+    // Add point information
+    if (p.points == NULL) {
+      if (p.npoint > 0) {
+	ygglog_error("ObjMetaschemaType::encode_data: There are %d points, but the vector is NULL.", p.npoint);
+	return false;
+      }
+    } else {
+      for (i = 0; i < p.npoint; i++) {
+	char ival[100];
+	sprintf(iline, "p");
+	for (j = 0; j < p.nvert_in_point[i]; j++) {
+	  sprintf(ival, " %d", p.points[i][j] + 1);
+	  strcat(iline, ival);
+	}
+	while (true) {
+	  ilen = snprintf(buf + msg_len, buf_size - msg_len, "%s\n", iline);
+	  if (ilen < 0) {
+	    ygglog_error("ObjMetaschemaType::encode_data: Error formatting line for point %d.", i);
+	    return false;
+	  } else if (ilen >= (buf_size - msg_len)) {
+	    buf_size = buf_size + ilen + 1;
+	    buf = (char*)realloc(buf, buf_size);
+	  } else {
+	    break;
+	  }
+	}
+	msg_len = msg_len + ilen;
+      }
+    }
+    // Add line information
+    if (p.lines == NULL) {
+      if (p.nline > 0) {
+	ygglog_error("ObjMetaschemaType::encode_data: There are %d lines, but the vector is NULL.", p.nline);
+	return false;
+      }
+    } else {
+      for (i = 0; i < p.nline; i++) {
+	char ival[10];
+	sprintf(iline, "l");
+	for (j = 0; j < p.nvert_in_line[i]; j++) {
+	  sprintf(ival, " %d", p.lines[i][j] + 1);
+	  strcat(iline, ival);
+	  if (p.line_texcoords != NULL) {
+	    if (p.line_texcoords[i][j] >= 0) {
+	      sprintf(ival, "/%d", p.line_texcoords[i][j] + 1);
+	      strcat(iline, ival);
+	    }
+	  }
+	}
+	while (true) {
+	  ilen = snprintf(buf + msg_len, buf_size - msg_len, "%s\n", iline);
+	  if (ilen < 0) {
+	    ygglog_error("ObjMetaschemaType::encode_data: Error formatting line for line %d.", i);
+	    return false;
+	  } else if (ilen >= (buf_size - msg_len)) {
+	    buf_size = buf_size + ilen + 1;
+	    buf = (char*)realloc(buf, buf_size);
+	  } else {
+	    break;
+	  }
+	}
+	msg_len = msg_len + ilen;
+      }
     }
     // Add face information
-    for (i = 0; i < p.nface; i++) {
-      char ival[10];
-      sprintf(iline, "f");
-      for (j = 0; j < 3; j++) {
-	sprintf(ival, " %d", p.faces[i][j] + 1);
-	strcat(iline, ival);
-	strcat(iline, "/");
-	if (p.face_texcoords[i][j] >= 0) {
-	  sprintf(ival, "%d", p.face_texcoords[i][j] + 1);
+    if (p.faces == NULL) {
+      if (p.nface > 0) {
+	ygglog_error("ObjMetaschemaType::encode_data: There are %d faces, but the vector is NULL.", p.nface);
+	return false;
+      }
+    } else {
+      for (i = 0; i < p.nface; i++) {
+	char ival[10];
+	sprintf(iline, "f");
+	for (j = 0; j < p.nvert_in_face[i]; j++) {
+	  sprintf(ival, " %d", p.faces[i][j] + 1);
+	  strcat(iline, ival);
+	  strcat(iline, "/");
+	  if (p.face_texcoords != NULL) {
+	    if (p.face_texcoords[i][j] >= 0) {
+	      sprintf(ival, "%d", p.face_texcoords[i][j] + 1);
+	      strcat(iline, ival);
+	    }
+	  }
+	  strcat(iline, "/");
+	  if (p.face_normals != NULL) {
+	    if (p.face_normals[i][j] >= 0) {
+	      sprintf(ival, "%d", p.face_normals[i][j] + 1);
+	      strcat(iline, ival);
+	    }
+	  }
+	}
+	while (true) {
+	  ilen = snprintf(buf + msg_len, buf_size - msg_len, "%s\n", iline);
+	  if (ilen < 0) {
+	    ygglog_error("ObjMetaschemaType::encode_data: Error formatting line for face %d.", i);
+	    return false;
+	  } else if (ilen >= (buf_size - msg_len)) {
+	    buf_size = buf_size + ilen + 1;
+	    buf = (char*)realloc(buf, buf_size);
+	  } else {
+	    break;
+	  }
+	}
+	msg_len = msg_len + ilen;
+      }
+    }
+    // Add curve information
+    if (p.curves == NULL) {
+      if (p.ncurve > 0) {
+	ygglog_error("ObjMetaschemaType::encode_data: There are %d curves, but the vector is NULL.", p.ncurve);
+	return false;
+      }
+    } else {
+      for (i = 0; i < p.ncurve; i++) {
+	char ival[10];
+	sprintf(iline, "curv");
+	for (j = 0; j < 2; j++) {
+	  sprintf(ival, " %f", p.curve_params[i][j]);
 	  strcat(iline, ival);
 	}
-	strcat(iline, "/");
-	if (p.face_normals[i][j] >= 0) {
-	  sprintf(ival, "%d", p.face_normals[i][j] + 1);
+	for (j = 0; j < p.nvert_in_curve[i]; j++) {
+	  sprintf(ival, " %d", p.curves[i][j] + 1);
 	  strcat(iline, ival);
 	}
-      }
-      while (true) {
-	ilen = snprintf(buf + msg_len, buf_size - msg_len, "%s\n", iline);
-	if (ilen < 0) {
-	  ygglog_error("ObjMetaschemaType::encode_data: Error formatting line face %d.", i);
-	  return false;
-	} else if (ilen >= (buf_size - msg_len)) {
-	  buf_size = buf_size + ilen + 1;
-	  buf = (char*)realloc(buf, buf_size);
-	} else {
-	  break;
+	while (true) {
+	  ilen = snprintf(buf + msg_len, buf_size - msg_len, "%s\n", iline);
+	  if (ilen < 0) {
+	    ygglog_error("ObjMetaschemaType::encode_data: Error formatting line for curve %d.", i);
+	    return false;
+	  } else if (ilen >= (buf_size - msg_len)) {
+	    buf_size = buf_size + ilen + 1;
+	    buf = (char*)realloc(buf, buf_size);
+	  } else {
+	    break;
+	  }
 	}
+	msg_len = msg_len + ilen;
       }
-      msg_len = msg_len + ilen;
+    }
+    // Add curve2 information
+    if (p.curves2 == NULL) {
+      if (p.ncurve2 > 0) {
+	ygglog_error("ObjMetaschemaType::encode_data: There are %d curve2s, but the vector is NULL.", p.ncurve2);
+	return false;
+      }
+    } else {
+      for (i = 0; i < p.ncurve2; i++) {
+	char ival[10];
+	sprintf(iline, "curv2");
+	for (j = 0; j < p.nparam_in_curve2[i]; j++) {
+	  sprintf(ival, " %d", p.curves2[i][j] + 1);
+	  strcat(iline, ival);
+	}
+	while (true) {
+	  ilen = snprintf(buf + msg_len, buf_size - msg_len, "%s\n", iline);
+	  if (ilen < 0) {
+	    ygglog_error("ObjMetaschemaType::encode_data: Error formatting line for curve2 %d.", i);
+	    return false;
+	  } else if (ilen >= (buf_size - msg_len)) {
+	    buf_size = buf_size + ilen + 1;
+	    buf = (char*)realloc(buf, buf_size);
+	  } else {
+	    break;
+	  }
+	}
+	msg_len = msg_len + ilen;
+      }
+    }
+    // Add surface information
+    if (p.surfaces == NULL) {
+      if (p.nsurf > 0) {
+	ygglog_error("ObjMetaschemaType::encode_data: There are %d surfaces, but the vector is NULL.", p.nsurf);
+	return false;
+      }
+    } else {
+      for (i = 0; i < p.nsurf; i++) {
+	char ival[10];
+	sprintf(iline, "surf");
+	for (j = 0; j < 2; j++) {
+	  sprintf(ival, " %f", p.surface_params_u[i][j]);
+	  strcat(iline, ival);
+	}
+	for (j = 0; j < 2; j++) {
+	  sprintf(ival, " %f", p.surface_params_v[i][j]);
+	  strcat(iline, ival);
+	}
+	for (j = 0; j < p.nvert_in_surface[i]; j++) {
+	  sprintf(ival, " %d", p.surfaces[i][j] + 1);
+	  strcat(iline, ival);
+	  strcat(iline, "/");
+	  if (p.surface_texcoords != NULL) {
+	    if (p.surface_texcoords[i][j] >= 0) {
+	      sprintf(ival, "%d", p.surface_texcoords[i][j] + 1);
+	      strcat(iline, ival);
+	    }
+	  }
+	  strcat(iline, "/");
+	  if (p.surface_normals != NULL) {
+	    if (p.surface_normals[i][j] >= 0) {
+	      sprintf(ival, "%d", p.surface_normals[i][j] + 1);
+	      strcat(iline, ival);
+	    }
+	  }
+	}
+	while (true) {
+	  ilen = snprintf(buf + msg_len, buf_size - msg_len, "%s\n", iline);
+	  if (ilen < 0) {
+	    ygglog_error("ObjMetaschemaType::encode_data: Error formatting line for surface %d.", i);
+	    return false;
+	  } else if (ilen >= (buf_size - msg_len)) {
+	    buf_size = buf_size + ilen + 1;
+	    buf = (char*)realloc(buf, buf_size);
+	  } else {
+	    break;
+	  }
+	}
+	msg_len = msg_len + ilen;
+      }
     }
     ygglog_info("writing:\n%s",buf);
     buf[msg_len] = '\0';
@@ -211,44 +487,224 @@ public:
     size_t *eind = NULL;
     int nlines = 0;
     int j;
-    int nvert = 0, nface = 0, ntexc = 0, nnorm = 0, nmatl = 0;
+    int nvert = 0, ntexc = 0, nnorm = 0, nparam = 0, npoint = 0,
+      nline = 0, nface = 0, ncurve = 0, ncurve2 = 0, nsurf = 0,
+      nmatl = 0;
     // Counts
-    int n_re_vert = 7;
-    int n_re_face = 3*3 + 1;
-    int n_re_texc = 3;
-    int n_re_norm = 4;
     int n_re_matl = 2;
-    char re_vert[100] = "v ([^ \n]+) ([^ \n]+) ([^ \n]+) ([^ \n]+) ([^ \n]+) ([^ \n]+)";
-    char re_face[100] = "f ([^ \n/]*)/([^ \n/]*)/([^ \n/]*) "
-      "([^ \n/]*)/([^ \n/]*)/([^ \n/]*) "
-      "([^ \n/]*)/([^ \n/]*)/([^ \n/]*)";
-    char re_texc[100] = "vt ([^ \n]+) ([^ \n]+)";
-    char re_norm[100] = "vn ([^ \n]+) ([^ \n]+) ([^ \n]+)";
+    int n_re_vert = 7;
+    int n_re_texc = 2;
+    int n_re_norm = 4;
+    int n_re_param = 3;
+    int n_re_point = 2;
+    int n_re_line = 2;
+    int n_re_face = 2;
+    int n_re_curve = 4;
+    int n_re_curve2 = 2;
+    int n_re_surf = 6;
+    char re_float[100] = "[[:digit:]]+\.[[:digit:]]+";
+    char re_int[100] = "[[:digit:]]+";
     char re_matl[100] = "usemtl ([^\n]+)";
+    char re_vert[500], re_vert_nocolor[500];
+    char re_texc[500];
+    char re_norm[500];
+    char re_param[500];
+    char re_point[500], re_point_tot[500], re_point_vert[100];
+    char re_line[500], re_line_vert[100];
+    char re_line_notexc[500], re_line_vert_notexc[100];
+    char re_line_clean[500], re_line_vert_clean[100];
+    char re_face[500], re_face_vert[100];
+    char re_face_notexc[500], re_face_vert_notexc[100];
+    char re_face_nonorm[500], re_face_vert_nonorm[100];
+    char re_face_noextr[500], re_face_vert_noextr[100];
+    char re_face_clean[500], re_face_vert_clean[100];
+    char re_curve[500], re_curve_vert[100];
+    char re_curve2[500], re_curve2_vert[100];
+    char re_surf[500], re_surf_vert[100];
+    char re_surf_notexc[500], re_surf_vert_notexc[100];
+    char re_surf_nonorm[500], re_surf_vert_nonorm[100];
+    char re_surf_noextr[500], re_surf_vert_noextr[100];
+    char re_surf_clean[500], re_surf_vert_clean[100];
+    snprintf(re_vert, 500, "v (%s) (%s) (%s) (%s) (%s) (%s)( %s)?",
+	     re_float, re_float, re_float, re_int, re_int, re_int,
+	     re_float);
+    snprintf(re_vert_nocolor, 500, "v (%s) (%s) (%s)( %s)?",
+	     re_float, re_float, re_float, re_float);
+    snprintf(re_texc, 500, "vt (%s)( %s)?( %s)?",
+	     re_float, re_float, re_float);
+    snprintf(re_norm, 500, "vn (%s) (%s) (%s)",
+	     re_float, re_float, re_float);
+    snprintf(re_param, 500, "vp (%s) (%s)( %s)?",
+	     re_float, re_float, re_float);
+    snprintf(re_point_tot, 500, "[^v]p( %s){1,}", re_int);
+    snprintf(re_point, 500, "p( %s){1,}", re_int);
+    snprintf(re_point_vert, 100, " (%s)", re_int);
+    snprintf(re_line, 500, "l( %s/%s){2,}", re_int, re_int);
+    snprintf(re_line_vert, 100, " (%s)/(%s)", re_int, re_int);
+    snprintf(re_line_notexc, 500, "l( %s/){2,}", re_int);
+    snprintf(re_line_vert_notexc, 100, " (%s)/", re_int);
+    snprintf(re_line_clean, 500, "l( %s){2,}", re_int);
+    snprintf(re_line_vert_clean, 100, " (%s)", re_int);
+    snprintf(re_face, 500, "f( %s/%s/%s){3,}",
+	     re_int, re_int, re_int);
+    snprintf(re_face_vert, 100, " (%s)/(%s)/(%s)",
+	     re_int, re_int, re_int);
+    snprintf(re_face_notexc, 500, "f( %s//%s){3,}",
+	     re_int, re_int);
+    snprintf(re_face_vert_notexc, 100, " (%s)//(%s)",
+	     re_int, re_int);
+    snprintf(re_face_nonorm, 500, "f( %s/%s/){3,}",
+	     re_int, re_int);
+    snprintf(re_face_vert_nonorm, 100, " (%s)/(%s)/",
+	     re_int, re_int);
+    snprintf(re_face_noextr, 500, "f( %s//){3,}", re_int);
+    snprintf(re_face_vert_noextr, 100, " (%s)//", re_int);
+    snprintf(re_face_clean, 500, "f( %s){3,}", re_int);
+    snprintf(re_face_vert_clean, 100, " (%s)", re_int);
+    snprintf(re_curve, 500, "curv (%s) (%s)( %s){2,}",
+	     re_float, re_float, re_int);
+    snprintf(re_curve_vert, 100, " (%s)", re_int);
+    snprintf(re_curve2, 500, "curv2( %s){2,}", re_int);
+    snprintf(re_curve2_vert, 100, " (%s)", re_int);
+    snprintf(re_surf, 500, "surf (%s) (%s) (%s) (%s)( %s/%s/%s){2,}",
+	     re_float, re_float, re_float, re_float,
+	     re_int, re_int, re_int);
+    snprintf(re_surf_vert, 100, " (%s)/(%s)/(%s)",
+	     re_int, re_int, re_int);
+    snprintf(re_surf_notexc, 500, "surf (%s) (%s) (%s)(%s)( %s//%s){2,}",
+	     re_float, re_float, re_float, re_float, re_int, re_int);
+    snprintf(re_surf_vert_notexc, 100, " (%s)//(%s)",
+	     re_int, re_int);
+    snprintf(re_surf_nonorm, 500, "surf (%s) (%s) (%s)(%s)( %s/%s/){2,}",
+	     re_float, re_float, re_float, re_float, re_int, re_int);
+    snprintf(re_surf_vert_nonorm, 100, " (%s)/(%s)/",
+	     re_int, re_int);
+    snprintf(re_surf_noextr, 500, "surf (%s) (%s) (%s)(%s)( %s//){2,}",
+	     re_float, re_float, re_float, re_float, re_int);
+    snprintf(re_surf_vert_noextr, 100, " (%s)//", re_int);
+    snprintf(re_surf_clean, 500, "surf (%s) (%s) (%s)(%s)( %s){2,}",
+	     re_float, re_float, re_float, re_float, re_int);
+    snprintf(re_surf_vert_clean, 100, " (%s)", re_int);
+    // Count matches
+    nmatl = count_matches(re_matl, buf);
     nvert = count_matches(re_vert, buf);
     if (nvert != 0) {
       do_colors = 1;
     } else {
-      strncpy(re_vert, "v ([^ \n]+) ([^ \n]+) ([^ \n]+)", 100);
+      do_colors = 0;
+      strncpy(re_vert, re_vert_nocolor, 500);
       n_re_vert = 4;
       nvert = count_matches(re_vert, buf);
     }
-    nface = count_matches(re_face, buf);
     ntexc = count_matches(re_texc, buf);
     nnorm = count_matches(re_norm, buf);
-    nmatl = count_matches(re_matl, buf);
-    ygglog_debug("deserialize_obj: expecting %d verts, %d faces, %d texcoords, %d normals",
-		 nvert, nface, ntexc, nnorm);
+    nparam = count_matches(re_param, buf);
+    npoint = count_matches(re_point_tot, buf);
+    nline = count_matches(re_line, buf);
+    // Revise regexes if no matches were found, but other version
+    // are present
+    int remove_line_texcoords = 0,
+      remove_face_texcoords = 0, remove_face_normals = 0,
+      remove_surf_texcoords = 0, remove_surf_normals = 0;
+    if (nline == 0) {
+      if (count_matches(re_line_notexc, buf) != 0) {
+	strncpy(re_line, re_line_notexc, 500);
+	strncpy(re_line_vert, re_line_vert_notexc, 100);
+	remove_line_texcoords = 1;
+      } else if (count_matches(re_line_clean, buf) != 0) {
+	strncpy(re_line, re_line_clean, 500);
+	strncpy(re_line_vert, re_line_vert_clean, 100);
+	remove_line_texcoords = 1;
+      }
+      nline = count_matches(re_line, buf);
+    }
+    nface = count_matches(re_face, buf);
+    if (nface == 0) {
+      if (count_matches(re_face_nonorm, buf) != 0) {
+	strncpy(re_face, re_face_nonorm, 500);
+	strncpy(re_face_vert, re_face_vert_nonorm, 100);
+	remove_face_normals = 1;
+      } else if (count_matches(re_face_notexc, buf) != 0) {
+	strncpy(re_face, re_face_notexc, 500);
+	strncpy(re_face_vert, re_face_vert_notexc, 100);
+	remove_face_texcoords = 1;
+      } else if (count_matches(re_face_noextr, buf) != 0) {
+	strncpy(re_face, re_face_noextr, 500);
+	strncpy(re_face_vert, re_face_vert_noextr, 100);
+	remove_face_texcoords = 1;
+	remove_face_normals = 1;
+      } else if (count_matches(re_face_clean, buf) != 0) {
+	strncpy(re_face, re_face_clean, 500);
+	strncpy(re_face_vert, re_face_vert_clean, 100);
+	remove_face_texcoords = 1;
+	remove_face_normals = 1;
+      }
+      nface = count_matches(re_face, buf);
+    }
+    ncurve = count_matches(re_curve, buf);
+    ncurve2 = count_matches(re_curve2, buf);
+    nsurf = count_matches(re_surf, buf);
+    if (nsurf == 0) {
+      if (count_matches(re_surf_nonorm, buf) != 0) {
+	strncpy(re_surf, re_surf_nonorm, 500);
+	strncpy(re_surf_vert, re_surf_vert_nonorm, 100);
+	remove_surf_normals = 1;
+      } else if (count_matches(re_surf_notexc, buf) != 0) {
+	strncpy(re_surf, re_surf_notexc, 500);
+	strncpy(re_surf_vert, re_surf_vert_notexc, 100);
+	remove_surf_texcoords = 1;
+      } else if (count_matches(re_surf_noextr, buf) != 0) {
+	strncpy(re_surf, re_surf_noextr, 500);
+	strncpy(re_surf_vert, re_surf_vert_noextr, 100);
+	remove_surf_texcoords = 1;
+	remove_surf_normals = 1;
+      } else if (count_matches(re_surf_clean, buf) != 0) {
+	strncpy(re_surf, re_surf_clean, 500);
+	strncpy(re_surf_vert, re_surf_vert_clean, 100);
+	remove_surf_texcoords = 1;
+	remove_surf_normals = 1;
+      }
+      nsurf = count_matches(re_surf, buf);
+    }
+    ygglog_info("deserialize_obj: expecting %d verts, %d texcoords, %d normals, "
+		 "%d parameters, %d points, %d lines, %d faces, "
+		 "%d curves, %d curve2s, %d surfaces",
+		 nvert, ntexc, nnorm, nparam, npoint,
+		 nline, nface, ncurve, ncurve2, nsurf);
     // Allocate
     if (out > 0) {
-      int ret = alloc_obj(p, nvert, nface, ntexc, nnorm, do_colors);
+      int ret = alloc_obj(p, nvert, ntexc, nnorm, nparam, npoint,
+			  nline, nface, ncurve, ncurve2, nsurf, do_colors);
       if (ret < 0) {
 	ygglog_error("deserialize_obj: Error allocating obj structure.");
 	out = -1;
+      } else {
+	if (remove_line_texcoords) {
+	  free(p->line_texcoords);
+	  p->line_texcoords = NULL;
+	}
+	if (remove_face_texcoords) {
+	  free(p->face_texcoords);
+	  p->face_texcoords = NULL;
+	}
+	if (remove_face_normals) {
+	  free(p->face_normals);
+	  p->face_normals = NULL;
+	}
+	if (remove_surf_texcoords) {
+	  free(p->surface_texcoords);
+	  p->surface_texcoords = NULL;
+	}
+	if (remove_surf_normals) {
+	  free(p->surface_normals);
+	  p->surface_normals = NULL;
+	}
       }
     }
     // Locate lines
-    int cvert = 0, cface = 0, ctexc = 0, cnorm = 0, cmatl = 0;
+    int cmatl = 0, cvert = 0, ctexc = 0, cnorm = 0, cparam = 0,
+      cpoint = 0, cline = 0, cface = 0, ccurve = 0, ccurve2 = 0,
+      csurf = 0;
     size_t cur_pos = 0;
     char iline[500];
     size_t iline_siz = 0;
@@ -262,7 +718,7 @@ public:
 	int n_sub_matches = find_match("([^\n]*)\n", buf + cur_pos,
 				       &sind_line, &eind_line);
 	if (n_sub_matches == 0) {
-	  ygglog_debug("deserialize_obj: End of file.");
+	  ygglog_info("deserialize_obj: End of file.");
 	  sind_line = 0;
 	  eind_line = buf_siz - cur_pos;
 	}
@@ -287,11 +743,24 @@ public:
 	  for (j = 0; j < 3; j++) {
 	    p->vertices[cvert][j] = (float)atof(iline + sind[j+1]);
 	  }
+	  p->vertices[cvert][3] = 1.0;
 	  if (do_colors) {
 	    for (j = 0; j < 3; j++) {
 	      p->vertex_colors[cvert][j] = atoi(iline + sind[j+4]);
 	    }
 	  }
+	  cvert++;
+	  // Vertex with optional weight
+	} else if (find_matches(re_vert, iline, &sind, &eind) == (n_re_vert + 1)) {
+	  for (j = 0; j < 3; j++) {
+	    p->vertices[cvert][j] = (float)atof(iline + sind[j+1]);
+	  }
+	  if (do_colors) {
+	    for (j = 0; j < 3; j++) {
+	      p->vertex_colors[cvert][j] = atoi(iline + sind[j+4]);
+	    }
+	  }
+	  p->vertices[cvert][3] = (float)atof(iline + sind[7]);
 	  cvert++;
 	} else if (find_matches(re_norm, iline, &sind, &eind) == n_re_norm) {
 	  // Normals
@@ -301,29 +770,305 @@ public:
 	  }
 	  cnorm++;
 	} else if (find_matches(re_texc, iline, &sind, &eind) == n_re_texc) {
-	  // Texcoords
-	  ygglog_debug("deserialize_obj: Texcoords");
+	  // Texcoords with just u
+	  ygglog_debug("deserialize_obj: Texcoords with u");
+	  p->texcoords[ctexc][0] = (float)atof(iline + sind[1]);
+	  p->texcoords[ctexc][1] = 0.0;
+	  p->texcoords[ctexc][2] = 0.0;
+	  ctexc++;
+	} else if (find_matches(re_texc, iline, &sind, &eind) == (n_re_texc + 1)) {
+	  // Texcoords with optional v
+	  ygglog_debug("deserialize_obj: Texcoords with u, v");
 	  for (j = 0; j < 2; j++) {
 	    p->texcoords[ctexc][j] = (float)atof(iline + sind[j+1]);
 	  }
+	  p->texcoords[ctexc][2] = 0.0;
 	  ctexc++;
+	} else if (find_matches(re_texc, iline, &sind, &eind) == (n_re_texc + 2)) {
+	  // Texcoords with optional w
+	  ygglog_debug("deserialize_obj: Texcoords with u, v, w");
+	  for (j = 0; j < 3; j++) {
+	    p->texcoords[ctexc][j] = (float)atof(iline + sind[j+1]);
+	  }
+	  ctexc++;
+	} else if (find_matches(re_param, iline, &sind, &eind) == n_re_param) {
+	  // Parameters
+	  ygglog_debug("deserialize_obj: Parameters");
+	  for (j = 0; j < 2; j++) {
+	    p->params[cparam][j] = (float)atof(iline + sind[j+1]);
+	  }
+	  p->params[cparam][2] = 1.0;
+	  cparam++;
+	} else if (find_matches(re_param, iline, &sind, &eind) == (n_re_param + 1)) {
+	  // Parameters with optional weigth
+	  ygglog_debug("deserialize_obj: Parameters");
+	  for (j = 0; j < 3; j++) {
+	    p->params[cparam][j] = (float)atof(iline + sind[j+1]);
+	  }
+	  cparam++;
+	} else if (find_matches(re_point, iline, &sind, &eind) == n_re_point) {
+	  // Points
+	  ygglog_debug("deserialize_obj: Point");
+	  int nvert = count_matches(re_point_vert, iline);
+	  char re_split_vert[100] = "";
+	  for (j = 0; j < nvert; j++) {
+	    strcat(re_split_vert, re_point_vert);
+	  }
+	  int nvert_found = find_matches(re_split_vert, iline, &sind, &eind) - 1;
+	  if (nvert_found != nvert) {
+	    ygglog_error("deserialize_obj: Expected %d verts in point, but found %d (re = %s, line = '%s').",
+			 nvert, nvert_found, re_split_vert, iline);
+	    out = -1;
+	    break;
+	  }
+	  p->nvert_in_point[cpoint] = nvert;
+	  int *ipoint = (int*)realloc(p->points[cpoint], nvert*sizeof(int));
+	  if (ipoint == NULL) {
+	    ygglog_error("deserialize_obj: Failed to allocate point %d.", cpoint);
+	    out = -1;
+	    break;
+	  }
+	  p->points[cpoint] = ipoint;
+	  for (j = 0; j < nvert; j++) {
+	    p->points[cpoint][j] = atoi(iline + sind[j+1]) - 1;
+	  }
+	  cpoint++;
+	} else if (find_matches(re_line, iline, &sind, &eind) == n_re_line) {
+	  // Lines
+	  ygglog_debug("deserialize_obj: Line");
+	  int val_per_vert;
+	  if (p->line_texcoords == NULL) {
+	    val_per_vert = 1;
+	  } else {
+	    val_per_vert = 2;
+	  }
+	  int nvert = count_matches(re_line_vert, iline);
+	  char re_split_vert[100] = "";
+	  for (j = 0; j < nvert; j++) {
+	    strcat(re_split_vert, re_line_vert);
+	  }
+	  int nvert_found = (find_matches(re_split_vert, iline, &sind, &eind) - 1)/val_per_vert;
+	  if (nvert_found != nvert) {
+	    ygglog_error("deserialize_obj: Expected %d verts in line, but found %d.",
+			 nvert, nvert_found);
+	    out = -1;
+	    break;
+	  }
+	  p->nvert_in_line[cline] = nvert;
+	  int* iline_ele = (int*)realloc(p->lines[cline], nvert*sizeof(int));
+	  if (iline_ele == NULL) {
+	    ygglog_error("deserialize_obj: Failed to allocate line %d.", cline);
+	    out = -1;
+	    break;
+	  }
+	  p->lines[cline] = iline_ele;
+	  for (j = 0; j < nvert; j++) {
+	    p->lines[cline][j] = atoi(iline + sind[j*val_per_vert + 1]) - 1;
+	  }
+	  if (p->line_texcoords != NULL) {
+	    int *iline_texcoord = (int*)realloc(p->line_texcoords[cline], nvert*sizeof(int));
+	    if (iline_texcoord == NULL) {
+	      ygglog_error("deserialize_obj: Failed to allocate texcoord for line %d.", cline);
+	      out = -1;
+	      break;
+	    }
+	    p->line_texcoords[cline] = iline_texcoord;
+	    for (j = 0; j < nvert; j++) {
+	      p->line_texcoords[cline][j] = atoi(iline + sind[j*val_per_vert + 2]) - 1;
+	    }
+	  }
+	  cline++;
 	} else if (find_matches(re_face, iline, &sind, &eind) == n_re_face) {
 	  // Face
-	  //int n_sub_matches2 = 
-	  find_matches(re_face, iline, &sind, &eind);
 	  ygglog_debug("deserialize_obj: Face");
-	  for (j = 0; j < 3; j++) {
-	    p->faces[cface][j] = atoi(iline + sind[3*j+1]) - 1;
-	    if ((eind[3*j+2] - sind[3*j+2]) == 0)
-	      p->face_texcoords[cface][j] = -1;
-	    else
-	      p->face_texcoords[cface][j] = atoi(iline + sind[3*j+2]) - 1;
-	    if ((eind[3*j+3] - sind[3*j+3]) == 0)
-	      p->face_normals[cface][j] = -1;
-	    else
-	      p->face_normals[cface][j] = atoi(iline + sind[3*j+3]) - 1;
+	  int val_per_vert = 1;
+	  if (p->face_texcoords != NULL) {
+	    val_per_vert++;
+	  }
+	  if (p->face_normals != NULL) {
+	    val_per_vert++;
+	  }
+	  int nvert = count_matches(re_face_vert, iline);
+	  char re_split_vert[100] = "";
+	  for (j = 0; j < nvert; j++) {
+	    strcat(re_split_vert, re_face_vert);
+	  }
+	  int nvert_found = (find_matches(re_split_vert, iline, &sind, &eind) - 1)/val_per_vert;
+	  if (nvert_found != nvert) {
+	    ygglog_error("deserialize_obj: Expected %d verts in face, but found %d.",
+			 nvert, nvert_found);
+	    out = -1;
+	    break;
+	  }
+	  p->nvert_in_face[cface] = nvert;
+	  int *iface = (int*)realloc(p->faces[cface], nvert*sizeof(int));
+	  if (iface == NULL) {
+	    ygglog_error("deserialize_obj: Failed to allocate face %d.", cface);
+	    out = -1;
+	    break;
+	  }
+	  p->faces[cface] = iface;
+	  for (j = 0; j < nvert; j++) {
+	    p->faces[cface][j] = atoi(iline + sind[val_per_vert*j+1]) - 1;
+	  }
+	  if (p->face_texcoords != NULL) {
+	    int *iface_texcoord = (int*)realloc(p->face_texcoords[cface], nvert*sizeof(int));
+	    if (iface_texcoord == NULL) {
+	      ygglog_error("deserialize_obj: Failed to allocate face texcoord %d.", cface);
+	      out = -1;
+	      break;
+	    }
+	    p->face_texcoords[cface] = iface_texcoord;
+	    for (j = 0; j < nvert; j++) {
+	      p->face_texcoords[cface][j] = atoi(iline + sind[val_per_vert*j+2]) - 1;
+	    }
+	  }
+	  if (p->face_normals != NULL) {
+	    int offset;
+	    if (p->face_texcoords == NULL) {
+	      offset = 2;
+	    } else {
+	      offset = 3;
+	    }
+	    int* iface_normal = (int*)realloc(p->face_normals[cface], nvert*sizeof(int));
+	    if (iface_normal == NULL) {
+	      ygglog_error("deserialize_obj: Failed to allocate face normal %d.", cface);
+	      out = -1;
+	      break;
+	    }
+	    p->face_normals[cface] = iface_normal;
+	    for (j = 0; j < nvert; j++) {
+	      p->face_normals[cface][j] = atoi(iline + sind[val_per_vert*j+offset]) - 1;
+	    }
 	  }
 	  cface++;
+	} else if (find_matches(re_curve, iline, &sind, &eind) == n_re_curve) {
+	  // Curves
+	  ygglog_debug("deserialize_obj: Curve");
+	  for (j = 0; j < 2; j++) {
+	    p->curve_params[ccurve][j] = (float)atof(iline + sind[j + 1]);
+	  }
+	  int sind_verts = eind[2];
+	  int nvert = count_matches(re_curve_vert, iline + sind_verts);
+	  char re_split_vert[100] = "";
+	  for (j = 0; j < nvert; j++) {
+	    strcat(re_split_vert, re_curve_vert);
+	  }
+	  int nvert_found = find_matches(re_split_vert, iline + sind_verts, &sind, &eind) - 1;
+	  if (nvert_found != nvert) {
+	    ygglog_error("deserialize_obj: Expected %d verts in curve, but found %d.",
+			 nvert, nvert_found);
+	    out = -1;
+	    break;
+	  }
+	  p->nvert_in_curve[ccurve] = nvert;
+	  int* icurve = (int*)realloc(p->curves[ccurve], nvert*sizeof(int));
+	  if (icurve == NULL) {
+	    ygglog_error("deserialize_obj: Failed to allocate curve %d.", ccurve);
+	    out = -1;
+	    break;
+	  }
+	  p->curves[ccurve] = icurve;
+	  for (j = 0; j < nvert; j++) {
+	    p->curves[ccurve][j] = atoi(iline + sind_verts + sind[j + 1]) - 1;
+	  }
+	  ccurve++;
+	} else if (find_matches(re_curve2, iline, &sind, &eind) == n_re_curve2) {
+	  // Curves2
+	  ygglog_debug("deserialize_obj: Curve2");
+	  int nvert = count_matches(re_curve2_vert, iline);
+	  char re_split_vert[100] = "";
+	  for (j = 0; j < nvert; j++) {
+	    strcat(re_split_vert, re_curve2_vert);
+	  }
+	  int nvert_found = find_matches(re_split_vert, iline, &sind, &eind) - 1;
+	  if (nvert_found != nvert) {
+	    ygglog_error("deserialize_obj: Expected %d verts in curve2, but found %d.",
+			 nvert, nvert_found);
+	    out = -1;
+	    break;
+	  }
+	  p->nparam_in_curve2[ccurve2] = nvert;
+	  int* icurve2 = (int*)realloc(p->curves2[ccurve2], nvert*sizeof(int));
+	  if (icurve2 == NULL) {
+	    ygglog_error("deserialize_obj: Failed to allocate curve2 %d.", ccurve);
+	    out = -1;
+	    break;
+	  }
+	  p->curves2[ccurve2] = icurve2;
+	  for (j = 0; j < nvert; j++) {
+	    p->curves2[ccurve2][j] = atoi(iline + sind[j + 1]) - 1;
+	  }
+	  ccurve2++;
+	} else if (find_matches(re_surf, iline, &sind, &eind) == n_re_surf) {
+	  // Surfaces
+	  ygglog_debug("deserialize_obj: Surface");
+	  int val_per_vert = 1;
+	  if (p->surface_texcoords != NULL) {
+	    val_per_vert++;
+	  }
+	  if (p->surface_normals != NULL) {
+	    val_per_vert++;
+	  }
+	  for (j = 0; j < 2; j++) {
+	    p->surface_params_u[csurf][j] = (float)atof(iline + sind[j + 1]);
+	    p->surface_params_v[csurf][j] = (float)atof(iline + sind[j + 3]);
+	  }
+	  int sind_verts = eind[4];
+	  int nvert = count_matches(re_surf_vert, iline + sind_verts);
+	  char re_split_vert[100] = "";
+	  for (j = 0; j < nvert; j++) {
+	    strcat(re_split_vert, re_surf_vert);
+	  }
+	  int nvert_found = (find_matches(re_split_vert, iline + sind_verts, &sind, &eind) - 1)/val_per_vert;
+	  if (nvert_found != nvert) {
+	    ygglog_error("deserialize_obj: Expected %d verts in surface, but found %d.",
+			 nvert, nvert_found);
+	    out = -1;
+	    break;
+	  }
+	  p->nvert_in_surface[csurf] = nvert;
+	  int* isurf = (int*)realloc(p->surfaces[csurf], nvert*sizeof(int));
+	  if (isurf == NULL) {
+	    ygglog_error("deserialize_obj: Failed to allocate surface %d.", csurf);
+	    out = -1;
+	    break;
+	  }
+	  p->surfaces[csurf] = isurf;
+	  for (j = 0; j < nvert; j++) {
+	    p->surfaces[csurf][j] = atoi(iline + sind_verts + sind[val_per_vert*j + 1]) - 1;
+	  }
+	  if (p->surface_texcoords != NULL) {
+	    int *isurf_texcoord = (int*)realloc(p->surface_texcoords[csurf], nvert*sizeof(int));
+	    if (isurf_texcoord == NULL) {
+	      ygglog_error("deserialize_obj: Failed to allocate surface texcoord %d.", csurf);
+	      out = -1;
+	      break;
+	    }
+	    p->surface_texcoords[csurf] = isurf_texcoord;
+	    for (j = 0; j < nvert; j++) {
+	      p->surface_texcoords[csurf][j] = atoi(iline + sind_verts + sind[val_per_vert*j + 2]) - 1;
+	    }
+	  }
+	  if (p->surface_normals != NULL) {
+	    int offset;
+	    if (p->surface_texcoords == NULL) {
+	      offset = 2;
+	    } else {
+	      offset = 3;
+	    }
+	    int* isurf_normal = (int*)realloc(p->surface_normals[csurf], nvert*sizeof(int));
+	    if (isurf_normal == NULL) {
+	      ygglog_error("deserialize_obj: Failed to allocate surface normal %d.", csurf);
+	      out = -1;
+	      break;
+	    }
+	    p->surface_normals[csurf] = isurf_normal;
+	    for (j = 0; j < nvert; j++) {
+	      p->surface_normals[csurf][j] = atoi(iline + sind_verts + sind[val_per_vert*j + offset]) - 1;
+	    }
+	  }
+	  csurf++;
 	} else if (find_matches("\n+", iline, &sind, &eind) == 1) {
 	  // Empty line
 	  ygglog_debug("deserialize_obj: Empty line");
@@ -339,12 +1084,12 @@ public:
       }
     }
     if (out > 0) {
-      if (cvert != nvert) {
-	ygglog_error("deserialize_obj: Found %d verts, expected %d.", cvert, nvert);
+      if (cmatl != nmatl) {
+	ygglog_error("deserialize_obj: Found %d materials, expected %d.", cmatl, nmatl);
 	out = -1;
       }
-      if (cface != nface) {
-	ygglog_error("deserialize_obj: Found %d faces, expected %d.", cface, nface);
+      if (cvert != nvert) {
+	ygglog_error("deserialize_obj: Found %d verts, expected %d.", cvert, nvert);
 	out = -1;
       }
       if (ctexc != ntexc) {
@@ -355,8 +1100,31 @@ public:
 	ygglog_error("deserialize_obj: Found %d norms, expected %d.", cnorm, nnorm);
 	out = -1;
       }
-      if (cmatl != nmatl) {
-	ygglog_error("deserialize_obj: Found %d materials, expected %d.", cmatl, nmatl);
+      if (cparam != nparam) {
+	ygglog_error("deserialize_obj: Found %d parameters, expected %d.", cparam, nparam);
+	out = -1;
+      }
+      if (cpoint != npoint) {
+	ygglog_error("deserialize_obj: Found %d points, expected %d.", cpoint, npoint);
+	out = -1;
+      }
+      if (cline != nline) {
+	ygglog_error("deserialize_obj: Found %d lines, expected %d.", cline, nline);
+      }
+      if (cface != nface) {
+	ygglog_error("deserialize_obj: Found %d faces, expected %d.", cface, nface);
+	out = -1;
+      }
+      if (ccurve != ncurve) {
+	ygglog_error("deserialize_obj: Found %d curves, expected %d.", ccurve, ncurve);
+	out = -1;
+      }
+      if (ccurve2 != ncurve2) {
+	ygglog_error("deserialize_obj: Found %d curve2s, expected %d.", ccurve2, ncurve2);
+	out = -1;
+      }
+      if (csurf != nsurf) {
+	ygglog_error("deserialize_obj: Found %d surfaces, expected %d.", csurf, nsurf);
 	out = -1;
       }
     }

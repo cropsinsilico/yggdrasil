@@ -12,12 +12,12 @@ from yggdrasil.drivers.LPyModelDriver import LPyModelDriver
 
 old_value = parent._test_value
 _test_value = {'vertices': [], 'faces': [], 'lines': [],
-               'params': [{'u': 0.0, 'v': 0.0, 'w': 1.0},
+               'params': [{'u': 0.0, 'v': 0.0, 'w': 0.5},
                           {'u': 0.0, 'v': 0.0}],
                'normals': [{'i': 0.0, 'j': 0.0, 'k': 0.0},
                            {'i': 1.0, 'j': 1.0, 'k': 1.0}],
-               'texcoords': [{'u': 0.0, 'v': 0.0, 'w': 0.0},
-                             {'u': 1.0, 'v': 1.0},
+               'texcoords': [{'u': 0.0, 'v': 0.0, 'w': 0.5},
+                             {'u': 1.0, 'v': 0.5},
                              {'u': 1.0}],
                'points': [[0, 2]],
                'curves': [{'starting_param': 0.0, 'ending_param': 1.0,
@@ -27,20 +27,18 @@ _test_value = {'vertices': [], 'faces': [], 'lines': [],
                    'starting_param_u': 0.0, 'ending_param_u': 1.0,
                    'starting_param_v': 0.0, 'ending_param_v': 1.0,
                    'vertex_indices': [{'vertex_index': 0,
+                                       'texcoord_index': 0,
                                        'normal_index': 0},
                                       {'vertex_index': 1,
                                        'texcoord_index': 1,
                                        'normal_index': 1}]}]}
 _test_value['material'] = old_value['material']
 _test_value['vertices'] = copy.deepcopy(old_value['vertices'])
-_test_value['vertices'][0]['w'] = 1.0
+_test_value['vertices'][0]['w'] = 0.5
 for f in old_value['faces']:
-    new = [{'vertex_index': x, 'texcoord_index': 0} for x in f['vertex_index']]
+    new = [{'vertex_index': x, 'texcoord_index': 0, 'normal_index': 0}
+           for x in f['vertex_index']]
     _test_value['faces'].append(new)
-for fv in _test_value['faces'][0]:
-    fv['normal_index'] = 0
-_test_value['faces'][1][0].pop('texcoord_index')
-_test_value['faces'][1][0]['normal_index'] = 0
 for e in old_value['edges']:
     new = [{'vertex_index': e['vertex%d' % x]} for x in [1, 2]]
     _test_value['lines'].append(new)
@@ -120,6 +118,7 @@ class TestObjMetaschemaType(parent.TestPlyMetaschemaType):
                                'faces': [[{'vertex_index': 0},
                                           {'vertex_index': 1},
                                           {'vertex_index': 2}]]}]
+        # TODO: Add tests for faces with just texcoord or normal?
         cls._invalid_encoded = [{}]
         cls._invalid_decoded = [{'vertices': [{k: 0.0 for k in 'xyz'}],
                                  'faces': [[{'vertex_index': 0},
