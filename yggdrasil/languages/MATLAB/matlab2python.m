@@ -16,7 +16,7 @@ function x_py = matlab2python(x_ml)
     keys = matlab2python(x_ml.keys);
     vals = matlab2python(x_ml.values);
     for i = 1:length(keys)
-      keys{i} = py.str(keys{i}.decode('utf-8'));
+      keys{i} = py.str(keys{i});  %.decode('utf-8'));
     end
     x_py = py.dict(py.zip(keys, vals));
   elseif isscalar(x_ml);
@@ -47,14 +47,18 @@ function x_py = matlab2python(x_ml)
     elseif isa(x_ml, 'integer');
       x_py = py.int(x_ml);
     elseif isa(x_ml, 'string');
-      x_py = py.str(x_ml);
-    elseif isa(x_ml, 'char');
       try
 	x_py = py.str(x_ml);
       catch
 	x_py = py.unicode(x_ml);
       end
       x_py = x_py.encode('utf-8');
+    elseif isa(x_ml, 'char');
+      try
+	x_py = py.str(x_ml);
+      catch
+	x_py = py.unicode(x_ml);
+      end
     elseif isa(x_ml, 'logical');
       x_py = py.bool(x_ml);
     elseif isa(x_ml, 'struct');
@@ -78,13 +82,19 @@ function x_py = matlab2python(x_ml)
   elseif isvector(x_ml);
     if isa(x_ml, 'string');
       x_py = py.str(x_ml);
+    elseif isa(x_ml, 'string');
+      try
+	x_py = py.str(x_ml);
+      catch
+	x_py = py.unicode(x_ml);
+      end
+      x_py = x_py.encode('utf-8');
     elseif isa(x_ml, 'char');
       try
         x_py = py.str(x_ml);
       catch
         x_py = py.unicode(x_ml);
       end;
-      x_py = x_py.encode('utf-8');
     elseif isa(x_ml, 'cell');
       for i = 1:length(x_ml)
 	x_ml{i} = matlab2python(x_ml{i});

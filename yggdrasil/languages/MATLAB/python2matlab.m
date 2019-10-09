@@ -27,14 +27,14 @@ function x_ml = python2matlab(x_py)
   elseif isa(x_py, 'py.numpy.float32')
     x_ml = python2matlab(py.float(x_py));
   elseif isa(x_py, 'py.bytes')
-    x_ml = char(x_py.decode('utf-8'));
+    x_ml = string(char(x_py.decode('utf-8')));
   elseif isa(x_py, 'py.unicode')
     x_ml = char(x_py);
   elseif isa(x_py, 'py.string')
     x_ml = char(x_py);
   elseif isa(x_py, 'py.str')
     if version == '2.7';
-      x_ml = char(x_py.decode('utf-8'));
+      x_ml = string(char(x_py.decode('utf-8')));
     else;
       x_ml = char(x_py);
     end;
@@ -52,6 +52,12 @@ function x_ml = python2matlab(x_py)
     % x_ml = struct(x_py);
     dict_keys = python2matlab(py.list(keys(x_py)));
     dict_vals = python2matlab(py.list(values(x_py)));
+    [nr, nc] = size(dict_keys);
+    for i = 1:nr
+      for j = 1:nc
+	dict_keys{i, j} = char(dict_keys{i, j});
+      end;
+    end;
     x_ml = containers.Map(dict_keys, dict_vals);
   elseif (isa(x_py, 'py.list') || isa(x_py, 'py.tuple') || isa(x_py, 'py.set'))
     x_ml = cell(x_py);
