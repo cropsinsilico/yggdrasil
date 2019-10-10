@@ -40,6 +40,12 @@ function x_py = matlab2python(x_ml)
       else
 	x_py = x_ml;
       end
+    elseif isa(x_ml, 'uint8');
+      x_py = py.numpy.uint8(py.int(x_ml));
+    elseif isa(x_ml, 'uint32');
+      x_py = py.numpy.uint32(py.int(x_ml));
+    elseif isa(x_ml, 'uint64');
+      x_py = py.numpy.uint64(py.int(x_ml));
     elseif isa(x_ml, 'int32');
       x_py = py.numpy.int32(py.int(x_ml));
     elseif isa(x_ml, 'int64');
