@@ -49,7 +49,7 @@ function x_py = matlab2python(x_ml)
     elseif isa(x_ml, 'int32');
       x_py = py.numpy.int32(py.int(x_ml));
     elseif isa(x_ml, 'int64');
-      x_py = py.numpy.int64(py.int(x_ml));
+      x_py = py.int(x_ml);
     elseif isa(x_ml, 'integer');
       x_py = py.int(x_ml);
     elseif isa(x_ml, 'string');
@@ -102,9 +102,16 @@ function x_py = matlab2python(x_ml)
         x_py = py.unicode(x_ml);
       end;
     elseif isa(x_ml, 'cell');
-      for i = 1:length(x_ml)
-	x_ml{i} = matlab2python(x_ml{i});
-      end
+      [nr, nc] = size(x_ml);
+      for i = 1:nr
+	for j = 1:nc
+	  if (isa(x_ml{i, j}, 'char') && (length(x_ml{i, j}) == 0))
+            x_ml{i, j} = py.str('');
+          else
+	    x_ml{i, j} = matlab2python(x_ml{i, j});
+          end;
+	end;
+      end;
       x_py = py.list(x_ml);
     else
       x_py = py.numpy.array(x_ml);
