@@ -134,6 +134,162 @@ public:
     printf("%-15s = %s\n", "units", units_);
   }
   /*!
+    @brief Display data.
+    @param[in] x YggGeneric* Pointer to generic object.
+    @param[in] indent char* Indentation to add to display output.
+   */
+  void display_generic(YggGeneric* x, const char* indent="") override {
+    int i;
+    size_t bytes_precision = nbytes();
+    std::cout << indent;
+    switch (subtype_code_) {
+    case T_INT: {
+      switch (precision_) {
+      case 8: {
+	int8_t* arg = (int8_t*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      }
+      case 16: {
+	int16_t* arg = (int16_t*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      }
+      case 32: {
+	int32_t* arg = (int32_t*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      }
+      case 64: {
+	int64_t* arg = (int64_t*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      }
+      default: {
+	ygglog_error("ScalarMetaschemaType::display_generic: Unsupported integer precision '%lu'.",
+		     precision_);
+	return;
+      }
+      }
+      break;
+    }
+    case T_UINT: {
+      switch (precision_) {
+      case 8: {
+	uint8_t* arg = (uint8_t*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      }
+      case 16: {
+	uint16_t* arg = (uint16_t*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      }
+      case 32: {
+	uint32_t* arg = (uint32_t*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      }
+      case 64: {
+	uint64_t* arg = (uint64_t*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      }
+      default: {
+	ygglog_error("ScalarMetaschemaType::display_generic: Unsupported unsigned integer precision '%lu'.",
+		     precision_);
+	return;
+      }
+      }
+      break;
+    }
+    case T_FLOAT: {
+      if (sizeof(float) == bytes_precision) {
+	float* arg = (float*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      } else if (sizeof(double) == bytes_precision) {
+	double* arg = (double*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      } else if (sizeof(long double) == bytes_precision) {
+	long double* arg = (long double*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      } else {
+	ygglog_error("ScalarMetaschemaType::display_generic: Unsupported float precision '%lu'.",
+		     precision_);
+	return;
+      }
+      break;
+    }
+    case T_COMPLEX: {
+      if (sizeof(float) == (bytes_precision / 2)) {
+#ifdef _WIN32
+	complex_double* arg = (complex_double*)(x->get_data());
+#else
+	complex_float* arg = (complex_float*)(x->get_data());
+#endif
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      } else if (sizeof(double) == (bytes_precision / 2)) {
+	complex_double* arg = (complex_double*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      } else if (sizeof(long double) == (bytes_precision / 2)) {
+	complex_long_double* arg = (complex_long_double*)(x->get_data());
+	for (i = 0; i < x->get_nelements(); i++)
+	  std::cout << arg[i] << " ";
+	std::cout << std::endl;
+	return;
+      } else {
+	ygglog_error("ScalarMetaschemaType::display_generic: Unsupported complex precision '%lu'.",
+		     precision_);
+	return;
+      }
+      break;
+    }
+    case T_BYTES:
+    case T_UNICODE: {
+      // TODO: Handle array of char arrays
+      char* arg = (char*)(x->get_data());
+      std::cout << arg << std::endl;
+      return;
+    }
+    default: {
+      ygglog_error("ScalarMetaschemaType::display_generic: Unsupported subtype '%s'.",
+		   subtype_);
+      return;
+    }
+    }
+  }
+  /*!
     @brief Check that the subtype is correct and get the corresponding code.
     @returns int Type code for the instance's subtype.
    */

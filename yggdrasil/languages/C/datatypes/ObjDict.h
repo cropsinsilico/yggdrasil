@@ -943,6 +943,86 @@ obj_t copy_obj(obj_t src) {
 };
 
 
+static inline
+void display_obj_indent(obj_t p, const char* indent) {
+  int i, j;
+  printf("%sMaterial: %s\n", indent, p.material);
+  printf("%s%d Vertices:\n", indent, p.nvert);
+  for (i = 0; i < p.nvert; i++) {
+    printf("%s  %f, %f, %f\n", indent,
+	   p.vertices[i][0], p.vertices[i][1], p.vertices[i][2]);
+  }
+  printf("%s%d Texcoords:\n", indent, p.ntexc);
+  for (i = 0; i < p.ntexc; i++) {
+    printf("%s  %f, %f, %f\n", indent,
+	   p.texcoords[i][0], p.texcoords[i][1], p.texcoords[i][2]);
+  }
+  printf("%s%d Normals:\n", indent, p.nnorm);
+  for (i = 0; i < p.nnorm; i++) {
+    printf("%s  %f, %f, %f\n", indent,
+	   p.normals[i][0], p.normals[i][1], p.normals[i][2]);
+  }
+  printf("%s%d Params:\n", indent, p.nparam);
+  for (i = 0; i < p.nparam; i++) {
+    printf("%s  %f, %f, %f\n", indent,
+	   p.params[i][0], p.params[i][1], p.params[i][2]);
+  }
+  printf("%s%d Points:\n", indent, p.npoint);
+  for (i = 0; i < p.npoint; i++) {
+    printf("%s  %d", indent, p.points[i][0]);
+    for (j = 1; j < p.nvert_in_point[i]; j++)
+      printf(", %d", p.points[i][j]);
+    printf("\n");
+  }
+  printf("%s%d Lines:\n", indent, p.nline);
+  for (i = 0; i < p.nline; i++) {
+    printf("%s  %d", indent, p.lines[i][0]);
+    for (j = 1; j < p.nvert_in_line[i]; j++)
+      printf(", %d", p.lines[i][j]);
+    printf("\n");
+  }
+  printf("%s%d Faces:\n", indent, p.nface);
+  for (i = 0; i < p.nface; i++) {
+    printf("%s  %d", indent, p.faces[i][0]);
+    for (j = 1; j < p.nvert_in_face[i]; j++)
+      printf(", %d", p.faces[i][j]);
+    printf("\n");
+  }
+  printf("%s%d Curves:\n", indent, p.ncurve);
+  for (i = 0; i < p.ncurve; i++) {
+    printf("%s  %f  %f  %d", indent,
+	   p.curve_params[i][0], p.curve_params[i][1],
+	   p.curves[i][0]);
+    for (j = 1; j < p.nvert_in_curve[i]; j++)
+      printf(", %d", p.curves[i][j]);
+    printf("\n");
+  }
+  printf("%s%d Curve2s:\n", indent, p.ncurve2);
+  for (i = 0; i < p.ncurve2; i++) {
+    printf("%s  %d", indent, p.curves2[i][0]);
+    for (j = 1; j < p.nparam_in_curve2[i]; j++)
+      printf(", %d", p.curves2[i][j]);
+    printf("\n");
+  }
+  printf("%s%d Surfaces:\n", indent, p.nsurf);
+  for (i = 0; i < p.nsurf; i++) {
+    printf("%s  %f  %f  %f  %f  %d", indent,
+	   p.surface_params_u[i][0], p.surface_params_u[i][1],
+	   p.surface_params_v[i][0], p.surface_params_v[i][1],
+	   p.surfaces[i][0]);
+    for (j = 1; j < p.nvert_in_surface[i]; j++)
+      printf(", %d", p.surfaces[i][j]);
+    printf("\n");
+  }
+};
+
+  
+static inline
+void display_obj(obj_t p) {
+  display_obj_indent(p, "");
+};
+
+  
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }
 #endif

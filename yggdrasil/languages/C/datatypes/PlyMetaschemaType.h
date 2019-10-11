@@ -33,6 +33,16 @@ public:
    */
   PlyMetaschemaType* copy() override { return (new PlyMetaschemaType()); }
   /*!
+    @brief Display data.
+    @param[in] x YggGeneric* Pointer to generic object.
+    @param[in] indent char* Indentation to add to display output.
+   */
+  void display_generic(YggGeneric* x, const char* indent="") override {
+    ply_t arg;
+    x->get_data(arg);
+    display_ply_indent(arg, indent);
+  }
+  /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
@@ -328,13 +338,14 @@ public:
     if (out > 0) {
       n_sub_matches = find_matches("element edge ([[:digit:]]+)\n", buf, &sind, &eind);
       if (n_sub_matches < 2) {
-	ygglog_error("PlyMetaschemaType::decode_data: Could not locate number of edges in ply header.");
-	out = -1;
+	ygglog_debug("PlyMetaschemaType::decode_data: Could not locate number of edges in ply header.");
+	nedge = 0;
+      } else {
+	value_size = eind[1] - sind[1];
+	memcpy(value, buf + sind[1], value_size);
+	value[value_size] = '\0';
+	nedge = atoi(value);
       }
-      value_size = eind[1] - sind[1];
-      memcpy(value, buf + sind[1], value_size);
-      value[value_size] = '\0';
-      nedge = atoi(value);
     }
     // Edge color
     if (out > 0) {

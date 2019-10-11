@@ -286,6 +286,35 @@ ply_t copy_ply(ply_t src) {
   return out;
 };
 
+
+static inline
+void display_ply_indent(ply_t p, const char* indent) {
+  int i, j;
+  printf("%s%d Vertices:\n", indent, p.nvert);
+  for (i = 0; i < p.nvert; i++) {
+    printf("%s  %f, %f, %f\n", indent,
+	   p.vertices[i][0], p.vertices[i][1], p.vertices[i][2]);
+  }
+  printf("%s%d Edges:\n", indent, p.nedge);
+  for (i = 0; i < p.nedge; i++) {
+    printf("%s  %d, %d\n", indent,
+	   p.edges[i][0], p.edges[i][1]);
+  }
+  printf("%s%d Faces:\n", indent, p.nface);
+  for (i = 0; i < p.nface; i++) {
+    printf("%s  %d", indent, p.faces[i][0]);
+    for (j = 1; j < p.nvert_in_face[i]; j++)
+      printf(", %d", p.faces[i][j]);
+    printf("\n");
+  }
+};
+
+  
+static inline
+void display_ply(ply_t p) {
+  display_ply_indent(p, "");
+};
+
   
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }

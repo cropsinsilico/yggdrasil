@@ -437,6 +437,17 @@ extern "C" {
       return -1;
     }
   }
+
+  void display_generic(generic_t* x) {
+    try {
+      YggGeneric* x_obj = (YggGeneric*)(x->obj);
+      if (x_obj != NULL) {
+	x_obj->display();
+      }
+    } catch (...) {
+      ygglog_error("display_generic: C++ exception thrown.");
+    }
+  }
   
   int is_generic(void* x) {
     if (x != NULL) {
@@ -954,7 +965,7 @@ extern "C" {
     }
     return 0;
   }
-  
+
 }
 
 // Local Variables:

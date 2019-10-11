@@ -4,6 +4,7 @@
 #include "../tools.h"
 
 #include <stdexcept>
+#include <iostream>
 #include <map>
 #include <vector>
 #include "rapidjson/document.h"
@@ -107,6 +108,10 @@ public:
    */
   YggGeneric(MetaschemaType* in_type, void* in_data, size_t in_nbytes=0);
   ~YggGeneric();
+  /*!
+    @brief Display the data.
+   */
+  void display(const char* indent="");
   /*!
     @brief Get a copy of the data.
     @returns void* Pointer to copy of data.
@@ -251,6 +256,45 @@ public:
   virtual void display() {
     printf("%-15s = %s\n", "type", type_);
     printf("%-15s = %d\n", "type_code", type_code_);
+  }
+  /*!
+    @brief Display data.
+    @param[in] x YggGeneric* Pointer to generic object.
+    @param[in] indent char* Indentation to add to display output.
+   */
+  virtual void display_generic(YggGeneric* data, const char* indent="") {
+    std::cout << indent;
+    switch (type_code_) {
+    case T_BOOLEAN: {
+      bool arg = false;
+      data->get_data(arg);
+      std::cout << arg << std::endl;
+      return;
+    }
+    case T_INTEGER: {
+      int arg = 0;
+      data->get_data(arg);
+      std::cout << arg << std::endl;
+      return;
+    }
+    case T_NULL: {
+      std::cout << NULL << std::endl;
+      return;
+    }
+    case T_NUMBER: {
+      double arg = 0.0;
+      data->get_data(arg);
+      std::cout << arg << std::endl;
+      return;
+    }
+    case T_STRING: {
+      char* arg = NULL;
+      data->get_data(arg);
+      std::cout << arg << std::endl;
+      return;
+    }
+    }
+    ygglog_throw_error("MetaschemaType::display_generic: Cannot display type '%s'.", type_);
   }
   /*!
     @brief Check that the type is correct and get the corresponding code.
@@ -845,6 +889,9 @@ YggGeneric::YggGeneric(MetaschemaType* in_type, void* in_data, size_t in_nbytes)
 };
 YggGeneric::~YggGeneric() {
   free_data();
+};
+void YggGeneric::display(const char* indent) {
+  type->display_generic(this, indent);
 };
 void* YggGeneric::copy_data(void* orig_data) {
   void* out = NULL;

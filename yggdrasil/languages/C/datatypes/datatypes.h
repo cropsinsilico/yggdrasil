@@ -124,6 +124,13 @@ generic_t* get_generic(void* x, int is_pointer);
  */
 generic_t* get_generic_va(size_t nargs, va_list_t ap, int is_pointer);
 
+
+/*!
+  @brief Display information about the generic type.
+  @param[in] x generic_t* Wrapper for generic object.
+ */
+void display_generic(generic_t* x);
+
   
 /*!
   @brief Determine if a pointer points to a generic object.
@@ -491,7 +498,18 @@ void display_dtype(const dtype_t *dtype);
 size_t nargs_exp_dtype(const dtype_t *dtype);
 
 
+#define free_generic destroy_generic
+#define init_map init_generic
+#define init_vector init_generic
+#define init_schema init_generic
+#define free_map free_generic
+#define free_vector free_generic
+#define free_schema free_generic
+#define copy_map copy_generic
+#define copy_vector copy_generic
+#define copy_schema copy_generic
 
+  
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }
 #endif

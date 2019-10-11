@@ -44,6 +44,24 @@ public:
     }
   }
   /*!
+    @brief Display data.
+    @param[in] x YggGeneric* Pointer to generic object.
+    @param[in] indent char* Indentation to add to display output.
+   */
+  void display_generic(YggGeneric* x, const char* indent) override {
+    YggGenericMap arg;
+    YggGenericMap::iterator it;
+    char new_indent[100] = "";
+    strcat(new_indent, indent);
+    strcat(new_indent, "    ");
+    x->get_data(arg);
+    printf("Object with %lu elements:\n", arg.size());
+    for (it = arg.begin(); it != arg.end(); it++) {
+      std::cout << "  " << it->first << ": ";
+      (it->second)->display(new_indent);
+    }
+  }
+  /*!
     @brief Get number of items in type.
     @returns size_t Number of items in type.
    */

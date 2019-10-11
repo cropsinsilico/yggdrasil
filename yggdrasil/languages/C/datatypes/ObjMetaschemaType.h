@@ -33,6 +33,16 @@ public:
    */
   ObjMetaschemaType* copy() override { return (new ObjMetaschemaType()); }
   /*!
+    @brief Display data.
+    @param[in] x YggGeneric* Pointer to generic object.
+    @param[in] indent char* Indentation to add to display output.
+   */
+  void display_generic(YggGeneric* x, const char* indent="") override {
+    obj_t arg;
+    x->get_data(arg);
+    display_obj_indent(arg, indent);
+  }
+  /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
