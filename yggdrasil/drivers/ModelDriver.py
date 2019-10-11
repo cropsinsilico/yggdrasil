@@ -1835,6 +1835,12 @@ checking if the model flag indicates
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
         out = []
+        if 'interface' in cls.function_param:
+            ygglib = cls.interface_library
+            if ygglib in cls.internal_libraries:
+                ygglib = cls.internal_libraries[ygglib]['source']
+            out.append(cls.format_function_param('interface',
+                                                 interface_library=ygglib))
         flag_var = {}
         if input_var is None:
             input_var = cls.prepare_input_variables(

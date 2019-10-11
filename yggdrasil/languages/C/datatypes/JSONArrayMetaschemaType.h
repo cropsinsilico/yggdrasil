@@ -35,11 +35,11 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new JSONArrayMetaschemaType instance with the same data.
    */
-  JSONArrayMetaschemaType* copy() { return (new JSONArrayMetaschemaType(items_, format_str_)); }
+  JSONArrayMetaschemaType* copy() override { return (new JSONArrayMetaschemaType(items_, format_str_)); }
   /*!
     @brief Print information about the type to stdout.
   */
-  void display() {
+  void display() override {
     MetaschemaType::display();
     if (strlen(format_str_) > 0) {
       printf("format_str = %s\n", format_str_);
@@ -80,7 +80,7 @@ public:
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
-  void update(MetaschemaType* new_info) {
+  void update(MetaschemaType* new_info) override {
     MetaschemaType::update(new_info);
     JSONArrayMetaschemaType* new_info_array = (JSONArrayMetaschemaType*)new_info;
     if (nitems() != new_info_array->nitems()) {
@@ -93,10 +93,17 @@ public:
     }
   }
   /*!
+    @brief Get the item size.
+    @returns size_t Size of item in bytes.
+   */
+  const size_t nbytes() override {
+    return sizeof(YggGenericVector);
+  }
+  /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
-  size_t nargs_exp() {
+  size_t nargs_exp() override {
     size_t nargs = 0;
     if (all_arrays())
       nargs++; // For the number of rows
@@ -113,7 +120,7 @@ public:
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @returns bool true if the encoding was successful, false otherwise.
    */
-  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
+  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) override {
     if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
     if (strlen(format_str_) > 0) {
       writer->Key("format_str");
@@ -139,7 +146,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   size_t *nargs, va_list_t &ap) {
+		   size_t *nargs, va_list_t &ap) override {
     size_t i;
     if (all_arrays()) {
       size_t nrows = va_arg(ap.va, size_t);
@@ -151,6 +158,35 @@ public:
     writer->StartArray();
     for (i = 0; i < items_.size(); i++) {
       if (!(items_[i]->encode_data(writer, nargs, ap)))
+	return false;
+    }
+    writer->EndArray();
+    return true;
+  }
+  /*!
+    @brief Encode arguments describine an instance of this type into a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @param[in] x YggGeneric* Pointer to generic wrapper for data.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
+  bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
+		   YggGeneric* x) override {
+    size_t i;
+    YggGenericVector arg;
+    x->get_data(arg);
+    if (arg.size() != items_.size()) {
+      ygglog_throw_error("JSONArrayMetaschemaType::encode_data: Type has %d elements, but object has %d.", items_.size(), arg.size());
+      return false;
+    }
+    if (all_arrays()) {
+      size_t nrows = arg[0]->get_nelements();
+      for (i = 0; i < items_.size(); i++) {
+	items_[i]->set_length(nrows);
+      }
+    }
+    writer->StartArray();
+    for (i = 0; i < items_.size(); i++) {
+      if (!(items_[i]->encode_data(writer, arg[i])))
 	return false;
     }
     writer->EndArray();
@@ -171,7 +207,7 @@ public:
     @returns bool true if the data was successfully decoded, false otherwise.
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
-		   size_t *nargs, va_list_t &ap) {
+		   size_t *nargs, va_list_t &ap) override {
     size_t i;
     if (all_arrays()) {
       size_t *nrows = va_arg(ap.va, size_t*);
@@ -197,6 +233,53 @@ public:
     }
     for (i = 0; i < (size_t)(items_.size()); i++) {
       if (!(items_[i]->decode_data(data[i], allow_realloc, nargs, ap)))
+	return false;
+    }
+    return true;
+  }
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[out] x YggGeneric* Pointer to generic object where data should be stored.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
+  bool decode_data(rapidjson::Value &data, YggGeneric* x) override {
+    size_t i;
+    if (all_arrays()) {
+      size_t inrows;
+      size_t nrows = items_[0]->get_length();
+      for (i = 1; i < items_.size(); i++) {
+	inrows = items_[i]->get_length();
+	if (nrows != inrows) {
+	  ygglog_error("JSONArrayMetaschemaType::decode_data: Number of rows not consistent across all items.");
+	  return false;
+	}
+      }
+    }
+    if (!(data.IsArray())) {
+      ygglog_error("JSONArrayMetaschemaType::decode_data: Raw data is not an array.");
+      return false;
+    }
+    if (data.Size() != items_.size()) {
+      ygglog_error("JSONArrayMetaschemaType::decode_data: %lu items expected, but %lu found.",
+		   items_.size(), data.Size());
+      return false;
+    }
+    YggGenericVector** arg = (YggGenericVector**)(x->get_data_pointer());
+    if (arg[0] == NULL) {
+      arg[0] = new YggGenericVector();
+      for (i = 0; i < (size_t)(items_.size()); i++) {
+	arg[0]->push_back((new YggGeneric(items_[i], NULL, 0)));
+      }
+    }
+    if (items_.size() != (arg[0])->size()) {
+      ygglog_error("JSONArrayMetaschemaType::decode_data: %lu items found, but destination has %lu.",
+		   items_.size(), (arg[0])->size());
+      return false;
+    }
+    
+    for (i = 0; i < (size_t)(items_.size()); i++) {
+      if (!(items_[i]->decode_data(data[i], (**arg)[i])))
 	return false;
     }
     return true;

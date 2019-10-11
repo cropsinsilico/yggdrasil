@@ -288,7 +288,7 @@ class CModelDriver(CompiledModelDriver):
     type_map = {
         'int': 'intX_t',
         'float': 'double',
-        'string': 'char*',
+        'string': 'string_t',
         'array': 'vector_t',
         'object': 'map_t',
         'boolean': 'bool',
@@ -296,12 +296,12 @@ class CModelDriver(CompiledModelDriver):
         'uint': 'uintX_t',
         'complex': 'complex_X',
         'bytes': 'char*',
-        'unicode': 'char*',
+        'unicode': 'unicode_t',
         '1darray': '*',
         'ndarray': '*',
         'ply': 'ply_t',
         'obj': 'obj_t',
-        'schema': 'map_t',
+        'schema': 'schema_t',
         'flag': 'int'}
     function_param = {
         'import': '#include \"{filename}\"',
@@ -316,10 +316,19 @@ class CModelDriver(CompiledModelDriver):
         'not_flag_cond': '{flag_var} < 0',
         'flag_cond': '{flag_var} >= 0',
         'declare': '{type_name} {variable};',
+        'init_array': 'init_generic()',
+        'init_object': 'init_generic()',
+        'init_schema': 'init_generic()',
         'init_ply': 'init_ply()',
         'init_obj': 'init_obj()',
+        'copy_array': 'copy_generic({name}, {value});',
+        'copy_object': 'copy_generic({name}, {value});',
+        'copy_schema': 'copy_generic({name}, {value});',
         'copy_ply': '{name} = copy_ply({value});',
         'copy_obj': '{name} = copy_obj({value});',
+        'free_array': 'destroy_generic({variable});',
+        'free_object': 'destroy_generic({variable});',
+        'free_schema': 'destroy_generic({variable});',
         'free_ply': 'free_ply({variable});',
         'free_obj': 'free_obj({variable});',
         'assign': '{name} = {value};',
@@ -568,7 +577,9 @@ class CModelDriver(CompiledModelDriver):
                 move = []
                 move_flags = {}
                 for x in out.get('inputs', []):
-                    if x.get('ptr', []) and (x['native_type'] != 'char*'):
+                    if x.get('ptr', []) and (x['native_type'] not in
+                                             ['char*', 'string_t',
+                                              'bytes_t', 'unicode_t']):
                         move.append(x)
                         if x.get('length_var', False):
                             move_flags[x['name']] = x['length_var']
@@ -632,8 +643,11 @@ class CModelDriver(CompiledModelDriver):
         # Flag input variables for reallocation
         for x in inputs:
             for v in x['vars']:
-                if (((v['native_type'] != 'char*')
+                if (((v['native_type'] not in ['char*', 'string_t',
+                                               'bytes_t', 'unicode_t'])
                      and (not v.get('is_length_var', False))
+                     and (v['datatype']['type'] not in
+                          ['object', 'array', 'schema'])
                      and ('Realloc' in cls.function_param['recv_function']))):
                     v['allow_realloc'] = True
         return flag_var
@@ -673,7 +687,8 @@ class CModelDriver(CompiledModelDriver):
 
         """
         if ((isinstance(var, dict)
-             and ((cls.get_native_type(**var) == 'char*')
+             and ((cls.get_native_type(**var) in ['char*', 'string_t',
+                                                  'bytes_t', 'unicode_t'])
                   or var.get('datatype', {}).get(
                       'type', var.get('type', None)) in ['1darray']))):
             return True
@@ -751,6 +766,8 @@ class CModelDriver(CompiledModelDriver):
             elif grp['type'] in ['int', 'uint']:
                 grp['type'] += 'X_t'
                 out['precision'] = 8 * np.dtype('intc').itemsize
+            elif grp['type'] in ['bytes_t', 'string_t', 'unicode_t']:
+                out['precision'] = 0
             out['type'] = super(CModelDriver, cls).get_json_type(grp['type'])
         if grp.get('pointer', False):
             nptr = len(grp['pointer'])
@@ -1065,37 +1082,45 @@ class CModelDriver(CompiledModelDriver):
         keys = {}
         typename = datatype['type']
         if datatype['type'] == 'array':
-            assert(isinstance(datatype['items'], list))
-            keys['nitems'] = len(datatype['items'])
-            keys['items'] = '%s_items' % name
-            fmt = 'create_dtype_json_array({nitems}, {items})'
-            out += [('dtype_t** %s = '
-                     '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
-                    % (keys['items'], keys['nitems'])]
-            for i, x in enumerate(datatype['items']):
-                out += cls.write_native_type_definition(
-                    '%s_items[%d]' % (name, i), x,
-                    requires_freeing=requires_freeing, no_decl=True)
-            assert(isinstance(requires_freeing, list))
-            requires_freeing += [keys['items']]
+            if 'items' in datatype:
+                assert(isinstance(datatype['items'], list))
+                keys['nitems'] = len(datatype['items'])
+                keys['items'] = '%s_items' % name
+                fmt = 'create_dtype_json_array({nitems}, {items})'
+                out += [('dtype_t** %s = '
+                         '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
+                        % (keys['items'], keys['nitems'])]
+                for i, x in enumerate(datatype['items']):
+                    out += cls.write_native_type_definition(
+                        '%s_items[%d]' % (name, i), x,
+                        requires_freeing=requires_freeing, no_decl=True)
+                assert(isinstance(requires_freeing, list))
+                requires_freeing += [keys['items']]
+            else:
+                fmt = 'create_dtype_empty()'
         elif datatype['type'] == 'object':
-            assert(isinstance(datatype['properties'], dict))
-            keys['nitems'] = len(datatype['properties'])
-            keys['keys'] = '%s_keys' % name
-            keys['values'] = '%s_vals' % name
-            fmt = 'create_dtype_json_object({nitems}, {keys}, {values})'
-            out += [('dtype_t** %s = '
-                     '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
-                    % (keys['values'], keys['nitems']),
-                    ('char** %s = (char**)malloc(%d*sizeof(char*));')
-                    % (keys['keys'], keys['nitems'])]
-            for i, (k, v) in enumerate(datatype['properties'].items()):
-                out += ['%s[%d] = \"%s\"' % (keys['keys'], i, k)]
-                out += cls.write_native_type_definition(
-                    '%s[%d]' % (keys['values'], i), v,
-                    requires_freeing=requires_freeing)
-            assert(isinstance(requires_freeing, list))
-            requires_freeing += [keys['values'], keys['keys']]
+            if 'properties' in datatype:
+                assert(isinstance(datatype['properties'], dict))
+                keys['nitems'] = len(datatype['properties'])
+                keys['keys'] = '%s_keys' % name
+                keys['values'] = '%s_vals' % name
+                fmt = 'create_dtype_json_object({nitems}, {keys}, {values})'
+                out += [('dtype_t** %s = '
+                         '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
+                        % (keys['values'], keys['nitems']),
+                        ('char** %s = (char**)malloc(%d*sizeof(char*));')
+                        % (keys['keys'], keys['nitems'])]
+                for i, (k, v) in enumerate(datatype['properties'].items()):
+                    out += ['%s[%d] = \"%s\"' % (keys['keys'], i, k)]
+                    out += cls.write_native_type_definition(
+                        '%s[%d]' % (keys['values'], i), v,
+                        requires_freeing=requires_freeing)
+                assert(isinstance(requires_freeing, list))
+                requires_freeing += [keys['values'], keys['keys']]
+            else:
+                fmt = 'create_dtype_empty()'
+        elif datatype['type'] == 'schema':
+            fmt = 'create_dtype_empty()'
         elif datatype['type'] in ['ply', 'obj']:
             fmt = 'create_dtype_%s()' % datatype['type']
         elif datatype['type'] == '1darray':
@@ -1114,7 +1139,7 @@ class CModelDriver(CompiledModelDriver):
             keys = {}
             keys['subtype'] = datatype.get('subtype', datatype['type'])
             keys['units'] = datatype.get('units', '')
-            if keys['subtype'] in ['bytes']:
+            if keys['subtype'] in ['bytes', 'string', 'unicode']:
                 keys['precision'] = datatype.get('precision', 0)
             else:
                 keys['precision'] = datatype['precision']
@@ -1192,7 +1217,10 @@ class CModelDriver(CompiledModelDriver):
                     outputs_in_inputs=outputs_in_inputs)
             else:
                 src_var_length = 'strlen(%s)' % src_var['name']
-            src_var_dtype = cls.get_native_type(**src_var).rsplit('*', 1)[0]
+            src_var_dtype = cls.get_native_type(**src_var)
+            if src_var_dtype in ['bytes_t', 'unicode_t', 'string_t']:
+                src_var_dtype = 'char*'
+            src_var_dtype = src_var_dtype.rsplit('*', 1)[0]
             out += cls.write_assign_to_output(
                 dst_var['name'],
                 '({native_type}*)malloc({N}*sizeof({native_type}))'.format(

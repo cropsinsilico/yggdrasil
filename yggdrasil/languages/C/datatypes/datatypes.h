@@ -21,7 +21,26 @@ typedef struct dtype_t {
   void *obj; //!< MetaschemaType Pointer
 } dtype_t;
 
+/*! @brief C-friendly defintion of YggGeneric. */
+typedef struct generic_t {
+  char prefix;
+  void *obj;
+} generic_t;
 
+/*! @brief C-friendly definition of vector object. */
+typedef generic_t* vector_t;
+
+/*! @brief C-friendly definition of map object. */
+typedef generic_t* map_t;
+
+/*! @brief C-friendly definition of schema object. */
+typedef generic_t* schema_t;
+
+/*! @brief Aliases to allow differentiation in parsing model definition. */
+typedef char* unicode_t;
+typedef char* string_t;
+typedef char* bytes_t;
+  
 /*! @brief Header information passed by comms for multipart messages. */
 typedef struct comm_head_t {
   int multipart; //!< 1 if message is multipart, 0 if it is not.
@@ -48,6 +67,72 @@ typedef struct comm_head_t {
 } comm_head_t;
 
 
+/*!
+  @brief Initialize an empty generic object.
+  @returns generic_t* Pointer to new generic object structure.
+ */
+generic_t* init_generic();
+
+
+/*!
+  @brief Create a generic object from the provided information.
+  @param[in] type_class dtype_t* Type structure/class.
+  @param[in] data void* Pointer to data.
+  @param[in] nbytes size_t Size of data.
+  @returns generic_t* Pointer to new generic object structure.
+ */
+generic_t* create_generic(dtype_t* type_class, void* data, size_t nbytes);
+
+  
+/*!
+  @brief Destroy a generic object.
+  @param[in] x generic_t* Pointer to generic object structure to destory.
+  @returns int -1 if unsuccessful, 0 otherwise.
+ */
+int destroy_generic(generic_t** x);
+
+
+/*!
+  @brief Copy data from one generic object to the other.
+  @param[in] dst generic_t* Pointer to generic structure that data should be copied to.
+  @param[in] src generic_t* Pointer to generic structure that data should be copied from.
+  @returns int 0 if successful, -1 otherwise.
+ */
+int copy_generic(generic_t* dst, generic_t* src);
+
+
+/*!
+  @brief Return the recovered generic structure if one is present.
+  @param[in] x void* Pointer to check for generic structure.
+  @param[in] is_pointer bool If true, the input is treated as a
+  pointer to as pointer. Defaults to false.
+  @returns generic_t* Pointer to generic structure if one is present,
+  NULL otherwise.
+ */
+generic_t* get_generic(void* x, int is_pointer);
+
+
+/*!
+  @brief Return the recovered generic structure if one is present in
+  the variable argument list.
+  @param[in] nargs size_t Number of argument present in ap.
+  @param[in] ap va_list_t Variable argument list.
+  @param[in] is_pointer bool If true, the input is treated as a
+  pointer to as pointer. Defaults to false.
+  @returns generic_t* Pointer to generic structure if one is present,
+  NULL otherwise.
+ */
+generic_t* get_generic_va(size_t nargs, va_list_t ap, int is_pointer);
+
+  
+/*!
+  @brief Determine if a pointer points to a generic object.
+  @param[in] x void* Pointer to test.
+  @returns 0 if pointer is not to generic structure, 1 if it is.
+ */
+int is_generic(void* x);
+
+  
 /*!
   @brief Get the name of the type from the class.
   @param[in] type_class dtype_t* Type structure/class.
@@ -79,11 +164,11 @@ const size_t dtype_precision(dtype_t* type_class);
 dtype_t* init_dtype(dtype_t *dtype);
   
 
-/* /\*! */
-/*   @brief Construct and empty type object. */
-/*   @returns dtype_t* Type structure/class. */
-/* *\/ */
-/* dtype_t* create_dtype_empty(); */
+/*!
+  @brief Construct and empty type object.
+  @returns dtype_t* Type structure/class.
+*/
+dtype_t* create_dtype_empty();
 
 
 /*!
@@ -223,10 +308,6 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
   out.request_id[0] = '\0';
   out.zmq_reply[0] = '\0';
   out.zmq_reply_worker[0] = '\0';
-  /* if (response_address == NULL) */
-  /*   out.response_address[0] = '\0'; */
-  /* else */
-  /*   strncpy(out.response_address, response_address, COMMBUFFSIZ); */
   // Parameters that will be removed
   out.serializer_type = -1;
   out.format_str[0] = '\0';
@@ -250,10 +331,9 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
 static inline
 int split_head_body(const char *buf, const size_t buf_siz,
 		    char **head, size_t *headsiz) {
-  // size_t bodysiz = 0;
   // Split buffer into head and body
   int ret;
-  size_t sind, eind, sind_head, eind_head;  //, sind_body, eind_body;
+  size_t sind, eind, sind_head, eind_head;
   sind = 0;
   eind = 0;
 #ifdef _WIN32
@@ -283,16 +363,11 @@ int split_head_body(const char *buf, const size_t buf_siz,
     ygglog_debug("split_head_body: No header in '%.1000s...'", buf);
     sind_head = 0;
     eind_head = 0;
-    /* sind_body = 0; */
-    /* eind_body = buf_siz; */
   } else {
     sind_head = sind + strlen(MSG_HEAD_SEP);
     eind_head = eind - strlen(MSG_HEAD_SEP);
-    /* sind_body = eind; */
-    /* eind_body = buf_siz; */
   }
   headsiz[0] = (eind_head - sind_head);
-  // bodysiz = (eind_body - sind_body);
   char* temp = (char*)realloc(*head, *headsiz + 1);
   if (temp == NULL) {
     ygglog_error("split_head_body: Failed to reallocate header.");
@@ -347,6 +422,18 @@ dtype_t* copy_dtype(const dtype_t* dtype);
   @returns: int 0 if successfull, -1 if there was an error.
 */
 int update_dtype(dtype_t* dtype1, dtype_t* dtype2);
+
+
+/*!
+  @brief Wrapper for updatining a type object with information from
+  the provided variable arguments if a generic structure is present.
+  @param[in] dtype1 dtype_t* Wrapper struct for C++ Metaschema type class that should be updated.
+  @param[in] nargs size_t Number of arguments in ap.
+  @param[in] ap va_list_t Variable argument list.
+  @returns: int 0 if successfull, -1 if there was an error.
+ */
+int update_dtype_from_generic_ap(dtype_t* dtype1, size_t nargs, va_list_t ap);
+
   
 /*!
   @brief Wrapper for updating the precision of a bytes or unicode scalar type.

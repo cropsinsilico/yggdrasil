@@ -965,6 +965,12 @@ int vcommSend(const comm_t *x, size_t nargs, va_list_t ap) {
     comm_t *handle = (comm_t*)(x->handle);
     datatype = handle->datatype;
   }
+  // Update datatype if not yet set and object being sent includes type
+  if (datatype->obj == NULL) {
+    if (update_dtype_from_generic_ap(datatype, nargs, ap) < 0) {
+      return -1;
+    }
+  }
   size_t nargs_orig = nargs;
   ret = serialize_dtype(datatype, &buf, &buf_siz, 1, &nargs, ap);
   if (ret < 0) {

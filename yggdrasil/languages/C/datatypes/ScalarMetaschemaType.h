@@ -176,7 +176,7 @@ public:
     @brief Get the size of the type in bytes.
     @returns size_t Type size.
    */
-  const size_t nbytes() {
+  const size_t nbytes() override {
     return nbits() / 8;
   }
   /*!
@@ -482,6 +482,148 @@ public:
     free(encoded_bytes);
     return out;
   }
+  /*!
+    @brief Encode arguments describine an instance of this type into a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @param[in] x YggGeneric* Pointer to generic wrapper for data.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
+  bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
+		   YggGeneric* x) override {
+    size_t nargs = 1;
+    size_t bytes_precision = nbytes();
+    if ((strcmp(type(), "1darray") == 0) || (strcmp(type(), "ndarray") == 0)) {
+      void* arg = x->get_data();
+      return MetaschemaType::encode_data(writer, &nargs, arg);
+    } else {
+      switch (subtype_code_) {
+      case T_INT: {
+	switch (precision_) {
+	case 8: {
+	  int8_t arg = 0;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	}
+	case 16: {
+	  int16_t arg = 0;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	}
+	case 32: {
+	  int32_t arg = 0;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	}
+	case 64: {
+	  int64_t arg = 0;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	}
+	default: {
+	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported integer precision '%lu'.",
+		       precision_);
+	  return false;
+	}
+	}
+	break;
+      }
+      case T_UINT: {
+	switch (precision_) {
+	case 8: {
+	  uint8_t arg = 0;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	}
+	case 16: {
+	  uint16_t arg = 0;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	}
+	case 32: {
+	  uint32_t arg = 0;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	}
+	case 64: {
+	  uint64_t arg = 0;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	}
+	default: {
+	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported unsigned integer precision '%lu'.",
+		       precision_);
+	  return false;
+	}
+	}
+	break;
+      }
+      case T_FLOAT: {
+	if (sizeof(float) == bytes_precision) {
+	  float arg = 0.0;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	} else if (sizeof(double) == bytes_precision) {
+	  double arg = 0.0;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	} else if (sizeof(long double) == bytes_precision) {
+	  long double arg = 0.0;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	} else {
+	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported float precision '%lu'.",
+		       precision_);
+	  return false;
+	}
+	break;
+      }
+      case T_COMPLEX: {
+	if (sizeof(float) == (bytes_precision / 2)) {
+#ifdef _WIN32
+	  complex_double arg;
+#else
+	  complex_float arg;
+#endif
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	} else if (sizeof(double) == (bytes_precision / 2)) {
+	  complex_double arg;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	} else if (sizeof(long double) == (bytes_precision / 2)) {
+	  complex_long_double arg;
+	  x->get_data(arg);
+	  return MetaschemaType::encode_data(writer, &nargs, arg);
+	} else {
+	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported complex precision '%lu'.",
+		       precision_);
+	  return false;
+	}
+	break;
+      }
+      case T_BYTES:
+      case T_UNICODE: {
+	nargs = 2;
+	char* arg = NULL;
+	size_t arg_siz = 0;
+	x->get_data_realloc(&arg, &arg_siz);
+	bool out = MetaschemaType::encode_data(writer, &nargs, arg, arg_siz);
+	if (arg != NULL) {
+	  free(arg);
+	  arg = NULL;
+	}
+	return out;
+      }
+      default: {
+	ygglog_error("ScalarMetaschemaType::encode_data: Unsupported subtype '%s'.",
+		     subtype_);
+	return false;
+      }
+      }
+    }
+    ygglog_error("ScalarMetaschemaType::encode_data: Cannot encode data of type '%s'.", type());
+    return false;
+  }
 
   // Decoding
   /*!
@@ -595,6 +737,26 @@ public:
     }
     free(decoded_bytes);
     return true;
+  }
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[out] x YggGeneric* Pointer to generic object where data should be stored.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
+  bool decode_data(rapidjson::Value &data, YggGeneric* x) override {
+    if ((strcmp(subtype(), "bytes") == 0) || (strcmp(subtype(), "unicode") == 0)) {
+      size_t nargs = 2;
+      int allow_realloc = 1;
+      if (x == NULL) {
+	ygglog_throw_error("MetaschemaType::decode_data: Generic wrapper is not initialized.");
+      }
+      void **arg = x->get_data_pointer();
+      size_t *arg_siz = x->get_nbytes_pointer();
+      return MetaschemaType::decode_data(data, allow_realloc, &nargs, arg, arg_siz);
+    } else {
+      return MetaschemaType::decode_data(data, x);
+    }
   }
   
   size_t cast_bytes(unsigned char **bytes, const size_t nbytes) {

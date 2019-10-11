@@ -49,12 +49,12 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new AsciiTableMetaschemaType instance with the same data.
    */
-  AsciiTableMetaschemaType* copy() { return (new AsciiTableMetaschemaType(format_str(),
+  AsciiTableMetaschemaType* copy() override { return (new AsciiTableMetaschemaType(format_str(),
 									  as_array())); }
   /*!
     @brief Print information about the type to stdout.
   */
-  void display() {
+  void display() override {
     MetaschemaType::display();
     printf("%-15s = %s\n", "format_str", format_str());
     printf("%-15s = %d\n", "as_array", as_array_);
@@ -78,7 +78,7 @@ public:
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
-  virtual size_t nargs_exp() {
+  size_t nargs_exp() override {
     size_t nargs = (size_t)(table_->ncols);
     if (as_array_) {
       nargs++; // For the number of rows
@@ -97,12 +97,28 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   size_t *nargs, va_list_t &ap) {
+		   size_t *nargs, va_list_t &ap) override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     writer;
     nargs;
     ap;
+#endif
+    ygglog_error("AsciiTableMetaschemaType::encode_data: AsciiTable type cannot be JSON encoded.");
+    return false;
+  }
+  /*!
+    @brief Encode arguments describine an instance of this type into a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @param[in] x YggGeneric* Pointer to generic wrapper for data.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
+  bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
+		   YggGeneric* x) override {
+    // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+    writer;
+    x;
 #endif
     ygglog_error("AsciiTableMetaschemaType::encode_data: AsciiTable type cannot be JSON encoded.");
     return false;
@@ -121,7 +137,7 @@ public:
     @returns int Size of the serialized data in buf.
    */
   int serialize(char **buf, size_t *buf_siz,
-		const int allow_realloc, size_t *nargs, va_list_t &ap) {
+		const int allow_realloc, size_t *nargs, va_list_t &ap) override {
     if (nargs_exp() != *nargs) {
       ygglog_throw_error("AsciiTableMetaschemaType::serialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
@@ -140,6 +156,29 @@ public:
     }
     return ret;
   }
+  /*!
+    @brief Serialize an instance including it's type and data.
+    @param[out] buf char ** Buffer where serialized data should be written.
+    @param[in,out] buf_siz size_t* Size of buf. If buf is reallocated, the
+    new size of the buffer will be assigned to this address.
+    @param[in] allow_realloc int If 1, buf will be reallocated if it is not
+    large enough to contain the serialized data. If 0, an error will be raised
+    if it is not large enough.
+    @param[in] Pointer to generic wrapper for object being serialized.
+    @returns int Size of the serialized data in buf.
+   */
+  int serialize(char **buf, size_t *buf_siz,
+		const int allow_realloc, YggGeneric* x) override {
+    // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+    buf;
+    buf_siz;
+    allow_realloc;
+    x;
+#endif
+    ygglog_error("AsciiTableMetaschemaType::deserialize: serialization from generic wrapper for table not supported.");
+    return -1;
+  }
   
   // Decoding
   /*!
@@ -155,13 +194,28 @@ public:
     @returns bool true if the data was successfully decoded, false otherwise.
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
-		   size_t *nargs, va_list_t &ap) {
+		   size_t *nargs, va_list_t &ap) override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     data;
     allow_realloc;
     nargs;
     ap;
+#endif
+    ygglog_error("AsciiTableMetaschemaType::decode_data: AsciiTable type cannot be JSON decoded.");
+    return false;
+  }
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[out] x YggGeneric* Pointer to generic object where data should be stored.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
+  bool decode_data(rapidjson::Value &data, YggGeneric* x) override {
+    // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+    data;
+    x;
 #endif
     ygglog_error("AsciiTableMetaschemaType::decode_data: AsciiTable type cannot be JSON decoded.");
     return false;
@@ -180,7 +234,7 @@ public:
     remaining in ap.
    */
   int deserialize(const char *buf, const size_t buf_siz,
-		  const int allow_realloc, size_t *nargs, va_list_t &ap) {
+		  const int allow_realloc, size_t *nargs, va_list_t &ap) override {
     if (nargs_exp() != *nargs) {
       ygglog_throw_error("AsciiTableMetaschemaType::deserialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
@@ -211,7 +265,26 @@ public:
     }
     return (int)(nargs_orig - *nargs);
   }
-
+  /*!
+    @brief Deserialize variables from a JSON string.
+    @param[in] buf char* Buffer containing serialized data.
+    @param[in] buf_siz size_t Size of the serialized data.
+    @param[out] x YggGeneric* Pointer to generic type wrapper where
+    deserialized data should be stored.
+    @returns int -1 if there is an error, 0 otherwise.
+   */
+  int deserialize(const char *buf, const size_t buf_siz,
+		  YggGeneric* x) override {
+    // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+    buf;
+    buf_siz;
+    x;
+#endif
+    ygglog_error("AsciiTableMetaschemaType::deserialize: deserialization into generic wrapper for table not supported.");
+    return -1;
+  }
+    
 private:
   const int as_array_;
   asciiTable_t *table_;

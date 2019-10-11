@@ -31,12 +31,12 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new PlyMetaschemaType instance with the same data.
    */
-  PlyMetaschemaType* copy() { return (new PlyMetaschemaType()); }
+  PlyMetaschemaType* copy() override { return (new PlyMetaschemaType()); }
   /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
-  virtual size_t nargs_exp() {
+  virtual size_t nargs_exp() override {
     return 1;
   }
 
@@ -51,7 +51,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   size_t *nargs, va_list_t &ap) {
+		   size_t *nargs, va_list_t &ap) override {
     // Get argument
     ply_t p = va_arg(ap.va, ply_t);
     (*nargs)--;
@@ -208,6 +208,19 @@ public:
     writer->String(buf, msg_len);
     return true;
   }
+  /*!
+    @brief Encode arguments describine an instance of this type into a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @param[in] x YggGeneric* Pointer to generic wrapper for data.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
+  bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
+		   YggGeneric* x) override {
+    size_t nargs = 1;
+    ply_t arg;
+    x->get_data(arg);
+    return MetaschemaType::encode_data(writer, &nargs, arg);
+  }
 
   // Decoded
   /*!
@@ -223,7 +236,7 @@ public:
     @returns bool true if the data was successfully decoded, false otherwise.
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
-		   size_t *nargs, va_list_t &ap) {
+		   size_t *nargs, va_list_t &ap) override {
     if (!(data.IsString()))
       ygglog_throw_error("PlyMetaschemaType::decode_data: Data is not a string.");
     // Get input data

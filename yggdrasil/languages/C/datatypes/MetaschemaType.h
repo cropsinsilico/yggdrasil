@@ -5,6 +5,7 @@
 
 #include <stdexcept>
 #include <map>
+#include <vector>
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 
@@ -83,6 +84,129 @@ std::map<const char*, int, strcomp> get_type_map() {
 };
 
 
+// Forward declaration
+class MetaschemaType;
+
+/*!
+  @brief Generic class.
+  The YggGeneric provides a wrapper for any type.
+ */
+class YggGeneric {
+private:
+  MetaschemaType *type;
+  void *data;
+  size_t nbytes;
+public:
+  YggGeneric();
+  /*!
+    @brief Constructor.
+    @param[in] in_type MetaschemaType* Pointer to type class describing data.
+    @param[in] in_data void* Pointer to data.
+    @param[in] in_nbytes size_t Number of bytes at the address provided
+    by data. Defaults to 0 and will be set by type->nbytes().
+   */
+  YggGeneric(MetaschemaType* in_type, void* in_data, size_t in_nbytes=0);
+  ~YggGeneric();
+  /*!
+    @brief Get a copy of the data.
+    @returns void* Pointer to copy of data.
+  */
+  void* copy_data(void* orig_data=NULL);
+  /*!
+    @brief Free the memory used by the data.
+   */
+  void free_data();
+  /*!
+    @brief Get a copy.
+    @returns YggGeneric* Copy of this class.
+   */
+  YggGeneric* copy();
+  /*!
+    @brief Set the data type.
+    @param[in] new_type MetaschemaType* Pointer to new type.
+   */
+  void set_type(MetaschemaType* new_type);
+  /*!
+    @brief Get the data type.
+    @returns MetaschemaType* Pointer to data type.
+   */
+  MetaschemaType* get_type();
+  /*!
+    @brief Set the data size.
+    @param[in] new_nbytes size_t New data size.
+   */
+  void set_nbytes(size_t new_nbytes);
+  /*!
+    @brief Get the data size.
+    @returns size_t Number of bytes in the data object.
+   */
+  size_t get_nbytes();
+  /*!
+    @brief Get a pointer to the data size.
+    @returns size_t* Pointer to number of bytes in the data object.
+   */
+  size_t* get_nbytes_pointer();
+  /*!
+    @brief Get the number of elements in the data.
+    @returns size_t Number of elements in the data.
+   */
+  size_t get_nelements();
+  /*!
+    @brief Set data.
+    @param[in] new_data void* New data.
+   */
+  void set_data(void *new_data);
+  /*!
+    @brief Extract data.
+    @returns void* Pointer to data.
+   */
+  void* get_data();
+  /*!
+    @brief Get the data pointer.
+    @returns void** Pointer to data object pointer.
+   */
+  void** get_data_pointer();
+  /*!
+    @brief Extract data and copy into the provided variable.
+    @param[out] obj T* Pointer to existing variable where data should be copied.
+    @param[in] nelements size_t Number of elements in the provided array.
+    Defaults to 1 if not provided.
+    @param[in] is_char bool If True, the input array is treated as a
+    charater array and need only be larger than the size of the data.
+    Defaults to false if not provided.
+   */
+  template <typename T>
+  void get_data(T* obj, size_t nelements=1, bool is_char=false);
+  /*!
+    @brief Extract data and assign the value to the provided variable.
+    @param[out] obj T Existing variable where data should be stored.
+   */
+  template <typename T>
+  void get_data(T &obj);
+  /*!
+    @brief Extract data, realloc provided array, and copy data into it.
+    @param[out] obj T** Pointer to existing array where data should be copied.
+    @param[in, out] nelements size_t* Pointer to number of elements in
+    the provided array. The number of elements in teh array after
+    reallocation is stored at this address. Defaults to NULL if not
+    provided.
+   */
+  template <typename T>
+  void get_data_realloc(T** obj, size_t* nelements=NULL);
+  /*!
+    @brief Extract data and copy into the provided variable.
+    @param[out] obj T* Pointer to existing variable where data should be copied.
+    @param[in] nelements size_t Number of elements in the provided array.
+    Defaults to 1 if not provided.
+   */
+  void get_data(char* obj, size_t nelements);
+};
+
+
+typedef std::vector<YggGeneric*> YggGenericVector;
+typedef std::map<const char*, YggGeneric*, strcomp> YggGenericMap;
+
+
 /*!
   @brief Base class for metaschema type definitions.
 
@@ -96,7 +220,8 @@ public:
     @param[in] type const character pointer to the name of the type.
    */
   MetaschemaType(const char* type) :
-    type_((const char*)malloc(100)), type_code_(-1), updated_(false) {
+    type_((const char*)malloc(100)), type_code_(-1), updated_(false),
+    nbytes_(0) {
     update_type(type);
   }
   /*!
@@ -105,7 +230,8 @@ public:
     definition from a JSON encoded header.
    */
   MetaschemaType(const rapidjson::Value &type_doc) :
-    type_((const char*)malloc(100)), type_code_(-1), updated_(false) {
+    type_((const char*)malloc(100)), type_code_(-1), updated_(false),
+    nbytes_(0) {
     if (!(type_doc.IsObject()))
       ygglog_throw_error("MetaschemaType: Parsed document is not an object.");
     if (!(type_doc.HasMember("type")))
@@ -113,11 +239,6 @@ public:
     if (!(type_doc["type"].IsString()))
       ygglog_throw_error("MetaschemaType: Type in parsed header is not a string.");
     update_type(type_doc["type"].GetString());
-    /*
-    type_ = type_doc["type"].GetString();
-    int* type_code_modifier = const_cast<int*>(&type_code_);
-    *type_code_modifier = check_type();
-    */
   }
   /*!
     @brief Create a copy of the type.
@@ -201,6 +322,35 @@ public:
    */
   virtual size_t get_length() {
     ygglog_throw_error("MetaschemaType::get_length: Cannot get length for type '%s'.", type_);
+    return 0;
+  }
+  /*!
+    @brief Get the item size.
+    @returns size_t Size of item in bytes.
+   */
+  virtual const size_t nbytes() {
+    switch (type_code_) {
+    case T_BOOLEAN: {
+      return sizeof(bool);
+    }
+    case T_INTEGER: {
+      return sizeof(int);
+    }
+    case T_NULL: {
+      return sizeof(NULL);
+    }
+    case T_NUMBER: {
+      return sizeof(double);
+    }
+    case T_STRING: {
+      if (nbytes_ == 0) {
+	ygglog_throw_error("MetaschemaType::nbytes: String cannot have size of 0.");
+      } else {
+	return nbytes_;
+      }
+    }
+    }
+    ygglog_throw_error("MetaschemaType::nbytes: Cannot get number of bytes for type '%s'.", type_);
     return 0;
   }
   /*!
@@ -318,6 +468,47 @@ public:
     va_end(ap_s.va);
     return out;
   }
+  /*!
+    @brief Encode arguments describine an instance of this type into a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @param[in] x YggGeneric* Pointer to generic wrapper for data.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
+  virtual bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
+			   YggGeneric* x) {
+    size_t nargs = 1;
+    switch (type_code_) {
+    case T_BOOLEAN:
+    case T_INTEGER: {
+      int arg = 0;
+      x->get_data(arg);
+      return encode_data(writer, &nargs, arg);
+    }
+    case T_NULL: {
+      void* arg = NULL;
+      return encode_data(writer, &nargs, arg);
+    }
+    case T_NUMBER: {
+      double arg = 0.0;
+      x->get_data(arg);
+      return encode_data(writer, &nargs, arg);
+    }
+    case T_STRING: {
+      nargs = 2;
+      char* arg = NULL;
+      size_t arg_siz = 0;
+      x->get_data_realloc(&arg, &arg_siz);
+      bool out = encode_data(writer, &nargs, arg, arg_siz);
+      if (arg != NULL) {
+	free(arg);
+	arg = NULL;
+      }
+      return out;
+    }
+    }
+    ygglog_error("MetaschemaType::encode_data: Cannot encode data of type '%s'.", type_);
+    return false;
+  }
 
   /*!
     @brief Copy data from a source buffer to a destination buffer.
@@ -400,6 +591,29 @@ public:
     }
     if (*nargs != 0) {
       ygglog_error("MetaschemaType::serialize: %d arguments were not used.", *nargs);
+      return -1;
+    }
+    // Copy message to buffer
+    return copy_to_buffer(body_buf.GetString(), body_buf.GetSize(),
+			  buf, *buf_siz, allow_realloc);
+  }
+  /*!
+    @brief Serialize an instance including it's type and data.
+    @param[out] buf char ** Buffer where serialized data should be written.
+    @param[in,out] buf_siz size_t* Size of buf. If buf is reallocated, the
+    new size of the buffer will be assigned to this address.
+    @param[in] allow_realloc int If 1, buf will be reallocated if it is not
+    large enough to contain the serialized data. If 0, an error will be raised
+    if it is not large enough.
+    @param[in] Pointer to generic wrapper for object being serialized.
+    @returns int Size of the serialized data in buf.
+   */
+  virtual int serialize(char **buf, size_t *buf_siz,
+			const int allow_realloc, YggGeneric* x) {
+    rapidjson::StringBuffer body_buf;
+    rapidjson::Writer<rapidjson::StringBuffer> body_writer(body_buf);
+    bool out = encode_data(&body_writer, x);
+    if (!(out)) {
       return -1;
     }
     // Copy message to buffer
@@ -517,6 +731,47 @@ public:
     return false;
   }
   /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[in] allow_realloc int If 1, the passed variables will be reallocated
+    to contain the deserialized data.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On return,
+    the number of arguments assigned from the deserialized data will be assigned
+    to this address.
+    @param[out] ... Variable number of arguments that contain addresses 
+    where deserialized data should be assigned.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
+  bool decode_data(rapidjson::Value &data, const int allow_realloc,
+		   size_t *nargs, ...) {
+    va_list_t ap_s;
+    va_start(ap_s.va, nargs);
+    bool out = decode_data(data, allow_realloc, nargs, ap_s);
+    va_end(ap_s.va);
+    return out;
+  }
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[out] x YggGeneric* Pointer to generic object where data should be stored.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
+  virtual bool decode_data(rapidjson::Value &data, YggGeneric* x) {
+    size_t nargs = 1;
+    int allow_realloc = 1;
+    if (x == NULL) {
+      ygglog_throw_error("MetaschemaType::decode_data: Generic wrapper is not initialized.");
+    }
+    void **arg = x->get_data_pointer();
+    if (type_code_ == T_STRING) {
+      nargs = 2;
+      size_t *arg_siz = x->get_nbytes_pointer();
+      return decode_data(data, allow_realloc, &nargs, arg, arg_siz);
+    } else {
+      return decode_data(data, allow_realloc, &nargs, arg);
+    }
+  }
+  /*!
     @brief Deserialize variables from a JSON string.
     @param[in] buf char* Buffer containing serialized data.
     @param[in] buf_siz size_t Size of the serialized data.
@@ -550,11 +805,178 @@ public:
     }
     return (int)(nargs_orig - *nargs);
   }
+  /*!
+    @brief Deserialize variables from a JSON string.
+    @param[in] buf char* Buffer containing serialized data.
+    @param[in] buf_siz size_t Size of the serialized data.
+    @param[out] x YggGeneric* Pointer to generic type wrapper where
+    deserialized data should be stored.
+    @returns int -1 if there is an error, 0 otherwise.
+   */
+  virtual int deserialize(const char *buf, const size_t buf_siz,
+			  YggGeneric* x) {
+    // Parse body
+    rapidjson::Document body_doc;
+    body_doc.Parse(buf, buf_siz);
+    bool out = decode_data(body_doc, x);
+    if (!(out)) {
+      ygglog_error("MetaschemaType::deserialize: One or more errors while parsing body.");
+      return -1;
+    }
+    return 0;
+  }
 
 private:
   const char *type_;
   const int type_code_;
   bool updated_;
+  const int nbytes_;
+};
+
+
+YggGeneric::YggGeneric() : type(NULL), data(NULL), nbytes(0) {};
+
+
+YggGeneric::YggGeneric(MetaschemaType* in_type, void* in_data, size_t in_nbytes) : type(in_type), data(NULL), nbytes(in_nbytes) {
+  if (nbytes == 0) {
+    nbytes = type->nbytes();
+  }
+  set_data(in_data);
+};
+YggGeneric::~YggGeneric() {
+  free_data();
+};
+void* YggGeneric::copy_data(void* orig_data) {
+  void* out = NULL;
+  if (orig_data == NULL) {
+    orig_data = data;
+  }
+  if (orig_data != NULL) {
+    if (type->type_code() == T_ARRAY) {
+      YggGenericVector* old_data = (YggGenericVector*)orig_data;
+      YggGenericVector* new_data = new YggGenericVector();
+      YggGenericVector::iterator it;
+      for (it = old_data->begin(); it != old_data->end(); it++) {
+      	new_data->push_back((*it)->copy());
+      }
+      out = (void*)new_data;
+    } else if (type->type_code() == T_OBJECT) {
+      YggGenericMap* old_data = (YggGenericMap*)orig_data;
+      YggGenericMap* new_data = new YggGenericMap();
+      YggGenericMap::iterator it;
+      for (it = old_data->begin(); it != old_data->end(); it++) {
+      	(*new_data)[it->first] = (it->second)->copy();
+      }
+      out = (void*)(new_data);
+    } else {
+      void* idata = (void*)realloc(out, nbytes);
+      if (idata == NULL) {
+	ygglog_throw_error("YggGeneric: Failed to realloc data.");
+      }
+      out = idata;
+      memcpy(out, orig_data, nbytes);
+    }
+  }
+  return out;
+};
+void YggGeneric::free_data() {
+  if (data != NULL) {
+    if (type->type_code() == T_ARRAY) {
+      YggGenericVector* old_data = (YggGenericVector*)data;
+      YggGenericVector::iterator it;
+      for (it = old_data->begin(); it != old_data->end(); it++) {
+      	delete *it;
+      	*it = NULL;
+      }
+      delete old_data;
+    } else if (type->type_code() == T_OBJECT) {
+      YggGenericMap::iterator it;
+      YggGenericMap* old_data = (YggGenericMap*)data;
+      for (it = old_data->begin(); it != old_data->end(); it++) {
+	delete it->second;
+	it->second = NULL;
+      }
+      delete old_data;
+    } else {
+      free(data);
+    }
+    data = NULL;
+  }
+};
+YggGeneric* YggGeneric::copy() {
+  YggGeneric* out = new YggGeneric();
+  // Bytes must be set before data to allow copy to work correctly
+  out->set_type(type);
+  out->set_nbytes(nbytes);
+  out->set_data(data);
+  return out;
+};
+void YggGeneric::set_type(MetaschemaType* new_type) {
+  type = new_type;
+};
+MetaschemaType* YggGeneric::get_type() {
+  return type;
+};
+void YggGeneric::set_nbytes(size_t new_nbytes) {
+  nbytes = new_nbytes;
+}
+size_t YggGeneric::get_nbytes() {
+  return nbytes;
+};
+size_t* YggGeneric::get_nbytes_pointer() {
+  return &nbytes;
+};
+size_t YggGeneric::get_nelements() {
+  return type->get_length();
+};
+void YggGeneric::set_data(void* new_data) {
+  free_data();
+  data = copy_data(new_data);
+};
+void* YggGeneric::get_data() {
+  return data;
+};
+void** YggGeneric::get_data_pointer() {
+  return &data;
+};
+template <typename T>
+void YggGeneric::get_data(T* obj, size_t nelements, bool is_char) {
+  size_t obj_size = nelements * sizeof(T);
+  bool check = false;
+  if (is_char) {
+    check = (obj_size > nbytes);
+  } else {
+    check = (obj_size != nbytes);
+  }
+  if (check) {
+    ygglog_throw_error("YggGeneric::get_data: Type indicates the data has a size of %d bytes, but the provided pointer is to an object with a size of %d bytes.",
+		       nbytes, sizeof(T));
+  }
+  memcpy((void*)obj, data, nbytes);
+};
+template <typename T>
+void YggGeneric::get_data(T &obj) {
+  if (nbytes != sizeof(T)) {
+    ygglog_throw_error("YggGeneric::get_data: There are %d elements in the data, but this call signature returns one (provided type has size %d bytes, but object stores %d bytes).", nbytes/sizeof(T),
+		       sizeof(T), nbytes);
+  }
+  T* ptr = static_cast<T*>(data);
+  obj = *ptr;
+};
+template <typename T>
+void YggGeneric::get_data_realloc(T** obj, size_t* nelements) {
+  T* new_obj = (T*)realloc(obj[0], nbytes);
+  if (new_obj == NULL) {
+    ygglog_throw_error("YggGeneric::get_data_realloc: Failed to reallocated input variables.");
+  }
+  obj[0] = new_obj;
+  if (nelements != NULL) {
+    nelements[0] = nbytes/sizeof(T);
+  }
+  get_data(obj[0], nbytes/sizeof(T));
+};
+void YggGeneric::get_data(char* obj, size_t nelements) {
+  get_data(obj, nelements, true);
 };
 
 #endif /*METASCHEMA_TYPE_H_*/
