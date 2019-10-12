@@ -27,7 +27,7 @@ class ExampleMeta(ComponentMeta):
         iter_lists = []
         iter_keys = []
         test_name_fmt = 'test'
-        iter_over = dct['iter_over']
+        iter_over = dct.get('iter_over', ['language'])
         for x in iter_over:
             test_name_fmt += '_%s'
             if x in ['language', 'lang']:
