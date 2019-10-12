@@ -38,7 +38,6 @@ New feature/example
 * Change "args" in drivers to more transparent wording (source_code, etc.)
 * Alias input/output keyword arguments for connections to from/to for clarity
 * Add example of each supported language (missing LPy, cmake, make)
-* Add map class for handling arbitrary objects in C/C++ and then update formatted_io 7, 8, and 9
 * change gs_lesson/formatted_io series to have more descriptive names
 * Silence warnings from pint on model processes
 * Use return code to indicate specific errors when using a generated wrapper (e.g. missing comm class)
