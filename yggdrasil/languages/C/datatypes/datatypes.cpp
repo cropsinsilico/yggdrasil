@@ -886,6 +886,18 @@ extern "C" {
 	if (set_dtype_name(&dtype2, type_class->type()) < 0) {
 	  return -1;
 	}
+	if (dtype1 != NULL) {
+	  if ((strcmp(dtype_name(dtype1), "scalar") == 0) &&
+	      (strcmp(dtype_subtype(dtype1), "bytes") == 0) &&
+	      (dtype_precision(dtype1) == 0)) {
+	    MetaschemaType *type_class1 = dtype2class(dtype1);
+	    if (destroy_dtype_class_safe(type_class1) < 0) {
+	      return -1;
+	    }
+	    dtype1->obj = NULL;
+	    strncpy(dtype1->type, "", COMMBUFFSIZ);
+	  }
+	}
 	if (update_dtype(dtype1, &dtype2) < 0) {
 	  return -1;
 	}

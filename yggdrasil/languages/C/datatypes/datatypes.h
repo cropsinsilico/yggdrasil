@@ -508,6 +508,9 @@ size_t nargs_exp_dtype(const dtype_t *dtype);
 #define copy_map copy_generic
 #define copy_vector copy_generic
 #define copy_schema copy_generic
+#define display_map display_generic
+#define display_vector display_generic
+#define display_schema display_generic
 
   
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */

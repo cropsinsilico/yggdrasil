@@ -55,9 +55,9 @@ public:
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
     x->get_data(arg);
-    printf("Object with %lu elements:\n", arg.size());
+    printf("%sObject with %lu elements:\n", indent, arg.size());
     for (it = arg.begin(); it != arg.end(); it++) {
-      std::cout << "  " << it->first << ": ";
+      std::cout << new_indent << std::left << std::setw(10) << it->first << " ";
       (it->second)->display(new_indent);
     }
   }

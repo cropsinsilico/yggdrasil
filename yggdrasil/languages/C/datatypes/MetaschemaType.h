@@ -5,6 +5,7 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <iomanip>
 #include <map>
 #include <vector>
 #include "rapidjson/document.h"
@@ -288,8 +289,7 @@ public:
       return;
     }
     case T_STRING: {
-      char* arg = NULL;
-      data->get_data(arg);
+      char* arg = (char*)(data->get_data());
       std::cout << arg << std::endl;
       return;
     }
@@ -365,8 +365,8 @@ public:
     @returns size_t Type length.
    */
   virtual size_t get_length() {
-    ygglog_throw_error("MetaschemaType::get_length: Cannot get length for type '%s'.", type_);
-    return 0;
+    // ygglog_throw_error("MetaschemaType::get_length: Cannot get length for type '%s'.", type_);
+    return 1;
   }
   /*!
     @brief Get the item size.
@@ -974,7 +974,11 @@ size_t* YggGeneric::get_nbytes_pointer() {
   return &nbytes;
 };
 size_t YggGeneric::get_nelements() {
-  return type->get_length();
+  try {
+    return type->get_length();
+  } catch(...) {
+    return 1;
+  }
 };
 void YggGeneric::set_data(void* new_data) {
   free_data();

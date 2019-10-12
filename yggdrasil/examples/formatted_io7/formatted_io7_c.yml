@@ -1,0 +1,30 @@
+models:
+  - name: c_modelA
+    language: c
+    args: ./src/formatted_io7_modelA.c
+    inputs:
+      - name: inputA
+        type: object
+    outputs:
+      - name: outputA
+        type: object
+
+  - name: c_modelB
+    language: c
+    args: ./src/formatted_io7_modelB.c
+    inputs:
+      - name: inputB
+        type: object
+    outputs:
+      - name: outputB
+        type: object
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: inputA
+    filetype: map
+  - input: outputB  # Connection between model B output and file
+    output: ./output.txt
+    filetype: map

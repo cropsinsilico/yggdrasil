@@ -275,11 +275,20 @@ public:
       }
       break;
     }
-    case T_BYTES:
-    case T_UNICODE: {
+    case T_BYTES: {
       // TODO: Handle array of char arrays
       char* arg = (char*)(x->get_data());
       std::cout << arg << std::endl;
+      return;
+    }
+    case T_UNICODE: {
+      // TODO: Handle array of char arrays
+      char* arg = (char*)(x->get_data());
+      size_t i;
+      for (i = 0; i < x->get_nbytes(); i+=4) {
+	std::cout << arg + i;
+      }
+      std::cout << std::endl;
       return;
     }
     default: {

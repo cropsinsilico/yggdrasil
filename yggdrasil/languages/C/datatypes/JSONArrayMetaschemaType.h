@@ -63,7 +63,7 @@ public:
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
     x->get_data(arg);
-    printf("Array with %lu elements:\n", arg.size());
+    printf("%sArray with %lu elements:\n", indent, arg.size());
     for (it = arg.begin(); it != arg.end(); it++) {
       (*it)->display(new_indent);
     }
