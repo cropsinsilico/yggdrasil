@@ -70,9 +70,14 @@ class TestExampleTypes(ExampleTstBase):
             outputs_in_inputs=drv.outputs_in_inputs)
         function_contents.append(
             drv.format_function_param('print', message='IN MODEL'))
-        if 'print_object' in drv.function_param:
+        if 'print_any' in drv.function_param:
             function_contents += [
-                drv.format_function_param('print_object',
+                drv.format_function_param('print_any',
+                                          object=x['name'])
+                for x in inputs]
+        elif ('print_%s' % testtype['type']) in drv.function_param:
+            function_contents += [
+                drv.format_function_param('print_%s' % testtype['type'],
                                           object=x['name'])
                 for x in inputs]
         lines = drv.write_function_def(
@@ -83,6 +88,21 @@ class TestExampleTypes(ExampleTstBase):
         os.environ['TEST_LANGUAGE'] = language
         os.environ['TEST_LANGUAGE_EXT'] = language_ext
         os.environ['TEST_TYPENAME'] = typename
+        if language == 'c':
+            in_vars = 'x'
+            out_vars = 'y'
+            if typename in ['string', 'bytes', 'unicode', '1darray']:
+                in_vars += ', x_length'
+                out_vars += ', y_length'
+            os.environ['TEST_MODEL_IO'] = (
+                'inputs:\n'
+                '      name: input\n'
+                '      vars: ' + in_vars + '\n'
+                '    outputs:\n'
+                '      name: output\n'
+                '      vars: ' + out_vars + '\n')
+        else:
+            os.environ['TEST_MODEL_IO'] = ''
         return modelfile
 
     def check_results(self):

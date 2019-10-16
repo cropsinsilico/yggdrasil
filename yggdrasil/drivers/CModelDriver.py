@@ -577,30 +577,6 @@ class CModelDriver(CompiledModelDriver):
                 if ((cls.requires_length_var(x)
                      and ((x['name'] + '_length') in io_map))):
                     x['length_var'] = x['name'] + '_length'
-            # Check for outputs
-            if outputs_in_inputs and (io == 'inputs'):
-                move = []
-                move_flags = {}
-                for x in out.get('inputs', []):
-                    if x.get('ptr', []) and (x['native_type'] not in
-                                             ['char*', 'string_t',
-                                              'bytes_t', 'unicode_t']):
-                        move.append(x)
-                        if x.get('length_var', False):
-                            move_flags[x['name']] = x['length_var']
-                if move:
-                    out.setdefault('outputs', [])
-                    move_names = [x['name'] for x in move]
-                    for k, v in move_flags.items():
-                        if v not in move_names:
-                            raise Exception(  # pragma: debug
-                                ("The length variable '%s' for array "
-                                 "variable '%s' was not converted "
-                                 "to output while '%s' was.")
-                                % (v, k, k))
-                    for x in move:
-                        out['outputs'].append(cls.input2output(x))
-                        out['inputs'].remove(x)
         return out
         
     @classmethod
@@ -1131,7 +1107,8 @@ class CModelDriver(CompiledModelDriver):
         elif datatype['type'] == '1darray':
             fmt = ('create_dtype_1darray(\"{subtype}\", {precision}, {length}, '
                    '\"{units}\")')
-            keys = {k: datatype[k] for k in ['subtype', 'precision', 'length']}
+            keys = {k: datatype[k] for k in ['subtype', 'precision']}
+            keys['length'] = datatype.get('length', '0')
             keys['units'] = datatype.get('units', '')
         elif datatype['type'] in ['1darray', 'ndarray']:
             fmt = ('create_dtype_ndarray(\"{subtype}\", {precision}, {ndim}, {shape}, '

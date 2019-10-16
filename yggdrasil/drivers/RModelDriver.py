@@ -80,7 +80,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'comment': '#',
         'indent': 2 * ' ',
         'quote': '\"',
-        'print_object': 'print({object})',
+        'print_any': 'print({object})',
         'print': 'print(\"{message}\")',
         'fprintf': 'print(sprintf(\"{message}\", {variables}))',
         'error': 'stop(\"{error_msg}\")',

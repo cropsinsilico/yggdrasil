@@ -1398,8 +1398,12 @@ class ModelDriver(Driver):
             outputs_in_inputs = cls.outputs_in_inputs
         if (((isinstance(model_file, str) and os.path.isfile(model_file))
              or (contents is not None))):
+            expected_outputs = []
+            for x in outputs:
+                expected_outputs += x.get('vars', [])
             info = cls.parse_function_definition(model_file, model_function,
-                                                 contents=contents)
+                                                 contents=contents,
+                                                 expected_outputs=expected_outputs)
         else:
             info = {"inputs": [], "outputs": []}
         info_map = {io: OrderedDict([(x['name'], x) for x in info.get(io, [])])
@@ -1410,8 +1414,8 @@ class ModelDriver(Driver):
             flag_var = dict(info['flag_var'], name='model_flag')
         # Move variables if outputs in inputs
         if outputs_in_inputs:
-            if ((((len(inputs) + len(outputs)) == len(info['inputs']))
-                 and (len(info['outputs']) == 0))):
+            if ((((len(inputs) + len(outputs)) == len(info.get('inputs', [])))
+                 and (len(info.get('outputs', [])) == 0))):
                 for i, vdict in enumerate(info['inputs'][:len(inputs)]):
                     if inputs[i].get('vars', False):
                         assert(inputs[i]['vars'] == [vdict['name']])
