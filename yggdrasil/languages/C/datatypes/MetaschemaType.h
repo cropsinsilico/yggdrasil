@@ -247,14 +247,37 @@ public:
     update_type(type_doc["type"].GetString());
   }
   /*!
+    @brief Equivalence operator.
+    @param[in] Ref MetaschemaType instance to compare against.
+    @returns bool true if the instance is equivalent, false otherwise.
+   */
+  virtual bool operator==(const MetaschemaType &Ref) const {
+    if (strcmp(type_, Ref.type()) != 0)
+      return false;
+    if (type_code_ != Ref.type_code())
+      return false;
+    return true;
+  }
+  /*!
+    @brief Inequivalence operator.
+    @param[in] Ref MetaschemaType instance to compare against.
+    @returns bool true if the instances are not equivalent, false otherwise.
+   */
+  virtual bool operator!=(const MetaschemaType &Ref) const {
+    if (operator==(Ref))
+      return false;
+    else
+      return true;
+  } 
+ /*!
     @brief Create a copy of the type.
     @returns pointer to new MetaschemaType instance with the same data.
    */
-  virtual MetaschemaType* copy() { return (new MetaschemaType(type_)); }
+  virtual MetaschemaType* copy() const { return (new MetaschemaType(type_)); }
   /*!
     @brief Print information about the type to stdout.
   */
-  virtual void display() {
+  virtual void display() const {
     printf("%-15s = %s\n", "type", type_);
     printf("%-15s = %d\n", "type_code", type_code_);
   }
@@ -263,7 +286,7 @@ public:
     @param[in] x YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  virtual void display_generic(YggGeneric* data, const char* indent="") {
+  virtual void display_generic(YggGeneric* data, const char* indent="") const {
     std::cout << indent;
     switch (type_code_) {
     case T_BOOLEAN: {
@@ -300,7 +323,7 @@ public:
     @brief Check that the type is correct and get the corresponding code.
     @returns int Type code for the instance's type.
    */
-  int check_type() {
+  int check_type() const {
     std::map<const char*, int, strcomp> type_map = get_type_map();
     std::map<const char*, int, strcomp>::iterator it = type_map.find(type_);
     if (it == type_map.end()) {
@@ -319,12 +342,12 @@ public:
     @brief Get the type string.
     @returns const char pointer to the type string.
    */
-  const char* type() { return type_; }
+  const char* type() const { return type_; }
   /*!
     @brief Get the type code.
     @returns int Type code associated with the curent type.
    */
-  const int type_code() { return type_code_; }
+  const int type_code() const { return type_code_; }
   /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
@@ -340,6 +363,36 @@ public:
     updated_ = true;
   }
   /*!
+    @brief Update the type object with info from provided variable arguments for serialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+   */
+  virtual void update_from_serialization_args(size_t *nargs, va_list_t &ap) {
+    return;
+  }
+  /*!
+    @brief Update the type object with info from provided variable arguments for deserialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+   */
+  virtual void update_from_deserialization_args(size_t *nargs, va_list_t &ap) {
+    return;
+  }
+  /*!
+    @brief Update the type object with info from provided variable arguments for serialization.
+    @param[in] x YggGeneric* Pointer to generic object containing data to be serialized.
+   */
+  virtual void update_from_serialization_args(YggGeneric* x) {
+    update(x->get_type());
+  }
+  /*!
+    @brief Update the type object with info from provided variable arguments for deserialization.
+    @param[in,out] x YggGeneric* Pointer to generic object where data will be stored.
+   */
+  virtual void update_from_deserialization_args(YggGeneric* x) {
+    x->get_type()->update(this);
+  }
+  /*!
     @brief Update the instance's type.
     @param[in] new_type const char * String for new type.
    */
@@ -353,7 +406,7 @@ public:
     @brief Set the type length.
     @param[in] new_length size_t New length.
    */
-  virtual void set_length(size_t new_length) {
+  virtual void set_length(size_t new_length, bool force=false) {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     new_length;
@@ -364,15 +417,15 @@ public:
     @brief Get the type's length.
     @returns size_t Type length.
    */
-  virtual size_t get_length() {
-    // ygglog_throw_error("MetaschemaType::get_length: Cannot get length for type '%s'.", type_);
+  virtual size_t length() const {
+    // ygglog_throw_error("MetaschemaType::length: Cannot get length for type '%s'.", type_);
     return 1;
   }
   /*!
     @brief Get the item size.
     @returns size_t Size of item in bytes.
    */
-  virtual const size_t nbytes() {
+  virtual const size_t nbytes() const {
     switch (type_code_) {
     case T_BOOLEAN: {
       return sizeof(bool);
@@ -401,7 +454,7 @@ public:
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
-  virtual size_t nargs_exp() {
+  virtual size_t nargs_exp() const {
     switch (type_code_) {
     case T_BOOLEAN:
     case T_INTEGER:
@@ -424,7 +477,7 @@ public:
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @returns bool true if the encoding was successful, false otherwise.
    */
-  bool encode_type(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
+  bool encode_type(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
     writer->StartObject();
     if (!(encode_type_prop(writer)))
       return false;
@@ -436,7 +489,7 @@ public:
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @returns bool true if the encoding was successful, false otherwise.
    */
-  virtual bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
+  virtual bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
     writer->Key("type");
     writer->String(type_, strlen(type_));
     return true;
@@ -451,7 +504,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   virtual bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-			   size_t *nargs, va_list_t &ap) {
+			   size_t *nargs, va_list_t &ap) const {
     if (nargs_exp() > *nargs)
       ygglog_throw_error("MetaschemaType::encode_data: %d arguments expected, but only %d provided.",
 			 nargs_exp(), *nargs);
@@ -505,7 +558,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   size_t *nargs, ...) {
+		   size_t *nargs, ...) const {
     va_list_t ap_s;
     va_start(ap_s.va, nargs);
     bool out = encode_data(writer, nargs, ap_s);
@@ -519,7 +572,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   virtual bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-			   YggGeneric* x) {
+			   YggGeneric* x) const {
     size_t nargs = 1;
     switch (type_code_) {
     case T_BOOLEAN:
@@ -572,7 +625,7 @@ public:
    */
   virtual int copy_to_buffer(const char *src_buf, const size_t src_buf_siz,
 			     char **dst_buf, size_t &dst_buf_siz,
-			     const int allow_realloc, bool skip_terminal = false) {
+			     const int allow_realloc, bool skip_terminal = false) const {
     size_t src_buf_siz_term = src_buf_siz;
     if (!(skip_terminal))
       src_buf_siz_term++;
@@ -623,6 +676,7 @@ public:
    */
   virtual int serialize(char **buf, size_t *buf_siz,
 			const int allow_realloc, size_t *nargs, va_list_t &ap) {
+    update_from_serialization_args(nargs, ap);
     if (nargs_exp() != *nargs) {
       ygglog_throw_error("MetaschemaType::serialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
@@ -654,6 +708,14 @@ public:
    */
   virtual int serialize(char **buf, size_t *buf_siz,
 			const int allow_realloc, YggGeneric* x) {
+    update_from_serialization_args(x);
+    if (*(x->get_type()) != (*this)) {
+      ygglog_throw_error("MetaschemaType::serialize: "
+			 "Type associated with provided generic "
+			 "object is not equivalent to the type "
+			 "associated with the communication object "
+			 "performing the serialization.");
+    }
     rapidjson::StringBuffer body_buf;
     rapidjson::Writer<rapidjson::StringBuffer> body_writer(body_buf);
     bool out = encode_data(&body_writer, x);
@@ -679,7 +741,7 @@ public:
     @returns bool true if the data was successfully decoded, false otherwise.
    */
   virtual bool decode_data(rapidjson::Value &data, const int allow_realloc,
-			   size_t *nargs, va_list_t &ap) {
+			   size_t *nargs, va_list_t &ap) const {
     if (nargs_exp() != *nargs) {
       ygglog_throw_error("MetaschemaType::decode_data: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
@@ -787,7 +849,7 @@ public:
     @returns bool true if the data was successfully decoded, false otherwise.
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
-		   size_t *nargs, ...) {
+		   size_t *nargs, ...) const {
     va_list_t ap_s;
     va_start(ap_s.va, nargs);
     bool out = decode_data(data, allow_realloc, nargs, ap_s);
@@ -800,7 +862,7 @@ public:
     @param[out] x YggGeneric* Pointer to generic object where data should be stored.
     @returns bool true if the data was successfully decoded, false otherwise.
    */
-  virtual bool decode_data(rapidjson::Value &data, YggGeneric* x) {
+  virtual bool decode_data(rapidjson::Value &data, YggGeneric* x) const {
     size_t nargs = 1;
     int allow_realloc = 1;
     if (x == NULL) {
@@ -831,6 +893,7 @@ public:
   virtual int deserialize(const char *buf, const size_t buf_siz,
 			  const int allow_realloc, size_t* nargs, va_list_t &ap) {
     const size_t nargs_orig = *nargs;
+    update_from_deserialization_args(nargs, ap);
     if (nargs_exp() > *nargs) {
       ygglog_throw_error("MetaschemaType::deserialize: %d arguments expected, but only %d provided.",
 			 nargs_exp(), *nargs);
@@ -859,6 +922,14 @@ public:
    */
   virtual int deserialize(const char *buf, const size_t buf_siz,
 			  YggGeneric* x) {
+    update_from_deserialization_args(x);
+    if (*(x->get_type()) != (*this)) {
+      ygglog_throw_error("MetaschemaType::deserialize: "
+			 "Type associated with provided generic "
+			 "object is not equivalent to the type "
+			 "associated with the communication object "
+			 "performing the deserialization.");
+    }
     // Parse body
     rapidjson::Document body_doc;
     body_doc.Parse(buf, buf_siz);
@@ -966,7 +1037,7 @@ MetaschemaType* YggGeneric::get_type() {
 };
 void YggGeneric::set_nbytes(size_t new_nbytes) {
   nbytes = new_nbytes;
-}
+};
 size_t YggGeneric::get_nbytes() {
   return nbytes;
 };
@@ -975,7 +1046,7 @@ size_t* YggGeneric::get_nbytes_pointer() {
 };
 size_t YggGeneric::get_nelements() {
   try {
-    return type->get_length();
+    return type->length();
   } catch(...) {
     return 1;
   }

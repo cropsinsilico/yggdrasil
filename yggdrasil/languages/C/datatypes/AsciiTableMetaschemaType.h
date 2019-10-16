@@ -46,15 +46,30 @@ public:
     }
   }
   /*!
+    @brief Equivalence operator.
+    @param[in] Ref MetaschemaType instance to compare against.
+    @returns bool true if the instance is equivalent, false otherwise.
+   */
+  bool operator==(const MetaschemaType &Ref) const override {
+    if (!(MetaschemaType::operator==(Ref)))
+      return false;
+    const AsciiTableMetaschemaType* pRef = dynamic_cast<const AsciiTableMetaschemaType*>(&Ref);
+    if (as_array_ != pRef->as_array())
+      return false;
+    if (strcmp(format_str(), pRef->format_str()) != 0)
+      return false;
+    return true;
+  }
+  /*!
     @brief Create a copy of the type.
     @returns pointer to new AsciiTableMetaschemaType instance with the same data.
    */
-  AsciiTableMetaschemaType* copy() override { return (new AsciiTableMetaschemaType(format_str(),
+  AsciiTableMetaschemaType* copy() const override { return (new AsciiTableMetaschemaType(format_str(),
 									  as_array())); }
   /*!
     @brief Print information about the type to stdout.
   */
-  void display() override {
+  void display() const override {
     MetaschemaType::display();
     printf("%-15s = %s\n", "format_str", format_str());
     printf("%-15s = %d\n", "as_array", as_array_);
@@ -63,22 +78,22 @@ public:
     @brief Get format string describing table.
     @returns char * Format string.
    */
-  const char* format_str() { return table_->format_str; }
+  const char* format_str() const { return table_->format_str; }
   /*!
     @brief Get table struct.
     @returns asciiTable_t* Table struct.
    */
-  asciiTable_t* table() { return table_; }
+  asciiTable_t* table() const { return table_; }
   /*!
     @brief Get as_array.
     @returns bool 1 if elements in table are all arrays, 0 otherwise.
    */
-  const int as_array() { return as_array_; }
+  const int as_array() const { return as_array_; }
   /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
-  size_t nargs_exp() override {
+  size_t nargs_exp() const override {
     size_t nargs = (size_t)(table_->ncols);
     if (as_array_) {
       nargs++; // For the number of rows
@@ -97,7 +112,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   size_t *nargs, va_list_t &ap) override {
+		   size_t *nargs, va_list_t &ap) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     writer;
@@ -114,7 +129,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   YggGeneric* x) override {
+		   YggGeneric* x) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     writer;
@@ -194,7 +209,7 @@ public:
     @returns bool true if the data was successfully decoded, false otherwise.
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
-		   size_t *nargs, va_list_t &ap) override {
+		   size_t *nargs, va_list_t &ap) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     data;
@@ -211,7 +226,7 @@ public:
     @param[out] x YggGeneric* Pointer to generic object where data should be stored.
     @returns bool true if the data was successfully decoded, false otherwise.
    */
-  bool decode_data(rapidjson::Value &data, YggGeneric* x) override {
+  bool decode_data(rapidjson::Value &data, YggGeneric* x) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     data;

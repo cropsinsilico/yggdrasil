@@ -966,10 +966,7 @@ int vcommSend(const comm_t *x, size_t nargs, va_list_t ap) {
     datatype = handle->datatype;
   }
   // Update datatype if not yet set and object being sent includes type
-  if ((datatype->obj == NULL) ||
-      ((strcmp(dtype_name(datatype), "scalar") == 0) &&
-       (strcmp(dtype_subtype(datatype), "bytes") == 0) &&
-       (dtype_precision(datatype) == 0))) {
+  if (is_empty_dtype(datatype)) {
     if (update_dtype_from_generic_ap(datatype, nargs, ap) < 0) {
       return -1;
     }

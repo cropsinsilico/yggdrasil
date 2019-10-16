@@ -139,13 +139,21 @@ void display_generic(generic_t* x);
  */
 int is_generic(void* x);
 
+
+/*!
+  @brief Determine if a datatype is empty.
+  @param[in] dtype dtype_t* Type structure to test.
+  @returns int 1 if dtype is empty, 0 otherwise.
+ */
+int is_empty_dtype(const dtype_t* dtype);
+
   
 /*!
   @brief Get the name of the type from the class.
   @param[in] type_class dtype_t* Type structure/class.
   @returns const char* Type name.
 */
-const char* dtype_name(dtype_t* type_class);
+const char* dtype_name(const dtype_t* type_class);
 
 
 /*!
@@ -153,7 +161,7 @@ const char* dtype_name(dtype_t* type_class);
   @param[in] type_class dtype_t* Type structure/class.
   @returns const char* The subtype of the class, "" if there is an error.
 */
-const char* dtype_subtype(dtype_t* type_class);
+const char* dtype_subtype(const dtype_t* type_class);
 
 
 /*!
@@ -161,7 +169,7 @@ const char* dtype_subtype(dtype_t* type_class);
   @param[in] type_class dtype_t* Type structure/class.
   @returns const size_t The precision of the class, 0 if there is an error.
 */
-const size_t dtype_precision(dtype_t* type_class);
+const size_t dtype_precision(const dtype_t* type_class);
 
 /*!
   @brief Initialize a datatype structure including setting the type string.

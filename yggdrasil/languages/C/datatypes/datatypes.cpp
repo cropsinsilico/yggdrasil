@@ -310,7 +310,7 @@ dtype_t* create_dtype(MetaschemaType* type_class=NULL) {
   return out;
 };
 
-  
+
 MetaschemaType* dtype2class(const dtype_t* dtype) {
   if (dtype == NULL) {
     ygglog_throw_error("dtype2class: Pointer to data structure is NULL.");
@@ -440,9 +440,16 @@ extern "C" {
 
   void display_generic(generic_t* x) {
     try {
-      YggGeneric* x_obj = (YggGeneric*)(x->obj);
-      if (x_obj != NULL) {
-	x_obj->display();
+      if (is_generic((void*)x)) {
+	YggGeneric* x_obj = (YggGeneric*)(x->obj);
+	if (x_obj != NULL) {
+	  x_obj->display();
+	}
+      } else if (x != NULL) {
+	void** xx = (void**)x;
+	if (xx[0] != NULL) {
+	  display_generic((generic_t*)(xx[0]));
+	}
       }
     } catch (...) {
       ygglog_error("display_generic: C++ exception thrown.");
@@ -479,17 +486,32 @@ extern "C" {
     return get_generic(arg, is_pointer);
   }
 
-  const char* dtype_name(dtype_t* type_struct) {
+  int is_empty_dtype(const dtype_t* dtype) {
+    if (dtype == NULL) {
+      return 1;
+    }
+    if (dtype->obj == NULL) {
+      return 1;
+    }
+    if ((strcmp(dtype_name(dtype), "scalar") == 0) &&
+	(strcmp(dtype_subtype(dtype), "bytes") == 0) &&
+	(dtype_precision(dtype) == 0)) {
+      return 1;
+    }
+    return 0;
+  }
+  
+  const char* dtype_name(const dtype_t* type_struct) {
     try {
       MetaschemaType* type_class = dtype2class(type_struct);
       return type_class->type();
     } catch(...) {
       ygglog_error("dtype_name: C++ exception thrown.");
-      return NULL;
+      return "";
     }
   }
 
-  const char* dtype_subtype(dtype_t* type_struct) {
+  const char* dtype_subtype(const dtype_t* type_struct) {
     try {
       if (strcmp(type_struct->type, "scalar") != 0) {
 	ygglog_throw_error("dtype_subtype: Only scalars have subtype.");
@@ -502,7 +524,7 @@ extern "C" {
     }
   }
 
-  const size_t dtype_precision(dtype_t* type_struct) {
+  const size_t dtype_precision(const dtype_t* type_struct) {
     try {
       if (strcmp(type_struct->type, "scalar") != 0) {
 	ygglog_throw_error("dtype_precision: Only scalars have precision.");
@@ -887,12 +909,12 @@ extern "C" {
 	  return -1;
 	}
 	if (dtype1 != NULL) {
-	  if ((strcmp(dtype_name(dtype1), "scalar") == 0) &&
-	      (strcmp(dtype_subtype(dtype1), "bytes") == 0) &&
-	      (dtype_precision(dtype1) == 0)) {
-	    MetaschemaType *type_class1 = dtype2class(dtype1);
-	    if (destroy_dtype_class_safe(type_class1) < 0) {
-	      return -1;
+	  if (is_empty_dtype(dtype1)) {
+	    if (dtype1->obj != NULL) {
+	      MetaschemaType *type_class1 = dtype2class(dtype1);
+	      if (destroy_dtype_class_safe(type_class1) < 0) {
+		return -1;
+	      }
 	    }
 	    dtype1->obj = NULL;
 	    strncpy(dtype1->type, "", COMMBUFFSIZ);

@@ -119,14 +119,35 @@ public:
     free((char*)units_);
   }
   /*!
+    @brief Equivalence operator.
+    @param[in] Ref MetaschemaType instance to compare against.
+    @returns bool true if the instance is equivalent, false otherwise.
+   */
+  virtual bool operator==(const MetaschemaType &Ref) const override {
+    if (!(MetaschemaType::operator==(Ref)))
+      return false;
+    const ScalarMetaschemaType* pRef = dynamic_cast<const ScalarMetaschemaType*>(&Ref);
+    if (!pRef)
+      return false;
+    if (strcmp(subtype_, pRef->subtype()) != 0)
+      return false;
+    if (subtype_code_ != pRef->subtype_code())
+      return false;
+    if ((!(_variable_precision)) && (precision_ != pRef->precision()))
+      return false;
+    if (strcmp(units_, pRef->units()) != 0)
+      return false;
+    return true;
+  }
+  /*!
     @brief Create a copy of the type.
     @returns pointer to new ScalarMetaschemaType instance with the same data.
    */
-  ScalarMetaschemaType* copy() override { return (new ScalarMetaschemaType(subtype_, precision_, units_)); }
+  ScalarMetaschemaType* copy() const override { return (new ScalarMetaschemaType(subtype_, precision_, units_)); }
   /*!
     @brief Print information about the type to stdout.
   */
-  void display() override {
+  void display() const override {
     MetaschemaType::display();
     printf("%-15s = %s\n", "subtype", subtype_);
     printf("%-15s = %d\n", "subtype_code", subtype_code_);
@@ -138,7 +159,7 @@ public:
     @param[in] x YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* x, const char* indent="") override {
+  void display_generic(YggGeneric* x, const char* indent="") const override {
     int i;
     size_t bytes_precision = nbytes();
     std::cout << indent;
@@ -302,7 +323,7 @@ public:
     @brief Check that the subtype is correct and get the corresponding code.
     @returns int Type code for the instance's subtype.
    */
-  int check_subtype() {
+  int check_subtype() const {
     std::map<const char*, int, strcomp> type_map = get_type_map();
     std::map<const char*, int, strcomp>::iterator it = type_map.find(subtype_);
     if (it == type_map.end()) {
@@ -311,37 +332,42 @@ public:
     return it->second;
   }
   /*!
+    @brief Get the subtype code.
+    @returns const int Subtype code.
+   */
+  const int subtype_code() const { return subtype_code_; }
+  /*!
     @brief Get the subtype string.
     @returns const char pointer to the subtype string.
    */
-  const char* subtype() { return subtype_; }
+  const char* subtype() const { return subtype_; }
   /*!
     @brief Get the type precision.
     @returns size_t Type precision in bytes.
    */
-  const size_t precision() { return precision_; }
+  const size_t precision() const { return precision_; }
   /*!
     @brief Get the type units.
     @returns const char* Type units string.
    */
-  const char* units() { return units_; }
+  const char* units() const { return units_; }
   /*!
     @brief Get the number of elements in the type.
     @returns size_t Number of elements (1 for scalar).
    */
-  virtual const size_t nelements() { return 1; }
+  virtual const size_t nelements() const { return 1; }
   /*!
     @brief Get the size of the type in bits.
     @returns size_t Type size.
    */
-  const size_t nbits() {
+  const size_t nbits() const {
     return precision_ * nelements();
   }
   /*!
     @brief Get the size of the type in bytes.
     @returns size_t Type size.
    */
-  const size_t nbytes() override {
+  const size_t nbytes() const override {
     return nbits() / 8;
   }
   /*!
@@ -366,6 +392,30 @@ public:
     }
     set_precision(new_info_scalar->precision());
     update_units(new_info_scalar->units());
+  }
+  /*!
+    @brief Update the type object with info from provided variable arguments for serialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+   */
+  virtual void update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
+    MetaschemaType::update_from_serialization_args(nargs, ap);
+    if (type_code() == T_SCALAR) {
+      switch (subtype_code_) {
+      case T_BYTES:
+      case T_UNICODE: {
+	if (_variable_precision) {
+	  va_list ap_copy;
+	  va_copy(ap_copy, ap.va);
+	  char* arg0 = va_arg(ap_copy, char*);
+	  UNUSED(arg0); // Parameter extract to get next
+	  const size_t arg0_siz = va_arg(ap_copy, size_t);
+	  set_precision(8 * arg0_siz);
+	}
+      }
+      }
+    }
+    return;
   }
   /*!
     @brief Update the instance's type.
@@ -447,7 +497,7 @@ public:
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
-  virtual size_t nargs_exp() override {
+  virtual size_t nargs_exp() const override {
     switch (subtype_code_) {
     case T_BYTES:
     case T_UNICODE: {
@@ -465,7 +515,7 @@ public:
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @returns bool true if the encoding was successful, false otherwise.
    */
-  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) override {
+  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override {
     if (!MetaschemaType::encode_type_prop(writer)) { return false; }
     writer->Key("subtype");
     writer->String(subtype_, strlen(subtype_));
@@ -490,8 +540,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   size_t *nargs, va_list_t &ap) override {
-    // TODO: case by case for scalar types
+		   size_t *nargs, va_list_t &ap) const override {
     size_t bytes_precision = nbytes();
     unsigned char* arg = (unsigned char*)malloc(bytes_precision + 1);
     if (arg == NULL) {
@@ -499,19 +548,18 @@ public:
 		   bytes_precision + 1);
       return false;
     }
-    if ((strcmp(type(), "1darray") == 0) || (strcmp(type(), "ndarray") == 0)) {
+    switch (type_code()) {
+    case T_1DARRAY:
+    case T_NDARRAY: {
+      unsigned char* arg0 = va_arg(ap.va, unsigned char*);
       if (nelements() == 0) {
 	ygglog_error("ScalarMetaschemaType::encode_data: Array types require the number of elements be non-zero.");
 	return false;
       }
-      switch (subtype_code_) {
-      case T_COMPLEX:
-	// TODO: Split real and imaginary parts?
-      default:
-	unsigned char* arg0 = va_arg(ap.va, unsigned char*);
-	memcpy(arg, arg0, bytes_precision);
-      }
-    } else {
+      memcpy(arg, arg0, bytes_precision);
+      break;
+    }
+    case T_SCALAR: {
       switch (subtype_code_) {
       case T_INT: {
 	switch (precision_) {
@@ -625,10 +673,6 @@ public:
 	  ygglog_error("ScalarMetaschemaType::encode_data: Failed to copy bytes/unicode variable to buffer.");
 	  free(arg);
 	  return false;
-	} else if ((arg0_siz > bytes_precision) && (_variable_precision)) {
-	  //printf("arg0_siz = %lu, bytes_precision = %lu\n", arg0_siz, bytes_precision);
-	  set_precision(8 * arg0_siz);
-	  bytes_precision = nbytes();
 	}
 	break;
       }
@@ -638,6 +682,7 @@ public:
 	return false;
       }
       }
+    }
     }
     (*nargs)--;
     size_t encoded_len = 0;
@@ -654,13 +699,16 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   YggGeneric* x) override {
+		   YggGeneric* x) const override {
     size_t nargs = 1;
     size_t bytes_precision = nbytes();
-    if ((strcmp(type(), "1darray") == 0) || (strcmp(type(), "ndarray") == 0)) {
+    switch (type_code()) {
+    case T_1DARRAY:
+    case T_NDARRAY: {
       void* arg = x->get_data();
       return MetaschemaType::encode_data(writer, &nargs, arg);
-    } else {
+    }
+    case T_SCALAR: {
       switch (subtype_code_) {
       case T_INT: {
 	switch (precision_) {
@@ -786,6 +834,7 @@ public:
       }
       }
     }
+    }
     ygglog_error("ScalarMetaschemaType::encode_data: Cannot encode data of type '%s'.", type());
     return false;
   }
@@ -804,7 +853,7 @@ public:
     @returns bool true if the data was successfully decoded, false otherwise.
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
-		   size_t *nargs, va_list_t &ap) override {
+		   size_t *nargs, va_list_t &ap) const override {
     if ((data.IsArray()) && (data.Size() == 1)) {
       data = data[0];
     }
@@ -824,7 +873,9 @@ public:
       return false;
     }
     // Transfer data to array memory
-    if ((strcmp(type(), "1darray") == 0) || (strcmp(type(), "ndarray") == 0)) {
+    switch (type_code()) {
+    case T_1DARRAY:
+    case T_NDARRAY: {
       char **temp = (char**)va_arg(ap.va, unsigned char**);
       (*nargs)--;
       size_t temp_siz = 0;
@@ -840,7 +891,9 @@ public:
 	*temp = NULL;
 	return false;
       }
-    } else {
+      break;
+    }
+    case T_SCALAR: {
       char *arg;
       char **p;
       if (allow_realloc) {
@@ -851,9 +904,10 @@ public:
 	p = &arg;
       }
       (*nargs)--;
-      //size_t 
       bool skip_terminal;
-      if ((strcmp(subtype(), "bytes") == 0) || (strcmp(subtype(), "unicode") == 0)) {
+      switch (subtype_code_) {
+      case T_BYTES:
+      case T_UNICODE: {
 	size_t * const arg_siz = va_arg(ap.va, size_t*);
 	(*nargs)--;
 	skip_terminal = false;
@@ -866,10 +920,9 @@ public:
 	  return false;
 	}
 	arg_siz[0] = (size_t)ret;
-	// if (_variable_precision) {
-	//   set_precision(8 * strlen(decoded_bytes));
-	// }
-      } else {
+	break;
+      }
+      default: {
 	size_t *arg_siz = &nbytes_expected;
 	if (allow_realloc) {
 	  arg_siz[0] = 0;
@@ -878,13 +931,13 @@ public:
 	if ((cast_precision_ != 0) && (cast_precision_ != precision_)) {
 	  try {
 	    decoded_len = cast_bytes(&decoded_bytes, decoded_len);
-	  			     
+	    
 	    if (!(allow_realloc)) {
 	      arg_siz[0] = decoded_len;
 	    }
 	  } catch(...) {
 	    ygglog_error("ScalarMetaschemaType::decode_data: Cannot cast subtype '%s' and precision %ld to precision %ld.",
-	  		 subtype_, precision_, cast_precision_);
+			 subtype_, precision_, cast_precision_);
 	    free(decoded_bytes);
 	    return false;
 	  }
@@ -899,6 +952,8 @@ public:
 	  return false;
 	}
       }
+      }
+    }
     }
     free(decoded_bytes);
     return true;
@@ -909,22 +964,30 @@ public:
     @param[out] x YggGeneric* Pointer to generic object where data should be stored.
     @returns bool true if the data was successfully decoded, false otherwise.
    */
-  bool decode_data(rapidjson::Value &data, YggGeneric* x) override {
-    if ((strcmp(subtype(), "bytes") == 0) || (strcmp(subtype(), "unicode") == 0)) {
-      size_t nargs = 2;
-      int allow_realloc = 1;
-      if (x == NULL) {
-	ygglog_throw_error("MetaschemaType::decode_data: Generic wrapper is not initialized.");
+  bool decode_data(rapidjson::Value &data, YggGeneric* x) const override {
+    switch (type_code()) {
+    case T_SCALAR: {
+      switch (subtype_code_) {
+      case T_BYTES:
+      case T_UNICODE: {
+	size_t nargs = 2;
+	int allow_realloc = 1;
+	if (x == NULL) {
+	  ygglog_throw_error("MetaschemaType::decode_data: Generic wrapper is not initialized.");
+	}
+	void **arg = x->get_data_pointer();
+	size_t *arg_siz = x->get_nbytes_pointer();
+	return MetaschemaType::decode_data(data, allow_realloc, &nargs, arg, arg_siz);
       }
-      void **arg = x->get_data_pointer();
-      size_t *arg_siz = x->get_nbytes_pointer();
-      return MetaschemaType::decode_data(data, allow_realloc, &nargs, arg, arg_siz);
-    } else {
+      }
+    }
+    default: {
       return MetaschemaType::decode_data(data, x);
+    }
     }
   }
   
-  size_t cast_bytes(unsigned char **bytes, const size_t nbytes) {
+  size_t cast_bytes(unsigned char **bytes, const size_t nbytes) const {
     bool raise_error = false;
     size_t from_precision = precision_;
     size_t to_precision = cast_precision_;
@@ -1002,6 +1065,10 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
 			  const size_t length, const char *units="") :
     ScalarMetaschemaType(subtype, precision, units), length_(length) {
     update_type("1darray");
+    if (length_ == 0)
+      _variable_length = true;
+    else
+      _variable_length = false;
   }
   /*!
     @brief Constructor for OneDArrayMetaschemaType from a JSON type defintion.
@@ -1016,18 +1083,37 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
       ygglog_throw_error("OneDArrayMetaschemaType: 1darray 'length' value must be an int.");
     length_ = type_doc["length"].GetInt();
     update_type("1darray");
+    if (length_ == 0)
+      _variable_length = true;
+    else
+      _variable_length = false;
+  }
+  /*!
+    @brief Equivalence operator.
+    @param[in] Ref MetaschemaType instance to compare against.
+    @returns bool true if the instance is equivalent, false otherwise.
+   */
+  bool operator==(const MetaschemaType &Ref) const override {
+    if (!(ScalarMetaschemaType::operator==(Ref)))
+      return false;
+    const OneDArrayMetaschemaType* pRef = dynamic_cast<const OneDArrayMetaschemaType*>(&Ref);
+    if (!pRef)
+      return false;
+    if (length_ != pRef->length())
+      return false;
+    return true;
   }
   /*!
     @brief Create a copy of the type.
     @returns pointer to new OneDArrayMetaschemaType instance with the same data.
    */
-  OneDArrayMetaschemaType* copy() override {
+  OneDArrayMetaschemaType* copy() const override {
     return (new OneDArrayMetaschemaType(subtype(), precision(), length_, units()));
   }
   /*!
     @brief Print information about the type to stdout.
   */
-  void display() override {
+  void display() const override {
     ScalarMetaschemaType::display();
     printf("%-15s = %lu\n", "length", length_);
   }
@@ -1035,7 +1121,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @brief Get the number of elements in the type.
     @returns size_t Number of elements.
    */
-  const size_t nelements() override {
+  const size_t nelements() const override {
     return length_;
   }
   /*!
@@ -1045,21 +1131,69 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
   void update(MetaschemaType* new_info) override {
     ScalarMetaschemaType::update(new_info);
     OneDArrayMetaschemaType* new_info_oned = (OneDArrayMetaschemaType*)new_info;
-    set_length(new_info_oned->get_length());
+    set_length(new_info_oned->length());
+  }
+  /*!
+    @brief Update the type object with info from provided variable arguments for serialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+   */
+  void update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
+    ScalarMetaschemaType::update_from_serialization_args(nargs, ap);
+    if (*nargs == 2) {
+      va_list ap_copy;
+      va_copy(ap_copy, ap.va);
+      unsigned char* temp = va_arg(ap_copy, unsigned char*);
+      UNUSED(temp); // Parameter extract to get next
+      size_t new_length = va_arg(ap_copy, size_t);
+      (*nargs)--;
+      set_length(new_length);
+    }
+    return;
+  }
+  /*!
+    @brief Update the type object with info from provided variable arguments for deserialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+   */
+  void update_from_deserialization_args(size_t *nargs, va_list_t &ap) override {
+    MetaschemaType::update_from_deserialization_args(nargs, ap);
+    if (*nargs == 2) {
+      va_list ap_copy;
+      va_copy(ap_copy, ap.va);
+      unsigned char** temp = va_arg(ap_copy, unsigned char**);
+      UNUSED(temp); // Parameter extract to get next
+      size_t * const new_length = va_arg(ap_copy, size_t*);
+      (*nargs)--;
+      new_length[0] = length_;
+    }
+    return;
   }
   /*!
     @brief Update the instance's length.
     @param[in] new_length size_t New length.
    */
-  void set_length(size_t new_length) override {
-    size_t* length_modifier = const_cast<size_t*>(&length_);
-    *length_modifier = new_length;
+  void set_length(size_t new_length, bool force=false) override {
+    if (length_ != new_length) {
+      if (!(force)) {
+	if (length_ == 0) {
+	  // Pass
+	} else if (_variable_length) {
+	  // Pass
+	} else {
+	  ygglog_throw_error("OneDArrayMetaschemaType::set_length: Cannot update precision from %ld to %ld for %s of subtype %s.",
+			     length_, new_length, type(), subtype());
+	}
+      }
+      size_t* length_modifier = const_cast<size_t*>(&length_);
+      *length_modifier = new_length;
+    }
   }
   /*!
     @brief Get type length.
     @returns size_t Number of elements in the array.
   */
-  size_t get_length() override {
+  size_t length() const override {
     size_t out = length_;
     return out;
   }
@@ -1068,14 +1202,16 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @returns bool true if the encoding was successful, false otherwise.
    */
-  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) override {
+  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override {
     if (!(ScalarMetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key("length");
     writer->Int(length_);
     return true;
   }
+  
 private:
   size_t length_;
+  bool _variable_length;
 };
 
 
@@ -1098,6 +1234,11 @@ public:
 			const std::vector<size_t> shape, const char *units="") :
     ScalarMetaschemaType(subtype, precision, units), shape_(shape) {
     update_type("ndarray");
+    if (shape_.size() == 0) {
+      _variable_shape = true;
+    } else {
+      _variable_shape = false;
+    }
   }
   /*!
     @brief Constructor for NDArrayMetaschemaType from a JSON type defintion.
@@ -1120,16 +1261,31 @@ public:
     update_type("ndarray");
   }
   /*!
+    @brief Equivalence operator.
+    @param[in] Ref MetaschemaType instance to compare against.
+    @returns bool true if the instance is equivalent, false otherwise.
+   */
+  bool operator==(const MetaschemaType &Ref) const override {
+    if (!(ScalarMetaschemaType::operator==(Ref)))
+      return false;
+    const NDArrayMetaschemaType* pRef = dynamic_cast<const NDArrayMetaschemaType*>(&Ref);
+    if (!pRef)
+      return false;
+    if (shape_ != pRef->shape())
+      return false;
+    return true;
+  }
+  /*!
     @brief Create a copy of the type.
     @returns pointer to new NDArrayMetaschemaType instance with the same data.
    */
-  NDArrayMetaschemaType* copy() override {
+  NDArrayMetaschemaType* copy() const override {
     return (new NDArrayMetaschemaType(subtype(), precision(), shape(), units()));
   }
   /*!
     @brief Print information about the type to stdout.
   */
-  void display() override {
+  void display() const override {
     ScalarMetaschemaType::display();
     printf("%-15s = [ ", "shape");
     if (ndim() > 0) {
@@ -1145,17 +1301,17 @@ public:
     @brief Get the number of dimensions in the array.
     @returns size_t Number of dimensions in type.
    */
-  const size_t ndim() { return shape_.size(); }
+  const size_t ndim() const { return shape_.size(); }
   /*!
     @brief Get the shape of the array type.
     @returns std::vector<size_t> Shape of type in each dimension.
    */
-  std::vector<size_t> shape() { return shape_; }
+  std::vector<size_t> shape() const { return shape_; }
   /*!
     @brief Get the number of elements in the type.
     @returns size_t Number of elements.
    */
-  const size_t nelements() override {
+  const size_t nelements() const override {
     size_t nelements = 0;
     if (ndim() > 0) {
       size_t i;
@@ -1172,13 +1328,83 @@ public:
   void update(MetaschemaType* new_info) override {
     ScalarMetaschemaType::update(new_info);
     NDArrayMetaschemaType* new_info_nd = (NDArrayMetaschemaType*)new_info;
-    if (ndim() != new_info_nd->ndim()) {
-      ygglog_throw_error("NDArrayMetaschemaType::update: Cannot update ND array with %ld dimensions to %ld dimensions.",
-			 ndim(), new_info_nd->ndim());
+    set_shape(new_info_nd->shape());
+  }
+  /*!
+    @brief Update the type object with info from provided variable arguments for serialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+   */
+  void update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
+    MetaschemaType::update_from_serialization_args(nargs, ap);
+    if (*nargs == 3) {
+      va_list ap_copy;
+      va_copy(ap_copy, ap.va);
+      size_t new_ndim = va_arg(ap_copy, size_t);
+      (*nargs)--;
+      size_t* new_shape_ptr = va_arg(ap_copy, size_t*);
+      (*nargs)--;
+      std::vector<size_t> new_shape(new_shape_ptr, new_shape_ptr + new_ndim);
+      set_shape(new_shape);
     }
+    return;
+  }
+  /*!
+    @brief Update the type object with info from provided variable arguments for deserialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+   */
+  void update_from_deserialization_args(size_t *nargs, va_list_t &ap) override {
+    MetaschemaType::update_from_deserialization_args(nargs, ap);
+    if (*nargs == 3) {
+      va_list ap_copy;
+      va_copy(ap_copy, ap.va);
+      size_t * const new_ndim = va_arg(ap_copy, size_t*);
+      (*nargs)--;
+      size_t** new_shape = va_arg(ap_copy, size_t**);
+      (*nargs)--;
+      new_ndim[0] = ndim();
+      size_t* new_shape_temp = (size_t*)realloc(new_shape[0], ndim()*sizeof(size_t));
+      if (new_shape_temp == NULL) {
+	ygglog_throw_error("NDArrayMetaschemaType::decode_data: Failed to realloc memory for the provided shape array.");
+      }
+      new_shape[0] = new_shape_temp;
+      size_t i;
+      for (i = 0; i < ndim(); i++) {
+	(*new_shape)[i] = shape_[i];
+      }
+    }
+    return;
+  }
+  /*!
+    @brief Update the instance's shape.
+    @param[in] new_shape std::vector<size_t> Vector of new array sizes in each dimension.
+   */
+  void set_shape(std::vector<size_t> new_shape, bool force=false) {
+    bool match = (ndim() == new_shape.size());
     size_t i;
-    for (i = 0; i < ndim(); i++) {
-      shape_[i] = new_info_nd->shape()[i];
+    if (match) {
+      for (i = 0; i < ndim(); i++) {
+	if (shape_[i] != new_shape[i]) {
+	  match = false;
+	  break;
+	}
+      }
+    }
+    if (!(match)) {
+      if (!(force)) {
+	if (ndim() == 0) {
+	  // Pass
+	} else if (_variable_shape) {
+	  // Pase
+	} else {
+	  ygglog_throw_error("NDArrayMetaschemaType::set_shape: Cannot update shape.");
+	}
+      }
+      shape_.resize(new_shape.size());
+      for (i = 0; i < new_shape.size(); i++) {
+	shape_[i] = new_shape[i];
+      }
     }
   }
   /*!
@@ -1186,7 +1412,7 @@ public:
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @returns bool true if the encoding was successful, false otherwise.
    */
-  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) override {
+  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override {
     if (!(ScalarMetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key("shape");
     writer->StartArray();
@@ -1197,8 +1423,10 @@ public:
     writer->EndArray();
     return true;
   }
+  
 private:
   std::vector<size_t> shape_;
+  bool _variable_shape;
 
 };
 

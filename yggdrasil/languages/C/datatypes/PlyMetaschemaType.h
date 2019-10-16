@@ -31,13 +31,13 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new PlyMetaschemaType instance with the same data.
    */
-  PlyMetaschemaType* copy() override { return (new PlyMetaschemaType()); }
+  PlyMetaschemaType* copy() const override { return (new PlyMetaschemaType()); }
   /*!
     @brief Display data.
     @param[in] x YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* x, const char* indent="") override {
+  void display_generic(YggGeneric* x, const char* indent="") const override {
     ply_t arg;
     x->get_data(arg);
     display_ply_indent(arg, indent);
@@ -46,7 +46,7 @@ public:
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
-  virtual size_t nargs_exp() override {
+  size_t nargs_exp() const override {
     return 1;
   }
 
@@ -61,7 +61,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   size_t *nargs, va_list_t &ap) override {
+		   size_t *nargs, va_list_t &ap) const override {
     // Get argument
     ply_t p = va_arg(ap.va, ply_t);
     (*nargs)--;
@@ -225,7 +225,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   YggGeneric* x) override {
+		   YggGeneric* x) const override {
     size_t nargs = 1;
     ply_t arg;
     x->get_data(arg);
@@ -246,7 +246,7 @@ public:
     @returns bool true if the data was successfully decoded, false otherwise.
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
-		   size_t *nargs, va_list_t &ap) override {
+		   size_t *nargs, va_list_t &ap) const override {
     if (!(data.IsString()))
       ygglog_throw_error("PlyMetaschemaType::decode_data: Data is not a string.");
     // Get input data

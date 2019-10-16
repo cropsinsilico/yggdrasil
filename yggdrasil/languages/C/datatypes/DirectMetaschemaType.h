@@ -39,12 +39,12 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new DirectMetaschemaType instance with the same data.
    */
-  DirectMetaschemaType* copy() override { return (new DirectMetaschemaType()); }
+  DirectMetaschemaType* copy() const override { return (new DirectMetaschemaType()); }
   /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
-  size_t nargs_exp() override {
+  size_t nargs_exp() const override {
     return 2;
   }
   
@@ -59,7 +59,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   size_t *nargs, va_list_t &ap) override {
+		   size_t *nargs, va_list_t &ap) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     writer;
@@ -76,7 +76,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   YggGeneric* x) override {
+		   YggGeneric* x) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     writer;
@@ -155,7 +155,7 @@ public:
     @returns bool true if the data was successfully decoded, false otherwise.
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
-		   size_t *nargs, va_list_t &ap) override {
+		   size_t *nargs, va_list_t &ap) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     data;
@@ -172,7 +172,7 @@ public:
     @param[out] x YggGeneric* Pointer to generic object where data should be stored.
     @returns bool true if the data was successfully decoded, false otherwise.
    */
-  bool decode_data(rapidjson::Value &data, YggGeneric* x) override {
+  bool decode_data(rapidjson::Value &data, YggGeneric* x) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     data;

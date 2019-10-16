@@ -70,16 +70,24 @@ class TestExampleTypes(ExampleTstBase):
             outputs_in_inputs=drv.outputs_in_inputs)
         function_contents.append(
             drv.format_function_param('print', message='IN MODEL'))
-        if 'print_any' in drv.function_param:
-            function_contents += [
-                drv.format_function_param('print_any',
-                                          object=x['name'])
-                for x in inputs]
-        elif ('print_%s' % testtype['type']) in drv.function_param:
-            function_contents += [
-                drv.format_function_param('print_%s' % testtype['type'],
-                                          object=x['name'])
-                for x in inputs]
+        print_key = None
+        if ('print_%s' % testtype['type']) in drv.function_param:
+            print_key = ('print_%s' % testtype['type'])
+        elif 'print_any' in drv.function_param:
+            print_key = 'print_any'
+        if print_key is not None:
+            for x in inputs:
+                function_contents += [
+                    drv.format_function_param('print', message=(
+                        'INPUT[%s]:' % x['name'])),
+                    drv.format_function_param(print_key,
+                                              object=x['name'])]
+            for x in outputs:
+                function_contents += [
+                    drv.format_function_param('print', message=(
+                        'OUTPUT[%s]:' % x['name'])),
+                    drv.format_function_param(print_key,
+                                              object=x['name'])]
         lines = drv.write_function_def(
             'model', function_contents=function_contents,
             inputs=inputs, outputs=outputs, outputs_in_inputs=drv.outputs_in_inputs)

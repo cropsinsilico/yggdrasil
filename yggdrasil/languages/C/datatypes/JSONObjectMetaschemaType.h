@@ -28,16 +28,33 @@ public:
   JSONObjectMetaschemaType(std::map<const char*, MetaschemaType*, strcomp> properties) :
     MetaschemaType("object"), properties_(properties) {}
   /*!
+    @brief Equivalence operator.
+    @param[in] Ref MetaschemaType instance to compare against.
+    @returns bool true if the instance is equivalent, false otherwise.
+   */
+  bool operator==(const MetaschemaType &Ref) const override {
+    if (!(MetaschemaType::operator==(Ref)))
+      return false;
+    const JSONObjectMetaschemaType* pRef = dynamic_cast<const JSONObjectMetaschemaType*>(&Ref);
+    if (!pRef)
+      return false;
+    if (nitems() != pRef->nitems())
+      return false;
+    if (properties_ != pRef->properties())
+      return false;
+    return true;
+  }
+  /*!
     @brief Create a copy of the type.
     @returns pointer to new JSONObjectMetaschemaType instance with the same data.
    */
-  JSONObjectMetaschemaType* copy() override { return (new JSONObjectMetaschemaType(properties_)); }
+  JSONObjectMetaschemaType* copy() const override { return (new JSONObjectMetaschemaType(properties_)); }
   /*!
     @brief Print information about the type to stdout.
   */
-  void display() override {
+  void display() const override {
     MetaschemaType::display();
-    std::map<const char*, MetaschemaType*, strcomp>::iterator it;
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
       printf("Element %s:\n", it->first);
       it->second->display();
@@ -48,7 +65,7 @@ public:
     @param[in] x YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* x, const char* indent) override {
+  void display_generic(YggGeneric* x, const char* indent) const override {
     YggGenericMap arg;
     YggGenericMap::iterator it;
     char new_indent[100] = "";
@@ -65,13 +82,13 @@ public:
     @brief Get number of items in type.
     @returns size_t Number of items in type.
    */
-  size_t nitems() { return properties_.size(); }
+  size_t nitems() const { return properties_.size(); }
   /*!
     @brief Get types for properties.
     @returns std::map<const char*, MetaschemaType*, strcomp> Map from property
     names to types.
    */
-  std::map<const char*, MetaschemaType*, strcomp> properties() { return properties_; }
+  std::map<const char*, MetaschemaType*, strcomp> properties() const { return properties_; }
   /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
@@ -92,16 +109,16 @@ public:
     @brief Get the item size.
     @returns size_t Size of item in bytes.
    */
-  const size_t nbytes() override {
+  const size_t nbytes() const override {
     return sizeof(YggGenericMap);
   }
   /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
-  size_t nargs_exp() override {
+  size_t nargs_exp() const override {
     size_t nargs = 0;
-    std::map<const char*, MetaschemaType*, strcomp>::iterator it;
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
       nargs = nargs + it->second->nargs_exp();
     }
@@ -114,11 +131,11 @@ public:
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @returns bool true if the encoding was successful, false otherwise.
    */
-  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) override {
+  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override {
     if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key("properties");
     writer->StartObject();
-    std::map<const char*, MetaschemaType*, strcomp>::iterator it = properties_.begin();
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it = properties_.begin();
     for (it = properties_.begin(); it != properties_.end(); it++) {
       writer->Key(it->first);
       if (!(it->second->encode_type(writer)))
@@ -137,9 +154,9 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   size_t *nargs, va_list_t &ap) override {
+		   size_t *nargs, va_list_t &ap) const override {
     writer->StartObject();
-    std::map<const char*, MetaschemaType*, strcomp>::iterator it;
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
     size_t i = 0;
     for (it = properties_.begin(); it != properties_.end(); it++, i++) {
       writer->Key(it->first);
@@ -156,11 +173,11 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   YggGeneric* x) override {
+		   YggGeneric* x) const override {
     YggGenericMap arg;
     x->get_data(arg);
     writer->StartObject();
-    std::map<const char*, MetaschemaType*, strcomp>::iterator it;
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
     size_t i = 0;
     for (it = properties_.begin(); it != properties_.end(); it++, i++) {
       YggGenericMap::iterator iarg = arg.find(it->first);
@@ -192,12 +209,12 @@ public:
     @returns bool true if the data was successfully decoded, false otherwise.
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
-		   size_t *nargs, va_list_t &ap) override {
+		   size_t *nargs, va_list_t &ap) const override {
     if (!(data.IsObject())) {
       ygglog_error("JSONObjectMetaschemaType::decode_data: Raw data is not an object.");
       return false;
     }
-    std::map<const char*, MetaschemaType*, strcomp>::iterator it;
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
     size_t i = 0;
     for (it = properties_.begin(); it != properties_.end(); it++, i++) {
       if (!(data.HasMember(it->first))) {
@@ -216,7 +233,7 @@ public:
     @param[out] x YggGeneric* Pointer to generic object where data should be stored.
     @returns bool true if the data was successfully decoded, false otherwise.
    */
-  bool decode_data(rapidjson::Value &data, YggGeneric* x) override {
+  bool decode_data(rapidjson::Value &data, YggGeneric* x) const override {
     if (!(data.IsObject())) {
       ygglog_error("JSONObjectMetaschemaType::decode_data: Raw data is not an object.");
       return false;
@@ -225,7 +242,7 @@ public:
       ygglog_error("JSONObjectMetaschemaType::decode_data: Generic object is NULL.");
       return false;
     }
-    std::map<const char*, MetaschemaType*, strcomp>::iterator it;
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
     YggGenericMap** arg = (YggGenericMap**)(x->get_data_pointer());
     if (arg == NULL) {
       ygglog_error("JSONObjectMetaschemaType::decode_data: Data pointer is NULL.");

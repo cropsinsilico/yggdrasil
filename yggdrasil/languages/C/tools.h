@@ -75,6 +75,7 @@ static int _ygg_error_flag = 0;
 #define _GET_NTH_ARG(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, N, ...) N
 #define COUNT_VARARGS(...) _GET_NTH_ARG("ignored", ##__VA_ARGS__, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #endif
+#define UNUSED(arg) ((void)&(arg))
 
 /*!
   @brief Get an unsigned long seed from the least significant 32bits of a pointer.

@@ -32,14 +32,36 @@ public:
     strncpy(format_str_, format_str, 1000);
   }
   /*!
+    @brief Equivalence operator.
+    @param[in] Ref MetaschemaType instance to compare against.
+    @returns bool true if the instance is equivalent, false otherwise.
+   */
+  bool operator==(const MetaschemaType &Ref) const override {
+    if (!(MetaschemaType::operator==(Ref)))
+      return false;
+    const JSONArrayMetaschemaType* pRef = dynamic_cast<const JSONArrayMetaschemaType*>(&Ref);
+    if (!pRef)
+      return false;
+    if (nitems() != pRef->nitems())
+      return false;
+    if (items_ != pRef->items())
+      return false;
+    // size_t i;
+    // for (i = 0; i < nitems(); i++) {
+    //   if (items_[i] != pRef->items()[i])
+    // 	return false;
+    // }
+    return true;
+  }
+  /*!
     @brief Create a copy of the type.
     @returns pointer to new JSONArrayMetaschemaType instance with the same data.
    */
-  JSONArrayMetaschemaType* copy() override { return (new JSONArrayMetaschemaType(items_, format_str_)); }
+  JSONArrayMetaschemaType* copy() const override { return (new JSONArrayMetaschemaType(items_, format_str_)); }
   /*!
     @brief Print information about the type to stdout.
   */
-  void display() override {
+  void display() const override {
     MetaschemaType::display();
     if (strlen(format_str_) > 0) {
       printf("format_str = %s\n", format_str_);
@@ -56,9 +78,9 @@ public:
     @param[in] x YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* x, const char* indent) override {
+  void display_generic(YggGeneric* x, const char* indent) const override {
     YggGenericVector arg;
-    YggGenericVector::iterator it;
+    YggGenericVector::const_iterator it;
     char new_indent[100] = "";
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
@@ -72,17 +94,17 @@ public:
     @brief Get number of items in type.
     @returns size_t Number of items in type.
    */
-  size_t nitems() { return items_.size(); }
+  size_t nitems() const { return items_.size(); }
   /*!
     @brief Get types for items.
     @returns std::vector<MetaschemaType*> Array item types.
    */
-  std::vector<MetaschemaType*> items() { return items_; }
+  std::vector<MetaschemaType*> items() const { return items_; }
   /*!
     @brief Determine if the items are all arrays.
     @returns bool true if all items are arrays, false otherwise.
    */
-  bool all_arrays() {
+  bool all_arrays() const {
     bool out = true;
     size_t i;
     for (i = 0; i < items_.size(); i++) {
@@ -113,14 +135,14 @@ public:
     @brief Get the item size.
     @returns size_t Size of item in bytes.
    */
-  const size_t nbytes() override {
+  const size_t nbytes() const override {
     return sizeof(YggGenericVector);
   }
   /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
-  size_t nargs_exp() override {
+  size_t nargs_exp() const override {
     size_t nargs = 0;
     if (all_arrays())
       nargs++; // For the number of rows
@@ -137,7 +159,7 @@ public:
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @returns bool true if the encoding was successful, false otherwise.
    */
-  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) override {
+  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override {
     if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
     if (strlen(format_str_) > 0) {
       writer->Key("format_str");
@@ -163,7 +185,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   size_t *nargs, va_list_t &ap) override {
+		   size_t *nargs, va_list_t &ap) const override {
     size_t i;
     if (all_arrays()) {
       size_t nrows = va_arg(ap.va, size_t);
@@ -187,7 +209,7 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   YggGeneric* x) override {
+		   YggGeneric* x) const override {
     size_t i;
     YggGenericVector arg;
     x->get_data(arg);
@@ -198,7 +220,10 @@ public:
     if (all_arrays()) {
       size_t nrows = arg[0]->get_nelements();
       for (i = 0; i < items_.size(); i++) {
-	items_[i]->set_length(nrows);
+	if (items_[i]->length() != nrows) {
+	  ygglog_throw_error("JSONArrayMetaschemaType::encode_data: Element %lu has length %lu but all elements are expected to have length %lu.",
+			     i, items_[i]->length(), nrows);
+	}
       }
     }
     writer->StartArray();
@@ -224,15 +249,15 @@ public:
     @returns bool true if the data was successfully decoded, false otherwise.
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
-		   size_t *nargs, va_list_t &ap) override {
+		   size_t *nargs, va_list_t &ap) const override {
     size_t i;
     if (all_arrays()) {
       size_t *nrows = va_arg(ap.va, size_t*);
       size_t inrows;
       (*nargs)--;
-      *nrows = items_[0]->get_length();
+      *nrows = items_[0]->length();
       for (i = 1; i < items_.size(); i++) {
-	inrows = items_[i]->get_length();
+	inrows = items_[i]->length();
 	if (*nrows != inrows) {
 	  ygglog_error("JSONArrayMetaschemaType::decode_data: Number of rows not consistent across all items.");
 	  return false;
@@ -260,13 +285,13 @@ public:
     @param[out] x YggGeneric* Pointer to generic object where data should be stored.
     @returns bool true if the data was successfully decoded, false otherwise.
    */
-  bool decode_data(rapidjson::Value &data, YggGeneric* x) override {
+  bool decode_data(rapidjson::Value &data, YggGeneric* x) const override {
     size_t i;
     if (all_arrays()) {
       size_t inrows;
-      size_t nrows = items_[0]->get_length();
+      size_t nrows = items_[0]->length();
       for (i = 1; i < items_.size(); i++) {
-	inrows = items_[i]->get_length();
+	inrows = items_[i]->length();
 	if (nrows != inrows) {
 	  ygglog_error("JSONArrayMetaschemaType::decode_data: Number of rows not consistent across all items.");
 	  return false;
