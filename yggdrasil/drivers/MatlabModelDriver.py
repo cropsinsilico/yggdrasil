@@ -490,10 +490,24 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'assign': '{name} = {value};',
         'functions_defined_last': True,
         'function_def_begin': 'function {output_var} = {function_name}({input_var})',
-        'function_def_regex': (r'function *(\[ *)?(?P<outputs>.*?)(?(1)\]) *'
-                               r'= {function_name} *\((?P<inputs>(?:.|\n)*?)\)'),
-        'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:(?:,(?: *... *\n)?)|$)',
-        'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
+        'function_def_regex': (
+            r'function *(\[ *)?(?P<outputs>.*?)(?(1)\]) *'
+            r'= {function_name} *\((?P<inputs>(?:.|\n)*?)\)\n'
+            r'(?:(?P<body>'
+            r'(?:\s*if(?:.*?\n?)*?end;?)|'
+            r'(?:\s*for(?:.*?\n?)*?end;?)|'
+            r'(?:\s*parfor(?:.*?\n?)*?end;?)|'
+            r'(?:\s*switch(?:.*?\n?)*?end;?)|'
+            r'(?:\s*try(?:.*?\n?)*?end;?)|'
+            r'(?:\s*while(?:.*?\n?)*?end;?)|'
+            r'(?:\s*arguments(?:.*?\n?)*?end;?)|'
+            r'(?:(?:.*?\n?)*?)'
+            r')'
+            r'(?:\s*end;?))?'),
+        'inputs_def_regex': (
+            r'\s*(?P<name>.+?)\s*(?:(?:,(?: *... *\n)?)|$)'),
+        'outputs_def_regex': (
+            r'\s*(?P<name>.+?)\s*(?:,|$)')}
 
     def __init__(self, name, args, **kwargs):
         self.using_matlab_engine = _matlab_engine_installed

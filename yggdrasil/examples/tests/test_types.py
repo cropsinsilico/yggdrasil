@@ -65,11 +65,12 @@ class TestExampleTypes(ExampleTstBase):
         inputs = [{'name': 'x', 'datatype': testtype}]
         outputs = [{'name': 'y', 'datatype': testtype}]
         # Write the model
-        function_contents = drv.write_assign_to_output(
-            outputs[0], inputs[0],
-            outputs_in_inputs=drv.outputs_in_inputs)
+        function_contents = []
         function_contents.append(
             drv.format_function_param('print', message='IN MODEL'))
+        for i, o in zip(inputs, outputs):
+            function_contents += drv.write_assign_to_output(
+                o, i, outputs_in_inputs=drv.outputs_in_inputs)
         print_key = None
         if ('print_%s' % testtype['type']) in drv.function_param:
             print_key = ('print_%s' % testtype['type'])
@@ -92,6 +93,8 @@ class TestExampleTypes(ExampleTstBase):
             'model', function_contents=function_contents,
             inputs=inputs, outputs=outputs, outputs_in_inputs=drv.outputs_in_inputs)
         with open(modelfile, 'w') as fd:
+            print(modelfile)
+            print('\n'.join(lines))
             fd.write('\n'.join(lines))
         os.environ['TEST_LANGUAGE'] = language
         os.environ['TEST_LANGUAGE_EXT'] = language_ext
@@ -102,6 +105,9 @@ class TestExampleTypes(ExampleTstBase):
             if typename in ['string', 'bytes', 'unicode', '1darray']:
                 in_vars += ', x_length'
                 out_vars += ', y_length'
+            elif typename in ['ndarray']:
+                in_vars += ', x_ndim, x_shape'
+                out_vars += ', y_ndim, y_shape'
             os.environ['TEST_MODEL_IO'] = (
                 'inputs:\n'
                 '      name: input\n'

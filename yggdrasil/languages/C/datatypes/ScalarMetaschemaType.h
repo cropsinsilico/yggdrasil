@@ -539,8 +539,8 @@ public:
     size_t bytes_precision = nbytes();
     unsigned char* arg = (unsigned char*)malloc(bytes_precision + 1);
     if (arg == NULL) {
-      ygglog_error("ScalarMetaschemaType::encode_data: Failed to malloc for %lu bytes.",
-		   bytes_precision + 1);
+      ygglog_error("ScalarMetaschemaType::encode_data: Failed to malloc for %lu bytes (%lu elements w/ precison of %lu bits).",
+		   bytes_precision + 1, nelements(), precision());
       return false;
     }
     switch (type_code()) {
@@ -1253,7 +1253,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
        va_list ap_copy;
       va_copy(ap_copy, ap.va);
       unsigned char** temp = va_arg(ap_copy, unsigned char**);
-      UNUSED(temp); // Parameter extract to get next
+      UNUSED(temp); // Parameter extracted to get next
       size_t * const new_length = va_arg(ap_copy, size_t*);
       (*nargs)--;
       new_length[0] = length_;
@@ -1383,6 +1383,8 @@ void NDArrayMetaschemaType::update_from_serialization_args(size_t *nargs, va_lis
   if (*nargs == 3) {
     va_list ap_copy;
     va_copy(ap_copy, ap.va);
+    unsigned char* temp = va_arg(ap_copy, unsigned char*);
+    UNUSED(temp); // Parameter extracted to get next
     size_t new_ndim = va_arg(ap_copy, size_t);
     (*nargs)--;
     size_t* new_shape_ptr = va_arg(ap_copy, size_t*);
@@ -1397,6 +1399,8 @@ void NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va_l
   if (*nargs == 3) {
     va_list ap_copy;
     va_copy(ap_copy, ap.va);
+    unsigned char** temp = va_arg(ap_copy, unsigned char**);
+    UNUSED(temp); // Parameter extracted to get next
     size_t * const new_ndim = va_arg(ap_copy, size_t*);
     (*nargs)--;
     size_t** new_shape = va_arg(ap_copy, size_t**);

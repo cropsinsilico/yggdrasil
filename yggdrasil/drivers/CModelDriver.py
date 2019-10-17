@@ -368,12 +368,14 @@ class CModelDriver(CompiledModelDriver):
             r'(?P<body>(?:.*?\n?)*?)'
             r'(?:return *(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
             r'|(?:\}})'),
-        'inputs_def_regex': (r'\s*(?P<native_type>(?:[^\s\*])+(\s+)?'
-                             r'(?P<ptr>\*+)?)(?(ptr)(?(1)(?:\s*)|(?:\s+)))'
-                             r'(?P<name>.+?)\s*(?:,|$)(?:\n)?'),
-        'outputs_def_regex': (r'\s*(?P<native_type>(?:[^\s\*])+(\s+)?'
-                              r'(?P<ptr>\*+)?)(?(ptr)(?(1)(?:\s*)|(?:\s+)))'
-                              r'(?P<name>.+?)\s*(?:,|$)(?:\n)?')}
+        'inputs_def_regex': (
+            r'\s*(?P<native_type>(?:[^\s\*])+(\s+)?'
+            r'(?P<ptr>\*+)?)(?(ptr)(?(1)(?:\s*)|(?:\s+)))'
+            r'(?P<name>.+?)(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?'),
+        'outputs_def_regex': (
+            r'\s*(?P<native_type>(?:[^\s\*])+(\s+)?'
+            r'(?P<ptr>\*+)?)(?(ptr)(?(1)(?:\s*)|(?:\s+)))'
+            r'(?P<name>.+?)(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?')}
     outputs_in_inputs = True
     include_channel_obj = True
     is_typed = True
@@ -720,6 +722,7 @@ class CModelDriver(CompiledModelDriver):
              and (var.get('datatype', {}).get(
                  'type', var.get('type', None)) == 'ndarray')
              and (not var.get('is_length_var', False)))):
+            # and ('shape' not in var.get('datatype', {})))):
             return True
         return False
               
@@ -1213,7 +1216,7 @@ class CModelDriver(CompiledModelDriver):
                 keys['shape'] = '[%s]' % ', '.join(datatype['shape'])
             else:
                 keys['ndim'] = 0
-                keys['shape'] = '[]'
+                keys['shape'] = 'NULL'
             keys['units'] = datatype.get('units', '')
         else:
             fmt = 'create_dtype_scalar(\"{subtype}\", {precision}, \"{units}\")'
@@ -1290,13 +1293,21 @@ class CModelDriver(CompiledModelDriver):
         """
         out = []
         if cls.requires_length_var(dst_var):
+            src_var_length = None
+            dst_var_length = None
+            if isinstance(src_var, dict):
+                src_var_length = src_var.get('length_var', None)
+            if isinstance(dst_var, dict):
+                dst_var_length = dst_var.get('length_var', None)
             if not dont_add_lengths:
-                dst_var_length = dst_var['name'] + '_length'
-                src_var_length = src_var['name'] + '_length'
+                if src_var_length is None:
+                    src_var_length = src_var['name'] + '_length'
+                if dst_var_length is None:
+                    dst_var_length = dst_var['name'] + '_length'
                 out += cls.write_assign_to_output(
                     dst_var_length, src_var_length,
                     outputs_in_inputs=outputs_in_inputs)
-            else:
+            elif src_var_length is None:
                 if ((dst_var['datatype']['type']
                      in ['1darray', 'ndarray'])):  # pragma: debug
                     raise RuntimeError("Length must be set in order "
@@ -1318,16 +1329,29 @@ class CModelDriver(CompiledModelDriver):
             if dont_add_lengths:  # pragma: debug
                 raise RuntimeError("Shape must be set in order "
                                    "to write ND array assignments.")
-            dst_var_ndim = dst_var['name'] + '_ndim'
-            src_var_ndim = src_var['name'] + '_ndim'
+            dst_var_ndim = {'name': dst_var['name'] + '_ndim',
+                            'datatype': {'type': 'uint',
+                                         'precision': 64}}
+            src_var_ndim = {'name': src_var['name'] + '_ndim',
+                            'datatype': {'type': 'uint',
+                                         'precision': 64}}
             out += cls.write_assign_to_output(
                 dst_var_ndim, src_var_ndim,
                 outputs_in_inputs=outputs_in_inputs)
-            dst_var_shape = dst_var['name'] + '_shape'
-            src_var_shape = src_var['name'] + '_shape'
+            dst_var_shape = {'name': dst_var['name'] + '_shape',
+                             'datatype': {'type': '1darray',
+                                          'subtype': 'uint',
+                                          'precision': 64},
+                             'length_var': dst_var_ndim['name']}
+            src_var_shape = {'name': src_var['name'] + '_shape',
+                             'datatype': {'type': '1darray',
+                                          'subtype': 'uint',
+                                          'precision': 64},
+                             'length_var': src_var_ndim['name']}
             out += cls.write_assign_to_output(
                 dst_var_shape, src_var_shape,
-                outputs_in_inputs=outputs_in_inputs)
+                outputs_in_inputs=outputs_in_inputs,
+                dont_add_lengths=True)
             src_var_dtype = cls.get_native_type(**src_var).rsplit('*', 1)[0]
             src_var_length = src_var['name'] + '_length'
             out += (('{length} = 1;\n'
@@ -1335,8 +1359,8 @@ class CModelDriver(CompiledModelDriver):
                      'for (cdim = 0; cdim < {ndim}; cdim++) {{\n'
                      '  {length} = {length}*{shape}[cdim];\n'
                      '}}\n').format(length=src_var_length,
-                                    ndim=src_var_ndim,
-                                    shape=src_var_shape)).splitlines()
+                                    ndim=src_var_ndim['name'],
+                                    shape=src_var_shape['name'])).splitlines()
             out += cls.write_assign_to_output(
                 dst_var['name'], 'value',
                 outputs_in_inputs=outputs_in_inputs,

@@ -80,15 +80,17 @@ class CPPModelDriver(CModelDriver):
         try_begin='try {',
         try_error_type='const std::exception&',
         try_except='}} catch ({error_type} {error_var}) {{',
-        function_def_regex=(r'(?P<flag_type>.+?)\s*{function_name}\s*'
-                            r'\((?P<inputs>(?:[^)&])*?)'
-                            r'(?:,\s*(?P<outputs>(?:[^)])*?&(?:[^)])*?))?\)\s*\{{'
-                            r'(?:.*?\n?)*?'
-                            r'(?:return +(?P<flag_var>.+?)?;'
-                            r'(?:.*?\n?)*?)?\}}'),
-        outputs_def_regex=(r'\s*(?P<native_type>.+?)(\s+)?'
-                           r'(?P<ref>&)(?(1)(?:\s*)|(?:\s+))'
-                           r'(?P<name>.+?)\s*(?:,|$)(?:\n)?'))
+        function_def_regex=(
+            r'(?P<flag_type>.+?)\s*{function_name}\s*'
+            r'\((?P<inputs>(?:[^)&])*?)'
+            r'(?:,\s*(?P<outputs>(?:[^)])*?&(?:[^)])*?))?\)\s*\{{'
+            r'(?P<body>(?:.*?\n?)*?)'
+            r'(?:return +(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
+            r'|(?:\}})'),
+        outputs_def_regex=(
+            r'\s*(?P<native_type>.+?)(\s+)?'
+            r'(?P<ref>&)(?(1)(?:\s*)|(?:\s+))'
+            r'(?P<name>.+?)(?P<shape>(?:\[.+?\])+)\s*(?:,|$)(?:\n)?'))
     include_arg_count = True
     include_channel_obj = False
     
