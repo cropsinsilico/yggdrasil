@@ -362,11 +362,12 @@ class CModelDriver(CompiledModelDriver):
         'free': 'if ({variable} != NULL) {{ free({variable}); {variable} = NULL; }}',
         'function_def_begin': '{output_type} {function_name}({input_var}) {{',
         'return': 'return {output_var};',
-        'function_def_regex': (r'(?P<flag_type>.+?)\s*{function_name}\s*'
-                               r'\((?P<inputs>(?:[^)])*?)\)\s*\{{'
-                               r'(?:.*?\n?)*?'
-                               r'(?:return +(?P<flag_var>.+?)?;'
-                               r'(?:.*?\n?)*?)?\}}'),
+        'function_def_regex': (
+            r'(?P<flag_type>.+?)\s*{function_name}\s*'
+            r'\((?P<inputs>(?:[^)])*?)\)\s*\{{'
+            r'(?P<body>(?:.*?\n?)*?)'
+            r'(?:return *(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
+            r'|(?:\}})'),
         'inputs_def_regex': (r'\s*(?P<native_type>(?:[^\s\*])+(\s+)?'
                              r'(?P<ptr>\*+)?)(?(ptr)(?(1)(?:\s*)|(?:\s+)))'
                              r'(?P<name>.+?)\s*(?:,|$)(?:\n)?'),
@@ -1329,10 +1330,6 @@ class CModelDriver(CompiledModelDriver):
                 outputs_in_inputs=outputs_in_inputs)
             src_var_dtype = cls.get_native_type(**src_var).rsplit('*', 1)[0]
             src_var_length = src_var['name'] + '_length'
-            length_var = {'name': src_var['name'] + '_length',
-                          'datatype': {'type': 'uint',
-                                       'precision': 64},
-                          'is_length_var': True}
             out += (('{length} = 1;\n'
                      'size_t cdim;\n'
                      'for (cdim = 0; cdim < {ndim}; cdim++) {{\n'

@@ -96,12 +96,14 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'assign_mult': '{name} %<-% {value}',
         'function_def_begin': '{function_name} <- function({input_var}) {{',
         'return': 'return({output_var})',
-        'function_def_regex': (r'{function_name} *(?:(?:\<-)|(?:=)) *function'
-                               r'\((?P<inputs>(?:.|\n)*?)\)\s*\{{'
-                               r'(?:.*?\n?)*?'
-                               r'(?:return\((list\()?'
-                               r'(?P<outputs>(?:.|\n)*?)(?(2)\))\)'
-                               r'(?:.*?\n?)*?)?\}}'),
+        'function_def_regex': (
+            r'{function_name} *(?:(?:\<-)|(?:=)) *function'
+            r'\((?P<inputs>(?:.|\n)*?)\)\s*\{{'
+            r'(?:P<body>(?:.*?\n?)*?)'
+            r'(?:return\((list\()?'
+            r'(?P<outputs>(?:.|\n)*?)(?(2)\))\)'
+            r'(?:.*?\n?)*?\}})'
+            r'|(?:\}})'),
         'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)',
         'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
     brackets = (r'{', r'}')
