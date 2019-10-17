@@ -204,6 +204,10 @@ class ModelDriver(Driver):
             input to the send/recv calls (after the argument count if it is
             also present due to include_arg_count being True). Defaults to
             False.
+        is_typed (bool): True if the language is typed, False otherwise.
+        brackets (tuple): A pair of opening and clossing characters that
+            are used by the language to mark blocks. Set to None and
+            ignored by default.
 
     Attributes:
         args (list): Argument(s) for running the model on the command line.
@@ -308,6 +312,7 @@ class ModelDriver(Driver):
     include_arg_count = False
     include_channel_obj = False
     is_typed = False
+    brackets = None
 
     _library_cache = {}
 
@@ -1304,6 +1309,24 @@ class ModelDriver(Driver):
                     raise RuntimeError(("Could not find function match in file:\n"
                                         "%s\nfor regex:\nr'%s'")
                                        % (pformat(contents), function_regex))
+                # Match brackets to determine where the function definition is
+                if isinstance(cls.brackets, tuple):
+                    assert(len(cls.brackets) == 2)
+                    contents = match.group(0)
+                    counts = {k: 0 for k in cls.brackets}
+                    first_zero = 0
+                    re_brackets = r'[\%s\%s]' % cls.brackets
+                    for x in re.finditer(re_brackets, contents):
+                        counts[x.group(0)] += 1
+                        if (((counts[cls.brackets[0]] > 0)
+                             and (counts[cls.brackets[0]]
+                                  == counts[cls.brackets[1]]))):
+                            first_zero = x.span(0)[1]
+                            break
+                    if (first_zero != 0) and first_zero != len(contents):
+                        contents = contents[:first_zero]
+                        match = re.search(function_regex, contents)
+                        assert(match)
             out = match.groupdict()
             for k in list(out.keys()):
                 if out[k] is None:
@@ -1454,16 +1477,18 @@ class ModelDriver(Driver):
             # Check for user defined length variables and add flag to
             # length variables
             for x in io_var:
-                if 'length_map' in x:
-                    var_map = {v['name']: v for v in x['vars']}
-                    for k, v in x['length_map'].items():
-                        var_map[k]['length_var'] = v
-                for v in x['vars']:
-                    if 'length_var' in v:
-                        v['length_var'] = info_map[io][v['length_var']]
-                        v['length_var']['is_length_var'] = True
-                    else:
-                        v['length_var'] = False
+                for k in ['length', 'shape', 'ndim']:
+                    if k + '_map' in x:
+                        var_map = {v['name']: v for v in x['vars']}
+                        for k, v in x[k + '_map'].items():
+                            var_map[k][k + '_var'] = v
+                    for v in x['vars']:
+                        if k + '_var' in v:
+                            v[k + '_var'] = info_map[io][v[k + '_var']]
+                            # v[k + '_var']['is_' + k + '_var'] = True
+                            v[k + '_var']['is_length_var'] = True
+                        else:
+                            v[k + '_var'] = False
             # Update datatypes
             if cls.is_typed:
                 for x in io_var:
