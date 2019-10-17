@@ -352,11 +352,6 @@ public:
    */
   const char* units() const { return units_; }
   /*!
-    @brief Get the number of elements in the type.
-    @returns size_t Number of elements (1 for scalar).
-   */
-  virtual const size_t nelements() const { return 1; }
-  /*!
     @brief Get the size of the type in bits.
     @returns size_t Type size.
    */
@@ -1047,6 +1042,95 @@ private:
 
 
 /*!
+  @brief Base class for ND array type definition.
+
+  The NDArrayMetaschemaType provides basic functionality for encoding/decoding
+  ND array datatypes from/to JSON style strings.
+ */
+class NDArrayMetaschemaType : public ScalarMetaschemaType {
+public:
+  /*!
+    @brief Constructor for NDArrayMetaschemaType.
+    @param[in] subtype const character pointer to the name of the subtype.
+    @param[in] precision size_t Type precision in bits.
+    @param[in] shape std::vector<size_t> Shape of type array in each dimension.
+    @param[in] units const char * (optional) Type units.
+   */
+  NDArrayMetaschemaType(const char *subtype, const size_t precision,
+			const std::vector<size_t> shape, const char *units="");
+  /*!
+    @brief Constructor for NDArrayMetaschemaType from a JSON type defintion.
+    @param[in] type_doc rapidjson::Value rapidjson object containing the type
+    definition from a JSON encoded header.
+   */
+  NDArrayMetaschemaType(const rapidjson::Value &type_doc);
+  /*!
+    @brief Equivalence operator.
+    @param[in] Ref MetaschemaType instance to compare against.
+    @returns bool true if the instance is equivalent, false otherwise.
+   */
+  bool operator==(const MetaschemaType &Ref) const override;
+  /*!
+    @brief Create a copy of the type.
+    @returns pointer to new NDArrayMetaschemaType instance with the same data.
+   */
+  NDArrayMetaschemaType* copy() const override;
+  /*!
+    @brief Print information about the type to stdout.
+  */
+  void display() const override;
+  /*!
+    @brief Get the number of dimensions in the array.
+    @returns size_t Number of dimensions in type.
+   */
+  const size_t ndim() const;
+  /*!
+    @brief Get the shape of the array type.
+    @returns std::vector<size_t> Shape of type in each dimension.
+   */
+  std::vector<size_t> shape() const;
+  /*!
+    @brief Get the number of elements in the type.
+    @returns size_t Number of elements.
+   */
+  const size_t nelements() const override;
+  /*!
+    @brief Update the type object with info from another type object.
+    @param[in] new_info MetaschemaType* type object.
+   */
+  void update(MetaschemaType* new_info) override;
+  /*!
+    @brief Update the type object with info from provided variable arguments for serialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+   */
+  void update_from_serialization_args(size_t *nargs, va_list_t &ap) override;
+  /*!
+    @brief Update the type object with info from provided variable arguments for deserialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+   */
+  void update_from_deserialization_args(size_t *nargs, va_list_t &ap) override;
+  /*!
+    @brief Update the instance's shape.
+    @param[in] new_shape std::vector<size_t> Vector of new array sizes in each dimension.
+   */
+  void set_shape(std::vector<size_t> new_shape, bool force=false);
+  /*!
+    @brief Encode the type's properties in a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
+  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
+  
+private:
+  std::vector<size_t> shape_;
+  bool _variable_shape;
+
+};
+
+
+/*!
   @brief Base class for 1D array type definition.
 
   The OneDArrayMetaschemaType provides basic functionality for encoding/decoding
@@ -1129,9 +1213,16 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @param[in] new_info MetaschemaType* type object.
    */
   void update(MetaschemaType* new_info) override {
-    ScalarMetaschemaType::update(new_info);
-    OneDArrayMetaschemaType* new_info_oned = (OneDArrayMetaschemaType*)new_info;
-    set_length(new_info_oned->length());
+    if (new_info->type_code() == T_NDARRAY) {
+      NDArrayMetaschemaType* new_info_nd = dynamic_cast<NDArrayMetaschemaType*>(new_info);
+      OneDArrayMetaschemaType* new_info_oned = new OneDArrayMetaschemaType(new_info_nd->subtype(), new_info_nd->precision(), new_info_nd->nelements(), new_info_nd->units());
+      update(new_info_oned);
+      delete new_info_oned;
+    } else {
+      ScalarMetaschemaType::update(new_info);
+      OneDArrayMetaschemaType* new_info_oned = dynamic_cast<OneDArrayMetaschemaType*>(new_info);
+      set_length(new_info_oned->length());
+    }
   }
   /*!
     @brief Update the type object with info from provided variable arguments for serialization.
@@ -1159,7 +1250,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
   void update_from_deserialization_args(size_t *nargs, va_list_t &ap) override {
     MetaschemaType::update_from_deserialization_args(nargs, ap);
     if (*nargs == 2) {
-      va_list ap_copy;
+       va_list ap_copy;
       va_copy(ap_copy, ap.va);
       unsigned char** temp = va_arg(ap_copy, unsigned char**);
       UNUSED(temp); // Parameter extract to get next
@@ -1193,9 +1284,8 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @brief Get type length.
     @returns size_t Number of elements in the array.
   */
-  size_t length() const override {
-    size_t out = length_;
-    return out;
+  size_t length() const {
+    return length_;
   }
   /*!
     @brief Encode the type's properties in a JSON string.
@@ -1215,219 +1305,152 @@ private:
 };
 
 
-/*!
-  @brief Base class for ND array type definition.
-
-  The NDArrayMetaschemaType provides basic functionality for encoding/decoding
-  ND array datatypes from/to JSON style strings.
- */
-class NDArrayMetaschemaType : public ScalarMetaschemaType {
-public:
-  /*!
-    @brief Constructor for NDArrayMetaschemaType.
-    @param[in] subtype const character pointer to the name of the subtype.
-    @param[in] precision size_t Type precision in bits.
-    @param[in] shape std::vector<size_t> Shape of type array in each dimension.
-    @param[in] units const char * (optional) Type units.
-   */
-  NDArrayMetaschemaType(const char *subtype, const size_t precision,
-			const std::vector<size_t> shape, const char *units="") :
-    ScalarMetaschemaType(subtype, precision, units), shape_(shape) {
-    update_type("ndarray");
-    if (shape_.size() == 0) {
-      _variable_shape = true;
-    } else {
-      _variable_shape = false;
-    }
+NDArrayMetaschemaType::NDArrayMetaschemaType(const char *subtype, const size_t precision,
+					     const std::vector<size_t> shape,
+					     const char *units) :
+  ScalarMetaschemaType(subtype, precision, units), shape_(shape) {
+  update_type("ndarray");
+  if (shape_.size() == 0) {
+    _variable_shape = true;
+  } else {
+    _variable_shape = false;
   }
-  /*!
-    @brief Constructor for NDArrayMetaschemaType from a JSON type defintion.
-    @param[in] type_doc rapidjson::Value rapidjson object containing the type
-    definition from a JSON encoded header.
-   */
-  NDArrayMetaschemaType(const rapidjson::Value &type_doc) :
-    ScalarMetaschemaType(type_doc) {
-    if (!(type_doc.HasMember("shape")))
-      ygglog_throw_error("NDArrayMetaschemaType: ndarray types must include 'shape'.");
-    if (!(type_doc["shape"].IsArray()))
-      ygglog_throw_error("NDArrayMetaschemaType: ndarray 'shape' value must be an array.");
-    size_t ndim = type_doc["shape"].Size();
+};
+NDArrayMetaschemaType::NDArrayMetaschemaType(const rapidjson::Value &type_doc) :
+  ScalarMetaschemaType(type_doc) {
+  if (!(type_doc.HasMember("shape")))
+    ygglog_throw_error("NDArrayMetaschemaType: ndarray types must include 'shape'.");
+  if (!(type_doc["shape"].IsArray()))
+    ygglog_throw_error("NDArrayMetaschemaType: ndarray 'shape' value must be an array.");
+  size_t ndim = type_doc["shape"].Size();
+  size_t i;
+  for (i = 0; i < ndim; i++) {
+    if (!(type_doc["shape"][i].IsInt()))
+      ygglog_throw_error("NDArrayMetaschemaType: ndarray 'shape' elements must be integers.");
+    shape_.push_back(type_doc["shape"][i].GetInt());
+  }
+  update_type("ndarray");
+};
+bool NDArrayMetaschemaType::operator==(const MetaschemaType &Ref) const {
+  if (!(ScalarMetaschemaType::operator==(Ref)))
+    return false;
+  const NDArrayMetaschemaType* pRef = dynamic_cast<const NDArrayMetaschemaType*>(&Ref);
+  if (!pRef)
+    return false;
+  if (shape_ != pRef->shape())
+    return false;
+  return true;
+};
+NDArrayMetaschemaType* NDArrayMetaschemaType::copy() const {
+  return (new NDArrayMetaschemaType(subtype(), precision(), shape(), units()));
+}
+void NDArrayMetaschemaType::display() const {
+  ScalarMetaschemaType::display();
+  printf("%-15s = [ ", "shape");
+  if (ndim() > 0) {
     size_t i;
-    for (i = 0; i < ndim; i++) {
-      if (!(type_doc["shape"][i].IsInt()))
-	ygglog_throw_error("NDArrayMetaschemaType: ndarray 'shape' elements must be integers.");
-      shape_.push_back(type_doc["shape"][i].GetInt());
+    printf("%lu", shape_[0]);
+    for (i = 1; i < ndim(); i++) {
+      printf(", %lu", shape_[i]);
     }
-    update_type("ndarray");
   }
-  /*!
-    @brief Equivalence operator.
-    @param[in] Ref MetaschemaType instance to compare against.
-    @returns bool true if the instance is equivalent, false otherwise.
-   */
-  bool operator==(const MetaschemaType &Ref) const override {
-    if (!(ScalarMetaschemaType::operator==(Ref)))
-      return false;
-    const NDArrayMetaschemaType* pRef = dynamic_cast<const NDArrayMetaschemaType*>(&Ref);
-    if (!pRef)
-      return false;
-    if (shape_ != pRef->shape())
-      return false;
-    return true;
-  }
-  /*!
-    @brief Create a copy of the type.
-    @returns pointer to new NDArrayMetaschemaType instance with the same data.
-   */
-  NDArrayMetaschemaType* copy() const override {
-    return (new NDArrayMetaschemaType(subtype(), precision(), shape(), units()));
-  }
-  /*!
-    @brief Print information about the type to stdout.
-  */
-  void display() const override {
-    ScalarMetaschemaType::display();
-    printf("%-15s = [ ", "shape");
-    if (ndim() > 0) {
-      size_t i;
-      printf("%lu", shape_[0]);
-      for (i = 1; i < ndim(); i++) {
-	printf(", %lu", shape_[i]);
-      }
-    }
-    printf(" ]\n");
-  }
-  /*!
-    @brief Get the number of dimensions in the array.
-    @returns size_t Number of dimensions in type.
-   */
-  const size_t ndim() const { return shape_.size(); }
-  /*!
-    @brief Get the shape of the array type.
-    @returns std::vector<size_t> Shape of type in each dimension.
-   */
-  std::vector<size_t> shape() const { return shape_; }
-  /*!
-    @brief Get the number of elements in the type.
-    @returns size_t Number of elements.
-   */
-  const size_t nelements() const override {
-    size_t nelements = 0;
-    if (ndim() > 0) {
-      size_t i;
-      for (i = 0; i < ndim(); i++) {
-	nelements = nelements * shape_[i];
-      }
-    }
-    return nelements;
-  }
-  /*!
-    @brief Update the type object with info from another type object.
-    @param[in] new_info MetaschemaType* type object.
-   */
-  void update(MetaschemaType* new_info) override {
-    ScalarMetaschemaType::update(new_info);
-    NDArrayMetaschemaType* new_info_nd = (NDArrayMetaschemaType*)new_info;
-    set_shape(new_info_nd->shape());
-  }
-  /*!
-    @brief Update the type object with info from provided variable arguments for serialization.
-    @param[in,out] nargs size_t Number of arguments contained in ap. On output
-    the number of unused arguments will be assigned to this address.
-   */
-  void update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
-    MetaschemaType::update_from_serialization_args(nargs, ap);
-    if (*nargs == 3) {
-      va_list ap_copy;
-      va_copy(ap_copy, ap.va);
-      size_t new_ndim = va_arg(ap_copy, size_t);
-      (*nargs)--;
-      size_t* new_shape_ptr = va_arg(ap_copy, size_t*);
-      (*nargs)--;
-      std::vector<size_t> new_shape(new_shape_ptr, new_shape_ptr + new_ndim);
-      set_shape(new_shape);
-    }
-    return;
-  }
-  /*!
-    @brief Update the type object with info from provided variable arguments for deserialization.
-    @param[in,out] nargs size_t Number of arguments contained in ap. On output
-    the number of unused arguments will be assigned to this address.
-   */
-  void update_from_deserialization_args(size_t *nargs, va_list_t &ap) override {
-    MetaschemaType::update_from_deserialization_args(nargs, ap);
-    if (*nargs == 3) {
-      va_list ap_copy;
-      va_copy(ap_copy, ap.va);
-      size_t * const new_ndim = va_arg(ap_copy, size_t*);
-      (*nargs)--;
-      size_t** new_shape = va_arg(ap_copy, size_t**);
-      (*nargs)--;
-      new_ndim[0] = ndim();
-      size_t* new_shape_temp = (size_t*)realloc(new_shape[0], ndim()*sizeof(size_t));
-      if (new_shape_temp == NULL) {
-	ygglog_throw_error("NDArrayMetaschemaType::decode_data: Failed to realloc memory for the provided shape array.");
-      }
-      new_shape[0] = new_shape_temp;
-      size_t i;
-      for (i = 0; i < ndim(); i++) {
-	(*new_shape)[i] = shape_[i];
-      }
-    }
-    return;
-  }
-  /*!
-    @brief Update the instance's shape.
-    @param[in] new_shape std::vector<size_t> Vector of new array sizes in each dimension.
-   */
-  void set_shape(std::vector<size_t> new_shape, bool force=false) {
-    bool match = (ndim() == new_shape.size());
+  printf(" ]\n");
+};
+const size_t NDArrayMetaschemaType::ndim() const {
+  return shape_.size();
+};
+std::vector<size_t> NDArrayMetaschemaType::shape() const {
+  return shape_;
+};
+const size_t NDArrayMetaschemaType::nelements() const {
+  size_t nelements = 0;
+  if (ndim() > 0) {
     size_t i;
-    if (match) {
-      for (i = 0; i < ndim(); i++) {
-	if (shape_[i] != new_shape[i]) {
-	  match = false;
-	  break;
-	}
-      }
-    }
-    if (!(match)) {
-      if (!(force)) {
-	if (ndim() == 0) {
-	  // Pass
-	} else if (_variable_shape) {
-	  // Pase
-	} else {
-	  ygglog_throw_error("NDArrayMetaschemaType::set_shape: Cannot update shape.");
-	}
-      }
-      shape_.resize(new_shape.size());
-      for (i = 0; i < new_shape.size(); i++) {
-	shape_[i] = new_shape[i];
-      }
+    nelements = 1;
+    for (i = 0; i < ndim(); i++) {
+      nelements = nelements * shape_[i];
     }
   }
-  /*!
-    @brief Encode the type's properties in a JSON string.
-    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
-    @returns bool true if the encoding was successful, false otherwise.
-   */
-  bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override {
-    if (!(ScalarMetaschemaType::encode_type_prop(writer))) { return false; }
-    writer->Key("shape");
-    writer->StartArray();
+  return nelements;
+};
+void NDArrayMetaschemaType::update(MetaschemaType* new_info) {
+  ScalarMetaschemaType::update(new_info);
+  NDArrayMetaschemaType* new_info_nd = (NDArrayMetaschemaType*)new_info;
+  set_shape(new_info_nd->shape());
+};
+void NDArrayMetaschemaType::update_from_serialization_args(size_t *nargs, va_list_t &ap) {
+  MetaschemaType::update_from_serialization_args(nargs, ap);
+  if (*nargs == 3) {
+    va_list ap_copy;
+    va_copy(ap_copy, ap.va);
+    size_t new_ndim = va_arg(ap_copy, size_t);
+    (*nargs)--;
+    size_t* new_shape_ptr = va_arg(ap_copy, size_t*);
+    (*nargs)--;
+    std::vector<size_t> new_shape(new_shape_ptr, new_shape_ptr + new_ndim);
+    set_shape(new_shape);
+  }
+  return;
+};
+void NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va_list_t &ap) {
+  MetaschemaType::update_from_deserialization_args(nargs, ap);
+  if (*nargs == 3) {
+    va_list ap_copy;
+    va_copy(ap_copy, ap.va);
+    size_t * const new_ndim = va_arg(ap_copy, size_t*);
+    (*nargs)--;
+    size_t** new_shape = va_arg(ap_copy, size_t**);
+    (*nargs)--;
+    new_ndim[0] = ndim();
+    size_t* new_shape_temp = (size_t*)realloc(new_shape[0], ndim()*sizeof(size_t));
+    if (new_shape_temp == NULL) {
+      ygglog_throw_error("NDArrayMetaschemaType::decode_data: Failed to realloc memory for the provided shape array.");
+    }
+    new_shape[0] = new_shape_temp;
     size_t i;
     for (i = 0; i < ndim(); i++) {
-      writer->Int((int)(shape_[i]));
+      (*new_shape)[i] = shape_[i];
     }
-    writer->EndArray();
-    return true;
   }
-  
-private:
-  std::vector<size_t> shape_;
-  bool _variable_shape;
-
+  return;
+};
+void NDArrayMetaschemaType::set_shape(std::vector<size_t> new_shape, bool force) {
+  bool match = (ndim() == new_shape.size());
+  size_t i;
+  if (match) {
+    for (i = 0; i < ndim(); i++) {
+      if (shape_[i] != new_shape[i]) {
+	match = false;
+	break;
+      }
+    }
+  }
+  if (!(match)) {
+    if (!(force)) {
+      if (ndim() == 0) {
+	// Pass
+      } else if (_variable_shape) {
+	// Pase
+      } else {
+	ygglog_throw_error("NDArrayMetaschemaType::set_shape: Cannot update shape.");
+      }
+    }
+    shape_.resize(new_shape.size());
+    for (i = 0; i < new_shape.size(); i++) {
+      shape_[i] = new_shape[i];
+    }
+  }
+};
+bool NDArrayMetaschemaType::encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
+  if (!(ScalarMetaschemaType::encode_type_prop(writer))) { return false; }
+  writer->Key("shape");
+  writer->StartArray();
+  size_t i;
+  for (i = 0; i < ndim(); i++) {
+    writer->Int((int)(shape_[i]));
+  }
+  writer->EndArray();
+  return true;
 };
 
 

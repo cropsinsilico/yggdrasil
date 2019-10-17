@@ -132,6 +132,28 @@ public:
     }
   }
   /*!
+    @brief Update the type object with info from provided variable arguments for serialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+   */
+  void update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
+    MetaschemaType::update_from_serialization_args(nargs, ap);
+    if ((all_arrays()) && (*nargs == (nitems() + 1))) {
+      size_t nrows = va_arg(ap.va, size_t);
+      (*nargs)--;
+      size_t i;
+      for (i = 0; i < items_.size(); i++) {
+	if (items_[i]->type_code() != T_1DARRAY) {
+	  ygglog_throw_error("JSONArrayMetaschemaType::update_from_serialization_args: "
+			     "Item %lu is of type %s, but the all_arrays"
+			     "parameter is set, indicating it should "
+			     "be \"1darray\".", i, items_[i]->type());
+	}
+	items_[i]->set_length(nrows);
+      }
+    }
+  }
+  /*!
     @brief Get the item size.
     @returns size_t Size of item in bytes.
    */
@@ -187,13 +209,6 @@ public:
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) const override {
     size_t i;
-    if (all_arrays()) {
-      size_t nrows = va_arg(ap.va, size_t);
-      (*nargs)--;
-      for (i = 0; i < items_.size(); i++) {
-	items_[i]->set_length(nrows);
-      }
-    }
     writer->StartArray();
     for (i = 0; i < items_.size(); i++) {
       if (!(items_[i]->encode_data(writer, nargs, ap)))
@@ -220,9 +235,9 @@ public:
     if (all_arrays()) {
       size_t nrows = arg[0]->get_nelements();
       for (i = 0; i < items_.size(); i++) {
-	if (items_[i]->length() != nrows) {
-	  ygglog_throw_error("JSONArrayMetaschemaType::encode_data: Element %lu has length %lu but all elements are expected to have length %lu.",
-			     i, items_[i]->length(), nrows);
+	if (items_[i]->nelements() != nrows) {
+	  ygglog_throw_error("JSONArrayMetaschemaType::encode_data: Element %lu has %lu elements but all array entries are expected to have %lu elements.",
+			     i, items_[i]->nelements(), nrows);
 	}
       }
     }
@@ -255,9 +270,9 @@ public:
       size_t *nrows = va_arg(ap.va, size_t*);
       size_t inrows;
       (*nargs)--;
-      *nrows = items_[0]->length();
+      *nrows = items_[0]->nelements();
       for (i = 1; i < items_.size(); i++) {
-	inrows = items_[i]->length();
+	inrows = items_[i]->nelements();
 	if (*nrows != inrows) {
 	  ygglog_error("JSONArrayMetaschemaType::decode_data: Number of rows not consistent across all items.");
 	  return false;
@@ -289,9 +304,9 @@ public:
     size_t i;
     if (all_arrays()) {
       size_t inrows;
-      size_t nrows = items_[0]->length();
+      size_t nrows = items_[0]->nelements();
       for (i = 1; i < items_.size(); i++) {
-	inrows = items_[i]->length();
+	inrows = items_[i]->nelements();
 	if (nrows != inrows) {
 	  ygglog_error("JSONArrayMetaschemaType::decode_data: Number of rows not consistent across all items.");
 	  return false;

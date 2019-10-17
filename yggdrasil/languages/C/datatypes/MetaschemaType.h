@@ -407,6 +407,10 @@ public:
     @param[in] new_length size_t New length.
    */
   virtual void set_length(size_t new_length, bool force=false) {
+    // This virtual class is required to allow setting lengths
+    // for table style type where data is an array of 1darrays.
+    // Otherwise circular include results as scalar requires
+    // JSON array for checking if there is a single element.
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     new_length;
@@ -414,13 +418,18 @@ public:
     ygglog_throw_error("MetaschemaType::set_length: Cannot set length for type '%s'.", type_);
   }
   /*!
-    @brief Get the type's length.
-    @returns size_t Type length.
+    @brief Get the number of elements in the type.
+    @returns size_t Number of elements (1 for scalar).
    */
-  virtual size_t length() const {
-    // ygglog_throw_error("MetaschemaType::length: Cannot get length for type '%s'.", type_);
-    return 1;
-  }
+  virtual const size_t nelements() const { return 1; }
+  // /*!
+  //   @brief Get the type's length.
+  //   @returns size_t Type length.
+  //  */
+  // virtual size_t length() const {
+  //   // ygglog_throw_error("MetaschemaType::length: Cannot get length for type '%s'.", type_);
+  //   return 1;
+  // }
   /*!
     @brief Get the item size.
     @returns size_t Size of item in bytes.
@@ -888,7 +897,7 @@ public:
     @param[out] ap va_list_t Arguments that should be assigned based on the
     deserialized data.
     @returns int -1 if there is an error, otherwise the number of arguments
-    remaining in ap.
+    used.
    */
   virtual int deserialize(const char *buf, const size_t buf_siz,
 			  const int allow_realloc, size_t* nargs, va_list_t &ap) {
@@ -1046,7 +1055,7 @@ size_t* YggGeneric::get_nbytes_pointer() {
 };
 size_t YggGeneric::get_nelements() {
   try {
-    return type->length();
+    return type->nelements();
   } catch(...) {
     return 1;
   }
