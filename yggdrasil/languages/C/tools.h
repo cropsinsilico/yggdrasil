@@ -13,6 +13,7 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <time.h>
+#include <Python.h>
 
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
@@ -52,6 +53,8 @@ extern "C" {
 #define YGG_MSG_BUF 2048
 /*! @brief Sleep time in micro-seconds */
 #define YGG_SLEEP_TIME 250000
+/*! @brief Size for buffers to contain names of Python objects. */
+#define PYTHON_NAME_SIZE 1000
 
 /*! @brief Define old style names for compatibility. */
 #define PSI_MSG_MAX YGG_MSG_MAX
@@ -96,7 +99,14 @@ unsigned long ptr2seed(void *ptr) {
 typedef struct va_list_t {
   va_list va;
 } va_list_t;
-    
+
+
+  
+/*! @brief Structure used to wrap Python objects. */
+typedef struct python_t {
+  char name[PYTHON_NAME_SIZE];
+  PyObject *obj;
+} python_t;
 
 
 //==============================================================================

@@ -14,7 +14,7 @@
 
 enum { T_BOOLEAN, T_INTEGER, T_NULL, T_NUMBER, T_STRING, T_ARRAY, T_OBJECT,
        T_DIRECT, T_1DARRAY, T_NDARRAY, T_SCALAR, T_FLOAT, T_UINT, T_INT, T_COMPLEX,
-       T_BYTES, T_UNICODE, T_PLY, T_OBJ, T_ASCII_TABLE };
+       T_BYTES, T_UNICODE, T_PLY, T_OBJ, T_ASCII_TABLE, T_CLASS, T_FUNCTION };
 
 
 /*!
@@ -81,6 +81,8 @@ std::map<const char*, int, strcomp> get_type_map() {
     global_type_map["ply"] = T_PLY;
     global_type_map["obj"] = T_OBJ;
     global_type_map["ascii_table"] = T_ASCII_TABLE;
+    global_type_map["class"] = T_CLASS;
+    global_type_map["function"] = T_FUNCTION;
   }
   return global_type_map;
 };

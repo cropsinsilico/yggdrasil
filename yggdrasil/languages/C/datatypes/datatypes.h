@@ -36,6 +36,15 @@ typedef generic_t map_t;
 /*! @brief C-friendly definition of schema object. */
 typedef generic_t schema_t;
 
+/*! @brief C-friendly defintion of Python class object. */
+typedef python_t python_class_t;
+
+/*! @brief C-friendly defintion of Python function object. */
+typedef python_t python_function_t;
+
+/*! @brief Macro wrapping call to PyObject_CallFunction. */
+#define call_python(x, format, ...) PyObject_CallFunction(x.obj, format, __VA_ARGS__)
+
 /*! @brief Aliases to allow differentiation in parsing model definition. */
 typedef char* unicode_t;
 typedef char* string_t;
@@ -69,7 +78,7 @@ typedef struct comm_head_t {
 
 /*!
   @brief Initialize an empty generic object.
-  @returns generic_t Pointer to new generic object structure.
+  @returns generic_t New generic object structure.
  */
 generic_t init_generic();
 
@@ -141,6 +150,35 @@ generic_t get_generic_va(size_t nargs, va_list_t ap);
   @returns generic_t* Generic structure if one is present, NULL otherwise.
  */
 generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap);
+
+
+/*!
+  @brief Initialize a structure to contain a Python object.
+  @returns python_t New Python object structure.
+ */
+python_t init_python();
+
+
+/*!
+  @brief Destroy a structure containing a Python object.
+  @param[in] x python_t* Pointer to Python object structure that should be freed.
+*/
+void destroy_python(python_t *x);
+
+
+/*!
+  @brief Copy a Python object structure (NOTE: this dosn't copy the underlying Python object.
+  @param[in] x python_t Structure containing Python object to copy.
+  @returns python_t Copy of x.
+ */
+python_t copy_python(python_t x);
+
+  
+/*!
+  @brief Destroy a structure containing a Python function object.
+  @param[in] x python_function_t* Pointer to Python function structure that should be freed.
+*/
+void destroy_python_function(python_function_t *x);
 
 
 /*!
@@ -312,6 +350,14 @@ dtype_t* create_dtype_ascii_table(const char *format_str, const int as_array);
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_format(const char *format_str, const int as_array);
+
+  
+/*!
+  @brief Construct a type object for Python objects.
+  @returns dtype_t* Type structure/class.
+ */
+dtype_t* create_dtype_pyobj(const char* type);
+  
 
 /*!
   @brief Wrapper for freeing MetaschemaType class wrapper struct.

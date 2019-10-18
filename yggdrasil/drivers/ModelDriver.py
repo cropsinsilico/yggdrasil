@@ -2197,6 +2197,8 @@ checking if the model flag indicates
         json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
         if isinstance(json_type, dict):
             type_name = json_type['type']
+            if type_name == 'scalar':
+                type_name = json_type['subtype']
         else:
             type_name = json_type
         if (type_name == 'flag') and (type_name not in cls.type_map):

@@ -114,6 +114,9 @@ void clean_comms(void) {
   // #if defined(_WIN32) && defined(ZMQINSTALLED)
   zsys_shutdown();
 #endif
+  if (Py_IsInitialized()) {
+    Py_Finalize();
+  }
   ygglog_debug("atexit done");
   /* printf(""); */
 };

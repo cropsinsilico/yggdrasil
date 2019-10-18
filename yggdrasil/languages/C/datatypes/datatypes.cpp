@@ -7,6 +7,7 @@
 #include "PlyMetaschemaType.h"
 #include "ObjMetaschemaType.h"
 #include "AsciiTableMetaschemaType.h"
+#include "PyObjMetaschemaType.h"
 #include "datatypes.h"
 
 #include "rapidjson/document.h"
@@ -87,6 +88,9 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
       return new PlyMetaschemaType(type_doc);
     case T_OBJ:
       return new ObjMetaschemaType(type_doc);
+    case T_CLASS:
+    case T_FUNCTION:
+      return new PyObjMetaschemaType(type_doc);
     }
   }
   ygglog_throw_error("Could not find class from doc for type '%s'.", type);
@@ -351,6 +355,9 @@ MetaschemaType* dtype2class(const dtype_t* dtype) {
       return static_cast<ObjMetaschemaType*>(dtype->obj);
     case T_ASCII_TABLE:
       return static_cast<AsciiTableMetaschemaType*>(dtype->obj);
+    case T_CLASS:
+    case T_FUNCTION:
+      return static_cast<PyObjMetaschemaType*>(dtype->obj);
     }
   } else {
     ygglog_throw_error("dtype2class: No handler for type '%s'.", dtype->type);
@@ -459,7 +466,31 @@ extern "C" {
       return NULL;
     }
   }
-  
+
+  python_t init_python() {
+    python_t out;
+    out.name[0] = '\0';
+    out.obj = NULL;
+    return out;
+  }
+
+  void destroy_python(python_t *x) {
+    x->name[0] = '\0';
+    if (x->obj != NULL) {
+      Py_DECREF(x->obj);
+      x->obj = NULL;
+    }
+  }
+
+  python_t copy_python(python_t x) {
+    python_t out;
+    strncpy(out.name, x.name, PYTHON_NAME_SIZE);
+    if (x.obj != NULL) {
+      out.obj = Py_BuildValue("O", x.obj);
+    }
+    return out;
+  }
+
   int is_empty_dtype(const dtype_t* dtype) {
     if (dtype == NULL) {
       return 1;
@@ -714,6 +745,17 @@ extern "C" {
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_ascii_table: C++ exception thrown.");
+      CSafe(delete obj);
+      return NULL;
+    }
+  }
+  dtype_t* create_dtype_pyobj(const char* type) {
+    PyObjMetaschemaType* obj = NULL;
+    try {
+      obj = new PyObjMetaschemaType(type);
+      return create_dtype(obj);
+    } catch(...) {
+      ygglog_error("create_dtype_pyobj: C++ exception thrown.");
       CSafe(delete obj);
       return NULL;
     }

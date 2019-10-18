@@ -4,10 +4,13 @@ import copy
 import shutil
 import subprocess
 import numpy as np
+import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, tools, backwards
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, ArchiverBase)
+from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
+    _valid_types)
 from yggdrasil.languages import get_language_dir
 from yggdrasil.config import ygg_cfg
 
@@ -233,6 +236,9 @@ _top_lang_dir = get_language_dir('c')
 _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
+_incl_python = sysconfig.get_paths()['include']
+_python_lib = os.path.join(sysconfig.get_config_var('LIBDIR'),
+                           sysconfig.get_config_var('LIBRARY'))
 
 
 class CModelDriver(CompiledModelDriver):
@@ -259,12 +265,14 @@ class CModelDriver(CompiledModelDriver):
                 'language': 'c'},
         'czmq': {'include': 'czmq.h',
                  'libtype': 'shared',
-                 'language': 'c'}}
+                 'language': 'c'},
+        'python': {'include': os.path.join(_incl_python, 'Python.h'),
+                   'language': 'c'}}
     internal_libraries = {
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
                 'linker_language': 'c++',  # Some dependencies are C++
                 'internal_dependencies': ['datatypes', 'regex'],
-                'external_dependencies': ['rapidjson'],
+                'external_dependencies': ['rapidjson', 'python'],
                 'include_dirs': [_incl_comm, _incl_seri],
                 'compiler_flags': []},
         'regex_win32': {'source': 'regex_win32.cpp',
@@ -283,7 +291,7 @@ class CModelDriver(CompiledModelDriver):
                       'language': 'c++',
                       'libtype': _default_internal_libtype,
                       'internal_dependencies': ['regex'],
-                      'external_dependencies': ['rapidjson'],
+                      'external_dependencies': ['rapidjson', 'python'],
                       'include_dirs': []}}
     type_map = {
         'int': 'intX_t',
@@ -302,7 +310,9 @@ class CModelDriver(CompiledModelDriver):
         'ply': 'ply_t',
         'obj': 'obj_t',
         'schema': 'schema_t',
-        'flag': 'int'}
+        'flag': 'int',
+        'class': 'python_class_t',
+        'function': 'python_function_t'}
     function_param = {
         'import': '#include \"{filename}\"',
         'index': '{variable}[{index}]',
@@ -323,16 +333,22 @@ class CModelDriver(CompiledModelDriver):
         'init_schema': 'init_schema()',
         'init_ply': 'init_ply()',
         'init_obj': 'init_obj()',
+        'init_class': 'init_python()',
+        'init_function': 'init_python()',
         'copy_array': '{name} = copy_vector({value});',
         'copy_object': '{name} = copy_map({value});',
         'copy_schema': '{name} = copy_schema({value});',
         'copy_ply': '{name} = copy_ply({value});',
         'copy_obj': '{name} = copy_obj({value});',
+        'copy_class': '{name} = copy_python({value});',
+        'copy_function': '{name} = copy_python({value});',
         'free_array': 'free_vector({variable});',
         'free_object': 'free_map({variable});',
         'free_schema': 'free_schema({variable});',
         'free_ply': 'free_ply({variable});',
         'free_obj': 'free_obj({variable});',
+        'free_class': 'destroy_python({variable});',
+        'free_function': 'destroy_python({variable});',
         'print_array': 'display_vector({object});',
         'print_object': 'display_map({object});',
         'print_schema': 'display_schema({object});',
@@ -398,6 +414,12 @@ class CModelDriver(CompiledModelDriver):
         CompiledModelDriver.after_registration(cls)
         archiver = cls.get_tool('archiver')
         linker = cls.get_tool('linker')
+        if _python_lib.endswith(archiver.library_ext):
+            cls.external_libraries['python']['libtype'] = 'static'
+            cls.external_libraries['python']['static'] = _python_lib
+        else:
+            cls.external_libraries['python']['libtype'] = 'shared'
+            cls.external_libraries['python']['shared'] = _python_lib
         for x in ['zmq', 'czmq']:
             if x in cls.external_libraries:
                 if platform._is_win:  # pragma: windows
@@ -520,7 +542,8 @@ class CModelDriver(CompiledModelDriver):
 
         """
         if paths_to_add is None:
-            paths_to_add = [cls.get_language_dir()]
+            paths_to_add = [cls.get_language_dir(),
+                            _incl_python]
         if platform._is_linux:
             path_list = []
             prev_path = env.pop('LD_LIBRARY_PATH', '')
@@ -592,7 +615,9 @@ class CModelDriver(CompiledModelDriver):
                     x['datatype']['shape'] = [
                         int(float(s.strip('[]')))
                         for s in x.pop('shape').split('][')]
-                    x['datatype']['subtype'] = x['datatype']['type']
+                    if 'subtype' not in x['datatype']:
+                        assert(x['datatype']['type'] in _valid_types)
+                        x['datatype']['subtype'] = x['datatype']['type']
                     if len(x['datatype']['shape']) == 1:
                         x['datatype']['length'] = x['datatype'].pop(
                             'shape')[0]
@@ -849,6 +874,9 @@ class CModelDriver(CompiledModelDriver):
                     out['type'] = '1darray'
                 else:
                     out['type'] = 'ndarray'
+        if out['type'] in _valid_types:
+            out['subtype'] = out['type']
+            out['type'] = 'scalar'
         return out
         
     @classmethod
@@ -1338,7 +1366,7 @@ class CModelDriver(CompiledModelDriver):
         elif datatype['type'] in ['boolean', 'null', 'number', 'integer']:
             fmt = 'create_dtype_default(\"{type}\")'
             keys = {'type': datatype['type']}
-        else:
+        elif (typename == 'scalar') or (typename in _valid_types):
             fmt = 'create_dtype_scalar(\"{subtype}\", {precision}, \"{units}\")'
             keys = {}
             keys['subtype'] = datatype.get('subtype', datatype['type'])
@@ -1348,6 +1376,12 @@ class CModelDriver(CompiledModelDriver):
             else:
                 keys['precision'] = datatype['precision']
             typename = 'scalar'
+        elif (typename in ['class', 'function']):
+            fmt = 'create_dtype_pyobj(\"{type}\")'
+            keys = {'type': typename}
+        else:  # pragma: debug
+            raise ValueError("Cannot create C version of type '%s'"
+                             % typename)
         if as_seri:
             def_line = ('seri_t* %s = init_serializer(\"%s\", %s);'
                         % (name, typename, fmt.format(**keys)))

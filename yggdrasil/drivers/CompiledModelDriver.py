@@ -2136,7 +2136,10 @@ class CompiledModelDriver(ModelDriver):
         if libclass == 'external':
             dep_lang = libinfo.get('language', cls.language)
             if libtype in libinfo:
-                out = ygg_cfg.get(dep_lang, '%s_%s' % (dep, libtype), None)
+                if os.path.isfile(libinfo[libtype]):
+                    out = libinfo[libtype]
+                else:
+                    out = ygg_cfg.get(dep_lang, '%s_%s' % (dep, libtype), None)
             else:
                 libtype_found = []
                 for k in libtype_list:
