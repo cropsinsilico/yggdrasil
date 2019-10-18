@@ -658,6 +658,12 @@ extern "C" {
       return NULL;
     }
   }
+  dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
+				    const size_t ndim, const size_t shape[],
+				    const char* units) {
+    const size_t* shape_ptr = shape;
+    return create_dtype_ndarray(subtype, precision, ndim, shape_ptr, units);
+  }
   dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items){
     JSONArrayMetaschemaType* obj = NULL;
     try {

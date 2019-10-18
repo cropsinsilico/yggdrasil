@@ -1706,7 +1706,7 @@ checking if the model flag indicates
 
     @classmethod
     def write_model_recv(cls, channel, recv_var, flag_var='flag',
-                         allow_failure=False):
+                         allow_failure=False, alt_recv_function=None):
         r"""Write a model receive call include checking the return flag.
 
         Args:
@@ -1719,6 +1719,8 @@ checking if the model flag indicates
             allow_failure (bool, optional): If True, the returned lines will
                 call a break if the flag is False. Otherwise, the returned
                 lines will issue an error. Defaults to False.
+            alt_recv_function (str, optional): Alternate receive function
+                format string. Defaults to None and is ignored.
 
         Returns:
             list: Lines required to carry out a receive call in this language.
@@ -1744,7 +1746,8 @@ checking if the model flag indicates
         if cls.include_channel_obj:
             inputs.insert(0, channel)
         lines = cls.write_function_call(
-            cls.format_function_param('recv_function', channel=channel),
+            cls.format_function_param('recv_function', channel=channel,
+                                      replacement=alt_recv_function),
             inputs=inputs, outputs=outputs, include_arg_count=cls.include_arg_count)
         if 'not_flag_cond' in cls.function_param:
             flag_cond = cls.format_function_param('not_flag_cond',

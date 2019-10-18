@@ -231,6 +231,23 @@ dtype_t* create_dtype_ndarray(const char* subtype, const size_t precision,
 			      const size_t ndim, const size_t* shape,
 			      const char* units);
 
+  
+/*!
+  @brief Construct a ND array type object.
+  @param[in] subtype char* Name of the array subtype (e.g. int, uint, float, bytes).
+  @param[in] precision size_t Precision of the array in bits.
+  @param[in] ndim size_t Number of dimensions in the array (and therefore also the
+  number of elements in shape).
+  @param[in] shape[] size_t Array where each element is the size of the
+  array in that dimension.
+  @param[in] units char* Units for array elements. (e.g. "cm", "g", "" for unitless)
+  @returns dtype_t* Type structure/class.
+*/
+dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
+				  const size_t ndim, const size_t shape[],
+				  const char* units);
+
+  
 /*!
   @brief Construct a JSON array type object.
   @param[in] nitems size_t Number of types in items.

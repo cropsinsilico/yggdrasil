@@ -422,14 +422,11 @@ public:
     @returns size_t Number of elements (1 for scalar).
    */
   virtual const size_t nelements() const { return 1; }
-  // /*!
-  //   @brief Get the type's length.
-  //   @returns size_t Type length.
-  //  */
-  // virtual size_t length() const {
-  //   // ygglog_throw_error("MetaschemaType::length: Cannot get length for type '%s'.", type_);
-  //   return 1;
-  // }
+  /*!
+    @brief Determine if the number of elements is variable.
+    @returns bool true if the number of elements can change, false otherwise.
+  */
+  virtual const bool variable_nelements() const { return false; }
   /*!
     @brief Get the item size.
     @returns size_t Size of item in bytes.

@@ -311,6 +311,8 @@ class CModelDriver(CompiledModelDriver):
                   '\"{channel_name}\", {channel_type});'),
         'output': ('yggOutput_t {channel} = yggOutputType('
                    '\"{channel_name}\", {channel_type});'),
+        'recv_heap': 'yggRecvRealloc',
+        'recv_stack': 'yggRecv',
         'recv_function': 'yggRecvRealloc',
         'send_function': 'yggSend',
         'not_flag_cond': '{flag_var} < 0',
@@ -364,14 +366,15 @@ class CModelDriver(CompiledModelDriver):
         'return': 'return {output_var};',
         'function_def_regex': (
             r'(?P<flag_type>.+?)\s*{function_name}\s*'
-            r'\((?P<inputs>(?:[^)])*?)\)\s*\{{'
+            r'\((?P<inputs>(?:[^{{])*?)\)\s*\{{'
             r'(?P<body>(?:.*?\n?)*?)'
             r'(?:return *(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
             r'|(?:\}})'),
         'inputs_def_regex': (
             r'\s*(?P<native_type>(?:[^\s\*])+(\s+)?'
             r'(?P<ptr>\*+)?)(?(ptr)(?(1)(?:\s*)|(?:\s+)))'
-            r'(?P<name>.+?)(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?'),
+            r'(\((?P<name_ptr>\*+)?)?(?P<name>.+?)(?(4)(?:\)))'
+            r'(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?'),
         'outputs_def_regex': (
             r'\s*(?P<native_type>(?:[^\s\*])+(\s+)?'
             r'(?P<ptr>\*+)?)(?(ptr)(?(1)(?:\s*)|(?:\s+)))'
@@ -585,6 +588,17 @@ class CModelDriver(CompiledModelDriver):
                     x['ndim_var'] = x['name'] + '_ndim'
                     x['shape_var'] = x['name'] + '_shape'
                     x['datatype']['type'] = 'ndarray'
+                elif 'shape' in x:
+                    x['datatype']['shape'] = [
+                        int(float(s.strip('[]')))
+                        for s in x.pop('shape').split('][')]
+                    x['datatype']['subtype'] = x['datatype']['type']
+                    if len(x['datatype']['shape']) == 1:
+                        x['datatype']['length'] = x['datatype'].pop(
+                            'shape')[0]
+                        x['datatype']['type'] = '1darray'
+                    else:
+                        x['datatype']['type'] = 'ndarray'
         return out
         
     @classmethod
@@ -653,15 +667,18 @@ class CModelDriver(CompiledModelDriver):
                     raise RuntimeError("Shape must be defined for ND arrays.")
         # Flag input variables for reallocation
         for x in inputs:
-            for v in x['vars']:
-                if (((v['native_type'] not in ['char*', 'string_t',
-                                               'bytes_t', 'unicode_t'])
-                     and (not v.get('is_length_var', False))
-                     and (v['datatype']['type'] not in
-                          ['object', 'array', 'schema',
-                           '1darray', 'ndarray'])
-                     and ('Realloc' in cls.function_param['recv_function']))):
-                    v['allow_realloc'] = True
+            allows_realloc = [cls.allows_realloc(v) for v in x['vars']]
+            if all(allows_realloc):
+                for v in x['vars']:
+                    if (((v['native_type'] not in ['char*', 'string_t',
+                                                   'bytes_t', 'unicode_t'])
+                         and (not v.get('is_length_var', False))
+                         and (v['datatype']['type'] not in
+                              ['object', 'array', 'schema',
+                               '1darray', 'ndarray'])
+                         and (cls.function_param['recv_function']
+                              == cls.function_param['recv_heap']))):
+                        v['allow_realloc'] = True
         return flag_var
         
     @classmethod
@@ -686,6 +703,24 @@ class CModelDriver(CompiledModelDriver):
             out['native_type'] = out['native_type'][:-1]
             out['datatype'] = cls.get_json_type(out['native_type'])
         return out
+
+    @classmethod
+    def allows_realloc(cls, var):
+        r"""Determine if a variable allows the receive call to perform
+        realloc.
+
+        Args:
+            var (dict): Dictionary of variable properties.
+
+        Returns:
+            bool: True if the variable allows realloc, False otherwise.
+
+        """
+        if isinstance(var, dict):
+            datatype = var.get('datatype', var)
+            if ('shape' in datatype) or ('length' in datatype):
+                return False
+        return True
         
     @classmethod
     def requires_length_var(cls, var):
@@ -703,7 +738,8 @@ class CModelDriver(CompiledModelDriver):
                                                   'bytes_t', 'unicode_t'])
                   or var.get('datatype', {}).get(
                       'type', var.get('type', None)) in ['1darray'])
-             and (not var.get('is_length_var', False)))):
+             and (not var.get('is_length_var', False))
+             and ('length' not in var.get('datatype', {})))):
             return True
         return False
     
@@ -721,8 +757,8 @@ class CModelDriver(CompiledModelDriver):
         if ((isinstance(var, dict)
              and (var.get('datatype', {}).get(
                  'type', var.get('type', None)) == 'ndarray')
-             and (not var.get('is_length_var', False)))):
-            # and ('shape' not in var.get('datatype', {})))):
+             and (not var.get('is_length_var', False))
+             and ('shape' not in var.get('datatype', {})))):
             return True
         return False
               
@@ -753,7 +789,9 @@ class CModelDriver(CompiledModelDriver):
         if out == '*':
             json_subtype = copy.deepcopy(json_type)
             json_subtype['type'] = json_subtype.pop('subtype')
-            out = cls.get_native_type(datatype=json_subtype) + '*'
+            out = cls.get_native_type(datatype=json_subtype)
+            if ('length' not in json_type) and ('shape' not in json_type):
+                out += '*'
         elif 'X' in out:
             precision = json_type['precision']
             out = out.replace('X', str(precision))
@@ -871,6 +909,36 @@ class CModelDriver(CompiledModelDriver):
             model_function, flag_var, new_inputs, outputs, **kwargs)
         
     @classmethod
+    def write_model_recv(cls, channel, recv_var, **kwargs):
+        r"""Write a model receive call include checking the return flag.
+
+        Args:
+            channel (str): Name of variable that the channel being received from
+                was stored in.
+            recv_var (dict, list): Information of one or more variables that
+                receieved information should be stored in.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            list: Lines required to carry out a receive call in this language.
+
+        """
+        recv_var_str = recv_var
+        if not isinstance(recv_var, str):
+            recv_var_par = cls.channels2vars(recv_var)
+            allows_realloc = [cls.allows_realloc(v)
+                              for v in recv_var_par]
+            if all(allows_realloc):
+                kwargs['alt_recv_function'] = cls.function_param['recv_heap']
+            else:
+                kwargs['alt_recv_function'] = cls.function_param['recv_stack']
+            recv_var_str = cls.prepare_output_variables(
+                recv_var_par, in_inputs=cls.outputs_in_inputs,
+                for_yggdrasil=True)
+        return super(CModelDriver, cls).write_model_recv(channel, recv_var_str, **kwargs)
+            
+    @classmethod
     def write_declaration(cls, var, **kwargs):
         r"""Return the lines required to declare a variable with a certain
         type.
@@ -896,11 +964,34 @@ class CModelDriver(CompiledModelDriver):
             kwargs.setdefault('value', 'NULL')
         elif var.get('is_length_var', False):
             kwargs.setdefault('value', '0')
+        var = dict(var, name=cls.get_name_declare(var))
         out = super(CModelDriver, cls).write_declaration(var, **kwargs)
         for k in ['length', 'ndim', 'shape']:
             if ((isinstance(var.get(k + '_var', None), dict)
                  and var[k + '_var'].get('dependent', False))):
                 out += cls.write_declaration(var[k + '_var'])
+        return out
+
+    @classmethod
+    def get_name_declare(cls, var):
+        r"""Determine the name that should be used for declaration.
+
+        Args:
+            var (str, dict): Name of variable or dictionary of information.
+
+        Returns:
+            str: Modified name for declaration.
+
+        """
+        if isinstance(var, str):
+            return var
+        assert(isinstance(var, dict))
+        out = var['name']
+        if 'length' in var.get('datatype', {}):
+            out += '[%d]' % var['datatype']['length']
+        elif 'shape' in var.get('datatype', {}):
+            for s in var['datatype']['shape']:
+                out += '[%d]' % s
         return out
         
     @classmethod
@@ -965,34 +1056,19 @@ class CModelDriver(CompiledModelDriver):
                     continue
                 new_vars_list.append(x)
                 if for_yggdrasil:
-                    if x.get('length_var', False):
-                        if x['name'].startswith('*'):
-                            new_vars_list.append(
-                                dict(x['length_var'],
-                                     name='*' + x['length_var']['name']))
-                        elif x['name'].startswith('&'):
-                            new_vars_list.append(
-                                dict(x['length_var'],
-                                     name='&' + x['length_var']['name']))
-                        else:
-                            new_vars_list.append(x['length_var'])
-                    elif (x.get('ndim_var', False)
-                          and x.get('shape_var', False)):
-                        if x['name'].startswith('*'):
-                            new_vars_list += [
-                                dict(x['ndim_var'],
-                                     name='*' + x['ndim_var']['name']),
-                                dict(x['shape_var'],
-                                     name='*' + x['shape_var']['name'])]
-                        elif x['name'].startswith('&'):
-                            new_vars_list += [
-                                dict(x['ndim_var'],
-                                     name='&' + x['ndim_var']['name']),
-                                dict(x['shape_var'],
-                                     name='&' + x['shape_var']['name'])]
-                        else:
-                            new_vars_list += [x['ndim_var'],
-                                              x['shape_var']]
+                    for k in ['length', 'ndim', 'shape']:
+                        kvar = k + '_var'
+                        if x.get(kvar, False):
+                            if x['name'].startswith('*'):
+                                new_vars_list.append(
+                                    dict(x[kvar],
+                                         name='*' + x[kvar]['name']))
+                            elif x['name'].startswith('&'):
+                                new_vars_list.append(
+                                    dict(x[kvar],
+                                         name='&' + x[kvar]['name']))
+                            else:
+                                new_vars_list.append(x[kvar])
         if in_definition:
             new_vars_list2 = []
             for x in new_vars_list:
@@ -1002,7 +1078,9 @@ class CModelDriver(CompiledModelDriver):
                         + x['name'].rsplit('*', 1))
                 else:
                     name = '%s %s' % (cls.get_native_type(**x), x['name'])
-                new_vars_list2.append(dict(x, name=name))
+                new_var = dict(x, name=name)
+                new_var['name'] = cls.get_name_declare(new_var)
+                new_vars_list2.append(new_var)
             new_vars_list = new_vars_list2
         return super(CModelDriver, cls).prepare_variables(
             new_vars_list, in_definition=in_definition,
@@ -1033,11 +1111,20 @@ class CModelDriver(CompiledModelDriver):
         """
         if in_inputs:
             if in_definition:
-                vars_list = [dict(y, name='*' + y['name'])
-                             for y in vars_list]
+                vars_list = [
+                    dict(y, name='*' + y['name'])
+                    for y in vars_list]
+                for y in vars_list:
+                    if ((('shape' in y.get('datatype', {}))
+                         or ('length' in y.get('datatype', {})))):
+                        y['name'] = '(%s)' % y['name']
             else:
                 vars_list = [dict(y, name='&' + y['name'])
                              for y in vars_list]
+                if for_yggdrasil:
+                    for y in vars_list:
+                        if 'shape' in y.get('datatype', {}):
+                            y['name'] += len(y['datatype']['shape']) * '[0]'
         else:
             # If the output is a True output and not passed as an input
             # parameter, then the output should not include the type
@@ -1212,8 +1299,14 @@ class CModelDriver(CompiledModelDriver):
                    '\"{units}\")')
             keys = {k: datatype[k] for k in ['subtype', 'precision']}
             if 'shape' in datatype:
+                shape_var = '%s_shape' % name
+                out += ['size_t %s[%d] = {%s};' % (
+                    shape_var, len(datatype['shape']),
+                    ', '.join([str(s) for s in datatype['shape']]))]
                 keys['ndim'] = len(datatype['shape'])
-                keys['shape'] = '[%s]' % ', '.join(datatype['shape'])
+                keys['shape'] = shape_var
+                fmt = fmt.replace('create_dtype_ndarray',
+                                  'create_dtype_ndarray_arr')
             else:
                 keys['ndim'] = 0
                 keys['shape'] = 'NULL'
@@ -1369,6 +1462,16 @@ class CModelDriver(CompiledModelDriver):
                 native_type=src_var_dtype, N=src_var_length)
             kwargs.update(copy=True, native_type=src_var_dtype,
                           N=src_var_length)
+        elif isinstance(dst_var, dict):
+            if 'shape' in dst_var.get('datatype', {}):
+                nele = 1
+                for s in dst_var['datatype']['shape']:
+                    nele *= s
+                kwargs.update(copy=True, N=nele,
+                              native_type=dst_var['datatype']['subtype'])
+            elif 'length' in dst_var.get('datatype', {}):
+                kwargs.update(copy=True, N=dst_var['datatype']['length'],
+                              native_type=dst_var['datatype']['subtype'])
         if outputs_in_inputs and (cls.language != 'c++'):
             if isinstance(dst_var, dict):
                 dst_var = dict(dst_var,

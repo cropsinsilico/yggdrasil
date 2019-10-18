@@ -868,87 +868,60 @@ public:
       return false;
     }
     // Transfer data to array memory
-    switch (type_code()) {
-    case T_1DARRAY:
-    case T_NDARRAY: {
-      char **temp = (char**)va_arg(ap.va, unsigned char**);
+    char *arg;
+    char **p;
+    if (allow_realloc) {
+      p = va_arg(ap.va, char**);
+      arg = *p;
+    } else {
+      arg = va_arg(ap.va, char*);
+      p = &arg;
+    }
+    (*nargs)--;
+    bool skip_terminal;
+    if ((type_code() == T_SCALAR) &&
+	((subtype_code_ == T_BYTES) || (subtype_code_ == T_UNICODE))) {
+      size_t * const arg_siz = va_arg(ap.va, size_t*);
       (*nargs)--;
-      size_t temp_siz = 0;
-      int allow_realloc0 = 1; // Always assumed to be pointers to buffers
-      bool skip_terminal = true;
-      int ret = copy_to_buffer((char*)decoded_bytes, decoded_len, temp, temp_siz,
-			       allow_realloc0, skip_terminal);
+      skip_terminal = false;
+      int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
+			       p, arg_siz[0], allow_realloc, skip_terminal);
       if (ret < 0) {
-	ygglog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for array.");
+	ygglog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for %s.",
+		     subtype());
 	free(decoded_bytes);
-	if (*temp != NULL)
-	  free(*temp);
-	*temp = NULL;
 	return false;
       }
-      break;
-    }
-    case T_SCALAR: {
-      char *arg;
-      char **p;
+      arg_siz[0] = (size_t)ret;
+    } else {
+      size_t *arg_siz = &nbytes_expected;
       if (allow_realloc) {
-	p = va_arg(ap.va, char**);
-	arg = *p;
-      } else {
-	arg = va_arg(ap.va, char*);
-	p = &arg;
+	arg_siz[0] = 0;
       }
-      (*nargs)--;
-      bool skip_terminal;
-      switch (subtype_code_) {
-      case T_BYTES:
-      case T_UNICODE: {
-	size_t * const arg_siz = va_arg(ap.va, size_t*);
-	(*nargs)--;
-	skip_terminal = false;
-	int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
-				 p, arg_siz[0], allow_realloc, skip_terminal);
-	if (ret < 0) {
-	  ygglog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for %s.",
-		       subtype());
-	  free(decoded_bytes);
-	  return false;
-	}
-	arg_siz[0] = (size_t)ret;
-	break;
-      }
-      default: {
-	size_t *arg_siz = &nbytes_expected;
-	if (allow_realloc) {
-	  arg_siz[0] = 0;
-	}
-	skip_terminal = true;
-	if ((cast_precision_ != 0) && (cast_precision_ != precision_)) {
-	  try {
-	    decoded_len = cast_bytes(&decoded_bytes, decoded_len);
-	    
-	    if (!(allow_realloc)) {
-	      arg_siz[0] = decoded_len;
-	    }
-	  } catch(...) {
-	    ygglog_error("ScalarMetaschemaType::decode_data: Cannot cast subtype '%s' and precision %ld to precision %ld.",
-			 subtype_, precision_, cast_precision_);
-	    free(decoded_bytes);
-	    return false;
+      skip_terminal = true;
+      if ((cast_precision_ != 0) && (cast_precision_ != precision_)) {
+	try {
+	  decoded_len = cast_bytes(&decoded_bytes, decoded_len);
+	  
+	  if (!(allow_realloc)) {
+	    arg_siz[0] = decoded_len;
 	  }
-	}
-	// ygglog_info("arg_siz = %ld", *arg_siz);
-	int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
-				 p, *arg_siz, allow_realloc, skip_terminal);
-	if (ret < 0) {
-	  ygglog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for %s.",
-		       subtype());
+	} catch(...) {
+	  ygglog_error("ScalarMetaschemaType::decode_data: Cannot cast subtype '%s' and precision %ld to precision %ld.",
+		       subtype_, precision_, cast_precision_);
 	  free(decoded_bytes);
 	  return false;
 	}
       }
+      // ygglog_info("arg_siz = %ld", *arg_siz);
+      int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
+			       p, *arg_siz, allow_realloc, skip_terminal);
+      if (ret < 0) {
+	ygglog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for %s.",
+		     subtype());
+	free(decoded_bytes);
+	return false;
       }
-    }
     }
     free(decoded_bytes);
     return true;
@@ -1095,6 +1068,11 @@ public:
    */
   const size_t nelements() const override;
   /*!
+    @brief Determine if the number of elements is variable.
+    @returns bool true if the number of elements can change, false otherwise.
+  */
+  const bool variable_nelements() const override;
+  /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
@@ -1207,6 +1185,13 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
    */
   const size_t nelements() const override {
     return length_;
+  }
+  /*!
+    @brief Determine if the number of elements is variable.
+    @returns bool true if the number of elements can change, false otherwise.
+  */
+  const bool variable_nelements() const override {
+    return _variable_length;
   }
   /*!
     @brief Update the type object with info from another type object.
@@ -1372,6 +1357,9 @@ const size_t NDArrayMetaschemaType::nelements() const {
     }
   }
   return nelements;
+};
+const bool NDArrayMetaschemaType::variable_nelements() const {
+  return _variable_shape;
 };
 void NDArrayMetaschemaType::update(MetaschemaType* new_info) {
   ScalarMetaschemaType::update(new_info);

@@ -1,4 +1,5 @@
 import os
+import copy
 from yggdrasil.components import import_component
 from yggdrasil.languages import get_language_ext
 from yggdrasil.metaschema.datatypes import get_type_class
@@ -40,7 +41,8 @@ class TestExampleTypes(ExampleTstBase):
         return out
 
     @classmethod
-    def setup_model(cls, language, typename, language_ext=None):
+    def setup_model(cls, language, typename, language_ext=None,
+                    using_pointers=False):
         r"""Write the model file for the specified combination of
         language and type.
 
@@ -50,6 +52,9 @@ class TestExampleTypes(ExampleTstBase):
             language_ext (str, optional): Extension that should be used
                 for the model file. If not provided, the extension is
                 determined from the specified language.
+            using_pointers (bool, optional): If True and the tested
+                languages supports pointers, pointers will be used rather
+                than explicit arrays. Defaults to False.
 
         Returns:
             str: Full path to the file that was written.
@@ -62,13 +67,17 @@ class TestExampleTypes(ExampleTstBase):
         drv = import_component('model', language)
         testdata = cls.get_test_data(typename)
         testtype = encode_type(testdata)
-        inputs = [{'name': 'x', 'datatype': testtype}]
-        outputs = [{'name': 'y', 'datatype': testtype}]
+        inputs = [{'name': 'x', 'datatype': copy.deepcopy(testtype)}]
+        outputs = [{'name': 'y', 'datatype': copy.deepcopy(testtype)}]
         # Write the model
         function_contents = []
         function_contents.append(
             drv.format_function_param('print', message='IN MODEL'))
         for i, o in zip(inputs, outputs):
+            if using_pointers:
+                for k in ['shape', 'length']:
+                    i['datatype'].pop(k, None)
+                    o['datatype'].pop(k, None)
             function_contents += drv.write_assign_to_output(
                 o, i, outputs_in_inputs=drv.outputs_in_inputs)
         print_key = None
@@ -102,12 +111,16 @@ class TestExampleTypes(ExampleTstBase):
         if language == 'c':
             in_vars = 'x'
             out_vars = 'y'
-            if typename in ['string', 'bytes', 'unicode', '1darray']:
+            if using_pointers:
+                if typename in ['string', 'bytes', 'unicode', '1darray']:
+                    in_vars += ', x_length'
+                    out_vars += ', y_length'
+                elif typename in ['ndarray']:
+                    in_vars += ', x_ndim, x_shape'
+                    out_vars += ', y_ndim, y_shape'
+            elif typename in ['string', 'bytes']:
                 in_vars += ', x_length'
                 out_vars += ', y_length'
-            elif typename in ['ndarray']:
-                in_vars += ', x_ndim, x_shape'
-                out_vars += ', y_ndim, y_shape'
             os.environ['TEST_MODEL_IO'] = (
                 'inputs:\n'
                 '      name: input\n'
