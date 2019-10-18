@@ -71,8 +71,6 @@ class TestExampleTypes(ExampleTstBase):
         outputs = [{'name': 'y', 'datatype': copy.deepcopy(testtype)}]
         # Write the model
         function_contents = []
-        function_contents.append(
-            drv.format_function_param('print', message='IN MODEL'))
         for i, o in zip(inputs, outputs):
             if using_pointers:
                 for k in ['shape', 'length']:
@@ -80,27 +78,12 @@ class TestExampleTypes(ExampleTstBase):
                     o['datatype'].pop(k, None)
             function_contents += drv.write_assign_to_output(
                 o, i, outputs_in_inputs=drv.outputs_in_inputs)
-        print_key = None
-        if ('print_%s' % testtype['type']) in drv.function_param:
-            print_key = ('print_%s' % testtype['type'])
-        elif 'print_any' in drv.function_param:
-            print_key = 'print_any'
-        if print_key is not None:
-            for x in inputs:
-                function_contents += [
-                    drv.format_function_param('print', message=(
-                        'INPUT[%s]:' % x['name'])),
-                    drv.format_function_param(print_key,
-                                              object=x['name'])]
-            for x in outputs:
-                function_contents += [
-                    drv.format_function_param('print', message=(
-                        'OUTPUT[%s]:' % x['name'])),
-                    drv.format_function_param(print_key,
-                                              object=x['name'])]
         lines = drv.write_function_def(
             'model', function_contents=function_contents,
-            inputs=inputs, outputs=outputs, outputs_in_inputs=drv.outputs_in_inputs)
+            inputs=inputs, outputs=outputs,
+            outputs_in_inputs=drv.outputs_in_inputs,
+            opening_msg='IN MODEL',
+            print_inputs=True, print_outputs=True)
         with open(modelfile, 'w') as fd:
             print(modelfile)
             print('\n'.join(lines))

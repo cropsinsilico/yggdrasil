@@ -362,130 +362,104 @@ MetaschemaType* dtype2class(const dtype_t* dtype) {
 // C exposed functions
 extern "C" {
 
-  generic_t* init_generic() {
-    try {
-      generic_t* out = (generic_t*)malloc(sizeof(generic_t));
-      if (out == NULL) {
-      	ygglog_throw_error("init_generic: Failed to malloc for generic type structure.");
-      }
-      out->prefix = '@';
-      out->obj = NULL;
-      return out;
-    } catch(...) {
-      ygglog_error("init_generic: C++ exception thrown.");
-      return NULL;
-    }
+  generic_t init_generic() {
+    generic_t out;
+    out.prefix = '@';
+    out.obj = NULL;
+    return out;
+  }
+
+  int is_generic_flag(char x) {
+    if (x == '@')
+      return 1;
+    else
+      return 0;
+  }
+
+  int is_generic_init(generic_t x) {
+    return is_generic_flag(x.prefix);
   }
   
-  generic_t* create_generic(dtype_t* type_struct, void* data, size_t nbytes) {
+  generic_t create_generic(dtype_t* type_struct, void* data, size_t nbytes) {
+    generic_t out = init_generic();
     try {
       MetaschemaType* type = dtype2class(type_struct);
       YggGeneric* obj = new YggGeneric(type, data, nbytes);
-      generic_t* out = init_generic();
-      out->obj = (void*)obj;
-      return out;
+      out.obj = (void*)obj;
     } catch(...) {
       ygglog_error("create_generic: C++ exception thrown.");
-      return NULL;
+      destroy_generic(&out);
     }
+    return out;
   }
 
-  int destroy_generic(generic_t** x) {
+  int destroy_generic(generic_t* x) {
     int ret = 0;
+    x->prefix = ' ';
     if (x != NULL) {
-      if (x[0] != NULL) {
-	if (x[0]->obj != NULL) {
-	  try {
-	    YggGeneric* obj = (YggGeneric*)(x[0]->obj);
-	    delete obj;
-	    x[0]->obj = NULL;
-	  } catch (...) {
-	    ygglog_error("destroy_generic: C++ exception thrown in destructor for YggGeneric.");
-	    ret = -1;
-	  }
+      if (x->obj != NULL) {
+	try {
+	  YggGeneric* obj = (YggGeneric*)(x->obj);
+	  delete obj;
+	  x->obj = NULL;
+	} catch (...) {
+	  ygglog_error("destroy_generic: C++ exception thrown in destructor for YggGeneric.");
+	  ret = -1;
 	}
-	free(x[0]);
-	x[0] = NULL;
       }
     }
     return ret;
   }
 
-  int copy_generic(generic_t* dst, generic_t* src) {
+  generic_t copy_generic(generic_t src) {
+    generic_t out = init_generic();
     try {
-      if (dst == NULL) {
-	ygglog_throw_error("copy_generic: Destination object not initialized.");
-	return -1;
-      }
-      if (src == NULL) {
+      if (!(is_generic_init(src))) {
 	ygglog_throw_error("copy_generic: Source object not initialized.");
-	return -1;
       }
-      YggGeneric* dst_obj = (YggGeneric*)(dst->obj);
-      YggGeneric* src_obj = (YggGeneric*)(src->obj);
+      YggGeneric* src_obj = (YggGeneric*)(src.obj);
       if (src_obj == NULL) {
 	ygglog_throw_error("copy_generic: Generic object class is NULL.");
-	return -1;
       }
-      if (dst_obj != NULL) {
-	delete dst_obj;
-      }
-      dst->obj = src_obj->copy();
-      return 0;
+      out.obj = src_obj->copy();
     } catch(...) {
       ygglog_error("copy_generic: C++ exception thrown.");
-      return -1;
+      destroy_generic(&out);
     }
+    return out;
   }
 
-  void display_generic(generic_t* x) {
+  void display_generic(generic_t x) {
     try {
-      if (is_generic((void*)x)) {
-	YggGeneric* x_obj = (YggGeneric*)(x->obj);
+      if (is_generic_init(x)) {
+	YggGeneric* x_obj = (YggGeneric*)(x.obj);
 	if (x_obj != NULL) {
 	  x_obj->display();
-	}
-      } else if (x != NULL) {
-	void** xx = (void**)x;
-	if (xx[0] != NULL) {
-	  display_generic((generic_t*)(xx[0]));
 	}
       }
     } catch (...) {
       ygglog_error("display_generic: C++ exception thrown.");
     }
   }
-  
-  int is_generic(void* x) {
-    if (x != NULL) {
-      generic_t* xgen = (generic_t*)x;
-      if (xgen->prefix == '@') {
-	return 1;
-      }
-    }
-    return 0;
-  }
 
-  generic_t* get_generic(void* x, int is_pointer) {
-    generic_t* out = NULL;
-    if ((is_pointer) && (x != NULL)) {
-      void** x2 = (void**)x;
-      if (is_generic(x2[0])) {
-	out = (generic_t*)(x2[0]);
-      }
-    } else if (is_generic(x)) {
-      out = (generic_t*)x;
-    }
+  generic_t get_generic_va(size_t nargs, va_list_t ap) {
+    va_list ap_copy;
+    va_copy(ap_copy, ap.va);
+    generic_t out = va_arg(ap_copy, generic_t);
     return out;
   }
 
-  generic_t* get_generic_va(size_t nargs, va_list_t ap, int is_pointer) {
+  generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap) {
     va_list ap_copy;
     va_copy(ap_copy, ap.va);
-    void* arg = va_arg(ap_copy, void*);
-    return get_generic(arg, is_pointer);
+    generic_t *out = va_arg(ap_copy, generic_t*);
+    if ((out != NULL) || (is_generic_init(*out))) {
+      return out;
+    } else {
+      return NULL;
+    }
   }
-
+  
   int is_empty_dtype(const dtype_t* dtype) {
     if (dtype == NULL) {
       return 1;
@@ -914,10 +888,10 @@ extern "C" {
   int update_dtype_from_generic_ap(dtype_t* dtype1, size_t nargs,
 				   va_list_t ap) {
     try {
-      generic_t* gen_arg = get_generic_va(nargs, ap, 0);
-      if (gen_arg != NULL) {
+      generic_t gen_arg = get_generic_va(nargs, ap);
+      if (is_generic_init(gen_arg)) {
 	dtype_t dtype2;
-	YggGeneric* ygg_gen_arg = (YggGeneric*)(gen_arg->obj);
+	YggGeneric* ygg_gen_arg = (YggGeneric*)(gen_arg.obj);
 	MetaschemaType *type_class = ygg_gen_arg->get_type();
 	if (type_class == NULL) {
 	  ygglog_throw_error("update_dtype_from_generic_ap: Type in generic class is NULL.");
@@ -968,8 +942,8 @@ extern "C" {
 			const int allow_realloc, size_t *nargs, va_list_t ap) {
     try {
       MetaschemaType* type = dtype2class(dtype);
-      generic_t* gen_arg = get_generic_va(*nargs, ap, 1);
-      if (gen_arg != NULL) {
+      generic_t* gen_arg = get_generic_va_ptr(*nargs, ap);
+      if ((gen_arg != NULL) && (is_generic_init(*gen_arg))) {
 	if (gen_arg->obj == NULL) {
 	  gen_arg->obj = (void*)(new YggGeneric(type, NULL));
 	}
@@ -987,10 +961,10 @@ extern "C" {
 		      const int allow_realloc, size_t *nargs, va_list_t ap) {
     try {
       MetaschemaType* type = dtype2class(dtype);
-      generic_t* gen_arg = get_generic_va(*nargs, ap, 0);
-      if (gen_arg != NULL) {
+      generic_t gen_arg = get_generic_va(*nargs, ap);
+      if (is_generic_init(gen_arg)) {
 	return type->serialize(buf, buf_siz, allow_realloc,
-			       (YggGeneric*)(gen_arg->obj));
+			       (YggGeneric*)(gen_arg.obj));
       }
       return type->serialize(buf, buf_siz, allow_realloc, nargs, ap);
     } catch (...) {

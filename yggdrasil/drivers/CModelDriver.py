@@ -323,9 +323,9 @@ class CModelDriver(CompiledModelDriver):
         'init_schema': 'init_schema()',
         'init_ply': 'init_ply()',
         'init_obj': 'init_obj()',
-        'copy_array': 'copy_vector({name}, {value});',
-        'copy_object': 'copy_map({name}, {value});',
-        'copy_schema': 'copy_schema({name}, {value});',
+        'copy_array': '{name} = copy_vector({value});',
+        'copy_object': '{name} = copy_map({value});',
+        'copy_schema': '{name} = copy_schema({value});',
         'copy_ply': '{name} = copy_ply({value});',
         'copy_obj': '{name} = copy_obj({value});',
         'free_array': 'free_vector({variable});',
@@ -1134,6 +1134,30 @@ class CModelDriver(CompiledModelDriver):
             vars_list, in_definition=in_definition, in_inputs=in_inputs,
             for_yggdrasil=for_yggdrasil)
 
+    @classmethod
+    def write_print_output_var(cls, var, in_inputs=False, **kwargs):
+        r"""Get the lines necessary to print an output variable in this
+        language.
+
+        Args:
+            var (dict): Variable information.
+            in_inputs (bool, optional): If True, the output variable
+                is passed in as an input variable to be populated.
+                Defaults to False.
+            **kwargs: Additional keyword arguments are passed to write_print_var.
+
+        Returns:
+            list: Lines printing the specified variable.
+
+        """
+        if in_inputs and (cls.language != 'c++'):
+            if isinstance(var, dict):
+                var = dict(var, name='%s[0]' % var['name'])
+            else:
+                var = '%s[0]' % var
+        return super(CModelDriver, cls).write_print_output_var(
+            var, in_inputs=in_inputs, **kwargs)
+        
     @classmethod
     def write_function_def(cls, function_name, dont_add_lengths=False,
                            **kwargs):

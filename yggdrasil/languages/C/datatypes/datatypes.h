@@ -28,13 +28,13 @@ typedef struct generic_t {
 } generic_t;
 
 /*! @brief C-friendly definition of vector object. */
-typedef generic_t* vector_t;
+typedef generic_t vector_t;
 
 /*! @brief C-friendly definition of map object. */
-typedef generic_t* map_t;
+typedef generic_t map_t;
 
 /*! @brief C-friendly definition of schema object. */
-typedef generic_t* schema_t;
+typedef generic_t schema_t;
 
 /*! @brief Aliases to allow differentiation in parsing model definition. */
 typedef char* unicode_t;
@@ -69,9 +69,25 @@ typedef struct comm_head_t {
 
 /*!
   @brief Initialize an empty generic object.
-  @returns generic_t* Pointer to new generic object structure.
+  @returns generic_t Pointer to new generic object structure.
  */
-generic_t* init_generic();
+generic_t init_generic();
+
+
+/*!
+  @brief Determine if the provided character matches the required generic prefix char.
+  @param[in] x char Character to check.
+  @returns int 1 if the character is the correct prefix, 0 otherwise.
+ */
+int is_generic_flag(char x);
+
+
+/*!
+  @brief Determine if a generic structure is initialized.
+  @param[in] x generic_t Generic structure to test.
+  @returns int 1 if the structure is initialized, 0 otherwise.
+ */
+int is_generic_init(generic_t x);
 
 
 /*!
@@ -79,9 +95,9 @@ generic_t* init_generic();
   @param[in] type_class dtype_t* Type structure/class.
   @param[in] data void* Pointer to data.
   @param[in] nbytes size_t Size of data.
-  @returns generic_t* Pointer to new generic object structure.
+  @returns generic_t Pointer to new generic object structure.
  */
-generic_t* create_generic(dtype_t* type_class, void* data, size_t nbytes);
+generic_t create_generic(dtype_t* type_class, void* data, size_t nbytes);
 
   
 /*!
@@ -89,27 +105,32 @@ generic_t* create_generic(dtype_t* type_class, void* data, size_t nbytes);
   @param[in] x generic_t* Pointer to generic object structure to destory.
   @returns int -1 if unsuccessful, 0 otherwise.
  */
-int destroy_generic(generic_t** x);
+int destroy_generic(generic_t* x);
 
 
 /*!
   @brief Copy data from one generic object to the other.
-  @param[in] dst generic_t* Pointer to generic structure that data should be copied to.
-  @param[in] src generic_t* Pointer to generic structure that data should be copied from.
-  @returns int 0 if successful, -1 otherwise.
+  @param[in] src generic_t Generic structure that data should be copied from.
+  @returns generic_t Copied structure.
  */
-int copy_generic(generic_t* dst, generic_t* src);
+generic_t copy_generic(generic_t src);
 
 
 /*!
-  @brief Return the recovered generic structure if one is present.
-  @param[in] x void* Pointer to check for generic structure.
-  @param[in] is_pointer bool If true, the input is treated as a
-  pointer to as pointer. Defaults to false.
-  @returns generic_t* Pointer to generic structure if one is present,
-  NULL otherwise.
+  @brief Display information about the generic type.
+  @param[in] x generic_t* Wrapper for generic object.
  */
-generic_t* get_generic(void* x, int is_pointer);
+void display_generic(generic_t x);
+
+  
+/*!
+  @brief Return the recovered generic structure if one is present in
+  the variable argument list.
+  @param[in] nargs size_t Number of argument present in ap.
+  @param[in] ap va_list_t Variable argument list.
+  @returns generic_t Generic structure if one is present.
+ */
+generic_t get_generic_va(size_t nargs, va_list_t ap);
 
 
 /*!
@@ -117,27 +138,9 @@ generic_t* get_generic(void* x, int is_pointer);
   the variable argument list.
   @param[in] nargs size_t Number of argument present in ap.
   @param[in] ap va_list_t Variable argument list.
-  @param[in] is_pointer bool If true, the input is treated as a
-  pointer to as pointer. Defaults to false.
-  @returns generic_t* Pointer to generic structure if one is present,
-  NULL otherwise.
+  @returns generic_t* Generic structure if one is present, NULL otherwise.
  */
-generic_t* get_generic_va(size_t nargs, va_list_t ap, int is_pointer);
-
-
-/*!
-  @brief Display information about the generic type.
-  @param[in] x generic_t* Wrapper for generic object.
- */
-void display_generic(generic_t* x);
-
-  
-/*!
-  @brief Determine if a pointer points to a generic object.
-  @param[in] x void* Pointer to test.
-  @returns 0 if pointer is not to generic structure, 1 if it is.
- */
-int is_generic(void* x);
+generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap);
 
 
 /*!

@@ -1821,11 +1821,77 @@ checking if the model flag indicates
         return lines
 
     @classmethod
+    def write_print_var(cls, var, prefix_msg=None):
+        r"""Get the lines necessary to print a variable in this language.
+
+        Args:
+            var (dict): Variable information.
+            prefix_msg (str, optional): Message that should be printed
+                before the variable. Defaults to None and is ignored.
+
+        Returns:
+            list: Lines printing the specified variable.
+
+        """
+        out = []
+        if isinstance(var, dict):
+            typename = var.get(
+                'datatype',
+                {'type': var.get('type', None)}).get('type', None)
+            print_key = None
+            if ('print_%s' % typename) in cls.function_param:
+                print_key = ('print_%s' % typename)
+            elif 'print_any' in cls.function_param:
+                print_key = 'print_any'
+            if print_key:
+                if prefix_msg is None:
+                    out.append(prefix_msg)
+                out += [cls.format_function_param(
+                    print_key, object=var['name'])]
+        return out
+
+    @classmethod
+    def write_print_input_var(cls, var, **kwargs):
+        r"""Get the lines necessary to print an input variable in this
+        language.
+
+        Args:
+            var (dict): Variable information.
+            **kwargs: Additional keyword arguments are passed to write_print_var.
+
+        Returns:
+            list: Lines printing the specified variable.
+
+        """
+        return cls.write_print_var(var, **kwargs)
+        
+    @classmethod
+    def write_print_output_var(cls, var, in_inputs=False, **kwargs):
+        r"""Get the lines necessary to print an output variable in this
+        language.
+
+        Args:
+            var (dict): Variable information.
+            in_inputs (bool, optional): If True, the output variable
+                is passed in as an input variable to be populated.
+                Defaults to False.
+            **kwargs: Additional keyword arguments are passed to write_print_var.
+
+        Returns:
+            list: Lines printing the specified variable.
+
+        """
+        return cls.write_print_var(var, **kwargs)
+        
+    @classmethod
     def write_function_def(cls, function_name, inputs=[], outputs=[],
                            input_var=None, output_var=None,
                            function_contents=[],
                            dont_declare_output=False,
-                           outputs_in_inputs=False, **kwargs):
+                           outputs_in_inputs=False,
+                           opening_msg=None, closing_msg=None,
+                           print_inputs=False, print_outputs=False,
+                           **kwargs):
         r"""Write a function definition.
 
         Args:
@@ -1852,6 +1918,18 @@ checking if the model flag indicates
             outputs_in_inputs (bool, optional): If True, the outputs are
                 presented in the function definition as inputs. Defaults
                 to False.
+            opening_msg (str, optional): String that should be printed
+                before the function contents (and inputs if print_inputs
+                is True). Defaults to None and is ignored.
+            closing_msg (str, optional): String that should be printed
+                after the function contents (and outputs if print_outputs
+                is True). Defaults to None and is ignored.
+            print_inputs (bool, optional): If True, the input variables
+                will be printed before the function contents. Defaults
+                to False.
+            print_outputs (bool, optional): If True, the output variables
+                will be printed after the function contents. Defaults to
+                False.
             **kwargs: Additional keyword arguments are passed to
                 cls.format_function_param.
 
@@ -1880,6 +1958,17 @@ checking if the model flag indicates
         if output_var is None:
             output_var = cls.prepare_output_variables(
                 outputs, in_inputs=outputs_in_inputs, in_definition=True)
+        print_input_lines = []
+        if print_inputs and inputs:
+            for x in inputs:
+                print_input_lines += cls.write_print_input_var(
+                    x, prefix_msg=('INPUT[%s]:' % x['name']))
+        print_output_lines = []
+        if print_outputs and outputs:
+            for x in outputs:
+                print_output_lines += cls.write_print_output_var(
+                    x, prefix_msg=('OUTPUT[%s]:' % x['name']),
+                    in_inputs=outputs_in_inputs)
         if outputs_in_inputs:
             input_var = cls.prepare_input_variables(
                 [input_var, output_var])
@@ -1910,8 +1999,22 @@ checking if the model flag indicates
             out.append(cls.function_param['indent']
                        + cls.format_function_param(
                            'assign', **flag_var))
+        if opening_msg:
+            out.append(cls.function_param['indent']
+                       + cls.format_function_param(
+                           'print', message=opening_msg))
+        if print_inputs:
+            for x in print_input_lines:
+                out.append(cls.function_param['indent'] + x)
         for x in function_contents:
             out.append(cls.function_param['indent'] + x)
+        if print_outputs:
+            for x in print_output_lines:
+                out.append(cls.function_param['indent'] + x)
+        if closing_msg:
+            out.append(cls.function_param['indent']
+                       + cls.format_function_param(
+                           'print', message=closing_msg))
         for x in free_vars:
             out.append(cls.function_param['indent']
                        + cls.format_function_param(
