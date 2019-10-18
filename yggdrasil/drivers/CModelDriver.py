@@ -1311,6 +1311,9 @@ class CModelDriver(CompiledModelDriver):
                 keys['ndim'] = 0
                 keys['shape'] = 'NULL'
             keys['units'] = datatype.get('units', '')
+        elif datatype['type'] in ['boolean', 'null', 'number', 'integer']:
+            fmt = 'create_dtype_default(\"{type}\")'
+            keys = {'type': datatype['type']}
         else:
             fmt = 'create_dtype_scalar(\"{subtype}\", {precision}, \"{units}\")'
             keys = {}

@@ -193,6 +193,15 @@ dtype_t* create_dtype_empty();
 dtype_t* create_dtype_direct();
 
 
+  
+/*!
+  @brief Construct a type object for one of the default JSON types.
+  @param[in] type char* Name of the type.
+  @returns dtype_t* Type structure/class.
+*/
+dtype_t* create_dtype_default(const char* type);
+
+
 /*!
   @brief Construct a Scalar type object.
   @param[in] subtype char* Name of the scalar subtype (e.g. int, uint, float, bytes).

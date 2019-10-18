@@ -601,6 +601,18 @@ extern "C" {
     }
   }
 
+  dtype_t* create_dtype_default(const char* type) {
+    MetaschemaType* obj = NULL;
+    try {
+      obj = new MetaschemaType(type);
+      return create_dtype(obj);
+    } catch(...) {
+      ygglog_error("create_dtype_default: C++ exception thrown.");
+      CSafe(delete obj);
+      return NULL;
+    }
+  }
+
   dtype_t* create_dtype_scalar(const char* subtype, const size_t precision,
 			       const char* units) {
     ScalarMetaschemaType* obj = NULL;

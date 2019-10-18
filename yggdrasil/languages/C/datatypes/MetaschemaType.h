@@ -581,7 +581,11 @@ public:
 			   YggGeneric* x) const {
     size_t nargs = 1;
     switch (type_code_) {
-    case T_BOOLEAN:
+    case T_BOOLEAN: {
+      bool arg = false;
+      x->get_data(arg);
+      return encode_data(writer, &nargs, arg);
+    }
     case T_INTEGER: {
       int arg = 0;
       x->get_data(arg);
