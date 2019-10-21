@@ -349,6 +349,7 @@ class CModelDriver(CompiledModelDriver):
         'free_obj': 'free_obj({variable});',
         'free_class': 'destroy_python({variable});',
         'free_function': 'destroy_python({variable});',
+        'print_complex': 'print_complex({object});',
         'print_array': 'display_vector({object});',
         'print_object': 'display_map({object});',
         'print_schema': 'display_schema({object});',
@@ -819,7 +820,18 @@ class CModelDriver(CompiledModelDriver):
                 out += '*'
         elif 'X' in out:
             precision = json_type['precision']
-            out = out.replace('X', str(precision))
+            if json_type['type'] == 'complex':
+                if precision == 64:
+                    out = out.replace('X', 'float')
+                elif precision == 128:
+                    out = out.replace('X', 'double')
+                elif precision == 256:
+                    out = out.replace('X', 'long_double')
+                else:  # pragma: debug
+                    raise ValueError("Unsupported precision for complex types: %d"
+                                     % precision)
+            else:
+                out = out.replace('X', str(precision))
         elif out == 'double':
             if json_type['precision'] == 32:
                 out = 'float'
@@ -852,6 +864,17 @@ class CModelDriver(CompiledModelDriver):
         if grp['type'] == 'char':
             out['type'] = 'bytes'
             out['precision'] = 0
+        elif grp['type'].startswith('complex'):
+            out['type'] = 'complex'
+            if grp['type'].endswith('long_double'):
+                out['precision'] = 256
+            elif grp['type'].endswith('double'):
+                out['precision'] = 128
+            elif grp['type'].endswith('float'):
+                out['precision'] = 64
+            else:  # pragma: debug
+                raise ValueError("Cannot determine precision for complex type '%s'"
+                                 % grp['type'])
         else:
             if grp['type'] == 'double':
                 out['precision'] = 8 * 8

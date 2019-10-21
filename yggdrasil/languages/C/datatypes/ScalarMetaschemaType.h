@@ -15,19 +15,6 @@
 #include "rapidjson/writer.h"
 
 
-#ifdef _WIN32
-#include <complex.h>
-typedef _Fcomplex complex_float;
-typedef _Dcomplex complex_double;
-typedef _Lcomplex complex_long_double;
-#else
-#include <complex.h>
-typedef float _Complex complex_float;
-typedef double _Complex complex_double;
-typedef long double _Complex complex_long_double;
-#endif
-
-
 /*!
   @brief Base class for scalar type definition.
 
@@ -269,24 +256,24 @@ public:
     case T_COMPLEX: {
       if (sizeof(float) == (bytes_precision / 2)) {
 #ifdef _WIN32
-	complex_double* arg = (complex_double*)(x->get_data());
+	complex_double_t* arg = (complex_double_t*)(x->get_data());
 #else
-	complex_float* arg = (complex_float*)(x->get_data());
+	complex_float_t* arg = (complex_float_t*)(x->get_data());
 #endif
 	for (i = 0; i < x->get_nelements(); i++)
-	  std::cout << arg[i] << " ";
+	  std::cout << arg[i].re << "+" << arg[i].im << "j ";
 	std::cout << std::endl;
 	return;
       } else if (sizeof(double) == (bytes_precision / 2)) {
-	complex_double* arg = (complex_double*)(x->get_data());
+	complex_double_t* arg = (complex_double_t*)(x->get_data());
 	for (i = 0; i < x->get_nelements(); i++)
-	  std::cout << arg[i] << " ";
+	  std::cout << arg[i].re << "+" << arg[i].im << "j ";
 	std::cout << std::endl;
 	return;
       } else if (sizeof(long double) == (bytes_precision / 2)) {
-	complex_long_double* arg = (complex_long_double*)(x->get_data());
+	complex_long_double_t* arg = (complex_long_double_t*)(x->get_data());
 	for (i = 0; i < x->get_nelements(); i++)
-	  std::cout << arg[i] << " ";
+	  std::cout << arg[i].re << "+" << arg[i].im << "j ";
 	std::cout << std::endl;
 	return;
       } else {
@@ -636,17 +623,20 @@ public:
       case T_COMPLEX: {
 	if (sizeof(float) == (bytes_precision / 2)) {
 #ifdef _WIN32
-	  complex_double arg00 = va_arg(ap.va, complex_double);
-	  complex_float arg0 = {(float)creal(arg00), (float)cimag(arg00)};
+	  complex_double_t arg00 = va_arg(ap.va, complex_double_t);
+	  complex_float_t arg0 = {(float)(arg00.re), (float)(arg00.im)};
 #else
-	  complex_float arg0 = (complex_float)va_arg(ap.va, complex_double);
+	  // complex_double_t arg00 = va_arg(ap.va, complex_double_t);
+	  // complex_float_t arg0 = {(float)(arg00.re), (float)(arg00.im)};
+	  // complex_float_t arg0 = (complex_float_t)va_arg(ap.va, complex_double_t);
+	  complex_float_t arg0 = (complex_float_t)va_arg(ap.va, complex_float_t);
 #endif
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(double) == (bytes_precision / 2)) {
-	  complex_double arg0 = va_arg(ap.va, complex_double);
+	  complex_double_t arg0 = va_arg(ap.va, complex_double_t);
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(long double) == (bytes_precision / 2)) {
-	  complex_long_double arg0 = va_arg(ap.va, complex_long_double);
+	  complex_long_double_t arg0 = va_arg(ap.va, complex_long_double_t);
 	  memcpy(arg, &arg0, bytes_precision);
 	} else {
 	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported complex precision '%lu'.",
@@ -788,18 +778,18 @@ public:
       case T_COMPLEX: {
 	if (sizeof(float) == (bytes_precision / 2)) {
 #ifdef _WIN32
-	  complex_double arg;
+	  complex_double_t arg;
 #else
-	  complex_float arg;
+	  complex_float_t arg;
 #endif
 	  x->get_data(arg);
 	  return MetaschemaType::encode_data(writer, &nargs, arg);
 	} else if (sizeof(double) == (bytes_precision / 2)) {
-	  complex_double arg;
+	  complex_double_t arg;
 	  x->get_data(arg);
 	  return MetaschemaType::encode_data(writer, &nargs, arg);
 	} else if (sizeof(long double) == (bytes_precision / 2)) {
-	  complex_long_double arg;
+	  complex_long_double_t arg;
 	  x->get_data(arg);
 	  return MetaschemaType::encode_data(writer, &nargs, arg);
 	} else {

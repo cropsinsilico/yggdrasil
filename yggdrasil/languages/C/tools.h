@@ -16,10 +16,51 @@
 #include <Python.h>
 
 
+#ifdef _WIN32
+#include <complex.h>
+typedef _Fcomplex complex_float;
+typedef _Dcomplex complex_double;
+typedef _Lcomplex complex_long_double;
+#else
+#ifdef __cplusplus
+#include <complex>
+typedef std::complex<float> complex_float;
+typedef std::complex<double> complex_double;
+typedef std::complex<long double> complex_long_double;
+#ifndef creal
+#define creal(x) x.real()
+#define crealf(x) x.real()
+#define creall(x) x.real()
+#define cimag(x) x.imag()
+#define cimagf(x) x.imag()
+#define cimagl(x) x.imag()
+#endif
+#else
+#include <complex.h>
+typedef float _Complex complex_float;
+typedef double _Complex complex_double;
+typedef long double _Complex complex_long_double;
+#endif
+#endif
+#define print_complex(x) printf("%lf+%lfj\n", (double)creal(x), (double)cimag(x))
+
+
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
 #endif
 
+typedef struct complex_float_t {
+  float re;
+  float im;
+} complex_float_t;
+typedef struct complex_double_t {
+  double re;
+  double im;
+} complex_double_t;
+typedef struct complex_long_double_t {
+  long double re;
+  long double im;
+} complex_long_double_t;
 // Platform specific
 #ifdef _WIN32
 #include "regex/regex_win32.h"
