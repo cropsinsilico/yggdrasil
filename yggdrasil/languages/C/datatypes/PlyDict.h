@@ -287,6 +287,11 @@ ply_t copy_ply(ply_t src) {
 };
 
 
+/*!
+  @brief Display the information contained by a Ply struct.
+  @param[in] p ply_t Ply structure.
+  @param[in] indent const char* Indentation that should be added to each line.
+ */
 static inline
 void display_ply_indent(ply_t p, const char* indent) {
   int i, j;
@@ -310,6 +315,10 @@ void display_ply_indent(ply_t p, const char* indent) {
 };
 
   
+/*!
+  @brief Display the information contained by a Ply struct.
+  @param[in] p ply_t Ply structure.
+ */
 static inline
 void display_ply(ply_t p) {
   display_ply_indent(p, "");

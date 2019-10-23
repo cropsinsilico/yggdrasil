@@ -664,7 +664,7 @@ int alloc_obj(obj_t *p, int nvert, int ntexc, int nnorm, int nparam,
     }
     p->surface_params_u = new_surface_params_u;
     for (i = 0; i < p->nsurf; i++) {
-      float *iparam = (float*)malloc(2*sizeof(int));
+      float *iparam = (float*)malloc(2*sizeof(float));
       if (iparam == NULL) {
 	ygglog_error("alloc_obj: Failed to allocate surface param %d.", i);
 	free_obj(p);
@@ -680,7 +680,7 @@ int alloc_obj(obj_t *p, int nvert, int ntexc, int nnorm, int nparam,
     }
     p->surface_params_v = new_surface_params_v;
     for (i = 0; i < p->nsurf; i++) {
-      float *iparam = (float*)malloc(2*sizeof(int));
+      float *iparam = (float*)malloc(2*sizeof(float));
       if (iparam == NULL) {
 	ygglog_error("alloc_obj: Failed to allocate surface param %d.", i);
 	free_obj(p);
@@ -943,6 +943,11 @@ obj_t copy_obj(obj_t src) {
 };
 
 
+/*!
+  @brief Display the information contained by an Obj struct.
+  @param[in] p obj_t Obj structure.
+  @param[in] indent const char* Indentation that should be added to each line.
+ */
 static inline
 void display_obj_indent(obj_t p, const char* indent) {
   int i, j;
@@ -1017,6 +1022,10 @@ void display_obj_indent(obj_t p, const char* indent) {
 };
 
   
+/*!
+  @brief Display the information contained by an Obj struct.
+  @param[in] p obj_t Obj structure.
+ */
 static inline
 void display_obj(obj_t p) {
   display_obj_indent(p, "");
