@@ -26,10 +26,18 @@ public:
     @param[in] format_str const char * (optional) Format string describing the
     item types. Defaults to empty string.
   */
-  JSONArrayMetaschemaType(std::vector<MetaschemaType*> items,
+  JSONArrayMetaschemaType(const std::vector<MetaschemaType*> items,
 			  const char *format_str = "") :
-    MetaschemaType("array"), items_(items) {
+    MetaschemaType("array") {
     strncpy(format_str_, format_str, 1000);
+    update_items(items, true);
+  }
+  /*!
+    @brief Destructor for JSONArrayMetaschemaType.
+    Free the type string malloc'd during constructor.
+   */
+  ~JSONArrayMetaschemaType() {
+    items_.clear();
   }
   /*!
     @brief Equivalence operator.
@@ -44,13 +52,12 @@ public:
       return false;
     if (nitems() != pRef->nitems())
       return false;
-    if (items_ != pRef->items())
-      return false;
-    // size_t i;
-    // for (i = 0; i < nitems(); i++) {
-    //   if (items_[i] != pRef->items()[i])
-    // 	return false;
-    // }
+    size_t i;
+    for (i = 0; i < items_.size(); i++) {
+      if (*(items_[i]) != *(pRef->items()[i])) {
+	return false;
+      }
+    }
     return true;
   }
   /*!
@@ -119,17 +126,36 @@ public:
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
-  void update(MetaschemaType* new_info) override {
+  void update(const MetaschemaType* new_info) override {
     MetaschemaType::update(new_info);
     JSONArrayMetaschemaType* new_info_array = (JSONArrayMetaschemaType*)new_info;
-    if (nitems() != new_info_array->nitems()) {
-      ygglog_throw_error("JSONArrayMetaschemaType::update: Cannot update array with %ld elements from an array with %ld elements.",
-			 nitems(), new_info_array->nitems());
-    }
+    update_items(new_info_array->items());
+  }
+  /*!
+    @brief Update the item types.
+    @param[in] new_items std::vector<MetaschemaType*> Vector of new types describing items.
+    @param[in] force bool If true, the existing items are overwritten, otherwise they are only updated.
+   */
+  void update_items(const std::vector<MetaschemaType*> new_items,
+		    bool force=false) {
     size_t i;
-    for (i = 0; i < items_.size(); i++) {
-      items_[i]->update(new_info_array->items()[i]);
+    if (force) {
+      items_.clear();
     }
+    if (items_.size() > 0) {
+      if (items_.size() != new_items.size()) {
+	ygglog_throw_error("JSONArrayMetaschemaType::update_items: Cannot update array with %ld elements from an array with %ld elements.",
+			   items_.size(), new_items.size());
+      }
+      for (i = 0; i < items_.size(); i++) {
+	items_[i]->update(new_items[i]);
+      }
+    } else {
+      for (i = 0; i < new_items.size(); i++) {
+	items_.push_back(new_items[i]->copy());
+      }
+    }
+    
   }
   /*!
     @brief Update the type object with info from provided variable arguments for serialization.
@@ -173,6 +199,57 @@ public:
       nargs = nargs + items_[i]->nargs_exp();
     }
     return nargs;
+  }
+  /*!
+    @brief Convert a Python representation to a C representation.
+    @param[in] pyobj PyObject* Pointer to Python object.
+    @returns YggGeneric* Pointer to C object.
+   */
+  YggGeneric* python2c(PyObject* pyobj) const override {
+    if (!(PyList_Check(pyobj))) {
+      ygglog_throw_error("JSONArrayMetaschemaType::python2c: Python object must be a list.");
+    }
+    if (PyList_Size(pyobj) != nitems()) {
+      ygglog_throw_error("JSONArrayMetaschemaType::python2c: Python list has %lu elements, but the type expects %lu.",
+			 PyList_Size(pyobj), nitems());
+    }
+    size_t i;
+    YggGenericVector *citems = new YggGenericVector();
+    for (i = 0; i < nitems(); i++) {
+      PyObject *ipy_item = PyList_GetItem(pyobj, (Py_ssize_t)i);
+      if (ipy_item == NULL) {
+	ygglog_throw_error("JSONArrayMetaschemaType::python2c: Failed to get item %lu out of the Python list.", i);
+      }
+      YggGeneric *ic_item = items_[i]->python2c(ipy_item);
+      citems->push_back(ic_item);
+    }
+    YggGeneric* cobj = new YggGeneric(this, citems);
+    return cobj;
+  }
+  /*!
+    @brief Convert a C representation to a Python representation.
+    @param[in] cobj YggGeneric* Pointer to C object.
+    @returns PyObject* Pointer to Python object.
+   */
+  PyObject* c2python(YggGeneric* cobj) const override {
+    initialize_python("JSONArrayMetaschemaType::c2python: ");
+    PyObject *pyobj = PyList_New((Py_ssize_t)(nitems()));
+    if (pyobj == NULL) {
+      ygglog_throw_error("JSONArrayMetaschemaType::c2python: Failed to create new Python list.");
+    }
+    YggGenericVector c_items;
+    cobj->get_data(c_items);
+    if (c_items.size() != nitems()) {
+      ygglog_throw_error("JSONArrayMetaschemaType::c2python: Type has %lu elements but object has %lu.", nitems(), c_items.size());
+    }
+    size_t i;
+    for (i = 0; i < items_.size(); i++) {
+      PyObject *iitem = items_[i]->c2python(c_items[i]);
+      if (PyList_SetItem(pyobj, (Py_ssize_t)i, iitem) < 0) {
+	ygglog_throw_error("JSONArrayMetaschemaType::c2python: Error setting item %lu in the Python list.", i);
+      }
+    }
+    return pyobj;
   }
 
   // Encoding

@@ -14,6 +14,9 @@
 #include <errno.h>
 #include <time.h>
 #include <Python.h>
+#include <numpy/arrayobject.h>
+#include <numpy/ndarrayobject.h>
+#include <numpy/npy_common.h>
 
 
 #ifdef _WIN32
@@ -146,10 +149,41 @@ typedef struct va_list_t {
 /*! @brief Structure used to wrap Python objects. */
 typedef struct python_t {
   char name[PYTHON_NAME_SIZE];
+  void *args;
   PyObject *obj;
 } python_t;
 
 
+/*!
+  @brief Initialize Numpy arrays if it is not initalized.
+  @returns int 0 if successful, other values indicate errors.
+ */
+static inline
+int init_numpy_API() {
+  if (PyArray_API == NULL) {
+    if (_import_array() < 0) {
+      return -2;
+    }
+  }
+  return 0;
+};
+
+
+/*!
+  @brief Initialize Python if it is not initialized.
+  @returns int 0 if successful, other values indicate errors.
+ */
+static inline
+int init_python_API() {
+  if (!(Py_IsInitialized())) {
+    Py_Initialize();
+    if (!(Py_IsInitialized()))
+      return -1;
+  }
+  return init_numpy_API();
+};
+
+  
 //==============================================================================
 /*!
   Logging

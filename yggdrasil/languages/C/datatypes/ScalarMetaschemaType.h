@@ -353,19 +353,33 @@ public:
     return nbits() / 8;
   }
   /*!
+    @brief Determine the dimensions of the equivalent numpy array.
+    @param[in, out] nd int* Address of integer where number of dimensions should be stored.
+    @param[in, out] dims npy_intp** Address of pointer to memory where dimensions should be stored.
+   */
+  virtual void numpy_dims(int *nd, npy_intp **dims) const {
+    nd[0] = 1;
+    npy_intp *idims = (npy_intp*)realloc(dims[0], sizeof(npy_intp));
+    if (idims == NULL) {
+      ygglog_throw_error("ScalarMetaschemaType::numpy_dims: Failed to realloc dims array.");
+    }
+    idims[0] = 1;
+    dims[0] = idims;
+  }
+  /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
-  void update(MetaschemaType* new_info) override {
+  void update(const MetaschemaType* new_info) override {
     if (strcmp(new_info->type(), "array") == 0) {
-      JSONArrayMetaschemaType* new_info_array = dynamic_cast<JSONArrayMetaschemaType*>(new_info);
+      const JSONArrayMetaschemaType* new_info_array = dynamic_cast<const JSONArrayMetaschemaType*>(new_info);
       if (new_info_array->nitems() == 1) {
 	update(new_info_array->items()[0]);
 	return;
       }
     }
     MetaschemaType::update(new_info);
-    ScalarMetaschemaType* new_info_scalar = dynamic_cast<ScalarMetaschemaType*>(new_info);
+    const ScalarMetaschemaType* new_info_scalar = dynamic_cast<const ScalarMetaschemaType*>(new_info);
     update_subtype(new_info_scalar->subtype());
     if ((strcmp(type(), "scalar") == 0) &&
 	((strcmp(subtype(), "bytes") == 0) ||
@@ -490,6 +504,154 @@ public:
     }
     return 1;
   }    
+  /*!
+    @brief Convert a Python representation to a C representation.
+    @param[in] pyobj PyObject* Pointer to Python object.
+    @returns YggGeneric* Pointer to C object.
+   */
+  YggGeneric* python2c(PyObject* pyobj) const override {
+    YggGeneric* cobj = new YggGeneric(this, NULL, 0);
+    void** data = cobj->get_data_pointer();
+    if (PyArray_NBYTES(pyobj) != nbytes()) {
+      ygglog_throw_error("ScalarMetaschemaType::python2c: Python object has a size of %lu bytes, but %lu were expected.",
+			 PyArray_NBYTES(pyobj), nbytes());
+    }
+    void* idata = (void*)realloc(data[0], nbytes());
+    if (data == NULL) {
+      ygglog_throw_error("ScalarMetaschemaType::python2c: Failed to realloc data.");
+    }
+    memcpy(idata, PyArray_DATA(pyobj), nbytes());
+    data[0] = idata;
+    return cobj;
+  }
+  /*!
+    @brief Convert a C representation to a Python representation.
+    @param[in] cobj YggGeneric* Pointer to C object.
+    @returns PyObject* Pointer to Python object.
+   */
+  PyObject* c2python(YggGeneric* cobj) const override {
+    initialize_python("ScalarMetaschemaType::c2python: ");
+    int nd = 1;
+    npy_intp* dims = NULL;
+    numpy_dims(&nd, &dims);
+    int np_type = -1;
+    void* data = cobj->copy_data();
+    if (data == NULL) {
+      ygglog_throw_error("ScalarMetaschemaType::c2python: Data pointer is NULL.");
+    }
+    int itemsize = precision_ / 8;
+    int flags = NPY_OWNDATA;
+    switch (subtype_code_) {
+    case T_INT: {
+      switch (precision_) {
+      case 8: {
+	np_type = NPY_INT8;
+	break;
+      }
+      case 16: {
+	np_type = NPY_INT16;
+	break;
+      }
+      case 32: {
+	np_type = NPY_INT32;
+	break;
+      }
+      case 64: {
+	np_type = NPY_INT64;
+	break;
+      }
+      default: {
+	ygglog_throw_error("ScalarMetaschemaType::c2python: Unsupported integer precision '%lu'.",
+			   precision_);
+      }
+      }
+      break;
+    }
+    case T_UINT: {
+      switch (precision_) {
+      case 8: {
+	np_type = NPY_UINT8;
+	break;
+      }
+      case 16: {
+	np_type = NPY_UINT16;
+	break;
+      }
+      case 32: {
+	np_type = NPY_UINT32;
+	break;
+      }
+      case 64: {
+	np_type = NPY_UINT64;
+	break;
+      }
+      default: {
+	ygglog_throw_error("ScalarMetaschemaType::c2python: Unsupported unsigned integer precision '%lu'.",
+			   precision_);
+      }
+      }
+      break;
+    }
+    case T_FLOAT: {
+      switch (precision_) {
+      case 16: {
+	np_type = NPY_FLOAT16;
+	break;
+      }
+      case 32: {
+	np_type = NPY_FLOAT32;
+	break;
+      }
+      case 64: {
+	np_type = NPY_FLOAT64;
+	break;
+      }
+      default: {
+	ygglog_throw_error("ScalarMetaschemaType::c2python: Unsupported float precision '%lu'.",
+			   precision_);
+      }
+      }
+      break;
+    }
+    case T_COMPLEX: {
+      switch (precision_) {
+      case 64: {
+	np_type = NPY_COMPLEX64;
+	break;
+      }
+      case 128: {
+	np_type = NPY_COMPLEX128;
+	break;
+      }
+      default: {
+	ygglog_throw_error("ScalarMetaschemaType::c2python: Unsupported complex precision '%lu'.",
+			   precision_);
+      }
+      }
+      break;
+    }
+    case T_BYTES: {
+      np_type = NPY_BYTE;
+      break;
+    }
+    case T_UNICODE: {
+      np_type = NPY_UNICODE;
+      break;
+    }
+    default: {
+      ygglog_throw_error("ScalarMetaschemaType::c2python: Unsupported subtype '%s'.",
+			 subtype_);
+    }
+    }
+    PyObject* pyobj = PyArray_New(&PyArray_Type, nd, dims, np_type,
+    				  nullptr, data, itemsize, flags, nullptr);
+    if (pyobj == NULL) {
+      ygglog_throw_error("MetaschemaType::c2python: Creation of Numpy array failed.");
+    }
+    if (dims != NULL)
+      free(dims);
+    return pyobj;
+  }
 
   // Encoding
   /*!
@@ -1063,10 +1225,16 @@ public:
   */
   const bool variable_nelements() const override;
   /*!
+    @brief Determine the dimensions of the equivalent numpy array.
+    @param[in, out] nd int* Address of integer where number of dimensions should be stored.
+    @param[in, out] dims npy_intp** Address of pointer to memory where dimensions should be stored.
+   */
+  void numpy_dims(int *nd, npy_intp **dims) const override;
+  /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
-  void update(MetaschemaType* new_info) override;
+  void update(const MetaschemaType* new_info) override;
   /*!
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
@@ -1184,18 +1352,32 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     return _variable_length;
   }
   /*!
+    @brief Determine the dimensions of the equivalent numpy array.
+    @param[in, out] nd int* Address of integer where number of dimensions should be stored.
+    @param[in, out] dims npy_intp** Address of pointer to memory where dimensions should be stored.
+   */
+  void numpy_dims(int *nd, npy_intp **dims) const override {
+    nd[0] = 1;
+    npy_intp *idim = (npy_intp*)realloc(dims[0], sizeof(npy_intp));
+    if (idim == NULL) {
+      ygglog_throw_error("OneDArrayMetaschemaType::numpy_dims: Failed to realloc dims.");
+    }
+    idim[0] = (npy_intp)(length());
+    dims[0] = idim;
+  }
+  /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
-  void update(MetaschemaType* new_info) override {
+  void update(const MetaschemaType* new_info) override {
     if (new_info->type_code() == T_NDARRAY) {
-      NDArrayMetaschemaType* new_info_nd = dynamic_cast<NDArrayMetaschemaType*>(new_info);
+      const NDArrayMetaschemaType* new_info_nd = dynamic_cast<const NDArrayMetaschemaType*>(new_info);
       OneDArrayMetaschemaType* new_info_oned = new OneDArrayMetaschemaType(new_info_nd->subtype(), new_info_nd->precision(), new_info_nd->nelements(), new_info_nd->units());
       update(new_info_oned);
       delete new_info_oned;
     } else {
       ScalarMetaschemaType::update(new_info);
-      OneDArrayMetaschemaType* new_info_oned = dynamic_cast<OneDArrayMetaschemaType*>(new_info);
+      const OneDArrayMetaschemaType* new_info_oned = dynamic_cast<const OneDArrayMetaschemaType*>(new_info);
       set_length(new_info_oned->length());
     }
   }
@@ -1351,9 +1533,21 @@ const size_t NDArrayMetaschemaType::nelements() const {
 const bool NDArrayMetaschemaType::variable_nelements() const {
   return _variable_shape;
 };
-void NDArrayMetaschemaType::update(MetaschemaType* new_info) {
+void NDArrayMetaschemaType::numpy_dims(int *nd, npy_intp **dims) const {
+  int i;
+  nd[0] = ndim();
+  npy_intp *idim = (npy_intp*)realloc(dims[0], nd[0]*sizeof(npy_intp));
+  if (idim == NULL) {
+    ygglog_throw_error("NDArrayMetaschemaType::numpy_dims: Failed to realloc dims.");
+  }
+  for (i = 0; i < nd[0]; i++) {
+    idim[i] = (npy_intp)(shape_[i]);
+  }
+  dims[0] = idim;
+};
+void NDArrayMetaschemaType::update(const MetaschemaType* new_info) {
   ScalarMetaschemaType::update(new_info);
-  NDArrayMetaschemaType* new_info_nd = (NDArrayMetaschemaType*)new_info;
+  const NDArrayMetaschemaType* new_info_nd = dynamic_cast<const NDArrayMetaschemaType*>(new_info);
   set_shape(new_info_nd->shape());
 };
 void NDArrayMetaschemaType::update_from_serialization_args(size_t *nargs, va_list_t &ap) {

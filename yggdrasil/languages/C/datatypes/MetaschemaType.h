@@ -14,7 +14,8 @@
 
 enum { T_BOOLEAN, T_INTEGER, T_NULL, T_NUMBER, T_STRING, T_ARRAY, T_OBJECT,
        T_DIRECT, T_1DARRAY, T_NDARRAY, T_SCALAR, T_FLOAT, T_UINT, T_INT, T_COMPLEX,
-       T_BYTES, T_UNICODE, T_PLY, T_OBJ, T_ASCII_TABLE, T_CLASS, T_FUNCTION };
+       T_BYTES, T_UNICODE, T_PLY, T_OBJ, T_ASCII_TABLE,
+       T_CLASS, T_FUNCTION, T_INSTANCE };
 
 
 /*!
@@ -83,10 +84,691 @@ std::map<const char*, int, strcomp> get_type_map() {
     global_type_map["ascii_table"] = T_ASCII_TABLE;
     global_type_map["class"] = T_CLASS;
     global_type_map["function"] = T_FUNCTION;
+    global_type_map["instance"] = T_INSTANCE;
   }
   return global_type_map;
 };
 
+
+/*!
+  @brief Initialize Python if it is not initialized.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+ */
+void initialize_python(const char* error_prefix="") {
+  int ret = init_python_API();
+  if (ret == -1) {
+    ygglog_throw_error("%sinitialize_python: Python not initialized.", error_prefix);
+  } else if (ret != 0) {
+    ygglog_throw_error("%sinitialize_python: Numpy not initialized.", error_prefix);
+  }
+};
+
+/*!
+  @brief Try to import a Python module, throw an error if it fails.
+  @param[in] module_name const char* Name of the module to import (absolute path).
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @returns PyObject* Pointer to the Python module object.
+ */
+PyObject* import_python_module(const char* module_name,
+			       const char* error_prefix="") {
+  initialize_python(error_prefix);
+  PyObject* out = PyImport_ImportModule(module_name);
+  if (out == NULL) {
+    ygglog_throw_error("%simport_python_module: Failed to import Python module '%s'.",
+		       error_prefix, module_name);
+  }
+  return out;
+};
+
+
+/*!
+  @brief Try to import a Python class, throw an error if it fails.
+  @param[in] module_name const char* Name of the module to import (absolute path).
+  @param[in] class_name const char* Name of the class to import from the specified module.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @returns PyObject* Pointer to the Python class object.
+ */
+PyObject* import_python_class(const char* module_name, const char* class_name,
+			      const char* error_prefix="") {
+  PyObject *py_module = import_python_module(module_name,
+					     error_prefix);
+  PyObject *out = PyObject_GetAttrString(py_module, class_name);
+  Py_DECREF(py_module);
+  if (out == NULL) {
+    ygglog_throw_error("import_python_class: Failed to import Python class '%s'.", class_name);
+  }
+  return out;
+};
+
+
+/*!
+  @brief Check that a Python object is the correct type, throw errors if it is not.
+  @param[in] pyobj PyObject* Python object.
+  @param[in] type_code int Type code.
+  @param[in] prefix char* Prefix string that should be prepended to error messages. Defaults to "".
+ */
+void check_python_object(PyObject *pyobj, int type_code=-1,
+			 const char* prefix="") {
+  char type_name[100] = "";
+  int result = 0;
+  if (type_code < 0)
+    return;
+  switch (type_code) {
+  case T_ARRAY: {
+    result = PyList_Check(pyobj);
+    strcat(type_name, "list");
+    break;
+  }
+  case T_OBJECT: {
+    result = PyDict_Check(pyobj);
+    strcat(type_name, "dict");
+    break;
+  }
+  case T_NUMBER:
+  case T_FLOAT: {
+    result = PyFloat_Check(pyobj);
+    strcat(type_name, "float");
+    break;
+  }
+  case T_INTEGER:
+  case T_INT:
+  case T_UINT: {
+    result = PyLong_Check(pyobj);
+    strcat(type_name, "long");
+    break;
+  }
+  case T_BOOLEAN: {
+    result = PyBool_Check(pyobj);
+    strcat(type_name, "bool");
+    break;
+  }
+  case T_COMPLEX: {
+    result = PyComplex_Check(pyobj);
+    strcat(type_name, "complex");
+    break;
+  }
+  case T_STRING:
+  case T_BYTES: {
+    result = PyBytes_Check(pyobj);
+    strcat(type_name, "bytes");
+    break;
+  }
+  case T_UNICODE: {
+    result = PyUnicode_Check(pyobj);
+    strcat(type_name, "unicode");
+    break;
+  }
+  default: {
+    ygglog_throw_error("%scheck_python_object: Unsupported type code: %d", prefix, type_code);
+  }
+  }
+  if (!(result)) {
+    ygglog_throw_error("%scheck_python_object: Python object is not %s.", prefix, type_name);
+  }
+  if (PyErr_Occurred() != NULL) {
+    ygglog_throw_error("%scheck_python_object: Python error.", prefix);
+  }
+};
+
+
+/*!
+  @brief Convert a Python object into the C representation.
+  @param[in] pyobj PyObject* Python object.
+  @param[in, out] dst void* Pointer to memory where C representation should be stored.
+  @param[in] type_code int Code indicating type of data that should be in pyobj.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @param[in] precision size_t Size (in bits) of the C type. Defaults to 0.
+ */
+void convert_python2c(PyObject *pyobj, void *dst, int type_code,
+		      const char* error_prefix="",
+		      size_t precision=0) {
+  if (type_code < 0)
+    return;
+  if (dst == NULL) {
+    ygglog_throw_error("%sconvert_python2c: Destination is NULL.", error_prefix);
+  }
+  // check_python_object(pyobj, type_code, error_prefix);
+  char type_name[100] = "";
+  switch (type_code) {
+  case T_ARRAY: {
+  case T_OBJECT:
+    PyObject **dst_ptr = (PyObject**)dst;
+    dst_ptr[0] = pyobj;
+    strcat(type_name, "list/dict");
+    break;
+  }
+  case T_NUMBER:
+  case T_FLOAT: {
+    double dst_cast = PyFloat_AsDouble(pyobj);
+    if ((precision == 0) || (sizeof(double) == precision/8)) {
+      double *dst_ptr = (double*)dst;
+      dst_ptr[0] = dst_cast;
+    } else if (sizeof(float) == precision/8) {
+      float *dst_ptr = (float*)dst;
+      dst_ptr[0] = (float)dst_cast;
+    } else if (sizeof(long double) == precision/8) {
+      long double *dst_ptr = (long double*)dst;
+      dst_ptr[0] = (long double)dst_cast;
+    } else {
+      ygglog_throw_error("%sconvert_python2c: Float precision of %lu unsupported.",
+			 error_prefix, precision);
+    }
+    strcat(type_name, "float");
+    break;
+  }
+  case T_INTEGER:
+  case T_INT: {
+    long dst_cast = PyLong_AsLong(pyobj);
+    switch (precision) {
+    case 8: {
+      int8_t *dst_ptr = (int8_t*)dst;
+      dst_ptr[0] = (int8_t)dst_cast;
+      break;
+    }
+    case 16: {
+      int16_t *dst_ptr = (int16_t*)dst;
+      dst_ptr[0] = (int16_t)dst_cast;
+      break;
+    }
+    case 32: {
+      int32_t *dst_ptr = (int32_t*)dst;
+      dst_ptr[0] = (int32_t)dst_cast;
+      break;
+    }
+    case 64: {
+      int64_t *dst_ptr = (int64_t*)dst;
+      dst_ptr[0] = (int64_t)dst_cast;
+      break;
+    }
+    default: {
+      if ((precision == 0) || (sizeof(long) == precision/8)) {
+	long *dst_ptr = (long*)dst;
+	dst_ptr[0] = dst_cast;
+      } else {
+	ygglog_throw_error("%sconvert_python2c: Int precision of %lu unsupported.",
+			   error_prefix, precision);
+      }
+    }
+    }
+    strcat(type_name, "long");
+    break;
+  }
+  case T_UINT: {
+    long dst_cast = PyLong_AsLong(pyobj);
+    switch (precision) {
+    case 8: {
+      uint8_t *dst_ptr = (uint8_t*)dst;
+      dst_ptr[0] = (uint8_t)dst_cast;
+      break;
+    }
+    case 16: {
+      uint16_t *dst_ptr = (uint16_t*)dst;
+      dst_ptr[0] = (uint16_t)dst_cast;
+      break;
+    }
+    case 32: {
+      uint32_t *dst_ptr = (uint32_t*)dst;
+      dst_ptr[0] = (uint32_t)dst_cast;
+      break;
+    }
+    case 64: {
+      uint64_t *dst_ptr = (uint64_t*)dst;
+      dst_ptr[0] = (uint64_t)dst_cast;
+      break;
+    }
+    default: {
+      if ((precision == 0) || (sizeof(long) == precision/8)) {
+	long *dst_ptr = (long*)dst;
+	dst_ptr[0] = dst_cast;
+      } else {
+	ygglog_throw_error("%sconvert_python2c: Uint precision of %lu unsupported.",
+			   error_prefix, precision);
+      }
+    }
+    }
+    strcat(type_name, "long");
+    break;
+  }
+  case T_BOOLEAN: {
+    bool *dst_ptr = (bool*)dst;
+    long res = PyLong_AsLong(pyobj);
+    if (res) {
+      dst_ptr[0] = true;
+    } else {
+      dst_ptr[0] = false;
+    }
+    strcat(type_name, "bool");
+    break;
+  }
+  case T_NULL: {
+    void **dst_ptr = (void**)dst;
+    dst_ptr[0] = NULL;
+    break;
+  }
+  case T_COMPLEX: {
+    double real_cast = PyComplex_RealAsDouble(pyobj);
+    double imag_cast = PyComplex_ImagAsDouble(pyobj);
+    if ((precision == 0) || (sizeof(complex_double_t) == precision/8)) {
+      complex_double_t *dst_ptr = (complex_double_t*)dst;
+      dst_ptr->re = real_cast;
+      dst_ptr->im = imag_cast;
+    } else if (sizeof(complex_float_t) == precision/8) {
+      complex_float_t *dst_ptr = (complex_float_t*)dst;
+      dst_ptr->re = (float)real_cast;
+      dst_ptr->im = (float)imag_cast;
+    } else if (sizeof(complex_long_double_t) == precision/8) {
+      complex_long_double_t *dst_ptr = (complex_long_double_t*)dst;
+      dst_ptr->re = (long double)real_cast;
+      dst_ptr->im = (long double)imag_cast;
+    } else {
+      ygglog_throw_error("%sconvert_python2c: Complex precision of %lu unsupported.",
+			 error_prefix, precision);
+    }
+    strcat(type_name, "complex");
+    break;
+  }
+  case T_STRING:
+  case T_BYTES: {
+    char **dst_ptr = (char**)dst;
+    char *res = PyBytes_AsString(pyobj);
+    if (precision != 0) {
+      if (PyBytes_Size(pyobj) > precision/8) {
+	ygglog_throw_error("%sconvert_python2c: String has size (%lu bytes) larger than the size of the buffer (%lu bytes).",
+			   error_prefix, PyBytes_Size(pyobj), precision/8);
+      }
+    }
+    strcpy(dst_ptr[0], res);
+    strcat(type_name, "bytes");
+    break;
+  }
+  case T_UNICODE: {
+    char **dst_ptr = (char**)dst;
+    char *res = (char*)PyUnicode_DATA(pyobj);
+    if (precision != 0) {
+      if (strlen(res) > precision/8) {
+	ygglog_throw_error("%sconvert_python2c: String has size (%lu bytes) larger than the size of the buffer (%lu bytes).",
+			   error_prefix, strlen(res), precision/8);
+      }
+    }
+    strcpy(dst_ptr[0], res);
+    strcat(type_name, "unicode");
+    break;
+  }
+  default: {
+    ygglog_throw_error("%sconvert_python2c: Unsupported type code: %d", error_prefix, type_code);
+  }
+  }
+  if (PyErr_Occurred() != NULL) {
+    ygglog_throw_error("%sconvert_python2c: Python error.", error_prefix);
+  }
+};
+
+/*!
+  @brief Convert a C object into a Python representation.
+  @param[in] src void* Pointer to C variable.
+  @param[in] type_code int Code indicating type of data contained in src.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @param[in] precision size_t Size (in bits) of the C type. Defaults to 0.
+  @returns PyObject* Python object.
+ */
+PyObject* convert_c2python(void *src, int type_code,
+			   const char* error_prefix="",
+			   size_t precision=0) {
+  initialize_python(error_prefix);
+  PyObject *dst = NULL;
+  if (type_code < 0)
+    return dst;
+  if (src == NULL) {
+    ygglog_throw_error("%sconvert_c2python: C pointer is NULL.", error_prefix);
+  }
+  char type_name[100] = "";
+  switch (type_code) {
+  case T_ARRAY: {
+  case T_OBJECT:
+    dst = (PyObject*)src;
+    strcat(type_name, "list/dict");
+    break;
+  }
+  case T_NUMBER:
+  case T_FLOAT: {
+    double src_cast = 0.0;
+    if ((precision == 0) || (sizeof(double) == precision/8)) {
+      double *src_ptr = (double*)src;
+      src_cast = src_ptr[0];
+    } else if (sizeof(float) == precision/8) {
+      float *src_ptr = (float*)src;
+      src_cast = (double)(src_ptr[0]);
+    } else if (sizeof(long double) == precision/8) {
+      long double *src_ptr = (long double*)src;
+      src_cast = (double)(src_ptr[0]);
+    } else {
+      ygglog_throw_error("%sconvert_c2python: Float precision of %lu unsupported.",
+			 error_prefix, precision);
+    }
+    dst = PyFloat_FromDouble(src_cast);
+    strcat(type_name, "float");
+    break;
+  }
+  case T_INTEGER:
+  case T_INT: {
+    long src_cast = 0;
+    switch (precision) {
+    case 8: {
+      int8_t *src_ptr = (int8_t*)src;
+      src_cast = (long)(src_ptr[0]);
+      break;
+    }
+    case 16: {
+      int16_t *src_ptr = (int16_t*)src;
+      src_cast = (long)(src_ptr[0]);
+      break;
+    }
+    case 32: {
+      int32_t *src_ptr = (int32_t*)src;
+      src_cast = (long)(src_ptr[0]);
+      break;
+    }
+    case 64: {
+      int64_t *src_ptr = (int64_t*)src;
+      src_cast = (long)(src_ptr[0]);
+      break;
+    }
+    default: {
+      if ((precision == 0) || (sizeof(long) == precision/8)) {
+	long *src_ptr = (long*)src;
+	src_cast = src_ptr[0];
+      } else {
+	ygglog_throw_error("%sconvert_c2python: Int precision of %lu unsupported.",
+			   error_prefix, precision);
+      }
+    }
+    }
+    dst = PyLong_FromLong(src_cast);
+    strcat(type_name, "int");
+    break;
+  }
+  case T_BOOLEAN:
+  case T_UINT: {
+    long src_cast = 0;
+    switch (precision) {
+    case 8: {
+      uint8_t *src_ptr = (uint8_t*)src;
+      src_cast = (long)(src_ptr[0]);
+      break;
+    }
+    case 16: {
+      uint16_t *src_ptr = (uint16_t*)src;
+      src_cast = (long)(src_ptr[0]);
+      break;
+    }
+    case 32: {
+      uint32_t *src_ptr = (uint32_t*)src;
+      src_cast = (long)(src_ptr[0]);
+      break;
+    }
+    case 64: {
+      uint64_t *src_ptr = (uint64_t*)src;
+      src_cast = (long)(src_ptr[0]);
+      break;
+    }
+    default: {
+      ygglog_throw_error("%sconvert_c2python: Uint precision of %lu unsupported.",
+			 error_prefix, precision);
+    }
+    }
+    if (type_code == T_BOOLEAN) {
+      dst = PyBool_FromLong(src_cast);
+    } else {
+      dst = PyLong_FromLong(src_cast);
+    }
+    strcat(type_name, "uint");
+    break;
+  }
+  case T_COMPLEX: {
+    Py_complex src_cast = {0, 0};
+    if ((precision == 0) || (sizeof(complex_double_t) == precision/8)) {
+      complex_double_t *src_ptr = (complex_double_t*)src;
+      src_cast.real = src_ptr->re;
+      src_cast.imag = src_ptr->im;
+    } else if (sizeof(complex_float_t) == precision/8) {
+      complex_float_t *src_ptr = (complex_float_t*)src;
+      src_cast.real = (float)(src_ptr->re);
+      src_cast.imag = (float)(src_ptr->im);
+    } else if (sizeof(complex_long_double_t) == precision/8) {
+      complex_long_double_t *src_ptr = (complex_long_double_t*)src;
+      src_cast.real = (long double)(src_ptr->re);
+      src_cast.imag = (long double)(src_ptr->im);
+    } else {
+      ygglog_throw_error("%sconvert_c2python: Complex precision of %lu unsupported.",
+			 error_prefix, precision);
+    }
+    dst = PyComplex_FromCComplex(src_cast);
+    strcat(type_name, "complex");
+    break;
+  }
+  case T_NULL: {
+    dst = Py_None;
+    break;
+  }
+  case T_STRING:
+  case T_BYTES: {
+    char **src_ptr = (char**)src;
+    dst = PyBytes_FromString(src_ptr[0]);
+    strcat(type_name, "bytes");
+    break;
+  }
+  case T_UNICODE: {
+    char **src_ptr = (char**)src;
+    dst = PyUnicode_FromString(src_ptr[0]);
+    strcat(type_name, "unicode");
+    break;
+  }
+  default: {
+    ygglog_throw_error("%sconvert_c2python: Unsupported type code: %d", error_prefix, type_code);
+  }
+  }
+  if (dst == NULL) {
+    ygglog_throw_error("%sconvert_c2python: Error getting type '%s'.",
+		       error_prefix, type_name);
+  }
+  if (PyErr_Occurred() != NULL) {
+    ygglog_throw_error("%sconvert_c2python: Python error.", error_prefix);
+  }
+  return dst;
+};
+
+/*!
+  @brief Create a new Python list and raise an error if it fails.
+  @param[in] N int Number of elements list should be initialized with.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @returns Python list.
+ */
+PyObject* new_python_list(int N, const char* error_prefix="") {
+  initialize_python(error_prefix);
+  PyObject *out = PyList_New(N);
+  if (out == NULL) {
+    ygglog_throw_error("%sFailed to initialize Python list.");
+  }
+  return out;
+};
+
+/*!
+  @brief Create a new Python dict and raise an error if it fails.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @returns Python dict.
+ */
+PyObject* new_python_dict(const char* error_prefix="") {
+  initialize_python(error_prefix);
+  PyObject *out = PyDict_New();
+  if (out == NULL) {
+    ygglog_throw_error("%sFailed to initialize Python dict.");
+  }
+  return out;
+};
+
+/*!
+  @brief Set an item in a Python list to a Python object, throw an error if it fails or the provided objects do not have the right type.
+  @param[in] pyobj PyObject* Python list.
+  @param[in] index int Index in Python list of item that should be set.
+  @param[in] item PyObject* Object to assign to the Python list item.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @param[in] type_code int Code specifying type that item should contain.
+ */
+void set_item_python_list(PyObject *pyobj, int index,
+			  PyObject *item, const char* error_prefix="",
+			  int type_code=-1) {
+  check_python_object(pyobj, (int)T_ARRAY, error_prefix);
+  check_python_object(item, type_code, error_prefix);
+  if (PyList_SetItem(pyobj, index, item) < 0) {
+    ygglog_throw_error("%sFailed to set element %d.",
+		       error_prefix, index);
+  }
+};
+
+/*!
+  @brief Set an item in a Python list to a C object, throw an error if it fails or the provided objects do not have the right type.
+  @param[in] pyobj PyObject* Python list.
+  @param[in] index int Index in Python list of item that should be set.
+  @param[in] item void* Pointer to C object to convert to a Python object and assign to the Python list item.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @param[in] type_code int Code specifying type that item should contain.
+  @param[in] precision size_t Size (in bits) of the C type. Defaults to 0.
+ */
+void set_item_python_list_c(PyObject *pyobj, int index, void *item,
+			    const char* error_prefix="",
+			    int type_code=-1, size_t precision=0) {
+  PyObject *py_item = convert_c2python(item, type_code, error_prefix,
+				       precision);
+  return set_item_python_list(pyobj, index, py_item,
+			      error_prefix, type_code);
+};
+
+/*!
+  @brief Set an item in a Python dict to a Python object, throw an error if it fails or the provided objects do not have the right type.
+  @param[in] pyobj PyObject* Python dict.
+  @param[in] key char* Key in Python dict for item that should be set.
+  @param[in] item PyObject* Object to assign to the Python dict item.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @param[in] type_code int Code specifying type that item should contain.
+ */
+void set_item_python_dict(PyObject *pyobj, const char* key,
+			  PyObject *item, const char* error_prefix="",
+			  int type_code=-1) {
+  check_python_object(pyobj, T_OBJECT, error_prefix);
+  check_python_object(item, type_code, error_prefix);
+  if (PyDict_SetItemString(pyobj, key, item) < 0) {
+    ygglog_throw_error("%sFailed to set element %s.",
+		       error_prefix, key);
+  }
+};
+
+/*!
+  @brief Set an item in a Python dict to a Python object, throw an error if it fails or the provided objects do not have the right type.
+  @param[in] pyobj PyObject* Python dict.
+  @param[in] key char* Key in Python dict for item that should be set.
+  @param[in] item void* Pointer to C object to convert to a Python object and assign to the Python list item.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @param[in] type_code int Code specifying type that item should contain.
+  @param[in] precision size_t Size (in bits) of the C type. Defaults to 0.
+ */
+void set_item_python_dict_c(PyObject *pyobj, const char* key,
+			    void *item, const char* error_prefix="",
+			    int type_code=-1, size_t precision=0) {
+  PyObject *py_item = convert_c2python(item, type_code, error_prefix,
+				       precision);
+  return set_item_python_dict(pyobj, key, py_item,
+			      error_prefix, type_code);
+};
+
+/*!
+  @brief Get a Python object from a Python list.
+  @param[in] pyobj PyObject* Python list.
+  @param[in] index int Index in Python list of item that should be returned.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @param[in] type_code int Code specifying type that item should contain.
+  @param[in] allow_null bool If true, no error will be raised if the item cannot be found.
+  @returns PyObject* Python object.
+ */
+PyObject *get_item_python_list(PyObject *pyobj, int index,
+			       const char* error_prefix="",
+			       int type_code=-1,
+			       bool allow_null=false) {
+  PyObject *out = PyList_GetItem(pyobj, index);
+  if ((out == NULL) && (!(allow_null))) {
+    ygglog_throw_error("%sFailed to get element %d.",
+		       error_prefix, index);
+  }
+  if (out != NULL) {
+    check_python_object(pyobj, type_code, error_prefix);
+  }
+  return out;
+};
+
+/*!
+  @brief Get a C object from a Python list.
+  @param[in] pyobj PyObject* Python list.
+  @param[in] index int Index in Python list of item that should be returned.
+  @param[in,out] dst Pointer to C variable where converted data should be stored.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @param[in] type_code int Code specifying type that item should contain.
+  @param[in] precision size_t Size (in bits) of the C type. Defaults to 0.
+  @param[in] allow_null bool If true, no error will be raised if the item cannot be found.
+ */
+void get_item_python_list_c(PyObject *pyobj, int index, void *dst,
+			    const char* error_prefix="",
+			    int type_code=-1, size_t precision=0,
+			    bool allow_null=false) {
+  PyObject *out = get_item_python_list(pyobj, index, error_prefix,
+				       type_code, allow_null);
+  if (out != NULL) {
+    convert_python2c(out, dst, type_code, error_prefix, precision);
+  }
+};
+
+/*!
+  @brief Get a Python object from a Python dict.
+  @param[in] pyobj PyObject* Python dict.
+  @param[in] key char* Key in Python dict for item that should be returned.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @param[in] type_code int Code specifying type that item should contain.
+  @param[in] allow_null bool If true, no error will be raised if the item cannot be found.
+  @returns PyObject* Python object.
+ */
+PyObject *get_item_python_dict(PyObject *pyobj, const char* key,
+			       const char* error_prefix="",
+			       int type_code=-1,
+			       bool allow_null=false) {
+  PyObject *out = PyDict_GetItemString(pyobj, key);
+  if ((out == NULL) && (!(allow_null))) {
+    ygglog_throw_error("%sFailed to get element for key '%s'.",
+		       error_prefix, key);
+  }
+  if (out != NULL) {
+    check_python_object(pyobj, type_code, error_prefix);
+  }
+  return out;
+};
+
+/*!
+  @brief Get a C object from a Python dict.
+  @param[in] pyobj PyObject* Python dict.
+  @param[in] key char* Key in Python dict for item that should be returned.
+  @param[in,out] dst Pointer to C variable where converted data should be stored.
+  @param[in] error_prefix char* Prefix that should be added to error messages.
+  @param[in] type_code int Code specifying type that item should contain.
+  @param[in] precision size_t Size (in bits) of the C type. Defaults to 0.
+  @param[in] allow_null bool If true, no error will be raised if the item cannot be found.
+ */
+void get_item_python_dict_c(PyObject *pyobj, const char* key,
+			    void *dst, const char* error_prefix="",
+			    int type_code=-1, size_t precision=0,
+			    bool allow_null=false) {
+  PyObject *out = get_item_python_dict(pyobj, key, error_prefix,
+				       type_code, allow_null);
+  if (out != NULL) {
+    convert_python2c(out, dst, type_code, error_prefix, precision);
+  }
+};
 
 // Forward declaration
 class MetaschemaType;
@@ -109,7 +791,7 @@ public:
     @param[in] in_nbytes size_t Number of bytes at the address provided
     by data. Defaults to 0 and will be set by type->nbytes().
    */
-  YggGeneric(MetaschemaType* in_type, void* in_data, size_t in_nbytes=0);
+  YggGeneric(const MetaschemaType* in_type, void* in_data, size_t in_nbytes=0);
   ~YggGeneric();
   /*!
     @brief Display the data.
@@ -133,7 +815,7 @@ public:
     @brief Set the data type.
     @param[in] new_type MetaschemaType* Pointer to new type.
    */
-  void set_type(MetaschemaType* new_type);
+  void set_type(const MetaschemaType* new_type);
   /*!
     @brief Get the data type.
     @returns MetaschemaType* Pointer to data type.
@@ -249,6 +931,13 @@ public:
     update_type(type_doc["type"].GetString());
   }
   /*!
+    @brief Destructor for MetaschemaType.
+    Free the type string malloc'd during constructor.
+   */
+  virtual ~MetaschemaType() {
+    free((char*)type_);
+  }
+  /*!
     @brief Equivalence operator.
     @param[in] Ref MetaschemaType instance to compare against.
     @returns bool true if the instance is equivalent, false otherwise.
@@ -275,7 +964,9 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new MetaschemaType instance with the same data.
    */
-  virtual MetaschemaType* copy() const { return (new MetaschemaType(type_)); }
+  virtual MetaschemaType* copy() const {
+    return (new MetaschemaType(type_));
+  }
   /*!
     @brief Print information about the type to stdout.
   */
@@ -334,13 +1025,6 @@ public:
     return it->second;
   }
   /*!
-    @brief Destructor for MetaschemaType.
-    Free the type string malloc'd during constructor.
-   */
-  virtual ~MetaschemaType() {
-    free((char*)type_);
-  }
-  /*!
     @brief Get the type string.
     @returns const char pointer to the type string.
    */
@@ -354,7 +1038,7 @@ public:
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
-  virtual void update(MetaschemaType* new_info) {
+  virtual void update(const MetaschemaType* new_info) {
     if (new_info == NULL) {
       ygglog_throw_error("MetaschemaType::update: New type information is NULL.");
     }
@@ -477,6 +1161,91 @@ public:
     }
     ygglog_throw_error("MetaschemaType::nargs_exp: Cannot get number of expected arguments for type '%s'.", type_);
     return 0;
+  }
+  /*!
+    @brief Convert a Python representation to a C representation.
+    @param[in] pyobj PyObject* Pointer to Python object.
+    @returns YggGeneric* Pointer to C object.
+   */
+  virtual YggGeneric* python2c(PyObject* pyobj) const {
+    YggGeneric* cobj = new YggGeneric(this, NULL, 0);
+    void** data = cobj->get_data_pointer();
+    void* idata = (void*)realloc(data[0], nbytes());
+    if (idata == NULL) {
+      ygglog_throw_error("MetaschemaType::python2c: Failed to realloc data.");
+    }
+    void *dst = idata;
+    size_t precision = 0;
+    switch (type_code_) {
+    case T_BOOLEAN: {
+      precision = 8;
+      break;
+    }
+    case T_INTEGER: {
+      precision = 8*sizeof(int);
+      break;
+    }
+    case T_NULL: {
+      break;
+    }
+    case T_NUMBER: {
+      precision = 8*sizeof(double);
+      break;
+    }
+    case T_STRING: {
+      dst = (void*)(&idata);
+      break;
+    }
+    default: {
+      ygglog_throw_error("MetaschemaType::python2c: Cannot convert type '%s'.", type_);
+    }
+    }
+    convert_python2c(pyobj, dst, type_code_,
+		     "MetaschemaType::python2c: ",
+		     precision);
+    if (type_code_ == T_STRING) {
+      cobj->set_nbytes(strlen((char*)idata));
+    }
+    data[0] = idata;
+    return cobj;
+  }
+  /*!
+    @brief Convert a C representation to a Python representation.
+    @param[in] cobj YggGeneric* Pointer to C object.
+    @returns PyObject* Pointer to Python object.
+   */
+  virtual PyObject* c2python(YggGeneric *cobj) const {
+    PyObject *pyobj = NULL;
+    void *src = cobj->get_data();
+    size_t precision = 0;
+    switch (type_code_) {
+    case T_BOOLEAN: {
+      precision = 8*sizeof(bool);
+      break;
+    }
+    case T_INTEGER: {
+      precision = 8*sizeof(int);
+      break;
+    }
+    case T_NULL: {
+      break;
+    }
+    case T_NUMBER: {
+      precision = 8*sizeof(double);
+      break;
+    }
+    case T_STRING: {
+      src = (void*)(cobj->get_data_pointer());
+      break;
+    }
+    default: {
+      ygglog_throw_error("MetaschemaType::c2python: Cannot convert type '%s'.", type_);
+    }
+    }
+    pyobj = convert_c2python(src, type_code_,
+			     "MetaschemaType::c2python: ",
+			     precision);
+    return pyobj;
   }
   
   // Encoding
@@ -964,14 +1733,18 @@ private:
 YggGeneric::YggGeneric() : type(NULL), data(NULL), nbytes(0) {};
 
 
-YggGeneric::YggGeneric(MetaschemaType* in_type, void* in_data, size_t in_nbytes) : type(in_type), data(NULL), nbytes(in_nbytes) {
+YggGeneric::YggGeneric(const MetaschemaType* in_type, void* in_data, size_t in_nbytes) : type(NULL), data(NULL), nbytes(in_nbytes) {
+  set_type(in_type);
+  set_data(in_data);
   if (nbytes == 0) {
     nbytes = type->nbytes();
   }
-  set_data(in_data);
 };
 YggGeneric::~YggGeneric() {
   free_data();
+  data = NULL;
+  delete type;
+  type = NULL;
 };
 void YggGeneric::display(const char* indent) {
   type->display_generic(this, indent);
@@ -1041,8 +1814,8 @@ YggGeneric* YggGeneric::copy() {
   out->set_data(data);
   return out;
 };
-void YggGeneric::set_type(MetaschemaType* new_type) {
-  type = new_type;
+void YggGeneric::set_type(const MetaschemaType* new_type) {
+  type = new_type->copy();
 };
 MetaschemaType* YggGeneric::get_type() {
   return type;

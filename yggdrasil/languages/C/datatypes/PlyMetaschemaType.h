@@ -49,6 +49,279 @@ public:
   size_t nargs_exp() const override {
     return 1;
   }
+  /*!
+    @brief Convert a Python representation to a C representation.
+    @param[in] pyobj PyObject* Pointer to Python object.
+    @returns YggGeneric* Pointer to C object.
+   */
+  YggGeneric* python2c(PyObject *pyobj) const override {
+    if (!(PyDict_Check(pyobj))) {
+      ygglog_throw_error("PlyMetaschemaType::python2c: Python object must be a dict.");
+    }
+    ply_t *arg = (ply_t*)malloc(sizeof(ply_t));
+    if (arg == NULL) {
+      ygglog_throw_error("PlyMetaschemaType::python2c: Failed to malloc for ply structure.");
+    }
+    arg[0] = init_ply();
+    char error_prefix[200] = "";
+    int i, j;
+    // Material
+    strcpy(error_prefix, "PlyMetaschemaType::python2c: material: ");
+    get_item_python_dict_c(pyobj, "material", &(arg->material),
+			   error_prefix, T_BYTES);
+    // Vertices
+    bool vertex_colors = false;
+    strcpy(error_prefix, "PlyMetaschemaType::python2c: vertices: ");
+    PyObject *vertices = get_item_python_dict(pyobj, "vertices",
+					      error_prefix,
+					      T_ARRAY, true);
+    if (vertices != NULL) {
+      arg->nvert = PyList_Size(vertices);
+      if (arg->nvert > 0) {
+	arg->vertices = (float**)malloc(arg->nvert*sizeof(float*));
+	if (arg->vertices == NULL) {
+	  ygglog_throw_error("%sFailed to malloc.", error_prefix);
+	}
+	for (i = 0; i < arg->nvert; i++) {
+	  PyObject *ivert = get_item_python_list(vertices, i,
+						 error_prefix,
+						 T_OBJECT);
+	  char dir_str[3][10] = {"x", "y", "z"};
+	  char clr_str[3][10] = {"red", "green", "blue"};
+	  arg->vertices[i] = (float*)malloc(3*sizeof(float));
+	  if (arg->vertices[i] == NULL) {
+	    ygglog_throw_error("%sFailed to malloc vertex %d.",
+			       error_prefix, i);
+	  }
+	  for (j = 0; j < 3; j++) {
+	    get_item_python_dict_c(ivert, dir_str[j],
+				   &(arg->vertices[i][j]),
+				   error_prefix, T_FLOAT,
+				   8*sizeof(float));
+	  }
+	  if (i == 0) {
+	    if (get_item_python_dict(ivert, "red", error_prefix,
+				     T_INT, true) != NULL) {
+	      vertex_colors = true;
+	      arg->vertex_colors = (int**)malloc(arg->nvert*sizeof(int*));
+	      if (arg->vertex_colors == NULL) {
+		ygglog_throw_error("%sFailed to malloc colors.", error_prefix);
+	      }
+	    }
+	  }
+	  if (vertex_colors) {
+	    arg->vertex_colors[i] = (int*)malloc(3*sizeof(int));
+	    if (arg->vertex_colors[i] == NULL) {
+	      ygglog_throw_error("%sFailed to malloc vertex color %d.",
+				 error_prefix, i);
+	    }
+	    for (j = 0; j < 3; j++) {
+	      get_item_python_dict_c(ivert, clr_str[j],
+				     &(arg->vertex_colors[i][j]),
+				     error_prefix, T_INT,
+				     8*sizeof(int));
+	    }
+	  }
+	}
+      }
+    }
+    // Faces
+    strcpy(error_prefix, "PlyMetaschemaType::python2c: faces: ");
+    PyObject *faces = get_item_python_dict(pyobj, "faces",
+					   error_prefix,
+					   T_ARRAY, true);
+    if (faces != NULL) {
+      arg->nface = PyList_Size(faces);
+      if (arg->nface > 0) {
+	arg->faces = (int**)malloc(arg->nface*sizeof(int*));
+	if (arg->faces == NULL) {
+	  ygglog_throw_error("%sFailed to malloc.", error_prefix);
+	}
+	arg->nvert_in_face = (int*)malloc(arg->nface*sizeof(int));
+	if (arg->nvert_in_face == NULL) {
+	  ygglog_throw_error("%sFailed to malloc nvert_in_face.",
+			     error_prefix);
+	}
+	for (i = 0; i < arg->nface; i++) {
+	  PyObject *iface = get_item_python_list(faces, i,
+						 error_prefix,
+						 T_OBJECT);
+	  PyObject *iface_vert = get_item_python_dict(iface, "vertex_index",
+						      error_prefix,
+						      T_ARRAY);
+	  arg->nvert_in_face[i] = PyList_Size(iface_vert);
+	  arg->faces[i] = (int*)malloc((arg->nvert_in_face[i])*sizeof(int));
+	  if (arg->faces[i] == NULL) {
+	    ygglog_throw_error("%sFailed to malloc face %d.",
+			       error_prefix, i);
+	  }
+	  for (j = 0; j < arg->nvert_in_face[i]; j++) {
+	    get_item_python_list_c(iface_vert, i, &(arg->faces[i][j]),
+				   error_prefix, T_INT,
+				   8*sizeof(int));
+	  }
+	}
+      }
+    }
+    // Edges
+    bool edge_colors = false;
+    strcpy(error_prefix, "PlyMetaschemaType::python2c: edges: ");
+    PyObject *edges = get_item_python_dict(pyobj, "edges",
+					   error_prefix,
+					   T_ARRAY, true);
+    if (edges != NULL) {
+      arg->nedge = PyList_Size(edges);
+      if (arg->nedge > 0) {
+	arg->edges = (int**)malloc(arg->nedge*sizeof(int*));
+	if (arg->edges == NULL) {
+	  ygglog_throw_error("%sFailed to malloc.", error_prefix);
+	}
+	for (i = 0; i < arg->nedge; i++) {
+	  PyObject *iedge = get_item_python_list(edges, i,
+						 error_prefix,
+						 T_OBJECT);
+	  char dir_str[3][10] = {"vertex1", "vertex2"};
+	  char clr_str[3][10] = {"red", "green", "blue"};
+	  arg->edges[i] = (int*)malloc(2*sizeof(int));
+	  if (arg->edges[i] == NULL) {
+	    ygglog_throw_error("%sFailed to malloc edge %d.",
+			       error_prefix, i);
+	  }
+	  for (j = 0; j < 2; j++) {
+	    get_item_python_dict_c(iedge, dir_str[j],
+				   &(arg->edges[i][j]),
+				   error_prefix, T_INT,
+				   8*sizeof(int));
+	  }
+	  if (i == 0) {
+	    if (get_item_python_dict(iedge, "red", error_prefix,
+				     T_INT, true) != NULL) {
+	      edge_colors = true;
+	      arg->edge_colors = (int**)malloc(arg->nedge*sizeof(int*));
+	      if (arg->edge_colors == NULL) {
+		ygglog_throw_error("%sFailed to malloc colors.", error_prefix);
+	      }
+	    }
+	  }
+	  if (edge_colors) {
+	    arg->edge_colors[i] = (int*)malloc(3*sizeof(int));
+	    if (arg->edge_colors[i] == NULL) {
+	      ygglog_throw_error("%sFailed to malloc edge color %d.",
+				 error_prefix, i);
+	    }
+	    for (j = 0; j < 3; j++) {
+	      get_item_python_dict_c(iedge, clr_str[j],
+				     &(arg->edge_colors[i][j]),
+				     error_prefix, T_INT,
+				     8*sizeof(int));
+	    }
+	  }
+	}
+      }
+    }
+    // Construct class
+    YggGeneric *cobj = new YggGeneric(this, arg);
+    return cobj;
+  }
+  /*!
+    @brief Convert a C representation to a Python representation.
+    @param[in] cobj YggGeneric* Pointer to C object.
+    @returns PyObject* Pointer to Python object.
+   */
+  PyObject* c2python(YggGeneric *cobj) const override {
+    initialize_python("PlyMetaschemaType::c2python: ");
+    PyObject *py_args = PyTuple_New(0);
+    PyObject *py_kwargs = PyDict_New();
+    ply_t arg;
+    cobj->get_data(arg);
+    int i, j;
+    char error_prefix[200] = "";
+    // Material
+    if (strlen(arg.material) > 0) {
+      strcpy(error_prefix, "PlyMetaschemaType::c2python: material: ");
+      set_item_python_dict_c(py_kwargs, "material", &(arg.material),
+			     error_prefix, T_BYTES);
+    }
+    // Vertices
+    if (arg.nvert > 0) {
+      strcpy(error_prefix, "PlyMetaschemaType::c2python: vertices: ");
+      PyObject *verts = new_python_list(arg.nvert, error_prefix);
+      for (i = 0; i < arg.nvert; i++) {
+	PyObject *ivert = new_python_dict(error_prefix);
+	char dir_str[3][10] = {"x", "y", "z"};
+	char clr_str[3][10] = {"red", "blue", "green"};
+	for (j = 0; j < 3; j++) {
+	  set_item_python_dict_c(ivert, dir_str[j],
+				 &(arg.vertices[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+	if (arg.vertex_colors != NULL) {
+	  for (j = 0; j < 3; j++) {
+	    set_item_python_dict_c(ivert, clr_str[j],
+				   &(arg.vertex_colors[i][j]),
+				   error_prefix, T_INT,
+				   8*sizeof(int));
+	  }
+	}
+	set_item_python_list(verts, i, ivert, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "vertices", verts,
+			   error_prefix);
+    }
+    // Faces
+    if (arg.nface > 0) {
+      strcpy(error_prefix, "PlyMetaschemaType::c2python: faces: ");
+      PyObject *faces = new_python_list(arg.nface, error_prefix);
+      for (i = 0; i < arg.nface; i++) {
+	PyObject *iface = new_python_dict(error_prefix);
+	PyObject *iface_vert = new_python_list(arg.nvert_in_face[i],
+					       error_prefix);
+	for (j = 0; j < arg.nvert_in_face[i]; j++) {
+	  set_item_python_list_c(iface_vert, j, &(arg.faces[i][j]),
+				 error_prefix, T_INT, 8*sizeof(int));
+	}
+	set_item_python_dict(iface, "vertex_index", iface_vert,
+			     error_prefix);
+	set_item_python_list(faces, i, iface, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "faces", faces,
+			   error_prefix);
+    }
+    // Edges
+    if (arg.nedge > 0) {
+      strcpy(error_prefix, "PlyMetaschemaType::c2python: edges: ");
+      PyObject *edges = new_python_list(arg.nedge, error_prefix);
+      for (i = 0; i < arg.nedge; i++) {
+	PyObject *iedge = new_python_dict(error_prefix);
+	char key_str[2][10] = {"vertex1", "vertex2"};
+	char clr_str[3][10] = {"red", "blue", "green"};
+	for (j = 0; j < 2; j++) {
+	  set_item_python_dict_c(iedge, key_str[j],
+				 &(arg.edges[i][j]),
+				 error_prefix, T_INT, 8*sizeof(int));
+	}
+	if (arg.edge_colors != NULL) {
+	  for (j = 0; j < 3; j++) {
+	    set_item_python_dict_c(iedge, clr_str[j],
+				   &(arg.edge_colors[i][j]),
+				   error_prefix, T_INT,
+				   8*sizeof(int));
+	  }
+	}
+	set_item_python_list(edges, i, iedge, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "edges", edges, error_prefix);
+    }
+    // Create class
+    PyObject *py_class = import_python_class("yggdrasil.metaschema.datatypes.PlyMetaschemaType",
+					     "PlyDict");
+    PyObject *pyobj = PyObject_Call(py_class, py_args, py_kwargs);
+    if (pyobj == NULL) {
+      ygglog_throw_error("PlyMetaschemaType::c2python: Failed to create PlyDict.");
+    }
+    return pyobj;
+  }
 
   // Encoding
   /*!

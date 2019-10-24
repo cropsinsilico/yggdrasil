@@ -42,6 +42,9 @@ typedef python_t python_class_t;
 /*! @brief C-friendly defintion of Python function object. */
 typedef python_t python_function_t;
 
+/*! @brief C-friendly defintion of Python instance object. */
+typedef python_t python_instance_t;
+
 /*! @brief Macro wrapping call to PyObject_CallFunction. */
 #define call_python(x, format, ...) PyObject_CallFunction(x.obj, format, __VA_ARGS__)
 
@@ -167,11 +170,18 @@ void destroy_python(python_t *x);
 
 
 /*!
-  @brief Copy a Python object structure (NOTE: this dosn't copy the underlying Python object.
+  @brief Copy a Python object structure (NOTE: this dosn't copy the underlying Python object but does increment the reference count).
   @param[in] x python_t Structure containing Python object to copy.
   @returns python_t Copy of x.
  */
 python_t copy_python(python_t x);
+
+
+/*!
+  @brief Display a Python object structure.
+  @param[in] x python_t Structure containing Python object to display.
+ */
+void display_python(python_t x);
 
   
 /*!
@@ -354,10 +364,21 @@ dtype_t* create_dtype_format(const char *format_str, const int as_array);
   
 /*!
   @brief Construct a type object for Python objects.
+  @param[in] type char* Type string.
   @returns dtype_t* Type structure/class.
  */
 dtype_t* create_dtype_pyobj(const char* type);
   
+
+/*!
+  @brief Construct a type object for Python object instances.
+  @param[in] class_name char* Python class name.
+  @param[in] args_dtype dtype_t* Datatype describing the arguments creating the instance.
+  @returns dtype_t* Type structure/class.
+ */
+dtype_t* create_dtype_pyinst(const char* class_name,
+			     const dtype_t* args_dtype);
+
 
 /*!
   @brief Wrapper for freeing MetaschemaType class wrapper struct.

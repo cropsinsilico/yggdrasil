@@ -25,8 +25,17 @@ public:
     @param[in] properties std::map<const char*, MetaschemaType*, strcomp> Map from
     property names to types.
   */
-  JSONObjectMetaschemaType(std::map<const char*, MetaschemaType*, strcomp> properties) :
-    MetaschemaType("object"), properties_(properties) {}
+  JSONObjectMetaschemaType(const std::map<const char*, MetaschemaType*, strcomp> properties) :
+    MetaschemaType("object") {
+    update_properties(properties, true);
+  }
+  /*!
+    @brief Destructor for JSONObjectMetaschemaType.
+    Free the type string malloc'd during constructor.
+   */
+  ~JSONObjectMetaschemaType() {
+    properties_.clear();
+  }
   /*!
     @brief Equivalence operator.
     @param[in] Ref MetaschemaType instance to compare against.
@@ -40,8 +49,19 @@ public:
       return false;
     if (nitems() != pRef->nitems())
       return false;
-    if (properties_ != pRef->properties())
-      return false;
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator oit;
+    std::map<const char*, MetaschemaType*, strcomp> new_properties = pRef->properties();
+    size_t i = 0;
+    for (it = properties_.begin(); it != properties_.end(); it++, i++) {
+      oit = new_properties.find(it->first);
+      if (oit == new_properties.end()) {
+	return false;
+      }
+      if (*(it->second) != *(oit->second)) {
+	return false;
+      }
+    }
     return true;
   }
   /*!
@@ -93,16 +113,41 @@ public:
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
-  void update(MetaschemaType* new_info) override {
+  void update(const MetaschemaType* new_info) override {
     MetaschemaType::update(new_info);
     JSONObjectMetaschemaType* new_info_obj = (JSONObjectMetaschemaType*)new_info;
-    if (nitems() != new_info_obj->nitems()) {
-      ygglog_throw_error("JSONObjectMetaschemaType::update: Cannot update object with %ld elements from an object with %ld elements.",
-			 nitems(), new_info_obj->nitems());
+    update_properties(new_info_obj->properties());
+  }
+  /*!
+    @brief Update the property types.
+    @param[in] new_properties std::map<const char*, MetaschemaType*, strcomp> Map of new types describing properties.
+    @param[in] force bool If true, the existing properties are overwritten, otherwise they are only updated.
+   */
+  void update_properties(const std::map<const char*, MetaschemaType*, strcomp> new_properties,
+			 bool force=false) {
+    if (force) {
+      properties_.clear();
     }
-    std::map<const char*, MetaschemaType*, strcomp>::iterator it;
-    for (it = properties_.begin(); it != properties_.end(); it++) {
-      it->second->update(new_info_obj->properties()[it->first]);
+    if (properties_.size() > 0) {
+      if (properties_.size() != new_properties.size()) {
+	ygglog_throw_error("JSONObjectMetaschemaType::update_properties: Cannot update object with %ld elements from an object with %ld elements.",
+			   properties_.size(), new_properties.size());
+      }
+      std::map<const char*, MetaschemaType*, strcomp>::iterator it;
+      std::map<const char*, MetaschemaType*, strcomp>::const_iterator new_it;
+      for (it = properties_.begin(); it != properties_.end(); it++) {
+	new_it = new_properties.find(it->first);
+	if (new_it == new_properties.end()) {
+	  ygglog_throw_error("JSONObjectMetaschemaType::update_properties: New property map dosn't include old property '%s'.",
+			     it->first);
+	}
+	it->second->update(new_it->second);
+      }
+    } else {
+      std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+      for (it = new_properties.begin(); it != new_properties.end(); it++) {
+	properties_[it->first] = it->second->copy();
+      }
     }
   }
   /*!
@@ -123,6 +168,61 @@ public:
       nargs = nargs + it->second->nargs_exp();
     }
     return nargs;
+  }
+  /*!
+    @brief Convert a Python representation to a C representation.
+    @param[in] pyobj PyObject* Pointer to Python object.
+    @returns YggGeneric* Pointer to C object.
+   */
+  YggGeneric* python2c(PyObject* pyobj) const override {
+    if (!(PyDict_Check(pyobj))) {
+      ygglog_throw_error("JSONObjectMetaschemaType::python2c: Python object must be a dict.");
+    }
+    if (PyDict_Size(pyobj) != nitems()) {
+      ygglog_throw_error("JSONObjectMetaschemaType::python2c: Python dict has %lu elements, but the type expects %lu.",
+			 PyDict_Size(pyobj), nitems());
+    }
+    YggGenericMap *cmap = new YggGenericMap();
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    for (it = properties_.begin(); it != properties_.end(); it++) {
+      PyObject *ipy_item = PyDict_GetItemString(pyobj, it->first);
+      if (ipy_item == NULL) {
+	ygglog_throw_error("JSONObjectMetaschemaType::python2c: Failed to get item %s out of the Python dict.", it->first);
+      }
+      YggGeneric *ic_item = it->second->python2c(ipy_item);
+      (*cmap)[it->first] = ic_item;
+    }
+    YggGeneric* cobj = new YggGeneric(this, cmap);
+    return cobj;
+  }
+  /*!
+    @brief Convert a C representation to a Python representation.
+    @param[in] cobj YggGeneric* Pointer to C object.
+    @returns PyObject* Pointer to Python object.
+   */
+  PyObject* c2python(YggGeneric* cobj) const override {
+    initialize_python("JSONObjectMetaschemaType::c2python: ");
+    PyObject *pyobj = PyDict_New();
+    if (pyobj == NULL) {
+      ygglog_throw_error("JSONObjectMetaschemaType::c2python: Failed to create new Python dict.");
+    }
+    YggGenericMap c_map;
+    cobj->get_data(c_map);
+    if (c_map.size() != nitems()) {
+      ygglog_throw_error("JSONObjectMetaschemaType::c2python: Type has %lu elements but object has %lu.", nitems(), c_map.size());
+    }
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    for (it = properties_.begin(); it != properties_.end(); it++) {
+      YggGenericMap::iterator ic_item = c_map.find(it->first);
+      if (ic_item == c_map.end()) {
+	ygglog_throw_error("JSONObjectMetaschemaType::c2python: C object does not have element %s.", it->first);
+      }
+      PyObject *ipy_item = it->second->c2python(ic_item->second);
+      if (PyDict_SetItemString(pyobj, it->first, ipy_item) < 0) {
+	ygglog_throw_error("JSONObjectMetaschemaType::c2python: Error setting item %s in the Python dict.", it->first);
+      }
+    }
+    return pyobj;
   }
 
   // Encoding
@@ -169,13 +269,11 @@ public:
   /*!
     @brief Encode arguments describine an instance of this type into a JSON string.
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
-    @param[in] x YggGeneric* Pointer to generic wrapper for data.
+    @param[in] arg YggGenericMap Mapping between keys and generic wrappers.
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   YggGeneric* x) const override {
-    YggGenericMap arg;
-    x->get_data(arg);
+		   YggGenericMap arg) const {
     writer->StartObject();
     std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
     size_t i = 0;
@@ -193,6 +291,18 @@ public:
     }
     writer->EndObject();
     return true;
+  }
+  /*!
+    @brief Encode arguments describine an instance of this type into a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @param[in] x YggGeneric* Pointer to generic wrapper for data.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
+  bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
+		   YggGeneric* x) const override {
+    YggGenericMap arg;
+    x->get_data(arg);
+    return encode_data(writer, arg);
   }
 
   // Decoding

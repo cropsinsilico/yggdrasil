@@ -13,6 +13,7 @@ from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     _valid_types)
 from yggdrasil.languages import get_language_dir
 from yggdrasil.config import ygg_cfg
+from numpy import distutils as numpy_distutils
 
 
 _default_internal_libtype = 'object'
@@ -236,9 +237,11 @@ _top_lang_dir = get_language_dir('c')
 _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
-_incl_python = sysconfig.get_paths()['include']
+_python_inc = sysconfig.get_paths()['include']
 _python_lib = os.path.join(sysconfig.get_config_var('LIBDIR'),
                            sysconfig.get_config_var('LIBRARY'))
+_numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
+_numpy_lib = None
 
 
 class CModelDriver(CompiledModelDriver):
@@ -266,13 +269,18 @@ class CModelDriver(CompiledModelDriver):
         'czmq': {'include': 'czmq.h',
                  'libtype': 'shared',
                  'language': 'c'},
-        'python': {'include': os.path.join(_incl_python, 'Python.h'),
+        'numpy': {'include': os.path.join(_numpy_inc[0], 'numpy',
+                                          'arrayobject.h'),
+                  'libtype': 'header_only',
+                  'language': 'c'},
+        'python': {'include': os.path.join(_python_inc, 'Python.h'),
                    'language': 'c'}}
     internal_libraries = {
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
                 'linker_language': 'c++',  # Some dependencies are C++
                 'internal_dependencies': ['datatypes', 'regex'],
-                'external_dependencies': ['rapidjson', 'python'],
+                'external_dependencies': ['rapidjson',
+                                          'python', 'numpy'],
                 'include_dirs': [_incl_comm, _incl_seri],
                 'compiler_flags': []},
         'regex_win32': {'source': 'regex_win32.cpp',
@@ -291,7 +299,8 @@ class CModelDriver(CompiledModelDriver):
                       'language': 'c++',
                       'libtype': _default_internal_libtype,
                       'internal_dependencies': ['regex'],
-                      'external_dependencies': ['rapidjson', 'python'],
+                      'external_dependencies': ['rapidjson',
+                                                'python', 'numpy'],
                       'include_dirs': []}}
     type_map = {
         'int': 'intX_t',
@@ -312,7 +321,8 @@ class CModelDriver(CompiledModelDriver):
         'schema': 'schema_t',
         'flag': 'int',
         'class': 'python_class_t',
-        'function': 'python_function_t'}
+        'function': 'python_function_t',
+        'instance': 'python_instance_t'}
     function_param = {
         'import': '#include \"{filename}\"',
         'index': '{variable}[{index}]',
@@ -493,6 +503,10 @@ class CModelDriver(CompiledModelDriver):
         if (rjlib is not None) and os.path.isfile(rjlib):
             cfg.set(cls._language, 'rapidjson_include',
                     os.path.dirname(os.path.dirname(rjlib)))
+        nplib = cfg.get(cls._language, 'numpy_include', None)
+        if (nplib is not None) and os.path.isfile(nplib):
+            cfg.set(cls._language, 'numpy_include',
+                    os.path.dirname(os.path.dirname(nplib)))
         if macos_sdkroot is not None:
             if not os.path.isdir(macos_sdkroot):  # pragma: debug
                 raise ValueError("Path to MacOS SDK root directory "
@@ -543,8 +557,7 @@ class CModelDriver(CompiledModelDriver):
 
         """
         if paths_to_add is None:
-            paths_to_add = [cls.get_language_dir(),
-                            _incl_python]
+            paths_to_add = [cls.get_language_dir()]
         if platform._is_linux:
             path_list = []
             prev_path = env.pop('LD_LIBRARY_PATH', '')
@@ -1402,6 +1415,8 @@ class CModelDriver(CompiledModelDriver):
         elif (typename in ['class', 'function']):
             fmt = 'create_dtype_pyobj(\"{type}\")'
             keys = {'type': typename}
+        elif typename == 'instance':
+            fmt = 'create_dtype_pyinst(NULL, NULL)'
         else:  # pragma: debug
             raise ValueError("Cannot create C version of type '%s'"
                              % typename)

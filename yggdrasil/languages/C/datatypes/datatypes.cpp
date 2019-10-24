@@ -8,6 +8,7 @@
 #include "ObjMetaschemaType.h"
 #include "AsciiTableMetaschemaType.h"
 #include "PyObjMetaschemaType.h"
+#include "PyInstMetaschemaType.h"
 #include "datatypes.h"
 
 #include "rapidjson/document.h"
@@ -91,6 +92,16 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
     case T_CLASS:
     case T_FUNCTION:
       return new PyObjMetaschemaType(type_doc);
+    case T_INSTANCE: {
+      PyInstMetaschemaType* out = new PyInstMetaschemaType(type_doc);
+      std::map<const char*, MetaschemaType*, strcomp> args;
+      for (rapidjson::Value::ConstMemberIterator itr = type_doc["args"].MemberBegin(); itr != type_doc["args"].MemberEnd(); ++itr) {
+	args[itr->name.GetString()] = type_from_doc(itr->value);
+      }
+      JSONObjectMetaschemaType* args_type = new JSONObjectMetaschemaType(args);
+      out->update_args_type(args_type);
+      return out;
+    }
     }
   }
   ygglog_throw_error("Could not find class from doc for type '%s'.", type);
@@ -308,6 +319,7 @@ dtype_t* create_dtype(MetaschemaType* type_class=NULL) {
       init_dtype_class(out, type_class);
     } catch (...) {
       free(out);
+      out = NULL;
       ygglog_throw_error("create_dtype: Failed to initialized data type structure with class information.");
     }
   }
@@ -358,6 +370,8 @@ MetaschemaType* dtype2class(const dtype_t* dtype) {
     case T_CLASS:
     case T_FUNCTION:
       return static_cast<PyObjMetaschemaType*>(dtype->obj);
+    case T_INSTANCE:
+      return static_cast<PyInstMetaschemaType*>(dtype->obj);
     }
   } else {
     ygglog_throw_error("dtype2class: No handler for type '%s'.", dtype->type);
@@ -470,25 +484,51 @@ extern "C" {
   python_t init_python() {
     python_t out;
     out.name[0] = '\0';
+    out.args = NULL;
     out.obj = NULL;
     return out;
   }
 
   void destroy_python(python_t *x) {
-    x->name[0] = '\0';
-    if (x->obj != NULL) {
-      Py_DECREF(x->obj);
-      x->obj = NULL;
+    if (x != NULL) {
+      x->name[0] = '\0';
+      if (x->args != NULL) {
+	YggGeneric* args = (YggGeneric*)(x->args);
+	delete args;
+	x->args = NULL;
+      }
+      if (x->obj != NULL) {
+	Py_DECREF(x->obj);
+	x->obj = NULL;
+      }
     }
   }
 
   python_t copy_python(python_t x) {
-    python_t out;
+    python_t out = init_python();
     strncpy(out.name, x.name, PYTHON_NAME_SIZE);
+    out.args = NULL;
+    if (x.args != NULL) {
+      YggGeneric* args = (YggGeneric*)(x.args);
+      out.args = args->copy();
+    }
     if (x.obj != NULL) {
       out.obj = Py_BuildValue("O", x.obj);
     }
     return out;
+  }
+
+  void display_python(python_t x) {
+    try {
+      FILE* fout = stdout;
+      if (x.obj != NULL) {
+	if (PyObject_Print(x.obj, fout, 0) < 0) {
+	  ygglog_throw_error("display_python: Failed to print the Python object.");
+	}
+      }
+    } catch (...) {
+      ygglog_error("display_python: C++ exception thrown.");
+    }
   }
 
   int is_empty_dtype(const dtype_t* dtype) {
@@ -756,6 +796,22 @@ extern "C" {
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_pyobj: C++ exception thrown.");
+      CSafe(delete obj);
+      return NULL;
+    }
+  }
+  dtype_t* create_dtype_pyinst(const char* class_name,
+			       const dtype_t* args_dtype) {
+    PyInstMetaschemaType* obj = NULL;
+    JSONObjectMetaschemaType* args_type = NULL;
+    try {
+      if (args_dtype != NULL) {
+	args_type = dynamic_cast<JSONObjectMetaschemaType*>(dtype2class(args_dtype));
+      }
+      obj = new PyInstMetaschemaType(class_name, args_type);
+      return create_dtype(obj);
+    } catch(...) {
+      ygglog_error("create_dtype_pyinst: C++ exception thrown.");
       CSafe(delete obj);
       return NULL;
     }

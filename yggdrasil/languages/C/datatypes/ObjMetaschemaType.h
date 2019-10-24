@@ -49,6 +49,642 @@ public:
   virtual size_t nargs_exp() const override {
     return 1;
   }
+  /*!
+    @brief Convert a Python representation to a C representation.
+    @param[in] pyobj PyObject* Pointer to Python object.
+    @returns YggGeneric* Pointer to C object.
+   */
+  YggGeneric* python2c(PyObject *pyobj) const override {
+    if (!(PyDict_Check(pyobj))) {
+      ygglog_throw_error("ObjMetaschemaType::python2c: Python object must be a dict.");
+    }
+    obj_t *arg = (obj_t*)malloc(sizeof(obj_t));
+    if (arg == NULL) {
+      ygglog_throw_error("ObjMetaschemaType::python2c: Failed to malloc for obj structure.");
+    }
+    arg[0] = init_obj();
+    char error_prefix[200] = "";
+    // Allocate
+    int nvert = 0, ntexc = 0, nnorm = 0, nparam = 0, npoint = 0,
+      nline = 0, nface = 0, ncurve = 0, ncurve2 = 0, nsurf = 0;
+    PyObject *verts = get_item_python_dict(pyobj, "vertices",
+					   error_prefix, T_ARRAY,
+					   true);
+    PyObject *texcs = get_item_python_dict(pyobj, "texcoords",
+					   error_prefix, T_ARRAY,
+					   true);
+    PyObject *norms = get_item_python_dict(pyobj, "normals",
+					   error_prefix, T_ARRAY,
+					   true);
+    PyObject *param = get_item_python_dict(pyobj, "params",
+					   error_prefix, T_ARRAY,
+					   true);
+    PyObject *point = get_item_python_dict(pyobj, "points",
+					   error_prefix, T_ARRAY,
+					   true);
+    PyObject *lines = get_item_python_dict(pyobj, "lines",
+					   error_prefix, T_ARRAY,
+					   true);
+    PyObject *faces = get_item_python_dict(pyobj, "faces",
+					   error_prefix, T_ARRAY,
+					   true);
+    PyObject *curve = get_item_python_dict(pyobj, "curves",
+					   error_prefix, T_ARRAY,
+					   true);
+    PyObject *curv2 = get_item_python_dict(pyobj, "curves2D",
+					   error_prefix, T_ARRAY,
+					   true);
+    PyObject *surfs = get_item_python_dict(pyobj, "surfaces",
+					   error_prefix, T_ARRAY,
+					   true);
+    int do_color = 0;
+    if (verts != NULL) {
+      nvert = PyList_Size(verts);
+      if (nvert > 0) {
+	PyObject *ivert = get_item_python_list(verts, 0,
+					       error_prefix,
+					       T_OBJECT);
+	PyObject *icolor = get_item_python_dict(ivert, "red",
+						error_prefix,
+						T_INT, true);
+	if (icolor != NULL)
+	  do_color = 1;
+      }
+    }
+    if (texcs != NULL)
+      ntexc = PyList_Size(texcs);
+    if (norms != NULL)
+      nnorm = PyList_Size(norms);
+    if (param != NULL)
+      nparam = PyList_Size(param);
+    if (point != NULL)
+      npoint = PyList_Size(point);
+    if (lines != NULL)
+      nline = PyList_Size(lines);
+    if (faces != NULL)
+      nface = PyList_Size(faces);
+    if (curve != NULL)
+      ncurve = PyList_Size(curve);
+    if (curv2 != NULL)
+      ncurve2 = PyList_Size(curv2);
+    if (surfs != NULL)
+      nsurf = PyList_Size(surfs);
+    if (alloc_obj(arg, nvert, ntexc, nnorm, nparam, npoint, nline, nface,
+		  ncurve, ncurve2, nsurf, do_color) < 0) {
+      ygglog_throw_error("ObjMetaschemaType::python2c: Error allocating obj structure.");
+    }
+    int i, j;
+    // Material
+    strcpy(error_prefix, "ObjMetaschemaType::python2c: material: ");
+    get_item_python_dict_c(pyobj, "material", &(arg->material),
+			   error_prefix, T_BYTES, 0, true);
+    // Vertices
+    if (arg->nvert > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::python2c: vertices: ");
+      for (i = 0; i < arg->nvert; i++) {
+	PyObject *ivert = get_item_python_list(verts, i,
+					       error_prefix,
+					       T_OBJECT);
+	char dir_str[4][10] = {"x", "y", "z", "w"};
+	char clr_str[3][10] = {"red", "green", "blue"};
+	for (j = 0; j < 4; j++) {
+	  get_item_python_dict_c(ivert, dir_str[j],
+				 &(arg->vertices[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+	if (do_color) {
+	  for (j = 0; j < 3; j++) {
+	    get_item_python_dict_c(ivert, clr_str[j],
+				   &(arg->vertex_colors[i][j]),
+				   error_prefix, T_INT,
+				   8*sizeof(int));
+	  }
+	}
+      }
+    }
+    // Texcoords
+    if (arg->ntexc > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::python2c: texcoords: ");
+      for (i = 0; i < arg->ntexc; i++) {
+	PyObject *itexc = get_item_python_list(texcs, i,
+					       error_prefix,
+					       T_OBJECT);
+	char key_str[3][10] = {"u", "v", "w"};
+	for (j = 0; j < 3; j++) {
+	  get_item_python_dict_c(itexc, key_str[j],
+				 &(arg->texcoords[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+      }
+    }
+    // Normals
+    if (arg->nnorm > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::python2c: normals: ");
+      for (i = 0; i < arg->nnorm; i++) {
+	PyObject *inorm = get_item_python_list(norms, i,
+					       error_prefix,
+					       T_OBJECT);
+	char key_str[3][10] = {"i", "j", "k"};
+	for (j = 0; j < 3; j++) {
+	  get_item_python_dict_c(inorm, key_str[j],
+				 &(arg->normals[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+      }
+    }
+    // Parameters
+    if (arg->nparam > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::python2c: params: ");
+      for (i = 0; i < arg->nparam; i++) {
+	PyObject *iparam = get_item_python_list(param, i,
+						error_prefix,
+						T_OBJECT);
+	char key_str[3][10] = {"u", "v", "w"};
+	for (j = 0; j < 3; j++) {
+	  get_item_python_dict_c(iparam, key_str[j],
+				 &(arg->params[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+      }
+    }
+    // Points
+    if (arg->npoint > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::python2c: points: ");
+      for (i = 0; i < arg->npoint; i++) {
+	PyObject *ipoint = get_item_python_list(point, i,
+						error_prefix,
+						T_ARRAY);
+	arg->nvert_in_point[i] = PyList_Size(ipoint);
+	arg->points[i] = (int*)malloc((arg->nvert_in_point[i])*sizeof(int));
+	if (arg->points[i] == NULL) {
+	  ygglog_throw_error("%sFailed to malloc point %d.",
+			     error_prefix, i);
+	}
+	for (j = 0; j < arg->nvert_in_point[i]; j++) {
+	  get_item_python_list_c(ipoint, i, &(arg->points[i][j]),
+				 error_prefix, T_INT, 8*sizeof(int));
+	}
+      }
+    }
+    // Lines
+    if (arg->nline > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::python2c: lines: ");
+      for (i = 0; i < arg->nline; i++) {
+	PyObject *iline = get_item_python_list(lines, i,
+					       error_prefix,
+					       T_ARRAY);
+	arg->nvert_in_line[i] = PyList_Size(iline);
+	arg->lines[i] = (int*)malloc((arg->nvert_in_line[i])*sizeof(int));
+	if (arg->lines[i] == NULL) {
+	  ygglog_throw_error("%sFailed to malloc line %d.",
+			     error_prefix, i);
+	}
+	arg->line_texcoords[i] = (int*)malloc((arg->nvert_in_line[i])*sizeof(int));
+	if (arg->line_texcoords[i] == NULL) {
+	  ygglog_throw_error("%sFailed to malloc line texcoord %d.",
+			     error_prefix, i);
+	}
+	for (j = 0; j < arg->nvert_in_line[i]; j++) {
+	  PyObject *iline_vert = get_item_python_list(iline, j,
+						      error_prefix,
+						      T_OBJECT);
+	  get_item_python_dict_c(iline_vert, "vertex_index",
+				 &(arg->lines[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  get_item_python_dict_c(iline_vert, "texcoord_index",
+				 &(arg->line_texcoords[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	}
+      }
+    }
+    // Faces
+    if (arg->nface > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::python2c: faces: ");
+      for (i = 0; i < arg->nface; i++) {
+	PyObject *iface = get_item_python_list(faces, i,
+					       error_prefix,
+					       T_ARRAY);
+	arg->nvert_in_face[i] = PyList_Size(iface);
+	arg->faces[i] = (int*)malloc((arg->nvert_in_face[i])*sizeof(int));
+	if (arg->faces[i] == NULL) {
+	  ygglog_throw_error("%sFailed to malloc face %d.",
+			     error_prefix, i);
+	}
+	arg->face_texcoords[i] = (int*)malloc((arg->nvert_in_face[i])*sizeof(int));
+	if (arg->face_texcoords[i] == NULL) {
+	  ygglog_throw_error("%sFailed to malloc face texcoord %d.",
+			     error_prefix, i);
+	}
+	arg->face_normals[i] = (int*)malloc((arg->nvert_in_face[i])*sizeof(int));
+	if (arg->face_normals[i] == NULL) {
+	  ygglog_throw_error("%sFailed to malloc face normal %d.",
+			     error_prefix, i);
+	}
+	for (j = 0; j < arg->nvert_in_face[i]; j++) {
+	  PyObject *iface_vert = get_item_python_list(iface, j,
+						      error_prefix,
+						      T_OBJECT);
+	  arg->face_texcoords[i][j] = -1;
+	  arg->face_normals[i][j] = -1;
+	  get_item_python_dict_c(iface_vert, "vertex_index",
+				 &(arg->faces[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  get_item_python_dict_c(iface_vert, "texcoord_index",
+				 &(arg->face_texcoords[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  get_item_python_dict_c(iface_vert, "normal_index",
+				 &(arg->face_normals[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	}
+      }
+    }
+    // Curves
+    if (arg->ncurve > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::python2c: curves: ");
+      for (i = 0; i < arg->ncurve; i++) {
+	PyObject *icurve = get_item_python_list(curve, i,
+						error_prefix,
+						T_OBJECT);
+	PyObject *icurve_vert = get_item_python_dict(icurve,
+						     "vertex_indices",
+						     error_prefix,
+						     T_ARRAY);
+	arg->nvert_in_curve[i] = PyList_Size(icurve_vert);
+	arg->curves[i] = (int*)malloc((arg->nvert_in_curve[i])*sizeof(int));
+	if (arg->curves[i] == NULL) {
+	  ygglog_throw_error("%sFailed to malloc curve %d.",
+			     error_prefix, i);
+	}
+	char key_str[2][50] = {"starting_param", "ending_param"};
+	for (j = 0; j < 2; j++) {
+	  get_item_python_dict_c(icurve, key_str[j],
+				 &(arg->curve_params[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+	for (j = 0; j < arg->nvert_in_curve[i]; j++) {
+	  get_item_python_list_c(icurve_vert, j,
+				 &(arg->curves[i][j]),
+				 error_prefix, T_INT, 8*sizeof(int));
+	}
+      }
+    }
+    // Curves 2D
+    if (arg->ncurve2 > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::python2c: curves 2D: ");
+      for (i = 0; i < arg->ncurve2; i++) {
+	PyObject *icurve2 = get_item_python_list(curv2, i,
+						 error_prefix,
+						 T_ARRAY);
+	arg->nparam_in_curve2[i] = PyList_Size(icurve2);
+	arg->curves2[i] = (int*)malloc((arg->nparam_in_curve2[i])*sizeof(int));
+	if (arg->curves2[i] == NULL) {
+	  ygglog_throw_error("%sFailed to malloc curve2 %d.",
+			     error_prefix, i);
+	}
+	for (j = 0; j < arg->nparam_in_curve2[i]; j++) {
+	  get_item_python_list_c(icurve2, j, &(arg->curves2[i][j]),
+				 error_prefix, T_INT, 8*sizeof(int));
+	}
+      }
+    }
+    // Surfaces
+    if (arg->nsurf > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::python2c: surfs: ");
+      for (i = 0; i < arg->nsurf; i++) {
+	PyObject *isurf = get_item_python_list(surfs, i,
+					       error_prefix,
+					       T_OBJECT);
+	PyObject *isurf_vert = get_item_python_dict(isurf,
+						    "vertex_indices",
+						    error_prefix,
+						    T_ARRAY);
+	arg->nvert_in_surface[i] = PyList_Size(isurf_vert);
+	arg->surfaces[i] = (int*)malloc((arg->nvert_in_surface[i])*sizeof(int));
+	if (arg->surfaces[i] == NULL) {
+	  ygglog_throw_error("%sFailed to malloc surface %d.",
+			     error_prefix, i);
+	}
+	arg->surface_texcoords[i] = (int*)malloc((arg->nvert_in_surface[i])*sizeof(int));
+	if (arg->surface_texcoords[i] == NULL) {
+	  ygglog_throw_error("%sFailed to malloc surface texcoord %d.",
+			     error_prefix, i);
+	}
+	arg->surface_normals[i] = (int*)malloc((arg->nvert_in_surface[i])*sizeof(int));
+	if (arg->surface_normals[i] == NULL) {
+	  ygglog_throw_error("%sFailed to malloc surface normal %d.",
+			     error_prefix, i);
+	}
+	
+	char key_str_u[2][50] = {"starting_param_u", "ending_param_u"};
+	for (j = 0; j < 2; j++) {
+	  get_item_python_dict_c(isurf, key_str_u[j],
+				 &(arg->surface_params_u[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+	char key_str_v[2][50] = {"starting_param_u", "ending_param_v"};
+	for (j = 0; j < 2; j++) {
+	  get_item_python_dict_c(isurf, key_str_v[j],
+				 &(arg->surface_params_v[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+	for (j = 0; j < arg->nvert_in_surface[i]; j++) {
+	  PyObject *ivert = get_item_python_list(isurf_vert, j,
+						 error_prefix,
+						 T_OBJECT);
+	  arg->surface_texcoords[i][j] = -1;
+	  arg->surface_normals[i][j] = -1;
+	  get_item_python_dict_c(ivert, "vertex_index",
+				 &(arg->surfaces[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  get_item_python_dict_c(ivert, "texcoord_index",
+				 &(arg->surface_texcoords[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  get_item_python_dict_c(ivert, "normal_index",
+				 &(arg->surface_normals[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	}
+      }
+    }
+    // Construct class
+    YggGeneric *cobj = new YggGeneric(this, arg);
+    return cobj;
+  }
+  /*!
+    @brief Convert a C representation to a Python representation.
+    @param[in] cobj YggGeneric* Pointer to C object.
+    @returns PyObject* Pointer to Python object.
+   */
+  PyObject* c2python(YggGeneric *cobj) const override {
+    initialize_python("ObjMetaschemaType::c2python: ");
+    PyObject *py_args = PyTuple_New(0);
+    PyObject *py_kwargs = PyDict_New();
+    obj_t arg;
+    cobj->get_data(arg);
+    int i, j;
+    char error_prefix[200] = "";
+    // Material
+    if (strlen(arg.material) > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::c2python: material: ");
+      set_item_python_dict_c(py_kwargs, "material", &(arg.material),
+			     error_prefix, T_BYTES);
+    }
+    // Vertices
+    if (arg.nvert > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::c2python: vertices: ");
+      PyObject *verts = new_python_list(arg.nvert, error_prefix);
+      for (i = 0; i < arg.nvert; i++) {
+	PyObject *ivert = new_python_dict(error_prefix);
+	char dir_str[4][10] = {"x", "y", "z", "w"};
+	char clr_str[3][10] = {"red", "blue", "green"};
+	for (j = 0; j < 4; j++) {
+	  set_item_python_dict_c(ivert, dir_str[j],
+				 &(arg.vertices[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+	if (arg.vertex_colors != NULL) {
+	  for (j = 0; j < 3; j++) {
+	    set_item_python_dict_c(ivert, clr_str[j],
+				   &(arg.vertex_colors[i][j]),
+				   error_prefix, T_INT,
+				   8*sizeof(int));
+	  }
+	}
+	set_item_python_list(verts, i, ivert, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "vertices", verts,
+			   error_prefix);
+    }
+    // Texcoords
+    if (arg.ntexc > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::c2python: texcoords: ");
+      PyObject *texcs = new_python_list(arg.ntexc, error_prefix);
+      for (i = 0; i < arg.ntexc; i++) {
+	PyObject *itexc = new_python_dict(error_prefix);
+	char key_str[3][10] = {"u", "v", "w"};
+	for (j = 0; j < 3; j++) {
+	  set_item_python_dict_c(itexc, key_str[j],
+				 &(arg.texcoords[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+	set_item_python_list(texcs, i, itexc, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "texcoords", texcs,
+			   error_prefix);
+    }
+    // Normals
+    if (arg.nnorm > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::c2python: normals: ");
+      PyObject *norms = new_python_list(arg.nnorm, error_prefix);
+      for (i = 0; i < arg.nnorm; i++) {
+	PyObject *inorm = new_python_dict(error_prefix);
+	char key_str[3][10] = {"i", "j", "k"};
+	for (j = 0; j < 3; j++) {
+	  set_item_python_dict_c(inorm, key_str[j],
+				 &(arg.normals[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+	set_item_python_list(norms, i, inorm, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "normals", norms,
+			   error_prefix);
+    }
+    // Params
+    if (arg.nparam > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::c2python: params: ");
+      PyObject *params = new_python_list(arg.nparam, error_prefix);
+      for (i = 0; i < arg.nparam; i++) {
+	PyObject *iparam = new_python_dict(error_prefix);
+	char key_str[3][10] = {"u", "v", "w"};
+	for (j = 0; j < 3; j++) {
+	  set_item_python_dict_c(iparam, key_str[j],
+				 &(arg.params[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+	set_item_python_list(params, i, iparam, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "params", params,
+			   error_prefix);
+    }
+    // Points
+    if (arg.npoint > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::c2python: points: ");
+      PyObject *points = new_python_list(arg.npoint, error_prefix);
+      for (i = 0; i < arg.npoint; i++) {
+	PyObject *ipoint = new_python_list(arg.nvert_in_point[i],
+					   error_prefix);
+	for (j = 0; j < arg.nvert_in_point[i]; j++) {
+	  set_item_python_list_c(ipoint, j, &(arg.points[i][j]),
+				 error_prefix, T_INT, 8*sizeof(int));
+	}
+	set_item_python_list(points, i, ipoint, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "points", points,
+			   error_prefix);
+    }
+    // Lines
+    if (arg.nline > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::c2python: lines: ");
+      PyObject *lines = new_python_list(arg.nline, error_prefix);
+      for (i = 0; i < arg.nline; i++) {
+	PyObject *iline = new_python_list(arg.nvert_in_line[i],
+					  error_prefix);
+	for (j = 0; j < arg.nvert_in_line[i]; j++) {
+	  PyObject *iline_vert = new_python_dict(error_prefix);
+	  set_item_python_dict_c(iline_vert, "vertex_index",
+				 &(arg.lines[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  set_item_python_dict_c(iline_vert, "texcoord_index",
+				 &(arg.line_texcoords[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  set_item_python_list(iline, j, iline_vert, error_prefix);
+	}
+	set_item_python_list(lines, i, iline, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "lines", lines, error_prefix);
+    }
+    // Faces
+    if (arg.nface > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::c2python: faces: ");
+      PyObject *faces = new_python_list(arg.nface, error_prefix);
+      for (i = 0; i < arg.nface; i++) {
+	PyObject *iface = new_python_list(arg.nvert_in_face[i],
+					  error_prefix);
+	for (j = 0; j < arg.nvert_in_face[i]; j++) {
+	  PyObject *iface_vert = new_python_dict(error_prefix);
+	  set_item_python_dict_c(iface_vert, "vertex_index",
+				 &(arg.faces[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  set_item_python_dict_c(iface_vert, "texcoord_index",
+				 &(arg.face_texcoords[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  set_item_python_dict_c(iface_vert, "normal_index",
+				 &(arg.face_normals[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  set_item_python_list(iface, j, iface_vert, error_prefix);
+	}
+	set_item_python_list(faces, i, iface, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "faces", faces, error_prefix);
+    }
+    // Curves
+    if (arg.ncurve > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::c2python: curves: ");
+      PyObject *curves = new_python_list(arg.ncurve, error_prefix);
+      for (i = 0; i < arg.ncurve; i++) {
+	PyObject *icurve = new_python_dict(error_prefix);
+	char key_str[2][50] = {"starting_param", "ending_param"};
+	for (j = 0; j < 2; j++) {
+	  set_item_python_dict_c(icurve, key_str[j],
+				 &(arg.curve_params[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+	PyObject *icurve_vert = new_python_list(arg.nvert_in_curve[i],
+						error_prefix);
+	for (j = 0; j < arg.nvert_in_curve[i]; j++) {
+	  set_item_python_list_c(icurve_vert, j, &(arg.curves[i][j]),
+				 error_prefix, T_INT, 8*sizeof(int));
+	}
+	set_item_python_dict(icurve, "vertex_indices", icurve_vert,
+			     error_prefix);
+	set_item_python_list(curves, i, icurve, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "curves", curves, error_prefix);
+    }
+    // Curves 2D
+    if (arg.ncurve2 > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::c2python: curves 2D: ");
+      PyObject *curves2 = new_python_list(arg.ncurve2, error_prefix);
+      for (i = 0; i < arg.ncurve2; i++) {
+	PyObject *icurve2 = new_python_list(arg.nparam_in_curve2[i],
+					    error_prefix);
+	for (j = 0; j < arg.nparam_in_curve2[i]; j++) {
+	  set_item_python_list_c(icurve2, j, &(arg.curves2[i][j]),
+				 error_prefix, T_INT, 8*sizeof(int));
+	}
+	set_item_python_list(curves2, i, icurve2, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "curve2Ds", curves2,
+			   error_prefix);
+    }
+    // Surfaces
+    if (arg.nsurf > 0) {
+      strcpy(error_prefix, "ObjMetaschemaType::c2python: surfaces: ");
+      PyObject *surfs = new_python_list(arg.nsurf, error_prefix);
+      for (i = 0; i < arg.nsurf; i++) {
+	PyObject *isurf = new_python_dict(error_prefix);
+	char key_str_u[2][50] = {"starting_param_u", "ending_param_u"};
+	for (j = 0; j < 2; j++) {
+	  set_item_python_dict_c(isurf, key_str_u[j],
+				 &(arg.surface_params_u[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+	char key_str_v[2][50] = {"starting_param_v", "ending_param_v"};
+	for (j = 0; j < 2; j++) {
+	  set_item_python_dict_c(isurf, key_str_v[j],
+				 &(arg.surface_params_v[i][j]),
+				 error_prefix, T_FLOAT,
+				 8*sizeof(float));
+	}
+	PyObject *isurf_vert = new_python_list(arg.nvert_in_surface[i],
+					       error_prefix);
+	for (j = 0; j < arg.nvert_in_surface[i]; j++) {
+	  PyObject *ivert = new_python_dict(error_prefix);
+	  set_item_python_dict_c(ivert, "vertex_index",
+				 &(arg.surfaces[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  set_item_python_dict_c(ivert, "texcoord_index",
+				 &(arg.surface_texcoords[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  set_item_python_dict_c(ivert, "normal_index",
+				 &(arg.surface_normals[i][j]),
+				 error_prefix, T_INT,
+				 8*sizeof(int));
+	  set_item_python_list(isurf_vert, j, ivert, error_prefix);
+	}
+	set_item_python_dict(isurf, "vertex_indices", isurf_vert,
+			     error_prefix);
+	set_item_python_list(surfs, i, isurf, error_prefix);
+      }
+      set_item_python_dict(py_kwargs, "surfaces", surfs,
+			   error_prefix);
+    }
+    // Create class
+    PyObject *py_class = import_python_class("yggdrasil.metaschema.datatypes.ObjMetaschemaType",
+					     "ObjDict");
+    PyObject *pyobj = PyObject_Call(py_class, py_args, py_kwargs);
+    if (pyobj == NULL) {
+      ygglog_throw_error("ObjMetaschemaType::c2python: Failed to create ObjDict.");
+    }
+    return pyobj;
+  }
 
   // Encoding
   /*!
