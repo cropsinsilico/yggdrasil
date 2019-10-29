@@ -43,7 +43,7 @@ typedef python_t python_class_t;
 typedef python_t python_function_t;
 
 /*! @brief C-friendly defintion of Python instance object. */
-typedef python_t python_instance_t;
+typedef generic_t python_instance_t;
 
 /*! @brief Macro wrapping call to PyObject_CallFunction. */
 #define call_python(x, format, ...) PyObject_CallFunction(x.obj, format, __VA_ARGS__)
@@ -153,13 +153,6 @@ generic_t get_generic_va(size_t nargs, va_list_t ap);
   @returns generic_t* Generic structure if one is present, NULL otherwise.
  */
 generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap);
-
-
-/*!
-  @brief Initialize a structure to contain a Python object.
-  @returns python_t New Python object structure.
- */
-python_t init_python();
 
 
 /*!

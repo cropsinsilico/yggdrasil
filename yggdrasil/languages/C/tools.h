@@ -155,6 +155,20 @@ typedef struct python_t {
 
 
 /*!
+  @brief Initialize a structure to contain a Python object.
+  @returns python_t New Python object structure.
+ */
+static inline
+python_t init_python() {
+  python_t out;
+  out.name[0] = '\0';
+  out.args = NULL;
+  out.obj = NULL;
+  return out;
+};
+
+  
+/*!
   @brief Initialize Numpy arrays if it is not initalized.
   @returns int 0 if successful, other values indicate errors.
  */

@@ -91,13 +91,55 @@ public:
     printf("%-15s = %d\n", "type_code", type_code_);
   }
   /*!
+    @brief Copy data wrapped in YggGeneric class.
+    @param[in] data YggGeneric* Pointer to generic object.
+    @returns void* Pointer to copy of data.
+   */
+  virtual void* copy_generic(YggGeneric* data, void* orig_data=NULL) const {
+    if (data == NULL) {
+      ygglog_throw_error("MetaschemaType::copy_generic: Generic object is NULL.");
+    }
+    void* out = NULL;
+    if (orig_data == NULL) {
+      orig_data = data->get_data();
+    }
+    if (orig_data != NULL) {
+      size_t nbytes_data = data->get_nbytes();
+      void* temp = (void*)realloc(out, nbytes_data);
+      if (temp == NULL) {
+	ygglog_throw_error("MetaschemaType::copy_generic: Failed to realloc output pointer.");
+      }
+      out = temp;
+      memcpy(out, orig_data, nbytes_data);
+    }
+    return out;
+  }
+  /*!
+    @brief Free data wrapped in YggGeneric class.
+    @param[in] data YggGeneric* Pointer to generic object.
+   */
+  virtual void free_generic(YggGeneric* data) const {
+    if (data == NULL) {
+      ygglog_throw_error("MetaschemaType::free_generic: Generic object is NULL.");
+    }
+    void** ptr = data->get_data_pointer();
+    if (ptr[0] != NULL) {
+      free(ptr[0]);
+      ptr[0] = NULL;
+    }
+  }
+  /*!
     @brief Display data.
-    @param[in] x YggGeneric* Pointer to generic object.
+    @param[in] data YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
   virtual void display_generic(YggGeneric* data, const char* indent="") const {
+    if (data == NULL) {
+      ygglog_throw_error("MetaschemaType::display_generic: Generic object is NULL.");
+    }
+    MetaschemaType* data_type = data->get_type();
     std::cout << indent;
-    switch (type_code_) {
+    switch (data_type->type_code()) {
     case T_BOOLEAN: {
       bool arg = false;
       data->get_data(arg);
@@ -126,7 +168,7 @@ public:
       return;
     }
     }
-    ygglog_throw_error("MetaschemaType::display_generic: Cannot display type '%s'.", type_);
+    ygglog_throw_error("MetaschemaType::display_generic: Cannot display type '%s'.", data_type->type());
   }
   /*!
     @brief Check that the type is correct and get the corresponding code.
@@ -872,62 +914,11 @@ void YggGeneric::display(const char* indent) {
 };
 
 void* YggGeneric::copy_data(void* orig_data) {
-  void* out = NULL;
-  if (orig_data == NULL) {
-    orig_data = data;
-  }
-  if (orig_data != NULL) {
-    if (type->type_code() == T_ARRAY) {
-      YggGenericVector* old_data = (YggGenericVector*)orig_data;
-      YggGenericVector* new_data = new YggGenericVector();
-      YggGenericVector::iterator it;
-      for (it = old_data->begin(); it != old_data->end(); it++) {
-      	new_data->push_back((*it)->copy());
-      }
-      out = (void*)new_data;
-    } else if (type->type_code() == T_OBJECT) {
-      YggGenericMap* old_data = (YggGenericMap*)orig_data;
-      YggGenericMap* new_data = new YggGenericMap();
-      YggGenericMap::iterator it;
-      for (it = old_data->begin(); it != old_data->end(); it++) {
-      	(*new_data)[it->first] = (it->second)->copy();
-      }
-      out = (void*)(new_data);
-    } else {
-      void* idata = (void*)realloc(out, nbytes);
-      if (idata == NULL) {
-	ygglog_throw_error("YggGeneric: Failed to realloc data.");
-      }
-      out = idata;
-      memcpy(out, orig_data, nbytes);
-    }
-  }
-  return out;
+  return type->copy_generic(this, orig_data);
 };
 
 void YggGeneric::free_data() {
-  if (data != NULL) {
-    if (type->type_code() == T_ARRAY) {
-      YggGenericVector* old_data = (YggGenericVector*)data;
-      YggGenericVector::iterator it;
-      for (it = old_data->begin(); it != old_data->end(); it++) {
-      	delete *it;
-      	*it = NULL;
-      }
-      delete old_data;
-    } else if (type->type_code() == T_OBJECT) {
-      YggGenericMap::iterator it;
-      YggGenericMap* old_data = (YggGenericMap*)data;
-      for (it = old_data->begin(); it != old_data->end(); it++) {
-	delete it->second;
-	it->second = NULL;
-      }
-      delete old_data;
-    } else {
-      free(data);
-    }
-    data = NULL;
-  }
+  type->free_generic(this);
 };
 
 YggGeneric* YggGeneric::copy() {

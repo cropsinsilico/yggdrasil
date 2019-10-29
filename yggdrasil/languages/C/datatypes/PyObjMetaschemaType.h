@@ -30,16 +30,105 @@ public:
   PyObjMetaschemaType(const rapidjson::Value &type_doc) :
     MetaschemaType(type_doc) {}
   /*!
+    @brief Copy Python data structure.
+    @param[in] x python_t Python struct.
+    @returns python_t Copy of data.
+   */
+  static python_t copy_python_t(python_t x) {
+    python_t out = init_python();
+    strncpy(out.name, x.name, PYTHON_NAME_SIZE);
+    out.args = NULL;
+    if (x.args != NULL) {
+      YggGeneric* args = (YggGeneric*)(x.args);
+      out.args = args->copy();
+    }
+    out.obj = NULL;
+    if (x.obj != NULL) {
+      // Increment reference count for underlying Python object
+      out.obj = Py_BuildValue("O", x.obj);
+    }
+    return out;
+  }
+  /*!
+    @brief Free a structure containing a Python object.
+    @param[in] x python_t* Pointer to Python object structure that should be freed.
+  */
+  static void free_python_t(python_t *x) {
+    if (x != NULL) {
+      x->name[0] = '\0';
+      if (x->args != NULL) {
+	YggGeneric* args = (YggGeneric*)(x->args);
+	delete args;
+	x->args = NULL;
+      }
+      if (x->obj != NULL) {
+	Py_DECREF(x->obj);
+	x->obj = NULL;
+      }
+    }
+  }
+  /*!
+    @brief Display a Python object structure.
+    @param[in] x python_t Structure containing Python object to display.
+  */
+  static void display_python_t(python_t x) {
+    FILE* fout = stdout;
+    if (x.obj != NULL) {
+      if (PyObject_Print(x.obj, fout, 0) < 0) {
+	ygglog_throw_error("display_python: Failed to print the Python object.");
+      }
+    }
+  }
+  /*!
+    @brief Copy data wrapped in YggGeneric class.
+    @param[in] data YggGeneric* Pointer to generic object.
+    @returns void* Pointer to copy of data.
+   */
+  void* copy_generic(YggGeneric* data, void* orig_data=NULL) const override {
+    if (data == NULL) {
+      ygglog_throw_error("PyObjMetaschemaType::copy_generic: Generic object is NULL.");
+    }
+    void* out = NULL;
+    if (orig_data == NULL) {
+      orig_data = data->get_data();
+    }
+    if (orig_data != NULL) {
+      python_t* old_data = (python_t*)orig_data;
+      python_t* new_data = (python_t*)malloc(sizeof(python_t));
+      if (new_data == NULL) {
+	ygglog_throw_error("PyObjMetaschemaType::copy_generic: Failed to malloc memory for Python wrapper struct.");
+      }
+      new_data[0] = copy_python_t(*old_data);
+      out = (void*)new_data;
+    }
+    return out;
+  }
+  /*!
+    @brief Free data wrapped in YggGeneric class.
+    @param[in] data YggGeneric* Pointer to generic object.
+   */
+  void free_generic(YggGeneric* data) const override {
+    if (data == NULL) {
+      ygglog_throw_error("PyObjMetaschemaType::free_generic: Generic object is NULL.");
+    }
+    python_t** ptr = (python_t**)(data->get_data_pointer());
+    if (ptr[0] != NULL) {
+      free_python_t(ptr[0]);
+      free(ptr[0]);
+      ptr[0] = NULL;
+    }
+  }
+  /*!
     @brief Display data.
-    @param[in] x YggGeneric* Pointer to generic object.
+    @param[in] data YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* x, const char* indent="") const override {
-    python_t* arg = (python_t*)(x->get_data());
-    FILE* fout = stdout;
-    if (PyObject_Print(arg->obj, fout, 0) < 0) {
-      ygglog_throw_error("PyObjMetaschemaType::display_generic: Failed to print the Python object.");
+  void display_generic(YggGeneric* data, const char* indent="") const override {
+    if (data == NULL) {
+      ygglog_throw_error("PyObjMetaschemaType::display_generic: Generic object is NULL.");
     }
+    python_t* arg = (python_t*)(data->get_data());
+    display_python_t(*arg);
   }
   /*!
     @brief Get the size of the type in bytes.

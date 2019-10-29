@@ -16,7 +16,7 @@
   The PyInstMetaschemaType provides basic functionality for encoding/decoding
   pyinst datatypes from/to JSON style strings.
  */
-class PyInstMetaschemaType : public MetaschemaType {
+class PyInstMetaschemaType : public PyObjMetaschemaType {
 public:
   /*!
     @brief Constructor for PyInstMetaschemaType.
@@ -25,7 +25,7 @@ public:
    */
   PyInstMetaschemaType(const char* class_name,
 		       const JSONObjectMetaschemaType* args_type) :
-    MetaschemaType("instance"), class_name_(""), args_type_(NULL) {
+    PyObjMetaschemaType("instance"), class_name_(""), args_type_(NULL) {
     if (class_name != NULL) {
       update_class_name(class_name, true);
     }
@@ -39,7 +39,7 @@ public:
     definition from a JSON encoded header.
    */
   PyInstMetaschemaType(const rapidjson::Value &type_doc) :
-    MetaschemaType(type_doc), class_name_(""), args_type_(NULL) {
+    PyObjMetaschemaType(type_doc), class_name_(""), args_type_(NULL) {
     if (!(type_doc.HasMember("class"))) {
       ygglog_throw_error("PyInstMetaschemaType: instance type must include 'class'.");
     }
@@ -76,7 +76,7 @@ public:
       return false;
     if (strcmp(class_name_, pRef->class_name()) != 0)
       return false;
-    if (args_type_ != pRef->args_type())
+    if (*args_type_ != *(pRef->args_type()))
       return false;
     return true;
   }
@@ -91,21 +91,13 @@ public:
     @brief Print information about the type to stdout.
   */
   void display() const override {
-    MetaschemaType::display();
+    PyObjMetaschemaType::display();
     printf("%-15s = %s\n", "class_name", class_name_);
-    printf("Args type:\n");
-    args_type_->display();
-  }
-  /*!
-    @brief Display data.
-    @param[in] x YggGeneric* Pointer to generic object.
-    @param[in] indent char* Indentation to add to display output.
-   */
-  void display_generic(YggGeneric* x, const char* indent="") const override {
-    python_t* arg = (python_t*)(x->get_data());
-    FILE* fout = stdout;
-    if (PyObject_Print(arg->obj, fout, 0) < 0) {
-      ygglog_throw_error("PyInstMetaschemaType::display_generic: Failed to print the Python object.");
+    if (args_type_ == NULL) {
+      printf("Args type: NULL\n");
+    } else {
+      printf("Args type:\n");
+      args_type_->display();
     }
   }
   /*!
@@ -119,13 +111,6 @@ public:
    */
   const JSONObjectMetaschemaType* args_type() const { return args_type_; }
   /*!
-    @brief Get the size of the type in bytes.
-    @returns size_t Type size.
-   */
-  const size_t nbytes() const override {
-    return sizeof(python_t);
-  }
-  /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
@@ -137,7 +122,7 @@ public:
     @param[in] new_info MetaschemaType* type object.
    */
   void update(const MetaschemaType* new_info) override {
-    MetaschemaType::update(new_info);
+    PyObjMetaschemaType::update(new_info);
     const PyInstMetaschemaType* new_info_inst = dynamic_cast<const PyInstMetaschemaType*>(new_info);
     update_class_name(new_info_inst->class_name());
     update_args_type(new_info_inst->args_type());
@@ -156,6 +141,7 @@ public:
   /*!
     @brief update the instance's args type.
     @param[in] new_args JSONObjectMetaschemaType* New args type.
+    @param[in] force bool If true, the args type will be updated reguardless of if it is compatible or not. Defaults to false.
    */
   void update_args_type(const JSONObjectMetaschemaType* new_args_type,
 			bool force=false) {
@@ -165,6 +151,35 @@ public:
     if (args_type_ != NULL)
       delete args_type_;
     args_type_ = new_args_type->copy();
+  }
+  /*!
+    @brief Update the type object with info from provided variable arguments for serialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+   */
+  void update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
+    if (args_type_ == NULL) {
+      va_list ap_copy;
+      va_copy(ap_copy, ap.va);
+      python_t arg = va_arg(ap_copy, python_t);
+      update_class_name(arg.name);
+      if ((args_type_ == NULL) && (arg.obj != NULL)) {
+	PyObject *py_class = import_python_class("yggdrasil.metaschema.properties.ArgsMetaschemaProperty",
+						 "ArgsMetaschemaProperty",
+						 "PyInstMetaschemaType::update_from_serialization_args: ");
+	PyObject *py_args = PyObject_CallMethod(py_class, "encode",
+						"Os", arg.obj, NULL);
+	Py_DECREF(py_class);
+	if (py_args == NULL) {
+	  ygglog_throw_error("PyObjMetaschemaType::update_from_serialization_args: Failed to get instance argument type.");
+	}
+	YggGenericMap new_args_type;
+	convert_python2c(py_args, &new_args_type, T_OBJECT,
+			 "PyObjMetaschemaType::update_from_serialization_args: ");
+	// update_args_type(new_args_type,);
+      }
+    }
+    return;
   }
   /*!
     @brief Convert a Python representation to a C representation.
@@ -180,28 +195,19 @@ public:
     }
     PyObject *py_class = import_python_class("yggdrasil.metaschema.datatypes.InstanceMetaschemaType",
 					     "InstanceMetaschemaType",
-					     "PyInstMetaschemaType::import_python: ");
+					     "PyInstMetaschemaType::python2c: ");
     PyObject *py_args = PyObject_CallMethod(py_class, "encode_data",
 					    "Os", pyobj, NULL);
     Py_DECREF(py_class);
     if (py_args == NULL) {
       ygglog_throw_error("PyObjMetaschemaType::python2c: Failed to get instance arguments.");
     }
+    // TODO: Use name from Python object?
     strcpy(idata->name, class_name_);
     idata->args = args_type_->python2c(py_args);
     idata->obj = pyobj;
     data[0] = (void*)idata;
     return cobj;
-  }
-  /*!
-    @brief Convert a C representation to a Python representation.
-    @param[in] cobj YggGeneric* Pointer to C object.
-    @returns PyObject* Pointer to Python object.
-   */
-  PyObject* c2python(YggGeneric* cobj) const override {
-    python_t *arg = (python_t*)(cobj->get_data());
-    PyObject *pyobj = arg->obj;
-    return pyobj;
   }
 
   // Encoding
@@ -212,6 +218,9 @@ public:
    */
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override {
     if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
+    if (args_type_ == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::encode_type_prop: Args type is not initialized.");
+    }
     writer->Key("class");
     writer->String(class_name_);
     writer->Key("args");
@@ -240,20 +249,10 @@ public:
     python_t arg0 = va_arg(ap.va, python_t);
     YggGeneric* args = (YggGeneric*)(arg0.args);
     (*nargs)--;
+    if (args_type_ == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::encode_data: Args type is not initialized.");
+    }
     return args_type_->encode_data(writer, args);
-  }
-  /*!
-    @brief Encode arguments describine an instance of this type into a JSON string.
-    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
-    @param[in] x YggGeneric* Pointer to generic wrapper for data.
-    @returns bool true if the encoding was successful, false otherwise.
-   */
-  bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-		   YggGeneric* x) const override {
-    size_t nargs = 1;
-    python_t arg;
-    x->get_data(arg);
-    return MetaschemaType::encode_data(writer, &nargs, arg);
   }
 
   // Decoding
@@ -271,6 +270,9 @@ public:
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) const override {
+    if (args_type_ == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::decode_data: Args type is not initialize.");
+    }
     YggGeneric* cargs = new YggGeneric(args_type_, NULL, 0);
     if (!(args_type_->decode_data(data, cargs))) {
       ygglog_error("PyInstMetaschemaType::decode_data: Error decoding arguments.");
@@ -296,8 +298,7 @@ public:
     arg->args = cargs;
     arg->obj = NULL;
     // Get the class/function and call it
-    PyObjMetaschemaType *class_type = new PyObjMetaschemaType("class");
-    PyObject *py_class = class_type->import_python(arg->name);
+    PyObject *py_class = import_python(arg->name);
     PyObject *py_args = PyTuple_New(0);
     PyObject *py_kwargs = args_type_->c2python((YggGeneric*)(arg->args));
     if (py_args == NULL) {
@@ -310,7 +311,6 @@ public:
     if (arg->obj == NULL) {
       ygglog_throw_error("PyInstMetaschemaType::decode_data: Failed to call constructor.");
     }
-    delete class_type;
     return true;
   }
 

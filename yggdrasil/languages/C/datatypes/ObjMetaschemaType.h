@@ -33,13 +33,58 @@ public:
    */
   ObjMetaschemaType* copy() const override { return (new ObjMetaschemaType()); }
   /*!
+    @brief Copy data wrapped in YggGeneric class.
+    @param[in] data YggGeneric* Pointer to generic object.
+    @returns void* Pointer to copy of data.
+   */
+  void* copy_generic(YggGeneric* data, void* orig_data=NULL) const override {
+    if (data == NULL) {
+      ygglog_throw_error("ObjMetaschemaType::copy_generic: Generic object is NULL.");
+    }
+    void* out = NULL;
+    if (orig_data == NULL) {
+      orig_data = data->get_data();
+    }
+    if (orig_data != NULL) {
+      obj_t* old_data = (obj_t*)orig_data;
+      obj_t* new_data = (obj_t*)malloc(sizeof(obj_t));
+      if (new_data == NULL) {
+	ygglog_throw_error("ObjMetaschemaType::copy_generic: Failed to malloc memory for obj struct.");
+      }
+      new_data[0] = copy_obj(*old_data);
+      if (new_data->vertices == NULL) {
+	ygglog_throw_error("ObjMetaschemaType::copy_generic: Failed to copy obj struct.");
+      }
+      out = (void*)new_data;
+    }
+    return out;
+  }
+  /*!
+    @brief Free data wrapped in YggGeneric class.
+    @param[in] data YggGeneric* Pointer to generic object.
+   */
+  void free_generic(YggGeneric* data) const override {
+    if (data == NULL) {
+      ygglog_throw_error("ObjMetaschemaType::free_generic: Generic object is NULL.");
+    }
+    obj_t** ptr = (obj_t**)(data->get_data_pointer());
+    if (ptr[0] != NULL) {
+      free_obj(ptr[0]);
+      free(ptr[0]);
+      ptr[0] = NULL;
+    }
+  }
+  /*!
     @brief Display data.
-    @param[in] x YggGeneric* Pointer to generic object.
+    @param[in] data YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* x, const char* indent="") const override {
+  void display_generic(YggGeneric* data, const char* indent="") const override {
+    if (data == NULL) {
+      ygglog_throw_error("ObjMetaschemaType::display_generic: Generic object is NULL.");
+    }
     obj_t arg;
-    x->get_data(arg);
+    data->get_data(arg);
     display_obj_indent(arg, indent);
   }
   /*!

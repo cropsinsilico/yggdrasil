@@ -81,17 +81,62 @@ public:
     }
   }
   /*!
+    @brief Copy data wrapped in YggGeneric class.
+    @param[in] data YggGeneric* Pointer to generic object.
+    @returns void* Pointer to copy of data.
+   */
+  void* copy_generic(YggGeneric* data, void* orig_data=NULL) const override {
+    if (data == NULL) {
+      ygglog_throw_error("JSONArrayMetaschemaType::copy_generic: Generic object is NULL.");
+    }
+    void* out = NULL;
+    if (orig_data == NULL) {
+      orig_data = data->get_data();
+    }
+    if (orig_data != NULL) {
+      YggGenericVector* old_data = (YggGenericVector*)orig_data;
+      YggGenericVector* new_data = new YggGenericVector();
+      YggGenericVector::iterator it;
+      for (it = old_data->begin(); it != old_data->end(); it++) {
+      	new_data->push_back((*it)->copy());
+      }
+      out = (void*)new_data;
+    }
+    return out;
+  }
+  /*!
+    @brief Free data wrapped in YggGeneric class.
+    @param[in] data YggGeneric* Pointer to generic object.
+   */
+  void free_generic(YggGeneric* data) const override {
+    if (data == NULL) {
+      ygglog_throw_error("JSONArrayMetaschemaType::free_generic: Generic object is NULL.");
+    }
+    YggGenericVector** ptr = (YggGenericVector**)(data->get_data_pointer());
+    if (ptr[0] != NULL) {
+      YggGenericVector::iterator it;
+      for (it = (*ptr)->begin(); it != (*ptr)->end(); it++) {
+	delete *it;
+      }
+      delete ptr[0];
+      ptr[0] = NULL;
+    }
+  }
+  /*!
     @brief Display data.
-    @param[in] x YggGeneric* Pointer to generic object.
+    @param[in] data YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* x, const char* indent) const override {
+  void display_generic(YggGeneric* data, const char* indent) const override {
+    if (data == NULL) {
+      ygglog_throw_error("JSONArrayMetaschemaType::display_generic: Generic object is NULL.");
+    }
     YggGenericVector arg;
     YggGenericVector::const_iterator it;
     char new_indent[100] = "";
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
-    x->get_data(arg);
+    data->get_data(arg);
     printf("%sArray with %lu elements:\n", indent, arg.size());
     for (it = arg.begin(); it != arg.end(); it++) {
       (*it)->display(new_indent);

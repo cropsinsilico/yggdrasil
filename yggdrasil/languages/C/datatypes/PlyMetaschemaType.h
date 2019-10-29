@@ -33,13 +33,58 @@ public:
    */
   PlyMetaschemaType* copy() const override { return (new PlyMetaschemaType()); }
   /*!
+    @brief Copy data wrapped in YggGeneric class.
+    @param[in] data YggGeneric* Pointer to generic object.
+    @returns void* Pointer to copy of data.
+   */
+  void* copy_generic(YggGeneric* data, void* orig_data=NULL) const override {
+    if (data == NULL) {
+      ygglog_throw_error("PlyMetaschemaType::copy_generic: Generic object is NULL.");
+    }
+    void* out = NULL;
+    if (orig_data == NULL) {
+      orig_data = data->get_data();
+    }
+    if (orig_data != NULL) {
+      ply_t* old_data = (ply_t*)orig_data;
+      ply_t* new_data = (ply_t*)malloc(sizeof(ply_t));
+      if (new_data == NULL) {
+	ygglog_throw_error("PlyMetaschemaType::copy_generic: Failed to malloc memory for ply struct.");
+      }
+      new_data[0] = copy_ply(*old_data);
+      if (new_data->vertices == NULL) {
+	ygglog_throw_error("PlyMetaschemaType::copy_generic: Failed to copy ply struct.");
+      }
+      out = (void*)new_data;
+    }
+    return out;
+  }
+  /*!
+    @brief Free data wrapped in YggGeneric class.
+    @param[in] data YggGeneric* Pointer to generic object.
+   */
+  void free_generic(YggGeneric* data) const override {
+    if (data == NULL) {
+      ygglog_throw_error("PlyMetaschemaType::free_generic: Generic object is NULL.");
+    }
+    ply_t** ptr = (ply_t**)(data->get_data_pointer());
+    if (ptr[0] != NULL) {
+      free_ply(ptr[0]);
+      free(ptr[0]);
+      ptr[0] = NULL;
+    }
+  }
+  /*!
     @brief Display data.
-    @param[in] x YggGeneric* Pointer to generic object.
+    @param[in] data YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* x, const char* indent="") const override {
+  void display_generic(YggGeneric* data, const char* indent="") const override {
     ply_t arg;
-    x->get_data(arg);
+    if (data == NULL) {
+      ygglog_throw_error("PlyMetaschemaType::display_generic: Generic object is NULL.");
+    }
+    data->get_data(arg);
     display_ply_indent(arg, indent);
   }
   /*!

@@ -52,8 +52,7 @@ public:
     std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
     std::map<const char*, MetaschemaType*, strcomp>::const_iterator oit;
     std::map<const char*, MetaschemaType*, strcomp> new_properties = pRef->properties();
-    size_t i = 0;
-    for (it = properties_.begin(); it != properties_.end(); it++, i++) {
+    for (it = properties_.begin(); it != properties_.end(); it++) {
       oit = new_properties.find(it->first);
       if (oit == new_properties.end()) {
 	return false;
@@ -81,17 +80,62 @@ public:
     }
   }
   /*!
+    @brief Copy data wrapped in YggGeneric class.
+    @param[in] data YggGeneric* Pointer to generic object.
+    @returns void* Pointer to copy of data.
+   */
+  void* copy_generic(YggGeneric* data, void* orig_data=NULL) const override {
+    if (data == NULL) {
+      ygglog_throw_error("JSONObjectMetaschemaType::copy_generic: Generic object is NULL.");
+    }
+    void* out = NULL;
+    if (orig_data == NULL) {
+      orig_data = data->get_data();
+    }
+    if (orig_data != NULL) {
+      YggGenericMap* old_data = (YggGenericMap*)orig_data;
+      YggGenericMap* new_data = new YggGenericMap();
+      YggGenericMap::iterator it;
+      for (it = old_data->begin(); it != old_data->end(); it++) {
+      	(*new_data)[it->first] = (it->second)->copy();
+      }
+      out = (void*)(new_data);
+    }
+    return out;
+  }
+  /*!
+    @brief Free data wrapped in YggGeneric class.
+    @param[in] data YggGeneric* Pointer to generic object.
+   */
+  void free_generic(YggGeneric* data) const override {
+    if (data == NULL) {
+      ygglog_throw_error("JSONObjectMetaschemaType::free_generic: Generic object is NULL.");
+    }
+    YggGenericMap** ptr = (YggGenericMap**)(data->get_data_pointer());
+    if (ptr[0] != NULL) {
+      YggGenericMap::iterator it;
+      for (it = (*ptr)->begin(); it != (*ptr)->end(); it++) {
+	delete it->second;
+      }
+      delete ptr[0];
+      ptr[0] = NULL;
+    }
+  }
+  /*!
     @brief Display data.
-    @param[in] x YggGeneric* Pointer to generic object.
+    @param[in] data YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* x, const char* indent) const override {
+  void display_generic(YggGeneric* data, const char* indent) const override {
+    if (data == NULL) {
+      ygglog_throw_error("JSONObjectMetaschemaType::display_generic: Generic object is NULL.");
+    }
     YggGenericMap arg;
     YggGenericMap::iterator it;
     char new_indent[100] = "";
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
-    x->get_data(arg);
+    data->get_data(arg);
     printf("%sObject with %lu elements:\n", indent, arg.size());
     for (it = arg.begin(); it != arg.end(); it++) {
       std::cout << new_indent << std::left << std::setw(10) << it->first << " ";
@@ -257,8 +301,7 @@ public:
 		   size_t *nargs, va_list_t &ap) const override {
     writer->StartObject();
     std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
-    size_t i = 0;
-    for (it = properties_.begin(); it != properties_.end(); it++, i++) {
+    for (it = properties_.begin(); it != properties_.end(); it++) {
       writer->Key(it->first);
       if (!(it->second->encode_data(writer, nargs, ap)))
 	return false;
@@ -276,8 +319,7 @@ public:
 		   YggGenericMap arg) const {
     writer->StartObject();
     std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
-    size_t i = 0;
-    for (it = properties_.begin(); it != properties_.end(); it++, i++) {
+    for (it = properties_.begin(); it != properties_.end(); it++) {
       YggGenericMap::iterator iarg = arg.find(it->first);
       if (iarg == arg.end()) {
 	ygglog_throw_error("JSONObjectMetaschemaType::encode_data: Object does not have element %s.", it->first);
@@ -325,8 +367,7 @@ public:
       return false;
     }
     std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
-    size_t i = 0;
-    for (it = properties_.begin(); it != properties_.end(); it++, i++) {
+    for (it = properties_.begin(); it != properties_.end(); it++) {
       if (!(data.HasMember(it->first))) {
 	ygglog_error("JSONObjectMetaschemaType::decode_data: Data dosn't have member '%s'.",
 		     it->first);

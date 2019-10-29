@@ -481,52 +481,29 @@ extern "C" {
     }
   }
 
-  python_t init_python() {
-    python_t out;
-    out.name[0] = '\0';
-    out.args = NULL;
-    out.obj = NULL;
-    return out;
-  }
-
   void destroy_python(python_t *x) {
-    if (x != NULL) {
-      x->name[0] = '\0';
-      if (x->args != NULL) {
-	YggGeneric* args = (YggGeneric*)(x->args);
-	delete args;
-	x->args = NULL;
-      }
-      if (x->obj != NULL) {
-	Py_DECREF(x->obj);
-	x->obj = NULL;
-      }
+    try {
+      PyObjMetaschemaType::free_python_t(x);
+    } catch(...) {
+      ygglog_error("destroy_python: C++ exception thrown.");
     }
   }
 
   python_t copy_python(python_t x) {
     python_t out = init_python();
-    strncpy(out.name, x.name, PYTHON_NAME_SIZE);
-    out.args = NULL;
-    if (x.args != NULL) {
-      YggGeneric* args = (YggGeneric*)(x.args);
-      out.args = args->copy();
-    }
-    if (x.obj != NULL) {
-      out.obj = Py_BuildValue("O", x.obj);
+    try {
+      out = PyObjMetaschemaType::copy_python_t(x);
+    } catch(...) {
+      ygglog_error("copy_python: C++ exception thrown.");
+      CSafe(destroy_python(&out));
     }
     return out;
   }
 
   void display_python(python_t x) {
     try {
-      FILE* fout = stdout;
-      if (x.obj != NULL) {
-	if (PyObject_Print(x.obj, fout, 0) < 0) {
-	  ygglog_throw_error("display_python: Failed to print the Python object.");
-	}
-      }
-    } catch (...) {
+      PyObjMetaschemaType::display_python_t(x);
+    } catch(...) {
       ygglog_error("display_python: C++ exception thrown.");
     }
   }

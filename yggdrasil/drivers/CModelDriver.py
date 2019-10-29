@@ -278,7 +278,7 @@ class CModelDriver(CompiledModelDriver):
     internal_libraries = {
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
                 'linker_language': 'c++',  # Some dependencies are C++
-                'internal_dependencies': ['datatypes', 'regex'],
+                'internal_dependencies': ['regex', 'datatypes'],
                 'external_dependencies': ['rapidjson',
                                           'python', 'numpy'],
                 'include_dirs': [_incl_comm, _incl_seri],
@@ -345,6 +345,7 @@ class CModelDriver(CompiledModelDriver):
         'init_obj': 'init_obj()',
         'init_class': 'init_python()',
         'init_function': 'init_python()',
+        'init_instance': 'init_generic()',
         'copy_array': '{name} = copy_vector({value});',
         'copy_object': '{name} = copy_map({value});',
         'copy_schema': '{name} = copy_schema({value});',
@@ -352,6 +353,7 @@ class CModelDriver(CompiledModelDriver):
         'copy_obj': '{name} = copy_obj({value});',
         'copy_class': '{name} = copy_python({value});',
         'copy_function': '{name} = copy_python({value});',
+        'copy_instance': '{name} = copy_generic({value});',
         'free_array': 'free_vector({variable});',
         'free_object': 'free_map({variable});',
         'free_schema': 'free_schema({variable});',
@@ -359,12 +361,16 @@ class CModelDriver(CompiledModelDriver):
         'free_obj': 'free_obj({variable});',
         'free_class': 'destroy_python({variable});',
         'free_function': 'destroy_python({variable});',
+        'free_instance': 'free_generic({variable});',
         'print_complex': 'print_complex({object});',
         'print_array': 'display_vector({object});',
         'print_object': 'display_map({object});',
         'print_schema': 'display_schema({object});',
         'print_ply': 'display_ply({object});',
         'print_obj': 'display_obj({object});',
+        'print_class': 'display_python({object});',
+        'print_function': 'display_python({object});',
+        'print_instance': 'display_generic({object});',
         'assign': '{name} = {value};',
         'assign_copy': 'memcpy({name}, {value}, {N}*sizeof({native_type}));',
         'comment': '//',
@@ -714,7 +720,7 @@ class CModelDriver(CompiledModelDriver):
                          and (not v.get('is_length_var', False))
                          and (v['datatype']['type'] not in
                               ['object', 'array', 'schema',
-                               '1darray', 'ndarray'])
+                               'instance', '1darray', 'ndarray'])
                          and (cls.function_param['recv_function']
                               == cls.function_param['recv_heap']))):
                         v['allow_realloc'] = True
@@ -1416,7 +1422,8 @@ class CModelDriver(CompiledModelDriver):
             fmt = 'create_dtype_pyobj(\"{type}\")'
             keys = {'type': typename}
         elif typename == 'instance':
-            fmt = 'create_dtype_pyinst(NULL, NULL)'
+            # fmt = 'create_dtype_pyinst(NULL, NULL)'
+            fmt = 'create_dtype_empty()'
         else:  # pragma: debug
             raise ValueError("Cannot create C version of type '%s'"
                              % typename)
