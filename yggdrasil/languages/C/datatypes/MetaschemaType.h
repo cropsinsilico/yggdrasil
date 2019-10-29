@@ -725,7 +725,17 @@ public:
     case T_NULL: {
       if (!(data.IsNull()))
 	ygglog_throw_error("MetaschemaType::decode_data: Data is not null.");
-      void **arg = va_arg(ap.va, void**);
+      void **arg;
+      void ***p;
+      if (allow_realloc) {
+	p = va_arg(ap.va, void***);
+	arg = (void**)realloc(*p, sizeof(void*));
+	if (arg == NULL)
+	  ygglog_throw_error("MetaschemaType::decode_data: could not realloc void* pointer.");
+	*p = arg;
+      } else {
+	arg = va_arg(ap.va, void**);
+      }
       (*nargs)--;
       arg[0] = NULL;
       return true;

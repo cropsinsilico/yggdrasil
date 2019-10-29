@@ -309,7 +309,7 @@ class CModelDriver(CompiledModelDriver):
         'array': 'vector_t',
         'object': 'map_t',
         'boolean': 'bool',
-        'null': 'NULL',
+        'null': 'void*',
         'uint': 'uintX_t',
         'complex': 'complex_X',
         'bytes': 'char*',
@@ -883,6 +883,8 @@ class CModelDriver(CompiledModelDriver):
         if grp['type'] == 'char':
             out['type'] = 'bytes'
             out['precision'] = 0
+        elif grp['type'] == 'void':
+            out['type'] = 'null'
         elif grp['type'].startswith('complex'):
             out['type'] = 'complex'
             if grp['type'].endswith('long_double'):
@@ -908,7 +910,7 @@ class CModelDriver(CompiledModelDriver):
             out['type'] = super(CModelDriver, cls).get_json_type(grp['type'])
         if grp.get('pointer', False):
             nptr = len(grp['pointer'])
-            if grp['type'] == 'char':
+            if grp['type'] in ['char', 'void']:
                 nptr -= 1
             if nptr > 0:
                 out['subtype'] = out['type']
