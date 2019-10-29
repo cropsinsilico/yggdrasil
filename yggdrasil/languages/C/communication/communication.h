@@ -118,6 +118,9 @@ void clean_comms(void) {
     Py_Finalize();
   }
   ygglog_debug("atexit done");
+  if (_ygg_error_flag != 0) {
+    _exit(_ygg_error_flag);
+  }
   /* printf(""); */
 };
 
