@@ -11,6 +11,7 @@
 
 static const unsigned char base64_table[65] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static const unsigned char base64_table_last = '=';
 
 /**
  * base64_encode - Base64 encode
@@ -62,13 +63,13 @@ unsigned char * base64_encode(const unsigned char *src, size_t len,
     *pos++ = base64_table[in[0] >> 2];
     if (end - in == 1) {
       *pos++ = base64_table[(in[0] & 0x03) << 4];
-      *pos++ = '=';
+      *pos++ = base64_table_last;
     } else {
       *pos++ = base64_table[((in[0] & 0x03) << 4) |
 			    (in[1] >> 4)];
       *pos++ = base64_table[(in[1] & 0x0f) << 2];
     }
-    *pos++ = '=';
+    *pos++ = base64_table_last;
     line_len += 4;
   }
 
@@ -103,7 +104,7 @@ unsigned char * base64_decode(const unsigned char *src, size_t len,
   memset(dtable, 0x80, 256);
   for (i = 0; i < sizeof(base64_table) - 1; i++)
     dtable[base64_table[i]] = (unsigned char) i;
-  dtable['='] = 0;
+  dtable[base64_table_last] = 0;
 
   count = 0;
   for (i = 0; i < len; i++) {
@@ -125,7 +126,7 @@ unsigned char * base64_decode(const unsigned char *src, size_t len,
     if (tmp == 0x80)
       continue;
 
-    if (src[i] == '=')
+    if (src[i] == base64_table_last)
       pad++;
     block[count] = tmp;
     count++;
