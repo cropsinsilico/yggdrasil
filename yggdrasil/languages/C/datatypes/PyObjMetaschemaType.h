@@ -19,16 +19,34 @@ public:
   /*!
     @brief Constructor for PyObjMetaschemaType.
     @param[in] type const character pointer to the name of the type.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  PyObjMetaschemaType(const char* type) :
-    MetaschemaType(type) {}
+  PyObjMetaschemaType(const char* type, const bool use_generic=false) :
+    MetaschemaType(type, use_generic) {}
   /*!
     @brief Constructor for PyObjMetaschemaType from a JSON type defintion.
     @param[in] type_doc rapidjson::Value rapidjson object containing the type
     definition from a JSON encoded header.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  PyObjMetaschemaType(const rapidjson::Value &type_doc) :
-    MetaschemaType(type_doc) {}
+  PyObjMetaschemaType(const rapidjson::Value &type_doc,
+		      const bool use_generic=false) :
+    MetaschemaType(type_doc, use_generic) {}
+  /*!
+    @brief Constructor for PyObjMetaschemaType from Python dictionary.
+    @param[in] pyobj PyObject* Python object.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+   */
+  PyObjMetaschemaType(PyObject* pyobj, const bool use_generic=false) :
+    MetaschemaType(pyobj, use_generic) {}
+  /*!
+    @brief Create a copy of the type.
+    @returns pointer to new PyObjMetaschemaType instance with the same data.
+   */
+  PyObjMetaschemaType* copy() const override { return (new PyObjMetaschemaType(type(), use_generic())); }
   /*!
     @brief Copy Python data structure.
     @param[in] x python_t Python struct.

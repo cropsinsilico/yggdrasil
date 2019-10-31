@@ -22,24 +22,39 @@ class DirectMetaschemaType : public MetaschemaType {
 public:
   /*!
     @brief Constructor for MetaschemaType.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  DirectMetaschemaType() : MetaschemaType("direct") {}
+  DirectMetaschemaType(const bool use_generic=false) :
+    MetaschemaType("direct", use_generic) {}
   /*!
     @brief Constructor for DirectMetaschemaType from a JSON type defintion.
     @param[in] type_doc rapidjson::Value rapidjson object containing the type
     definition from a JSON encoded header.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  DirectMetaschemaType(const rapidjson::Value &type_doc) : MetaschemaType("direct") {
+  DirectMetaschemaType(const rapidjson::Value &type_doc,
+		       const bool use_generic=false) :
+    MetaschemaType("direct", use_generic) {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
     type_doc;
 #endif
   }
   /*!
+    @brief Constructor for DirectMetaschemaType from Python dictionary.
+    @param[in] pyobj PyObject* Python object.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+   */
+  DirectMetaschemaType(PyObject* pyobj, const bool use_generic=false) :
+    MetaschemaType(pyobj, use_generic) {}
+  /*!
     @brief Create a copy of the type.
     @returns pointer to new DirectMetaschemaType instance with the same data.
    */
-  DirectMetaschemaType* copy() const override { return (new DirectMetaschemaType()); }
+  DirectMetaschemaType* copy() const override { return (new DirectMetaschemaType(use_generic())); }
   /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.

@@ -747,7 +747,7 @@ comm_t* yggAsciiArrayInput(const char *name) {
  */
 static inline
 comm_t* yggPlyOutput(const char *name) {
-  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_ply());
+  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_ply(false));
   if ((out->valid) && (out->datatype->obj == NULL)) {
     out->valid = 0;
   }
@@ -809,7 +809,7 @@ comm_t* yggPlyInput(const char *name) {
  */
 static inline
 comm_t* yggObjOutput(const char *name) {
-  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_obj());
+  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_obj(false));
   if ((out->valid) && (out->datatype->obj == NULL)) {
     out->valid = 0;
   }

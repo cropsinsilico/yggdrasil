@@ -9,6 +9,7 @@
 #include "AsciiTableMetaschemaType.h"
 #include "PyObjMetaschemaType.h"
 #include "PyInstMetaschemaType.h"
+#include "SchemaMetaschemaType.h"
 #include "datatypes.h"
 
 #include "rapidjson/document.h"
@@ -27,7 +28,8 @@
     }
 
 // C++ functions
-MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
+MetaschemaType* type_from_doc(const rapidjson::Value &type_doc,
+			      const bool use_generic=true) {
   if (!(type_doc.IsObject()))
     ygglog_throw_error("type_from_doc: Parsed document is not an object.");
   if (!(type_doc.HasMember("type")))
@@ -45,38 +47,19 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
     case T_NULL:
     case T_NUMBER:
     case T_STRING:
-      return new MetaschemaType(type_doc);
+      return new MetaschemaType(type_doc, use_generic);
       // Enhanced types
-    case T_ARRAY: {
-      if (!(type_doc.HasMember("items")))
-	ygglog_throw_error("JSONArrayMetaschemaType: Items missing.");
-      if (!(type_doc["items"].IsArray()))
-	ygglog_throw_error("JSONArrayMetaschemaType: Items must be an array.");
-      std::vector<MetaschemaType*> items;
-      size_t i;
-      for (i = 0; i < (size_t)(type_doc["items"].Size()); i++) {
-	items.push_back(type_from_doc(type_doc["items"][i]));
-      }
-      return new JSONArrayMetaschemaType(items);
-    }
-    case T_OBJECT: {
-      if (!(type_doc.HasMember("properties")))
-	ygglog_throw_error("JSONObjectMetaschemaType: Properties missing.");
-      if (!(type_doc["properties"].IsObject()))
-	ygglog_throw_error("JSONObjectMetaschemaType: Properties must be an object.");
-      std::map<const char*, MetaschemaType*, strcomp> properties;
-      for (rapidjson::Value::ConstMemberIterator itr = type_doc["properties"].MemberBegin(); itr != type_doc["properties"].MemberEnd(); ++itr) {
-	properties[itr->name.GetString()] = type_from_doc(itr->value);
-      }
-      return new JSONObjectMetaschemaType(properties);
-    }
+    case T_ARRAY:
+      return new JSONArrayMetaschemaType(type_doc, "", use_generic);
+    case T_OBJECT:
+      return new JSONObjectMetaschemaType(type_doc, use_generic);
       // Non-standard types
     case T_DIRECT:
-      return new DirectMetaschemaType(type_doc);
+      return new DirectMetaschemaType(type_doc, use_generic);
     case T_1DARRAY:
-      return new OneDArrayMetaschemaType(type_doc);
+      return new OneDArrayMetaschemaType(type_doc, use_generic);
     case T_NDARRAY:
-      return new NDArrayMetaschemaType(type_doc);
+      return new NDArrayMetaschemaType(type_doc, use_generic);
     case T_SCALAR:
     case T_FLOAT:
     case T_UINT:
@@ -84,27 +67,76 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
     case T_COMPLEX:
     case T_BYTES:
     case T_UNICODE:
-      return new ScalarMetaschemaType(type_doc);
+      return new ScalarMetaschemaType(type_doc, use_generic);
     case T_PLY:
-      return new PlyMetaschemaType(type_doc);
+      return new PlyMetaschemaType(type_doc, use_generic);
     case T_OBJ:
-      return new ObjMetaschemaType(type_doc);
+      return new ObjMetaschemaType(type_doc, use_generic);
     case T_CLASS:
     case T_FUNCTION:
-      return new PyObjMetaschemaType(type_doc);
-    case T_INSTANCE: {
-      PyInstMetaschemaType* out = new PyInstMetaschemaType(type_doc);
-      std::map<const char*, MetaschemaType*, strcomp> args;
-      for (rapidjson::Value::ConstMemberIterator itr = type_doc["args"].MemberBegin(); itr != type_doc["args"].MemberEnd(); ++itr) {
-	args[itr->name.GetString()] = type_from_doc(itr->value);
-      }
-      JSONObjectMetaschemaType* args_type = new JSONObjectMetaschemaType(args);
-      out->update_args_type(args_type);
-      return out;
-    }
+      return new PyObjMetaschemaType(type_doc, use_generic);
+    case T_INSTANCE:
+      return new PyInstMetaschemaType(type_doc, use_generic);
+    case T_SCHEMA:
+      return new SchemaMetaschemaType(type_doc, use_generic);
     }
   }
   ygglog_throw_error("Could not find class from doc for type '%s'.", type);
+  return NULL;
+};
+
+
+MetaschemaType* type_from_pyobj(PyObject* pyobj,
+				const bool use_generic=true) {
+  char type[100] = "";
+  get_item_python_dict_c(pyobj, "type", type,
+			 "type_from_pyobj: type: ",
+			 T_STRING, 100);
+  std::map<const char*, int, strcomp> type_map = get_type_map();
+  std::map<const char*, int, strcomp>::iterator it = type_map.find(type);
+  if (it != type_map.end()) {
+    switch (it->second) {
+      // Standard types
+    case T_BOOLEAN:
+    case T_INTEGER:
+    case T_NULL:
+    case T_NUMBER:
+    case T_STRING:
+      return new MetaschemaType(pyobj, use_generic);
+      // Enhanced types
+    case T_ARRAY:
+      return new JSONArrayMetaschemaType(pyobj, use_generic);
+    case T_OBJECT:
+      return new JSONObjectMetaschemaType(pyobj, use_generic);
+      // Non-standard types
+    case T_DIRECT:
+      return new DirectMetaschemaType(pyobj, use_generic);
+    case T_1DARRAY:
+      return new OneDArrayMetaschemaType(pyobj, use_generic);
+    case T_NDARRAY:
+      return new NDArrayMetaschemaType(pyobj, use_generic);
+    case T_SCALAR:
+    case T_FLOAT:
+    case T_UINT:
+    case T_INT:
+    case T_COMPLEX:
+    case T_BYTES:
+    case T_UNICODE:
+      return new ScalarMetaschemaType(pyobj, use_generic);
+    case T_PLY:
+      return new PlyMetaschemaType(pyobj, use_generic);
+    case T_OBJ:
+      return new ObjMetaschemaType(pyobj, use_generic);
+    case T_CLASS:
+    case T_FUNCTION:
+      return new PyObjMetaschemaType(pyobj, use_generic);
+    case T_INSTANCE:
+      return new PyInstMetaschemaType(pyobj, use_generic);
+    case T_SCHEMA:
+      return new SchemaMetaschemaType(pyobj, use_generic);
+    }
+  }
+  ygglog_throw_error("type_from_pyobj: Could not find class from doc for type '%s'.", type);
   return NULL;
 };
 
@@ -176,8 +208,10 @@ bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
 };
 
 JSONArrayMetaschemaType* create_dtype_format_class(const char *format_str,
-						   const int as_array = 0) {
+						   const int as_array = 0,
+						   const bool use_generic=false) {
   std::vector<MetaschemaType*> items;
+  JSONArrayMetaschemaType* out = new JSONArrayMetaschemaType(items, format_str, use_generic);
   // Loop over string
   int mres;
   size_t sind, eind, beg = 0, end;
@@ -269,13 +303,13 @@ JSONArrayMetaschemaType* create_dtype_format_class(const char *format_str,
     ygglog_debug("isubtype = %s, iprecision = %lu, ifmt = %s",
 		 isubtype, iprecision, ifmt);
     if (as_array == 1) {
-      items.push_back(new OneDArrayMetaschemaType(isubtype, iprecision, 0));
+      items.push_back(new OneDArrayMetaschemaType(isubtype, iprecision, 0, "", out->use_generic()));
     } else {
-      items.push_back(new ScalarMetaschemaType(isubtype, iprecision, ""));
+      items.push_back(new ScalarMetaschemaType(isubtype, iprecision, "", out->use_generic()));
     }
     beg = end;
   }
-  JSONArrayMetaschemaType* out = new JSONArrayMetaschemaType(items, format_str);
+  out->update_items(items, true);
   return out;
 };
 
@@ -289,6 +323,7 @@ void init_dtype_class(dtype_t *dtype, MetaschemaType* type_class) {
     ygglog_throw_error("init_dtype_class: Data type string already set.");
   }
   dtype->obj = type_class;
+  dtype->use_generic = type_class->use_generic();
   strncpy(dtype->type, type_class->type(), COMMBUFFSIZ);
 };
 
@@ -306,13 +341,15 @@ int destroy_dtype_class_safe(MetaschemaType *type_class) {
 };
 
 
-dtype_t* create_dtype(MetaschemaType* type_class=NULL) {
+dtype_t* create_dtype(MetaschemaType* type_class=NULL,
+		      const bool use_generic=false) {
   dtype_t* out = NULL;
   out = (dtype_t*)malloc(sizeof(dtype_t));
   if (out == NULL) {
     ygglog_throw_error("create_dtype: Failed to malloc for datatype.");
   }
   out->type[0] = '\0';
+  out->use_generic = use_generic;
   out->obj = NULL;
   if (type_class != NULL) {
     try {
@@ -372,6 +409,8 @@ MetaschemaType* dtype2class(const dtype_t* dtype) {
       return static_cast<PyObjMetaschemaType*>(dtype->obj);
     case T_INSTANCE:
       return static_cast<PyInstMetaschemaType*>(dtype->obj);
+    case T_SCHEMA:
+      return static_cast<SchemaMetaschemaType*>(dtype->obj);
     }
   } else {
     ygglog_throw_error("dtype2class: No handler for type '%s'.", dtype->type);
@@ -383,15 +422,44 @@ MetaschemaType* dtype2class(const dtype_t* dtype) {
 // C exposed functions
 extern "C" {
 
+  void* type_from_doc_c(const void* type_doc, const bool use_generic=false) {
+    MetaschemaType* out = NULL;
+    try {
+      const rapidjson::Value* type_doc_cpp = (const rapidjson::Value*)type_doc;
+      out = type_from_doc(*type_doc_cpp, use_generic);
+    } catch(...) {
+      ygglog_error("type_from_doc_c: C++ exception thrown.");
+      if (out != NULL) {
+	delete out;
+	out = NULL;
+      }
+    }
+    return (void*)out;
+  }
+
+  void* type_from_pyobj_c(PyObject* pyobj, const bool use_generic=false) {
+    MetaschemaType* out = NULL;
+    try {
+      out = type_from_pyobj(pyobj, use_generic);
+    } catch(...) {
+      ygglog_error("type_from_pyobj_c: C++ exception thrown.");
+      if (out != NULL) {
+	delete out;
+	out = NULL;
+      }
+    }
+    return (void*)out;
+  }
+
   generic_t init_generic() {
     generic_t out;
-    out.prefix = '@';
+    out.prefix = prefix_char;
     out.obj = NULL;
     return out;
   }
 
   int is_generic_flag(char x) {
-    if (x == '@')
+    if (x == prefix_char)
       return 1;
     else
       return 0;
@@ -464,13 +532,18 @@ extern "C" {
   }
 
   generic_t get_generic_va(size_t nargs, va_list_t ap) {
+    generic_t out;
+    if (nargs != 1)
+      return out;
     va_list ap_copy;
     va_copy(ap_copy, ap.va);
-    generic_t out = va_arg(ap_copy, generic_t);
+    out = va_arg(ap_copy, generic_t);
     return out;
   }
 
   generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap) {
+    if (nargs != 1)
+      return NULL;
     va_list ap_copy;
     va_copy(ap_copy, ap.va);
     generic_t *out = va_arg(ap_copy, generic_t*);
@@ -568,53 +641,78 @@ extern "C" {
     return 0;
   }
 
-  dtype_t* init_dtype(dtype_t *dtype) {
+  dtype_t* complete_dtype(dtype_t *dtype, const bool use_generic=false) {
     try {
       if (dtype == NULL) {
-	return create_dtype();
+	return create_dtype(NULL, use_generic);
       } else if ((dtype->obj != NULL) && (strlen(dtype->type) == 0)){
 	int ret = set_dtype_name(dtype, dtype_name(dtype));
 	if (ret != 0) {
-	  ygglog_throw_error("init_dtype: Failed to set data type name.");
+	  ygglog_throw_error("complete_dtype: Failed to set data type name.");
 	}
       }
     } catch (...) {
-      ygglog_error("init_dtype: C++ exception thrown.");
+      ygglog_error("complete_dtype: C++ exception thrown.");
       return NULL;
     }
     return dtype;
   }
 
-  int destroy_dtype(dtype_t *dtype) {
+  int destroy_dtype(dtype_t **dtype) {
     int ret = 0;
     if (dtype != NULL) {
-      if (dtype->obj != NULL) {
-	try {
-	  MetaschemaType *type_class = dtype2class(dtype);
-	  ret = destroy_dtype_class_safe(type_class);
-	} catch (...) {
-	  ygglog_error("destroy_dtype: C++ exception thrown in dtype2class.");
-	  ret = -1;
+      if (dtype[0] != NULL) {
+	if ((dtype[0])->obj != NULL) {
+	  try {
+	    MetaschemaType *type_class = dtype2class(dtype[0]);
+	    ret = destroy_dtype_class_safe(type_class);
+	  } catch (...) {
+	    ygglog_error("destroy_dtype: C++ exception thrown in dtype2class.");
+	    ret = -1;
+	  }
 	}
+	free(dtype[0]);
+	dtype[0] = NULL;
       }
-      free(dtype);
     }
     return ret;
   }
 
-  dtype_t* create_dtype_empty() {
+  dtype_t* create_dtype_empty(const bool use_generic=false) {
     try {
-      return create_dtype();
+      return create_dtype(NULL, use_generic);
     } catch(...) {
       ygglog_error("create_dtype_empty: C++ exception thrown.");
       return NULL;
     }
   }
 
-  dtype_t* create_dtype_direct() {
+  dtype_t* create_dtype_doc(void* type_doc, const bool use_generic=false) {
+    MetaschemaType* obj = NULL;
+    try {
+      obj = (MetaschemaType*)type_from_doc_c(type_doc, use_generic);
+      return create_dtype(obj);
+    } catch(...) {
+      ygglog_error("create_dtype_doc: C++ exception thrown.");
+      return NULL;
+    }
+  }
+
+  dtype_t* create_dtype_python(PyObject* pyobj, const bool use_generic=false) {
+    MetaschemaType* obj = NULL;
+    try {
+      obj = type_from_pyobj(pyobj, use_generic);
+      return create_dtype(obj);
+    } catch(...) {
+      ygglog_error("create_dtype_python: C++ exception thrown.");
+      return NULL;
+    }
+  }
+
+  dtype_t* create_dtype_direct(const bool use_generic=false) {
     DirectMetaschemaType* obj = NULL;
     try {
-      obj = new DirectMetaschemaType();
+      obj = new DirectMetaschemaType(use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_direct: C++ exception thrown.");
@@ -623,10 +721,10 @@ extern "C" {
     }
   }
 
-  dtype_t* create_dtype_default(const char* type) {
+  dtype_t* create_dtype_default(const char* type, const bool use_generic=false) {
     MetaschemaType* obj = NULL;
     try {
-      obj = new MetaschemaType(type);
+      obj = new MetaschemaType(type, use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_default: C++ exception thrown.");
@@ -636,10 +734,10 @@ extern "C" {
   }
 
   dtype_t* create_dtype_scalar(const char* subtype, const size_t precision,
-			       const char* units) {
+			       const char* units, const bool use_generic=false) {
     ScalarMetaschemaType* obj = NULL;
     try {
-      obj = new ScalarMetaschemaType(subtype, precision, units);
+      obj = new ScalarMetaschemaType(subtype, precision, units, use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_scalar: C++ exception thrown.");
@@ -649,10 +747,11 @@ extern "C" {
   }
 
   dtype_t* create_dtype_format(const char *format_str,
-			       const int as_array = 0) {
+			       const int as_array = 0,
+			       const bool use_generic=false) {
     JSONArrayMetaschemaType* obj = NULL;
     try {
-      obj = create_dtype_format_class(format_str, as_array);
+      obj = create_dtype_format_class(format_str, as_array, use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_format: C++ exception thrown.");
@@ -662,10 +761,12 @@ extern "C" {
   }
 
   dtype_t* create_dtype_1darray(const char* subtype, const size_t precision,
-				const size_t length, const char* units) {
+				const size_t length, const char* units,
+				const bool use_generic=false) {
     OneDArrayMetaschemaType* obj = NULL;
     try {
-      obj = new OneDArrayMetaschemaType(subtype, precision, length, units);
+      obj = new OneDArrayMetaschemaType(subtype, precision, length, units,
+					use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_1darray: C++ exception thrown.");
@@ -676,7 +777,7 @@ extern "C" {
 
   dtype_t* create_dtype_ndarray(const char* subtype, const size_t precision,
 				const size_t ndim, const size_t* shape,
-				const char* units) {
+				const char* units, const bool use_generic=false) {
     NDArrayMetaschemaType* obj = NULL;
     try {
       std::vector<size_t> shape_vec;
@@ -684,7 +785,7 @@ extern "C" {
       for (i = 0; i < ndim; i++) {
 	shape_vec.push_back(shape[i]);
       }
-      obj = new NDArrayMetaschemaType(subtype, precision, shape_vec, units);
+      obj = new NDArrayMetaschemaType(subtype, precision, shape_vec, units, use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_ndarray: C++ exception thrown.");
@@ -694,11 +795,12 @@ extern "C" {
   }
   dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
 				    const size_t ndim, const size_t shape[],
-				    const char* units) {
+				    const char* units, const bool use_generic=false) {
     const size_t* shape_ptr = shape;
-    return create_dtype_ndarray(subtype, precision, ndim, shape_ptr, units);
+    return create_dtype_ndarray(subtype, precision, ndim, shape_ptr, units, use_generic);
   }
-  dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items){
+  dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items,
+				   const bool use_generic=true){
     JSONArrayMetaschemaType* obj = NULL;
     try {
       std::vector<MetaschemaType*> items_vec;
@@ -707,7 +809,7 @@ extern "C" {
 	MetaschemaType* iitem = dtype2class(items[i]);
 	items_vec.push_back(iitem);
       }
-      obj = new JSONArrayMetaschemaType(items_vec);
+      obj = new JSONArrayMetaschemaType(items_vec, "", use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_json_array: C++ exception thrown.");
@@ -716,7 +818,8 @@ extern "C" {
     }
   }
   dtype_t* create_dtype_json_object(const size_t nitems, const char** keys,
-				    dtype_t** values) {
+				    dtype_t** values,
+				    const bool use_generic=true) {
     JSONObjectMetaschemaType* obj = NULL;
     try {
       std::map<const char*, MetaschemaType*, strcomp> properties;
@@ -725,7 +828,7 @@ extern "C" {
 	MetaschemaType* iitem = dtype2class(values[i]);
 	properties[keys[i]] = iitem;
       }
-      obj = new JSONObjectMetaschemaType(properties);
+      obj = new JSONObjectMetaschemaType(properties, use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_json_object: C++ exception thrown.");
@@ -733,10 +836,10 @@ extern "C" {
       return NULL;
     }
   }
-  dtype_t* create_dtype_ply() {
+  dtype_t* create_dtype_ply(const bool use_generic=false) {
     PlyMetaschemaType* obj = NULL;
     try {
-      obj = new PlyMetaschemaType();
+      obj = new PlyMetaschemaType(use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_ply: C++ exception thrown.");
@@ -744,10 +847,10 @@ extern "C" {
       return NULL;
     }
   }
-  dtype_t* create_dtype_obj() {
+  dtype_t* create_dtype_obj(const bool use_generic=false) {
     ObjMetaschemaType* obj = NULL;
     try {
-      obj = new ObjMetaschemaType();
+      obj = new ObjMetaschemaType(use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_obj: C++ exception thrown.");
@@ -755,10 +858,11 @@ extern "C" {
       return NULL;
     }
   }
-  dtype_t* create_dtype_ascii_table(const char *format_str, const int as_array) {
+  dtype_t* create_dtype_ascii_table(const char *format_str, const int as_array,
+				    const bool use_generic=false) {
     AsciiTableMetaschemaType* obj = NULL;
     try {
-      obj = new AsciiTableMetaschemaType(format_str, as_array);
+      obj = new AsciiTableMetaschemaType(format_str, as_array, use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_ascii_table: C++ exception thrown.");
@@ -766,10 +870,10 @@ extern "C" {
       return NULL;
     }
   }
-  dtype_t* create_dtype_pyobj(const char* type) {
+  dtype_t* create_dtype_pyobj(const char* type, const bool use_generic=false) {
     PyObjMetaschemaType* obj = NULL;
     try {
-      obj = new PyObjMetaschemaType(type);
+      obj = new PyObjMetaschemaType(type, use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_pyobj: C++ exception thrown.");
@@ -778,17 +882,29 @@ extern "C" {
     }
   }
   dtype_t* create_dtype_pyinst(const char* class_name,
-			       const dtype_t* args_dtype) {
+			       const dtype_t* args_dtype,
+			       const bool use_generic=true) {
     PyInstMetaschemaType* obj = NULL;
     JSONObjectMetaschemaType* args_type = NULL;
     try {
       if (args_dtype != NULL) {
 	args_type = dynamic_cast<JSONObjectMetaschemaType*>(dtype2class(args_dtype));
       }
-      obj = new PyInstMetaschemaType(class_name, args_type);
+      obj = new PyInstMetaschemaType(class_name, args_type, use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_pyinst: C++ exception thrown.");
+      CSafe(delete obj);
+      return NULL;
+    }
+  }
+  dtype_t* create_dtype_schema(const bool use_generic=true) {
+    SchemaMetaschemaType* obj = NULL;
+    try {
+      obj = new SchemaMetaschemaType(use_generic);
+      return create_dtype(obj);
+    } catch(...) {
+      ygglog_error("create_dtype_schema: C++ exception thrown.");
       CSafe(delete obj);
       return NULL;
     }
@@ -892,7 +1008,7 @@ extern "C" {
       if (!(update_header_from_doc(out, head_doc))) {
 	ygglog_error("parse_comm_header: Error updating header from JSON doc.");
 	out.valid = 0;
-	destroy_dtype(out.dtype);
+	destroy_dtype(&(out.dtype));
 	out.dtype = NULL;
 	free(head);
 	return out;
@@ -931,7 +1047,7 @@ extern "C" {
       return out;
     } catch (...) {
       ygglog_error("copy_dtype: C++ exception thrown.");
-      destroy_dtype(out);
+      destroy_dtype(&out);
       return NULL;
     }
   }
@@ -947,6 +1063,7 @@ extern "C" {
 	MetaschemaType *type1 = type2->copy();
 	dtype1->obj = type1;
 	strcpy(dtype1->type, type1->type());
+	type1->update_use_generic(dtype1->use_generic);
       } else {
 	MetaschemaType *type1 = dtype2class(dtype1);
 	MetaschemaType *type2 = dtype2class(dtype2);
@@ -962,9 +1079,17 @@ extern "C" {
 
   int update_dtype_from_generic_ap(dtype_t* dtype1, size_t nargs,
 				   va_list_t ap) {
+    if (!(is_empty_dtype(dtype1))) {
+      return 0;
+    }
+    if (!(dtype1->use_generic)) {
+      return 0;
+    }
     try {
       generic_t gen_arg = get_generic_va(nargs, ap);
-      if (is_generic_init(gen_arg)) {
+      if (!(is_generic_init(gen_arg))) {
+	ygglog_throw_error("update_dtype_from_generic_ap: Type expects generic object, but provided object is not generic.");
+      } else {
 	dtype_t dtype2;
 	YggGeneric* ygg_gen_arg = (YggGeneric*)(gen_arg.obj);
 	MetaschemaType *type_class = ygg_gen_arg->get_type();
@@ -1017,13 +1142,17 @@ extern "C" {
 			const int allow_realloc, size_t *nargs, va_list_t ap) {
     try {
       MetaschemaType* type = dtype2class(dtype);
-      generic_t* gen_arg = get_generic_va_ptr(*nargs, ap);
-      if ((gen_arg != NULL) && (is_generic_init(*gen_arg))) {
-	if (gen_arg->obj == NULL) {
-	  gen_arg->obj = (void*)(new YggGeneric(type, NULL));
+      if (type->use_generic()) {
+	generic_t* gen_arg = get_generic_va_ptr(*nargs, ap);
+	if ((gen_arg == NULL) || (!(is_generic_init(*gen_arg)))) {
+	  ygglog_throw_error("deserialize_dtype: Type expects pointer to generic object, but one was not provided.");
+	} else {
+	  if (gen_arg->obj == NULL) {
+	    gen_arg->obj = (void*)(new YggGeneric(type, NULL));
+	  }
+	  return type->deserialize(buf, buf_siz,
+				   (YggGeneric*)(gen_arg->obj));
 	}
-	return type->deserialize(buf, buf_siz,
-				 (YggGeneric*)(gen_arg->obj));
       }
       return type->deserialize(buf, buf_siz, allow_realloc, nargs, ap);
     } catch (...) {
@@ -1036,10 +1165,15 @@ extern "C" {
 		      const int allow_realloc, size_t *nargs, va_list_t ap) {
     try {
       MetaschemaType* type = dtype2class(dtype);
-      generic_t gen_arg = get_generic_va(*nargs, ap);
-      if (is_generic_init(gen_arg)) {
-	return type->serialize(buf, buf_siz, allow_realloc,
-			       (YggGeneric*)(gen_arg.obj));
+      if (type->use_generic()) {
+	generic_t gen_arg = get_generic_va(*nargs, ap);
+	if (!(is_generic_init(gen_arg))) {
+	  ygglog_throw_error("serialize_dtype: Type expects generic object, but one was not provided.");
+	}
+	if (is_generic_init(gen_arg)) {
+	  return type->serialize(buf, buf_siz, allow_realloc,
+				 (YggGeneric*)(gen_arg.obj));
+	}
       }
       return type->serialize(buf, buf_siz, allow_realloc, nargs, ap);
     } catch (...) {
@@ -1048,10 +1182,10 @@ extern "C" {
     }
   }
 
-  void display_dtype(const dtype_t *dtype) {
+  void display_dtype(const dtype_t *dtype, const char* indent="") {
     try {
       MetaschemaType* type = dtype2class(dtype);
-      type->display();
+      type->display(indent);
     } catch(...) {
       ygglog_error("display_dtype: C++ exception thrown.");
     }

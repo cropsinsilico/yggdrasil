@@ -85,6 +85,8 @@ typedef struct complex_long_double_t {
 #define ygg_getpid getpid
 #endif
 
+#define STRBUFF 100
+  
 /*! @brief Maximum message size. */
 #ifdef IPCDEF
 #define YGG_MSG_MAX 2048

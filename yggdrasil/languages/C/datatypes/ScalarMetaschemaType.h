@@ -1,8 +1,6 @@
 #ifndef SCALAR_METASCHEMA_TYPE_H_
 #define SCALAR_METASCHEMA_TYPE_H_
 
-#define STRBUFF 100
-
 #include <vector>
 #include <cstring>
 
@@ -28,10 +26,12 @@ public:
     @param[in] subtype const character pointer to the name of the subtype.
     @param[in] precision size_t Type precision in bits.
     @param[in] units const char * (optional) Type units.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
   ScalarMetaschemaType(const char *subtype, const size_t precision,
-		       const char *units="") :
-    MetaschemaType("scalar"), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
+		       const char *units="", const bool use_generic=false) :
+    MetaschemaType("scalar", use_generic), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
     precision_(precision), units_((const char*)malloc(STRBUFF)), cast_precision_(0) {
     if (subtype_ == NULL) {
       ygglog_throw_error("ScalarMetaschemaType: Failed to malloc subtype.");
@@ -50,9 +50,12 @@ public:
     @brief Constructor for ScalarMetaschemaType from a JSON type defintion.
     @param[in] type_doc rapidjson::Value rapidjson object containing the type
     definition from a JSON encoded header.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  ScalarMetaschemaType(const rapidjson::Value &type_doc) :
-    MetaschemaType(type_doc), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
+  ScalarMetaschemaType(const rapidjson::Value &type_doc,
+		       const bool use_generic=false) :
+    MetaschemaType(type_doc, use_generic), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
     precision_(0), units_((const char*)malloc(STRBUFF)), cast_precision_(0) {
     if (subtype_ == NULL) {
       ygglog_throw_error("ScalarMetaschemaType: Failed to malloc subtype.");
@@ -91,7 +94,40 @@ public:
     } else {
       update_units("", true);
     }
-    // Set variable
+    // Set variable precision
+    if (precision_ == 0)
+      _variable_precision = true;
+    else
+      _variable_precision = false;
+  }
+  /*!
+    @brief Constructor for ScalarMetaschemaType from Python dictionary.
+    @param[in] pyobj PyObject* Python object.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+   */
+  ScalarMetaschemaType(PyObject* pyobj, const bool use_generic=false) :
+    MetaschemaType(pyobj, use_generic), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
+    precision_(0), units_((const char*)malloc(STRBUFF)), cast_precision_(0) {
+    // Subtype
+    char subtype[STRBUFF] = "";
+    get_item_python_dict_c(pyobj, "subtype", subtype,
+			   "ScalarMetaschemaType: subtype: ",
+			   T_STRING, STRBUFF);
+    update_subtype(subtype, true);
+    // Precision
+    size_t precision = 0;
+    get_item_python_dict_c(pyobj, "precision", &precision,
+			   "ScalarMetaschemaType: precision: ",
+			   T_INT, sizeof(size_t)*8);
+    set_precision(precision, true);
+    // Units
+    char units[STRBUFF] = "";
+    get_item_python_dict_c(pyobj, "units", units,
+			   "ScalarMetaschemaType: units: ",
+			   T_STRING, STRBUFF, true);
+    update_units(units, true);
+    // Set variable precision
     if (precision_ == 0)
       _variable_precision = true;
     else
@@ -130,16 +166,34 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new ScalarMetaschemaType instance with the same data.
    */
-  ScalarMetaschemaType* copy() const override { return (new ScalarMetaschemaType(subtype_, precision_, units_)); }
+  ScalarMetaschemaType* copy() const override { return (new ScalarMetaschemaType(subtype_, precision_, units_, use_generic())); }
   /*!
     @brief Print information about the type to stdout.
+    @param[in] indent char* Indentation to add to display output.
   */
-  void display() const override {
-    MetaschemaType::display();
-    printf("%-15s = %s\n", "subtype", subtype_);
-    printf("%-15s = %d\n", "subtype_code", subtype_code_);
-    printf("%-15s = %lu\n", "precision", precision_);
-    printf("%-15s = %s\n", "units", units_);
+  void display(const char* indent="") const override {
+    MetaschemaType::display(indent);
+    printf("%s%-15s = %s\n", indent, "subtype", subtype_);
+    printf("%s%-15s = %d\n", indent, "subtype_code", subtype_code_);
+    printf("%s%-15s = %lu\n", indent, "precision", precision_);
+    printf("%s%-15s = %s\n", indent, "units", units_);
+  }
+  /*!
+    @brief Get type information as a Python dictionary.
+    @returns PyObject* Python dictionary.
+   */
+  PyObject* as_python_dict() const override {
+    PyObject* out = MetaschemaType::as_python_dict();
+    set_item_python_dict_c(out, "subtype", subtype_,
+			   "ScalarMetaschemaType::as_python_dict: ",
+			   T_STRING, STRBUFF);
+    set_item_python_dict_c(out, "precision", &precision_,
+			   "ScalarMetaschemaType::as_python_dict: ",
+			   T_INT, sizeof(size_t)*8);
+    set_item_python_dict_c(out, "units", units_,
+			   "ScalarMetaschemaType::as_python_dict: ",
+			   T_STRING, STRBUFF);
+    return out;
   }
   /*!
     @brief Display data.
@@ -1183,15 +1237,28 @@ public:
     @param[in] precision size_t Type precision in bits.
     @param[in] shape std::vector<size_t> Shape of type array in each dimension.
     @param[in] units const char * (optional) Type units.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
   NDArrayMetaschemaType(const char *subtype, const size_t precision,
-			const std::vector<size_t> shape, const char *units="");
+			const std::vector<size_t> shape, const char *units="",
+			const bool use_generic=false);
   /*!
     @brief Constructor for NDArrayMetaschemaType from a JSON type defintion.
     @param[in] type_doc rapidjson::Value rapidjson object containing the type
     definition from a JSON encoded header.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  NDArrayMetaschemaType(const rapidjson::Value &type_doc);
+  NDArrayMetaschemaType(const rapidjson::Value &type_doc,
+			const bool use_generic=false);
+  /*!
+    @brief Constructor for NDArrayMetaschemaType from Python dictionary.
+    @param[in] pyobj PyObject* Python object.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+   */
+  NDArrayMetaschemaType(PyObject* pyobj, const bool use_generic=false);
   /*!
     @brief Equivalence operator.
     @param[in] Ref MetaschemaType instance to compare against.
@@ -1205,8 +1272,14 @@ public:
   NDArrayMetaschemaType* copy() const override;
   /*!
     @brief Print information about the type to stdout.
+    @param[in] indent char* Indentation to add to display output.
   */
-  void display() const override;
+  void display(const char* indent="") const override;
+  /*!
+    @brief Get type information as a Python dictionary.
+    @returns PyObject* Python dictionary.
+   */
+  PyObject* as_python_dict() const override;
   /*!
     @brief Get the number of dimensions in the array.
     @returns size_t Number of dimensions in type.
@@ -1283,10 +1356,13 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @param[in] precision size_t Type precision in bits.
     @param[in] length size_t Number of elements in the array.
     @param[in] units const char * (optional) Type units.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
   OneDArrayMetaschemaType(const char *subtype, const size_t precision,
-			  const size_t length, const char *units="") :
-    ScalarMetaschemaType(subtype, precision, units), length_(length) {
+			  const size_t length, const char *units="",
+			  const bool use_generic=false) :
+    ScalarMetaschemaType(subtype, precision, units, use_generic), length_(length) {
     update_type("1darray");
     if (length_ == 0)
       _variable_length = true;
@@ -1297,15 +1373,36 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @brief Constructor for OneDArrayMetaschemaType from a JSON type defintion.
     @param[in] type_doc rapidjson::Value rapidjson object containing the type
     definition from a JSON encoded header.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  OneDArrayMetaschemaType(const rapidjson::Value &type_doc) :
-    ScalarMetaschemaType(type_doc) {
+  OneDArrayMetaschemaType(const rapidjson::Value &type_doc,
+			  const bool use_generic=false) :
+    ScalarMetaschemaType(type_doc, use_generic) {
     if (!(type_doc.HasMember("length")))
       ygglog_throw_error("OneDArrayMetaschemaType: 1darray types must include 'length'.");
     if (!(type_doc["length"].IsInt()))
       ygglog_throw_error("OneDArrayMetaschemaType: 1darray 'length' value must be an int.");
     length_ = type_doc["length"].GetInt();
     update_type("1darray");
+    if (length_ == 0)
+      _variable_length = true;
+    else
+      _variable_length = false;
+  }
+  /*!
+    @brief Constructor for OneDArrayMetaschemaType from Python dictionary.
+    @param[in] pyobj PyObject* Python object.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+   */
+  OneDArrayMetaschemaType(PyObject* pyobj, const bool use_generic=false) :
+    ScalarMetaschemaType(pyobj, use_generic), length_(0) {
+    update_type("1darray");
+    get_item_python_dict_c(pyobj, "length", &length_,
+			   "OneDArrayMetaschemaType: length: ",
+			   T_INT, sizeof(size_t)*8);
+    // Set variable length
     if (length_ == 0)
       _variable_length = true;
     else
@@ -1331,14 +1428,26 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @returns pointer to new OneDArrayMetaschemaType instance with the same data.
    */
   OneDArrayMetaschemaType* copy() const override {
-    return (new OneDArrayMetaschemaType(subtype(), precision(), length_, units()));
+    return (new OneDArrayMetaschemaType(subtype(), precision(), length_, units(), use_generic()));
   }
   /*!
     @brief Print information about the type to stdout.
+    @param[in] indent char* Indentation to add to display output.
   */
-  void display() const override {
-    ScalarMetaschemaType::display();
-    printf("%-15s = %lu\n", "length", length_);
+  void display(const char* indent="") const override {
+    ScalarMetaschemaType::display(indent);
+    printf("%s%-15s = %lu\n", "length", indent, length_);
+  }
+  /*!
+    @brief Get type information as a Python dictionary.
+    @returns PyObject* Python dictionary.
+   */
+  PyObject* as_python_dict() const override {
+    PyObject* out = ScalarMetaschemaType::as_python_dict();
+    set_item_python_dict_c(out, "length", &length_,
+			   "OneDArrayMetaschemaType: as_python_dict: ",
+			   T_INT, sizeof(size_t)*8);
+    return out;
   }
   /*!
     @brief Get the number of elements in the type.
@@ -1467,8 +1576,10 @@ private:
 
 NDArrayMetaschemaType::NDArrayMetaschemaType(const char *subtype, const size_t precision,
 					     const std::vector<size_t> shape,
-					     const char *units) :
-  ScalarMetaschemaType(subtype, precision, units), shape_(shape) {
+					     const char *units,
+					     const bool use_generic) :
+  ScalarMetaschemaType(subtype, precision, units, use_generic),
+  shape_(shape) {
   update_type("ndarray");
   if (shape_.size() == 0) {
     _variable_shape = true;
@@ -1476,8 +1587,9 @@ NDArrayMetaschemaType::NDArrayMetaschemaType(const char *subtype, const size_t p
     _variable_shape = false;
   }
 };
-NDArrayMetaschemaType::NDArrayMetaschemaType(const rapidjson::Value &type_doc) :
-  ScalarMetaschemaType(type_doc) {
+NDArrayMetaschemaType::NDArrayMetaschemaType(const rapidjson::Value &type_doc,
+					     const bool use_generic) :
+  ScalarMetaschemaType(type_doc, use_generic) {
   if (!(type_doc.HasMember("shape")))
     ygglog_throw_error("NDArrayMetaschemaType: ndarray types must include 'shape'.");
   if (!(type_doc["shape"].IsArray()))
@@ -1491,6 +1603,29 @@ NDArrayMetaschemaType::NDArrayMetaschemaType(const rapidjson::Value &type_doc) :
   }
   update_type("ndarray");
 };
+NDArrayMetaschemaType::NDArrayMetaschemaType(PyObject* pyobj,
+					     const bool use_generic) :
+  ScalarMetaschemaType(pyobj, use_generic) {
+  update_type("ndarray");
+  // Shape
+  PyObject* pyshape = get_item_python_dict(pyobj, "shape",
+					   "NDArrayMetaschemaType: shape: ",
+					   T_ARRAY);
+  size_t i, ishape, ndim = PyList_Size(pyshape);
+  for (i = 0; i < ndim; i++) {
+    get_item_python_list_c(pyobj, i, &ishape,
+			   "NDArrayMetaschemaType: shape: ",
+			   T_INT, sizeof(size_t)*8);
+    shape_.push_back(ishape);
+  }
+  Py_DECREF(pyshape);
+  // Set variable shape
+  if (shape_.size() == 0) {
+    _variable_shape = true;
+  } else {
+    _variable_shape = false;
+  }
+};
 bool NDArrayMetaschemaType::operator==(const MetaschemaType &Ref) const {
   if (!(ScalarMetaschemaType::operator==(Ref)))
     return false;
@@ -1502,11 +1637,11 @@ bool NDArrayMetaschemaType::operator==(const MetaschemaType &Ref) const {
   return true;
 };
 NDArrayMetaschemaType* NDArrayMetaschemaType::copy() const {
-  return (new NDArrayMetaschemaType(subtype(), precision(), shape(), units()));
+  return (new NDArrayMetaschemaType(subtype(), precision(), shape(), units(), use_generic()));
 }
-void NDArrayMetaschemaType::display() const {
-  ScalarMetaschemaType::display();
-  printf("%-15s = [ ", "shape");
+void NDArrayMetaschemaType::display(const char* indent) const {
+  ScalarMetaschemaType::display(indent);
+  printf("%s%-15s = [ ", indent, "shape");
   if (ndim() > 0) {
     size_t i;
     printf("%lu", shape_[0]);
@@ -1515,6 +1650,23 @@ void NDArrayMetaschemaType::display() const {
     }
   }
   printf(" ]\n");
+};
+PyObject* NDArrayMetaschemaType::as_python_dict() const {
+  PyObject* out = ScalarMetaschemaType::as_python_dict();
+  PyObject* pyshape = PyList_New(ndim());
+  if (pyshape == NULL) {
+    ygglog_throw_error("NDArrayMetaschemaType::as_python_dict: Failed to create new Python list for shape.");
+  }
+  size_t i;
+  for (i = 1; i < ndim(); i++) {
+    set_item_python_list_c(pyshape, i, &(shape_[i]),
+			   "NDArrayMetaschemaType::as_python_dict: shape: ",
+			   T_INT, sizeof(size_t)*8);
+  }
+  set_item_python_dict(out, "shape", pyshape,
+		       "NDArrayMetaschemaType::as_python_dict: ",
+		       T_ARRAY);
+  return out;
 };
 const size_t NDArrayMetaschemaType::ndim() const {
   return shape_.size();

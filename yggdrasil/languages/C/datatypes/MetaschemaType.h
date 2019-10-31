@@ -3,6 +3,7 @@
 
 #include "../tools.h"
 #include "utils.h"
+#include "datatypes.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -24,20 +25,25 @@ public:
   /*!
     @brief Constructor for MetaschemaType.
     @param[in] type const character pointer to the name of the type.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  MetaschemaType(const char* type) :
-    type_((const char*)malloc(100)), type_code_(-1), updated_(false),
-    nbytes_(0) {
+  MetaschemaType(const char* type, const bool use_generic=false) :
+    type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
+    nbytes_(0), use_generic_(use_generic) {
     update_type(type);
   }
   /*!
     @brief Constructor for MetaschemaType from a JSON type defintion.
-    @param[in] type_doc rapidjson::Value rapidjson object containing the type
-    definition from a JSON encoded header.
+    @param[in] type_doc rapidjson::Value rapidjson object containing
+    the type definition from a JSON encoded header.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  MetaschemaType(const rapidjson::Value &type_doc) :
-    type_((const char*)malloc(100)), type_code_(-1), updated_(false),
-    nbytes_(0) {
+  MetaschemaType(const rapidjson::Value &type_doc,
+		 const bool use_generic=false) :
+    type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
+    nbytes_(0), use_generic_(use_generic) {
     if (!(type_doc.IsObject()))
       ygglog_throw_error("MetaschemaType: Parsed document is not an object.");
     if (!(type_doc.HasMember("type")))
@@ -45,6 +51,24 @@ public:
     if (!(type_doc["type"].IsString()))
       ygglog_throw_error("MetaschemaType: Type in parsed header is not a string.");
     update_type(type_doc["type"].GetString());
+  }
+  /*!
+    @brief Constructor for MetaschemaType from Python dictionary.
+    @param[in] pyobj PyObject* Python object.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+   */
+  MetaschemaType(PyObject* pyobj, const bool use_generic=false) :
+    type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
+    nbytes_(0), use_generic_(use_generic) {
+    if (!(PyDict_Check(pyobj))) {
+      ygglog_throw_error("MetaschemaType: Python object must be a dict.");
+    }
+    char ctype[STRBUFF] = "";
+    get_item_python_dict_c(pyobj, "type", ctype,
+			   "MetaschemaType: type: ",
+			   T_STRING, STRBUFF);
+    update_type(ctype);
   }
   /*!
     @brief Destructor for MetaschemaType.
@@ -81,14 +105,26 @@ public:
     @returns pointer to new MetaschemaType instance with the same data.
    */
   virtual MetaschemaType* copy() const {
-    return (new MetaschemaType(type_));
+    return (new MetaschemaType(type_, use_generic_));
   }
   /*!
     @brief Print information about the type to stdout.
+    @param[in] indent char* Indentation to add to display output.
   */
-  virtual void display() const {
-    printf("%-15s = %s\n", "type", type_);
-    printf("%-15s = %d\n", "type_code", type_code_);
+  virtual void display(const char* indent="") const {
+    printf("%s%-15s = %s\n", indent, "type", type_);
+    printf("%s%-15s = %d\n", indent, "type_code", type_code_);
+  }
+  /*!
+    @brief Get type information as a Python dictionary.
+    @returns PyObject* Python dictionary.
+   */
+  virtual PyObject* as_python_dict() const {
+    PyObject* out = PyDict_New();
+    set_item_python_dict_c(out, "type", type_,
+			   "MetaschemaType::as_python_dict: type: ",
+			   T_STRING, STRBUFF);
+    return out;
   }
   /*!
     @brief Copy data wrapped in YggGeneric class.
@@ -193,6 +229,11 @@ public:
    */
   const int type_code() const { return type_code_; }
   /*!
+    @brief Get the value of class attribute use_generic.
+    @returns bool Value of use_generic.
+   */
+  const int use_generic() const { return use_generic_; }
+  /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
@@ -242,9 +283,17 @@ public:
    */
   virtual void update_type(const char* new_type) {
     char** type_modifier = const_cast<char**>(&type_);
-    strncpy(*type_modifier, new_type, 100);
+    strncpy(*type_modifier, new_type, STRBUFF);
     int* type_code_modifier = const_cast<int*>(&type_code_);
     *type_code_modifier = check_type();
+  }
+  /*!
+    @brief Update the instance's use_generic flag.
+    @param[in] new_use_generic const bool New flag value.
+   */
+  virtual void update_use_generic(const bool new_use_generic) {
+    bool* use_generic_modifier = const_cast<bool*>(&use_generic_);
+    *use_generic_modifier = new_use_generic;
   }
   /*!
     @brief Set the type length.
@@ -899,6 +948,7 @@ private:
   const int type_code_;
   bool updated_;
   const int nbytes_;
+  const bool use_generic_;
 };
 
 

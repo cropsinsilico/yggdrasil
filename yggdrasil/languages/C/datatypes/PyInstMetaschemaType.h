@@ -22,10 +22,14 @@ public:
     @brief Constructor for PyInstMetaschemaType.
     @param[in] class_name char* Name of Python class.
     @param[in] args_type JSONObjectMetaschemaType Type definition for instance arguments.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
   PyInstMetaschemaType(const char* class_name,
-		       const JSONObjectMetaschemaType* args_type) :
-    PyObjMetaschemaType("instance"), class_name_(""), args_type_(NULL) {
+		       const JSONObjectMetaschemaType* args_type,
+		       const bool use_generic=true) :
+    // Always generic
+    PyObjMetaschemaType("instance", true), class_name_(""), args_type_(NULL) {
     if (class_name != NULL) {
       update_class_name(class_name, true);
     }
@@ -37,9 +41,13 @@ public:
     @brief Constructor for PyInstMetaschemaType from a JSON type defintion.
     @param[in] type_doc rapidjson::Value rapidjson object containing the type
     definition from a JSON encoded header.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  PyInstMetaschemaType(const rapidjson::Value &type_doc) :
-    PyObjMetaschemaType(type_doc), class_name_(""), args_type_(NULL) {
+  PyInstMetaschemaType(const rapidjson::Value &type_doc,
+		       const bool use_generic=false) :
+    // Always generic
+    PyObjMetaschemaType(type_doc, true), class_name_(""), args_type_(NULL) {
     if (!(type_doc.HasMember("class"))) {
       ygglog_throw_error("PyInstMetaschemaType: instance type must include 'class'.");
     }
@@ -52,6 +60,33 @@ public:
     }
     if (!(type_doc["args"].IsObject())) {
       ygglog_throw_error("PyInstMetaschemaType: 'args' value must be an object.");
+    }
+    JSONObjectMetaschemaType* args_type = new JSONObjectMetaschemaType(type_doc, MetaschemaType::use_generic(), "args");
+    if (args_type != NULL) {
+      args_type->update_type("object");
+      update_args_type(args_type, true);
+    }
+  }
+  /*!
+    @brief Constructor for PyInstMetaschemaType from Python dictionary.
+    @param[in] pyobj PyObject* Python object.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+   */
+  PyInstMetaschemaType(PyObject* pyobj, const bool use_generic=false) :
+    // Always generic
+    PyObjMetaschemaType(pyobj, true) {
+    // Class
+    char class_name[200] = "";
+    get_item_python_dict_c(pyobj, "class", class_name,
+			   "PyInstMetaschemaType: class: ",
+			   T_STRING, 200);
+    update_class_name(class_name, true);
+    // Args type
+    JSONObjectMetaschemaType* args_type = new JSONObjectMetaschemaType(pyobj, MetaschemaType::use_generic(), "args");
+    if (args_type != NULL) {
+      args_type->update_type("object");
+      update_args_type(args_type, true);
     }
   }
   /*!
@@ -85,22 +120,38 @@ public:
     @returns pointer to new MetaschemaType instance with the same data.
    */
   PyInstMetaschemaType* copy() const override {
-    return (new PyInstMetaschemaType(class_name_, args_type_));
+    return (new PyInstMetaschemaType(class_name_, args_type_, use_generic()));
   }
   /*!
     @brief Print information about the type to stdout.
+    @param[in] indent char* Indentation to add to display output.
   */
-  void display() const override {
-    PyObjMetaschemaType::display();
-    printf("%-15s = %s\n", "class_name", class_name_);
+  void display(const char* indent="") const override {
+    PyObjMetaschemaType::display(indent);
+    printf("%s%-15s = %s\n", indent, "class_name", class_name_);
     if (args_type_ == NULL) {
-      printf("Args type: NULL\n");
+      printf("%sArgs type: NULL\n", indent);
     } else {
-      printf("Args type:\n");
-      args_type_->display();
+      printf("%sArgs type:\n", indent);
+      args_type_->display(indent);
     }
   }
   /*!
+    @brief Get type information as a Python dictionary.
+    @returns PyObject* Python dictionary.
+   */
+  PyObject* as_python_dict() const override {
+    PyObject* out = PyObjMetaschemaType::as_python_dict();
+    set_item_python_dict_c(out, "class", class_name_,
+			   "PyInstMetaschemaType::as_python_dict: ",
+			   T_STRING, PYTHON_NAME_SIZE);
+    PyObject* pyargs = args_type_->as_python_dict();
+    set_item_python_dict(out, "args", pyargs,
+			 "PyInstMetaschemaType::as_python_dict: ",
+			 T_OBJECT);
+    return out;
+  } 
+ /*!
     @brief Get the class name string.
     @returns const char Pointer to the class name string.
    */
@@ -151,6 +202,17 @@ public:
     if (args_type_ != NULL)
       delete args_type_;
     args_type_ = new_args_type->copy();
+    // Force children to follow parent use_generic
+    args_type_->update_use_generic(use_generic());
+  }
+  /*!
+    @brief Update the instance's use_generic flag.
+    @param[in] new_use_generic const bool New flag value.
+   */
+  void update_use_generic(const bool new_use_generic) override {
+    MetaschemaType::update_use_generic(new_use_generic);
+    // Force children to follow parent use_generic
+    args_type_->update_use_generic(use_generic());
   }
   /*!
     @brief Update the type object with info from provided variable arguments for serialization.

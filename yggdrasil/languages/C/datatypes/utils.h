@@ -13,7 +13,7 @@
 enum { T_BOOLEAN, T_INTEGER, T_NULL, T_NUMBER, T_STRING, T_ARRAY, T_OBJECT,
        T_DIRECT, T_1DARRAY, T_NDARRAY, T_SCALAR, T_FLOAT, T_UINT, T_INT, T_COMPLEX,
        T_BYTES, T_UNICODE, T_PLY, T_OBJ, T_ASCII_TABLE,
-       T_CLASS, T_FUNCTION, T_INSTANCE };
+       T_CLASS, T_FUNCTION, T_INSTANCE, T_SCHEMA };
 
 
 /*!
@@ -83,6 +83,7 @@ std::map<const char*, int, strcomp> get_type_map() {
     global_type_map["class"] = T_CLASS;
     global_type_map["function"] = T_FUNCTION;
     global_type_map["instance"] = T_INSTANCE;
+    global_type_map["schema"] = T_SCHEMA;
   }
   return global_type_map;
 };
@@ -212,7 +213,16 @@ public:
 };
 
 
+/*! @brief Vector of void pointers. */
+typedef std::vector<void*> void_vector_t;
+
+/*! @brief Map of void pointers. */
+typedef std::map<const char*, void*, strcomp> void_map_t;
+
+/*! @brief Vector of generic types. */
 typedef std::vector<YggGeneric*> YggGenericVector;
+
+/*! @brief Map of generic types. */
 typedef std::map<const char*, YggGeneric*, strcomp> YggGenericMap;
 
 
@@ -537,7 +547,7 @@ void convert_python2c(PyObject *pyobj, void *dst, int type_code,
   @param[in] precision size_t Size (in bits) of the C type. Defaults to 0.
   @returns PyObject* Python object.
  */
-PyObject* convert_c2python(void *src, int type_code,
+PyObject* convert_c2python(const void *src, int type_code,
 			   const char* error_prefix="",
 			   size_t precision=0) {
   initialize_python(error_prefix);
@@ -551,7 +561,7 @@ PyObject* convert_c2python(void *src, int type_code,
   switch (type_code) {
   case T_ARRAY: {
   case T_OBJECT:
-    dst = (PyObject*)src;
+    dst = Py_BuildValue("O", (const PyObject*)src);
     strcat(type_name, "list/dict");
     break;
   }
@@ -760,7 +770,7 @@ void set_item_python_list(PyObject *pyobj, int index,
   @param[in] type_code int Code specifying type that item should contain.
   @param[in] precision size_t Size (in bits) of the C type. Defaults to 0.
  */
-void set_item_python_list_c(PyObject *pyobj, int index, void *item,
+void set_item_python_list_c(PyObject *pyobj, int index, const void *item,
 			    const char* error_prefix="",
 			    int type_code=-1, size_t precision=0) {
   PyObject *py_item = convert_c2python(item, type_code, error_prefix,
@@ -798,7 +808,7 @@ void set_item_python_dict(PyObject *pyobj, const char* key,
   @param[in] precision size_t Size (in bits) of the C type. Defaults to 0.
  */
 void set_item_python_dict_c(PyObject *pyobj, const char* key,
-			    void *item, const char* error_prefix="",
+			    const void *item, const char* error_prefix="",
 			    int type_code=-1, size_t precision=0) {
   PyObject *py_item = convert_c2python(item, type_code, error_prefix,
 				       precision);

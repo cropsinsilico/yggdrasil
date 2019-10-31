@@ -1,6 +1,8 @@
 #ifndef DATATYPES_H_
 #define DATATYPES_H_
 
+#include <stdbool.h>
+
 #include "../tools.h"
 #include "PlyDict.h"
 #include "ObjDict.h"
@@ -14,17 +16,20 @@
 extern "C" {
 #endif
 
+static char prefix_char = '#';
+
 
 /*! @brief C-friendly definition of MetaschemaType. */
 typedef struct dtype_t {
   char type[COMMBUFFSIZ]; //!< Type name
+  bool use_generic; //!< Flag for empty dtypes to specify generic in/out
   void *obj; //!< MetaschemaType Pointer
 } dtype_t;
 
 /*! @brief C-friendly defintion of YggGeneric. */
 typedef struct generic_t {
-  char prefix;
-  void *obj;
+  char prefix; //!< Prefix character for verification.
+  void *obj; //!< Pointer to YggGeneric class.
 } generic_t;
 
 /*! @brief C-friendly definition of vector object. */
@@ -77,6 +82,22 @@ typedef struct comm_head_t {
   //
   dtype_t* dtype; //!< Type structure.
 } comm_head_t;
+
+
+/*!
+  @brief C wrapper for the C++ type_from_doc function.
+  @param type_doc void* Pointer to const rapidjson::Value type doc.
+  @returns void* Pointer to MetaschemaType class.
+ */
+void* type_from_doc_c(const void* type_doc, const bool use_generic);
+
+
+/*!
+  @brief C wrapper for the C++ type_from_pyobj function.
+  @param type_doc void* Pointer to const rapidjson::Value type doc.
+  @returns void* Pointer to MetaschemaType class.
+ */
+void* type_from_pyobj_c(PyObject* pyobj, const bool use_generic);
 
 
 /*!
@@ -220,30 +241,57 @@ const size_t dtype_precision(const dtype_t* type_class);
   @param[in] dtype dtype_t* Type structure/class.
   @returns dtype_t* Initialized type structure/class.
 */
-dtype_t* init_dtype(dtype_t *dtype);
+dtype_t* complete_dtype(dtype_t *dtype, const bool use_generic);
   
 
 /*!
   @brief Construct and empty type object.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
-dtype_t* create_dtype_empty();
+dtype_t* create_dtype_empty(const bool use_generic);
+
+
+/*!
+  @brief Create a datatype based on a JSON document.
+  @param type_doc void* Pointer to const rapidjson::Value type doc.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
+  @returns dtype_t* Type structure/class.
+ */
+dtype_t* create_dtype_doc(void* type_doc, const bool use_generic);
+
+
+/*!
+  @brief Create a datatype based on a Python dictionary.
+  @param[in] pyobj PyObject* Python dictionary.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
+  @returns dtype_t* Type structure/class.
+ */
+dtype_t* create_dtype_python(PyObject* pyobj, const bool use_generic);
 
 
 /*!
   @brief Construct a Direct type object.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
-dtype_t* create_dtype_direct();
+dtype_t* create_dtype_direct(const bool use_generic);
 
 
   
 /*!
   @brief Construct a type object for one of the default JSON types.
   @param[in] type char* Name of the type.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
-dtype_t* create_dtype_default(const char* type);
+dtype_t* create_dtype_default(const char* type,
+			      const bool use_generic);
 
 
 /*!
@@ -251,10 +299,12 @@ dtype_t* create_dtype_default(const char* type);
   @param[in] subtype char* Name of the scalar subtype (e.g. int, uint, float, bytes).
   @param[in] precision size_t Precision of the scalar in bits.
   @param[in] units char* Units for scalar. (e.g. "cm", "g", "" for unitless)
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_scalar(const char* subtype, const size_t precision,
-			     const char* units);
+			     const char* units, const bool use_generic);
 
 
 /*!
@@ -263,10 +313,13 @@ dtype_t* create_dtype_scalar(const char* subtype, const size_t precision,
   @param[in] precision size_t Precision of the array in bits.
   @param[in] length size_t Number of elements in the array.
   @param[in] units char* Units for array elements. (e.g. "cm", "g", "" for unitless)
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_1darray(const char* subtype, const size_t precision,
-			      const size_t length, const char* units);
+			      const size_t length, const char* units,
+			      const bool use_generic);
 
 
 /*!
@@ -278,11 +331,13 @@ dtype_t* create_dtype_1darray(const char* subtype, const size_t precision,
   @param[in] shape size_t* Pointer to array where each element is the size of the
   array in that dimension.
   @param[in] units char* Units for array elements. (e.g. "cm", "g", "" for unitless)
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_ndarray(const char* subtype, const size_t precision,
 			      const size_t ndim, const size_t* shape,
-			      const char* units);
+			      const char* units, const bool use_generic);
 
   
 /*!
@@ -294,11 +349,13 @@ dtype_t* create_dtype_ndarray(const char* subtype, const size_t precision,
   @param[in] shape[] size_t Array where each element is the size of the
   array in that dimension.
   @param[in] units char* Units for array elements. (e.g. "cm", "g", "" for unitless)
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
 				  const size_t ndim, const size_t shape[],
-				  const char* units);
+				  const char* units, const bool use_generic);
 
   
 /*!
@@ -306,9 +363,12 @@ dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
   @param[in] nitems size_t Number of types in items.
   @param[in] items dtype_t** Pointer to array of types describing the array
   elements.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
-dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items);
+dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items,
+				 const bool use_generic);
 
 
 /*!
@@ -317,30 +377,39 @@ dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items);
   @param[in] keys char** Pointer to array of keys for each type.
   @param[in] values dtype_t** Pointer to array of types describing the values
   for each key.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_json_object(const size_t nitems, const char** keys,
-				  dtype_t** values);
+				  dtype_t** values, const bool use_generic);
 
 /*!
   @brief Construct a Ply type object.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
-dtype_t* create_dtype_ply();
+dtype_t* create_dtype_ply(const bool use_generic);
 
 
 /*!
   @brief Construct a Obj type object.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
-dtype_t* create_dtype_obj();
+dtype_t* create_dtype_obj(const bool use_generic);
 
 
 /*!
   @brief Construct an AsciiTable type object.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
-dtype_t* create_dtype_ascii_table(const char *format_str, const int as_array);
+dtype_t* create_dtype_ascii_table(const char *format_str, const int as_array,
+				  const bool use_generic);
 
 
 /*!
@@ -350,35 +419,52 @@ dtype_t* create_dtype_ascii_table(const char *format_str, const int as_array);
   the resulting type.
   @param[in] as_array int If 1, the types will be arrays. Otherwise they will be
   scalars.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
 */
-dtype_t* create_dtype_format(const char *format_str, const int as_array);
+dtype_t* create_dtype_format(const char *format_str, const int as_array,
+			     const bool use_generic);
 
   
 /*!
   @brief Construct a type object for Python objects.
   @param[in] type char* Type string.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
  */
-dtype_t* create_dtype_pyobj(const char* type);
+dtype_t* create_dtype_pyobj(const char* type, const bool use_generic);
   
 
 /*!
   @brief Construct a type object for Python object instances.
   @param[in] class_name char* Python class name.
   @param[in] args_dtype dtype_t* Datatype describing the arguments creating the instance.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
  */
 dtype_t* create_dtype_pyinst(const char* class_name,
-			     const dtype_t* args_dtype);
+			     const dtype_t* args_dtype,
+			     const bool use_generic);
+
+  
+/*!
+  @brief Construct a type object for a schema.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
+  @returns dtype_t* Type structure/class.
+ */
+dtype_t* create_dtype_schema(const bool use_generic);
 
 
 /*!
   @brief Wrapper for freeing MetaschemaType class wrapper struct.
-  @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
+  @param[in] dtype dtype_t** Wrapper struct for C++ Metaschema type class.
   @returns: int 0 if free was successfull, -1 if there was an error.
 */
-int destroy_dtype(dtype_t* dtype);
+int destroy_dtype(dtype_t** dtype);
 
 /*!
   @brief Initialize a header struct.
@@ -584,8 +670,9 @@ int serialize_dtype(const dtype_t *dtype, char **buf, size_t *buf_siz,
 /*!
   @brief Wrapper for displaying a data type.
   @param[in] dtype dtype_t* Wrapper struct for C++ Metaschema type class.
+  @param[in] indent char* Indentation to add to display output.
 */
-void display_dtype(const dtype_t *dtype);
+  void display_dtype(const dtype_t *dtype, const char* indent);
 
 
 /*!

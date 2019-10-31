@@ -3,6 +3,7 @@
 
 #include "../tools.h"
 #include "MetaschemaType.h"
+#include "datatypes.h"
 
 #ifndef __cplusplus /* If this is a C compiler, use C++ linkage */
 //extern "C++" {
@@ -25,11 +26,76 @@ public:
     @param[in] items std::vector<MetaschemaType*> Type classes for array items.
     @param[in] format_str const char * (optional) Format string describing the
     item types. Defaults to empty string.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
   */
   JSONArrayMetaschemaType(const std::vector<MetaschemaType*> items,
-			  const char *format_str = "") :
-    MetaschemaType("array") {
+			  const char *format_str = "",
+			  const bool use_generic=true) :
+    // Always generic
+    MetaschemaType("array", true) {
     strncpy(format_str_, format_str, 1000);
+    update_items(items, true);
+  }
+  /*!
+    @brief Constructor for JSONArrayMetaschemaType from a JSON type defintion.
+    @param[in] type_doc rapidjson::Value rapidjson object containing
+    the type definition from a JSON encoded header.
+    @param[in] format_str const char * (optional) Format string describing the
+    item types. Defaults to empty string.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+   */
+  JSONArrayMetaschemaType(const rapidjson::Value &type_doc,
+			  const char *format_str = "",
+			  const bool use_generic=true) :
+    // Always generic
+    MetaschemaType(type_doc, true) {
+    strncpy(format_str_, format_str, 1000);
+    if (!(type_doc.HasMember("items")))
+      ygglog_throw_error("JSONArrayMetaschemaType: Items missing.");
+    if (!(type_doc["items"].IsArray()))
+      ygglog_throw_error("JSONArrayMetaschemaType: Items must be an array.");
+    if (type_doc.HasMember("format_str")) {
+      if (!(type_doc["format_str"].IsString()))
+	ygglog_throw_error("JSONArrayMetaschemaType: format_str must be a string.");
+      strncpy(format_str_, type_doc["format_str"].GetString(), 1000);
+    }
+    size_t i;
+    for (i = 0; i < (size_t)(type_doc["items"].Size()); i++) {
+      MetaschemaType* iitem = (MetaschemaType*)type_from_doc_c(&(type_doc["items"][i]), MetaschemaType::use_generic());
+      if (iitem == NULL)
+	ygglog_throw_error("JSONArrayMetaschemaType: Error reconstructing item %lu from JSON document.", i);
+      items_.push_back(iitem);
+    }
+  }
+  /*!
+    @brief Constructor for JSONArrayMetaschemaType from Python dictionary.
+    @param[in] pyobj PyObject* Python object.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+   */
+  JSONArrayMetaschemaType(PyObject* pyobj, const bool use_generic=true) :
+    // Always generic
+    MetaschemaType(pyobj, true) {
+    PyObject* pyitems = get_item_python_dict(pyobj, "items",
+  					     "JSONArrayMetaschemaType: items: ",
+  					     T_ARRAY);
+    if (pyitems == NULL) {
+      ygglog_throw_error("JSONArrayMetaschemaType: Failed to recover items list from Python dictionary.");
+    }
+    std::vector<MetaschemaType*> items;
+    size_t i, nitems = PyList_Size(pyitems);
+    for (i = 0; i < nitems; i++) {
+      PyObject* ipyitem = get_item_python_list(pyitems, i,
+					       "JSONArrayMetaschemaType: items: ",
+					       T_OBJECT);
+      MetaschemaType* iitem = (MetaschemaType*)type_from_pyobj_c(ipyitem, MetaschemaType::use_generic());
+      if (iitem == NULL) {
+	ygglog_throw_error("JSONArrayMetaschemaType: Failed to reconstruct type for item %d from the Python object.", i);
+      }
+      items.push_back(iitem);
+    }
     update_items(items, true);
   }
   /*!
@@ -64,21 +130,44 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new JSONArrayMetaschemaType instance with the same data.
    */
-  JSONArrayMetaschemaType* copy() const override { return (new JSONArrayMetaschemaType(items_, format_str_)); }
+  JSONArrayMetaschemaType* copy() const override { return (new JSONArrayMetaschemaType(items_, format_str_, use_generic())); }
   /*!
     @brief Print information about the type to stdout.
+    @param[in] indent char* Indentation to add to display output.
   */
-  void display() const override {
-    MetaschemaType::display();
+  void display(const char* indent="") const override {
+    MetaschemaType::display(indent);
     if (strlen(format_str_) > 0) {
-      printf("format_str = %s\n", format_str_);
+      printf("%sformat_str = %s\n", indent, format_str_);
     }
-    printf("%lu Elements\n", items_.size());
+    printf("%s%lu Elements\n", indent, items_.size());
+    char new_indent[100] = "";
+    strcat(new_indent, indent);
+    strcat(new_indent, "    ");
     size_t i;
     for (i = 0; i < items_.size(); i++) {
-      printf("Element %lu:\n", i);
-      items_[i]->display();
+      printf("%sElement %lu:\n", indent, i);
+      items_[i]->display(new_indent);
     }
+  }
+  /*!
+    @brief Get type information as a Python dictionary.
+    @returns PyObject* Python dictionary.
+   */
+  PyObject* as_python_dict() const override {
+    PyObject* out = MetaschemaType::as_python_dict();
+    PyObject* pyitems = PyList_New(nitems());
+    size_t i;
+    for (i = 0; i < nitems(); i++) {
+      PyObject* ipyitem = items_[i]->as_python_dict();
+      set_item_python_list(pyitems, i, ipyitem,
+			   "JSONArrayMetaschemaType::as_python_dict: items: ",
+			   T_OBJECT);
+    }
+    set_item_python_dict(out, "items", pyitems,
+			 "JSONArrayMetaschemaType::as_python_dict: ",
+			 T_ARRAY);
+    return out;
   }
   /*!
     @brief Copy data wrapped in YggGeneric class.
@@ -200,7 +289,22 @@ public:
 	items_.push_back(new_items[i]->copy());
       }
     }
-    
+    // Force children to follow parent use_generic
+    for (i = 0; i < items_.size(); i++) {
+      items_[i]->update_use_generic(use_generic());
+    }
+  }
+  /*!
+    @brief Update the instance's use_generic flag.
+    @param[in] new_use_generic const bool New flag value.
+   */
+  void update_use_generic(const bool new_use_generic) override {
+    MetaschemaType::update_use_generic(new_use_generic);
+    // Force children to follow parent use_generic
+    size_t i;
+    for (i = 0; i < items_.size(); i++) {
+      items_[i]->update_use_generic(use_generic());
+    }
   }
   /*!
     @brief Update the type object with info from provided variable arguments for serialization.

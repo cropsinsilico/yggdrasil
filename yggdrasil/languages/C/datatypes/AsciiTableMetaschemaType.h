@@ -27,9 +27,37 @@ public:
     @param[in] as_array int (optional) If 1, the instance will act to
     serialize/deserialize table columns. If 0, the instnace will act to
     serialize/deserialize table rows. Defaults to 0.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  AsciiTableMetaschemaType(const char *format_str, const int as_array=0) :
-    MetaschemaType("ascii_table"), as_array_(as_array), table_(NULL) {
+  AsciiTableMetaschemaType(const char *format_str, const int as_array=0,
+			   const bool use_generic=false) :
+    MetaschemaType("ascii_table", use_generic), as_array_(as_array), table_(NULL) {
+    table_ = (asciiTable_t*)malloc(sizeof(asciiTable_t));
+    if (table_ == NULL)
+      ygglog_throw_error("AsciiTableMetaschemaType: Failed to allocate table.");
+    table_[0] = asciiTable("seri", "0", format_str, NULL, NULL, NULL);
+  }
+  /*!
+    @brief Constructor for AsciiTableMetaschemaType from Python dictionary.
+    @param[in] pyobj PyObject* Python object.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+   */
+  AsciiTableMetaschemaType(PyObject* pyobj, const bool use_generic=false) :
+    MetaschemaType(pyobj, use_generic), as_array_(0), table_(NULL) {
+    // As array
+    int as_array = 0;
+    get_item_python_dict_c(pyobj, "as_array", &as_array,
+			   "AsciiTableMetaschemaType: as_array: ",
+			   T_INT, sizeof(int), true);
+    update_as_array(as_array, true);
+    // Format string
+    char format_str[200];
+    get_item_python_dict_c(pyobj, "format_str", format_str,
+			   "AsciiTableMetaschemaType: format_str: ",
+			   T_STRING, 200);
+    // Create table
     table_ = (asciiTable_t*)malloc(sizeof(asciiTable_t));
     if (table_ == NULL)
       ygglog_throw_error("AsciiTableMetaschemaType: Failed to allocate table.");
@@ -64,15 +92,29 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new AsciiTableMetaschemaType instance with the same data.
    */
-  AsciiTableMetaschemaType* copy() const override { return (new AsciiTableMetaschemaType(format_str(),
-									  as_array())); }
+  AsciiTableMetaschemaType* copy() const override { return (new AsciiTableMetaschemaType(format_str(), as_array(), use_generic())); }
   /*!
     @brief Print information about the type to stdout.
+    @param[in] indent char* Indentation to add to display output.
   */
-  void display() const override {
-    MetaschemaType::display();
-    printf("%-15s = %s\n", "format_str", format_str());
-    printf("%-15s = %d\n", "as_array", as_array_);
+  void display(const char* indent="") const override {
+    MetaschemaType::display(indent);
+    printf("%s%-15s = %s\n", "format_str", indent, format_str());
+    printf("%s%-15s = %d\n", "as_array", indent, as_array_);
+  }
+  /*!
+    @brief Get type information as a Python dictionary.
+    @returns PyObject* Python dictionary.
+   */
+  PyObject* as_python_dict() const override {
+    PyObject* out = MetaschemaType::as_python_dict();
+    set_item_python_dict_c(out, "format_str", format_str(),
+			   "AsciiTableMetaschemaType::as_python_dict: ",
+			   T_STRING, LINE_SIZE_MAX);
+    set_item_python_dict_c(out, "as_array", &as_array_,
+			   "AsciiTableMetaschemaType::as_python_dict: ",
+			   T_INT, sizeof(int)*8);
+    return out;
   }
   /*!
     @brief Get format string describing table.
@@ -99,6 +141,18 @@ public:
       nargs++; // For the number of rows
     }
     return nargs;
+  }
+  /*!
+    @brief Update the instance's as_array flag.
+    @param[in] new_as_array const int New as_array flag.
+   */
+  void update_as_array(const int new_as_array, bool force=false) {
+    if ((!(force)) && (as_array_ != new_as_array)) {
+      ygglog_throw_error("AsciiTableMetaschemaType::update_as_array: Cannot update as_array from %d to %d.",
+			 as_array_, new_as_array);
+    }
+    int* as_array_modifier = const_cast<int*>(&as_array_);
+    *as_array_modifier = new_as_array;
   }
   
   // Encoding

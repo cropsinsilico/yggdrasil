@@ -24,9 +24,74 @@ public:
     @brief Constructor for JSONObjectMetaschemaType.
     @param[in] properties std::map<const char*, MetaschemaType*, strcomp> Map from
     property names to types.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
   */
-  JSONObjectMetaschemaType(const std::map<const char*, MetaschemaType*, strcomp> properties) :
-    MetaschemaType("object") {
+  JSONObjectMetaschemaType(const std::map<const char*, MetaschemaType*, strcomp> properties,
+			   const bool use_generic=true) :
+    // Always generic
+    MetaschemaType("object", true) {
+    strncpy(prop_key_, "properties", 100);
+    update_properties(properties, true);
+  }
+  /*!
+    @brief Constructor for JSONObjectMetaschemaType from a JSON type defintion.
+    @param[in] type_doc rapidjson::Value rapidjson object containing
+    the type definition from a JSON encoded header.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+    @param[in] prop_key const char Key to use for properties. Defaults to "properties".
+   */
+  JSONObjectMetaschemaType(const rapidjson::Value &type_doc,
+			   const bool use_generic=true,
+			   const char prop_key[100]="properties") :
+    // Always generic
+    MetaschemaType(type_doc, true), prop_key_("") {
+    strncpy(prop_key_, prop_key, 100);
+    if (!(type_doc.HasMember(prop_key_)))
+      ygglog_throw_error("JSONObjectMetaschemaType: Properties missing.");
+    if (!(type_doc[prop_key_].IsObject()))
+      ygglog_throw_error("JSONObjectMetaschemaType: Properties must be an object.");
+    for (rapidjson::Value::ConstMemberIterator itr = type_doc[prop_key_].MemberBegin(); itr != type_doc[prop_key_].MemberEnd(); ++itr) {
+      MetaschemaType* iprop = (MetaschemaType*)type_from_doc_c(&(itr->value), MetaschemaType::use_generic());
+      properties_[itr->name.GetString()] = iprop;
+    }
+  }
+  /*!
+    @brief Constructor for JSONObjectMetaschemaType from Python dictionary.
+    @param[in] pyobj PyObject* Python object.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+    @param[in] prop_key const char Key to use for properties. Defaults to "properties".
+   */
+  JSONObjectMetaschemaType(PyObject* pyobj, const bool use_generic=true,
+			   const char prop_key[100]="properties") :
+    // Always generic
+    MetaschemaType(pyobj, true), prop_key_("") {
+    strncpy(prop_key_, prop_key, 100);
+    PyObject* pyprops = get_item_python_dict(pyobj, prop_key_,
+  					     "JSONObjectMetaschemaType: properties: ",
+  					     T_OBJECT);
+    std::map<const char*, MetaschemaType*, strcomp> properties;
+    PyObject* pykeys = PyDict_Keys(pyprops);
+    if (pykeys == NULL) {
+      ygglog_throw_error("JSONObjectMetaschemaType: Failed to get keys from Python dictionary.");
+    }
+    size_t i, nkeys = PyList_Size(pykeys);
+    for (i = 0; i < nkeys; i++) {
+      char ikey[100] = "";
+      get_item_python_list_c(pykeys, i, ikey,
+			     "JSONObjectMetaschemaType: keys: ",
+			     T_STRING, 100);
+      PyObject* ipyprop = get_item_python_dict(pyprops, ikey,
+					       "JSONObjectMetaschemaType: properties: ",
+					       T_OBJECT);
+      MetaschemaType* iprop = (MetaschemaType*)type_from_pyobj_c(ipyprop, MetaschemaType::use_generic());
+      if (iprop == NULL) {
+	ygglog_throw_error("JSONObjectMetaschemaType: Failed to reconstruct type for property '%s' from the Python object.", ikey);
+      }
+      properties[ikey] = iprop;
+    }
     update_properties(properties, true);
   }
   /*!
@@ -67,17 +132,40 @@ public:
     @brief Create a copy of the type.
     @returns pointer to new JSONObjectMetaschemaType instance with the same data.
    */
-  JSONObjectMetaschemaType* copy() const override { return (new JSONObjectMetaschemaType(properties_)); }
+  JSONObjectMetaschemaType* copy() const override { return (new JSONObjectMetaschemaType(properties_, use_generic())); }
   /*!
     @brief Print information about the type to stdout.
+    @param[in] indent char* Indentation to add to display output.
   */
-  void display() const override {
-    MetaschemaType::display();
+  void display(const char* indent="") const override {
+    MetaschemaType::display(indent);
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    char new_indent[100] = "";
+    strcat(new_indent, indent);
+    strcat(new_indent, "    ");
+    for (it = properties_.begin(); it != properties_.end(); it++) {
+      printf("%sElement %s:\n", indent, it->first);
+      it->second->display(new_indent);
+    }
+  }
+  /*!
+    @brief Get type information as a Python dictionary.
+    @returns PyObject* Python dictionary.
+   */
+  PyObject* as_python_dict() const override {
+    PyObject* out = MetaschemaType::as_python_dict();
+    PyObject* pyprops = PyDict_New();
     std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
-      printf("Element %s:\n", it->first);
-      it->second->display();
+      PyObject* ipyitem = it->second->as_python_dict();
+      set_item_python_dict(pyprops, it->first, ipyitem,
+			   "JSONObjectMetaschemaType::as_python_dict: properties: ",
+			   T_OBJECT);
     }
+    set_item_python_dict(out, prop_key_, pyprops,
+			 "JSONObjectMetaschemaType::as_python_dict: ",
+			 T_OBJECT);
+    return out;
   }
   /*!
     @brief Copy data wrapped in YggGeneric class.
@@ -193,6 +281,23 @@ public:
 	properties_[it->first] = it->second->copy();
       }
     }
+    // Force children to follow parent use_generic
+    std::map<const char*, MetaschemaType*, strcomp>::iterator it;
+    for (it = properties_.begin(); it != properties_.end(); it++) {
+      it->second->update_use_generic(use_generic());
+    }
+  }
+  /*!
+    @brief Update the instance's use_generic flag.
+    @param[in] new_use_generic const bool New flag value.
+   */
+  void update_use_generic(const bool new_use_generic) override {
+    MetaschemaType::update_use_generic(new_use_generic);
+    // Force children to follow parent use_generic
+    std::map<const char*, MetaschemaType*, strcomp>::iterator it;
+    for (it = properties_.begin(); it != properties_.end(); it++) {
+      it->second->update_use_generic(use_generic());
+    }
   }
   /*!
     @brief Get the item size.
@@ -277,7 +382,7 @@ public:
    */
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override {
     if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
-    writer->Key("properties");
+    writer->Key(prop_key_);
     writer->StartObject();
     std::map<const char*, MetaschemaType*, strcomp>::const_iterator it = properties_.begin();
     for (it = properties_.begin(); it != properties_.end(); it++) {
@@ -326,8 +431,6 @@ public:
 	return false;
       }
       writer->Key(it->first);
-      // printf("Item %s:\n", it->first);
-      // it->second->display();
       if (!(it->second->encode_data(writer, iarg->second)))
 	return false;
     }
@@ -423,6 +526,7 @@ public:
   }
 
 private:
+  char prop_key_[100];
   std::map<const char*, MetaschemaType*, strcomp> properties_;
 };
 

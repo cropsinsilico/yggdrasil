@@ -19,19 +19,32 @@ class ObjMetaschemaType : public MetaschemaType {
 public:
   /*!
     @brief Constructor for ObjMetaschemaType.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  ObjMetaschemaType() : MetaschemaType("obj") {}
+  ObjMetaschemaType(const bool use_generic=false) : MetaschemaType("obj", use_generic) {}
   /*!
     @brief Constructor for ObjMetaschemaType from a JSON type defintion.
     @param[in] type_doc rapidjson::Value rapidjson object containing the type
     definition from a JSON encoded header.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  ObjMetaschemaType(const rapidjson::Value &type_doc) : MetaschemaType(type_doc) {}
+  ObjMetaschemaType(const rapidjson::Value &type_doc,
+		    const bool use_generic=false) : MetaschemaType(type_doc, use_generic) {}
+  /*!
+    @brief Constructor for ObjMetaschemaType from Python dictionary.
+    @param[in] pyobj PyObject* Python object.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+   */
+  ObjMetaschemaType(PyObject* pyobj,
+		    const bool use_generic=false) : MetaschemaType(pyobj, use_generic) {}
   /*!
     @brief Create a copy of the type.
     @returns pointer to new ObjMetaschemaType instance with the same data.
    */
-  ObjMetaschemaType* copy() const override { return (new ObjMetaschemaType()); }
+  ObjMetaschemaType* copy() const override { return (new ObjMetaschemaType(use_generic())); }
   /*!
     @brief Copy data wrapped in YggGeneric class.
     @param[in] data YggGeneric* Pointer to generic object.
@@ -1206,7 +1219,7 @@ public:
     int n_re_curve = 4;
     int n_re_curve2 = 2;
     int n_re_surf = 6;
-    char re_float[100] = "[[:digit:]]+\.[[:digit:]]+";
+    char re_float[100] = "[[:digit:]]+\\.[[:digit:]]+";
     char re_int[100] = "[[:digit:]]+";
     char re_matl[100] = "usemtl ([^\n]+)";
     char re_vert[500], re_vert_nocolor[500];

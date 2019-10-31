@@ -19,19 +19,32 @@ class PlyMetaschemaType : public MetaschemaType {
 public:
   /*!
     @brief Constructor for PlyMetaschemaType.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  PlyMetaschemaType() : MetaschemaType("ply") {}
+  PlyMetaschemaType(const bool use_generic=false) : MetaschemaType("ply", use_generic) {}
   /*!
     @brief Constructor for PlyMetaschemaType from a JSON type defintion.
     @param[in] type_doc rapidjson::Value rapidjson object containing the type
     definition from a JSON encoded header.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
    */
-  PlyMetaschemaType(const rapidjson::Value &type_doc) : MetaschemaType(type_doc) {}
+  PlyMetaschemaType(const rapidjson::Value &type_doc,
+		    const bool use_generic=false) : MetaschemaType(type_doc, use_generic) {}
+  /*!
+    @brief Constructor for PlyMetaschemaType from Python dictionary.
+    @param[in] pyobj PyObject* Python object.
+    @param[in] use_generic bool If true, serialized/deserialized
+    objects will be expected to be YggGeneric classes.
+   */
+  PlyMetaschemaType(PyObject* pyobj,
+		    const bool use_generic=false) : MetaschemaType(pyobj, use_generic) {}
   /*!
     @brief Create a copy of the type.
     @returns pointer to new PlyMetaschemaType instance with the same data.
    */
-  PlyMetaschemaType* copy() const override { return (new PlyMetaschemaType()); }
+  PlyMetaschemaType* copy() const override { return (new PlyMetaschemaType(use_generic())); }
   /*!
     @brief Copy data wrapped in YggGeneric class.
     @param[in] data YggGeneric* Pointer to generic object.

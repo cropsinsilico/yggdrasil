@@ -1320,7 +1320,8 @@ class CModelDriver(CompiledModelDriver):
         
     @classmethod
     def write_native_type_definition(cls, name, datatype, as_seri=False,
-                                     requires_freeing=None, no_decl=False):
+                                     requires_freeing=None, no_decl=False,
+                                     use_generic=False):
         r"""Get lines declaring the data type within the language.
 
         Args:
@@ -1333,6 +1334,9 @@ class CModelDriver(CompiledModelDriver):
             no_decl (bool, optional): If True, the variable is defined without
                 declaring it (assumes that variable has already been declared).
                 Defaults to False.
+            use_generic (bool, optional): If True variables serialized
+                and/or deserialized by the type will be assumed to be
+                generic objects. Defaults to False.
 
         Returns:
             list: Lines required to define a type definition.
@@ -1341,31 +1345,40 @@ class CModelDriver(CompiledModelDriver):
         out = []
         fmt = None
         keys = {}
+        if use_generic:
+            keys['use_generic'] = 'true'
+        else:
+            keys['use_generic'] = 'false'
         typename = datatype['type']
         if datatype['type'] == 'array':
+            keys['use_generic'] = 'true'
             if 'items' in datatype:
                 assert(isinstance(datatype['items'], list))
                 keys['nitems'] = len(datatype['items'])
                 keys['items'] = '%s_items' % name
-                fmt = 'create_dtype_json_array({nitems}, {items})'
+                fmt = ('create_dtype_json_array({nitems}, {items}, '
+                       '{use_generic})')
                 out += [('dtype_t** %s = '
                          '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
                         % (keys['items'], keys['nitems'])]
                 for i, x in enumerate(datatype['items']):
                     out += cls.write_native_type_definition(
                         '%s_items[%d]' % (name, i), x,
-                        requires_freeing=requires_freeing, no_decl=True)
+                        requires_freeing=requires_freeing, no_decl=True,
+                        use_generic=use_generic)
                 assert(isinstance(requires_freeing, list))
                 requires_freeing += [keys['items']]
             else:
-                fmt = 'create_dtype_empty()'
+                fmt = 'create_dtype_empty({use_generic})'
         elif datatype['type'] == 'object':
+            keys['use_generic'] = 'true'
             if 'properties' in datatype:
                 assert(isinstance(datatype['properties'], dict))
                 keys['nitems'] = len(datatype['properties'])
                 keys['keys'] = '%s_keys' % name
                 keys['values'] = '%s_vals' % name
-                fmt = 'create_dtype_json_object({nitems}, {keys}, {values})'
+                fmt = ('create_dtype_json_object({nitems}, {keys}, '
+                       '{values}, {use_generic})')
                 out += [('dtype_t** %s = '
                          '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
                         % (keys['values'], keys['nitems']),
@@ -1375,25 +1388,26 @@ class CModelDriver(CompiledModelDriver):
                     out += ['%s[%d] = \"%s\"' % (keys['keys'], i, k)]
                     out += cls.write_native_type_definition(
                         '%s[%d]' % (keys['values'], i), v,
-                        requires_freeing=requires_freeing)
+                        requires_freeing=requires_freeing,
+                        use_generic=use_generic)
                 assert(isinstance(requires_freeing, list))
                 requires_freeing += [keys['values'], keys['keys']]
             else:
-                fmt = 'create_dtype_empty()'
-        elif datatype['type'] == 'schema':
-            fmt = 'create_dtype_empty()'
+                fmt = 'create_dtype_empty({use_generic})'
         elif datatype['type'] in ['ply', 'obj']:
-            fmt = 'create_dtype_%s()' % datatype['type']
+            fmt = 'create_dtype_%s({use_generic})' % datatype['type']
         elif datatype['type'] == '1darray':
             fmt = ('create_dtype_1darray(\"{subtype}\", {precision}, {length}, '
-                   '\"{units}\")')
-            keys = {k: datatype[k] for k in ['subtype', 'precision']}
+                   '\"{units}\", {use_generic})')
+            for k in ['subtype', 'precision']:
+                keys[k] = datatype[k]
             keys['length'] = datatype.get('length', '0')
             keys['units'] = datatype.get('units', '')
         elif datatype['type'] == 'ndarray':
-            fmt = ('create_dtype_ndarray(\"{subtype}\", {precision}, {ndim}, {shape}, '
-                   '\"{units}\")')
-            keys = {k: datatype[k] for k in ['subtype', 'precision']}
+            fmt = ('create_dtype_ndarray(\"{subtype}\", {precision},'
+                   ' {ndim}, {shape}, \"{units}\", {use_generic})')
+            for k in ['subtype', 'precision']:
+                keys[k] = datatype[k]
             if 'shape' in datatype:
                 shape_var = '%s_shape' % name
                 out += ['size_t %s[%d] = {%s};' % (
@@ -1408,11 +1422,11 @@ class CModelDriver(CompiledModelDriver):
                 keys['shape'] = 'NULL'
             keys['units'] = datatype.get('units', '')
         elif datatype['type'] in ['boolean', 'null', 'number', 'integer']:
-            fmt = 'create_dtype_default(\"{type}\")'
-            keys = {'type': datatype['type']}
+            fmt = 'create_dtype_default(\"{type}\", {use_generic})'
+            keys['type'] = datatype['type']
         elif (typename == 'scalar') or (typename in _valid_types):
-            fmt = 'create_dtype_scalar(\"{subtype}\", {precision}, \"{units}\")'
-            keys = {}
+            fmt = ('create_dtype_scalar(\"{subtype}\", {precision}, '
+                   '\"{units}\", {use_generic})')
             keys['subtype'] = datatype.get('subtype', datatype['type'])
             keys['units'] = datatype.get('units', '')
             if keys['subtype'] in ['bytes', 'string', 'unicode']:
@@ -1421,14 +1435,20 @@ class CModelDriver(CompiledModelDriver):
                 keys['precision'] = datatype['precision']
             typename = 'scalar'
         elif (typename in ['class', 'function']):
-            fmt = 'create_dtype_pyobj(\"{type}\")'
-            keys = {'type': typename}
+            fmt = 'create_dtype_pyobj(\"{type}\", {use_generic})'
+            keys['type'] = typename
         elif typename == 'instance':
+            keys['use_generic'] = 'true'
             # fmt = 'create_dtype_pyinst(NULL, NULL)'
-            fmt = 'create_dtype_empty()'
+            fmt = 'create_dtype_empty({use_generic})'
+        elif typename == 'schema':
+            keys['use_generic'] = 'true'
+            fmt = 'create_dtype_schema({use_generic})'
         else:  # pragma: debug
             raise ValueError("Cannot create C version of type '%s'"
                              % typename)
+        # if keys['use_generic'] == 'true':
+        #     fmt = 'create_dtype_empty({use_generic})'
         if as_seri:
             def_line = ('seri_t* %s = init_serializer(\"%s\", %s);'
                         % (name, typename, fmt.format(**keys)))
