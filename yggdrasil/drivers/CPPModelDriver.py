@@ -62,11 +62,6 @@ class CPPModelDriver(CModelDriver):
     # To prevent inheritance
     default_compiler = None
     default_linker = None
-    type_map = dict(
-        CModelDriver.type_map,
-        array='std::vector<void*>',
-        object='std::map<char*,void*>',
-        schema='MetaschemaType')
     function_param = dict(
         CModelDriver.function_param,
         input='YggInput {channel}(\"{channel_name}\", {channel_type});',
@@ -190,7 +185,7 @@ class CPPModelDriver(CModelDriver):
 
     @classmethod
     def prepare_output_variables(cls, vars_list, in_definition=False,
-                                 in_inputs=False):
+                                 in_inputs=False, for_yggdrasil=False):
         r"""Concatenate a set of output variables such that it can be passed as
         a single string to the function_call parameter.
 
@@ -203,6 +198,9 @@ class CPPModelDriver(CModelDriver):
             in_inputs (bool, optional): If True, the output variables should
                 be formated to be included as input variables. Defaults to
                 False.
+            for_yggdrasil (bool, optional): If True, the variables will be
+                prepared in the formated expected by calls to yggdarsil
+                send/recv methods. Defaults to False.
 
         Returns:
             str: Concatentated variables list.
@@ -223,4 +221,5 @@ class CPPModelDriver(CModelDriver):
             # information that is added if in_definition is True.
             in_definition = False
         return super(CModelDriver, cls).prepare_output_variables(
-            vars_list, in_definition=in_definition, in_inputs=in_inputs)
+            vars_list, in_definition=in_definition, in_inputs=in_inputs,
+            for_yggdrasil=for_yggdrasil)

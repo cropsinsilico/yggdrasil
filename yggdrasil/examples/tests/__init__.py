@@ -223,8 +223,11 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
         r"""Run a test for the specified parameters."""
         if not tools.check_environ_bool('YGG_ENABLE_EXAMPLE_TESTS'):
             raise unittest.SkipTest("Example tests not enabled.")
-        if os.environ.get('YGG_TEST_LANGUAGE', None):  # pragma: debug
-            if (((os.environ['YGG_TEST_LANGUAGE'] != language)
+        test_language = os.environ.get('YGG_TEST_LANGUAGE', None)
+        if test_language == 'c++':
+            test_language = 'cpp'
+        if test_language:  # pragma: debug
+            if (((test_language != language)
                  and (language is not None))):
                 raise unittest.SkipTest("Tests for language %s not enabled."
                                         % language)
