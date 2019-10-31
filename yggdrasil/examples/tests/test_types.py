@@ -1,5 +1,6 @@
 import os
 import copy
+import pprint
 from yggdrasil.components import import_component
 from yggdrasil.languages import get_language_ext
 from yggdrasil.metaschema.datatypes import get_type_class
@@ -39,6 +40,29 @@ class TestExampleTypes(ExampleTstBase):
         testclass = typeclass.import_test_class()
         out = testclass._valid_decoded[0]
         return out
+
+    @classmethod
+    def check_received_data(cls, typename, x_recv):
+        r"""Check that the received message is equivalent to the
+        test data for the specified type.
+
+        Args:
+            typename (str): Name of datatype.
+            x_recv (object): Received object.
+
+        Raises:
+            AssertionError: If the received message is not equivalent
+                to the received message.
+
+        """
+        typeclass = get_type_class(typename)
+        testclass = typeclass.import_test_class()()
+        x_sent = cls.get_test_data(typename)
+        print('RECEIVED:')
+        pprint.pprint(x_recv)
+        print('EXPECTED:')
+        pprint.pprint(x_sent)
+        testclass.assert_result_equal(x_recv, x_sent)
 
     @classmethod
     def setup_model(cls, language, typename, language_ext=None,

@@ -127,7 +127,7 @@ public:
     PyObject *pyobj = NULL;
     dtype_t *src = (dtype_t*)(cobj->get_data());
     if (src != NULL) {
-      JSONObjectMetaschemaType* obj = static_cast<JSONObjectMetaschemaType*>(src->obj);
+      MetaschemaType* obj = (MetaschemaType*)(src->obj);
       if (obj != NULL) {
 	pyobj = obj->as_python_dict();
       }
@@ -148,7 +148,7 @@ public:
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) const override {
     dtype_t* arg = va_arg(ap.va, dtype_t*);
-    JSONObjectMetaschemaType* obj = static_cast<JSONObjectMetaschemaType*>(arg->obj);
+    MetaschemaType* obj = (MetaschemaType*)(arg->obj);
     (*nargs)--;
     return obj->encode_type(writer);
   }
@@ -184,16 +184,31 @@ public:
     dtype_t **p;
     if (allow_realloc) {
       p = va_arg(ap.va, dtype_t**);
+      dtype_t *temp = (dtype_t*)realloc(p[0], sizeof(dtype_t));
+      if (temp == NULL) {
+	ygglog_throw_error("SchemaMetaschemaType::decode_data: Failed to realloc variable.");
+      }
+      p[0] = temp;
       arg = *p;
     } else {
       arg = va_arg(ap.va, dtype_t*);
       p = &arg;
     }
     (*nargs)--;
-    arg = create_dtype_doc(&data, false);
-    if (arg == NULL) {
+    arg->type[0] = '\0';
+    arg->use_generic = false;
+    if (arg->obj != NULL) {
+      ygglog_throw_error("SchemaMetaschemaType::decode_data: Datatype has existing type.");
+    }
+    arg->obj = NULL;
+    MetaschemaType* obj = (MetaschemaType*)type_from_doc_c(&data, use_generic());
+    if (obj == NULL) {
       ygglog_throw_error("SchemaMetaschemaType::decode_data: Failed to decode type from JSON document.");
     }
+    arg->obj = obj;
+    arg->use_generic = obj->use_generic();
+    strncpy(arg->type, obj->type(), COMMBUFFSIZ);
+    display_dtype(arg, "");
     return true;
   }
 

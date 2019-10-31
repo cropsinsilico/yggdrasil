@@ -1,3 +1,5 @@
+import copy
+from yggdrasil.metaschema.datatypes import compare_schema
 from yggdrasil.metaschema.datatypes.tests import (
     test_JSONObjectMetaschemaType as parent)
 
@@ -12,7 +14,8 @@ class TestSchemaMetaschemaType(parent.TestJSONObjectMetaschemaType):
     def after_class_creation(cls):
         r"""Actions to be taken during class construction."""
         parent.TestJSONObjectMetaschemaType.after_class_creation(cls)
-        cls._value = cls._fulldef
+        cls._value = copy.deepcopy(cls._fulldef)
+        cls._value['type'] = 'object'
         cls._fulldef = {'type': 'schema'}
         cls._typedef = {'type': 'schema'}
         cls._valid_encoded = [cls._fulldef]
@@ -33,3 +36,7 @@ class TestSchemaMetaschemaType(parent.TestJSONObjectMetaschemaType):
                                    'type': 'scalar', 'subtype': 'float',
                                    'precision': 64}),
                                  ({}, {})]
+        
+    def assert_result_equal(self, x, y):
+        r"""Assert that serialized/deserialized objects equal."""
+        compare_schema(x, y)
