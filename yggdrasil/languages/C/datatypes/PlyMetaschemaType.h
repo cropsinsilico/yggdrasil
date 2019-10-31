@@ -101,6 +101,13 @@ public:
     display_ply_indent(arg, indent);
   }
   /*!
+    @brief Get the item size.
+    @returns size_t Size of item in bytes.
+   */
+  const size_t nbytes() const override {
+    return sizeof(ply_t);
+  }
+  /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */

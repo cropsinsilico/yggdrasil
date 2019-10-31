@@ -66,7 +66,7 @@ class TestExampleTypes(ExampleTstBase):
 
     @classmethod
     def setup_model(cls, language, typename, language_ext=None,
-                    using_pointers=False):
+                    using_pointers=False, using_generics=False):
         r"""Write the model file for the specified combination of
         language and type.
 
@@ -77,8 +77,12 @@ class TestExampleTypes(ExampleTstBase):
                 for the model file. If not provided, the extension is
                 determined from the specified language.
             using_pointers (bool, optional): If True and the tested
-                languages supports pointers, pointers will be used rather
+                language supports pointers, pointers will be used rather
                 than explicit arrays. Defaults to False.
+            using_generics (bool, optional): If True and the tested
+                language has a dedicated generic class, the generic
+                type will be used rather than explict types. Defaults
+                to False.
 
         Returns:
             str: Full path to the file that was written.
@@ -89,14 +93,18 @@ class TestExampleTypes(ExampleTstBase):
         modelfile = os.path.join(_example_dir, cls.example_name,
                                  'src', 'model' + language_ext)
         drv = import_component('model', language)
-        testdata = cls.get_test_data(typename)
-        testtype = encode_type(testdata)
+        if using_generics and drv.is_typed:
+            testtype = {'type': 'generic'}
+        else:
+            testdata = cls.get_test_data(typename)
+            testtype = encode_type(testdata)
+            using_generics = False
         inputs = [{'name': 'x', 'datatype': copy.deepcopy(testtype)}]
         outputs = [{'name': 'y', 'datatype': copy.deepcopy(testtype)}]
         # Write the model
         function_contents = []
         for i, o in zip(inputs, outputs):
-            if using_pointers:
+            if using_pointers and drv.is_typed:
                 for k in ['shape', 'length']:
                     i['datatype'].pop(k, None)
                     o['datatype'].pop(k, None)
@@ -115,7 +123,7 @@ class TestExampleTypes(ExampleTstBase):
         os.environ['TEST_LANGUAGE'] = language
         os.environ['TEST_LANGUAGE_EXT'] = language_ext
         os.environ['TEST_TYPENAME'] = typename
-        if language == 'c':
+        if language == 'c' and (not using_generics):
             in_vars = 'x'
             out_vars = 'y'
             if using_pointers:
@@ -125,7 +133,7 @@ class TestExampleTypes(ExampleTstBase):
                 elif typename in ['ndarray']:
                     in_vars += ', x_ndim, x_shape'
                     out_vars += ', y_ndim, y_shape'
-            elif typename in ['string', 'bytes']:
+            elif typename in ['string', 'bytes', 'unicode']:
                 in_vars += ', x_length'
                 out_vars += ', y_length'
             os.environ['TEST_MODEL_IO'] = (
@@ -148,3 +156,15 @@ class TestExampleTypes(ExampleTstBase):
         self._output_files = [self.setup_model(self.language,
                                                self.datatype)]
         super(TestExampleTypes, self).run_example()
+        drv = import_component('model', self.language)
+        if drv.is_typed:
+            # Version using generic type
+            self._output_files = [self.setup_model(self.language,
+                                                   self.datatype,
+                                                   using_generics=True)]
+            super(TestExampleTypes, self).run_example()
+            # Version using pointers
+            self._output_files = [self.setup_model(self.language,
+                                                   self.datatype,
+                                                   using_pointers=True)]
+            super(TestExampleTypes, self).run_example()

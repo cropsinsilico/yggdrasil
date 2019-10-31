@@ -179,7 +179,10 @@ public:
     case T_BOOLEAN: {
       bool arg = false;
       data->get_data(arg);
-      std::cout << arg << std::endl;
+      if (arg)
+	std::cout << "true" << std::endl;
+      else
+	std::cout << "false" << std::endl;
       return;
     }
     case T_INTEGER: {

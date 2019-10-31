@@ -322,7 +322,8 @@ class CModelDriver(CompiledModelDriver):
         'flag': 'int',
         'class': 'python_class_t',
         'function': 'python_function_t',
-        'instance': 'python_instance_t'}
+        'instance': 'python_instance_t',
+        'generic': 'generic_t'}
     function_param = {
         'import': '#include \"{filename}\"',
         'index': '{variable}[{index}]',
@@ -346,6 +347,7 @@ class CModelDriver(CompiledModelDriver):
         'init_class': 'init_python()',
         'init_function': 'init_python()',
         'init_instance': 'init_generic()',
+        'init_generic': 'init_generic()',
         'copy_array': '{name} = copy_vector({value});',
         'copy_object': '{name} = copy_map({value});',
         'copy_schema': '{name} = copy_schema({value});',
@@ -354,6 +356,7 @@ class CModelDriver(CompiledModelDriver):
         'copy_class': '{name} = copy_python({value});',
         'copy_function': '{name} = copy_python({value});',
         'copy_instance': '{name} = copy_generic({value});',
+        'copy_generic': '{name} = copy_generic({value});',
         'free_array': 'free_vector({variable});',
         'free_object': 'free_map({variable});',
         'free_schema': 'free_schema({variable});',
@@ -362,6 +365,7 @@ class CModelDriver(CompiledModelDriver):
         'free_class': 'destroy_python({variable});',
         'free_function': 'destroy_python({variable});',
         'free_instance': 'free_generic({variable});',
+        'free_generic': 'free_generic({variable});',
         'print_complex': 'print_complex({object});',
         'print_array': 'display_vector({object});',
         'print_object': 'display_map({object});',
@@ -371,6 +375,7 @@ class CModelDriver(CompiledModelDriver):
         'print_class': 'display_python({object});',
         'print_function': 'display_python({object});',
         'print_instance': 'display_generic({object});',
+        'print_generic': 'display_generic({object});',
         'assign': '{name} = {value};',
         'assign_copy': 'memcpy({name}, {value}, {N}*sizeof({native_type}));',
         'comment': '//',
@@ -719,7 +724,7 @@ class CModelDriver(CompiledModelDriver):
                                                    'bytes_t', 'unicode_t'])
                          and (not v.get('is_length_var', False))
                          and (v['datatype']['type'] not in
-                              ['object', 'array', 'schema',
+                              ['generic', 'object', 'array', 'schema',
                                'instance', '1darray', 'ndarray'])
                          and (cls.function_param['recv_function']
                               == cls.function_param['recv_heap']))):
@@ -1444,6 +1449,9 @@ class CModelDriver(CompiledModelDriver):
         elif typename == 'schema':
             keys['use_generic'] = 'true'
             fmt = 'create_dtype_schema({use_generic})'
+        elif typename == 'generic':
+            keys['use_generic'] = 'true'
+            fmt = 'create_dtype_empty({use_generic})'
         else:  # pragma: debug
             raise ValueError("Cannot create C version of type '%s'"
                              % typename)
@@ -1461,7 +1469,7 @@ class CModelDriver(CompiledModelDriver):
 
     @classmethod
     def write_channel_def(cls, key, datatype=None, requires_freeing=None,
-                          **kwargs):
+                          use_generic=False, **kwargs):
         r"""Write an channel declaration/definition.
 
         Args:
@@ -1470,6 +1478,9 @@ class CModelDriver(CompiledModelDriver):
                 Defaults to None and is ignored.
             requires_freeing (list, optional): List that variables requiring
                 freeing should be appended to. Defaults to None.
+            use_generic (bool, optional): If True variables serialized
+                and/or deserialized by the channel will be assumed to be
+                generic objects. Defaults to False.
             **kwargs: Additional keyword arguments are passed as parameters
                 to format_function_param.
 
@@ -1482,7 +1493,8 @@ class CModelDriver(CompiledModelDriver):
             kwargs['channel_type'] = '%s_type' % kwargs['channel']
             out += cls.write_native_type_definition(
                 kwargs['channel_type'], datatype,
-                requires_freeing=requires_freeing)
+                requires_freeing=requires_freeing,
+                use_generic=use_generic)
         out += super(CModelDriver, cls).write_channel_def(key, datatype=datatype,
                                                           **kwargs)
         return out

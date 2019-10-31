@@ -205,7 +205,7 @@ public:
     if (data == NULL) {
       ygglog_throw_error("ScalarMetaschemaType::display_generic: Generic object is NULL.");
     }
-    size_t bytes_precision = data->get_nbytes();
+    size_t bytes_precision = (data->get_nbytes())/(data->get_nelements());
     std::cout << indent;
     switch (subtype_code_) {
     case T_INT: {
@@ -304,8 +304,8 @@ public:
 	std::cout << std::endl;
 	return;
       } else {
-	ygglog_error("ScalarMetaschemaType::display_generic: Unsupported float precision '%lu'.",
-		     precision_);
+	ygglog_error("ScalarMetaschemaType::display_generic: Unsupported float precision '%lu bit' (%lu bytes).",
+		     precision_, bytes_precision);
 	return;
       }
       break;
