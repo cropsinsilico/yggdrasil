@@ -944,6 +944,10 @@ public:
     // Parse body
     rapidjson::Document body_doc;
     body_doc.Parse(buf, buf_siz);
+    if (x->get_data() != NULL) {
+      ygglog_info("MetaschemaType::deserialize: The generic object where deserialized results are to be stored already contains information. Freeing it.");
+      x->free_data();
+    }
     bool out = decode_data(body_doc, x);
     if (!(out)) {
       ygglog_error("MetaschemaType::deserialize: One or more errors while parsing body.");

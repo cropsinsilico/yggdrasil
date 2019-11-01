@@ -190,9 +190,17 @@ public:
     dtype_t **p;
     if (allow_realloc) {
       p = va_arg(ap.va, dtype_t**);
+      bool new_obj = false;
+      if (p[0] == NULL)
+	new_obj = true;
       dtype_t *temp = (dtype_t*)realloc(p[0], sizeof(dtype_t));
       if (temp == NULL) {
 	ygglog_throw_error("SchemaMetaschemaType::decode_data: Failed to realloc variable.");
+      }
+      if (new_obj) {
+	temp->type[0] = '\0';
+	temp->use_generic = false;
+	temp->obj = NULL;
       }
       p[0] = temp;
       arg = *p;
@@ -204,7 +212,9 @@ public:
     arg->type[0] = '\0';
     arg->use_generic = false;
     if (arg->obj != NULL) {
-      ygglog_throw_error("SchemaMetaschemaType::decode_data: Datatype has existing type.");
+      ygglog_info("SchemaMetaschemaType::decode_data: Datatype has existing type. Deleting.");
+      MetaschemaType* old_obj = (MetaschemaType*)(arg->obj);
+      delete old_obj;
     }
     arg->obj = NULL;
     MetaschemaType* obj = (MetaschemaType*)type_from_doc_c(&data, use_generic());
