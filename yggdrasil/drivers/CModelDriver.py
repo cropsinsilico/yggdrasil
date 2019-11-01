@@ -1036,7 +1036,8 @@ class CModelDriver(CompiledModelDriver):
         if var.get('allow_realloc', False):
             type_name += '*'
             var = dict(var, native_type=type_name)
-        if type_name.endswith('*'):
+        if ((type_name.endswith('*')
+             or (type_name in ['bytes_t', 'string_t', 'unicode_t']))):
             kwargs.get('requires_freeing', []).append(var)
             kwargs.setdefault('value', 'NULL')
         elif var.get('is_length_var', False):
