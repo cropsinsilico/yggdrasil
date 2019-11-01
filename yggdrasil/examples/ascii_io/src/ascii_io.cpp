@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <complex>
 // Include interface methods
 #include "YggInterface.hpp"
 
@@ -64,26 +63,24 @@ int main(int argc,char *argv[]){
     name_siz = BSIZE;  // Reset to buffer size
 
     // Receive a single row with values stored in scalars declared locally
-    //ret = yggRecv(TableInput.pi(), &name, &name_siz, &number, &value, &comp);
     ret = TableInput.recv(5, &name, &name_siz, &number, &value, &comp);
     name_siz = strlen(name);
     if (ret >= 0) {
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
       printf("Table: %.5s, %d, %3.1f, %3.1lf%+3.1lfj\n", name, number, value,
-	     std::real(comp), std::imag(comp));
+  	     std::real(comp), std::imag(comp));
       ret = TableOutput.send(5, name, name_siz, number, value, comp);
       if (ret < 0) {
-	printf("ascii_io(CPP): ERROR SENDING ROW\n");
-	error_code = -1;
-	break;
+      	printf("ascii_io(CPP): ERROR SENDING ROW\n");
+      	error_code = -1;
+      	break;
       }
       name_siz = BSIZE;
     } else {
       // If the receive was not succesful, send the end-of-file message to
       // close the output file.
       printf("End of table input (CPP)\n");
-      // TableOutput.send_eof();
     }
   }
 
@@ -98,20 +95,20 @@ int main(int argc,char *argv[]){
   std::complex<double> *comp_arr = NULL;
   ret = 0;
   while (ret >= 0) {
-    ret = ArrayInput.recv(5, &nrows, &name_arr, &number_arr, &value_arr, &comp_arr);
+    ret = ArrayInput.recvRealloc(5, &nrows, &name_arr, &number_arr, &value_arr, &comp_arr);
     if (ret >= 0) {
       printf("Array: (%lu rows)\n", nrows);
       // Print each line in the array
       for (size_t i = 0; i < nrows; i++)
-	printf("%.5s, %ld, %3.1f, %3.1lf%+3.1lfj\n", &name_arr[5*i], number_arr[i],
-	       value_arr[i], std::real(comp_arr[i]), std::imag(comp_arr[i]));
+  	printf("%.5s, %ld, %3.1f, %3.1lf%+3.1lfj\n", &name_arr[5*i], number_arr[i],
+  	       value_arr[i], std::real(comp_arr[i]), std::imag(comp_arr[i]));
       // Send the columns in the array to output. Formatting is handled on the
       // output driver side.
       ret = ArrayOutput.send(5, nrows, name_arr, number_arr, value_arr, comp_arr);
       if (ret < 0) {
-	printf("ascii_io(CPP): ERROR SENDING ARRAY\n");
-	error_code = -1;
-	break;
+  	printf("ascii_io(CPP): ERROR SENDING ARRAY\n");
+  	error_code = -1;
+  	break;
       }
     } else {
       printf("End of array input (C++)\n"); 

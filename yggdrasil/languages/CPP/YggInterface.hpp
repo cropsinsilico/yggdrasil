@@ -226,7 +226,7 @@ public:
   int send(const int nargs, ...) {
     va_list_t va;
     va_start(va.va, nargs);
-    int ret = vyggSend(_pi, nargs, va);
+    int ret = vyggSend(_pi, (size_t)nargs, va);
     va_end(va.va);
     return ret;
   }

@@ -120,6 +120,7 @@ public:
   virtual void display(const char* indent="") const {
     printf("%s%-15s = %s\n", indent, "type", type_);
     printf("%s%-15s = %d\n", indent, "type_code", type_code_);
+    printf("%s%-15s = %d\n", indent, "use_generic", use_generic_);
   }
   /*!
     @brief Get type information as a Python dictionary.

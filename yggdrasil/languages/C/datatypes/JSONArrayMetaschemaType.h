@@ -33,7 +33,7 @@ public:
 			  const char *format_str = "",
 			  const bool use_generic=true) :
     // Always generic
-    MetaschemaType("array", true) {
+    MetaschemaType("array", use_generic) {
     strncpy(format_str_, format_str, 1000);
     update_items(items, true);
   }
@@ -50,7 +50,7 @@ public:
 			  const char *format_str = "",
 			  const bool use_generic=true) :
     // Always generic
-    MetaschemaType(type_doc, true) {
+    MetaschemaType(type_doc, use_generic) {
     strncpy(format_str_, format_str, 1000);
     if (!(type_doc.HasMember("items")))
       ygglog_throw_error("JSONArrayMetaschemaType: Items missing.");
@@ -77,7 +77,7 @@ public:
    */
   JSONArrayMetaschemaType(PyObject* pyobj, const bool use_generic=true) :
     // Always generic
-    MetaschemaType(pyobj, true) {
+    MetaschemaType(pyobj, use_generic) {
     PyObject* pyitems = get_item_python_dict(pyobj, "items",
   					     "JSONArrayMetaschemaType: items: ",
   					     T_ARRAY);
@@ -145,7 +145,10 @@ public:
   void display(const char* indent="") const override {
     MetaschemaType::display(indent);
     if (strlen(format_str_) > 0) {
-      printf("%sformat_str = %s\n", indent, format_str_);
+      printf("%s%-15s = %s\n", indent, "format_str", format_str_);
+    }
+    if (all_arrays()) {
+      printf("%s%-15s = %s\n", indent, "all_arrays", "true");
     }
     printf("%s%lu Elements\n", indent, items_.size());
     char new_indent[100] = "";
@@ -353,8 +356,6 @@ public:
    */
   size_t nargs_exp() const override {
     size_t nargs = 0;
-    if (all_arrays())
-      nargs++; // For the number of rows
     size_t i;
     for (i = 0; i < items_.size(); i++) {
       nargs = nargs + items_[i]->nargs_exp();

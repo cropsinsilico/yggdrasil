@@ -1456,7 +1456,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
   */
   void display(const char* indent="") const override {
     ScalarMetaschemaType::display(indent);
-    printf("%s%-15s = %lu\n", "length", indent, length_);
+    printf("%s%-15s = %lu\n", indent, "length", length_);
   }
   /*!
     @brief Get type information as a Python dictionary.

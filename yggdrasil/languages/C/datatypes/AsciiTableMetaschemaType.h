@@ -106,8 +106,8 @@ public:
   */
   void display(const char* indent="") const override {
     MetaschemaType::display(indent);
-    printf("%s%-15s = %s\n", "format_str", indent, format_str());
-    printf("%s%-15s = %d\n", "as_array", indent, as_array_);
+    printf("%s%-15s = %s\n", indent, "format_str", format_str());
+    printf("%s%-15s = %d\n", indent, "as_array", as_array_);
   }
   /*!
     @brief Get type information as a Python dictionary.
