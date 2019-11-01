@@ -64,7 +64,8 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         return obj
 
     @classmethod
-    def coerce_type(cls, obj, typedef=None, key_order=None, **kwargs):
+    def coerce_type(cls, obj, typedef=None, key_order=None,
+                    dont_wrap_single=False, **kwargs):
         r"""Coerce objects of specific types to match the data type.
 
         Args:
@@ -73,6 +74,9 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
                 coerced to. Defaults to None.
             key_order (list, optional): Order that keys from a dictionary should
                 be used to compose an array. Defaults to None.
+            dont_wrap_single (bool, optional): If True, single element
+                data types will not attempt to wrap input object in
+                additional list. Defaults to False.
             **kwargs: Additional keyword arguments are metadata entries that may
                 aid in coercing the type.
 
@@ -93,12 +97,17 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
                 obj = dict2list(obj, order=key_order)
             else:
                 obj = [obj]
-        elif isinstance(typedef, dict) and (len(typedef.get('items', [])) == 1):
+        elif ((isinstance(typedef, dict) and (not dont_wrap_single)
+               and (len(typedef.get('items', [])) == 1))):
             typedef_validated = kwargs.get('typedef_validated', False)
-            if cls.check_decoded([obj], typedef,
+            try_obj = cls.coerce_type([obj], typedef=typedef,
+                                      key_order=key_order,
+                                      dont_wrap_single=True, **kwargs)
+            if cls.check_decoded(try_obj, typedef,
                                  typedef_validated=typedef_validated):
-                obj = [obj]
-        return obj
+                obj = try_obj
+        return super(JSONArrayMetaschemaType, cls).coerce_type(
+            obj, typedef=typedef, **kwargs)
 
     @classmethod
     def _iterate(cls, container):

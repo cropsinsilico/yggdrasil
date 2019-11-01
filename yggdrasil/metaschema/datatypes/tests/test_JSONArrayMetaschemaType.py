@@ -19,6 +19,7 @@ def test_coerce():
     key_order = ['a']
     msg_recv = [np.zeros(3, 'float64')]
     msg_send_list = [msg_recv[0],
+                     np.zeros(3, 'float32'),
                      serialize.list2numpy(msg_recv, names=key_order),
                      serialize.list2pandas(msg_recv, names=key_order),
                      serialize.list2dict(msg_recv, names=key_order)]

@@ -167,6 +167,39 @@ class ContainerMetaschemaType(MetaschemaType):
         return container
 
     @classmethod
+    def coerce_type(cls, obj, typedef=None, **kwargs):
+        r"""Coerce objects of specific types to match the data type.
+
+        Args:
+            obj (object): Object to be coerced.
+            typedef (dict, optional): Type defintion that object should be
+                coerced to. Defaults to None.
+            **kwargs: Additional keyword arguments are metadata entries that may
+                aid in coercing the type.
+
+        Returns:
+            object: Coerced object.
+
+        Raises:
+            RuntimeError: If obj is a dictionary, but key_order is not provided.
+
+        """
+        if not (isinstance(typedef, dict)
+                and isinstance(typedef.get(cls._json_property, None),
+                               cls.python_types)
+                and isinstance(obj, cls.python_types)):
+            return obj
+        map_typedef = typedef[cls._json_property]
+        map_out = cls._container_type()
+        for k, v in cls._iterate(map_typedef):
+            if not cls._has_element(obj, k):
+                return obj
+            cls._assign(map_out, k,
+                        get_type_class(v['type']).coerce_type(
+                            obj[k], typedef=v))
+        return map_out
+        
+    @classmethod
     def extract_typedef(cls, metadata):
         r"""Extract the minimum typedef required for this type from the provided
         metadata.

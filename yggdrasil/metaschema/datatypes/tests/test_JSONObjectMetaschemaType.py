@@ -19,7 +19,8 @@ def test_coerce():
     x = JSONObjectMetaschemaType(**typedef)
     key_order = ['a']
     msg_recv = {'a': np.zeros(3, 'float64')}
-    msg_send_list = [serialize.dict2numpy(msg_recv, order=key_order),
+    msg_send_list = [{'a': np.zeros(3, 'float32')},
+                     serialize.dict2numpy(msg_recv, order=key_order),
                      serialize.dict2pandas(msg_recv, order=key_order),
                      serialize.dict2list(msg_recv, order=key_order)]
 
