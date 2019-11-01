@@ -97,8 +97,10 @@ def requires_language(language, installed=True):
 
     """
     drv = import_component('model', language)
-    test_language = os.environ.get('YGG_TEST_LANGUAGE', None).lower()
-    
+    test_language = os.environ.get('YGG_TEST_LANGUAGE', None)
+    if test_language is not None:
+        test_language = test_language.lower()
+        
     def wrapper(function):
         skips = []
         if installed is True:
