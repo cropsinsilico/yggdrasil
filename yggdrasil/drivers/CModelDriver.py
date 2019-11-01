@@ -2,6 +2,7 @@ import os
 import re
 import copy
 import shutil
+import pprint
 import subprocess
 import numpy as np
 import sysconfig
@@ -233,6 +234,10 @@ class MSVCArchiver(ArchiverBase):
     output_key = '/OUT:%s'
     
 
+print('get_paths')
+pprint.pprint(sysconfig.get_paths())
+print('get_config_vars')
+pprint.pprint(sysconfig.get_config_vars())
 _top_lang_dir = get_language_dir('c')
 _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
