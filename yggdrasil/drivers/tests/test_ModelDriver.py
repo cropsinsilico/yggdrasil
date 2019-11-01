@@ -212,7 +212,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             return
         test_vals = self.get_test_types()
         for a, b in test_vals:
-            self.import_cls.write_declaration('test', datatype=a)
+            self.import_cls.write_declaration({'name': 'test',
+                                               'datatype': a})
 
     def test_write_model_wrapper(self):
         r"""Test writing a model based on yaml parameters."""
@@ -291,7 +292,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                         'datatype': 'flag',
                         'value': self.import_cls.function_param['true']}
             function_contents = self.import_cls.write_assign_to_output(
-                'x', 'y',
+                'y', 'x',
                 outputs_in_inputs=outputs_in_inputs)
             definition = self.import_cls.write_function_def(
                 'test_function', inputs=inputs, outputs=outputs,
@@ -313,9 +314,9 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             lines = []
             if 'declare' in self.import_cls.function_param:
                 for x in inputs + outputs:
-                    lines.append(self.import_cls.write_declaration(**x))
+                    lines += self.import_cls.write_declaration(x)
                 if outputs_in_inputs:
-                    lines.append(self.import_cls.write_declaration(**flag_var))
+                    lines += self.import_cls.write_declaration(flag_var)
             for x in inputs:
                 lines.append(self.import_cls.format_function_param(
                     'assign', **x))

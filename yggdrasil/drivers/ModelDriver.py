@@ -1581,7 +1581,8 @@ class ModelDriver(Driver):
                                                    allow_failure=True)
         # Call model
         loop_lines += cls.write_model_function_call(
-            model_function, model_flag, inputs, outputs)
+            model_function, model_flag, inputs, outputs,
+            outputs_in_inputs=outputs_in_inputs)
         # Send outputs
         for x in outputs:
             if not x.get('outside_loop', False):
@@ -2052,11 +2053,13 @@ checking if the model flag indicates
             list: Lines completing the function call.
 
         """
-
         if outputs_in_inputs:
             inputs = inputs + [cls.prepare_output_variables(
                 outputs, in_inputs=outputs_in_inputs)]
-            outputs = [kwargs.get('flag_var', 'flag')]
+            flag_var = kwargs.get('flag_var', None)
+            if flag_var is None:
+                flag_var = 'flag'
+            outputs = [flag_var]
         if 'output_var' in kwargs:
             nout = len(cls.split_variables(kwargs['output_var']))
         else:

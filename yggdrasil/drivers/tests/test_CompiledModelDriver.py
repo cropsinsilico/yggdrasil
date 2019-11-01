@@ -159,10 +159,13 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
     
     def test_build(self):
         r"""Test building libraries as a shared/static library or object files."""
-        self.import_cls.compile_dependencies(libtype='shared', overwrite=True)
-        self.import_cls.compile_dependencies(libtype='object', overwrite=True)
-        self.import_cls.compile_dependencies(libtype='static', overwrite=True)
-        self.import_cls.compile_dependencies(libtype='shared', overwrite=False)
+        for libtype in ['shared', 'object', 'static']:
+            self.import_cls.compile_dependencies(
+                libtype=libtype, overwrite=True)
+            if libtype == 'shared':
+                self.import_cls.compile_dependencies(
+                    libtype=libtype, overwrite=False)
+            self.import_cls.cleanup_dependencies(libtype=libtype)
 
     def test_get_tool(self):
         r"""Test other methods of calling get_tool."""

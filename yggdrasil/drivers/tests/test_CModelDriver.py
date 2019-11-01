@@ -51,7 +51,10 @@ class TestCModelDriverNoInit(TestCModelParam,
                 out[i] = (knew, vnew)
             elif 'X' in v:
                 knew = {'type': k, 'precision': 64}
-                vnew = v.replace('X', '64')
+                if k == 'complex':
+                    vnew = v.replace('X', 'float')
+                else:
+                    vnew = v.replace('X', '64')
                 out[i] = (knew, vnew)
         return out
     

@@ -623,14 +623,6 @@ class CModelDriver(CompiledModelDriver):
         """
         out = super(CModelDriver, cls).parse_function_definition(
             model_file, model_function, **kwargs)
-        outputs_in_inputs = kwargs.get('outputs_in_inputs', cls.outputs_in_inputs)
-        if not outputs_in_inputs:
-            assert(not out.get('outputs', []))
-            flag_output = {
-                'name': out.pop('flag_var'),
-                'native_type': out.pop('flag_type').replace(' ', '')}
-            flag_output['datatype'] = cls.get_json_type(flag_output['native_type'])
-            out['outputs'] = [flag_output]
         # Check for length variables
         for io in ['inputs', 'outputs']:
             io_map = {x['name']: x for x in out.get(io, [])}
@@ -1433,9 +1425,6 @@ class CModelDriver(CompiledModelDriver):
                 keys['ndim'] = 0
                 keys['shape'] = 'NULL'
             keys['units'] = datatype.get('units', '')
-        elif datatype['type'] in ['boolean', 'null', 'number', 'integer']:
-            fmt = 'create_dtype_default(\"{type}\", {use_generic})'
-            keys['type'] = datatype['type']
         elif (typename == 'scalar') or (typename in _valid_types):
             fmt = ('create_dtype_scalar(\"{subtype}\", {precision}, '
                    '\"{units}\", {use_generic})')
@@ -1446,6 +1435,10 @@ class CModelDriver(CompiledModelDriver):
             else:
                 keys['precision'] = datatype['precision']
             typename = 'scalar'
+        elif datatype['type'] in ['boolean', 'null', 'number',
+                                  'integer', 'string']:
+            fmt = 'create_dtype_default(\"{type}\", {use_generic})'
+            keys['type'] = datatype['type']
         elif (typename in ['class', 'function']):
             fmt = 'create_dtype_pyobj(\"{type}\", {use_generic})'
             keys['type'] = typename
