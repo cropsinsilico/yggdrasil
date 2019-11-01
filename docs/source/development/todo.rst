@@ -58,6 +58,8 @@ New feature/example
 * Add comm for using files as temporary storage in passing information between models
 * Run connections on separate processes instead of threads
 * Assign meanings to error codes and implement across languages
+* Add parameters constraining valid values for inputs/outputs (e.g. range) using JSON paramaters
+* Add properties to C/C++
 
 Deprecation
 -----------

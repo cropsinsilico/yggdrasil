@@ -223,8 +223,6 @@ class CPPModelDriver(CModelDriver):
                             or (for_yggdrasil
                                 and (y.get('is_length_var', False)))):
                         y['name'] = '&' + y['name']
-                    if 'shape' in y.get('datatype', {}):
-                        y['name'] += len(y['datatype']['shape']) * '[0]'
         else:
             # If the output is a True output and not passed as an input
             # parameter, then the output should not include the type
