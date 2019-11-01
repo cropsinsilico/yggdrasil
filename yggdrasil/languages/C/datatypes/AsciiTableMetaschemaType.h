@@ -64,6 +64,13 @@ public:
     table_[0] = asciiTable("seri", "0", format_str, NULL, NULL, NULL);
   }
   /*!
+    @brief Copy constructor.
+    @param[in] other AsciiTableMetaschemaType* Instance to copy.
+   */
+  AsciiTableMetaschemaType(const AsciiTableMetaschemaType &other) :
+    AsciiTableMetaschemaType(other.format_str(), other.as_array(),
+			     other.use_generic()) {}
+  /*!
     @brief Destructor for AsciiTableMetaschemaType.
     Free the table structure created during constructor.
    */

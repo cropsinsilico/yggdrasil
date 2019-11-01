@@ -71,6 +71,12 @@ public:
     update_type(ctype);
   }
   /*!
+    @brief Copy constructor.
+    @param[in] other MetaschemaType* Instance to copy.
+   */
+  MetaschemaType(const MetaschemaType &other) :
+    MetaschemaType(other.type(), other.use_generic()) {}
+  /*!
     @brief Destructor for MetaschemaType.
     Free the type string malloc'd during constructor.
    */
@@ -131,7 +137,7 @@ public:
     @param[in] data YggGeneric* Pointer to generic object.
     @returns void* Pointer to copy of data.
    */
-  virtual void* copy_generic(YggGeneric* data, void* orig_data=NULL) const {
+  virtual void* copy_generic(const YggGeneric* data, void* orig_data=NULL) const {
     if (data == NULL) {
       ygglog_throw_error("MetaschemaType::copy_generic: Generic object is NULL.");
     }
@@ -169,11 +175,11 @@ public:
     @param[in] data YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  virtual void display_generic(YggGeneric* data, const char* indent="") const {
+  virtual void display_generic(const YggGeneric* data, const char* indent="") const {
     if (data == NULL) {
       ygglog_throw_error("MetaschemaType::display_generic: Generic object is NULL.");
     }
-    MetaschemaType* data_type = data->get_type();
+    const MetaschemaType* data_type = data->get_type();
     std::cout << indent;
     switch (data_type->type_code()) {
     case T_BOOLEAN: {
@@ -965,26 +971,33 @@ YggGeneric::YggGeneric(const MetaschemaType* in_type, void* in_data, size_t in_n
   }
 };
 
+YggGeneric::YggGeneric(const YggGeneric &other) :
+  YggGeneric(other.get_type(), other.get_data(), other.get_nbytes()) {};
+
 YggGeneric::~YggGeneric() {
   free_data();
   data = NULL;
-  delete type;
-  type = NULL;
+  if (type != NULL) {
+    delete type;
+    type = NULL;
+  }
 };
 
-void YggGeneric::display(const char* indent) {
+void YggGeneric::display(const char* indent) const {
   type->display_generic(this, indent);
 };
 
-void* YggGeneric::copy_data(void* orig_data) {
+void* YggGeneric::copy_data(void* orig_data) const {
   return type->copy_generic(this, orig_data);
 };
 
 void YggGeneric::free_data() {
-  type->free_generic(this);
+  if ((data != NULL) && (type != NULL)) {
+    type->free_generic(this);
+  }
 };
 
-YggGeneric* YggGeneric::copy() {
+YggGeneric* YggGeneric::copy() const {
   YggGeneric* out = new YggGeneric();
   // Bytes must be set before data to allow copy to work correctly
   out->set_type(type);
@@ -997,7 +1010,7 @@ void YggGeneric::set_type(const MetaschemaType* new_type) {
   type = new_type->copy();
 };
 
-MetaschemaType* YggGeneric::get_type() {
+MetaschemaType* YggGeneric::get_type() const {
   return type;
 };
 
@@ -1005,7 +1018,7 @@ void YggGeneric::set_nbytes(size_t new_nbytes) {
   nbytes = new_nbytes;
 };
 
-size_t YggGeneric::get_nbytes() {
+size_t YggGeneric::get_nbytes() const {
   return nbytes;
 };
 
@@ -1013,7 +1026,7 @@ size_t* YggGeneric::get_nbytes_pointer() {
   return &nbytes;
 };
 
-size_t YggGeneric::get_nelements() {
+size_t YggGeneric::get_nelements() const {
   try {
     return type->nelements();
   } catch(...) {
@@ -1026,7 +1039,7 @@ void YggGeneric::set_data(void* new_data) {
   data = copy_data(new_data);
 };
 
-void* YggGeneric::get_data() {
+void* YggGeneric::get_data() const {
   return data;
 };
 
@@ -1035,7 +1048,7 @@ void** YggGeneric::get_data_pointer() {
 };
 
 template <typename T>
-void YggGeneric::get_data(T* obj, size_t nelements, bool is_char) {
+void YggGeneric::get_data(T* obj, size_t nelements, bool is_char) const {
   size_t obj_size = nelements * sizeof(T);
   bool check = false;
   if (is_char) {
@@ -1051,7 +1064,7 @@ void YggGeneric::get_data(T* obj, size_t nelements, bool is_char) {
 };
 
 template <typename T>
-void YggGeneric::get_data(T &obj) {
+void YggGeneric::get_data(T &obj) const {
   if (nbytes != sizeof(T)) {
     ygglog_throw_error("YggGeneric::get_data: There are %d elements in the data, but this call signature returns one (provided type has size %d bytes, but object stores %d bytes).", nbytes/sizeof(T),
 		       sizeof(T), nbytes);
@@ -1061,7 +1074,7 @@ void YggGeneric::get_data(T &obj) {
 };
 
 template <typename T>
-void YggGeneric::get_data_realloc(T** obj, size_t* nelements) {
+void YggGeneric::get_data_realloc(T** obj, size_t* nelements) const {
   T* new_obj = (T*)realloc(obj[0], nbytes);
   if (new_obj == NULL) {
     ygglog_throw_error("YggGeneric::get_data_realloc: Failed to reallocated input variables.");
@@ -1073,7 +1086,7 @@ void YggGeneric::get_data_realloc(T** obj, size_t* nelements) {
   get_data(obj[0], nbytes/sizeof(T));
 };
 
-void YggGeneric::get_data(char* obj, size_t nelements) {
+void YggGeneric::get_data(char* obj, size_t nelements) const {
   get_data(obj, nelements, true);
 };
 

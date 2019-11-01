@@ -134,6 +134,13 @@ public:
       _variable_precision = false;
   }
   /*!
+    @brief Copy constructor.
+    @param[in] other ScalarMetaschemaType* Instance to copy.
+   */
+  ScalarMetaschemaType(const ScalarMetaschemaType &other) :
+    ScalarMetaschemaType(other.subtype(), other.precision(),
+			 other.units(), other.use_generic()) {}
+  /*!
     @brief Destructor for ScalarMetaschemaType.
     Free the type string malloc'd during constructor.
    */
@@ -200,7 +207,7 @@ public:
     @param[in] data YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* data, const char* indent="") const override {
+  void display_generic(const YggGeneric* data, const char* indent="") const override {
     int i;
     if (data == NULL) {
       ygglog_throw_error("ScalarMetaschemaType::display_generic: Generic object is NULL.");
@@ -1260,6 +1267,11 @@ public:
    */
   NDArrayMetaschemaType(PyObject* pyobj, const bool use_generic=false);
   /*!
+    @brief Copy constructor.
+    @param[in] other NDArrayMetaschemaType* Instance to copy.
+   */
+  NDArrayMetaschemaType(const NDArrayMetaschemaType &other);
+  /*!
     @brief Equivalence operator.
     @param[in] Ref MetaschemaType instance to compare against.
     @returns bool true if the instance is equivalent, false otherwise.
@@ -1408,6 +1420,14 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     else
       _variable_length = false;
   }
+  /*!
+    @brief Copy constructor.
+    @param[in] other OneDArrayMetaschemaType* Instance to copy.
+   */
+  OneDArrayMetaschemaType(const OneDArrayMetaschemaType &other) :
+    OneDArrayMetaschemaType(other.subtype(), other.precision(),
+			    other.length(), other.units(),
+			    other.use_generic()) {}
   /*!
     @brief Equivalence operator.
     @param[in] Ref MetaschemaType instance to compare against.
@@ -1626,6 +1646,10 @@ NDArrayMetaschemaType::NDArrayMetaschemaType(PyObject* pyobj,
     _variable_shape = false;
   }
 };
+NDArrayMetaschemaType::NDArrayMetaschemaType(const NDArrayMetaschemaType &other) :
+  NDArrayMetaschemaType(other.subtype(), other.precision(),
+			other.shape(), other.units(),
+			other.use_generic()) {};
 bool NDArrayMetaschemaType::operator==(const MetaschemaType &Ref) const {
   if (!(ScalarMetaschemaType::operator==(Ref)))
     return false;

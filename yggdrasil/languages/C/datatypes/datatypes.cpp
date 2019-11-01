@@ -484,8 +484,8 @@ extern "C" {
 
   int destroy_generic(generic_t* x) {
     int ret = 0;
-    x->prefix = ' ';
     if (x != NULL) {
+      x->prefix = ' ';
       if (x->obj != NULL) {
 	try {
 	  YggGeneric* obj = (YggGeneric*)(x->obj);

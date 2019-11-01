@@ -41,6 +41,12 @@ public:
     // Always generic
     MetaschemaType(pyobj, true) {} 
   /*!
+    @brief Copy constructor.
+    @param[in] other SchemaMetaschemaType* Instance to copy.
+   */
+  SchemaMetaschemaType(const SchemaMetaschemaType &other) :
+    SchemaMetaschemaType(other.use_generic()) {}
+  /*!
     @brief Create a copy of the type.
     @returns pointer to new SchemaMetaschemaType instance with the same data.
    */
@@ -50,7 +56,7 @@ public:
     @param[in] data YggGeneric* Pointer to generic object.
     @returns void* Pointer to copy of data.
    */
-  void* copy_generic(YggGeneric* data, void* orig_data=NULL) const override {
+  void* copy_generic(const YggGeneric* data, void* orig_data=NULL) const override {
     if (data == NULL) {
       ygglog_throw_error("SchemaMetaschemaType::copy_generic: Generic object is NULL.");
     }
@@ -86,7 +92,7 @@ public:
     @param[in] data YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* data, const char* indent="") const override {
+  void display_generic(const YggGeneric* data, const char* indent="") const override {
     if (data == NULL) {
       ygglog_throw_error("SchemaMetaschemaType::display_generic: Generic object is NULL.");
     }

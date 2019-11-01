@@ -95,6 +95,13 @@ public:
     update_properties(properties, true);
   }
   /*!
+    @brief Copy constructor.
+    @param[in] other JSONObjectMetaschemaType* Instance to copy.
+   */
+  JSONObjectMetaschemaType(const JSONObjectMetaschemaType &other) :
+    JSONObjectMetaschemaType(other.properties(),
+			     other.use_generic()) {}
+  /*!
     @brief Destructor for JSONObjectMetaschemaType.
     Free the type string malloc'd during constructor.
    */
@@ -172,7 +179,7 @@ public:
     @param[in] data YggGeneric* Pointer to generic object.
     @returns void* Pointer to copy of data.
    */
-  void* copy_generic(YggGeneric* data, void* orig_data=NULL) const override {
+  void* copy_generic(const YggGeneric* data, void* orig_data=NULL) const override {
     if (data == NULL) {
       ygglog_throw_error("JSONObjectMetaschemaType::copy_generic: Generic object is NULL.");
     }
@@ -214,7 +221,7 @@ public:
     @param[in] data YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* data, const char* indent) const override {
+  void display_generic(const YggGeneric* data, const char* indent) const override {
     if (data == NULL) {
       ygglog_throw_error("JSONObjectMetaschemaType::display_generic: Generic object is NULL.");
     }

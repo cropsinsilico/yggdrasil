@@ -112,16 +112,24 @@ public:
     by data. Defaults to 0 and will be set by type->nbytes().
    */
   YggGeneric(const MetaschemaType* in_type, void* in_data, size_t in_nbytes=0);
+  /*!
+    @brief Copy constructor.
+    @param[in] other YggGeneric Instance of class to copy.
+   */
+  YggGeneric(const YggGeneric &other);
+  /*!
+    @brief Desctructor.
+   */
   ~YggGeneric();
   /*!
     @brief Display the data.
    */
-  void display(const char* indent="");
+  void display(const char* indent="") const;
   /*!
     @brief Get a copy of the data.
     @returns void* Pointer to copy of data.
   */
-  void* copy_data(void* orig_data=NULL);
+  void* copy_data(void* orig_data=NULL) const;
   /*!
     @brief Free the memory used by the data.
    */
@@ -130,7 +138,7 @@ public:
     @brief Get a copy.
     @returns YggGeneric* Copy of this class.
    */
-  YggGeneric* copy();
+  YggGeneric* copy() const;
   /*!
     @brief Set the data type.
     @param[in] new_type MetaschemaType* Pointer to new type.
@@ -140,7 +148,7 @@ public:
     @brief Get the data type.
     @returns MetaschemaType* Pointer to data type.
    */
-  MetaschemaType* get_type();
+  MetaschemaType* get_type() const;
   /*!
     @brief Set the data size.
     @param[in] new_nbytes size_t New data size.
@@ -150,7 +158,7 @@ public:
     @brief Get the data size.
     @returns size_t Number of bytes in the data object.
    */
-  size_t get_nbytes();
+  size_t get_nbytes() const;
   /*!
     @brief Get a pointer to the data size.
     @returns size_t* Pointer to number of bytes in the data object.
@@ -160,7 +168,7 @@ public:
     @brief Get the number of elements in the data.
     @returns size_t Number of elements in the data.
    */
-  size_t get_nelements();
+  size_t get_nelements() const;
   /*!
     @brief Set data.
     @param[in] new_data void* New data.
@@ -170,7 +178,7 @@ public:
     @brief Extract data.
     @returns void* Pointer to data.
    */
-  void* get_data();
+  void* get_data() const;
   /*!
     @brief Get the data pointer.
     @returns void** Pointer to data object pointer.
@@ -186,13 +194,13 @@ public:
     Defaults to false if not provided.
    */
   template <typename T>
-  void get_data(T* obj, size_t nelements=1, bool is_char=false);
+  void get_data(T* obj, size_t nelements=1, bool is_char=false) const;
   /*!
     @brief Extract data and assign the value to the provided variable.
     @param[out] obj T Existing variable where data should be stored.
    */
   template <typename T>
-  void get_data(T &obj);
+  void get_data(T &obj) const;
   /*!
     @brief Extract data, realloc provided array, and copy data into it.
     @param[out] obj T** Pointer to existing array where data should be copied.
@@ -202,14 +210,14 @@ public:
     provided.
    */
   template <typename T>
-  void get_data_realloc(T** obj, size_t* nelements=NULL);
+  void get_data_realloc(T** obj, size_t* nelements=NULL) const;
   /*!
     @brief Extract data and copy into the provided variable.
     @param[out] obj T* Pointer to existing variable where data should be copied.
     @param[in] nelements size_t Number of elements in the provided array.
     Defaults to 1 if not provided.
    */
-  void get_data(char* obj, size_t nelements);
+  void get_data(char* obj, size_t nelements) const;
 };
 
 

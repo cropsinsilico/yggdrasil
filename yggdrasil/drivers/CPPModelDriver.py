@@ -79,15 +79,15 @@ class CPPModelDriver(CModelDriver):
         try_except='}} catch ({error_type} {error_var}) {{',
         function_def_regex=(
             r'(?P<flag_type>.+?)\s*{function_name}\s*'
-            r'\((?P<inputs>(?:[^)&])*?)'
-            r'(?:,\s*(?P<outputs>(?:[^)])*?&(?:[^)])*?))?\)\s*\{{'
+            r'\((?P<inputs>(?:[^{{&])*?)'
+            r'(?:,\s*(?P<outputs>(?:[^{{])*?&(?:[^{{])+?))?\)\s*\{{'
             r'(?P<body>(?:.*?\n?)*?)'
             r'(?:return +(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
             r'|(?:\}})'),
         outputs_def_regex=(
-            r'\s*(?P<native_type>.+?)(\s+)?'
-            r'(?P<ref>&)(?(1)(?:\s*)|(?:\s+))'
-            r'(?P<name>.+?)(?P<shape>(?:\[.+?\])+)\s*(?:,|$)(?:\n)?'))
+            r'\s*(?P<native_type>(?:[^\s])+)(\s+)?'
+            r'(\()?(?P<ref>&)(?(1)(?:\s*)|(?:\s+))'
+            r'(?P<name>.+?)(?(2)(?:\)|(?:)))(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?'))
     include_arg_count = True
     include_channel_obj = False
     
@@ -210,11 +210,17 @@ class CPPModelDriver(CModelDriver):
             if in_definition:
                 vars_list = [dict(y, name='&' + y['name'])
                              for y in vars_list]
+                for y in vars_list:
+                    if ((('shape' in y.get('datatype', {}))
+                         or ('length' in y.get('datatype', {})))):
+                        y['name'] = '(%s)' % y['name']
             else:
                 vars_list = copy.deepcopy(vars_list)
                 for y in vars_list:
                     if not y.get('ref', False):
                         y['name'] = '&' + y['name']
+                    if 'shape' in y.get('datatype', {}):
+                        y['name'] += len(y['datatype']['shape']) * '[0]'
         else:
             # If the output is a True output and not passed as an input
             # parameter, then the output should not include the type

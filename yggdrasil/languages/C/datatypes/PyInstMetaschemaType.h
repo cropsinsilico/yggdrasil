@@ -90,6 +90,13 @@ public:
     }
   }
   /*!
+    @brief Copy constructor.
+    @param[in] other PyInstMetaschemaType* Instance to copy.
+   */
+  PyInstMetaschemaType(const PyInstMetaschemaType &other) :
+    PyInstMetaschemaType(other.class_name(), other.args_type(),
+			 other.use_generic()) {}
+  /*!
     @brief Destructor for PyInstMetaschemaType.
     Free the type string malloc'd during constructor.
    */

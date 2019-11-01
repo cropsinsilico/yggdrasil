@@ -13,10 +13,6 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <time.h>
-#include <Python.h>
-#include <numpy/arrayobject.h>
-#include <numpy/ndarrayobject.h>
-#include <numpy/npy_common.h>
 
 
 #ifdef _WIN32
@@ -52,6 +48,11 @@ typedef long double _Complex complex_long_double;
 extern "C" {
 #endif
 
+#include <Python.h>
+#include <numpy/arrayobject.h>
+#include <numpy/ndarrayobject.h>
+#include <numpy/npy_common.h>
+  
 typedef struct complex_float_t {
   float re;
   float im;

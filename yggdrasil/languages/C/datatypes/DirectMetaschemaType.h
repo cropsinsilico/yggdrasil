@@ -51,6 +51,12 @@ public:
   DirectMetaschemaType(PyObject* pyobj, const bool use_generic=false) :
     MetaschemaType(pyobj, use_generic) {}
   /*!
+    @brief Copy constructor.
+    @param[in] other DirectMetaschemaType* Instance to copy.
+   */
+  DirectMetaschemaType(const DirectMetaschemaType &other) :
+    DirectMetaschemaType(other.use_generic()) {}
+  /*!
     @brief Create a copy of the type.
     @returns pointer to new DirectMetaschemaType instance with the same data.
    */

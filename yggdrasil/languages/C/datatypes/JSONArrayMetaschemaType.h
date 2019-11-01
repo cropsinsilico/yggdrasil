@@ -99,6 +99,13 @@ public:
     update_items(items, true);
   }
   /*!
+    @brief Copy constructor.
+    @param[in] other JSONArrayMetaschemaType* Instance to copy.
+   */
+  JSONArrayMetaschemaType(const JSONArrayMetaschemaType &other) :
+    JSONArrayMetaschemaType(other.items(), other.format_str(),
+			    other.use_generic()) {}
+  /*!
     @brief Destructor for JSONArrayMetaschemaType.
     Free the type string malloc'd during constructor.
    */
@@ -174,7 +181,7 @@ public:
     @param[in] data YggGeneric* Pointer to generic object.
     @returns void* Pointer to copy of data.
    */
-  void* copy_generic(YggGeneric* data, void* orig_data=NULL) const override {
+  void* copy_generic(const YggGeneric* data, void* orig_data=NULL) const override {
     if (data == NULL) {
       ygglog_throw_error("JSONArrayMetaschemaType::copy_generic: Generic object is NULL.");
     }
@@ -216,7 +223,7 @@ public:
     @param[in] data YggGeneric* Pointer to generic object.
     @param[in] indent char* Indentation to add to display output.
    */
-  void display_generic(YggGeneric* data, const char* indent) const override {
+  void display_generic(const YggGeneric* data, const char* indent) const override {
     if (data == NULL) {
       ygglog_throw_error("JSONArrayMetaschemaType::display_generic: Generic object is NULL.");
     }
@@ -241,6 +248,11 @@ public:
     @returns std::vector<MetaschemaType*> Array item types.
    */
   std::vector<MetaschemaType*> items() const { return items_; }
+  /*!
+    @brief Get format string.
+    @returns char* Format string.
+   */
+  const char* format_str() const { return format_str_; }
   /*!
     @brief Determine if the items are all arrays.
     @returns bool true if all items are arrays, false otherwise.
