@@ -80,7 +80,9 @@ class CPPModelDriver(CModelDriver):
         function_def_regex=(
             r'(?P<flag_type>.+?)\s*{function_name}\s*'
             r'\((?P<inputs>(?:[^{{&])*?)'
-            r'(?:,\s*(?P<outputs>(?:[^{{])*?&(?:[^{{])+?))?\)\s*\{{'
+            r'(?:,\s*(?P<outputs>'
+            r'(?:\s*(?:[^\s])+(?:\s+)(?:\()?&(?:[^{{])+)+'
+            r'))?\)\s*\{{'
             r'(?P<body>(?:.*?\n?)*?)'
             r'(?:return +(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
             r'|(?:\}})'),
@@ -217,7 +219,9 @@ class CPPModelDriver(CModelDriver):
             else:
                 vars_list = copy.deepcopy(vars_list)
                 for y in vars_list:
-                    if not y.get('ref', False):
+                    if not (y.get('ref', False)
+                            or (for_yggdrasil
+                                and (y.get('is_length_var', False)))):
                         y['name'] = '&' + y['name']
                     if 'shape' in y.get('datatype', {}):
                         y['name'] += len(y['datatype']['shape']) * '[0]'
