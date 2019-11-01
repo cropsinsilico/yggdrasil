@@ -291,7 +291,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                         'datatype': 'flag',
                         'value': self.import_cls.function_param['true']}
             function_contents = self.import_cls.write_assign_to_output(
-                name='y', value='x',
+                'x', 'y',
                 outputs_in_inputs=outputs_in_inputs)
             definition = self.import_cls.write_function_def(
                 'test_function', inputs=inputs, outputs=outputs,
