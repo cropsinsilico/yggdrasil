@@ -370,7 +370,7 @@ public:
     if (!(PyList_Check(pyobj))) {
       ygglog_throw_error("JSONArrayMetaschemaType::python2c: Python object must be a list.");
     }
-    if (PyList_Size(pyobj) != nitems()) {
+    if ((size_t)(PyList_Size(pyobj)) != nitems()) {
       ygglog_throw_error("JSONArrayMetaschemaType::python2c: Python list has %lu elements, but the type expects %lu.",
 			 PyList_Size(pyobj), nitems());
     }

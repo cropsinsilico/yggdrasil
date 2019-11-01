@@ -4,7 +4,7 @@ import copy
 import pprint
 import jsonschema
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError, YGG_MSG_HEAD
-from yggdrasil.tests import YggTestClassInfo
+from yggdrasil.tests import YggTestClassInfo, assert_equal
 
 
 class TstMetaschemaTypeMeta(type):
@@ -54,7 +54,8 @@ class TestMetaschemaType(YggTestClassInfo):
         r"""dict: Keyword arguments for creating a class instance."""
         return self._typedef
 
-    def assert_result_equal(self, x, y):
+    @classmethod
+    def assert_result_equal(cls, x, y):
         r"""Assert that serialized/deserialized objects equal."""
         if isinstance(x, dict):
             if not isinstance(y, dict):  # pragma: debug
@@ -66,7 +67,7 @@ class TestMetaschemaType(YggTestClassInfo):
                     print('y')
                     pprint.pprint(y)
                     raise AssertionError("Key '%s' not in second dictionary." % k)
-                self.assert_result_equal(x[k], y[k])
+                cls.assert_result_equal(x[k], y[k])
             for k in y.keys():
                 if k not in x:  # pragma: debug
                     print('x')
@@ -85,7 +86,7 @@ class TestMetaschemaType(YggTestClassInfo):
                 raise AssertionError("Sizes do not match. %d vs. %d"
                                      % (len(x), len(y)))
             for ix, iy in zip(x, y):
-                self.assert_result_equal(ix, iy)
+                cls.assert_result_equal(ix, iy)
         elif isinstance(x, np.ndarray):
             np.testing.assert_array_equal(x, y)
         else:
@@ -96,7 +97,7 @@ class TestMetaschemaType(YggTestClassInfo):
                 pprint.pprint(y)
                 raise AssertionError("Compared objects are different types. "
                                      "%s vs. %s" % (type(x), type(y)))
-            self.assert_equal(x, y)
+            assert_equal(x, y)
 
     def test_validate(self):
         r"""Test validation."""

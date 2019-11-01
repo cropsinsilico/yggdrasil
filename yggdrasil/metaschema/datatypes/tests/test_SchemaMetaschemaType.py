@@ -36,7 +36,8 @@ class TestSchemaMetaschemaType(parent.TestJSONObjectMetaschemaType):
                                    'type': 'scalar', 'subtype': 'float',
                                    'precision': 64}),
                                  ({}, {})]
-        
-    def assert_result_equal(self, x, y):
+
+    @classmethod
+    def assert_result_equal(cls, x, y):
         r"""Assert that serialized/deserialized objects equal."""
         compare_schema(x, y)

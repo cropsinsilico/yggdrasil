@@ -334,7 +334,7 @@ public:
     if (!(PyDict_Check(pyobj))) {
       ygglog_throw_error("JSONObjectMetaschemaType::python2c: Python object must be a dict.");
     }
-    if (PyDict_Size(pyobj) != nitems()) {
+    if ((size_t)(PyDict_Size(pyobj)) != nitems()) {
       ygglog_throw_error("JSONObjectMetaschemaType::python2c: Python dict has %lu elements, but the type expects %lu.",
 			 PyDict_Size(pyobj), nitems());
     }

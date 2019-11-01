@@ -2,7 +2,6 @@ import os
 import re
 import copy
 import shutil
-import pprint
 import subprocess
 import numpy as np
 import sysconfig
@@ -234,17 +233,19 @@ class MSVCArchiver(ArchiverBase):
     output_key = '/OUT:%s'
     
 
-print('get_paths')
-pprint.pprint(sysconfig.get_paths())
-print('get_config_vars')
-pprint.pprint(sysconfig.get_config_vars())
 _top_lang_dir = get_language_dir('c')
 _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
 _python_inc = sysconfig.get_paths()['include']
-_python_lib = os.path.join(sysconfig.get_config_var('LIBDIR'),
-                           sysconfig.get_config_var('LIBRARY'))
+if platform._is_win:  # pragma: windows
+    _python_lib = os.path.join(
+        sysconfig.get_paths()['stdlib'],
+        'python%s.lib'
+        % sysconfig.get_config_var('py_version_nodot'))
+else:
+    _python_lib = os.path.join(sysconfig.get_config_var('LIBDIR'),
+                               sysconfig.get_config_var('LIBRARY'))
 _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
 _numpy_lib = None
 

@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <map>
 #include <vector>
+#include <cstring>
 
 
 enum { T_BOOLEAN, T_INTEGER, T_NULL, T_NUMBER, T_STRING, T_ARRAY, T_OBJECT,
@@ -516,7 +517,7 @@ void convert_python2c(PyObject *pyobj, void *dst, int type_code,
     char **dst_ptr = (char**)dst;
     char *res = PyBytes_AsString(pyobj);
     if (precision != 0) {
-      if (PyBytes_Size(pyobj) > precision/8) {
+      if ((size_t)(PyBytes_Size(pyobj)) > precision/8) {
 	ygglog_throw_error("%sconvert_python2c: String has size (%lu bytes) larger than the size of the buffer (%lu bytes).",
 			   error_prefix, PyBytes_Size(pyobj), precision/8);
       }
@@ -527,7 +528,11 @@ void convert_python2c(PyObject *pyobj, void *dst, int type_code,
   }
   case T_UNICODE: {
     char **dst_ptr = (char**)dst;
+#ifdef PyUnicode_DATA
     char *res = (char*)PyUnicode_DATA(pyobj);
+#else
+    const char *res = PyUnicode_AS_DATA(pyobj);
+#endif
     if (precision != 0) {
       if (strlen(res) > precision/8) {
 	ygglog_throw_error("%sconvert_python2c: String has size (%lu bytes) larger than the size of the buffer (%lu bytes).",

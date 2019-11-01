@@ -56,7 +56,7 @@ class TestExampleTypes(ExampleTstBase):
 
         """
         typeclass = get_type_class(typename)
-        testclass = typeclass.import_test_class()()
+        testclass = typeclass.import_test_class()
         x_sent = cls.get_test_data(typename)
         print('RECEIVED:')
         pprint.pprint(x_recv)

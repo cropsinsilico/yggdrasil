@@ -330,7 +330,7 @@ public:
     if (ret < 0) {
       ygglog_error("AsciiTableMetaschemaType::deserialize: Error using table.");
       return -1;
-    } else if (ret != nargs_exp()) {
+    } else if ((size_t)ret != nargs_exp()) {
       ygglog_error("AsciiTableMetaschemaType::deserialize: Table used %d arguments, but was expected to used %d.",
 		   ret, nargs_exp());
       return -1;

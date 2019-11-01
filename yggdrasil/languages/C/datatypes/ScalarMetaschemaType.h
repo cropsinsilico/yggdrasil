@@ -208,7 +208,7 @@ public:
     @param[in] indent char* Indentation to add to display output.
    */
   void display_generic(const YggGeneric* data, const char* indent="") const override {
-    int i;
+    size_t i;
     if (data == NULL) {
       ygglog_throw_error("ScalarMetaschemaType::display_generic: Generic object is NULL.");
     }
@@ -576,7 +576,7 @@ public:
   YggGeneric* python2c(PyObject* pyobj) const override {
     YggGeneric* cobj = new YggGeneric(this, NULL, 0);
     void** data = cobj->get_data_pointer();
-    if (PyArray_NBYTES(pyobj) != nbytes()) {
+    if ((size_t)(PyArray_NBYTES(pyobj)) != nbytes()) {
       ygglog_throw_error("ScalarMetaschemaType::python2c: Python object has a size of %lu bytes, but %lu were expected.",
 			 PyArray_NBYTES(pyobj), nbytes());
     }
