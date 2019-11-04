@@ -200,7 +200,7 @@ int init_python_API() {
   return init_numpy_API();
 };
 
-  
+
 //==============================================================================
 /*!
   Logging
@@ -314,6 +314,52 @@ void yggError(const char* fmt, ...) {
 #define ygglog_info while (0) yggInfo
 #define ygglog_debug while (0) yggDebug
 #endif
+
+/*!
+  @brief Called snprintf and realloc buffer if the formatted string is
+  larger than the provided buffer.
+  @param[in] dst char** Pointer to buffer where formatted message
+  should be stored.
+  @param[in,out] max_len size_t* Pointer to maximum size of buffer
+  that will be modified when the buffer is reallocated.
+  @param[in,out] offset size_t* Pointer to offset in buffer where the
+  formatted message should be stored. This will be updated to the end
+  of the updated message.
+  @param[in] format_str const char* Format string that should be used.
+  @param[in] ... Additional arguments are passed to snprintf as
+  parameters for formatting.
+  @returns int -1 if there is an error, otherwise the number of new
+  characters written to the buffer.
+ */
+static inline
+int snprintf_realloc(char** dst, size_t* max_len, size_t* offset,
+		     const char* format_str, ...) {
+  va_list arglist;
+  va_start(arglist, format_str);
+  int fmt_len = 0;
+  while (1) {
+    va_list arglist_copy;
+    va_copy(arglist_copy, arglist);
+    fmt_len = vsnprintf(dst[0] + offset[0],
+			max_len[0] - offset[0],
+			format_str, arglist_copy);
+    if (fmt_len > (max_len[0] - offset[0])) {
+      max_len[0] = max_len[0] + fmt_len + 1;
+      char* temp = (char*)realloc(dst[0], max_len[0]);
+      if (temp == NULL) {
+	ygglog_error("snprintf_realloc: Error reallocating buffer.");
+	fmt_len = -1;
+	break;
+      }
+      dst[0] = temp;
+    } else {
+      offset[0] = offset[0] + fmt_len;
+      break;
+    }
+  }
+  va_end(arglist);
+  return fmt_len;
+};
 
 /*!
   @brief Check if a character array matches a message and is non-zero length.

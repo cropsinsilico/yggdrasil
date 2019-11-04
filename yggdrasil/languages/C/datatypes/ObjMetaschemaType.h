@@ -1176,7 +1176,268 @@ public:
     return MetaschemaType::encode_data(writer, &nargs, arg);
   }
 
-  // Decoded
+  // Decoding
+  /*!
+    @brief Decode a line describine a line entry.
+    @param[in,out] p obj_t* Obj struct that should be updated.
+    @param[in,out] cline int Reference to count of lines currently in
+    p that should be updated when a line is added to the structure.
+    @param[in] iline char* Line that should be parsed for line
+    information.
+    @param[in] do_texcoords bool If true, texcoords will be extracted
+    from the line.
+    @returns int -1 if there is an error, 1 otherwise.
+  */
+  int decode_line(obj_t *p, int &cline, char *iline,
+		  const char *re_line_vert,
+		  bool do_texcoords) const {
+    size_t *sind = NULL;
+    size_t *eind = NULL;
+    int j;
+    int out = 1;
+    try {
+      ygglog_debug("ObjMetaschema::decode_line: Line");
+      int val_per_vert = 1;
+      if (do_texcoords)
+	val_per_vert++;
+      int nvert = count_matches(re_line_vert, iline);
+      char re_split_vert[100] = "";
+      for (j = 0; j < nvert; j++) {
+	strcat(re_split_vert, re_line_vert);
+      }
+      int nvert_found = (find_matches(re_split_vert, iline, &sind, &eind) - 1)/val_per_vert;
+      if (nvert_found != nvert) {
+	ygglog_throw_error("ObjMetaschema::decode_line: Expected %d verts in line, but found %d.",
+			   nvert, nvert_found);
+      }
+      p->nvert_in_line[cline] = nvert;
+      int* iline_ele = (int*)realloc(p->lines[cline], nvert*sizeof(int));
+      if (iline_ele == NULL) {
+	ygglog_throw_error("ObjMetaschema::decode_line: Failed to allocate line %d.", cline);
+      }
+      p->lines[cline] = iline_ele;
+      for (j = 0; j < nvert; j++) {
+	p->lines[cline][j] = atoi(iline + sind[j*val_per_vert + 1]) - 1;
+      }
+      if (p->line_texcoords != NULL) {
+	int *iline_texcoord = (int*)realloc(p->line_texcoords[cline], nvert*sizeof(int));
+	if (iline_texcoord == NULL) {
+	  ygglog_throw_error("ObjMetaschema::decode_line: Failed to allocate texcoord for line %d.", cline);
+	}
+	p->line_texcoords[cline] = iline_texcoord;
+	if (do_texcoords) {
+	  for (j = 0; j < nvert; j++) {
+	    p->line_texcoords[cline][j] = atoi(iline + sind[j*val_per_vert + 2]) - 1;
+	  }
+	} else {
+	  for (j = 0; j < nvert; j++) {
+	    p->line_texcoords[cline][j] = -1;
+	  }
+	}
+      }
+      cline++;
+    } catch(...) {
+      out = -1;
+    }
+    if (sind != NULL) free(sind);
+    if (eind != NULL) free(eind);
+    return out;
+  }
+  
+  /*!
+    @brief Decode a line describine a face.
+    @param[in,out] p obj_t* Obj struct that should be updated.
+    @param[in,out] cface int Reference to count of faces currently in
+    p that should be updated when a face is added to the structure.
+    @param[in] iline char* Line that should be parsed for face
+    information.
+    @param[in] do_texcoords bool If true, texcoords will be extracted
+    from the line.
+    @param[in] do_normals bool If true, normals will be extracted
+    from the line.
+    @returns int -1 if there is an error, 1 otherwise.
+  */
+  int decode_face(obj_t *p, int &cface, char *iline,
+		  const char *re_face_vert,
+		  bool do_texcoords, bool do_normals) const {
+    size_t *sind = NULL;
+    size_t *eind = NULL;
+    int j;
+    int out = 1;
+    try {
+      ygglog_debug("ObjMetaschemaType::decode_face: Face");
+      int val_per_vert = 1;
+      if (do_texcoords)
+	val_per_vert++;
+      if (do_normals)
+	val_per_vert++;
+      int nvert = count_matches(re_face_vert, iline);
+      char re_split_vert[100] = "";
+      for (j = 0; j < nvert; j++) {
+	strcat(re_split_vert, re_face_vert);
+      }
+      int nvert_found = (find_matches(re_split_vert, iline, &sind, &eind) - 1)/val_per_vert;
+      if (nvert_found != nvert) {
+	ygglog_throw_error("ObjMetaschemaType::decode_face: Expected %d verts in face, but found %d.",
+			   nvert, nvert_found);
+      }
+      p->nvert_in_face[cface] = nvert;
+      int *iface = (int*)realloc(p->faces[cface], nvert*sizeof(int));
+      if (iface == NULL) {
+	ygglog_throw_error("ObjMetaschemaType::decode_face: Failed to allocate face %d.", cface);
+      }
+      p->faces[cface] = iface;
+      for (j = 0; j < nvert; j++) {
+	p->faces[cface][j] = atoi(iline + sind[val_per_vert*j+1]) - 1;
+      }
+      if (p->face_texcoords != NULL) {
+      	int *iface_texcoord = (int*)realloc(p->face_texcoords[cface], nvert*sizeof(int));
+      	if (iface_texcoord == NULL) {
+      	  ygglog_throw_error("ObjMetaschemaType::decode_face: Failed to allocate face texcoord %d.", cface);
+      	}
+      	p->face_texcoords[cface] = iface_texcoord;
+      	if (do_texcoords) {
+      	  for (j = 0; j < nvert; j++) {
+      	    p->face_texcoords[cface][j] = atoi(iline + sind[val_per_vert*j+2]) - 1;
+      	}
+      	} else {
+      	  for (j = 0; j < nvert; j++) {
+      	    p->face_texcoords[cface][j] = -1;
+      	  }
+      	}
+      }
+      if (p->face_normals != NULL) {
+      	int offset;
+      	if (do_texcoords) {
+      	  offset = 3;
+      	} else {
+      	  offset = 2;
+      	}
+      	int* iface_normal = (int*)realloc(p->face_normals[cface], nvert*sizeof(int));
+      	if (iface_normal == NULL) {
+      	  ygglog_throw_error("ObjMetaschemaType::decode_face: Failed to allocate face normal %d.", cface);
+      	}
+      	p->face_normals[cface] = iface_normal;
+      	if (do_normals) {
+      	  for (j = 0; j < nvert; j++) {
+      	    p->face_normals[cface][j] = atoi(iline + sind[val_per_vert*j+offset]) - 1;
+      	  }
+      	} else {
+      	  for (j = 0; j < nvert; j++) {
+      	    p->face_normals[cface][j] = -1;
+      	  }
+      	}
+      }
+      cface++;
+    } catch(...) {
+      out = -1;
+    }
+    if (sind != NULL) free(sind);
+    if (eind != NULL) free(eind);
+    return out;
+  }
+  
+  /*!
+    @brief Decode a line describine a surface.
+    @param[in,out] p obj_t* Obj struct that should be updated.
+    @param[in,out] csurf int Reference to count of surfaces currently in
+    p that should be updated when a surface is added to the structure.
+    @param[in] iline char* Line that should be parsed for surface
+    information.
+    @param[in] sind_ptr size_t** Pointer to array containing starting
+    indices for subexpressions in the regex for the surface entry.
+    @param[in] eind_ptr size_t** Pointer to array containing ending
+    indices for subexpressions in the regex for the surface entry.
+    @param[in] do_texcoords bool If true, texcoords will be extracted
+    from the line.
+    @param[in] do_normals bool If true, normals will be extracted
+    from the line.
+    @returns int -1 if there is an error, 1 otherwise.
+  */
+  int decode_surface(obj_t *p, int &csurf, char *iline,
+		     const char *re_surf_vert,
+		     size_t **sind_ptr, size_t **eind_ptr,
+		     bool do_texcoords, bool do_normals) const {
+    int j;
+    int out = 1;
+    size_t *sind = *sind_ptr;
+    size_t *eind = *eind_ptr;
+    try {
+      ygglog_debug("ObjMetaschemaType::decode_surface: Surface");
+      int val_per_vert = 1;
+      if (do_texcoords)
+	val_per_vert++;
+      if (do_normals)
+	val_per_vert++;
+      for (j = 0; j < 2; j++) {
+	p->surface_params_u[csurf][j] = (float)atof(iline + sind[j + 1]);
+	p->surface_params_v[csurf][j] = (float)atof(iline + sind[j + 3]);
+      }
+      int sind_verts = eind[4];
+      int nvert = count_matches(re_surf_vert, iline + sind_verts);
+      char re_split_vert[100] = "";
+      for (j = 0; j < nvert; j++) {
+	strcat(re_split_vert, re_surf_vert);
+      }
+      int nvert_found = (find_matches(re_split_vert, iline + sind_verts, sind_ptr, eind_ptr) - 1)/val_per_vert;
+      if (nvert_found != nvert) {
+	ygglog_throw_error("ObjMetaschemaType::decode_surface: Expected %d verts in surface, but found %d.",
+			   nvert, nvert_found);
+      }
+      sind = *sind_ptr;
+      eind = *eind_ptr;
+      p->nvert_in_surface[csurf] = nvert;
+      int* isurf = (int*)realloc(p->surfaces[csurf], nvert*sizeof(int));
+      if (isurf == NULL) {
+	ygglog_throw_error("ObjMetaschemaType::decode_surface: Failed to allocate surface %d.", csurf);
+      }
+      p->surfaces[csurf] = isurf;
+      for (j = 0; j < nvert; j++) {
+	p->surfaces[csurf][j] = atoi(iline + sind_verts + sind[val_per_vert*j + 1]) - 1;
+      }
+      if (p->surface_texcoords != NULL) {
+	int *isurf_texcoord = (int*)realloc(p->surface_texcoords[csurf], nvert*sizeof(int));
+	if (isurf_texcoord == NULL) {
+	  ygglog_throw_error("ObjMetaschemaType::decode_surface: Failed to allocate surface texcoord %d.", csurf);
+	}
+	p->surface_texcoords[csurf] = isurf_texcoord;
+	if (do_texcoords) {
+	  for (j = 0; j < nvert; j++) {
+	    p->surface_texcoords[csurf][j] = atoi(iline + sind_verts + sind[val_per_vert*j + 2]) - 1;
+	  }
+	} else {
+	  for (j = 0; j < nvert; j++) {
+	    p->surface_texcoords[csurf][j] = -1;
+	  }
+	}
+      }
+      if (p->surface_normals != NULL) {
+	int offset;
+	if (do_texcoords)
+	  offset = 3;
+	else
+	  offset = 2;
+	int* isurf_normal = (int*)realloc(p->surface_normals[csurf], nvert*sizeof(int));
+	if (isurf_normal == NULL) {
+	  ygglog_throw_error("ObjMetaschemaType::decode_surface: Failed to allocate surface normal %d.", csurf);
+	}
+	p->surface_normals[csurf] = isurf_normal;
+	if (do_normals) {
+	  for (j = 0; j < nvert; j++) {
+	    p->surface_normals[csurf][j] = atoi(iline + sind_verts + sind[val_per_vert*j + offset]) - 1;
+	  }
+	} else {
+	  for (j = 0; j < nvert; j++) {
+	    p->surface_normals[csurf][j] = -1;
+	  }
+	}
+      }
+      csurf++;
+    } catch(...) {
+      out = -1;
+    }
+    return out;
+  }
   /*!
     @brief Decode variables from a JSON string.
     @param[in] data rapidjson::Value Reference to entry in JSON string.
@@ -1240,17 +1501,17 @@ public:
     char re_norm[500];
     char re_param[500];
     char re_point[500], re_point_tot[500], re_point_vert[100];
-    char re_line[500], re_line_vert[100];
+    char re_line_orig[500], re_line_vert_orig[100];
     char re_line_notexc[500], re_line_vert_notexc[100];
     char re_line_clean[500], re_line_vert_clean[100];
-    char re_face[500], re_face_vert[100];
+    char re_face_orig[500], re_face_vert_orig[100];
     char re_face_notexc[500], re_face_vert_notexc[100];
     char re_face_nonorm[500], re_face_vert_nonorm[100];
     char re_face_noextr[500], re_face_vert_noextr[100];
     char re_face_clean[500], re_face_vert_clean[100];
     char re_curve[500], re_curve_vert[100];
     char re_curve2[500], re_curve2_vert[100];
-    char re_surf[500], re_surf_vert[100];
+    char re_surf_orig[500], re_surf_vert_orig[100];
     char re_surf_notexc[500], re_surf_vert_notexc[100];
     char re_surf_nonorm[500], re_surf_vert_nonorm[100];
     char re_surf_noextr[500], re_surf_vert_noextr[100];
@@ -1269,15 +1530,15 @@ public:
     snprintf(re_point_tot, 500, "[^v]p( %s){1,}", re_int);
     snprintf(re_point, 500, "p( %s){1,}", re_int);
     snprintf(re_point_vert, 100, " (%s)", re_int);
-    snprintf(re_line, 500, "l( %s/%s){2,}", re_int, re_int);
-    snprintf(re_line_vert, 100, " (%s)/(%s)", re_int, re_int);
+    snprintf(re_line_orig, 500, "l( %s/%s){2,}", re_int, re_int);
+    snprintf(re_line_vert_orig, 100, " (%s)/(%s)", re_int, re_int);
     snprintf(re_line_notexc, 500, "l( %s/){2,}", re_int);
     snprintf(re_line_vert_notexc, 100, " (%s)/", re_int);
     snprintf(re_line_clean, 500, "l( %s){2,}", re_int);
     snprintf(re_line_vert_clean, 100, " (%s)", re_int);
-    snprintf(re_face, 500, "f( %s/%s/%s){3,}",
+    snprintf(re_face_orig, 500, "f( %s/%s/%s){3,}",
 	     re_int, re_int, re_int);
-    snprintf(re_face_vert, 100, " (%s)/(%s)/(%s)",
+    snprintf(re_face_vert_orig, 100, " (%s)/(%s)/(%s)",
 	     re_int, re_int, re_int);
     snprintf(re_face_notexc, 500, "f( %s//%s){3,}",
 	     re_int, re_int);
@@ -1296,23 +1557,23 @@ public:
     snprintf(re_curve_vert, 100, " (%s)", re_int);
     snprintf(re_curve2, 500, "curv2( %s){2,}", re_int);
     snprintf(re_curve2_vert, 100, " (%s)", re_int);
-    snprintf(re_surf, 500, "surf (%s) (%s) (%s) (%s)( %s/%s/%s){2,}",
+    snprintf(re_surf_orig, 500, "surf (%s) (%s) (%s) (%s)( %s/%s/%s){2,}",
 	     re_float, re_float, re_float, re_float,
 	     re_int, re_int, re_int);
-    snprintf(re_surf_vert, 100, " (%s)/(%s)/(%s)",
+    snprintf(re_surf_vert_orig, 100, " (%s)/(%s)/(%s)",
 	     re_int, re_int, re_int);
-    snprintf(re_surf_notexc, 500, "surf (%s) (%s) (%s)(%s)( %s//%s){2,}",
+    snprintf(re_surf_notexc, 500, "surf (%s) (%s) (%s) (%s)( %s//%s){2,}",
 	     re_float, re_float, re_float, re_float, re_int, re_int);
     snprintf(re_surf_vert_notexc, 100, " (%s)//(%s)",
 	     re_int, re_int);
-    snprintf(re_surf_nonorm, 500, "surf (%s) (%s) (%s)(%s)( %s/%s/){2,}",
+    snprintf(re_surf_nonorm, 500, "surf (%s) (%s) (%s) (%s)( %s/%s/){2,}",
 	     re_float, re_float, re_float, re_float, re_int, re_int);
     snprintf(re_surf_vert_nonorm, 100, " (%s)/(%s)/",
 	     re_int, re_int);
-    snprintf(re_surf_noextr, 500, "surf (%s) (%s) (%s)(%s)( %s//){2,}",
+    snprintf(re_surf_noextr, 500, "surf (%s) (%s) (%s) (%s)( %s//){2,}",
 	     re_float, re_float, re_float, re_float, re_int);
     snprintf(re_surf_vert_noextr, 100, " (%s)//", re_int);
-    snprintf(re_surf_clean, 500, "surf (%s) (%s) (%s)(%s)( %s){2,}",
+    snprintf(re_surf_clean, 500, "surf (%s) (%s) (%s) (%s)( %s){2,}",
 	     re_float, re_float, re_float, re_float, re_int);
     snprintf(re_surf_vert_clean, 100, " (%s)", re_int);
     // Count matches
@@ -1330,71 +1591,46 @@ public:
     nnorm = count_matches(re_norm, buf);
     nparam = count_matches(re_param, buf);
     npoint = count_matches(re_point_tot, buf);
-    nline = count_matches(re_line, buf);
-    // Revise regexes if no matches were found, but other version
-    // are present
+    ncurve = count_matches(re_curve, buf);
+    ncurve2 = count_matches(re_curve2, buf);
     int remove_line_texcoords = 0,
       remove_face_texcoords = 0, remove_face_normals = 0,
       remove_surf_texcoords = 0, remove_surf_normals = 0;
-    if (nline == 0) {
-      if (count_matches(re_line_notexc, buf) != 0) {
-	strncpy(re_line, re_line_notexc, 500);
-	strncpy(re_line_vert, re_line_vert_notexc, 100);
+    // Count lines in different versions
+    int nline_orig = count_matches(re_line_orig, buf);
+    int nline_notexc = count_matches(re_line_notexc, buf);
+    int nline_clean = count_matches(re_line_clean, buf);
+    nline = nline_orig + nline_notexc + nline_clean;
+    if (nline > 0) {
+      if (nline_orig == 0)
 	remove_line_texcoords = 1;
-      } else if (count_matches(re_line_clean, buf) != 0) {
-	strncpy(re_line, re_line_clean, 500);
-	strncpy(re_line_vert, re_line_vert_clean, 100);
-	remove_line_texcoords = 1;
-      }
-      nline = count_matches(re_line, buf);
     }
-    nface = count_matches(re_face, buf);
-    if (nface == 0) {
-      if (count_matches(re_face_nonorm, buf) != 0) {
-	strncpy(re_face, re_face_nonorm, 500);
-	strncpy(re_face_vert, re_face_vert_nonorm, 100);
+    // Count faces in different versions
+    int nface_orig = count_matches(re_face_orig, buf);
+    int nface_nonorm = count_matches(re_face_nonorm, buf);
+    int nface_notexc = count_matches(re_face_notexc, buf);
+    int nface_noextr = count_matches(re_face_noextr, buf);
+    int nface_clean = count_matches(re_face_clean, buf);
+    nface = nface_orig + nface_nonorm + nface_notexc +
+      nface_noextr + nface_clean;
+    if (nface > 0) {
+      if ((nface_orig == 0) && (nface_notexc == 0))
 	remove_face_normals = 1;
-      } else if (count_matches(re_face_notexc, buf) != 0) {
-	strncpy(re_face, re_face_notexc, 500);
-	strncpy(re_face_vert, re_face_vert_notexc, 100);
+      if ((nface_orig == 0) && (nface_nonorm == 0))
 	remove_face_texcoords = 1;
-      } else if (count_matches(re_face_noextr, buf) != 0) {
-	strncpy(re_face, re_face_noextr, 500);
-	strncpy(re_face_vert, re_face_vert_noextr, 100);
-	remove_face_texcoords = 1;
-	remove_face_normals = 1;
-      } else if (count_matches(re_face_clean, buf) != 0) {
-	strncpy(re_face, re_face_clean, 500);
-	strncpy(re_face_vert, re_face_vert_clean, 100);
-	remove_face_texcoords = 1;
-	remove_face_normals = 1;
-      }
-      nface = count_matches(re_face, buf);
     }
-    ncurve = count_matches(re_curve, buf);
-    ncurve2 = count_matches(re_curve2, buf);
-    nsurf = count_matches(re_surf, buf);
-    if (nsurf == 0) {
-      if (count_matches(re_surf_nonorm, buf) != 0) {
-	strncpy(re_surf, re_surf_nonorm, 500);
-	strncpy(re_surf_vert, re_surf_vert_nonorm, 100);
+    // Count surfaces in different versions
+    int nsurf_orig = count_matches(re_surf_orig, buf);
+    int nsurf_nonorm = count_matches(re_surf_nonorm, buf);
+    int nsurf_notexc = count_matches(re_surf_notexc, buf);
+    int nsurf_noextr = count_matches(re_surf_noextr, buf);
+    int nsurf_clean = count_matches(re_surf_clean, buf);
+    nsurf = nsurf_orig + nsurf_nonorm + nsurf_notexc + nsurf_noextr + nsurf_clean;
+    if (nsurf > 0) {
+      if ((nsurf_orig == 0) && (nsurf_notexc == 0))
 	remove_surf_normals = 1;
-      } else if (count_matches(re_surf_notexc, buf) != 0) {
-	strncpy(re_surf, re_surf_notexc, 500);
-	strncpy(re_surf_vert, re_surf_vert_notexc, 100);
+      if ((nsurf_orig == 0) && (nsurf_nonorm == 0))
 	remove_surf_texcoords = 1;
-      } else if (count_matches(re_surf_noextr, buf) != 0) {
-	strncpy(re_surf, re_surf_noextr, 500);
-	strncpy(re_surf_vert, re_surf_vert_noextr, 100);
-	remove_surf_texcoords = 1;
-	remove_surf_normals = 1;
-      } else if (count_matches(re_surf_clean, buf) != 0) {
-	strncpy(re_surf, re_surf_clean, 500);
-	strncpy(re_surf_vert, re_surf_vert_clean, 100);
-	remove_surf_texcoords = 1;
-	remove_surf_normals = 1;
-      }
-      nsurf = count_matches(re_surf, buf);
     }
     ygglog_info("deserialize_obj: expecting %d verts, %d texcoords, %d normals, "
 		 "%d parameters, %d points, %d lines, %d faces, "
@@ -1442,7 +1678,7 @@ public:
     if (out > 0) {
       /* char ival[10]; */
       /* size_t ival_siz = 0; */
-      while (cur_pos < buf_siz) {
+      while ((cur_pos < buf_siz) && (out >= 0)) {
 	ygglog_debug("deserialize_obj: Starting position %d/%d",
 		     cur_pos, buf_siz);
 	int n_sub_matches = find_match("([^\n]*)\n", buf + cur_pos,
@@ -1460,15 +1696,17 @@ public:
 	if (find_matches("#[^\n]*", iline, &sind, &eind) == 1) {
 	  // Comment
 	  ygglog_debug("deserialize_obj: Comment");
-	} else if (find_matches(re_matl, iline, &sind, &eind) == n_re_matl) {
-	  // Material
+	}
+	// Material
+	else if (find_matches(re_matl, iline, &sind, &eind) == n_re_matl) {
 	  ygglog_debug("deserialize_obj: Material");
 	  int matl_size = (int)(eind[1] - sind[1]);
 	  memcpy(p->material, iline+sind[1], matl_size);
 	  p->material[matl_size] = '\0';
 	  cmatl++;
-	} else if (find_matches(re_vert, iline, &sind, &eind) == n_re_vert) {
-	  // Vertex
+	}
+	// Vertex
+	else if (find_matches(re_vert, iline, &sind, &eind) == n_re_vert) {
 	  ygglog_debug("deserialize_obj: Vertex");
 	  for (j = 0; j < 3; j++) {
 	    p->vertices[cvert][j] = (float)atof(iline + sind[j+1]);
@@ -1480,8 +1718,9 @@ public:
 	    }
 	  }
 	  cvert++;
-	  // Vertex with optional weight
-	} else if (find_matches(re_vert, iline, &sind, &eind) == (n_re_vert + 1)) {
+	}
+	// Vertex with optional weight
+	else if (find_matches(re_vert, iline, &sind, &eind) == (n_re_vert + 1)) {
 	  for (j = 0; j < 3; j++) {
 	    p->vertices[cvert][j] = (float)atof(iline + sind[j+1]);
 	  }
@@ -1492,52 +1731,59 @@ public:
 	  }
 	  p->vertices[cvert][3] = (float)atof(iline + sind[7]);
 	  cvert++;
-	} else if (find_matches(re_norm, iline, &sind, &eind) == n_re_norm) {
-	  // Normals
+	}
+	// Normals
+	else if (find_matches(re_norm, iline, &sind, &eind) == n_re_norm) {
 	  ygglog_debug("deserialize_obj: Normals");
 	  for (j = 0; j < 3; j++) {
 	    p->normals[cnorm][j] = (float)atof(iline + sind[j+1]);
 	  }
 	  cnorm++;
-	} else if (find_matches(re_texc, iline, &sind, &eind) == n_re_texc) {
-	  // Texcoords with just u
+	}
+	// Texcoords with just u
+	else if (find_matches(re_texc, iline, &sind, &eind) == n_re_texc) {
 	  ygglog_debug("deserialize_obj: Texcoords with u");
 	  p->texcoords[ctexc][0] = (float)atof(iline + sind[1]);
 	  p->texcoords[ctexc][1] = 0.0;
 	  p->texcoords[ctexc][2] = 0.0;
 	  ctexc++;
-	} else if (find_matches(re_texc, iline, &sind, &eind) == (n_re_texc + 1)) {
-	  // Texcoords with optional v
+	}
+	// Texcoords with optional v
+	else if (find_matches(re_texc, iline, &sind, &eind) == (n_re_texc + 1)) {
 	  ygglog_debug("deserialize_obj: Texcoords with u, v");
 	  for (j = 0; j < 2; j++) {
 	    p->texcoords[ctexc][j] = (float)atof(iline + sind[j+1]);
 	  }
 	  p->texcoords[ctexc][2] = 0.0;
 	  ctexc++;
-	} else if (find_matches(re_texc, iline, &sind, &eind) == (n_re_texc + 2)) {
-	  // Texcoords with optional w
+	}
+	// Texcoords with optional w
+	else if (find_matches(re_texc, iline, &sind, &eind) == (n_re_texc + 2)) {
 	  ygglog_debug("deserialize_obj: Texcoords with u, v, w");
 	  for (j = 0; j < 3; j++) {
 	    p->texcoords[ctexc][j] = (float)atof(iline + sind[j+1]);
 	  }
 	  ctexc++;
-	} else if (find_matches(re_param, iline, &sind, &eind) == n_re_param) {
-	  // Parameters
+	}
+	// Parameters
+	else if (find_matches(re_param, iline, &sind, &eind) == n_re_param) {
 	  ygglog_debug("deserialize_obj: Parameters");
 	  for (j = 0; j < 2; j++) {
 	    p->params[cparam][j] = (float)atof(iline + sind[j+1]);
 	  }
 	  p->params[cparam][2] = 1.0;
 	  cparam++;
-	} else if (find_matches(re_param, iline, &sind, &eind) == (n_re_param + 1)) {
-	  // Parameters with optional weigth
+	}
+	// Parameters with optional weigth
+	else if (find_matches(re_param, iline, &sind, &eind) == (n_re_param + 1)) {
 	  ygglog_debug("deserialize_obj: Parameters");
 	  for (j = 0; j < 3; j++) {
 	    p->params[cparam][j] = (float)atof(iline + sind[j+1]);
 	  }
 	  cparam++;
-	} else if (find_matches(re_point, iline, &sind, &eind) == n_re_point) {
-	  // Points
+	}
+	// Points
+	else if (find_matches(re_point, iline, &sind, &eind) == n_re_point) {
 	  ygglog_debug("deserialize_obj: Point");
 	  int nvert = count_matches(re_point_vert, iline);
 	  char re_split_vert[100] = "";
@@ -1563,117 +1809,37 @@ public:
 	    p->points[cpoint][j] = atoi(iline + sind[j+1]) - 1;
 	  }
 	  cpoint++;
-	} else if (find_matches(re_line, iline, &sind, &eind) == n_re_line) {
-	  // Lines
-	  ygglog_debug("deserialize_obj: Line");
-	  int val_per_vert;
-	  if (p->line_texcoords == NULL) {
-	    val_per_vert = 1;
-	  } else {
-	    val_per_vert = 2;
-	  }
-	  int nvert = count_matches(re_line_vert, iline);
-	  char re_split_vert[100] = "";
-	  for (j = 0; j < nvert; j++) {
-	    strcat(re_split_vert, re_line_vert);
-	  }
-	  int nvert_found = (find_matches(re_split_vert, iline, &sind, &eind) - 1)/val_per_vert;
-	  if (nvert_found != nvert) {
-	    ygglog_error("deserialize_obj: Expected %d verts in line, but found %d.",
-			 nvert, nvert_found);
-	    out = -1;
-	    break;
-	  }
-	  p->nvert_in_line[cline] = nvert;
-	  int* iline_ele = (int*)realloc(p->lines[cline], nvert*sizeof(int));
-	  if (iline_ele == NULL) {
-	    ygglog_error("deserialize_obj: Failed to allocate line %d.", cline);
-	    out = -1;
-	    break;
-	  }
-	  p->lines[cline] = iline_ele;
-	  for (j = 0; j < nvert; j++) {
-	    p->lines[cline][j] = atoi(iline + sind[j*val_per_vert + 1]) - 1;
-	  }
-	  if (p->line_texcoords != NULL) {
-	    int *iline_texcoord = (int*)realloc(p->line_texcoords[cline], nvert*sizeof(int));
-	    if (iline_texcoord == NULL) {
-	      ygglog_error("deserialize_obj: Failed to allocate texcoord for line %d.", cline);
-	      out = -1;
-	      break;
-	    }
-	    p->line_texcoords[cline] = iline_texcoord;
-	    for (j = 0; j < nvert; j++) {
-	      p->line_texcoords[cline][j] = atoi(iline + sind[j*val_per_vert + 2]) - 1;
-	    }
-	  }
-	  cline++;
-	} else if (find_matches(re_face, iline, &sind, &eind) == n_re_face) {
-	  // Face
-	  ygglog_debug("deserialize_obj: Face");
-	  int val_per_vert = 1;
-	  if (p->face_texcoords != NULL) {
-	    val_per_vert++;
-	  }
-	  if (p->face_normals != NULL) {
-	    val_per_vert++;
-	  }
-	  int nvert = count_matches(re_face_vert, iline);
-	  char re_split_vert[100] = "";
-	  for (j = 0; j < nvert; j++) {
-	    strcat(re_split_vert, re_face_vert);
-	  }
-	  int nvert_found = (find_matches(re_split_vert, iline, &sind, &eind) - 1)/val_per_vert;
-	  if (nvert_found != nvert) {
-	    ygglog_error("deserialize_obj: Expected %d verts in face, but found %d.",
-			 nvert, nvert_found);
-	    out = -1;
-	    break;
-	  }
-	  p->nvert_in_face[cface] = nvert;
-	  int *iface = (int*)realloc(p->faces[cface], nvert*sizeof(int));
-	  if (iface == NULL) {
-	    ygglog_error("deserialize_obj: Failed to allocate face %d.", cface);
-	    out = -1;
-	    break;
-	  }
-	  p->faces[cface] = iface;
-	  for (j = 0; j < nvert; j++) {
-	    p->faces[cface][j] = atoi(iline + sind[val_per_vert*j+1]) - 1;
-	  }
-	  if (p->face_texcoords != NULL) {
-	    int *iface_texcoord = (int*)realloc(p->face_texcoords[cface], nvert*sizeof(int));
-	    if (iface_texcoord == NULL) {
-	      ygglog_error("deserialize_obj: Failed to allocate face texcoord %d.", cface);
-	      out = -1;
-	      break;
-	    }
-	    p->face_texcoords[cface] = iface_texcoord;
-	    for (j = 0; j < nvert; j++) {
-	      p->face_texcoords[cface][j] = atoi(iline + sind[val_per_vert*j+2]) - 1;
-	    }
-	  }
-	  if (p->face_normals != NULL) {
-	    int offset;
-	    if (p->face_texcoords == NULL) {
-	      offset = 2;
-	    } else {
-	      offset = 3;
-	    }
-	    int* iface_normal = (int*)realloc(p->face_normals[cface], nvert*sizeof(int));
-	    if (iface_normal == NULL) {
-	      ygglog_error("deserialize_obj: Failed to allocate face normal %d.", cface);
-	      out = -1;
-	      break;
-	    }
-	    p->face_normals[cface] = iface_normal;
-	    for (j = 0; j < nvert; j++) {
-	      p->face_normals[cface][j] = atoi(iline + sind[val_per_vert*j+offset]) - 1;
-	    }
-	  }
-	  cface++;
-	} else if (find_matches(re_curve, iline, &sind, &eind) == n_re_curve) {
-	  // Curves
+	}
+	// Lines
+	else if (find_matches(re_line_orig, iline, &sind, &eind) == n_re_line) {
+	  out = decode_line(p, cline, iline, re_line_vert_orig, true);
+	}
+	else if (find_matches(re_line_notexc, iline, &sind, &eind) == n_re_line) {
+	  out = decode_line(p, cline, iline, re_line_vert_notexc, false);
+	}
+	// Faces
+	else if (find_matches(re_face_orig, iline, &sind, &eind) == n_re_face) {
+	  out = decode_face(p, cface, iline, re_face_vert_orig,
+			    true, true);
+	}
+	else if (find_matches(re_face_notexc, iline, &sind, &eind) == n_re_face) {
+	  out = decode_face(p, cface, iline, re_face_vert_notexc,
+			    false, true);
+	}
+	else if (find_matches(re_face_nonorm, iline, &sind, &eind) == n_re_face) {
+	  out = decode_face(p, cface, iline, re_face_vert_nonorm,
+			    true, false);
+	}
+	else if (find_matches(re_face_noextr, iline, &sind, &eind) == n_re_face) {
+	  out = decode_face(p, cface, iline, re_face_vert_noextr,
+			    false, false);
+	}
+	else if (find_matches(re_face_clean, iline, &sind, &eind) == n_re_face) {
+	  out = decode_face(p, cface, iline, re_face_vert_clean,
+			    false, false);
+	}
+	// Curves
+	else if (find_matches(re_curve, iline, &sind, &eind) == n_re_curve) {
 	  ygglog_debug("deserialize_obj: Curve");
 	  for (j = 0; j < 2; j++) {
 	    p->curve_params[ccurve][j] = (float)atof(iline + sind[j + 1]);
@@ -1703,8 +1869,9 @@ public:
 	    p->curves[ccurve][j] = atoi(iline + sind_verts + sind[j + 1]) - 1;
 	  }
 	  ccurve++;
-	} else if (find_matches(re_curve2, iline, &sind, &eind) == n_re_curve2) {
-	  // Curves2
+	}
+	// Curves2
+	else if (find_matches(re_curve2, iline, &sind, &eind) == n_re_curve2) {
 	  ygglog_debug("deserialize_obj: Curve2");
 	  int nvert = count_matches(re_curve2_vert, iline);
 	  char re_split_vert[100] = "";
@@ -1730,79 +1897,34 @@ public:
 	    p->curves2[ccurve2][j] = atoi(iline + sind[j + 1]) - 1;
 	  }
 	  ccurve2++;
-	} else if (find_matches(re_surf, iline, &sind, &eind) == n_re_surf) {
-	  // Surfaces
-	  ygglog_debug("deserialize_obj: Surface");
-	  int val_per_vert = 1;
-	  if (p->surface_texcoords != NULL) {
-	    val_per_vert++;
-	  }
-	  if (p->surface_normals != NULL) {
-	    val_per_vert++;
-	  }
-	  for (j = 0; j < 2; j++) {
-	    p->surface_params_u[csurf][j] = (float)atof(iline + sind[j + 1]);
-	    p->surface_params_v[csurf][j] = (float)atof(iline + sind[j + 3]);
-	  }
-	  int sind_verts = eind[4];
-	  int nvert = count_matches(re_surf_vert, iline + sind_verts);
-	  char re_split_vert[100] = "";
-	  for (j = 0; j < nvert; j++) {
-	    strcat(re_split_vert, re_surf_vert);
-	  }
-	  int nvert_found = (find_matches(re_split_vert, iline + sind_verts, &sind, &eind) - 1)/val_per_vert;
-	  if (nvert_found != nvert) {
-	    ygglog_error("deserialize_obj: Expected %d verts in surface, but found %d.",
-			 nvert, nvert_found);
-	    out = -1;
-	    break;
-	  }
-	  p->nvert_in_surface[csurf] = nvert;
-	  int* isurf = (int*)realloc(p->surfaces[csurf], nvert*sizeof(int));
-	  if (isurf == NULL) {
-	    ygglog_error("deserialize_obj: Failed to allocate surface %d.", csurf);
-	    out = -1;
-	    break;
-	  }
-	  p->surfaces[csurf] = isurf;
-	  for (j = 0; j < nvert; j++) {
-	    p->surfaces[csurf][j] = atoi(iline + sind_verts + sind[val_per_vert*j + 1]) - 1;
-	  }
-	  if (p->surface_texcoords != NULL) {
-	    int *isurf_texcoord = (int*)realloc(p->surface_texcoords[csurf], nvert*sizeof(int));
-	    if (isurf_texcoord == NULL) {
-	      ygglog_error("deserialize_obj: Failed to allocate surface texcoord %d.", csurf);
-	      out = -1;
-	      break;
-	    }
-	    p->surface_texcoords[csurf] = isurf_texcoord;
-	    for (j = 0; j < nvert; j++) {
-	      p->surface_texcoords[csurf][j] = atoi(iline + sind_verts + sind[val_per_vert*j + 2]) - 1;
-	    }
-	  }
-	  if (p->surface_normals != NULL) {
-	    int offset;
-	    if (p->surface_texcoords == NULL) {
-	      offset = 2;
-	    } else {
-	      offset = 3;
-	    }
-	    int* isurf_normal = (int*)realloc(p->surface_normals[csurf], nvert*sizeof(int));
-	    if (isurf_normal == NULL) {
-	      ygglog_error("deserialize_obj: Failed to allocate surface normal %d.", csurf);
-	      out = -1;
-	      break;
-	    }
-	    p->surface_normals[csurf] = isurf_normal;
-	    for (j = 0; j < nvert; j++) {
-	      p->surface_normals[csurf][j] = atoi(iline + sind_verts + sind[val_per_vert*j + offset]) - 1;
-	    }
-	  }
-	  csurf++;
-	} else if (find_matches("\n+", iline, &sind, &eind) == 1) {
-	  // Empty line
+	}
+	// Surfaces
+	else if (find_matches(re_surf_orig, iline, &sind, &eind) == n_re_surf) {
+	  out = decode_surface(p, csurf, iline, re_surf_vert_orig,
+			       &sind, &eind, true, true);
+	}
+	else if (find_matches(re_surf_notexc, iline, &sind, &eind) == n_re_surf) {
+	  out = decode_surface(p, csurf, iline, re_surf_vert_notexc,
+			       &sind, &eind, false, true);
+	}
+	else if (find_matches(re_surf_nonorm, iline, &sind, &eind) == n_re_surf) {
+	  out = decode_surface(p, csurf, iline, re_surf_vert_nonorm,
+			       &sind, &eind, true, false);
+	}
+	else if (find_matches(re_surf_noextr, iline, &sind, &eind) == n_re_surf) {
+	  out = decode_surface(p, csurf, iline, re_surf_vert_noextr,
+			       &sind, &eind, false, false);
+	}
+	else if (find_matches(re_surf_clean, iline, &sind, &eind) == n_re_surf) {
+	  out = decode_surface(p, csurf, iline, re_surf_vert_clean,
+			       &sind, &eind, false, false);
+	}
+	// Empty line
+	else if (find_matches("\n+", iline, &sind, &eind) == 1) {
 	  ygglog_debug("deserialize_obj: Empty line");
-	} else {
+	}
+	// No match
+	else {
 	  ygglog_error("deserialize_obj: Could not match line: %s", iline);
 	  out = -1;
 	  break;
