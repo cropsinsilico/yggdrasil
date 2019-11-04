@@ -1355,7 +1355,6 @@ class CModelDriver(CompiledModelDriver):
             keys['use_generic'] = 'false'
         typename = datatype['type']
         if datatype['type'] == 'array':
-            keys['use_generic'] = 'true'
             if 'items' in datatype:
                 assert(isinstance(datatype['items'], list))
                 keys['nitems'] = len(datatype['items'])
@@ -1373,6 +1372,7 @@ class CModelDriver(CompiledModelDriver):
                 assert(isinstance(requires_freeing, list))
                 requires_freeing += [keys['items']]
             else:
+                keys['use_generic'] = 'true'
                 fmt = 'create_dtype_empty({use_generic})'
         elif datatype['type'] == 'object':
             keys['use_generic'] = 'true'

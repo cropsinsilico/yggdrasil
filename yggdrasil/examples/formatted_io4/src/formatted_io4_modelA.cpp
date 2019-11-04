@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     // Receive input from input channel
     // If there is an error, the flag will be negative
     // Otherwise, it is the size of the received message
-    flag = in_channel.recv(4, &nrows, &name, &count, &size);
+    flag = in_channel.recvRealloc(4, &nrows, &name, &count, &size);
     if (flag < 0) {
       std::cout << "Model A: No more input." << std::endl;
       break;
