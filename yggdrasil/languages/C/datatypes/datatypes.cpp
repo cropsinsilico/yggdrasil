@@ -588,11 +588,9 @@ extern "C" {
     if (dtype->obj == NULL) {
       return 1;
     }
-    if ((strcmp(dtype_name(dtype), "scalar") == 0) &&
-	(strcmp(dtype_subtype(dtype), "bytes") == 0) &&
-	(dtype_precision(dtype) == 0)) {
+    MetaschemaType *obj = dtype2class(dtype);
+    if (obj->is_empty())
       return 1;
-    }
     return 0;
   }
   
@@ -805,6 +803,9 @@ extern "C" {
     try {
       std::vector<MetaschemaType*> items_vec;
       size_t i;
+      if ((nitems > 0) && (items == NULL)) {
+	ygglog_throw_error("create_dtype_json_array: %d items expected, but the items parameter is NULL.", nitems);
+      }
       for (i = 0; i < nitems; i++) {
 	MetaschemaType* iitem = dtype2class(items[i]);
 	items_vec.push_back(iitem);
@@ -824,6 +825,9 @@ extern "C" {
     try {
       std::map<const char*, MetaschemaType*, strcomp> properties;
       size_t i;
+      if ((nitems > 0) && ((keys == NULL) || (values == NULL))) {
+	ygglog_throw_error("create_dtype_json_object: %d items expected, but the keys and/or values parameter is NULL.", nitems);
+      }
       for (i = 0; i < nitems; i++) {
 	MetaschemaType* iitem = dtype2class(values[i]);
 	properties[keys[i]] = iitem;
@@ -1099,18 +1103,6 @@ extern "C" {
 	dtype2.obj = (void*)(type_class);
 	if (set_dtype_name(&dtype2, type_class->type()) < 0) {
 	  return -1;
-	}
-	if (dtype1 != NULL) {
-	  if (is_empty_dtype(dtype1)) {
-	    if (dtype1->obj != NULL) {
-	      MetaschemaType *type_class1 = dtype2class(dtype1);
-	      if (destroy_dtype_class_safe(type_class1) < 0) {
-		return -1;
-	      }
-	    }
-	    dtype1->obj = NULL;
-	    strncpy(dtype1->type, "", COMMBUFFSIZ);
-	  }
 	}
 	if (update_dtype(dtype1, &dtype2) < 0) {
 	  return -1;

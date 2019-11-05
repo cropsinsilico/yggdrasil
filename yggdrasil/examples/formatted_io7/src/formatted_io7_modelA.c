@@ -4,12 +4,12 @@
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
-  yggInput_t in_channel = yggInput("inputA");
-  yggOutput_t out_channel = yggOutput("outputA");
+  yggInput_t in_channel = yggJSONObjectInput("inputA");
+  yggOutput_t out_channel = yggJSONObjectOutput("outputA");
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;
-  map_t obj = init_map();
+  json_object_t obj = init_json_object();
 
   // Loop until there is no longer input or the queues are closed
   while (flag >= 0) {
@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
     // Print received message
     printf("Model A:\n");
-    display_map(obj);
+    display_json_object(obj);
 
     // Send output to output channel
     // If there is an error, the flag will be negative
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Free dynamically allocated obj structure
-  free_map(&obj);
+  free_json_object(&obj);
   
   return 0;
 }

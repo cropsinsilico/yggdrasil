@@ -105,8 +105,15 @@ public:
       return false;
     else
       return true;
-  } 
- /*!
+  }
+  /*!
+    @brief Determine if the datatype is effectively empty.
+    @returns bool true if the datatype is empty, false otherwise.
+   */
+  virtual bool is_empty() const {
+    return false;
+  }
+  /*!
     @brief Create a copy of the type.
     @returns pointer to new MetaschemaType instance with the same data.
    */

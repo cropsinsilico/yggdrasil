@@ -134,6 +134,15 @@ public:
     return true;
   }
   /*!
+    @brief Determine if the datatype is effectively empty.
+    @returns bool true if the datatype is empty, false otherwise.
+   */
+  bool is_empty() const override {
+    if (nitems() == 0)
+      return true;
+    return false;
+  }
+  /*!
     @brief Create a copy of the type.
     @returns pointer to new JSONArrayMetaschemaType instance with the same data.
    */

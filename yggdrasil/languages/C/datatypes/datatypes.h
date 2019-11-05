@@ -33,10 +33,10 @@ typedef struct generic_t {
 } generic_t;
 
 /*! @brief C-friendly definition of vector object. */
-typedef generic_t vector_t;
+typedef generic_t json_array_t;
 
 /*! @brief C-friendly definition of map object. */
-typedef generic_t map_t;
+typedef generic_t json_object_t;
 
 /*! @brief C-friendly definition of schema object. */
 typedef generic_t schema_t;
@@ -683,17 +683,17 @@ size_t nargs_exp_dtype(const dtype_t *dtype);
 
 
 #define free_generic destroy_generic
-#define init_map init_generic
-#define init_vector init_generic
+#define init_json_object init_generic
+#define init_json_array init_generic
 #define init_schema init_generic
-#define free_map free_generic
-#define free_vector free_generic
+#define free_json_object free_generic
+#define free_json_array free_generic
 #define free_schema free_generic
-#define copy_map copy_generic
-#define copy_vector copy_generic
+#define copy_json_object copy_generic
+#define copy_json_array copy_generic
 #define copy_schema copy_generic
-#define display_map display_generic
-#define display_vector display_generic
+#define display_json_object display_generic
+#define display_json_array display_generic
 #define display_schema display_generic
 
   
