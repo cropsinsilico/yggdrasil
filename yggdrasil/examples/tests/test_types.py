@@ -94,7 +94,7 @@ class TestExampleTypes(ExampleTstBase):
                                  'src', 'model' + language_ext)
         drv = import_component('model', language)
         if using_generics and drv.is_typed:
-            testtype = {'type': 'generic'}
+            testtype = {'type': 'any'}
         else:
             testdata = cls.get_test_data(typename)
             testtype = encode_type(testdata)

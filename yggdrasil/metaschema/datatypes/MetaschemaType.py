@@ -180,12 +180,14 @@ class MetaschemaType(object):
         r"""Determine if this type is a subclass of the provided type.
 
         Args:
-            t (str): Type name to check against.
+            t (str, list): Type name or list of type names to check against.
 
         Returns:
             bool: True if this type is a subtype of the specified type t.
 
         """
+        if isinstance(t, list):
+            return (cls.name in t)
         return (cls.name == t)
 
     @classmethod

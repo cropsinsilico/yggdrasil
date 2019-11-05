@@ -329,7 +329,7 @@ class CModelDriver(CompiledModelDriver):
         'class': 'python_class_t',
         'function': 'python_function_t',
         'instance': 'python_instance_t',
-        'generic': 'generic_t'}
+        'any': 'generic_t'}
     function_param = {
         'import': '#include \"{filename}\"',
         'index': '{variable}[{index}]',
@@ -353,7 +353,7 @@ class CModelDriver(CompiledModelDriver):
         'init_class': 'init_python()',
         'init_function': 'init_python()',
         'init_instance': 'init_generic()',
-        'init_generic': 'init_generic()',
+        'init_any': 'init_generic()',
         'copy_array': '{name} = copy_json_array({value});',
         'copy_object': '{name} = copy_json_object({value});',
         'copy_schema': '{name} = copy_schema({value});',
@@ -362,7 +362,7 @@ class CModelDriver(CompiledModelDriver):
         'copy_class': '{name} = copy_python({value});',
         'copy_function': '{name} = copy_python({value});',
         'copy_instance': '{name} = copy_generic({value});',
-        'copy_generic': '{name} = copy_generic({value});',
+        'copy_any': '{name} = copy_generic({value});',
         'free_array': 'free_json_array({variable});',
         'free_object': 'free_json_object({variable});',
         'free_schema': 'free_schema({variable});',
@@ -371,7 +371,7 @@ class CModelDriver(CompiledModelDriver):
         'free_class': 'destroy_python({variable});',
         'free_function': 'destroy_python({variable});',
         'free_instance': 'free_generic({variable});',
-        'free_generic': 'free_generic({variable});',
+        'free_any': 'free_generic({variable});',
         'print_complex': 'print_complex({object});',
         'print_array': 'display_json_array({object});',
         'print_object': 'display_json_object({object});',
@@ -381,7 +381,7 @@ class CModelDriver(CompiledModelDriver):
         'print_class': 'display_python({object});',
         'print_function': 'display_python({object});',
         'print_instance': 'display_generic({object});',
-        'print_generic': 'display_generic({object});',
+        'print_any': 'display_generic({object});',
         'assign': '{name} = {value};',
         'assign_copy': 'memcpy({name}, {value}, {N}*sizeof({native_type}));',
         'comment': '//',
@@ -722,7 +722,7 @@ class CModelDriver(CompiledModelDriver):
                                                    'bytes_t', 'unicode_t'])
                          and (not v.get('is_length_var', False))
                          and (v['datatype']['type'] not in
-                              ['generic', 'object', 'array', 'schema',
+                              ['any', 'object', 'array', 'schema',
                                'instance', '1darray', 'ndarray'])
                          and (cls.function_param['recv_function']
                               == cls.function_param['recv_heap']))):
@@ -1449,7 +1449,7 @@ class CModelDriver(CompiledModelDriver):
         elif typename == 'schema':
             keys['use_generic'] = 'true'
             fmt = 'create_dtype_schema({use_generic})'
-        elif typename == 'generic':
+        elif typename == 'any':
             keys['use_generic'] = 'true'
             fmt = 'create_dtype_empty({use_generic})'
         else:  # pragma: debug

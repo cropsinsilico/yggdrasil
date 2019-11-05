@@ -46,7 +46,7 @@ class AnyMetaschemaType(MetaschemaType):
         """
         out = None
         if isinstance(typedef, dict):
-            out = typedef.get('temptype', None)
+            out = typedef.get('temptype', typedef)
         return out
         
     @classmethod

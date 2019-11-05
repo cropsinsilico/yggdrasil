@@ -1842,8 +1842,8 @@ checking if the model flag indicates
             print_key = None
             if ('print_%s' % typename) in cls.function_param:
                 print_key = ('print_%s' % typename)
-            elif 'print_any' in cls.function_param:
-                print_key = 'print_any'
+            elif 'print_generic' in cls.function_param:
+                print_key = 'print_generic'
             if print_key:
                 if prefix_msg is None:
                     out.append(prefix_msg)

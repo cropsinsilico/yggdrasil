@@ -59,7 +59,7 @@ class PythonModelDriver(InterpretedModelDriver):
         'and': 'and',
         'indent': 4 * ' ',
         'quote': '\"',
-        'print_any': 'print({object})',
+        'print_generic': 'print({object})',
         'print': 'print(\"{message}\")',
         'fprintf': 'print(\"{message}\" % ({variables}))',
         'error': 'raise Exception("{error_msg}")',

@@ -474,7 +474,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'and': '&&',
         'indent': 2 * ' ',
         'quote': '\'',
-        'print_any': 'disp({object});',
+        'print_generic': 'disp({object});',
         'print': 'disp(\'{message}\');',
         'fprintf': 'fprintf(\'{message}\', {variables});',
         'error': 'error(\'{error_msg}\');',

@@ -244,12 +244,16 @@ def get_type_class(type_name):
     r"""Return a type class given it's name.
 
     Args:
-        type_name (str): Name of type class.
+        type_name (str, list): Name of type class or list of names of type classes.
 
     Returns:
         class: Type class.
 
     """
+    from yggdrasil.metaschema.datatypes.MultiMetaschemaType import (
+        create_multitype_class)
+    if isinstance(type_name, list):
+        return create_multitype_class(type_name)
     if type_name not in _type_registry:
         raise ValueError("Class for type '%s' could not be found." % type_name)
     return _type_registry[type_name]
@@ -410,7 +414,8 @@ def decode_data(obj, typedef):
     if isinstance(typedef, dict) and ('type' in typedef):
         cls = get_type_class(typedef['type'])
     else:
-        raise ValueError("Type not properly specified.")
+        raise ValueError("Type not properly specified: %s."
+                         % typedef)
     return cls.decode_data(obj, typedef)
 
 

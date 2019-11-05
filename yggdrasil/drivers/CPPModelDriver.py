@@ -72,7 +72,7 @@ class CPPModelDriver(CModelDriver):
         send_function='{channel}.send',
         exec_prefix=('#include <iostream>\n'
                      '#include <exception>\n'),
-        print_any='std::cout << {object} << std::endl << std::flush;',
+        print_generic='std::cout << {object} << std::endl << std::flush;',
         error='throw \"{error_msg}\";',
         try_begin='try {',
         try_error_type='const std::exception&',
