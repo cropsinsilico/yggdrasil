@@ -4,8 +4,8 @@
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
-  YggGenericInput in_channel("inputB");
-  YggGenericOutput out_channel("outputB");
+  YggAnyInput in_channel("inputB");
+  YggAnyOutput out_channel("outputB");
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;

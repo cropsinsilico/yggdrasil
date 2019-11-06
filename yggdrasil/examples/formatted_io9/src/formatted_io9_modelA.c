@@ -4,8 +4,8 @@
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
-  yggInput_t in_channel = yggGenericInput("inputA");
-  yggOutput_t out_channel = yggGenericOutput("outputA");
+  yggInput_t in_channel = yggAnyInput("inputA");
+  yggOutput_t out_channel = yggAnyOutput("outputA");
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;

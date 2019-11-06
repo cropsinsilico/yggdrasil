@@ -10,6 +10,7 @@
 #include "PyObjMetaschemaType.h"
 #include "PyInstMetaschemaType.h"
 #include "SchemaMetaschemaType.h"
+#include "AnyMetaschemaType.h"
 #include "datatypes.h"
 
 #include "rapidjson/document.h"
@@ -79,6 +80,8 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc,
       return new PyInstMetaschemaType(type_doc, use_generic);
     case T_SCHEMA:
       return new SchemaMetaschemaType(type_doc, use_generic);
+    case T_ANY:
+      return new AnyMetaschemaType(type_doc, use_generic);
     }
   }
   ygglog_throw_error("Could not find class from doc for type '%s'.", type);
@@ -134,6 +137,8 @@ MetaschemaType* type_from_pyobj(PyObject* pyobj,
       return new PyInstMetaschemaType(pyobj, use_generic);
     case T_SCHEMA:
       return new SchemaMetaschemaType(pyobj, use_generic);
+    case T_ANY:
+      return new AnyMetaschemaType(pyobj, use_generic);
     }
   }
   ygglog_throw_error("type_from_pyobj: Could not find class from doc for type '%s'.", type);
@@ -411,6 +416,8 @@ MetaschemaType* dtype2class(const dtype_t* dtype) {
       return static_cast<PyInstMetaschemaType*>(dtype->obj);
     case T_SCHEMA:
       return static_cast<SchemaMetaschemaType*>(dtype->obj);
+    case T_ANY:
+      return static_cast<AnyMetaschemaType*>(dtype->obj);
     }
   } else {
     ygglog_throw_error("dtype2class: No handler for type '%s'.", dtype->type);
@@ -909,6 +916,17 @@ extern "C" {
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_schema: C++ exception thrown.");
+      CSafe(delete obj);
+      return NULL;
+    }
+  }
+  dtype_t* create_dtype_any(const bool use_generic=true) {
+    AnyMetaschemaType* obj = NULL;
+    try {
+      obj = new AnyMetaschemaType(use_generic);
+      return create_dtype(obj);
+    } catch(...) {
+      ygglog_error("create_dtype_any: C++ exception thrown.");
       CSafe(delete obj);
       return NULL;
     }

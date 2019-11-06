@@ -14,7 +14,7 @@
 enum { T_BOOLEAN, T_INTEGER, T_NULL, T_NUMBER, T_STRING, T_ARRAY, T_OBJECT,
        T_DIRECT, T_1DARRAY, T_NDARRAY, T_SCALAR, T_FLOAT, T_UINT, T_INT, T_COMPLEX,
        T_BYTES, T_UNICODE, T_PLY, T_OBJ, T_ASCII_TABLE,
-       T_CLASS, T_FUNCTION, T_INSTANCE, T_SCHEMA };
+       T_CLASS, T_FUNCTION, T_INSTANCE, T_SCHEMA, T_ANY };
 
 
 /*!
@@ -85,6 +85,7 @@ std::map<const char*, int, strcomp> get_type_map() {
     global_type_map["function"] = T_FUNCTION;
     global_type_map["instance"] = T_INSTANCE;
     global_type_map["schema"] = T_SCHEMA;
+    global_type_map["any"] = T_ANY;
   }
   return global_type_map;
 };
@@ -135,6 +136,10 @@ public:
     @brief Free the memory used by the data.
    */
   void free_data();
+  /*!
+    @brief Free the memory used by the type.
+   */
+  void free_type();
   /*!
     @brief Get a copy.
     @returns YggGeneric* Copy of this class.

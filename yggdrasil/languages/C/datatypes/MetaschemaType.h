@@ -28,9 +28,12 @@ public:
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
    */
-  MetaschemaType(const char* type, const bool use_generic=false) :
+  MetaschemaType(const char* type, const bool use_generic=false,
+		 const bool always_generic=false) :
     type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
-    nbytes_(0), use_generic_(use_generic) {
+    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic) {
+    if (always_generic_)
+      update_use_generic(true);
     update_type(type);
   }
   /*!
@@ -41,9 +44,12 @@ public:
     objects will be expected to be YggGeneric classes.
    */
   MetaschemaType(const rapidjson::Value &type_doc,
-		 const bool use_generic=false) :
+		 const bool use_generic=false,
+		 const bool always_generic=false) :
     type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
-    nbytes_(0), use_generic_(use_generic) {
+    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic) {
+    if (always_generic_)
+      update_use_generic(true);
     if (!(type_doc.IsObject()))
       ygglog_throw_error("MetaschemaType: Parsed document is not an object.");
     if (!(type_doc.HasMember("type")))
@@ -58,9 +64,12 @@ public:
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
    */
-  MetaschemaType(PyObject* pyobj, const bool use_generic=false) :
+  MetaschemaType(PyObject* pyobj, const bool use_generic=false,
+		 const bool always_generic=false) :
     type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
-    nbytes_(0), use_generic_(use_generic) {
+    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic) {
+    if (always_generic_)
+      update_use_generic(true);
     if (!(PyDict_Check(pyobj))) {
       ygglog_throw_error("MetaschemaType: Python object must be a dict.");
     }
@@ -310,7 +319,10 @@ public:
    */
   virtual void update_use_generic(const bool new_use_generic) {
     bool* use_generic_modifier = const_cast<bool*>(&use_generic_);
-    *use_generic_modifier = new_use_generic;
+    if (always_generic_)
+      *use_generic_modifier = true;
+    else
+      *use_generic_modifier = new_use_generic;
   }
   /*!
     @brief Set the type length.
@@ -938,6 +950,11 @@ public:
   virtual int deserialize(const char *buf, const size_t buf_siz,
 			  YggGeneric* x) {
     update_from_deserialization_args(x);
+    if (x->get_type() == NULL) {
+      ygglog_throw_error("MetaschemaType::deserialize: "
+			 "The type associated with the generic "
+			 "object is NULL.");
+    }
     if (*(x->get_type()) != (*this)) {
       printf("Generic object's type:\n");
       x->get_type()->display();
@@ -967,9 +984,13 @@ public:
 private:
   const char *type_;
   const int type_code_;
+protected:
   bool updated_;
+private:
   const int nbytes_;
   const bool use_generic_;
+protected:
+  bool always_generic_;
 };
 
 
@@ -988,11 +1009,7 @@ YggGeneric::YggGeneric(const YggGeneric &other) :
 
 YggGeneric::~YggGeneric() {
   free_data();
-  data = NULL;
-  if (type != NULL) {
-    delete type;
-    type = NULL;
-  }
+  free_type();
 };
 
 void YggGeneric::display(const char* indent) const {
@@ -1000,12 +1017,24 @@ void YggGeneric::display(const char* indent) const {
 };
 
 void* YggGeneric::copy_data(void* orig_data) const {
+  if (orig_data == NULL)
+    orig_data = data;
+  if (orig_data == NULL)
+    return NULL;
   return type->copy_generic(this, orig_data);
 };
 
 void YggGeneric::free_data() {
   if ((data != NULL) && (type != NULL)) {
     type->free_generic(this);
+  }
+  data = NULL;
+};
+
+void YggGeneric::free_type() {
+  if (type != NULL) {
+    delete type;
+    type = NULL;
   }
 };
 

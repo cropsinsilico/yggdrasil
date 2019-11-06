@@ -4,20 +4,20 @@ models:
     args: ./src/formatted_io9_modelA.c
     inputs:
       - name: inputA
-        type: object
+        type: any
     outputs:
       - name: outputA
-        type: object
+        type: any
 
   - name: c_modelB
     language: c
     args: ./src/formatted_io9_modelB.c
     inputs:
       - name: inputB
-        type: object
+        type: any
     outputs:
       - name: outputB
-        type: object
+        type: any
 
 connections:
   - input: outputA  # Connection between model A output & model B input

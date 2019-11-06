@@ -460,6 +460,15 @@ dtype_t* create_dtype_schema(const bool use_generic);
 
 
 /*!
+  @brief Construct a type object for receiving any type.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
+  @returns dtype_t* Type structure/class.
+ */
+dtype_t* create_dtype_any(const bool use_generic);
+
+
+/*!
   @brief Wrapper for freeing MetaschemaType class wrapper struct.
   @param[in] dtype dtype_t** Wrapper struct for C++ Metaschema type class.
   @returns: int 0 if free was successfull, -1 if there was an error.

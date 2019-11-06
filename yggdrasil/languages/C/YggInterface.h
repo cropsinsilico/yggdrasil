@@ -882,6 +882,67 @@ comm_t* yggGenericInput(const char *name) {
   
 //==============================================================================
 /*!
+  Generic object I/O of any type.
+
+  Handle I/O from/to a generic object of any type.
+
+  Input Usage:
+      1. One-time: Create interface by providing a channel name.
+	    comm_t* fin = yggAnyInput("file_channel");  // channel
+      2. Prepare: Allocate generic structure.
+            generic_t p;
+      3. Receive each structure, terminating when receive returns -1 (EOF or channel
+         closed).
+	    int ret = 1;
+	    while (ret > 0) {
+	      ret = yggRecv(fin, &p);
+	      // Do something with the generic structure
+	    }
+
+  Output by Usage:
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t* fout = yggAnyOutput("file_channel");  // channel
+      2. Send structure to the file by providing entries. Formatting is handled by
+         the interface. If return value is not 0, the send was not succesful.
+            int ret;
+	    generic_t p;
+	    // Populate the structure
+	    ret = yggSend(fout, p);
+
+*/
+//==============================================================================
+
+/*!
+  @brief Constructor for generic output comm to an output channel.
+  @param[in] name constant character pointer to output channel name.
+  @returns comm_t* output structure.
+ */
+static inline
+comm_t* yggAnyOutput(const char *name) {
+  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_any(true));
+  if ((out->valid) && (out->datatype->obj == NULL)) {
+    out->valid = 0;
+  }
+  return out;
+};
+
+/*!
+  @brief Constructor for generic input comm from an input channel.
+  @param[in] name constant character pointer to input channel name.
+  @returns comm_t* input structure.
+ */
+static inline
+comm_t* yggAnyInput(const char *name) {
+  comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_any(true));
+  if ((out->valid) && (out->datatype->obj == NULL)) {
+    out->valid = 0;
+  }
+  return out;
+};
+
+  
+//==============================================================================
+/*!
   JSON array IO
 
   Handle I/O from/to a JSON array.

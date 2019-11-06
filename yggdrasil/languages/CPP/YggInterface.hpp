@@ -768,6 +768,54 @@ public:
 
 
 /*!
+  @brief C++ interface to yggAnyOutput_t functionality.
+  The YggAnyOutput class is a basic wrapper around the C
+  yggAnyOutput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
+  ASCII file output operations.
+ */
+class YggAnyOutput : public YggOutput {
+public:
+
+  /*!
+    @brief Constructor for YggAnyOutput.
+    @param[in] name constant character pointer to the name of an output channel.
+   */
+  YggAnyOutput(const char *name) :
+    YggOutput(yggAnyOutput(name)) {}
+  
+  /*! @brief Empty constructor for inheritance. */
+  YggAnyOutput(yggOutput_t x) :
+    YggOutput(x) {}
+  
+};
+
+
+/*!
+  @brief C++ interface to yggAnyInput_t functionality.
+  The YggAnyInput class is a basic wrapper around the C
+  yggAnyInput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
+  ASCII file input operations.
+ */
+class YggAnyInput : public YggInput {
+public:
+
+  /*!
+    @brief Constructor for YggAnyInput.
+    @param[in] name constant character pointer to the name of an input channel.
+   */
+  YggAnyInput(const char *name) :
+    YggInput(yggAnyInput(name)) {}
+
+  /*! @brief Empty constructor for inheritance. */
+  YggAnyInput(yggInput_t x) :
+    YggInput(x) {}
+  
+};
+
+
+/*!
   @brief C++ interface to yggJSONArrayOutput_t functionality.
   The YggJSONArrayOutput class is a basic wrapper around the C
   yggJSONArrayOutput_t structure and associated functions from the
