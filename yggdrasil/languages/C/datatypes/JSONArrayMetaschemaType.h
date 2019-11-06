@@ -334,13 +334,16 @@ public:
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
    */
-  void update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
-    MetaschemaType::update_from_serialization_args(nargs, ap);
-    if ((all_arrays()) && (*nargs == (nitems() + 1))) {
+  size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
+    size_t i, iout;
+    size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
+    if ((all_arrays()) && (*nargs >= (nitems() + 1))) {
       size_t nrows = va_arg(ap.va, size_t);
-      (*nargs)--;
-      size_t i;
+      nskip_before_++;
+      out++;
       for (i = 0; i < items_.size(); i++) {
 	if (items_[i]->type_code() != T_1DARRAY) {
 	  ygglog_throw_error("JSONArrayMetaschemaType::update_from_serialization_args: "
@@ -348,9 +351,59 @@ public:
 			     "parameter is set, indicating it should "
 			     "be \"1darray\".", i, items_[i]->type());
 	}
-	items_[i]->set_length(nrows);
+	items_[i]->set_length(nrows, true);
+	items_[i]->set_variable_length(false);
       }
     }
+    size_t new_nargs;
+    for (i = 0; i < items_.size(); i++) {
+      new_nargs = nargs[0] - out;
+      iout = items_[i]->update_from_serialization_args(&new_nargs, ap);
+      if (iout == 0) {
+	for (iout = 0; iout < items_[i]->nargs_exp(); iout++) {
+	  va_arg(ap.va, void*);
+	}
+      }
+      out = out + iout;
+    }
+    return out;
+  }
+  /*!
+    @brief Update the type object with info from provided variable arguments for deserialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
+   */
+  size_t update_from_deserialization_args(size_t *nargs, va_list_t &ap) override {
+    size_t i, iout;
+    size_t out = MetaschemaType::update_from_deserialization_args(nargs, ap);
+    if ((all_arrays()) && (*nargs >= (nitems() + 1))) {
+      size_t *nrows = va_arg(ap.va, size_t*);
+      size_t inrows;
+      nskip_before_++;
+      out++;
+      *nrows = items_[0]->nelements();
+      for (i = 1; i < items_.size(); i++) {
+	inrows = items_[i]->nelements();
+	if (*nrows != inrows) {
+	  ygglog_error("JSONArrayMetaschemaType::update_from_deserialization_args: Number of rows not consistent across all items.");
+	  return false;
+	}
+      }
+    }
+    size_t new_nargs;
+    for (i = 0; i < items_.size(); i++) {
+      new_nargs = nargs[0] - out;
+      iout = items_[i]->update_from_deserialization_args(&new_nargs, ap);
+      if (iout == 0) {
+	for (iout = 0; iout < items_[i]->nargs_exp(); iout++) {
+	  va_arg(ap.va, void*);
+	}
+      }
+      out = out + iout;
+    }
+    return out;
   }
   /*!
     @brief Get the item size.
@@ -369,6 +422,8 @@ public:
     for (i = 0; i < items_.size(); i++) {
       nargs = nargs + items_[i]->nargs_exp();
     }
+    if (all_arrays())
+      nargs++;
     return nargs;
   }
   /*!
@@ -459,7 +514,7 @@ public:
     size_t i;
     writer->StartArray();
     for (i = 0; i < items_.size(); i++) {
-      if (!(items_[i]->encode_data(writer, nargs, ap)))
+      if (!(items_[i]->encode_data_remove_args(writer, nargs, ap)))
 	return false;
     }
     writer->EndArray();
@@ -514,19 +569,6 @@ public:
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) const override {
     size_t i;
-    if (all_arrays()) {
-      size_t *nrows = va_arg(ap.va, size_t*);
-      size_t inrows;
-      (*nargs)--;
-      *nrows = items_[0]->nelements();
-      for (i = 1; i < items_.size(); i++) {
-	inrows = items_[i]->nelements();
-	if (*nrows != inrows) {
-	  ygglog_error("JSONArrayMetaschemaType::decode_data: Number of rows not consistent across all items.");
-	  return false;
-	}
-      }
-    }
     if (!(data.IsArray())) {
       ygglog_error("JSONArrayMetaschemaType::decode_data: Raw data is not an array.");
       return false;

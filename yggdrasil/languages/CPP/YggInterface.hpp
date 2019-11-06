@@ -47,7 +47,10 @@ public:
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
-  void _destroy_pi() { ygg_free(_pi); }
+  void _destroy_pi() {
+    ygg_free(_pi);
+    _pi = NULL;
+  }
   
   /*!
     @brief Destructor for YggInput.
@@ -187,7 +190,10 @@ public:
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
-  void _destroy_pi() { ygg_free(_pi); }
+  void _destroy_pi() {
+    ygg_free(_pi);
+    _pi = NULL;
+  }
   
   /*!
     @brief Destructor for YggOutput.
@@ -284,7 +290,10 @@ public:
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
-  void _destroy_pi() { ygg_free(_pi); }
+  void _destroy_pi() {
+    ygg_free(_pi);
+    _pi = NULL;
+  }
   
   /*!
     @brief Destructor for YggRpc.

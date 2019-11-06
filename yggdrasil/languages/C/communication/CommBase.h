@@ -83,6 +83,8 @@ int free_comm_base(comm_t *x) {
     x->datatype = NULL;
   }
   x->valid = 0;
+  x->name[0] = '\0';
+  x->index_in_register = -1;
   return 0;
 };
 

@@ -316,6 +316,54 @@ public:
     }
   }
   /*!
+    @brief Update the type object with info from provided variable arguments for serialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
+   */
+  size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
+    size_t iout;
+    size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    size_t new_nargs;
+    for (it = properties_.begin(); it != properties_.end(); it++) {
+      new_nargs = nargs[0] - out;
+      iout = it->second->update_from_serialization_args(&new_nargs, ap);
+      if (iout == 0) {
+	for (iout = 0; iout < it->second->nargs_exp(); iout++) {
+	  va_arg(ap.va, void*);
+	}
+      }
+      out = out + iout;
+    }
+    return out;
+  }
+  /*!
+    @brief Update the type object with info from provided variable arguments for deserialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
+   */
+  size_t update_from_deserialization_args(size_t *nargs, va_list_t &ap) override {
+    size_t iout;
+    size_t out = MetaschemaType::update_from_deserialization_args(nargs, ap);
+    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    size_t new_nargs;
+    for (it = properties_.begin(); it != properties_.end(); it++) {
+      new_nargs = nargs[0] - out;
+      iout = it->second->update_from_deserialization_args(&new_nargs, ap);
+      if (iout == 0) {
+	for (iout = 0; iout < it->second->nargs_exp(); iout++) {
+	  va_arg(ap.va, void*);
+	}
+      }
+      out = out + iout;
+    }
+    return out;
+  }
+  /*!
     @brief Get the item size.
     @returns size_t Size of item in bytes.
    */

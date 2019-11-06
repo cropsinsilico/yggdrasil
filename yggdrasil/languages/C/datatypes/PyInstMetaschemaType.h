@@ -225,12 +225,14 @@ public:
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
    */
-  void update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
+  size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
+    size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
     if (args_type_ == NULL) {
-      va_list ap_copy;
-      va_copy(ap_copy, ap.va);
-      python_t arg = va_arg(ap_copy, python_t);
+      python_t arg = va_arg(ap.va, python_t);
+      out++;
       update_class_name(arg.name);
       if ((args_type_ == NULL) && (arg.obj != NULL)) {
 	PyObject *py_class = import_python_class("yggdrasil.metaschema.properties.ArgsMetaschemaProperty",
@@ -248,7 +250,7 @@ public:
 	// update_args_type(new_args_type,);
       }
     }
-    return;
+    return out;
   }
   /*!
     @brief Convert a Python representation to a C representation.

@@ -31,7 +31,8 @@ public:
   MetaschemaType(const char* type, const bool use_generic=false,
 		 const bool always_generic=false) :
     type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
-    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic) {
+    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic),
+    nskip_before_(0), nskip_after_(0) {
     if (always_generic_)
       update_use_generic(true);
     update_type(type);
@@ -47,7 +48,8 @@ public:
 		 const bool use_generic=false,
 		 const bool always_generic=false) :
     type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
-    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic) {
+    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic),
+    nskip_before_(0), nskip_after_(0) {
     if (always_generic_)
       update_use_generic(true);
     if (!(type_doc.IsObject()))
@@ -67,7 +69,8 @@ public:
   MetaschemaType(PyObject* pyobj, const bool use_generic=false,
 		 const bool always_generic=false) :
     type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
-    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic) {
+    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic),
+    nskip_before_(0), nskip_after_(0) {
     if (always_generic_)
       update_use_generic(true);
     if (!(PyDict_Check(pyobj))) {
@@ -277,17 +280,25 @@ public:
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
    */
-  virtual void update_from_serialization_args(size_t *nargs, va_list_t &ap) {
-    return;
+  virtual size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) {
+    nskip_before_ = 0;
+    nskip_after_ = 0;
+    return 0;
   }
   /*!
     @brief Update the type object with info from provided variable arguments for deserialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
    */
-  virtual void update_from_deserialization_args(size_t *nargs, va_list_t &ap) {
-    return;
+  virtual size_t update_from_deserialization_args(size_t *nargs, va_list_t &ap) {
+    nskip_before_ = 0;
+    nskip_after_ = 0;
+    return 0;
   }
   /*!
     @brief Update the type object with info from provided variable arguments for serialization.
@@ -338,6 +349,16 @@ public:
     new_length;
 #endif 
     ygglog_throw_error("MetaschemaType::set_length: Cannot set length for type '%s'.", type_);
+  }
+  /*!
+    @brief Set the _variable_length private variable.
+    @param[in] new_variable_length bool New value.
+   */
+  virtual void set_variable_length(bool new_variable_length) {
+#ifdef _WIN32
+    new_variable_length;
+#endif 
+    ygglog_throw_error("MetaschemaType::set_variable_length: Cannot set variable_length for type '%s'.", type_);
   }
   /*!
     @brief Get the number of elements in the type.
@@ -579,6 +600,31 @@ public:
     return out;
   }
   /*!
+    @brief Encode data, but remove args before and after that were
+    used by update_from_serialization_args and should not remain in
+    the variable argument list.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @param[in,out] nargs size_t * Pointer to the number of arguments contained in
+    ap. On return it will be set to the number of arguments used.
+    @param[in] ap va_list_t Variable number of arguments that should be encoded
+    as a JSON string.
+    @returns bool true if the encoding was successful, false otherwise.
+  */
+  bool encode_data_remove_args(rapidjson::Writer<rapidjson::StringBuffer> *writer,
+			       size_t *nargs, va_list_t &ap) const {
+    size_t i;
+    for (i = 0; i < nskip_before_; i++) {
+      va_arg(ap.va, void*);
+      (*nargs)--;
+    }
+    bool out = encode_data(writer, nargs, ap);
+    for (i = 0; i < nskip_after_; i++) {
+      va_arg(ap.va, void*);
+      (*nargs)--;
+    }
+    return out;
+  }
+  /*!
     @brief Encode arguments describine an instance of this type into a JSON string.
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @param[in] x YggGeneric* Pointer to generic wrapper for data.
@@ -693,14 +739,16 @@ public:
    */
   virtual int serialize(char **buf, size_t *buf_siz,
 			const int allow_realloc, size_t *nargs, va_list_t &ap) {
-    update_from_serialization_args(nargs, ap);
+    va_list_t ap_copy;
+    va_copy(ap_copy.va, ap.va);
+    update_from_serialization_args(nargs, ap_copy);
     if (nargs_exp() != *nargs) {
       ygglog_throw_error("MetaschemaType::serialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
     }
     rapidjson::StringBuffer body_buf;
     rapidjson::Writer<rapidjson::StringBuffer> body_writer(body_buf);
-    bool out = encode_data(&body_writer, nargs, ap);
+    bool out = encode_data_remove_args(&body_writer, nargs, ap);
     if (!(out)) {
       return -1;
     }
@@ -886,6 +934,32 @@ public:
   /*!
     @brief Decode variables from a JSON string.
     @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[in] allow_realloc int If 1, the passed variables will be reallocated
+    to contain the deserialized data.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On return,
+    the number of arguments assigned from the deserialized data will be assigned
+    to this address.
+    @param[out] ap va_list_t Reference to variable argument list containing
+    address where deserialized data should be assigned.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
+  bool decode_data_remove_args(rapidjson::Value &data, const int allow_realloc,
+			       size_t *nargs, va_list_t &ap) const {
+    size_t i;
+    for (i = 0; i < nskip_before_; i++) {
+      va_arg(ap.va, void*);
+      (*nargs)--;
+    }
+    bool out = decode_data(data, allow_realloc, nargs, ap);
+    for (i = 0; i < nskip_after_; i++) {
+      va_arg(ap.va, void*);
+      (*nargs)--;
+    }
+    return out;
+  }
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
     @param[out] x YggGeneric* Pointer to generic object where data should be stored.
     @returns bool true if the data was successfully decoded, false otherwise.
    */
@@ -920,15 +994,17 @@ public:
   virtual int deserialize(const char *buf, const size_t buf_siz,
 			  const int allow_realloc, size_t* nargs, va_list_t &ap) {
     const size_t nargs_orig = *nargs;
-    update_from_deserialization_args(nargs, ap);
-    if (nargs_exp() > *nargs) {
+    va_list_t ap_copy;
+    va_copy(ap_copy.va, ap.va);
+    update_from_deserialization_args(nargs, ap_copy);
+    if (nargs_exp() != *nargs) {
       ygglog_throw_error("MetaschemaType::deserialize: %d arguments expected, but only %d provided.",
 			 nargs_exp(), *nargs);
     }
     // Parse body
     rapidjson::Document body_doc;
     body_doc.Parse(buf, buf_siz);
-    bool out = decode_data(body_doc, allow_realloc, nargs, ap);
+    bool out = decode_data_remove_args(body_doc, allow_realloc, nargs, ap);
     if (!(out)) {
       ygglog_error("MetaschemaType::deserialize: One or more errors while parsing body.");
       return -1;
@@ -991,6 +1067,8 @@ private:
   const bool use_generic_;
 protected:
   bool always_generic_;
+  size_t nskip_before_;
+  size_t nskip_after_;
 };
 
 

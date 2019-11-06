@@ -468,25 +468,26 @@ public:
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
    */
-  virtual void update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
-    MetaschemaType::update_from_serialization_args(nargs, ap);
+  virtual size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
+    size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
     if (type_code() == T_SCALAR) {
       switch (subtype_code_) {
       case T_BYTES:
       case T_UNICODE: {
 	if (_variable_precision) {
-	  va_list ap_copy;
-	  va_copy(ap_copy, ap.va);
-	  char* arg0 = va_arg(ap_copy, char*);
+	  char* arg0 = va_arg(ap.va, char*);
 	  UNUSED(arg0); // Parameter extract to get next
-	  const size_t arg0_siz = va_arg(ap_copy, size_t);
+	  const size_t arg0_siz = va_arg(ap.va, size_t);
 	  set_precision(8 * arg0_siz);
+	  out = out + 1;
 	}
       }
       }
     }
-    return;
+    return out;
   }
   /*!
     @brief Update the instance's type.
@@ -1330,6 +1331,11 @@ public:
    */
   void numpy_dims(int *nd, npy_intp **dims) const override;
   /*!
+    @brief Get the number of arguments expected to be filled/used by the type.
+    @returns size_t Number of arguments.
+   */
+  size_t nargs_exp() const override;
+  /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */
@@ -1338,14 +1344,18 @@ public:
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
    */
-  void update_from_serialization_args(size_t *nargs, va_list_t &ap) override;
+  size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override;
   /*!
     @brief Update the type object with info from provided variable arguments for deserialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
    */
-  void update_from_deserialization_args(size_t *nargs, va_list_t &ap) override;
+  size_t update_from_deserialization_args(size_t *nargs, va_list_t &ap) override;
   /*!
     @brief Update the instance's shape.
     @param[in] new_shape std::vector<size_t> Vector of new array sizes in each dimension.
@@ -1528,37 +1538,39 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
    */
-  void update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
-    ScalarMetaschemaType::update_from_serialization_args(nargs, ap);
-    if (*nargs == 2) {
-      va_list ap_copy;
-      va_copy(ap_copy, ap.va);
-      unsigned char* temp = va_arg(ap_copy, unsigned char*);
+  size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
+    size_t out = ScalarMetaschemaType::update_from_serialization_args(nargs, ap);
+    if ((_variable_length) && (*nargs >= 2)) {
+      unsigned char* temp = va_arg(ap.va, unsigned char*);
       UNUSED(temp); // Parameter extract to get next
-      size_t new_length = va_arg(ap_copy, size_t);
-      (*nargs)--;
+      size_t new_length = va_arg(ap.va, size_t);
+      nskip_after_++;
       set_length(new_length);
+      out = out + 2;
     }
-    return;
+    return out;
   }
   /*!
     @brief Update the type object with info from provided variable arguments for deserialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
    */
-  void update_from_deserialization_args(size_t *nargs, va_list_t &ap) override {
-    MetaschemaType::update_from_deserialization_args(nargs, ap);
-    if (*nargs == 2) {
-       va_list ap_copy;
-      va_copy(ap_copy, ap.va);
-      unsigned char** temp = va_arg(ap_copy, unsigned char**);
+  size_t update_from_deserialization_args(size_t *nargs, va_list_t &ap) override {
+    size_t out = MetaschemaType::update_from_deserialization_args(nargs, ap);
+    if ((_variable_length) && (*nargs >= 2)) {
+      unsigned char** temp = va_arg(ap.va, unsigned char**);
       UNUSED(temp); // Parameter extracted to get next
-      size_t * const new_length = va_arg(ap_copy, size_t*);
-      (*nargs)--;
+      size_t * const new_length = va_arg(ap.va, size_t*);
       new_length[0] = length_;
+      nskip_after_++;
+      out = out + 2;
     }
-    return;
+    return out;
   }
   /*!
     @brief Update the instance's length.
@@ -1581,11 +1593,28 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     }
   }
   /*!
+    @brief Set the _variable_length private variable.
+    @param[in] new_variable_length bool New value.
+   */
+  void set_variable_length(bool new_variable_length) override {
+    _variable_length = new_variable_length;
+  }
+  /*!
     @brief Get type length.
     @returns size_t Number of elements in the array.
   */
   size_t length() const {
     return length_;
+  }
+  /*!
+    @brief Get the number of arguments expected to be filled/used by the type.
+    @returns size_t Number of arguments.
+   */
+  size_t nargs_exp() const override {
+    size_t out = 1;
+    if (_variable_length)
+      out++;
+    return out;
   }
   /*!
     @brief Encode the type's properties in a JSON string.
@@ -1735,38 +1764,41 @@ void NDArrayMetaschemaType::numpy_dims(int *nd, npy_intp **dims) const {
   }
   dims[0] = idim;
 };
+size_t NDArrayMetaschemaType::nargs_exp() const {
+  size_t out = 1;
+  if (_variable_shape)
+    out = out + 2;
+  return out;
+}
 void NDArrayMetaschemaType::update(const MetaschemaType* new_info) {
   ScalarMetaschemaType::update(new_info);
   const NDArrayMetaschemaType* new_info_nd = dynamic_cast<const NDArrayMetaschemaType*>(new_info);
   set_shape(new_info_nd->shape());
 };
-void NDArrayMetaschemaType::update_from_serialization_args(size_t *nargs, va_list_t &ap) {
-  MetaschemaType::update_from_serialization_args(nargs, ap);
-  if (*nargs == 3) {
-    va_list ap_copy;
-    va_copy(ap_copy, ap.va);
-    unsigned char* temp = va_arg(ap_copy, unsigned char*);
+size_t NDArrayMetaschemaType::update_from_serialization_args(size_t *nargs, va_list_t &ap) {
+  size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
+  if ((_variable_shape) && (*nargs >= 3)) {
+    unsigned char* temp = va_arg(ap.va, unsigned char*);
     UNUSED(temp); // Parameter extracted to get next
-    size_t new_ndim = va_arg(ap_copy, size_t);
-    (*nargs)--;
-    size_t* new_shape_ptr = va_arg(ap_copy, size_t*);
-    (*nargs)--;
+    size_t new_ndim = va_arg(ap.va, size_t);
+    nskip_after_++;
+    size_t* new_shape_ptr = va_arg(ap.va, size_t*);
+    nskip_after_++;
     std::vector<size_t> new_shape(new_shape_ptr, new_shape_ptr + new_ndim);
     set_shape(new_shape);
+    out = out + 3;
   }
-  return;
+  return out;
 };
-void NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va_list_t &ap) {
-  MetaschemaType::update_from_deserialization_args(nargs, ap);
-  if (*nargs == 3) {
-    va_list ap_copy;
-    va_copy(ap_copy, ap.va);
-    unsigned char** temp = va_arg(ap_copy, unsigned char**);
+size_t NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va_list_t &ap) {
+  size_t out = MetaschemaType::update_from_deserialization_args(nargs, ap);
+  if ((_variable_shape) && (*nargs >= 3)) {
+    unsigned char** temp = va_arg(ap.va, unsigned char**);
     UNUSED(temp); // Parameter extracted to get next
-    size_t * const new_ndim = va_arg(ap_copy, size_t*);
-    (*nargs)--;
-    size_t** new_shape = va_arg(ap_copy, size_t**);
-    (*nargs)--;
+    size_t * const new_ndim = va_arg(ap.va, size_t*);
+    nskip_after_++;
+    size_t** new_shape = va_arg(ap.va, size_t**);
+    nskip_after_++;
     new_ndim[0] = ndim();
     size_t* new_shape_temp = (size_t*)realloc(new_shape[0], ndim()*sizeof(size_t));
     if (new_shape_temp == NULL) {
@@ -1777,8 +1809,9 @@ void NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va_l
     for (i = 0; i < ndim(); i++) {
       (*new_shape)[i] = shape_[i];
     }
+    out = out + 3;
   }
-  return;
+  return out;
 };
 void NDArrayMetaschemaType::set_shape(std::vector<size_t> new_shape, bool force) {
   bool match = (ndim() == new_shape.size());
