@@ -4,14 +4,18 @@ models:
     args: ./src/model_function_modelA.c
     function: model_function
     inputs: inputA
-    outputs: outputA
+    outputs:
+      - name: outputA
+        vars: out, length_out
 
   - name: c_modelB
     language: c
     args: ./src/model_function_modelB.c
     function: model_function
     inputs: inputB
-    outputs: outputB
+    outputs:
+      - name: outputB
+        vars: out, length_out
 
 connections:
   - input: outputA  # Connection between model A output & model B input

@@ -629,10 +629,17 @@ class CModelDriver(CompiledModelDriver):
             for i, x in enumerate(out.get(io, [])):
                 if (x['name'] + '_length') in io_map:
                     x['length_var'] = x['name'] + '_length'
+                elif ('length_' + x['name']) in io_map:
+                    x['length_var'] = 'length_' + x['name']
                 elif (((x['name'] + '_ndim') in io_map)
                       and ((x['name'] + '_shape') in io_map)):
                     x['ndim_var'] = x['name'] + '_ndim'
                     x['shape_var'] = x['name'] + '_shape'
+                    x['datatype']['type'] = 'ndarray'
+                elif ((('ndim_' + x['name']) in io_map)
+                      and (('shape_' + x['name']) in io_map)):
+                    x['ndim_var'] = 'ndim_' + x['name']
+                    x['shape_var'] = 'shape_' + x['name']
                     x['datatype']['type'] = 'ndarray'
                 elif 'shape' in x:
                     x['datatype']['shape'] = [

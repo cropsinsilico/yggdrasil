@@ -1435,6 +1435,21 @@ class ModelDriver(Driver):
         flag_var = None
         if info.get('flag_var', None):
             flag_var = dict(info['flag_var'], name='model_flag')
+        # Check for vars matching names of input/output channels
+        for io, io_var in zip(['inputs', 'outputs'], [inputs, outputs]):
+            if (io == 'outputs') and outputs_in_inputs:
+                io_map = info_map['inputs']
+            else:
+                io_map = info_map[io]
+            for x in io_var:
+                if x.get('vars', []):
+                    continue
+                if x['name'] in io_map:
+                    x['vars'] = [x['name']]
+                    for k in ['length', 'shape', 'ndim']:
+                        kvar = '%s_var' % k
+                        if kvar in io_map[x['name']]:
+                            x['vars'].append(io_map[x['name']][kvar])
         # Move variables if outputs in inputs
         if outputs_in_inputs:
             if ((((len(inputs) + len(outputs)) == len(info.get('inputs', [])))
@@ -1462,9 +1477,8 @@ class ModelDriver(Driver):
                 for i, v in enumerate(x.get('vars', [])):
                     if v in info_map[io]:
                         x['vars'][i] = info_map[io][v]
-            if (len(io_var) == 1) and io_var[0].get('is_default', True):
-                if info_map.get(io, False):
-                    io_var[0].setdefault('vars', list(info_map[io].values()))
+            if (len(io_var) == 1) and info_map.get(io, False):
+                io_var[0].setdefault('vars', list(info_map[io].values()))
             for x in io_var:
                 if 'vars' not in x:
                     x['vars'] = [copy.deepcopy(x)]
