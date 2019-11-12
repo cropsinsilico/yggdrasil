@@ -1331,6 +1331,7 @@ class LinkerBase(CompilationToolBase):
             cls.library_prefix = ''
             cls.library_ext = '.dll'
             cls.executable_ext = '.exe'
+            cls.search_path_conda = 'DLLs'
         elif platform._is_mac:
             # TODO: Dynamic library by default on windows?
             # cls.shared_library_flag = '-dynamiclib'
@@ -1572,6 +1573,7 @@ class ArchiverBase(LinkerBase):
             setattr(cls, k, None)
         if platform._is_win:  # pragma: windows
             cls.library_ext = '.lib'
+            cls.search_path_conda = os.path.join('Library', 'lib')
         else:
             cls.library_ext = '.a'
 
@@ -2667,6 +2669,9 @@ class CompiledModelDriver(ModelDriver):
                         fpath = None
                     else:
                         search_list = tool.get_search_path()
+                        if ((platform._is_win and fname.endswith('.lib')
+                             and (not fname.startswith('lib')))):  # pragma: windows
+                            fname = [fname, 'lib' + fname]
                         fpath = locate_file(fname, directory_list=search_list)
                 if fpath:
                     logger.info('Located %s: %s' % (fname, fpath))
