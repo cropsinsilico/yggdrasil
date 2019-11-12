@@ -4,3 +4,5 @@ r-base
 r-reticulate
 r-zeallot
 zeromq
+c-compiler; platform_system == 'Windows'
+cxx-compiler; platform_system == 'Windows'

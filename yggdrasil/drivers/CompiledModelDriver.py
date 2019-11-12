@@ -79,13 +79,16 @@ def find_compilation_tool(tooltype, language, allow_failure=False):
     return out
 
 
-def get_compilation_tool(tooltype, name):
+def get_compilation_tool(tooltype, name, default=False):
     r"""Return the class providing information about a compilation tool.
 
     Args:
         tooltype (str): Type of tool. Valid values include 'compiler', 'linker',
             and 'archiver'.
         name (str): Name or path to the desired compilation tool.
+        default (object, optional): Value that should be returned if a tool
+            cannot be located. If False, an error will be raised. Defaults to
+            False.
 
     Returns:
         CompilationToolBase: Class providing access to the specified tool.
@@ -108,8 +111,10 @@ def get_compilation_tool(tooltype, name):
         return reg[name]
     if name.lower() in reg:
         return reg[name.lower()]
-    raise ValueError("Could not locate a %s tool with name '%s'"
-                     % (tooltype, name))
+    if default is False:
+        raise ValueError("Could not locate a %s tool with name '%s'"
+                         % (tooltype, name))
+    return default
 
 
 # TODO: Cannot currently make compilation tools components because
@@ -1992,7 +1997,8 @@ class CompiledModelDriver(ModelDriver):
                         raise NotImplementedError("%s not set for language '%s'."
                                                   % (tooltype.title(), cls.language))
                     return default
-        # Return correct property given the tool
+                out = getattr(out_tool, tooltype)()
+        # Returns correct property given the tool
         if return_prop == 'tool':
             return out
         elif return_prop == 'name':  # pragma: no cover
