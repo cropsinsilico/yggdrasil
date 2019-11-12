@@ -146,6 +146,7 @@ class MSVCCompiler(CCompilerBase):
     combine_with_linker = True  # Must be explicit; linker is separate .exe
     linker_attributes = dict(GCCCompiler.linker_attributes,
                              default_executable=None,
+                             default_executable_env=None,
                              default_flags_env=None,
                              output_key='/OUT:%s',
                              output_first=True,
