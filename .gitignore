@@ -20,6 +20,9 @@ docs/source/modules.rst
 docs/source/examples/*.rst
 docs/source/tables
 
+# Dev setup
+requirements_pruned.txt
+
 # Profiling
 prof
 
