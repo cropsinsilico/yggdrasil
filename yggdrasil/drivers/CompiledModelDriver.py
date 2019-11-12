@@ -1933,7 +1933,7 @@ class CompiledModelDriver(ModelDriver):
         return copy.deepcopy(reg.get(cls.language, {}))
 
     @staticmethod
-    def get_tool_static(cls, tooltype, return_prop='tool'):
+    def get_tool_static(cls, tooltype, return_prop='tool', default=False):
         r"""Get the class associated with the specified compilation tool for
         this language.
 
@@ -1943,6 +1943,9 @@ class CompiledModelDriver(ModelDriver):
                 'tool', the tool is returned. If 'name', the tool name is
                 returned. If 'flags', the tool flags are returned. Defaults to
                 'tool'.
+            default (object, optiona): Tool that should be returned if one cannot
+                be identified. If False, an error will be raised when a tool
+                cannot be located. Defaults to False.
 
         Returns:
             CompilationToolBase: Class providing an interface to the specified
@@ -1962,8 +1965,10 @@ class CompiledModelDriver(ModelDriver):
                 toolname = getattr(cls, tooltype,
                                    getattr(cls, 'default_%s' % tooltype, None))
                 if toolname is None:
-                    raise NotImplementedError("%s not set for language '%s'."
-                                              % (tooltype.title(), cls.language))
+                    if default is False:
+                        raise NotImplementedError("%s not set for language '%s'."
+                                                  % (tooltype.title(), cls.language))
+                    return default
                 if return_prop == 'name':
                     return toolname
                 # Get flags
@@ -1981,7 +1986,12 @@ class CompiledModelDriver(ModelDriver):
                         archiver_flags=cls.get_tool('archiver', return_prop='flags'))
                 out = get_compilation_tool(tooltype, toolname)(**kwargs)
             else:
-                out = getattr(cls.get_tool('compiler'), tooltype)()
+                out_tool = cls.get_tool('compiler', default=None)
+                if out_tool is None:
+                    if default is False:
+                        raise NotImplementedError("%s not set for language '%s'."
+                                                  % (tooltype.title(), cls.language))
+                    return default
         # Return correct property given the tool
         if return_prop == 'tool':
             return out
@@ -2639,15 +2649,19 @@ class CompiledModelDriver(ModelDriver):
                 else:
                     fpath = os.path.join(os.getcwd(), fname)
                 fname = os.path.basename(fpath)
-                search_list = None
+                search_list = []
                 if not os.path.isfile(fpath):
                     # Search the compiler/linker's search path, then the
                     # PATH environment variable.
                     if t in ['include']:
-                        search_list = cls.get_tool('compiler').get_search_path()
+                        tool = cls.get_tool('compiler', default=None)
                     else:
-                        search_list = cls.get_tool('linker').get_search_path()
-                    fpath = locate_file(fname, directory_list=search_list)
+                        tool = cls.get_tool('linker', default=None)
+                    if tool is None:
+                        fpath = None
+                    else:
+                        search_list = tool.get_search_path()
+                        fpath = locate_file(fname, directory_list=search_list)
                 if fpath:
                     logger.info('Located %s: %s' % (fname, fpath))
                     # if (t in ['static']) and platform._is_mac:

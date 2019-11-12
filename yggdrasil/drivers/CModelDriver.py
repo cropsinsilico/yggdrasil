@@ -329,8 +329,8 @@ class CModelDriver(CompiledModelDriver):
             elif platform._is_win:  # pragma: windows
                 cls.default_compiler = 'cl'
         CompiledModelDriver.after_registration(cls)
-        archiver = cls.get_tool('archiver')
-        linker = cls.get_tool('linker')
+        archiver = cls.get_tool('archiver', default=None)
+        linker = cls.get_tool('linker', default=None)
         for x in ['zmq', 'czmq']:
             if x in cls.external_libraries:
                 if platform._is_win:  # pragma: windows
@@ -342,8 +342,9 @@ class CModelDriver(CompiledModelDriver):
                 else:
                     tool = linker
                     kwargs = {'build_library': True}
-                cls.external_libraries[x][libtype] = tool.get_output_file(
-                    x, **kwargs)
+                if tool is not None:
+                    cls.external_libraries[x][libtype] = tool.get_output_file(
+                        x, **kwargs)
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']

@@ -9,6 +9,7 @@ yggdrasil/tests/scripts/Makefile
 *.so
 *.dll
 *.dylib
+yggdrasil/languages/C/stdint.h
 
 # Intermediate docs
 docs/build
