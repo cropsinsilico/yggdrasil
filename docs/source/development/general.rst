@@ -26,18 +26,31 @@ Setting Up a Dev Environment
 
 The following is only one method for setting up a development environment. You are welcome to select another method (e.g. using virtual env), but this is what has worked for me.
 
+#. [WINDOWS ONLY] Download and install Visual Studio Community from `here <https://visualstudio.microsoft.com/vs/community/>`_. During installation, we recommend selecting the components below. If you forget to add something during the initial download, you can always modify the installation via the "Visual Studio Installer".
+
+   * "Desktop development with C++" - Workload under "Windows" section
+   * "MSVC v140 - VS 2015 C++ build tools (v14.00)" - Individual component under "Compilers, build tools, and runtimes" section.
+
+   If you will be developing on Python 2, you will need additional compilers that can be found `here <https://www.microsoft.com/en-us/download/details.aspx?id=44266>`_.
 #. [OPTIONAL] Download and install Miniconda (or Anaconda) from `here <https://www.anaconda.com/download/>`_.
+#. Create a fork of the |yggdrasil| Github repository for you Github account (``Fork`` button located in the upper right corner of the |yggdrasil| `Github repository <https://github.com/cropsinsilico/yggdrasil>`_).
+#. Clone your fork of the |yggdrasil| repository using git and then change directory into the cloned repository. NOTE: If you do not have ``git`` you can either `install it yourself <https://git-scm.com/book/en/v2/Getting-Started-Installing-Git>`_ or using conda (``conda install git``).::
+
+     $ git clone --recurse-submodules https://github.com/<your Github username>/yggdrasil.git
+     $ cd yggdrasil
+
 #. [OPTIONAL] Create a conda environment for development and activate that environment. You can create an environment using any of the supported versions of Python and may need more than one for testing.::
 
      $ conda create -n ygg python=3.6
      $ conda activate ygg
      
-#. Create a fork of the |yggdrasil| Github repository for you Github account (``Fork`` button located in the upper right corner of the |yggdrasil| `Github repository <https://github.com/cropsinsilico/yggdrasil>`_).
-#. Clone your fork of the |yggdrasil| repository using git and then change directory into the cloned repository. NOTE: If you do not have you can either `install it yourself <https://git-scm.com/book/en/v2/Getting-Started-Installing-Git>`_ or using conda.::
+   |yggdrasil| provides a python script, ``utils/create_envs.py`` for creating development environments and installing yggdrasil in develoment mode for a combination of dependency installation methods (pip vs. conda) and versions of Python. For example, to create a conda environment with Python 3.6 (as above) and install |yggdrasil|'s dependencies using conda, the following commands can
+   be executed from the root directory of your local |yggdrasil| repository.::
 
-     $ git clone --recurse-submodules https://github.com/<your Github username>/yggdrasil.git
-     $ cd yggdrasil
+     $ python utils/create_envs.py --name=ygg
+     $ conda activate ygg
 
+   If you use ``utils/create_envs.py`` to create your dev environment, you can skip to the last step.
 #. Install the requirements using conda via the helper script ``utils/install_from_requirements.py``::
 
      $ python utils/install_from_requirements.py conda requirements.txt requirements_condaonly.txt requirements_testing.txt
