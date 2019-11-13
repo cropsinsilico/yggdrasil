@@ -225,7 +225,7 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
     return out
 
 
-def remove_path(fpath, timer_class=None):
+def remove_path(fpath, timer_class=None, timeout=None):
     r"""Delete a single file.
 
     Args:
@@ -234,6 +234,9 @@ def remove_path(fpath, timer_class=None):
         timer_class (YggClass, optional): Class that should be used to
             generate a timer that is used to wait for file to be removed.
             Defaults to None and a new class instance will be created.
+        timeout (float, optional): Time (in seconds) that should be
+            waited before raising an error that a file cannot be removed.
+            Defaults to None and will be set by the timer_class.
 
     Raises:
         RuntimeError: If the product cannot be removed.
@@ -242,7 +245,7 @@ def remove_path(fpath, timer_class=None):
     if timer_class is None:
         timer_class = YggClass()
     if os.path.isdir(fpath):
-        T = timer_class.start_timeout()
+        T = timer_class.start_timeout(t=timeout)
         while ((not T.is_out) and os.path.isdir(fpath)):
             try:
                 shutil.rmtree(fpath)
@@ -255,7 +258,7 @@ def remove_path(fpath, timer_class=None):
         if os.path.isdir(fpath):  # pragma: debug
             raise RuntimeError("Failed to remove directory: %s" % fpath)
     elif os.path.isfile(fpath):
-        T = timer_class.start_timeout()
+        T = timer_class.start_timeout(t=timeout)
         while ((not T.is_out) and os.path.isfile(fpath)):
             try:
                 os.remove(fpath)

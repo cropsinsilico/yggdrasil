@@ -218,7 +218,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
             timer_class = tools.YggClass()
             for fout in self.output_files:
                 if os.path.isfile(fout):
-                    tools.remove_path(fout, timer_class=timer_class)
+                    tools.remove_path(fout, timer_class=timer_class, timeout=5)
 
     def run_iteration(self, language=None, datatype=None, comm=None):
         r"""Run a test for the specified parameters."""
