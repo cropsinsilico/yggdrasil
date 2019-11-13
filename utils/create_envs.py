@@ -1,4 +1,5 @@
 import os
+import argparse
 import subprocess
 from install_from_requirements import locate_conda_exe
 _utils_dir = os.path.dirname(os.path.abspath(__file__))
@@ -86,6 +87,24 @@ def create_devenv(env_type, python='3.6', **kwargs):
     
 
 if __name__ == "__main__":
-    for env_type in ['pip', 'conda']:
-        for python in ['2.7', '3.6']:
+    parser = argparse.ArgumentParser(
+        "Create dev environments for matrix of installation methods "
+        "and Python versions.")
+    parser.add_argument('--method', choices=['conda', 'pip', 'both'], default='both',
+                        help=("Method(s) that should be used to install the "
+                              "dependencies."))
+    parser.add_argument('--version', choices=['2.7', '3.6', '3.7', '2&3'],
+                        default='2&3',
+                        help=("Python version(s) to create environments for."))
+    args = parser.parse_args()
+    if args.method == 'both':
+        args.method = ['pip', 'conda']
+    else:
+        args.method = [args.method]
+    if args.version == '2&3':
+        args.version = ['2.7', '3.6']
+    else:
+        args.version = [args.version]
+    for env_type in args.method:
+        for python in args.version:
             create_devenv(env_type, python=python)

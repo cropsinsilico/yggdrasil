@@ -267,7 +267,10 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
     variable.
 
     Args:
-        fname (str): Name of the file that should be located.
+        fname (str, list): One or more possible names of the file that should be
+            located. If a list is provided, the path for the first entry for
+            which a match could be located will be returned and subsequent entries
+            will not be checked.
         environment_variable (str): Environment variable containing the set of
             paths that should be searched. Defaults to 'PATH'. If None, this
             keyword argument will be ignored. If a list is provided, it is
@@ -283,6 +286,14 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
             otherwise.
 
     """
+    if isinstance(fname, list):
+        out = False
+        for ifname in fname:
+            out = locate_file(ifname, environment_variable=environment_variable,
+                              directory_list=directory_list)
+            if out:
+                break
+        return out
     out = []
     if ((platform._is_win and (environment_variable == 'PATH')
          and (directory_list is None))):  # pragma: windows
