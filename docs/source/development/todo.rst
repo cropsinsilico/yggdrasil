@@ -60,6 +60,7 @@ New feature/example
 * Assign meanings to error codes and implement across languages
 * Add parameters constraining valid values for inputs/outputs (e.g. range) using JSON paramaters
 * Add properties to C/C++
+* Allow users to select from list of multiple possiblities when locating libraries to avoid conflict
 
 Deprecation
 -----------

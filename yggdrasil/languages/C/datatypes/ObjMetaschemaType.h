@@ -1845,27 +1845,27 @@ public:
 	    p->curve_params[ccurve][j] = (float)atof(iline + sind[j + 1]);
 	  }
 	  int sind_verts = eind[2];
-	  int nvert = count_matches(re_curve_vert, iline + sind_verts);
+	  int nvert_local = count_matches(re_curve_vert, iline + sind_verts);
 	  char re_split_vert[100] = "";
-	  for (j = 0; j < nvert; j++) {
+	  for (j = 0; j < nvert_local; j++) {
 	    strcat(re_split_vert, re_curve_vert);
 	  }
 	  int nvert_found = find_matches(re_split_vert, iline + sind_verts, &sind, &eind) - 1;
-	  if (nvert_found != nvert) {
+	  if (nvert_found != nvert_local) {
 	    ygglog_error("deserialize_obj: Expected %d verts in curve, but found %d.",
-			 nvert, nvert_found);
+			 nvert_local, nvert_found);
 	    out = -1;
 	    break;
 	  }
-	  p->nvert_in_curve[ccurve] = nvert;
-	  int* icurve = (int*)realloc(p->curves[ccurve], nvert*sizeof(int));
+	  p->nvert_in_curve[ccurve] = nvert_local;
+	  int* icurve = (int*)realloc(p->curves[ccurve], nvert_local*sizeof(int));
 	  if (icurve == NULL) {
 	    ygglog_error("deserialize_obj: Failed to allocate curve %d.", ccurve);
 	    out = -1;
 	    break;
 	  }
 	  p->curves[ccurve] = icurve;
-	  for (j = 0; j < nvert; j++) {
+	  for (j = 0; j < nvert_local; j++) {
 	    p->curves[ccurve][j] = atoi(iline + sind_verts + sind[j + 1]) - 1;
 	  }
 	  ccurve++;
@@ -1873,27 +1873,27 @@ public:
 	// Curves2
 	else if (find_matches(re_curve2, iline, &sind, &eind) == n_re_curve2) {
 	  ygglog_debug("deserialize_obj: Curve2");
-	  int nvert = count_matches(re_curve2_vert, iline);
+	  int nvert_local = count_matches(re_curve2_vert, iline);
 	  char re_split_vert[100] = "";
-	  for (j = 0; j < nvert; j++) {
+	  for (j = 0; j < nvert_local; j++) {
 	    strcat(re_split_vert, re_curve2_vert);
 	  }
 	  int nvert_found = find_matches(re_split_vert, iline, &sind, &eind) - 1;
-	  if (nvert_found != nvert) {
+	  if (nvert_found != nvert_local) {
 	    ygglog_error("deserialize_obj: Expected %d verts in curve2, but found %d.",
-			 nvert, nvert_found);
+			 nvert_local, nvert_found);
 	    out = -1;
 	    break;
 	  }
-	  p->nparam_in_curve2[ccurve2] = nvert;
-	  int* icurve2 = (int*)realloc(p->curves2[ccurve2], nvert*sizeof(int));
+	  p->nparam_in_curve2[ccurve2] = nvert_local;
+	  int* icurve2 = (int*)realloc(p->curves2[ccurve2], nvert_local*sizeof(int));
 	  if (icurve2 == NULL) {
 	    ygglog_error("deserialize_obj: Failed to allocate curve2 %d.", ccurve);
 	    out = -1;
 	    break;
 	  }
 	  p->curves2[ccurve2] = icurve2;
-	  for (j = 0; j < nvert; j++) {
+	  for (j = 0; j < nvert_local; j++) {
 	    p->curves2[ccurve2][j] = atoi(iline + sind[j + 1]) - 1;
 	  }
 	  ccurve2++;

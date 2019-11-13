@@ -874,8 +874,8 @@ class CompilationToolBase(object):
             output = backwards.as_str(output)
             if (proc.returncode != 0) and (not allow_error):
                 logger.error(output)
-                raise RuntimeError("Command '%s' failed with code %d."
-                                   % (' '.join(cmd), proc.returncode))
+                raise RuntimeError("Command '%s' failed with code %d:\n%s."
+                                   % (' '.join(cmd), proc.returncode, output))
             try:
                 logger.debug(' '.join(cmd) + '\n' + output)
             except UnicodeDecodeError:  # pragma: debug

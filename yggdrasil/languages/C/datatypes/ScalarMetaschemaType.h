@@ -367,7 +367,6 @@ public:
     case T_UNICODE: {
       // TODO: Handle array of char arrays
       char* arg = (char*)(data->get_data());
-      size_t i;
       for (i = 0; i < data->get_nbytes(); i+=4) {
 	std::cout << arg + i;
       }

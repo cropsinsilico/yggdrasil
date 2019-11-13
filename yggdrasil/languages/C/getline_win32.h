@@ -30,7 +30,7 @@ int getline(char** lineptr, size_t* n, FILE* stream) {
     nread = (int)strlen(*lineptr);
 
     // Break if new line reached or buffer not filled
-    if ((nread < (*n - 1)) || ((*lineptr)[nread - 1] == '\n'))
+    if ((nread < (int)(*n - 1)) || ((*lineptr)[nread - 1] == '\n'))
       return nread;
 
     // Stop if max size exceeded
