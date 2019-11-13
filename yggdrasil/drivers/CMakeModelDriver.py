@@ -22,7 +22,10 @@ class CMakeConfigure(BuildToolBase):
     flag_options = OrderedDict([('definitions', '-D%s'),
                                 ('sourcedir', ''),  # '-S'
                                 ('builddir', '-B%s'),
-                                ('configuration', '-DCMAKE_BUILD_TYPE=%s')])
+                                ('configuration', '-DCMAKE_BUILD_TYPE=%s'),
+                                ('generator', '-G%s'),
+                                ('toolset', '-T%s'),
+                                ('platform', '-A%s')])
     output_key = None
     compile_only_flag = None
     default_builddir = '.'
@@ -40,8 +43,6 @@ class CMakeConfigure(BuildToolBase):
         """
         BuildToolBase.before_registration(cls)
         if platform._is_win:  # pragma: windows
-            if platform._is_64bit:
-                cls.default_flags.append('-DCMAKE_GENERATOR_PLATFORM=x64')
             cls.product_files += ['ALL_BUILD.vcxproj',
                                   'ALL_BUILD.vcxproj.filters',
                                   'Debug', 'Release', 'Win32', 'Win64', 'x64',
@@ -49,6 +50,73 @@ class CMakeConfigure(BuildToolBase):
                                   'ZERO_CHECK.vcxproj.filters']
             cls.remove_product_exts += ['Debug', 'Release', 'Win32', 'Win64',
                                         'x64', '.dir']
+
+    @classmethod
+    def generator(cls, return_default=False, default=None, **kwargs):
+        r"""Determine the generator that should be used.
+
+        Args:
+            return_default (bool, optional): If True, the default generator will
+                be returned even if the environment variable is set. Defaults to
+                False.
+            default (str, optional): Value that should be returned if a generator
+                cannot be located. Defaults to None.
+            **kwargs: Keyword arguments are passed to cls.call.
+
+        Returns:
+            str: Name of the generator.
+
+        """
+        out = default
+        if not return_default:
+            out = os.environ.get('CMAKE_GENERATOR', default)
+        if not out:
+            lines = cls.call(['--help'], skip_flags=True,
+                             allow_error=True, **kwargs)
+            if 'Generators' not in lines:  # pragma: debug
+                raise RuntimeError("Generator call failed:\n%s" % lines)
+            gen_list = (lines.split('Generators')[-1]).splitlines()
+            for x in gen_list:
+                if x.startswith('*'):
+                    out = (x.split('=')[0]).strip()
+                    out = (out.strip('*')).strip()
+                    break
+        return out
+
+    @classmethod
+    def generator2toolset(cls, generator):
+        r"""Determine the toolset string option that corresponds to the provided
+        generator name.
+
+        Args:
+            generator (str): Name of the generator.
+
+        Returns:
+            str: Name of the toolset.
+
+        Raises:
+            NotImplementedError: If the platform is not windows.
+            ValueError: If the generator is not a flavor of Visual Studio.
+            ValueError: If a tool set cannot be located for the specified generator.
+
+        """
+        if not platform._is_win:  # pragma: debug
+            raise NotImplementedError("generator2toolset only available on Windows")
+        if not generator.startswith("Visual Studio"):  # pragma: debug
+            raise ValueError("Toolsets only available for Visual Studio generators.")
+        if generator.endswith(('Win64', 'ARM', 'IA64')):
+            generator = (generator.rsplit(' ', 1)[0]).strip()
+        vs_generator_map = {'Visual Studio 16 2019': 'v142',
+                            'Visual Studio 15 2017': 'v141',
+                            'Visual Studio 14 2015': 'v140',
+                            'Visual Studio 12 2013': 'v120',
+                            'Visual Studio 11 2012': 'v110',
+                            'Visual Studio 10 2010': 'v100',
+                            'Visual Studio 9 2008': 'v90'}
+        out = vs_generator_map.get(generator, None)
+        if out is None:  # pragma: debug
+            raise ValueError("Failed to locate toolset for generator: %s" % generator)
+        return out
         
     @classmethod
     def append_product(cls, products, src, new, **kwargs):
@@ -121,6 +189,39 @@ class CMakeConfigure(BuildToolBase):
         return out
 
     @classmethod
+    def call(cls, args, **kwargs):
+        r"""Call the tool with the provided arguments. If the first argument
+        resembles the name of the tool executable, the executable will not be
+        added.
+
+        Args:
+            args (list): The arguments that should be passed to the tool.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method and the associated linker/archiver's call method
+                if dont_link is False.
+
+        Returns:
+            str: Output to stdout from the command execution if skip_flags is
+                True, produced file otherwise.
+
+        """
+        try:
+            out = super(CMakeConfigure, cls).call(args, **kwargs)
+        except RuntimeError as e:
+            if platform._is_win:  # pragma: windows
+                error_MSB4019 = (r'error MSB4019: The imported project '
+                                 r'"C:\Microsoft.Cpp.Default.props" was not found.')
+                if error_MSB4019 in str(e):
+                    old_generator = os.environ.get('CMAKE_GENERATOR', None)
+                    new_generator = cls.generator(return_default=True)
+                    if old_generator and (old_generator != new_generator):
+                        kwargs['generator'] = new_generator
+                        kwargs['toolset'] = cls.generator2toolset(old_generator)
+                        return super(CMakeConfigure, cls).call(args, **kwargs)
+            raise
+        return out
+
+    @classmethod
     def get_flags(cls, sourcedir='.', builddir=None, **kwargs):
         r"""Get a list of configuration/generation flags.
 
@@ -164,6 +265,13 @@ class CMakeConfigure(BuildToolBase):
         #                                  % os.path.join(conda_prefix, 'lib'))
         out = super(CMakeConfigure, cls).get_flags(sourcedir=sourcedir,
                                                    builddir=builddir, **kwargs)
+        if platform._is_win and ('platform' not in kwargs):  # pragma: windows
+            generator = kwargs.get('generator', None)
+            if generator is None:
+                generator = cls.generator()
+            if (generator is not None) and (not generator.endswith(('Win64', 'ARM'))):
+                if platform._is_64bit:
+                    out.append('-DCMAKE_GENERATOR_PLATFORM=x64')
         return out
 
     @classmethod
@@ -184,7 +292,7 @@ class CMakeConfigure(BuildToolBase):
         """
         assert(len(args) == 1)
         new_args = []
-        if args == cls.version_flags:
+        if (args == cls.version_flags) or ('--help' in args):
             new_args = args
         if not kwargs.get('skip_flags', False):
             sourcedir = kwargs.get('sourcedir', args[0])
@@ -290,10 +398,12 @@ class CMakeConfigure(BuildToolBase):
         if platform._is_win:  # pragma: windows
             new_flags = ["/W4", "/EHsc", '/TP', "/nologo",
                          "-D_CRT_SECURE_NO_WARNINGS"]
-            if configuration.lower() == 'debug':  # pragma: debug
-                new_flags.append("/MTd")
-            else:
-                new_flags.append("/MT")
+            if not (('/MD' in os.environ.get('CXXFLAGS'))
+                    or ('-MD' in os.environ.get('CXXFLAGS'))):
+                if configuration.lower() == 'debug':  # pragma: debug
+                    new_flags.append("/MTd")
+                else:
+                    new_flags.append("/MT")
             for x in new_flags:
                 if x not in compile_flags:
                     compile_flags.append(x)
@@ -653,8 +763,8 @@ class CMakeModelDriver(BuildModelDriver):
             # used
             conda_prefix = self.get_tool_instance('compiler').get_conda_prefix()
             if conda_prefix:
-                newlines_before.append(
-                    'LINK_DIRECTORIES(%s)' % os.path.join(conda_prefix, 'lib'))
+                newlines_before += ['file(TO_CMAKE_PATH "%s" ygg_link_dir)',
+                                    'LINK_DIRECTORIES(${ygg_link_dir})']
             # Explicitly set Release/Debug directories to builddir on windows
             if platform._is_win:  # pragma: windows
                 for artifact in ['runtime', 'library', 'archive']:
