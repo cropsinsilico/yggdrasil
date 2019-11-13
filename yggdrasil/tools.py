@@ -225,6 +225,50 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
     return out
 
 
+def remove_path(fpath, timer_class=None):
+    r"""Delete a single file.
+
+    Args:
+        fpath (str): Full path to a file or directory that should be
+            removed.
+        timer_class (YggClass, optional): Class that should be used to
+            generate a timer that is used to wait for file to be removed.
+            Defaults to None and a new class instance will be created.
+
+    Raises:
+        RuntimeError: If the product cannot be removed.
+
+    """
+    if timer_class is None:
+        timer_class = YggClass()
+    if os.path.isdir(fpath):
+        T = timer_class.start_timeout()
+        while ((not T.is_out) and os.path.isdir(fpath)):
+            try:
+                shutil.rmtree(fpath)
+            except BaseException:  # pragma: debug
+                if os.path.isdir(fpath):
+                    timer_class.sleep()
+                if T.is_out:
+                    raise
+        timer_class.stop_timeout()
+        if os.path.isdir(fpath):  # pragma: debug
+            raise RuntimeError("Failed to remove directory: %s" % fpath)
+    elif os.path.isfile(fpath):
+        T = timer_class.start_timeout()
+        while ((not T.is_out) and os.path.isfile(fpath)):
+            try:
+                os.remove(fpath)
+            except BaseException:  # pragma: debug
+                if os.path.isfile(fpath):
+                    timer_class.sleep()
+                if T.is_out:
+                    raise
+        timer_class.stop_timeout()
+        if os.path.isfile(fpath):  # pragma: debug
+            raise RuntimeError("Failed to remove file: %s" % fpath)
+
+
 def get_supported_platforms():
     r"""Get a list of the platforms supported by yggdrasil.
 

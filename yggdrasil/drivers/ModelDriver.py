@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 _map_language_ext = OrderedDict()
 
 
-def remove_product(product, check_for_source=False, timer_class=None):
+def remove_product(product, check_for_source=False, **kwargs):
     r"""Delete a single product after checking that the product is not (or
     does not contain, in the case of directories), source files.
 
@@ -36,6 +36,7 @@ def remove_product(product, check_for_source=False, timer_class=None):
             will be checked to ensure that no source files are present. If
             a source file is present, a RuntimeError will be raised.
             Defaults to False.
+        **kwargs: Additional keyword arguments are passed to tools.remove_path.
 
     Raises:
         RuntimeError: If the specified product is a source file and
@@ -48,43 +49,19 @@ def remove_product(product, check_for_source=False, timer_class=None):
     source_keys = list(_map_language_ext.keys())
     if '.exe' in source_keys:  # pragma: windows
         source_keys.remove('.exe')
-    if timer_class is None:
-        timer_class = tools.YggClass()
-    if os.path.isdir(product):
-        ext_tuple = tuple(source_keys)
-        if check_for_source:
+    if check_for_source:
+        if os.path.isdir(product):
+            ext_tuple = tuple(source_keys)
             for root, dirs, files in os.walk(product):
                 for f in files:
                     if f.endswith(ext_tuple):
                         raise RuntimeError(("%s contains a source file "
                                             "(%s)") % (product, f))
-        T = timer_class.start_timeout()
-        while ((not T.is_out) and os.path.isdir(product)):
-            try:
-                shutil.rmtree(product)
-            except BaseException:  # pragma: debug
-                if os.path.isdir(product):
-                    timer_class.sleep()
-                if T.is_out:
-                    raise
-        timer_class.stop_timeout()
-    elif os.path.isfile(product):
-        if check_for_source:
+        elif os.path.isfile(product):
             ext = os.path.splitext(product)[-1]
             if ext in source_keys:
                 raise RuntimeError("%s is a source file." % product)
-        T = timer_class.start_timeout()
-        while ((not T.is_out) and os.path.isfile(product)):
-            try:
-                os.remove(product)
-            except BaseException:  # pragma: debug
-                if os.path.isfile(product):
-                    timer_class.sleep()
-                if T.is_out:
-                    raise
-        timer_class.stop_timeout()
-        if os.path.isfile(product):  # pragma: debug
-            raise RuntimeError("Failed to remove product: %s" % product)
+    tools.remove_path(product, **kwargs)
         
 
 def remove_products(products, source_products, timer_class=None):
