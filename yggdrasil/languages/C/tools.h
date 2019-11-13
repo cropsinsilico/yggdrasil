@@ -16,11 +16,26 @@
 
 
 #ifdef _WIN32
+#ifdef __cplusplus
+#include <complex>
+typedef std::complex<float> complex_float;
+typedef std::complex<double> complex_double;
+typedef std::complex<long double> complex_long_double;
+#ifndef creal
+#define creal(x) x.real()
+#define crealf(x) x.real()
+#define creall(x) x.real()
+#define cimag(x) x.imag()
+#define cimagf(x) x.imag()
+#define cimagl(x) x.imag()
+#endif
+#else
 #include <complex.h>
 typedef _Fcomplex complex_float;
 typedef _Dcomplex complex_double;
 typedef _Lcomplex complex_long_double;
-#else
+#endif
+#else // Unix
 #ifdef __cplusplus
 #include <complex>
 typedef std::complex<float> complex_float;
@@ -343,7 +358,7 @@ int snprintf_realloc(char** dst, size_t* max_len, size_t* offset,
     fmt_len = vsnprintf(dst[0] + offset[0],
 			max_len[0] - offset[0],
 			format_str, arglist_copy);
-    if (fmt_len > (max_len[0] - offset[0])) {
+    if (fmt_len > (int)(max_len[0] - offset[0])) {
       max_len[0] = max_len[0] + fmt_len + 1;
       char* temp = (char*)realloc(dst[0], max_len[0]);
       if (temp == NULL) {

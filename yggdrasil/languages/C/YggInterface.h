@@ -227,6 +227,7 @@ int ygg_send_nolimit_eof(const yggOutput_t yggQ) {
  */
 static inline
 int ygg_recv_nolimit(yggInput_t yggQ, char **data, const size_t len){
+  UNUSED(len);
   int ret = -1;
   size_t len_used = 0; // Send 0 to indicate data can be realloced
   int nargs_used = commRecvRealloc(yggQ, data, &len_used);
