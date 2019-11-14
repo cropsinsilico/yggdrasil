@@ -606,6 +606,11 @@ class CModelDriver(CompiledModelDriver):
         """
         out = super(CModelDriver, self).set_env(**kwargs)
         out = self.update_ld_library_path(out)
+        if platform._is_win:  # pragma: windows
+            out.setdefault('PYTHONHOME', sysconfig.get_config_var('prefix'))
+            out.setdefault('PYTHONPATH', os.pathsep.join([
+                sysconfig.get_path('stdlib'), sysconfig.get_path('purelib'),
+                os.path.join(sysconfig.get_config_var('prefix'), 'DLLs')]))
         return out
     
     @classmethod
