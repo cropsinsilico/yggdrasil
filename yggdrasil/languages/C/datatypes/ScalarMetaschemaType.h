@@ -1006,11 +1006,7 @@ public:
       }
       case T_COMPLEX: {
 	if (sizeof(float) == (bytes_precision / 2)) {
-#ifdef _WIN32
-	  complex_double_t arg;
-#else
 	  complex_float_t arg;
-#endif
 	  x->get_data(arg);
 	  return MetaschemaType::encode_data(writer, &nargs, arg);
 	} else if (sizeof(double) == (bytes_precision / 2)) {
