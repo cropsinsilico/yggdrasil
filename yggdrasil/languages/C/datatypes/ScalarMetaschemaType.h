@@ -859,15 +859,7 @@ public:
       }
       case T_COMPLEX: {
 	if (sizeof(float) == (bytes_precision / 2)) {
-#ifdef _WIN32
-	  complex_double_t arg00 = va_arg(ap.va, complex_double_t);
-	  complex_float_t arg0 = {(float)(arg00.re), (float)(arg00.im)};
-#else
-	  // complex_double_t arg00 = va_arg(ap.va, complex_double_t);
-	  // complex_float_t arg0 = {(float)(arg00.re), (float)(arg00.im)};
-	  // complex_float_t arg0 = (complex_float_t)va_arg(ap.va, complex_double_t);
-	  complex_float_t arg0 = (complex_float_t)va_arg(ap.va, complex_float_t);
-#endif
+    complex_float_t arg0 = (complex_float_t)va_arg(ap.va, complex_float_t);
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(double) == (bytes_precision / 2)) {
 	  complex_double_t arg0 = va_arg(ap.va, complex_double_t);
