@@ -40,6 +40,7 @@ class TestExampleConditionalIO(ExampleTstBase):
         msg = x.recv_array()[1]
         if msg is not None:
             msg = msg.sort_values(by=['InputMass']).reset_index(drop=True)
+        x.close()
         return msg
 
     def assert_equal_file_contents(self, a, b):

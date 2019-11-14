@@ -8,8 +8,8 @@ try:
     import sysv_ipc
     _ipc_installed = (platform._is_linux or platform._is_mac)
 except ImportError:  # pragma: windows
-    logger.warn("Could not import sysv_ipc. "
-                + "IPC support will be disabled.")
+    logger.debug("Could not import sysv_ipc. "
+                 + "IPC support will be disabled.")
     sysv_ipc = None
     _ipc_installed = False
 
