@@ -528,7 +528,7 @@ public:
    */
   virtual bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
     writer->Key("type");
-    writer->String(type_, strlen(type_));
+    writer->String(type_, (rapidjson::SizeType)strlen(type_));
     return true;
   }
   /*!
@@ -578,7 +578,7 @@ public:
       size_t arg_siz = va_arg(ap.va, size_t);
       (*nargs)--;
       (*nargs)--;
-      writer->String(arg, arg_siz);
+      writer->String(arg, (rapidjson::SizeType)arg_siz);
       return true;
     }
     }
@@ -1212,6 +1212,9 @@ void YggGeneric::get_data(char* obj, size_t nelements) const {
   get_data(obj, nelements, true);
 };
 
+
+typedef std::map<std::string, MetaschemaType*> MetaschemaTypeMap;
+typedef std::vector<MetaschemaType*> MetaschemaTypeVector;
 
 #endif /*METASCHEMA_TYPE_H_*/
 // Local Variables:

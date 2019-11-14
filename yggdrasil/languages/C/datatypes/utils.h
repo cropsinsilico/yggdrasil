@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <map>
 #include <vector>
+#include <functional>
 #include <cstring>
 
 
@@ -31,11 +32,69 @@ void ygglog_throw_error(const char* fmt, ...) {
   throw std::exception();
 };
 
+/*!
+  @brief Count the number of times a regular expression is matched in a string.
+  @param[in] regex_text constant character pointer to string that should be
+  compiled into a regex.
+  @param[in] to_match constant character pointer to string that should be
+  checked for matches.
+  @return size_t Number of matches found.
+*/
+static inline
+size_t count_matches_raise(const char *regex_text, const char *to_match) {
+  int out = count_matches(regex_text, to_match);
+  if (out < 0) {
+    ygglog_throw_error("count_matches_raise: Error in count_matches. regex = '%s', string = '%s'",
+                       regex_text, to_match);
+  }
+  return (size_t)out;
+};
+
+/*!
+  @brief Find first match to regex and any sub-matches.
+  @param[in] regex_text constant character pointer to string that should be
+  compiled into a regex.
+  @param[in] to_match constant character pointer to string that should be
+  checked for matches.
+  @param[out] sind size_t ** indices of where matches begin.
+  @param[out] eind size_t ** indices of where matches ends.
+  @return size_t Number of matches/submatches found.
+*/
+size_t find_matches_raise(const char *regex_text, const char *to_match,
+        size_t **sind, size_t **eind) {
+  int out = find_matches(regex_text, to_match, sind, eind);
+  if (out < 0) {
+    ygglog_throw_error("find_matches_raise: Error in find_matches. regex = '%s', string = '%s'",
+                       regex_text, to_match);
+  }
+  return (size_t)out;
+};
+
+/*!
+  @brief Find first match to regex.
+  @param[in] regex_text constant character pointer to string that should be
+  compiled into a regex.
+  @param[in] to_match constant character pointer to string that should be
+  checked for matches.
+  @param[out] sind size_t index where match begins.
+  @param[out] eind size_t index where match ends.
+  @return size_t Number of matches found. -1 is returned if the regex could not be
+  compiled.
+*/
+size_t find_match_raise(const char *regex_text, const char *to_match,
+            size_t *sind, size_t *eind) {
+  int out = find_match(regex_text, to_match, sind, eind);
+  if (out < 0) {
+    ygglog_throw_error("find_match_raise: Error in find_match. regex = '%s', string = '%s'",
+                       regex_text, to_match);
+  }
+  return (size_t)out;
+};
 
 /*!
   @brief String comparison structure.
  */
-struct strcomp
+struct strcomp : public std::binary_function<const char*, const char*, bool> 
 {
   /*!
     @brief Comparison operator.
@@ -43,7 +102,7 @@ struct strcomp
     @param[in] b char const * Second string for comparison.
     @returns bool true if the strings are equivalent, false otherwise.
    */
-  bool operator()(char const *a, char const *b) const
+  bool operator()(const char *a, const char *b) const
   {
     return std::strcmp(a, b) < 0;
   }
@@ -237,7 +296,8 @@ typedef std::map<const char*, void*, strcomp> void_map_t;
 typedef std::vector<YggGeneric*> YggGenericVector;
 
 /*! @brief Map of generic types. */
-typedef std::map<const char*, YggGeneric*, strcomp> YggGenericMap;
+typedef std::map<std::string, YggGeneric*> YggGenericMap;
+//typedef std::map<const char*, YggGeneric*, strcomp> YggGenericMap;
 
 
 /*!
@@ -686,12 +746,12 @@ PyObject* convert_c2python(const void *src, int type_code,
       src_cast.imag = src_ptr->im;
     } else if (sizeof(complex_float_t) == precision/8) {
       complex_float_t *src_ptr = (complex_float_t*)src;
-      src_cast.real = (float)(src_ptr->re);
-      src_cast.imag = (float)(src_ptr->im);
+      src_cast.real = (double)(src_ptr->re);
+      src_cast.imag = (double)(src_ptr->im);
     } else if (sizeof(complex_long_double_t) == precision/8) {
       complex_long_double_t *src_ptr = (complex_long_double_t*)src;
-      src_cast.real = (long double)(src_ptr->re);
-      src_cast.imag = (long double)(src_ptr->im);
+      src_cast.real = (double)(src_ptr->re);
+      src_cast.imag = (double)(src_ptr->im);
     } else {
       ygglog_throw_error("%sconvert_c2python: Complex precision of %lu unsupported.",
 			 error_prefix, precision);
@@ -763,18 +823,18 @@ PyObject* new_python_dict(const char* error_prefix="") {
 /*!
   @brief Set an item in a Python list to a Python object, throw an error if it fails or the provided objects do not have the right type.
   @param[in] pyobj PyObject* Python list.
-  @param[in] index int Index in Python list of item that should be set.
+  @param[in] index size_t Index in Python list of item that should be set.
   @param[in] item PyObject* Object to assign to the Python list item.
   @param[in] error_prefix char* Prefix that should be added to error messages.
   @param[in] type_code int Code specifying type that item should contain.
  */
-void set_item_python_list(PyObject *pyobj, int index,
+void set_item_python_list(PyObject *pyobj, size_t index,
 			  PyObject *item, const char* error_prefix="",
 			  int type_code=-1) {
   check_python_object(pyobj, (int)T_ARRAY, error_prefix);
   check_python_object(item, type_code, error_prefix);
   if (PyList_SetItem(pyobj, index, item) < 0) {
-    ygglog_throw_error("%sFailed to set element %d.",
+    ygglog_throw_error("%sFailed to set element %zu.",
 		       error_prefix, index);
   }
 };
@@ -782,13 +842,13 @@ void set_item_python_list(PyObject *pyobj, int index,
 /*!
   @brief Set an item in a Python list to a C object, throw an error if it fails or the provided objects do not have the right type.
   @param[in] pyobj PyObject* Python list.
-  @param[in] index int Index in Python list of item that should be set.
+  @param[in] index size_t Index in Python list of item that should be set.
   @param[in] item void* Pointer to C object to convert to a Python object and assign to the Python list item.
   @param[in] error_prefix char* Prefix that should be added to error messages.
   @param[in] type_code int Code specifying type that item should contain.
   @param[in] precision size_t Size (in bits) of the C type. Defaults to 0.
  */
-void set_item_python_list_c(PyObject *pyobj, int index, const void *item,
+void set_item_python_list_c(PyObject *pyobj, size_t index, const void *item,
 			    const char* error_prefix="",
 			    int type_code=-1, size_t precision=0) {
   PyObject *py_item = convert_c2python(item, type_code, error_prefix,
@@ -837,19 +897,19 @@ void set_item_python_dict_c(PyObject *pyobj, const char* key,
 /*!
   @brief Get a Python object from a Python list.
   @param[in] pyobj PyObject* Python list.
-  @param[in] index int Index in Python list of item that should be returned.
+  @param[in] index size_t Index in Python list of item that should be returned.
   @param[in] error_prefix char* Prefix that should be added to error messages.
   @param[in] type_code int Code specifying type that item should contain.
   @param[in] allow_null bool If true, no error will be raised if the item cannot be found.
   @returns PyObject* Python object.
  */
-PyObject *get_item_python_list(PyObject *pyobj, int index,
+PyObject *get_item_python_list(PyObject *pyobj, size_t index,
 			       const char* error_prefix="",
 			       int type_code=-1,
 			       bool allow_null=false) {
   PyObject *out = PyList_GetItem(pyobj, index);
   if ((out == NULL) && (!(allow_null))) {
-    ygglog_throw_error("%sFailed to get element %d.",
+    ygglog_throw_error("%sFailed to get element %zu.",
 		       error_prefix, index);
   }
   if (out != NULL) {
@@ -861,14 +921,14 @@ PyObject *get_item_python_list(PyObject *pyobj, int index,
 /*!
   @brief Get a C object from a Python list.
   @param[in] pyobj PyObject* Python list.
-  @param[in] index int Index in Python list of item that should be returned.
+  @param[in] index size_t Index in Python list of item that should be returned.
   @param[in,out] dst Pointer to C variable where converted data should be stored.
   @param[in] error_prefix char* Prefix that should be added to error messages.
   @param[in] type_code int Code specifying type that item should contain.
   @param[in] precision size_t Size (in bits) of the C type. Defaults to 0.
   @param[in] allow_null bool If true, no error will be raised if the item cannot be found.
  */
-void get_item_python_list_c(PyObject *pyobj, int index, void *dst,
+void get_item_python_list_c(PyObject *pyobj, size_t index, void *dst,
 			    const char* error_prefix="",
 			    int type_code=-1, size_t precision=0,
 			    bool allow_null=false) {

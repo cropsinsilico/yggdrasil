@@ -214,6 +214,7 @@ public:
    */
   int serialize(char **buf, size_t *buf_siz,
 		const int allow_realloc, size_t *nargs, va_list_t &ap) override {
+    UNUSED(allow_realloc);
     if (nargs_exp() != *nargs) {
       ygglog_throw_error("AsciiTableMetaschemaType::serialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);

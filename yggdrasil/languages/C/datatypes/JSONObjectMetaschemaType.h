@@ -22,12 +22,12 @@ class JSONObjectMetaschemaType : public MetaschemaType {
 public:
   /*!
     @brief Constructor for JSONObjectMetaschemaType.
-    @param[in] properties std::map<const char*, MetaschemaType*, strcomp> Map from
+    @param[in] properties MetaschemaTypeMap Map from
     property names to types.
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
   */
-  JSONObjectMetaschemaType(const std::map<const char*, MetaschemaType*, strcomp> properties,
+  JSONObjectMetaschemaType(const MetaschemaTypeMap properties,
 			   const bool use_generic=true) :
     // Always generic
     MetaschemaType("object", true) {
@@ -75,7 +75,7 @@ public:
     PyObject* pyprops = get_item_python_dict(pyobj, prop_key_,
   					     "JSONObjectMetaschemaType: properties: ",
   					     T_OBJECT);
-    std::map<const char*, MetaschemaType*, strcomp> properties;
+    MetaschemaTypeMap properties;
     PyObject* pykeys = PyDict_Keys(pyprops);
     if (pykeys == NULL) {
       ygglog_throw_error("JSONObjectMetaschemaType: Failed to get keys from Python dictionary.");
@@ -109,6 +109,17 @@ public:
     Free the type string malloc'd during constructor.
    */
   ~JSONObjectMetaschemaType() {
+    free_properties();
+  }
+  /*!
+    @brief Free properties.
+   */
+  void free_properties() {
+    MetaschemaTypeMap::iterator it;
+    for (it = properties_.begin(); it != properties_.end(); it++) {
+      delete it->second;
+      it->second = NULL;
+    }
     properties_.clear();
   }
   /*!
@@ -124,9 +135,9 @@ public:
       return false;
     if (nitems() != pRef->nitems())
       return false;
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator oit;
-    std::map<const char*, MetaschemaType*, strcomp> new_properties = pRef->properties();
+    MetaschemaTypeMap::const_iterator it;
+    MetaschemaTypeMap::const_iterator oit;
+    MetaschemaTypeMap new_properties = pRef->properties();
     for (it = properties_.begin(); it != properties_.end(); it++) {
       oit = new_properties.find(it->first);
       if (oit == new_properties.end()) {
@@ -158,12 +169,12 @@ public:
   */
   void display(const char* indent="") const override {
     MetaschemaType::display(indent);
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    MetaschemaTypeMap::const_iterator it;
     char new_indent[100] = "";
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
     for (it = properties_.begin(); it != properties_.end(); it++) {
-      printf("%sElement %s:\n", indent, it->first);
+      printf("%sElement %s:\n", indent, it->first.c_str());
       it->second->display(new_indent);
     }
   }
@@ -174,10 +185,10 @@ public:
   PyObject* as_python_dict() const override {
     PyObject* out = MetaschemaType::as_python_dict();
     PyObject* pyprops = PyDict_New();
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    MetaschemaTypeMap::const_iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
       PyObject* ipyitem = it->second->as_python_dict();
-      set_item_python_dict(pyprops, it->first, ipyitem,
+      set_item_python_dict(pyprops, it->first.c_str(), ipyitem,
 			   "JSONObjectMetaschemaType::as_python_dict: properties: ",
 			   T_OBJECT);
     }
@@ -243,7 +254,7 @@ public:
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
     data->get_data(arg);
-    printf("%sObject with %lu elements:\n", indent, arg.size());
+    printf("%sObject with %zu elements:\n", indent, arg.size());
     for (it = arg.begin(); it != arg.end(); it++) {
       std::cout << new_indent << std::left << std::setw(10) << it->first << " ";
       (it->second)->display(new_indent);
@@ -256,10 +267,10 @@ public:
   size_t nitems() const { return properties_.size(); }
   /*!
     @brief Get types for properties.
-    @returns std::map<const char*, MetaschemaType*, strcomp> Map from property
+    @returns MetaschemaTypeMap Map from property
     names to types.
    */
-  std::map<const char*, MetaschemaType*, strcomp> properties() const { return properties_; }
+  MetaschemaTypeMap properties() const { return properties_; }
   /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
@@ -271,21 +282,21 @@ public:
   }
   /*!
     @brief Update the property types.
-    @param[in] new_properties std::map<const char*, MetaschemaType*, strcomp> Map of new types describing properties.
+    @param[in] new_properties MetaschemaTypeMap Map of new types describing properties.
     @param[in] force bool If true, the existing properties are overwritten, otherwise they are only updated.
    */
-  void update_properties(const std::map<const char*, MetaschemaType*, strcomp> new_properties,
+  void update_properties(const MetaschemaTypeMap new_properties,
 			 bool force=false) {
     if (force) {
-      properties_.clear();
+      free_properties();
     }
     if (properties_.size() > 0) {
       if (properties_.size() != new_properties.size()) {
 	ygglog_throw_error("JSONObjectMetaschemaType::update_properties: Cannot update object with %ld elements from an object with %ld elements.",
 			   properties_.size(), new_properties.size());
       }
-      std::map<const char*, MetaschemaType*, strcomp>::iterator it;
-      std::map<const char*, MetaschemaType*, strcomp>::const_iterator new_it;
+      MetaschemaTypeMap::iterator it;
+      MetaschemaTypeMap::const_iterator new_it;
       for (it = properties_.begin(); it != properties_.end(); it++) {
 	new_it = new_properties.find(it->first);
 	if (new_it == new_properties.end()) {
@@ -295,13 +306,13 @@ public:
 	it->second->update(new_it->second);
       }
     } else {
-      std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+      MetaschemaTypeMap::const_iterator it;
       for (it = new_properties.begin(); it != new_properties.end(); it++) {
 	properties_[it->first] = it->second->copy();
       }
     }
     // Force children to follow parent use_generic
-    std::map<const char*, MetaschemaType*, strcomp>::iterator it;
+    MetaschemaTypeMap::iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
       it->second->update_use_generic(use_generic());
     }
@@ -313,7 +324,7 @@ public:
   void update_use_generic(const bool new_use_generic) override {
     MetaschemaType::update_use_generic(new_use_generic);
     // Force children to follow parent use_generic
-    std::map<const char*, MetaschemaType*, strcomp>::iterator it;
+    MetaschemaTypeMap::iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
       it->second->update_use_generic(use_generic());
     }
@@ -328,7 +339,7 @@ public:
   size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
     size_t iout;
     size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    MetaschemaTypeMap::const_iterator it;
     size_t new_nargs;
     for (it = properties_.begin(); it != properties_.end(); it++) {
       new_nargs = nargs[0] - out;
@@ -352,7 +363,7 @@ public:
   size_t update_from_deserialization_args(size_t *nargs, va_list_t &ap) override {
     size_t iout;
     size_t out = MetaschemaType::update_from_deserialization_args(nargs, ap);
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    MetaschemaTypeMap::const_iterator it;
     size_t new_nargs;
     for (it = properties_.begin(); it != properties_.end(); it++) {
       new_nargs = nargs[0] - out;
@@ -379,7 +390,7 @@ public:
    */
   size_t nargs_exp() const override {
     size_t nargs = 0;
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    MetaschemaTypeMap::const_iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
       nargs = nargs + it->second->nargs_exp();
     }
@@ -399,9 +410,9 @@ public:
 			 PyDict_Size(pyobj), nitems());
     }
     YggGenericMap *cmap = new YggGenericMap();
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    MetaschemaTypeMap::const_iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
-      PyObject *ipy_item = PyDict_GetItemString(pyobj, it->first);
+      PyObject *ipy_item = PyDict_GetItemString(pyobj, it->first.c_str());
       if (ipy_item == NULL) {
 	ygglog_throw_error("JSONObjectMetaschemaType::python2c: Failed to get item %s out of the Python dict.", it->first);
       }
@@ -427,15 +438,15 @@ public:
     if (c_map.size() != nitems()) {
       ygglog_throw_error("JSONObjectMetaschemaType::c2python: Type has %lu elements but object has %lu.", nitems(), c_map.size());
     }
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    MetaschemaTypeMap::const_iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
       YggGenericMap::iterator ic_item = c_map.find(it->first);
       if (ic_item == c_map.end()) {
 	ygglog_throw_error("JSONObjectMetaschemaType::c2python: C object does not have element %s.", it->first);
       }
       PyObject *ipy_item = it->second->c2python(ic_item->second);
-      if (PyDict_SetItemString(pyobj, it->first, ipy_item) < 0) {
-	ygglog_throw_error("JSONObjectMetaschemaType::c2python: Error setting item %s in the Python dict.", it->first);
+      if (PyDict_SetItemString(pyobj, it->first.c_str(), ipy_item) < 0) {
+	ygglog_throw_error("JSONObjectMetaschemaType::c2python: Error setting item %s in the Python dict.", it->first.c_str());
       }
     }
     return pyobj;
@@ -451,9 +462,9 @@ public:
     if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key(prop_key_);
     writer->StartObject();
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it = properties_.begin();
+    MetaschemaTypeMap::const_iterator it = properties_.begin();
     for (it = properties_.begin(); it != properties_.end(); it++) {
-      writer->Key(it->first);
+      writer->Key(it->first.c_str());
       if (!(it->second->encode_type(writer)))
 	return false;
     }
@@ -472,9 +483,9 @@ public:
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) const override {
     writer->StartObject();
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    MetaschemaTypeMap::const_iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
-      writer->Key(it->first);
+      writer->Key(it->first.c_str());
       if (!(it->second->encode_data(writer, nargs, ap)))
 	return false;
     }
@@ -490,14 +501,14 @@ public:
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   YggGenericMap arg) const {
     writer->StartObject();
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    MetaschemaTypeMap::const_iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
       YggGenericMap::iterator iarg = arg.find(it->first);
       if (iarg == arg.end()) {
 	ygglog_throw_error("JSONObjectMetaschemaType::encode_data: Object does not have element %s.", it->first);
 	return false;
       }
-      writer->Key(it->first);
+      writer->Key(it->first.c_str());
       if (!(it->second->encode_data(writer, iarg->second)))
 	return false;
     }
@@ -536,14 +547,14 @@ public:
       ygglog_error("JSONObjectMetaschemaType::decode_data: Raw data is not an object.");
       return false;
     }
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    MetaschemaTypeMap::const_iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
-      if (!(data.HasMember(it->first))) {
-	ygglog_error("JSONObjectMetaschemaType::decode_data: Data dosn't have member '%s'.",
-		     it->first);
+      if (!(data.HasMember(it->first.c_str()))) {
+	ygglog_error("JSONObjectMetaschemaType::decode_data: Data doesn't have member '%s'.",
+		     it->first.c_str());
 	return false;
       }
-      if (!(it->second->decode_data(data[it->first], allow_realloc, nargs, ap)))
+      if (!(it->second->decode_data(data[it->first.c_str()], allow_realloc, nargs, ap)))
 	return false;
     }
     return true;
@@ -563,7 +574,7 @@ public:
       ygglog_error("JSONObjectMetaschemaType::decode_data: Generic object is NULL.");
       return false;
     }
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it;
+    MetaschemaTypeMap::const_iterator it;
     YggGenericMap** arg = (YggGenericMap**)(x->get_data_pointer());
     if (arg == NULL) {
       ygglog_error("JSONObjectMetaschemaType::decode_data: Data pointer is NULL.");
@@ -576,9 +587,9 @@ public:
       }
     }
     for (it = properties_.begin(); it != properties_.end(); it++) {
-      if (!(data.HasMember(it->first))) {
-	ygglog_error("JSONObjectMetaschemaType::decode_data: Data dosn't have member '%s'.",
-		     it->first);
+      if (!(data.HasMember(it->first.c_str()))) {
+	ygglog_error("JSONObjectMetaschemaType::decode_data: Data doesn't have member '%s'.",
+		     it->first.c_str());
 	return false;
       }
       YggGenericMap::iterator iarg = (*arg)->find(it->first);
@@ -586,7 +597,7 @@ public:
 	ygglog_error("JSONObjectMetaschemaType::decode_data: Destination dosn't have member '%s'.", it->first);
 	return false;
       }
-      if (!(it->second->decode_data(data[it->first], iarg->second)))
+      if (!(it->second->decode_data(data[it->first.c_str()], iarg->second)))
 	return false;
     }
     return true;
@@ -594,7 +605,7 @@ public:
 
 private:
   char prop_key_[100];
-  std::map<const char*, MetaschemaType*, strcomp> properties_;
+  MetaschemaTypeMap properties_;
 };
 
 #ifndef __cplusplus /* If this is a C compiler, end C++ linkage */

@@ -215,7 +215,7 @@ bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
 JSONArrayMetaschemaType* create_dtype_format_class(const char *format_str,
 						   const int as_array = 0,
 						   const bool use_generic=false) {
-  std::vector<MetaschemaType*> items;
+  MetaschemaTypeVector items;
   JSONArrayMetaschemaType* out = new JSONArrayMetaschemaType(items, format_str, use_generic);
   // Loop over string
   int mres;
@@ -808,7 +808,7 @@ extern "C" {
 				   const bool use_generic=true){
     JSONArrayMetaschemaType* obj = NULL;
     try {
-      std::vector<MetaschemaType*> items_vec;
+      MetaschemaTypeVector items_vec;
       size_t i;
       if ((nitems > 0) && (items == NULL)) {
 	ygglog_throw_error("create_dtype_json_array: %d items expected, but the items parameter is NULL.", nitems);
@@ -830,7 +830,7 @@ extern "C" {
 				    const bool use_generic=true) {
     JSONObjectMetaschemaType* obj = NULL;
     try {
-      std::map<const char*, MetaschemaType*, strcomp> properties;
+      MetaschemaTypeMap properties;
       size_t i;
       if ((nitems > 0) && ((keys == NULL) || (values == NULL))) {
 	ygglog_throw_error("create_dtype_json_object: %d items expected, but the keys and/or values parameter is NULL.", nitems);

@@ -170,7 +170,7 @@ public:
 					   true);
     int do_color = 0;
     if (verts != NULL) {
-      nvert = PyList_Size(verts);
+      nvert = (int)PyList_Size(verts);
       if (nvert > 0) {
 	PyObject *ivert = get_item_python_list(verts, 0,
 					       error_prefix,
@@ -183,23 +183,23 @@ public:
       }
     }
     if (texcs != NULL)
-      ntexc = PyList_Size(texcs);
+      ntexc = (int)PyList_Size(texcs);
     if (norms != NULL)
-      nnorm = PyList_Size(norms);
+      nnorm = (int)PyList_Size(norms);
     if (param != NULL)
-      nparam = PyList_Size(param);
+      nparam = (int)PyList_Size(param);
     if (point != NULL)
-      npoint = PyList_Size(point);
+      npoint = (int)PyList_Size(point);
     if (lines != NULL)
-      nline = PyList_Size(lines);
+      nline = (int)PyList_Size(lines);
     if (faces != NULL)
-      nface = PyList_Size(faces);
+      nface = (int)PyList_Size(faces);
     if (curve != NULL)
-      ncurve = PyList_Size(curve);
+      ncurve = (int)PyList_Size(curve);
     if (curv2 != NULL)
-      ncurve2 = PyList_Size(curv2);
+      ncurve2 = (int)PyList_Size(curv2);
     if (surfs != NULL)
-      nsurf = PyList_Size(surfs);
+      nsurf = (int)PyList_Size(surfs);
     if (alloc_obj(arg, nvert, ntexc, nnorm, nparam, npoint, nline, nface,
 		  ncurve, ncurve2, nsurf, do_color) < 0) {
       ygglog_throw_error("ObjMetaschemaType::python2c: Error allocating obj structure.");
@@ -289,7 +289,7 @@ public:
 	PyObject *ipoint = get_item_python_list(point, i,
 						error_prefix,
 						T_ARRAY);
-	arg->nvert_in_point[i] = PyList_Size(ipoint);
+	arg->nvert_in_point[i] = (int)PyList_Size(ipoint);
 	arg->points[i] = (int*)malloc((arg->nvert_in_point[i])*sizeof(int));
 	if (arg->points[i] == NULL) {
 	  ygglog_throw_error("%sFailed to malloc point %d.",
@@ -308,7 +308,7 @@ public:
 	PyObject *iline = get_item_python_list(lines, i,
 					       error_prefix,
 					       T_ARRAY);
-	arg->nvert_in_line[i] = PyList_Size(iline);
+	arg->nvert_in_line[i] = (int)PyList_Size(iline);
 	arg->lines[i] = (int*)malloc((arg->nvert_in_line[i])*sizeof(int));
 	if (arg->lines[i] == NULL) {
 	  ygglog_throw_error("%sFailed to malloc line %d.",
@@ -341,7 +341,7 @@ public:
 	PyObject *iface = get_item_python_list(faces, i,
 					       error_prefix,
 					       T_ARRAY);
-	arg->nvert_in_face[i] = PyList_Size(iface);
+	arg->nvert_in_face[i] = (int)PyList_Size(iface);
 	arg->faces[i] = (int*)malloc((arg->nvert_in_face[i])*sizeof(int));
 	if (arg->faces[i] == NULL) {
 	  ygglog_throw_error("%sFailed to malloc face %d.",
@@ -389,7 +389,7 @@ public:
 						     "vertex_indices",
 						     error_prefix,
 						     T_ARRAY);
-	arg->nvert_in_curve[i] = PyList_Size(icurve_vert);
+	arg->nvert_in_curve[i] = (int)PyList_Size(icurve_vert);
 	arg->curves[i] = (int*)malloc((arg->nvert_in_curve[i])*sizeof(int));
 	if (arg->curves[i] == NULL) {
 	  ygglog_throw_error("%sFailed to malloc curve %d.",
@@ -416,7 +416,7 @@ public:
 	PyObject *icurve2 = get_item_python_list(curv2, i,
 						 error_prefix,
 						 T_ARRAY);
-	arg->nparam_in_curve2[i] = PyList_Size(icurve2);
+	arg->nparam_in_curve2[i] = (int)PyList_Size(icurve2);
 	arg->curves2[i] = (int*)malloc((arg->nparam_in_curve2[i])*sizeof(int));
 	if (arg->curves2[i] == NULL) {
 	  ygglog_throw_error("%sFailed to malloc curve2 %d.",
@@ -439,7 +439,7 @@ public:
 						    "vertex_indices",
 						    error_prefix,
 						    T_ARRAY);
-	arg->nvert_in_surface[i] = PyList_Size(isurf_vert);
+	arg->nvert_in_surface[i] = (int)PyList_Size(isurf_vert);
 	arg->surfaces[i] = (int*)malloc((arg->nvert_in_surface[i])*sizeof(int));
 	if (arg->surfaces[i] == NULL) {
 	  ygglog_throw_error("%sFailed to malloc surface %d.",
@@ -1373,7 +1373,7 @@ public:
 	p->surface_params_u[csurf][j] = (float)atof(iline + sind[j + 1]);
 	p->surface_params_v[csurf][j] = (float)atof(iline + sind[j + 3]);
       }
-      int sind_verts = eind[4];
+      int sind_verts = (int)(eind[4]);
       int nvert = count_matches(re_surf_vert, iline + sind_verts);
       char re_split_vert[200] = "";
       for (j = 0; j < nvert; j++) {
@@ -1844,7 +1844,7 @@ public:
 	  for (j = 0; j < 2; j++) {
 	    p->curve_params[ccurve][j] = (float)atof(iline + sind[j + 1]);
 	  }
-	  int sind_verts = eind[2];
+	  int sind_verts = (int)(eind[2]);
 	  int nvert_local = count_matches(re_curve_vert, iline + sind_verts);
 	  char re_split_vert[100] = "";
 	  for (j = 0; j < nvert_local; j++) {

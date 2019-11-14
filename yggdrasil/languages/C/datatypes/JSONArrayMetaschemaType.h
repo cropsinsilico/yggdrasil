@@ -23,13 +23,13 @@ class JSONArrayMetaschemaType : public MetaschemaType {
 public:
   /*!
     @brief Constructor for JSONArrayMetaschemaType.
-    @param[in] items std::vector<MetaschemaType*> Type classes for array items.
+    @param[in] items MetaschemaTypeVector Type classes for array items.
     @param[in] format_str const char * (optional) Format string describing the
     item types. Defaults to empty string.
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
   */
-  JSONArrayMetaschemaType(const std::vector<MetaschemaType*> items,
+  JSONArrayMetaschemaType(const MetaschemaTypeVector items,
 			  const char *format_str = "",
 			  const bool use_generic=true) :
     // Always generic
@@ -61,8 +61,8 @@ public:
 	ygglog_throw_error("JSONArrayMetaschemaType: format_str must be a string.");
       strncpy(format_str_, type_doc["format_str"].GetString(), 1000);
     }
-    size_t i;
-    for (i = 0; i < (size_t)(type_doc["items"].Size()); i++) {
+    rapidjson::SizeType i;
+    for (i = 0; i < type_doc["items"].Size(); i++) {
       MetaschemaType* iitem = (MetaschemaType*)type_from_doc_c(&(type_doc["items"][i]), MetaschemaType::use_generic());
       if (iitem == NULL)
 	ygglog_throw_error("JSONArrayMetaschemaType: Error reconstructing item %lu from JSON document.", i);
@@ -84,10 +84,10 @@ public:
     if (pyitems == NULL) {
       ygglog_throw_error("JSONArrayMetaschemaType: Failed to recover items list from Python dictionary.");
     }
-    std::vector<MetaschemaType*> items;
-    size_t i, nitems = PyList_Size(pyitems);
+    MetaschemaTypeVector items;
+    Py_ssize_t i, nitems = PyList_Size(pyitems);
     for (i = 0; i < nitems; i++) {
-      PyObject* ipyitem = get_item_python_list(pyitems, i,
+      PyObject* ipyitem = get_item_python_list(pyitems, (size_t)i,
 					       "JSONArrayMetaschemaType: items: ",
 					       T_OBJECT);
       MetaschemaType* iitem = (MetaschemaType*)type_from_pyobj_c(ipyitem, MetaschemaType::use_generic());
@@ -110,6 +110,17 @@ public:
     Free the type string malloc'd during constructor.
    */
   ~JSONArrayMetaschemaType() {
+    free_items();
+  }
+  /*!
+    @brief Free the items.
+   */
+  void free_items() {
+    size_t i;
+    for (i = 0; i < items_.size(); i++) {
+      delete items_[i];
+      items_[i] = NULL;
+    }
     items_.clear();
   }
   /*!
@@ -159,13 +170,13 @@ public:
     if (all_arrays()) {
       printf("%s%-15s = %s\n", indent, "all_arrays", "true");
     }
-    printf("%s%lu Elements\n", indent, items_.size());
+    printf("%s%zu Elements\n", indent, items_.size());
     char new_indent[100] = "";
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
     size_t i;
     for (i = 0; i < items_.size(); i++) {
-      printf("%sElement %lu:\n", indent, i);
+      printf("%sElement %zu:\n", indent, i);
       items_[i]->display(new_indent);
     }
   }
@@ -176,7 +187,7 @@ public:
   PyObject* as_python_dict() const override {
     PyObject* out = MetaschemaType::as_python_dict();
     PyObject* pyitems = PyList_New(nitems());
-    size_t i;
+    rapidjson::SizeType i;
     for (i = 0; i < nitems(); i++) {
       PyObject* ipyitem = items_[i]->as_python_dict();
       set_item_python_list(pyitems, i, ipyitem,
@@ -245,7 +256,7 @@ public:
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
     data->get_data(arg);
-    printf("%sArray with %lu elements:\n", indent, arg.size());
+    printf("%sArray with %zu elements:\n", indent, arg.size());
     for (it = arg.begin(); it != arg.end(); it++) {
       (*it)->display(new_indent);
     }
@@ -257,9 +268,9 @@ public:
   size_t nitems() const { return items_.size(); }
   /*!
     @brief Get types for items.
-    @returns std::vector<MetaschemaType*> Array item types.
+    @returns MetaschemaTypeVector Array item types.
    */
-  std::vector<MetaschemaType*> items() const { return items_; }
+  MetaschemaTypeVector items() const { return items_; }
   /*!
     @brief Get format string.
     @returns char* Format string.
@@ -291,14 +302,14 @@ public:
   }
   /*!
     @brief Update the item types.
-    @param[in] new_items std::vector<MetaschemaType*> Vector of new types describing items.
+    @param[in] new_items MetaschemaTypeVector Vector of new types describing items.
     @param[in] force bool If true, the existing items are overwritten, otherwise they are only updated.
    */
-  void update_items(const std::vector<MetaschemaType*> new_items,
+  void update_items(const MetaschemaTypeVector new_items,
 		    bool force=false) {
     size_t i;
     if (force) {
-      items_.clear();
+      free_items();
     }
     if (items_.size() > 0) {
       if (items_.size() != new_items.size()) {
@@ -488,7 +499,7 @@ public:
     if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
     if (strlen(format_str_) > 0) {
       writer->Key("format_str");
-      writer->String(format_str_, strlen(format_str_));
+      writer->String(format_str_, (rapidjson::SizeType)strlen(format_str_));
     }
     writer->Key("items");
     writer->StartArray();
@@ -579,7 +590,7 @@ public:
       return false;
     }
     for (i = 0; i < (size_t)(items_.size()); i++) {
-      if (!(items_[i]->decode_data(data[i], allow_realloc, nargs, ap)))
+      if (!(items_[i]->decode_data(data[(rapidjson::SizeType)i], allow_realloc, nargs, ap)))
 	return false;
     }
     return true;
@@ -626,14 +637,14 @@ public:
     }
     
     for (i = 0; i < (size_t)(items_.size()); i++) {
-      if (!(items_[i]->decode_data(data[i], (**arg)[i])))
+      if (!(items_[i]->decode_data(data[(rapidjson::SizeType)i], (**arg)[i])))
 	return false;
     }
     return true;
   }
 
 private:
-  std::vector<MetaschemaType*> items_;
+  MetaschemaTypeVector items_;
   char format_str_[1000];
 };
 

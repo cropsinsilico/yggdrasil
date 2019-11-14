@@ -147,7 +147,7 @@ public:
 					      error_prefix,
 					      T_ARRAY, true);
     if (vertices != NULL) {
-      arg->nvert = PyList_Size(vertices);
+      arg->nvert = (int)PyList_Size(vertices);
       if (arg->nvert > 0) {
 	arg->vertices = (float**)malloc(arg->nvert*sizeof(float*));
 	if (arg->vertices == NULL) {
@@ -202,7 +202,7 @@ public:
 					   error_prefix,
 					   T_ARRAY, true);
     if (faces != NULL) {
-      arg->nface = PyList_Size(faces);
+      arg->nface = (int)PyList_Size(faces);
       if (arg->nface > 0) {
 	arg->faces = (int**)malloc(arg->nface*sizeof(int*));
 	if (arg->faces == NULL) {
@@ -220,7 +220,7 @@ public:
 	  PyObject *iface_vert = get_item_python_dict(iface, "vertex_index",
 						      error_prefix,
 						      T_ARRAY);
-	  arg->nvert_in_face[i] = PyList_Size(iface_vert);
+	  arg->nvert_in_face[i] = (int)PyList_Size(iface_vert);
 	  arg->faces[i] = (int*)malloc((arg->nvert_in_face[i])*sizeof(int));
 	  if (arg->faces[i] == NULL) {
 	    ygglog_throw_error("%sFailed to malloc face %d.",
@@ -241,7 +241,7 @@ public:
 					   error_prefix,
 					   T_ARRAY, true);
     if (edges != NULL) {
-      arg->nedge = PyList_Size(edges);
+      arg->nedge = (int)PyList_Size(edges);
       if (arg->nedge > 0) {
 	arg->edges = (int**)malloc(arg->nedge*sizeof(int*));
 	if (arg->edges == NULL) {
@@ -572,7 +572,7 @@ public:
       }
     }
     buf[msg_len] = '\0';
-    writer->String(buf, msg_len);
+    writer->String(buf, (rapidjson::SizeType)msg_len);
     return true;
   }
   /*!

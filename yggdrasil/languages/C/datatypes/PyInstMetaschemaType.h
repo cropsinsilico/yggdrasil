@@ -30,6 +30,7 @@ public:
 		       const bool use_generic=true) :
     // Always generic
     PyObjMetaschemaType("instance", true), class_name_(""), args_type_(NULL) {
+    UNUSED(use_generic);
     if (class_name != NULL) {
       update_class_name(class_name, true);
     }
@@ -48,6 +49,7 @@ public:
 		       const bool use_generic=false) :
     // Always generic
     PyObjMetaschemaType(type_doc, true), class_name_(""), args_type_(NULL) {
+    UNUSED(use_generic);
     if (!(type_doc.HasMember("class"))) {
       ygglog_throw_error("PyInstMetaschemaType: instance type must include 'class'.");
     }
@@ -76,6 +78,7 @@ public:
   PyInstMetaschemaType(PyObject* pyobj, const bool use_generic=false) :
     // Always generic
     PyObjMetaschemaType(pyobj, true) {
+    UNUSED(use_generic);
     // Class
     char class_name[200] = "";
     get_item_python_dict_c(pyobj, "class", class_name,
@@ -296,10 +299,10 @@ public:
     writer->String(class_name_);
     writer->Key("args");
     writer->StartObject();
-    std::map<const char*, MetaschemaType*, strcomp> properties = args_type_->properties();
-    std::map<const char*, MetaschemaType*, strcomp>::const_iterator it = properties.begin();
+    MetaschemaTypeMap properties = args_type_->properties();
+    MetaschemaTypeMap::const_iterator it = properties.begin();
     for (it = properties.begin(); it != properties.end(); it++) {
-      writer->Key(it->first);
+      writer->Key(it->first.c_str());
       if (!(it->second->encode_type(writer)))
 	return false;
     }

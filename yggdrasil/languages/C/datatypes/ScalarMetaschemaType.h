@@ -193,7 +193,7 @@ public:
     MetaschemaType::display(indent);
     printf("%s%-15s = %s\n", indent, "subtype", subtype_);
     printf("%s%-15s = %d\n", indent, "subtype_code", subtype_code_);
-    printf("%s%-15s = %lu\n", indent, "precision", precision_);
+    printf("%s%-15s = %zu\n", indent, "precision", precision_);
     printf("%s%-15s = %s\n", indent, "units", units_);
   }
   /*!
@@ -614,7 +614,7 @@ public:
     if (data == NULL) {
       ygglog_throw_error("ScalarMetaschemaType::c2python: Data pointer is NULL.");
     }
-    int itemsize = precision_ / 8;
+    size_t itemsize = precision_ / 8;
     int flags = NPY_OWNDATA;
     switch (subtype_code_) {
     case T_INT: {
@@ -719,7 +719,7 @@ public:
     }
     }
     PyObject* pyobj = PyArray_New(&PyArray_Type, nd, dims, np_type,
-    				  nullptr, data, itemsize, flags, nullptr);
+    				  nullptr, data, (int)itemsize, flags, nullptr);
     if (pyobj == NULL) {
       ygglog_throw_error("MetaschemaType::c2python: Creation of Numpy array failed.");
     }
@@ -737,15 +737,15 @@ public:
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override {
     if (!MetaschemaType::encode_type_prop(writer)) { return false; }
     writer->Key("subtype");
-    writer->String(subtype_, strlen(subtype_));
+    writer->String(subtype_, (rapidjson::SizeType)strlen(subtype_));
     writer->Key("precision");
-    writer->Int(precision_);
+    writer->Int((rapidjson::SizeType)precision_);
     if (strlen(units_) == 0) {
       writer->Key("units");
       writer->String("");
     } else {
       writer->Key("units");
-      writer->String(units_, strlen(units_));
+      writer->String(units_, (rapidjson::SizeType)strlen(units_));
     }
     return true;
   }
@@ -909,7 +909,7 @@ public:
     (*nargs)--;
     size_t encoded_len = 0;
     unsigned char* encoded_bytes = base64_encode(arg, nbytes(), &encoded_len);
-    bool out = writer->String((char*)encoded_bytes, encoded_len);
+    bool out = writer->String((char*)encoded_bytes, (rapidjson::SizeType)encoded_len);
     free(arg);
     free(encoded_bytes);
     return out;
@@ -1476,7 +1476,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
   */
   void display(const char* indent="") const override {
     ScalarMetaschemaType::display(indent);
-    printf("%s%-15s = %lu\n", indent, "length", length_);
+    printf("%s%-15s = %zu\n", indent, "length", length_);
   }
   /*!
     @brief Get type information as a Python dictionary.
@@ -1623,7 +1623,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override {
     if (!(ScalarMetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key("length");
-    writer->Int(length_);
+    writer->Int((int)length_);
     return true;
   }
   
@@ -1656,9 +1656,9 @@ NDArrayMetaschemaType::NDArrayMetaschemaType(const rapidjson::Value &type_doc,
   size_t ndim = type_doc["shape"].Size();
   size_t i;
   for (i = 0; i < ndim; i++) {
-    if (!(type_doc["shape"][i].IsInt()))
+    if (!(type_doc["shape"][(rapidjson::SizeType)i].IsInt()))
       ygglog_throw_error("NDArrayMetaschemaType: ndarray 'shape' elements must be integers.");
-    shape_.push_back(type_doc["shape"][i].GetInt());
+    shape_.push_back(type_doc["shape"][(rapidjson::SizeType)i].GetInt());
   }
   update_type("ndarray");
 };
@@ -1707,9 +1707,9 @@ void NDArrayMetaschemaType::display(const char* indent) const {
   printf("%s%-15s = [ ", indent, "shape");
   if (ndim() > 0) {
     size_t i;
-    printf("%lu", shape_[0]);
+    printf("%zu", shape_[0]);
     for (i = 1; i < ndim(); i++) {
-      printf(", %lu", shape_[i]);
+      printf(", %zu", shape_[i]);
     }
   }
   printf(" ]\n");
@@ -1753,7 +1753,7 @@ const bool NDArrayMetaschemaType::variable_nelements() const {
 };
 void NDArrayMetaschemaType::numpy_dims(int *nd, npy_intp **dims) const {
   int i;
-  nd[0] = ndim();
+  nd[0] = (int)ndim();
   npy_intp *idim = (npy_intp*)realloc(dims[0], nd[0]*sizeof(npy_intp));
   if (idim == NULL) {
     ygglog_throw_error("NDArrayMetaschemaType::numpy_dims: Failed to realloc dims.");

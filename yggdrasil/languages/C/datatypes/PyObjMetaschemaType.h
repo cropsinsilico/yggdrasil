@@ -148,6 +148,7 @@ public:
     @param[in] indent char* Indentation to add to display output.
    */
   void display_generic(const YggGeneric* data, const char* indent="") const override {
+    UNUSED(indent);
     if (data == NULL) {
       ygglog_throw_error("PyObjMetaschemaType::display_generic: Generic object is NULL.");
     }
@@ -244,7 +245,7 @@ public:
       bytes_precision = strlen(arg0.name);
     }
     (*nargs)--;
-    bool out = writer->String(arg0.name, bytes_precision);
+    bool out = writer->String(arg0.name, (rapidjson::SizeType)bytes_precision);
     return out;
   }
   /*!
