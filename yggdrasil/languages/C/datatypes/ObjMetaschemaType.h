@@ -1201,7 +1201,7 @@ public:
       if (do_texcoords)
 	val_per_vert++;
       int nvert = count_matches(re_line_vert, iline);
-      char re_split_vert[100] = "";
+      char re_split_vert[200] = "";
       for (j = 0; j < nvert; j++) {
 	strcat(re_split_vert, re_line_vert);
       }
@@ -1272,7 +1272,7 @@ public:
       if (do_normals)
 	val_per_vert++;
       int nvert = count_matches(re_face_vert, iline);
-      char re_split_vert[100] = "";
+      char re_split_vert[200] = "";
       for (j = 0; j < nvert; j++) {
 	strcat(re_split_vert, re_face_vert);
       }
@@ -1375,7 +1375,7 @@ public:
       }
       int sind_verts = eind[4];
       int nvert = count_matches(re_surf_vert, iline + sind_verts);
-      char re_split_vert[100] = "";
+      char re_split_vert[200] = "";
       for (j = 0; j < nvert; j++) {
 	strcat(re_split_vert, re_surf_vert);
       }
@@ -1785,27 +1785,27 @@ public:
 	// Points
 	else if (find_matches(re_point, iline, &sind, &eind) == n_re_point) {
 	  ygglog_debug("deserialize_obj: Point");
-	  int nvert = count_matches(re_point_vert, iline);
+	  int nvert_local = count_matches(re_point_vert, iline);
 	  char re_split_vert[100] = "";
-	  for (j = 0; j < nvert; j++) {
+	  for (j = 0; j < nvert_local; j++) {
 	    strcat(re_split_vert, re_point_vert);
 	  }
 	  int nvert_found = find_matches(re_split_vert, iline, &sind, &eind) - 1;
-	  if (nvert_found != nvert) {
+	  if (nvert_found != nvert_local) {
 	    ygglog_error("deserialize_obj: Expected %d verts in point, but found %d (re = %s, line = '%s').",
-			 nvert, nvert_found, re_split_vert, iline);
+			 nvert_local, nvert_found, re_split_vert, iline);
 	    out = -1;
 	    break;
 	  }
-	  p->nvert_in_point[cpoint] = nvert;
-	  int *ipoint = (int*)realloc(p->points[cpoint], nvert*sizeof(int));
+	  p->nvert_in_point[cpoint] = nvert_local;
+	  int *ipoint = (int*)realloc(p->points[cpoint], nvert_local*sizeof(int));
 	  if (ipoint == NULL) {
 	    ygglog_error("deserialize_obj: Failed to allocate point %d.", cpoint);
 	    out = -1;
 	    break;
 	  }
 	  p->points[cpoint] = ipoint;
-	  for (j = 0; j < nvert; j++) {
+	  for (j = 0; j < nvert_local; j++) {
 	    p->points[cpoint][j] = atoi(iline + sind[j+1]) - 1;
 	  }
 	  cpoint++;
