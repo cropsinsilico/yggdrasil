@@ -954,8 +954,8 @@ void display_obj_indent(obj_t p, const char* indent) {
   printf("%sMaterial: %s\n", indent, p.material);
   printf("%s%d Vertices:\n", indent, p.nvert);
   for (i = 0; i < p.nvert; i++) {
-    printf("%s  %f, %f, %f\n", indent,
-	   p.vertices[i][0], p.vertices[i][1], p.vertices[i][2]);
+    printf("%s  %f, %f, %f, %f\n", indent,
+	   p.vertices[i][0], p.vertices[i][1], p.vertices[i][2], p.vertices[i][3]);
   }
   printf("%s%d Texcoords:\n", indent, p.ntexc);
   for (i = 0; i < p.ntexc; i++) {
