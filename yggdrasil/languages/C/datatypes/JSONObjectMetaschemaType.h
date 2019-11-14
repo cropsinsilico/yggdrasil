@@ -31,6 +31,7 @@ public:
 			   const bool use_generic=true) :
     // Always generic
     MetaschemaType("object", true) {
+    UNUSED(use_generic);
     strncpy(prop_key_, "properties", 100);
     update_properties(properties, true);
   }
@@ -47,6 +48,7 @@ public:
 			   const char prop_key[100]="properties") :
     // Always generic
     MetaschemaType(type_doc, true), prop_key_("") {
+    UNUSED(use_generic);
     strncpy(prop_key_, prop_key, 100);
     if (!(type_doc.HasMember(prop_key_)))
       ygglog_throw_error("JSONObjectMetaschemaType: Properties missing.");
@@ -68,6 +70,7 @@ public:
 			   const char prop_key[100]="properties") :
     // Always generic
     MetaschemaType(pyobj, true), prop_key_("") {
+    UNUSED(use_generic);
     strncpy(prop_key_, prop_key, 100);
     PyObject* pyprops = get_item_python_dict(pyobj, prop_key_,
   					     "JSONObjectMetaschemaType: properties: ",

@@ -261,7 +261,7 @@ public:
     @brief Get the value of class attribute use_generic.
     @returns bool Value of use_generic.
    */
-  const int use_generic() const { return use_generic_; }
+  const bool use_generic() const { return use_generic_; }
   /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
@@ -284,6 +284,8 @@ public:
     @returns size_t Number of arguments in ap consumed.
    */
   virtual size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) {
+    UNUSED(nargs);
+    UNUSED(ap);
     nskip_before_ = 0;
     nskip_after_ = 0;
     return 0;
@@ -296,6 +298,8 @@ public:
     @returns size_t Number of arguments in ap consumed.
    */
   virtual size_t update_from_deserialization_args(size_t *nargs, va_list_t &ap) {
+    UNUSED(nargs);
+    UNUSED(ap);
     nskip_before_ = 0;
     nskip_after_ = 0;
     return 0;
@@ -345,9 +349,8 @@ public:
     // Otherwise circular include results as scalar requires
     // JSON array for checking if there is a single element.
     // Prevent C4100 warning on windows by referencing param
-#ifdef _WIN32
-    new_length;
-#endif 
+    UNUSED(new_length);
+    UNUSED(force);
     ygglog_throw_error("MetaschemaType::set_length: Cannot set length for type '%s'.", type_);
   }
   /*!

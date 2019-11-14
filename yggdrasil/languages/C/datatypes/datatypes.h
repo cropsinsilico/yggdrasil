@@ -537,6 +537,7 @@ int split_head_body(const char *buf, const size_t buf_siz,
   eind = 0;
 #ifdef _WIN32
   // Windows regex of newline is buggy
+  UNUSED(buf_siz);
   size_t sind1, eind1, sind2, eind2;
   char re_head_tag[COMMBUFFSIZ];
   sprintf(re_head_tag, "(%s)", MSG_HEAD_SEP);
