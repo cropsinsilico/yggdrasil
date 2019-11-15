@@ -190,7 +190,7 @@ before_install:
 
     # Temp fix to install missing dependencies from jsonschema dependency
     if [[ -n "$YGG_CONDA" && "${YGG_CONDA:0:1}" == "2" ]]; then
-      conda install contextlib2 pathlib "configparser >=3.5"
+      conda install contextlib2 pathlib2 "configparser >=3.5"
     fi
 
 install:
