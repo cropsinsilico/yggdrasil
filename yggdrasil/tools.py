@@ -129,9 +129,12 @@ def get_python_c_library():
             dir_try.append(os.path.join(cvars['prefix'], 'lib'))
     if cvars.get('LIBDIR', None):
         dir_try.append(cvars['LIBDIR'])
-    for k in ['stdlib', 'purelib', 'platlib', 'platstdlib']:
-        if paths[k] not in dir_try:
-            dir_try.append(paths[k])
+    if cvars.get('LIBDEST', None):
+        dir_try.append(cvars['LIBDEST'])
+    for k in ['stdlib', 'purelib', 'platlib', 'platstdlib', 'data']:
+        dir_try.append(paths[k])
+    dir_try.append(os.path.join(paths['data'], 'lib'))
+    dir_try = set(dir_try)
     for idir in dir_try:
         x = os.path.join(idir, base)
         if os.path.isfile(x):
