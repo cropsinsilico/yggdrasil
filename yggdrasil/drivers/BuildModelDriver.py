@@ -133,8 +133,9 @@ class BuildModelDriver(CompiledModelDriver):
         if self.sourcedir is None:
             self.sourcedir = os.path.dirname(args[0])
         if not os.path.isabs(self.sourcedir):
-            self.sourcedir = os.path.realpath(os.path.join(self.working_dir,
-                                                           self.sourcedir))
+            self.sourcedir = os.path.normpath(
+                os.path.realpath(os.path.join(self.working_dir,
+                                              self.sourcedir)))
         # Build file
         if self.buildfile is None:
             self.buildfile = self.buildfile_base
