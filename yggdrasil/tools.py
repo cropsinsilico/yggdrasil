@@ -109,13 +109,8 @@ def get_python_c_library():
     """
     paths = sysconfig.get_paths()
     cvars = sysconfig.get_config_vars()
-    dir_try = []
-    if cvars['prefix']:
-        dir_try.append(cvars['prefix'])
     if platform._is_win:  # pragma: windows
         base = 'python%s.lib' % cvars['py_version_nodot']
-        if cvars['prefix']:
-            dir_try.append(os.path.join(cvars['prefix'], 'libs'))
     else:
         base = cvars.get('LIBRARY', None)
     if base is None:
@@ -125,6 +120,13 @@ def get_python_c_library():
                             "sysconfig.get_config_vars():\n%s\n")
                            % (pprint.pformat(paths),
                               pprint.pformat(cvars)))  # pragma: debug
+    dir_try = []
+    if cvars['prefix']:
+        dir_try.append(cvars['prefix'])
+        if platform._is_win:  # pragma: windows
+            dir_try.append(os.path.join(cvars['prefix'], 'libs'))
+        else:
+            dir_try.append(os.path.join(cvars['prefix'], 'lib'))
     if cvars.get('LIBDIR', None):
         dir_try.append(cvars['LIBDIR'])
     for k in ['stdlib', 'purelib', 'platlib', 'platstdlib']:
