@@ -239,7 +239,7 @@ _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
 _python_inc = sysconfig.get_paths()['include']
-_python_lib = tools.get_python_c_library()
+_python_lib = tools.get_python_c_library(allow_failure=True)
 _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
 _numpy_lib = None
 

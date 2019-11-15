@@ -96,8 +96,12 @@ def check_environ_bool(name, valid_values=['true', '1', True, 1]):
     return (os.environ.get(name, '').lower() in valid_values)
 
 
-def get_python_c_library():
+def get_python_c_library(allow_failure=False):
     r"""Determine the location of the Python C API library.
+
+    Args:
+        allow_failure (bool, optional): If True, the base name will be returned
+            if the file cannot be located. Defaults to False.
 
     Returns:
         str: Full path to the library.
@@ -139,6 +143,8 @@ def get_python_c_library():
         x = os.path.join(idir, base)
         if os.path.isfile(x):
             return x
+    if allow_failure:
+        return base
     raise RuntimeError(("Could not determine the location of the Python "
                         "C API library: %s.\n"
                         "sysconfig.get_paths():\n%s\n"
