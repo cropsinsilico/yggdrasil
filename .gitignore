@@ -10,7 +10,6 @@ yggdrasil/tests/scripts/Makefile
 *.dll
 *.dylib
 yggdrasil/languages/C/stdint.h
-**/__cmake_systeminformation
 
 # Intermediate docs
 docs/build
