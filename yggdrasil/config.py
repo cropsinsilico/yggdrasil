@@ -8,6 +8,7 @@ This module imports the configuration for yggdrasil.
 import os
 import sys
 import json
+import pprint
 import shutil
 import logging
 import warnings
@@ -313,9 +314,10 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
         return False
     first = out[0]
     if len(out) > 1:
-        warnings.warn(("More than one (%d) match to %s. "
+        warnings.warn(("More than one (%d) match to %s:\n%s\n "
                        + "Using first match (%s)") %
-                      (len(out), fname, first), RuntimeWarning)
+                      (len(out), fname, pprint.pformat(out),
+                       first), RuntimeWarning)
     return first
 
 
