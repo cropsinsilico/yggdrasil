@@ -398,8 +398,9 @@ class CMakeConfigure(BuildToolBase):
         if platform._is_win:  # pragma: windows
             new_flags = ["/W4", "/EHsc", '/TP', "/nologo",
                          "-D_CRT_SECURE_NO_WARNINGS"]
-            if not (('/MD' in os.environ.get('CXXFLAGS'))
-                    or ('-MD' in os.environ.get('CXXFLAGS'))):
+            if (((os.environ.get('CXXFLAGS', None) is not None)
+                 and not (('/MD' in os.environ.get('CXXFLAGS'))
+                          or ('-MD' in os.environ.get('CXXFLAGS'))))):
                 if configuration.lower() == 'debug':  # pragma: debug
                     new_flags.append("/MTd")
                 else:
