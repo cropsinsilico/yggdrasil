@@ -239,14 +239,7 @@ _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
 _python_inc = sysconfig.get_paths()['include']
-if platform._is_win:  # pragma: windows
-    _python_lib = os.path.join(
-        sysconfig.get_paths()['stdlib'],
-        'python%s.lib'
-        % sysconfig.get_config_var('py_version_nodot'))
-else:
-    _python_lib = os.path.join(sysconfig.get_config_var('LIBDIR'),
-                               sysconfig.get_config_var('LIBRARY'))
+_python_lib = tools.get_python_c_library()
 _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
 _numpy_lib = None
 

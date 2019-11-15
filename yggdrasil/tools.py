@@ -5,6 +5,7 @@ import logging
 import pprint
 import os
 import sys
+import sysconfig
 import copy
 import shutil
 import inspect
@@ -93,6 +94,52 @@ def check_environ_bool(name, valid_values=['true', '1', True, 1]):
 
     """
     return (os.environ.get(name, '').lower() in valid_values)
+
+
+def get_python_c_library():
+    r"""Determine the location of the Python C API library.
+
+    Returns:
+        str: Full path to the library.
+
+    Raises:
+        RuntimeError: If the base name for the library cannot be determined.
+        RuntimeError: If the library cannot be located.
+
+    """
+    paths = sysconfig.get_paths()
+    cvars = sysconfig.get_config_vars()
+    dir_try = []
+    if cvars['prefix']:
+        dir_try.append(cvars['prefix'])
+    if platform._is_win:  # pragma: windows
+        base = 'python%s.lib' % cvars['py_version_nodot']
+        if cvars['prefix']:
+            dir_try.append(os.path.join(cvars['prefix'], 'libs'))
+    else:
+        base = cvars.get('LIBRARY', None)
+    if base is None:
+        raise RuntimeError(("Could not determine base name for the Python "
+                            "C API library.\n"
+                            "sysconfig.get_paths():\n%s\n"
+                            "sysconfig.get_config_vars():\n%s\n")
+                           % (pprint.pformat(paths),
+                              pprint.pformat(cvars)))  # pragma: debug
+    if cvars.get('LIBDIR', None):
+        dir_try.append(cvars['LIBDIR'])
+    for k in ['stdlib', 'purelib', 'platlib', 'platstdlib']:
+        if paths[k] not in dir_try:
+            dir_try.append(paths[k])
+    for idir in dir_try:
+        x = os.path.join(idir, base)
+        if os.path.isfile(x):
+            return x
+    raise RuntimeError(("Could not determine the location of the Python "
+                        "C API library: %s.\n"
+                        "sysconfig.get_paths():\n%s\n"
+                        "sysconfig.get_config_vars():\n%s\n")
+                       % (base, pprint.pformat(paths),
+                          pprint.pformat(cvars)))  # pragma: debug
 
 
 def get_conda_prefix():
