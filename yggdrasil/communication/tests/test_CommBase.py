@@ -533,7 +533,7 @@ class TestCommBase(YggTestClassInfo):
             msg = self.map_sent2recv(msg)
 
         def fcond(x):
-            return (my_repr(x) != my_repr(msg))
+            return ((x != msg) and (my_repr(x) != my_repr(msg)))
         return FunctionFilter(function=fcond)
 
     def setup_filters(self):
