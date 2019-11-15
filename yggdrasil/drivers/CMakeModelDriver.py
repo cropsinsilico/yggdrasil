@@ -764,7 +764,8 @@ class CMakeModelDriver(BuildModelDriver):
             # used
             conda_prefix = self.get_tool_instance('compiler').get_conda_prefix()
             if conda_prefix:
-                newlines_before += ['file(TO_CMAKE_PATH "%s" ygg_link_dir)',
+                newlines_before += ['file(TO_CMAKE_PATH "%s" ygg_link_dir)'
+                                    % conda_prefix,
                                     'LINK_DIRECTORIES(${ygg_link_dir})']
             # Explicitly set Release/Debug directories to builddir on windows
             if platform._is_win:  # pragma: windows

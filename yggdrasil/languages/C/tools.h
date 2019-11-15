@@ -63,10 +63,19 @@ typedef long double _Complex complex_long_double;
 extern "C" {
 #endif
 
+#ifdef _DEBUG
+#undef _DEBUG
 #include <Python.h>
 #include <numpy/arrayobject.h>
 #include <numpy/ndarrayobject.h>
 #include <numpy/npy_common.h>
+#define _DEBUG
+#else
+#include <Python.h>
+#include <numpy/arrayobject.h>
+#include <numpy/ndarrayobject.h>
+#include <numpy/npy_common.h>
+#endif
   
 typedef struct complex_float_t {
   float re;
