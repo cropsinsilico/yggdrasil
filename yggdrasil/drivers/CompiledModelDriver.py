@@ -633,7 +633,7 @@ class CompilationToolBase(object):
                     cls.search_path_conda = [cls.search_path_conda]
                 for ienv in cls.search_path_conda:
                     ienv_path = os.path.join(conda_prefix, ienv)
-                    if os.path.isdir(ienv_path):
+                    if (ienv_path not in paths) and os.path.isdir(ienv_path):
                         paths.append(ienv_path)
         return paths
 
