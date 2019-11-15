@@ -302,8 +302,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                 None, 'test_function', contents='\n'.join(definition),
                 outputs_in_inputs=outputs_in_inputs,
                 expected_outputs=outputs)
-            self.assert_equal(len(parsed['inputs']), len(inputs))
-            self.assert_equal(len(parsed['outputs']), len(outputs))
+            self.assert_equal(len(parsed.get('inputs', [])), len(inputs))
+            self.assert_equal(len(parsed.get('outputs', [])), len(outputs))
             for xp, x0 in zip(parsed['inputs'], inputs):
                 assert(xp['name'] == x0['name'])
                 x0.update(xp)

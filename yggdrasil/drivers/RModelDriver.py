@@ -98,11 +98,11 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'return': 'return({output_var})',
         'function_def_regex': (
             r'{function_name} *(?:(?:\<-)|(?:=)) *function'
-            r'\((?P<inputs>(?:.|\n)*?)\)\s*\{{'
-            r'(?:P<body>(?:.*?\n?)*?)'
+            r'\((?P<inputs>(?:.|(?:\r?\n))*?)\)\s*\{{'
+            r'(?P<body>(?:.|(?:\r?\n))*?)'
             r'(?:return\((list\()?'
-            r'(?P<outputs>(?:.|\n)*?)(?(2)\))\)'
-            r'(?:.*?\n?)*?\}})'
+            r'(?P<outputs>(?:.|(?:\r?\n))*?)(?(3)\))\)'
+            r'(?:.|(?:\r?\n))*?\}})'
             r'|(?:\}})'),
         'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)',
         'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
