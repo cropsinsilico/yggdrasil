@@ -22,7 +22,7 @@ def load_yaml(fname):
             to a file containing a YAML, or a loaded YAML document. If fname starts with
             'git:' then the code will assume the file is in a remote git repository. The
             remainder of fname can be the full url to the YAML file (http://mygit.repo/foo/bar/yaml/interesting.yaml)
-            or just the repo and YAML file (the server is assumed to be github.com if not given) 
+            or just the repo and YAML file (the server is assumed to be github.com if not given)
             (foo/bar/yam/interesting.yaml will be interpreted as http://github.com/foo/bar/yam/interesting.yaml).
 
     Returns:
@@ -55,11 +55,13 @@ def load_yaml(fname):
             # the full path is the file name and location
             # turn the file path into an os based format
             fname = os.path.join(*splitpath)
-            # create the url for cloning the repo
-            cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' + reponame
-            # clone the repo into the appropriate directory
-            repo = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
-            # now that it is cloned, just pass the yaml file (and path) onwards
+            # check to see if the file already exists, and clone if it does not
+            if not os.path.exists(fname):
+                # create the url for cloning the repo
+                cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' + reponame
+                # clone the repo into the appropriate directory
+                repo = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
+                # now that it is cloned, just pass the yaml file (and path) onwards
         fname = os.path.realpath(fname)
         if not os.path.isfile(fname):
             raise IOError("Unable locate yaml file %s" % fname)
@@ -259,8 +261,8 @@ def parse_model(yml, existing):
             x['model_driver'] = [yml['name']]
             existing = parse_component(x, io[:-1], existing=existing)
     return existing
-            
-    
+
+
 def parse_connection(yml, existing):
     r"""Parse a yaml entry for a connection between I/O channels.
 
@@ -367,7 +369,7 @@ def parse_connection(yml, existing):
         xi['driver'] = 'InputDriver'
 
     # Parse drivers
-    
+
     # Transfer connection keywords to one connection driver
     conn_keys_gen = ['inputs', 'outputs']
     conn_keys = list(set(schema['connection'].properties) - set(conn_keys_gen))
