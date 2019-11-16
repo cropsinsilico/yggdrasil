@@ -153,8 +153,9 @@ class TestExampleTypes(ExampleTstBase):
     
     def run_example(self):
         r"""This runs an example in the correct language."""
-        self._output_files = [self.setup_model(self.language,
-                                               self.datatype)]
+        if self.yaml is not None:
+            self._output_files = [self.setup_model(self.language,
+                                                   self.datatype)]
         super(TestExampleTypes, self).run_example()
         drv = import_component('model', self.language)
         if drv.is_typed:
