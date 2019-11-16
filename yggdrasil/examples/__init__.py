@@ -57,6 +57,8 @@ def register_example(example_dir):
         lang_avail += ['all', 'all_nomatlab', 'c', 'cpp', 'matlab', 'python']
     elif example_base == 'types':
         lang_avail += tools.get_supported_lang()
+        lang_avail.remove('cmake')
+        lang_avail.remove('make')
     else:
         lang_search = example_base + '_%s.yml'
     if lang_search is not None:
