@@ -301,7 +301,7 @@ public:
 	new_it = new_properties.find(it->first);
 	if (new_it == new_properties.end()) {
 	  ygglog_throw_error("JSONObjectMetaschemaType::update_properties: New property map dosn't include old property '%s'.",
-			     it->first);
+			     it->first.c_str());
 	}
 	it->second->update(new_it->second);
       }
@@ -414,7 +414,7 @@ public:
     for (it = properties_.begin(); it != properties_.end(); it++) {
       PyObject *ipy_item = PyDict_GetItemString(pyobj, it->first.c_str());
       if (ipy_item == NULL) {
-	ygglog_throw_error("JSONObjectMetaschemaType::python2c: Failed to get item %s out of the Python dict.", it->first);
+	ygglog_throw_error("JSONObjectMetaschemaType::python2c: Failed to get item %s out of the Python dict.", it->first.c_str());
       }
       YggGeneric *ic_item = it->second->python2c(ipy_item);
       (*cmap)[it->first] = ic_item;
@@ -442,7 +442,7 @@ public:
     for (it = properties_.begin(); it != properties_.end(); it++) {
       YggGenericMap::iterator ic_item = c_map.find(it->first);
       if (ic_item == c_map.end()) {
-	ygglog_throw_error("JSONObjectMetaschemaType::c2python: C object does not have element %s.", it->first);
+	ygglog_throw_error("JSONObjectMetaschemaType::c2python: C object does not have element %s.", it->first.c_str());
       }
       PyObject *ipy_item = it->second->c2python(ic_item->second);
       if (PyDict_SetItemString(pyobj, it->first.c_str(), ipy_item) < 0) {
@@ -505,7 +505,7 @@ public:
     for (it = properties_.begin(); it != properties_.end(); it++) {
       YggGenericMap::iterator iarg = arg.find(it->first);
       if (iarg == arg.end()) {
-	ygglog_throw_error("JSONObjectMetaschemaType::encode_data: Object does not have element %s.", it->first);
+	ygglog_throw_error("JSONObjectMetaschemaType::encode_data: Object does not have element %s.", it->first.c_str());
 	return false;
       }
       writer->Key(it->first.c_str());
@@ -594,7 +594,7 @@ public:
       }
       YggGenericMap::iterator iarg = (*arg)->find(it->first);
       if (iarg == (*arg)->end()) {
-	ygglog_error("JSONObjectMetaschemaType::decode_data: Destination dosn't have member '%s'.", it->first);
+	ygglog_error("JSONObjectMetaschemaType::decode_data: Destination dosn't have member '%s'.", it->first.c_str());
 	return false;
       }
       if (!(it->second->decode_data(data[it->first.c_str()], iarg->second)))
