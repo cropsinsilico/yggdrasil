@@ -2,6 +2,7 @@ import os
 import re
 import shutil
 import logging
+import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, components
 from yggdrasil.drivers.CompiledModelDriver import LinkerBase
@@ -408,6 +409,11 @@ class CMakeConfigure(BuildToolBase):
             for x in new_flags:
                 if x not in compile_flags:
                     compile_flags.append(x)
+        python_flags = sysconfig.get_config_var('LIBS')
+        if python_flags:
+            for x in python_flags.split():
+                if x not in linker_flags:
+                    linker_flags.append(x)
         # Compilation flags
         for x in compile_flags:
             if x.startswith('-D'):
