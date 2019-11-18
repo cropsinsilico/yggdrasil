@@ -114,9 +114,11 @@ def get_python_c_library(allow_failure=False):
     paths = sysconfig.get_paths()
     cvars = sysconfig.get_config_vars()
     if platform._is_win:  # pragma: windows
-        base = 'python%s.lib' % cvars['py_version_nodot']
+        # base = 'python%s.lib' % cvars['py_version_nodot']
+        base = 'python%s.dll' % cvars['py_version_nodot']
     else:
-        base = cvars.get('LIBRARY', None)
+        # base = cvars.get('LIBRARY', None)
+        base = cvars.get('LDLIBRARY', None)
     if base is None:
         raise RuntimeError(("Could not determine base name for the Python "
                             "C API library.\n"
