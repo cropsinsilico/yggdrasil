@@ -492,6 +492,23 @@ class CompilationToolBase(object):
         return (exec_path is not None)
 
     @classmethod
+    def get_env_flags(cls):
+        r"""Get a list of flags stored in the environment variables.
+
+        Returns:
+            list: Flags for the tool.
+
+        """
+        out = []
+        env = getattr(cls, 'default_flags_env', None)
+        if env is not None:
+            if not isinstance(env, list):
+                env = [env]
+            for ienv in env:
+                out += os.environ.get(ienv, '').split()
+        return out
+
+    @classmethod
     def get_flags(cls, flags=None, outfile=None, output_first=None,
                   unused_kwargs=None, skip_defaults=False,
                   dont_skip_env_defaults=False, **kwargs):
@@ -536,12 +553,7 @@ class CompilationToolBase(object):
             # Include flags set by the environment (this is especially
             # important when using the Conda compilers
             if dont_skip_env_defaults:
-                env = getattr(cls, 'default_flags_env', None)
-                if env is not None:
-                    if not isinstance(env, list):
-                        env = [env]
-                    for ienv in env:
-                        out += os.environ.get(ienv, '').split()
+                out += cls.get_env_flags()
         else:
             new_flags = cls.default_flags + getattr(cls, 'flags', [])
             for x in new_flags:
