@@ -412,7 +412,7 @@ class CMakeConfigure(BuildToolBase):
         python_flags = sysconfig.get_config_var('LIBS')
         if python_flags:
             for x in python_flags.split():
-                if x not in linker_flags:
+                if x.startswith('-l') and (x not in linker_flags):
                     linker_flags.append(x)
         # Compilation flags
         for x in compile_flags:

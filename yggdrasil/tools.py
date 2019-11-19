@@ -96,29 +96,41 @@ def check_environ_bool(name, valid_values=['true', '1', True, 1]):
     return (os.environ.get(name, '').lower() in valid_values)
 
 
-def get_python_c_library(allow_failure=False):
+def get_python_c_library(allow_failure=False, libtype=None):
     r"""Determine the location of the Python C API library.
 
     Args:
         allow_failure (bool, optional): If True, the base name will be returned
             if the file cannot be located. Defaults to False.
+        libtype (str, optional): Type of library that should be located.
+            Valid values include 'static' and 'shared'. Defaults to 'shared'
+            on Unix OSs and 'static' on Windows.
 
     Returns:
         str: Full path to the library.
 
     Raises:
+        ValueError: If libtype is not 'static' or 'shared'.
         RuntimeError: If the base name for the library cannot be determined.
         RuntimeError: If the library cannot be located.
 
     """
+    if libtype not in ['static', 'shared', None]:  # pragma: debug
+        raise ValueError("libtype must be 'shared' or 'static', "
+                         "'%s' not supported." % libtype)
     paths = sysconfig.get_paths()
     cvars = sysconfig.get_config_vars()
     if platform._is_win:  # pragma: windows
-        # base = 'python%s.lib' % cvars['py_version_nodot']
-        base = 'python%s.dll' % cvars['py_version_nodot']
+        if libtype is None:
+            libtype = 'static'
+        libtype2ext = {'shared': '.dll', 'static': '.lib'}
+        base = 'python%s%s' % (cvars['py_version_nodot'],
+                               libtype2ext[libtype])
     else:
-        # base = cvars.get('LIBRARY', None)
-        base = cvars.get('LDLIBRARY', None)
+        if libtype is None:
+            libtype = 'shared'
+        libtype2key = {'shared': 'LDLIBRARY', 'static': 'LIBRARY'}
+        base = cvars.get(libtype2key[libtype], None)
     if base is None:
         raise RuntimeError(("Could not determine base name for the Python "
                             "C API library.\n"

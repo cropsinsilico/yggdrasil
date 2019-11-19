@@ -70,7 +70,7 @@ def create_devenv(env_type, python='3.6', name=None, **kwargs):
         name = '%s%s' % (env_type, python.replace('.', ''))
     create_env(name, python=python, **kwargs)
     python_cmd = locate_conda_exe(name, 'python')
-    req_suffixes = ['', '_testing']
+    req_suffixes = ['', '_testing', '_development']
     if env_type == 'conda':
         req_suffixes.append('_condaonly')
     elif env_type == 'pip':
