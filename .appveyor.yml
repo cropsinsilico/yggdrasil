@@ -23,6 +23,7 @@ environment:
     INSTALLRMQ: 0
     APPVEYOR_SAVE_CACHE_ON_ERROR: true
     YGG_RUN_EXAMPLES: 0
+    YGG_ENABLE_LONG_TESTS: 0
 
   erlang_download_url: "http://erlang.org/download/otp_win64_20.2.exe"
   erlang_exe_path: "C:\\Users\\appveyor\\erlang.exe"
@@ -43,6 +44,10 @@ environment:
       YGG_ENABLE_LONG_TESTS: 1
     - platform: x64
       PYTHON_VERSION: "3.6"
+      YGG_RUN_EXAMPLES: 1
+    - platform: x64
+      PYTHON_VERSION: "3.6"
+      YGG_ENABLE_LONG_TESTS: 1
       YGG_RUN_EXAMPLES: 1
 
 install:
@@ -131,7 +136,8 @@ before_test:
 test_script:
   - "type .coveragerc"
   - "if %YGG_RUN_EXAMPLES% == 0 yggtest -c setup.cfg --cov-config=.coveragerc"
-  - "if %YGG_RUN_EXAMPLES% == 1 yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples"
+  - "if ((%YGG_RUN_EXAMPLES% == 1) && (%YGG_ENABLE_LONG_TESTS% == 0)) yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples"
+  - "if ((%YGG_RUN_EXAMPLES% == 1) && (%YGG_ENABLE_LONG_TESTS% == 1)) yggtest -c setup.cfg --cov-config=.coveragerc examples\\tests\\test_types.py --with-examples"
 
 after_test:
   - "codecov"
