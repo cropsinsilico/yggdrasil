@@ -400,8 +400,6 @@ class CMakeConfigure(BuildToolBase):
             compiler = driver.get_tool('compiler')
             new_flags = compiler.default_flags
             def_flags = compiler.get_env_flags()
-            print('new_flags', new_flags)
-            print('def_flags', def_flags)
             if not (('/MD' in def_flags) or ('-MD' in def_flags)):
                 if configuration.lower() == 'debug':  # pragma: debug
                     new_flags.append("/MTd")
