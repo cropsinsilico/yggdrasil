@@ -3,9 +3,10 @@ import sys
 import argparse
 import uuid
 import pprint
+import subprocess
 PYVER = ('%s.%s' % sys.version_info[:2])
 PY2 = (sys.version_info[0] == 2)
-_is_mac = (sys.platform == 'darwin')
+_is_osx = (sys.platform == 'darwin')
 _is_linux = ('linux' in sys.platform)
 _is_win = (sys.platform in ['win32', 'cygwin'])
 INSTALLLPY = (os.environ.get('INSTALLLPY', '0') == '1')
@@ -29,7 +30,7 @@ def call_script(lines):
         script_ext = '.bat'
     else:
         script_ext = '.sh'
-    fname = 'ci_script_%s%s' % (uuid.uuid4()), script_ext)
+    fname = 'ci_script_%s%s' % (str(uuid.uuid4()), script_ext)
     try:
         pprint.pprint(lines)
         with open(fname, 'w') as fd:
@@ -144,7 +145,7 @@ def deploy_package_on_ci(method, python):
         # Temp fix to install missing dependencies from jsonschema
         if PY2:
             cmds.append("conda install contextlib2 pathlib2 "
-                        "\"configparser >=3.5\"") 
+                        "\"configparser >=3.5\"")
         cmds += [
             # Install from conda build
             "conda build recipe/meta.yaml --python %s" % PYVER,
