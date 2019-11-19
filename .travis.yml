@@ -59,18 +59,7 @@ before_install:
     echo "YGG_CONDA = $YGG_CONDA"
     echo "YGG_PYTHON = $YGG_PYTHON"
 
-    # Install from source in virtual env
-    if [[ -n "$YGG_PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then
-      echo Installing Python using virtualenv...;
-      if [[ "$TRAVIS_OS_NAME" == "osx" && "${YGG_PYTHON:0:1}" == "3" ]]; then
-         brew install python3;
-      fi
-      pip install --upgrade pip virtualenv
-      virtualenv -p python$YGG_PYTHON venv
-      source venv/bin/activate
-    fi
-
-    # Install from conda in conda env
+    # Install miniconda
     if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
       echo Installing Python using conda...;
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi
@@ -81,23 +70,11 @@ before_install:
       bash miniconda.sh -b -p $HOME/miniconda
       export PATH="$HOME/miniconda/bin:$PATH"
       hash -r
-      conda config --set always_yes yes --set changeps1 no
-      conda config --set channel_priority strict
-      conda config --add channels conda-forge
-      conda update -q conda
-      if [[ -n "$YGG_CONDA" ]]; then
-        conda create -q -n test-environment python=$YGG_CONDA
-      else
-        conda create -q -n test-environment python=$YGG_PYTHON
-      fi
-      source activate test-environment
-      conda install -q conda-build conda-verify
-      pip uninstall -y numpy
-      pip uninstall -y matplotlib
-      conda info -a
 
+      # Download and point to older SDK on OSX
       echo "TRAVIS_OS_NAME = ${TRAVIS_OS_NAME}"
       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+        conda info -a
         # Install older Mac SDK so that conda llvm (7) can be used
         # https://github.com/conda-forge/mpi-feedstock/issues/4
         export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-10.9}
@@ -118,49 +95,6 @@ before_install:
           printf "CONDA_BUILD_SYSROOT:\n  - ${CONDA_BUILD_SYSROOT}  # [osx]\n" > ~/conda_build_config.yaml
         fi
       fi
-
-    fi
-    
-    # Install r-base from conda, apt, or homebrew
-    if [[ $INSTALLR == '1' ]]; then
-      if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
-        if [[ $INSTALLLPY == '1' ]]; then
-          conda install r-base
-        fi
-      elif [[ -n "$YGG_PYTHON" ]]; then
-        export YGG_USE_SUDO_FOR_R=1
-        if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-          sudo apt-get install r-base
-        elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-          brew install r
-        fi
-      fi
-    fi
-
-    # Install AstroPy
-    if [[ $INSTALLAPY == '1' ]]; then
-       echo Installing AstroPy...;
-       if [[ -n "$YGG_PYTHON" ]]; then
-         pip install astropy
-       elif [[ -n "$YGG_CONDA" ]]; then
-         conda install astropy
-       fi
-    fi
-
-    # Install LPy
-    if [[ $INSTALLLPY == '1' ]]; then
-       echo Installing LPy...;
-       sh ci/install-lpy-linux.sh
-    fi
-
-    # Install ZeroMQ
-    if [[ $INSTALLZMQ == '1' && -n "$YGG_PYTHON" ]]; then
-       echo Installing ZeroMQ...;
-       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-          sh ci/install-czmq-osx.sh
-       else
-          sh ci/install-czmq-linux.sh
-       fi
     fi
 
     # Install RabbitMQ & Start a server
@@ -179,64 +113,33 @@ before_install:
        fi
        echo Checking rabbitmq status...;
        sudo rabbitmqctl status
-
-       echo Installing Pika...;
-       if [[ -n "$YGG_PYTHON" ]]; then
-         pip install "pika<1.0.0b1"
-       elif [[ -n "$YGG_CONDA" ]]; then
-         conda install "pika<1.0.0b1"
-       fi
     fi
 
-    # Temp fix to install missing dependencies from jsonschema dependency
-    if [[ -n "$YGG_CONDA" && "${YGG_CONDA:0:1}" == "2" ]]; then
-      conda install contextlib2 pathlib2 "configparser >=3.5"
+    # Setup environment
+    if [[ -n "$YGG_CONDA" ]]; then
+      python utils/ci_setup.py conda env $YGG_CONDA
+    else
+      python utils/ci_setup.py pip env $YGG_PYTHON
     fi
 
+    # Activate environment
+    if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
+      conda activate test-environment
+    else if [[ -n "$YGG_PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then
+      source venv/bin/activate
+    fi
+
+    # Build and install
+    if [[ -n "$YGG_CONDA" ]]; then
+      python utils/ci_setup.py conda deploy
+    else
+      python utils/ci_setup.py pip deploy
+    fi
+    
 install:
   - |
     # setup environment
     ccache -s
-    # Upgrade pip and setuptools and wheel to get clean install
-    pip install --upgrade pip
-    pip install --upgrade wheel
-    pip install --upgrade setuptools
-    # Install yggdrasil
-    if [[ -n "$YGG_PYTHON" ]]; then
-      # May need to uninstall conda version of numpy and matplotlib on LPy test
-      pip install $NUMPY
-      pip install $MATPLOTLIB
-      pip install $JSONSCHEMA
-      pip install -r requirements_testing.txt
-      if [[ $BUILDDOCS == '1' ]]; then
-        pip install -r requirements_documentation.txt
-      fi
-      # Install from source dist
-      python setup.py sdist
-      pip install --verbose dist/*.tar.gz
-      # Install from source
-      # pip install --verbose -e .
-      pip list
-    elif [[ -n "$YGG_CONDA" ]]; then
-      conda install $NUMPY $MATPLOTLIB $JSONSCHEMA
-      python utils/install_from_requirements.py conda requirements_testing.txt
-      if [[ $BUILDDOCS == '1' ]]; then
-        python utils/install_from_requirements.py conda requirements_documentation.txt
-      fi
-      conda build recipe/meta.yaml --python $YGG_CONDA
-      # --use-local not working in
-      #  - conda 4.7.5, conda-build 3.17.8, Python 2.7, 3.6, or 3.7
-      conda --version
-      conda index ${CONDA_PREFIX}/conda-bld
-      conda install -c file:/${CONDA_PREFIX}/conda-bld yggdrasil
-      # if [[ "$YGG_CONDA" == "3.7" ]]; then
-      #   # conda install -c local yggdrasil
-      #   conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
-      # else
-      #   conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
-      # fi
-      conda list
-    fi
 
 script:
   - sh ci/pretest_script.sh || travis_terminate 1;

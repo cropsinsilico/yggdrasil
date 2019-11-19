@@ -19,10 +19,20 @@ environment:
 
   global:
     PYTHON: "C:\\Miniconda3-x64"
+    APPVEYOR_SAVE_CACHE_ON_ERROR: true
+    NUMPY: numpy
+    MATPLOTLIB: matplotlib
+    MPLBACKEND=agg
+    JSONSCHEMA: jsonschema
     INSTALLZMQ: 1
     INSTALLRMQ: 0
-    APPVEYOR_SAVE_CACHE_ON_ERROR: true
-    YGG_RUN_EXAMPLES: 0
+    INSTALLAPY=0
+    INSTALLLPY=0
+    INSTALLR=1
+    BUILDDOCS=0
+    YGG_RUN_EXAMPLES=0
+    YGG_ENABLE_LONG_TESTS=0
+    YGG_CONDA: 1
 
   erlang_download_url: "http://erlang.org/download/otp_win64_20.2.exe"
   erlang_exe_path: "C:\\Users\\appveyor\\erlang.exe"
@@ -46,47 +56,20 @@ environment:
       YGG_RUN_EXAMPLES: 1
 
 install:
-  - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
-  - "if %MSVCVER% gtr 11 set /a MSVCVER = MSVCVER - 1"
-  - "SET VSINSTALLDIR=%ProgramFiles(x86)%\\Microsoft Visual Studio %MSVCVER%.0\\"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-  - "SET MPLBACKEND=agg"
   - "SET ZMQINSTALLDIR=%APPVEYOR_BUILD_FOLDER%"
   - "git submodule update --init --recursive"
 
-  # Setup Visual C++ toolset
-  # TODO: Generic case. This is specific to 64bit VS 2015/2017 (14.0/16.0)
-  - if "%MSVCVER%" == "16" if /I "%PLATFORM%" == "x64" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-  - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 /debug
-  - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
-
-  # Create a conda environment
-  # - "conda update -q --yes conda"
-  - "conda create -q --yes -n test python=%PYTHON_VERSION%"
-  - "activate test"
-  - "conda install --yes -c conda-forge r-base"
-
-  # Download and install Rtools
-  - ps: (new-object net.webclient).DownloadFile(
-      "https://cran.rstudio.com/bin/windows/Rtools/Rtools35.exe",
-      "C:\projects\rtools.exe")
-  - C:\projects\rtools.exe /VERYSILENT /DIR=C:\Rtools
-  - set PATH=c:\Rtools\bin;%PATH%
-  # - set PATH=c:\Rtools\bin;c:\Rtools\gcc-4.6.3\bin;%PATH%
-
-  # Check that we have the expected version of Python
-  - "python --version"
-
-  # Upgrade pip and setuptools and wheel to get clean install
-  - "python -m pip install --upgrade pip"
-  - "python -m pip install --upgrade wheel"
-  - "python -m pip install --upgrade setuptools"
-
-  # Install ZeroMQ
-  - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
+  # Install R tools
+  - ps: If ($INSTALLRMQ -eq 1) {
+      (new-object net.webclient).DownloadFile(
+        "https://cran.rstudio.com/bin/windows/Rtools/Rtools35.exe",
+        "C:\projects\rtools.exe")
+      }
+  - if "%INSTALLR%" == "1" C:\projects\rtools.exe /VERYSILENT /DIR=C:\Rtools
+  - if "%INSTALLR%" == "1" set PATH=c:\Rtools\bin;%PATH%
 
   # Install & start RabbitMQ
-  - "if %INSTALLRMQ% == 1 pip install \"pika<1.0\""
   - ps: If ($INSTALLRMQ -eq 1) { $webclient=New-Object System.Net.WebClient }
   - if "%INSTALLRMQ%" == "1" ECHO Downloading Erlang...
   - ps: If ($INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:erlang_download_url", "$env:erlang_exe_path") }
@@ -99,18 +82,17 @@ install:
   - if "%INSTALLRMQ%" == "1" start /B /WAIT %rabbitmq_installer_path% /S
   - ps: If ($INSTALLRMQ -eq 1) { (Get-Service -Name RabbitMQ).Status }
 
-  # Install testing dependencies
-  - "conda install --yes -c conda-forge numpy scipy"  # Installing via pip causes import error
-  - "pip install -r requirements_testing.txt"
+  # Setup environment
+  - "python utils\\ci_setup.py conda env %PYTHON_VERSION%"
 
-  # Install yggdrasil allowing pip to resolve requirements
-  - "python setup.py sdist"
-  - "dir dist\\*.tar.gz"
-  - for %%a in ("dist\\*.tar.gz") do set YGGSDIST=%%a
-  - echo %YGGSDIST%
-  - "pip install --verbose %YGGSDIST%"
-  # - "pip install --verbose -e ."
-  - "python create_coveragerc.py"
+  # Activate environment
+  - "conda activate test-environment"
+  
+  # Setup Visual C++ toolset
+  - call "ci\\install-compilers.bat"
+
+  # Build and install
+  - "python utils\\ci_setup.py deploy"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
