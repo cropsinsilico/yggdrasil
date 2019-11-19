@@ -29,8 +29,9 @@ public:
 		       const JSONObjectMetaschemaType* args_type,
 		       const bool use_generic=true) :
     // Always generic
-    PyObjMetaschemaType("instance", true), class_name_(""), args_type_(NULL) {
+    PyObjMetaschemaType("instance", true), args_type_(NULL) {
     UNUSED(use_generic);
+    class_name_[0] = '\0';
     if (class_name != NULL) {
       update_class_name(class_name, true);
     }
@@ -48,8 +49,9 @@ public:
   PyInstMetaschemaType(const rapidjson::Value &type_doc,
 		       const bool use_generic=false) :
     // Always generic
-    PyObjMetaschemaType(type_doc, true), class_name_(""), args_type_(NULL) {
+    PyObjMetaschemaType(type_doc, true), args_type_(NULL) {
     UNUSED(use_generic);
+    class_name_[0] = '\0';
     if (!(type_doc.HasMember("class"))) {
       ygglog_throw_error("PyInstMetaschemaType: instance type must include 'class'.");
     }

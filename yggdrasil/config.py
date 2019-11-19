@@ -313,10 +313,12 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
     if not out:
         return False
     first = out[0]
-    if len(out) > 1:
+    out = set(out)
+    out.remove(first)
+    if len(out) > 0:
         warnings.warn(("More than one (%d) match to %s:\n%s\n "
                        + "Using first match (%s)") %
-                      (len(out), fname, pprint.pformat(out),
+                      (len(out) + 1, fname, pprint.pformat(out),
                        first), RuntimeWarning)
     return first
 

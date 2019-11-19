@@ -218,7 +218,7 @@ public:
       return;
     }
     case T_NULL: {
-      std::cout << NULL << std::endl;
+      std::cout << "NULL" << std::endl;
       return;
     }
     case T_NUMBER: {

@@ -397,8 +397,7 @@ class CMakeConfigure(BuildToolBase):
         # Suppress warnings on windows about the security of strcpy etc.
         # and target x64 if the current platform is 64bit
         if platform._is_win:  # pragma: windows
-            new_flags = ["/W4", "/EHsc", '/TP', "/nologo",
-                         "-D_CRT_SECURE_NO_WARNINGS"]
+            new_flags = driver.get_tool('compiler').default_flags
             # if (((os.environ.get('CXXFLAGS', None) is not None)
             #      and not (('/MD' in os.environ.get('CXXFLAGS'))
             #               or ('-MD' in os.environ.get('CXXFLAGS'))))):
