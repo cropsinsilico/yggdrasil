@@ -61,7 +61,7 @@ install:
   - "git submodule update --init --recursive"
 
   # Install R tools
-  - ps: If ($INSTALLRMQ -eq 1) {
+  - ps: If ($INSTALLR -eq 1) {
       (new-object net.webclient).DownloadFile(
         "https://cran.rstudio.com/bin/windows/Rtools/Rtools35.exe",
         "C:\projects\rtools.exe")
