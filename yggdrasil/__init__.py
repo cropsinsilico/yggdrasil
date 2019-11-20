@@ -106,6 +106,8 @@ def run_tsts(**kwargs):  # pragma: no cover
          True, {'help': 'Record coverage during tests.'}),
         (['withexamples', 'with-examples'], ['noexamples', 'no-examples'],
          False, {'help': 'Run example tests when encountered.'}),
+        (['longrunning', 'long-running'], ['nolongrunning', 'no-long-running'],
+         False, {'help': 'Run long tests when encounterd.'}),
         (['verbose', 'v'], ['quiet'],
          True, {'help': ('Increase verbosity of output from '
                          'the test runner.')}),
@@ -191,6 +193,8 @@ def run_tsts(**kwargs):  # pragma: no cover
     # Run test command and perform cleanup before logging any errors
     logger.info("Running %s from %s", argv, os.getcwd())
     old_env = {}
+    pth_file = 'ygg_coverage.pth'
+    assert(not os.path.isfile(pth_file))
     try:
         # Set env
         if args.withexamples:
@@ -204,6 +208,16 @@ def run_tsts(**kwargs):  # pragma: no cover
             old_env['YGG_TEST_LANGUAGE'] = os.environ.get(
                 'YGG_TEST_LANGUAGE', None)
             os.environ['YGG_TEST_LANGUAGE'] = args.language
+        if args.longrunning:
+            old_env['YGG_ENABLE_LONG_TESTS'] = os.environ.get(
+                'YGG_ENABLE_LONG_TESTS', None)
+            os.environ['YGG_ENABLE_LONG_TESTS'] = 'True'
+        if args.withcoverage:
+            old_env['COVERAGE_PROCESS_START'] = os.environ.get(
+                'COVERAGE_PROCESS_START', None)
+            os.environ['COVERAGE_PROCESS_START'] = 'True'
+            with open(pth_file, 'w') as fd:
+                fd.write("import coverage; coverage.process_startup()")
         old_env['YGG_SKIP_COMPONENT_VALIDATION'] = os.environ.get(
             'YGG_SKIP_COMPONENT_VALIDATION', None)
         if old_env['YGG_SKIP_COMPONENT_VALIDATION'] is None:
@@ -219,6 +233,8 @@ def run_tsts(**kwargs):  # pragma: no cover
                 del os.environ[k]
             else:
                 os.environ[k] = v
+        if os.path.isfile(pth_file):
+            os.remove(pth_file)
     return error_code
 
 
