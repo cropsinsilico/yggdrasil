@@ -87,14 +87,13 @@ def setup_package_on_ci(method, python):
     call_script(cmds)
     
 
-def deploy_package_on_ci(method, python):
+def deploy_package_on_ci(method):
     r"""Build and install the package and its dependencies on a CI
     resource.
 
     Args:
         method (str): Method that should be used to build and install
             the package. Valid values include 'conda' and 'pip'.
-        python (str): Version of Python that should be tested.
 
     Raises:
         ValueError: If method is not 'conda' or 'pip'.
