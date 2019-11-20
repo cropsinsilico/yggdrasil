@@ -13,6 +13,7 @@ import threading
 import psutil
 import copy
 import pprint
+import types
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil import tools, backwards, platform, units
 from yggdrasil.communication import cleanup_comms
@@ -128,6 +129,7 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
         self.addTypeEqualityFunc(units._unit_array, 'assertUnitsEqual')
         self.addTypeEqualityFunc(np.ndarray, 'assertArrayEqual')
         self.addTypeEqualityFunc(pd.DataFrame, 'assertArrayEqual')
+        self.addTypeEqualityFunc(types.FunctionType, 'assertFunctionEqual')
 
     def has_units(self, obj):
         if isinstance(obj, (list, tuple)):
@@ -142,12 +144,30 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
             return units.has_units(obj)
         return False
 
+    def is_func(self, obj):
+        return hasattr(obj, '__call__')
+
+    def has_func(self, obj):
+        if isinstance(obj, (list, tuple)):
+            for x in obj:
+                if self.has_func(x):
+                    return True
+        elif isinstance(obj, dict):
+            for x in obj.values():
+                if self.has_func(x):
+                    return True
+        else:
+            return self.is_func(obj)
+        return False
+
     def _getAssertEqualityFunc(self, first, second):
         # Allow comparison of tuple to list and units to anything
         if (type(first), type(second)) in [(list, tuple), (tuple, list)]:
             return self.assertSequenceEqual
         elif units.has_units(first) or units.has_units(second):
             return self.assertUnitsEqual
+        elif self.is_func(first) or self.is_func(second):
+            return self.assertFunctionEqual
         return super(WrappedTestCase, self)._getAssertEqualityFunc(first, second)
         
     def assertEqual(self, first, second, msg=None, dont_nest=False):
@@ -156,6 +176,9 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
         if (not dont_nest):
             # Do nested evaluation for objects containing units
             if (self.has_units(first) or self.has_units(second)):
+                self.assertEqualNested(first, second, msg=msg)
+                return
+            elif (self.has_func(first) or self.has_func(second)):
                 self.assertEqualNested(first, second, msg=msg)
                 return
         try:
@@ -279,7 +302,7 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
         r"""Assertion for equality in case of objects with units."""
         if units.has_units(first) and units.has_units(second):
             first = units.convert_to(first, units.get_units(second))
-        self.assertEqual(units.get_data(first), units.get_data(second))
+        self.assertEqual(units.get_data(first), units.get_data(second), msg=msg)
         
     def assertArrayEqual(self, first, second, msg=None):
         r"""Assertion for equality in case of arrays."""
@@ -289,6 +312,31 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
             standardMsg = str(e)
             msg = self._formatMessage(msg, standardMsg)
             raise self.failureException(msg)
+
+    def assertFunctionEqual(self, first, second, msg=None):
+        r"""Assertion for equality in case of Python function."""
+        if first == second:
+            return
+        self.assertHasAttr(first, '__call__',
+                           'First argument is not callable.')
+        self.assertHasAttr(second, '__call__',
+                           'Second argument is not callable.')
+        standardMsg = 'Function file differs.'
+        msg_k = self._formatMessage(msg, standardMsg)
+        first_name = first.__module__ + '.' + first.__name__
+        second_name = second.__module__ + '.' + second.__name__
+        self.assertTrue((first_name.endswith(second_name)
+                         or second_name.endswith(first_name)),
+                        msg=msg_k)
+        standardMsg = 'Function __dict__ differs.'
+        msg_k = self._formatMessage(msg, standardMsg)
+        self.assertEqual(first.__dict__, second.__dict__, msg=msg_k)
+            
+    def assertHasAttr(self, obj, intendedAttr, msg=None):
+        testBool = hasattr(obj, intendedAttr)
+        standardMsg = "Object lacks attribute '%s'" % intendedAttr
+        msg_k = self._formatMessage(msg, standardMsg)
+        self.assertTrue(testBool, msg=msg_k)
 
 
 if backwards.PY2:  # pragma: Python 2

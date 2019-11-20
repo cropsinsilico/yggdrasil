@@ -179,7 +179,8 @@ class ComponentSchema(object):
                 return subtype
             except ValidationError:
                 pass
-        raise ValueError("Could not determine subtype for document: %s" % doc)
+        raise ValueError("Could not determine subtype "
+                         "for document: %s" % doc)  # pragma: debug
 
     def get_subtype_schema(self, subtype, unique=False, relaxed=False,
                            allow_instance=False):

@@ -5,38 +5,59 @@ from yggdrasil import schema
 from yggdrasil.tests import assert_raises, assert_equal
 
 
+def filter_func_ex(x):
+    r"""Test function for normalizing filters."""
+    return False
+
+
+filter_func_ex_name = '%s:filter_func_ex' % __file__
+
+
 _normalize_objects = [
-    ({'models': [{'name': 'modelA',
-                  'language': 'c',
-                  'args': 'model.c',
-                  'outputs': [{'name': 'outputA',
-                               'column_names': ['a', 'b'],
-                               'column_units': ['cm', 'g']}],
-                  'working_dir': os.getcwd()}],
-      'connections': [{'inputs': 'outputA',
-                       'outputs': 'fileA.txt',
-                       'seritype': 'direct',
-                       'working_dir': os.getcwd()}]},
-     {'models': [{'name': 'modelA',
-                  'language': 'c',
-                  'args': ['model.c'],
-                  'inputs': [{'commtype': 'default',
-                              'datatype': {'type': 'bytes'},
-                              'is_default': True,
-                              'name': 'modelA:input'}],
-                  'outputs': [{'name': 'modelA:outputA',
-                               'commtype': 'default',
-                               'datatype': {'type': 'bytes'}}],
-                  'working_dir': os.getcwd()}],
-      'connections': [{'inputs': [{'name': 'modelA:outputA',
-                                   'datatype': {'type': 'bytes'},
-                                   'commtype': 'default'}],
-                       'outputs': [{'name': 'fileA.txt',
-                                    'filetype': 'binary',
-                                    'working_dir': os.getcwd(),
-                                    'serializer': {'seritype': 'direct'},
-                                    'field_names': ['a', 'b'],
-                                    'field_units': ['cm', 'g']}]}]})]
+    ({'models': [{
+        'name': 'modelA',
+        'language': 'c',
+        'args': 'model.c',
+        'outputs': [
+            {'name': 'outputA',
+             'column_names': ['a', 'b'],
+             'column_units': ['cm', 'g'],
+             'filter': {
+                 'function': filter_func_ex_name}}],
+        'working_dir': os.getcwd()}],
+      'connections': [{
+          'inputs': 'outputA',
+          'outputs': 'fileA.txt',
+          'seritype': 'direct',
+          'working_dir': os.getcwd()}]},
+     {'models': [{
+         'name': 'modelA',
+         'language': 'c',
+         'args': ['model.c'],
+         'inputs': [{'commtype': 'default',
+                     'datatype': {'type': 'bytes'},
+                     'is_default': True,
+                     'name': 'modelA:input'}],
+         'outputs': [{'name': 'modelA:outputA',
+                      'commtype': 'default',
+                      'datatype': {'type': 'bytes'},
+                      'filter': {
+                          'function': filter_func_ex}}],
+         'working_dir': os.getcwd()}],
+      'connections': [{
+          'inputs': [
+              {'name': 'modelA:outputA',
+               'datatype': {'type': 'bytes'},
+               'commtype': 'default',
+               'filter': {
+                   'function': filter_func_ex}}],
+          'outputs': [
+              {'name': 'fileA.txt',
+               'filetype': 'binary',
+               'working_dir': os.getcwd(),
+               'serializer': {'seritype': 'direct'},
+               'field_names': ['a', 'b'],
+               'field_units': ['cm', 'g']}]}]})]
                                     
 
 def test_SchemaRegistry():
