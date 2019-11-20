@@ -434,7 +434,7 @@ class ComponentMeta(type):
                 cls.after_registration(cls)
                 cls.finalize_registration(cls)
         return cls
-    
+
     # def __getattribute__(cls, key):
     #     r"""If the class is an alias for another class and has been initialized,
     #     call getattr on the aliased class."""
@@ -503,6 +503,12 @@ class ComponentBase(object):
     _schema_excluded_from_class_validation = []
     _schema_inherit = True
     _dont_register = False
+
+    def __new__(cls, *args, **kwargs):
+        obj = object.__new__(cls)
+        obj._input_args = args
+        obj._input_kwargs = kwargs
+        return obj
     
     def __init__(self, skip_component_schema_normalization=None, **kwargs):
         if skip_component_schema_normalization is None:

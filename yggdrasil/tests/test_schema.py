@@ -1,7 +1,8 @@
 import os
 import pprint
 import tempfile
-from yggdrasil import schema
+from jsonschema import ValidationError
+from yggdrasil import schema, components
 from yggdrasil.tests import assert_raises, assert_equal
 
 
@@ -147,3 +148,26 @@ def test_normalize():
 def test_cdriver2commtype_error():
     r"""Test error when invalid driver supplied."""
     assert_raises(ValueError, schema.cdriver2commtype, 'invalid')
+
+
+def test_get_schema_subtype():
+    r"""Test get_schema_subtype for allow_instance=True."""
+    component = 'serializer'
+    subtype = 'direct'
+    doc = {'seritype': subtype}
+    valid = components.create_component(component, seritype=subtype)
+    invalid = components.create_component(component, seritype='json')
+    s = schema.get_schema()
+    kwargs = {'subtype': subtype, 'allow_instance': True}
+    s.validate_component(component, doc, **kwargs)
+    s.validate_component(component, valid, **kwargs)
+    assert_raises(ValidationError, s.validate_component,
+                  component, invalid, **kwargs)
+    s.validate_component(component, doc, subtype=subtype)
+    assert_raises(ValidationError, s.validate_component,
+                  component, valid, subtype=subtype)
+    # Test for base
+    s.validate_component(component, valid, subtype='base',
+                         allow_instance=True)
+    s.validate_component(component, invalid, subtype='base',
+                         allow_instance=True)
