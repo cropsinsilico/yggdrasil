@@ -25,4 +25,9 @@ def test_import_component():
 
 def test_create_component():
     r"""Test dynamic creation of component instance."""
-    components.create_component('serializer', seritype='direct')
+    x = components.create_component('serializer', seritype='direct')
+    assert(components.isinstance_component(x, ['serializer']))
+    assert(components.isinstance_component(x, ['comm', 'serializer']))
+    assert(not components.isinstance_component(x, ['comm']))
+    x = components.create_component('serializer')
+    assert(components.isinstance_component(x, ['serializer']))
