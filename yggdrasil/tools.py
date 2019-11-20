@@ -131,7 +131,7 @@ def get_python_c_library(allow_failure=False, libtype=None):
             libtype = 'shared'
         libtype2key = {'shared': 'LDLIBRARY', 'static': 'LIBRARY'}
         base = cvars.get(libtype2key[libtype], None)
-        if platform._is_osx and base.endswith('/Python'):  # pragma: osx
+        if platform._is_mac and base.endswith('/Python'):  # pragma: osx
             base = 'libpython%s.dylib' % cvars['py_version_short']
     if base is None:
         raise RuntimeError(("Could not determine base name for the Python "
