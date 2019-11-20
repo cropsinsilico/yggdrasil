@@ -520,6 +520,8 @@ class CModelDriver(CompiledModelDriver):
         if (nplib is not None) and os.path.isfile(nplib):
             cfg.set(cls._language, 'numpy_include',
                     os.path.dirname(os.path.dirname(nplib)))
+        if macos_sdkroot is None:
+            macos_sdkroot = _osx_sysroot
         if macos_sdkroot is not None:
             if not os.path.isdir(macos_sdkroot):  # pragma: debug
                 raise ValueError("Path to MacOS SDK root directory "
