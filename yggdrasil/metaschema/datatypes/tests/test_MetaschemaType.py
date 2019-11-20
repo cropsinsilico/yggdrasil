@@ -99,6 +99,18 @@ class TestMetaschemaType(YggTestClassInfo):
                                      "%s vs. %s" % (type(x), type(y)))
             assert_equal(x, y)
 
+    def test_issubtype(self):
+        r"""Test issubtype."""
+        if self._cls == 'MetaschemaType':
+            return
+        assert(self.import_cls.issubtype(self.typedef['type']))
+        if self.import_cls.name == 'any':
+            assert(self.import_cls.issubtype('invalid'))
+        else:
+            assert(not self.import_cls.issubtype('invalid'))
+        if not isinstance(self.typedef['type'], (list, tuple)):
+            assert(self.import_cls.issubtype([self.typedef['type']]))
+
     def test_validate(self):
         r"""Test validation."""
         if self._cls == 'MetaschemaType':
