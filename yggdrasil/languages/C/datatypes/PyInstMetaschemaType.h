@@ -4,6 +4,7 @@
 #include "../tools.h"
 #include "MetaschemaType.h"
 #include "PyObjMetaschemaType.h"
+#include "JSONArrayMetaschemaType.h"
 #include "JSONObjectMetaschemaType.h"
 
 #include "rapidjson/document.h"
@@ -21,15 +22,17 @@ public:
   /*!
     @brief Constructor for PyInstMetaschemaType.
     @param[in] class_name char* Name of Python class.
-    @param[in] args_type JSONObjectMetaschemaType Type definition for instance arguments.
+    @param[in] args_type JSONArrayMetaschemaType Type definition for instance arguments.
+    @param[in] kwargs_type JSONObjectMetaschemaType Type definition for instance arguments.
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
    */
   PyInstMetaschemaType(const char* class_name,
-		       const JSONObjectMetaschemaType* args_type,
+		       const JSONArrayMetaschemaType* args_type,
+		       const JSONObjectMetaschemaType* kwargs_type,
 		       const bool use_generic=true) :
     // Always generic
-    PyObjMetaschemaType("instance", true), args_type_(NULL) {
+    PyObjMetaschemaType("instance", true), args_type_(NULL), kwargs_type_(NULL) {
     UNUSED(use_generic);
     class_name_[0] = '\0';
     if (class_name != NULL) {
@@ -37,6 +40,9 @@ public:
     }
     if (args_type != NULL) {
       update_args_type(args_type, true);
+    }
+    if (kwargs_type != NULL) {
+      update_kwargs_type(kwargs_type, true);
     }
   }
   /*!
@@ -52,6 +58,7 @@ public:
     PyObjMetaschemaType(type_doc, true), args_type_(NULL) {
     UNUSED(use_generic);
     class_name_[0] = '\0';
+    // Class
     if (!(type_doc.HasMember("class"))) {
       ygglog_throw_error("PyInstMetaschemaType: instance type must include 'class'.");
     }
@@ -59,16 +66,29 @@ public:
       ygglog_throw_error("PyInstMetaschemaType: 'class' value must be a string.");
     }
     update_class_name(type_doc["class"].GetString(), true);
+    // Args
     if (!(type_doc.HasMember("args"))) {
       ygglog_throw_error("PyInstMetaschemaType: instance type must include 'args'.");
     }
-    if (!(type_doc["args"].IsObject())) {
-      ygglog_throw_error("PyInstMetaschemaType: 'args' value must be an object.");
+    if (!(type_doc["args"].IsArray())) {
+      ygglog_throw_error("PyInstMetaschemaType: 'args' value must be an array.");
     }
-    JSONObjectMetaschemaType* args_type = new JSONObjectMetaschemaType(type_doc, MetaschemaType::use_generic(), "args");
+    JSONArrayMetaschemaType* args_type = new JSONArrayMetaschemaType(type_doc, "", MetaschemaType::use_generic(), "args");
     if (args_type != NULL) {
-      args_type->update_type("object");
+      args_type->update_type("array");
       update_args_type(args_type, true);
+    }
+    // Kwargs
+    if (!(type_doc.HasMember("kwargs"))) {
+      ygglog_throw_error("PyInstMetaschemaType: instance type must include 'kwargs'.");
+    }
+    if (!(type_doc["kwargs"].IsObject())) {
+      ygglog_throw_error("PyInstMetaschemaType: 'kwargs' value must be an object.");
+    }
+    JSONObjectMetaschemaType* kwargs_type = new JSONObjectMetaschemaType(type_doc, MetaschemaType::use_generic(), "kwargs");
+    if (kwargs_type != NULL) {
+      kwargs_type->update_type("object");
+      update_kwargs_type(kwargs_type, true);
     }
   }
   /*!
@@ -88,10 +108,16 @@ public:
 			   T_STRING, 200);
     update_class_name(class_name, true);
     // Args type
-    JSONObjectMetaschemaType* args_type = new JSONObjectMetaschemaType(pyobj, MetaschemaType::use_generic(), "args");
+    JSONArrayMetaschemaType* args_type = new JSONArrayMetaschemaType(pyobj, MetaschemaType::use_generic(), "args");
     if (args_type != NULL) {
-      args_type->update_type("object");
+      args_type->update_type("array");
       update_args_type(args_type, true);
+    }
+    // Kwargs type
+    JSONObjectMetaschemaType* kwargs_type = new JSONObjectMetaschemaType(pyobj, MetaschemaType::use_generic(), "kwargs");
+    if (kwargs_type != NULL) {
+      kwargs_type->update_type("object");
+      update_kwargs_type(kwargs_type, true);
     }
   }
   /*!
@@ -100,7 +126,7 @@ public:
    */
   PyInstMetaschemaType(const PyInstMetaschemaType &other) :
     PyInstMetaschemaType(other.class_name(), other.args_type(),
-			 other.use_generic()) {}
+			 other.kwargs_type(), other.use_generic()) {}
   /*!
     @brief Destructor for PyInstMetaschemaType.
     Free the type string malloc'd during constructor.
@@ -109,6 +135,8 @@ public:
     class_name_[0] = '\0';
     delete args_type_;
     args_type_ = NULL;
+    delete kwargs_type_;
+    kwargs_type_ = NULL;
   }
   /*!
     @brief Equivalence operator.
@@ -125,6 +153,8 @@ public:
       return false;
     if (*args_type_ != *(pRef->args_type()))
       return false;
+    if (*kwargs_type_ != (*pRef->kwargs_type()))
+      return false;
     return true;
   }
  /*!
@@ -132,7 +162,8 @@ public:
     @returns pointer to new MetaschemaType instance with the same data.
    */
   PyInstMetaschemaType* copy() const override {
-    return (new PyInstMetaschemaType(class_name_, args_type_, use_generic()));
+    return (new PyInstMetaschemaType(class_name_, args_type_,
+				     kwargs_type_, use_generic()));
   }
   /*!
     @brief Print information about the type to stdout.
@@ -147,6 +178,12 @@ public:
       printf("%sArgs type:\n", indent);
       args_type_->display(indent);
     }
+    if (kwargs_type_ == NULL) {
+      printf("%sKwargs type: NULL\n", indent);
+    } else {
+      printf("%sKwargs type:\n", indent);
+      kwargs_type_->display(indent);
+    }
   }
   /*!
     @brief Get type information as a Python dictionary.
@@ -160,6 +197,10 @@ public:
     PyObject* pyargs = args_type_->as_python_dict();
     set_item_python_dict(out, "args", pyargs,
 			 "PyInstMetaschemaType::as_python_dict: ",
+			 T_ARRAY);
+    PyObject* pykwargs = kwargs_type_->as_python_dict();
+    set_item_python_dict(out, "kwargs", pykwargs,
+			 "PyInstMetaschemaType::as_python_dict: ",
 			 T_OBJECT);
     return out;
   } 
@@ -170,9 +211,14 @@ public:
   const char* class_name() const { return class_name_; }
   /*!
     @brief Get the argument type.
-    @returns JSONObjectMetaschemaType* Arguments type.
+    @returns JSONArrayMetaschemaType* Arguments type.
    */
-  const JSONObjectMetaschemaType* args_type() const { return args_type_; }
+  const JSONArrayMetaschemaType* args_type() const { return args_type_; }
+  /*!
+    @brief Get the keyword argument type.
+    @returns JSONObjectMetaschemaType* Keyword arguments type.
+   */
+  const JSONObjectMetaschemaType* kwargs_type() const { return kwargs_type_; }
   /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
@@ -189,6 +235,7 @@ public:
     const PyInstMetaschemaType* new_info_inst = dynamic_cast<const PyInstMetaschemaType*>(new_info);
     update_class_name(new_info_inst->class_name());
     update_args_type(new_info_inst->args_type());
+    update_kwargs_type(new_info_inst->kwargs_type());
   }
   /*!
     @brief Update the instance's class name.
@@ -203,10 +250,10 @@ public:
   }
   /*!
     @brief update the instance's args type.
-    @param[in] new_args JSONObjectMetaschemaType* New args type.
+    @param[in] new_args JSONArrayMetaschemaType* New args type.
     @param[in] force bool If true, the args type will be updated reguardless of if it is compatible or not. Defaults to false.
    */
-  void update_args_type(const JSONObjectMetaschemaType* new_args_type,
+  void update_args_type(const JSONArrayMetaschemaType* new_args_type,
 			bool force=false) {
     if ((!(force)) && (args_type_ != NULL) && (*new_args_type != *args_type_)) {
       ygglog_throw_error("PyInstMetaschemaType::update_args_type: Cannot update args type.");
@@ -216,6 +263,22 @@ public:
     args_type_ = new_args_type->copy();
     // Force children to follow parent use_generic
     args_type_->update_use_generic(use_generic());
+  }
+  /*!
+    @brief update the instance's kwargs type.
+    @param[in] new_kwargs JSONObjectMetaschemaType* New kwargs type.
+    @param[in] force bool If true, the kwargs type will be updated reguardless of if it is compatible or not. Defaults to false.
+   */
+  void update_kwargs_type(const JSONObjectMetaschemaType* new_kwargs_type,
+			bool force=false) {
+    if ((!(force)) && (kwargs_type_ != NULL) && (*new_kwargs_type != *kwargs_type_)) {
+      ygglog_throw_error("PyInstMetaschemaType::update_kwargs_type: Cannot update kwargs type.");
+    }
+    if (kwargs_type_ != NULL)
+      delete kwargs_type_;
+    kwargs_type_ = new_kwargs_type->copy();
+    // Force children to follow parent use_generic
+    kwargs_type_->update_use_generic(use_generic());
   }
   /*!
     @brief Update the instance's use_generic flag.
@@ -239,6 +302,7 @@ public:
       python_t arg = va_arg(ap.va, python_t);
       out++;
       update_class_name(arg.name);
+      // Args
       if ((args_type_ == NULL) && (arg.obj != NULL)) {
 	PyObject *py_class = import_python_class("yggdrasil.metaschema.properties.ArgsMetaschemaProperty",
 						 "ArgsMetaschemaProperty",
@@ -249,10 +313,26 @@ public:
 	if (py_args == NULL) {
 	  ygglog_throw_error("PyObjMetaschemaType::update_from_serialization_args: Failed to get instance argument type.");
 	}
-	YggGenericMap new_args_type;
-	convert_python2c(py_args, &new_args_type, T_OBJECT,
+	YggGenericVector new_args_type;
+	convert_python2c(py_args, &new_args_type, T_ARRAY,
 			 "PyObjMetaschemaType::update_from_serialization_args: ");
 	// update_args_type(new_args_type,);
+      }
+      // Kwargs
+      if ((kwargs_type_ == NULL) && (arg.obj != NULL)) {
+	PyObject *py_class = import_python_class("yggdrasil.metaschema.properties.KwargsMetaschemaProperty",
+						 "KwargsMetaschemaProperty",
+						 "PyInstMetaschemaType::update_from_serialization_args: ");
+	PyObject *py_kwargs = PyObject_CallMethod(py_class, "encode",
+						  "Os", arg.obj, NULL);
+	Py_DECREF(py_class);
+	if (py_kwargs == NULL) {
+	  ygglog_throw_error("PyObjMetaschemaType::update_from_serialization_args: Failed to get instance keyword argument type.");
+	}
+	YggGenericMap new_kwargs_type;
+	convert_python2c(py_kwargs, &new_kwargs_type, T_OBJECT,
+			 "PyObjMetaschemaType::update_from_serialization_args: ");
+	// update_kwargs_type(new_kwargs_type,);
       }
     }
     return out;
@@ -272,15 +352,22 @@ public:
     PyObject *py_class = import_python_class("yggdrasil.metaschema.datatypes.InstanceMetaschemaType",
 					     "InstanceMetaschemaType",
 					     "PyInstMetaschemaType::python2c: ");
-    PyObject *py_args = PyObject_CallMethod(py_class, "encode_data",
-					    "Os", pyobj, NULL);
+    PyObject *py_enc = PyObject_CallMethod(py_class, "encode_data",
+					   "Os", pyobj, NULL);
     Py_DECREF(py_class);
-    if (py_args == NULL) {
+    if (py_enc == NULL) {
       ygglog_throw_error("PyObjMetaschemaType::python2c: Failed to get instance arguments.");
     }
+    PyObject *py_args = get_item_python_list(py_enc, 0,
+					     "PyInstMetaschemaType::python2c: ",
+					     T_ARRAY);
+    PyObject *py_kwargs = get_item_python_list(py_enc, 1,
+					       "PyInstMetaschemaType::python2c: ",
+					       T_OBJECT);
     // TODO: Use name from Python object?
     strcpy(idata->name, class_name_);
     idata->args = args_type_->python2c(py_args);
+    idata->kwargs = kwargs_type_->python2c(py_kwargs);
     idata->obj = pyobj;
     data[0] = (void*)idata;
     return cobj;
@@ -299,9 +386,20 @@ public:
     }
     writer->Key("class");
     writer->String(class_name_);
+    // Args
     writer->Key("args");
+    writer->StartArray();
+    MetaschemaTypeVector items = args_type_->items();
+    size_t i;
+    for (i = 0; i < items.size(); i++) {
+      if (!(items[i]->encode_type(writer)))
+	return false;
+    }
+    writer->EndArray();
+    // Kwargs
+    writer->Key("kwargs");
     writer->StartObject();
-    MetaschemaTypeMap properties = args_type_->properties();
+    MetaschemaTypeMap properties = kwargs_type_->properties();
     MetaschemaTypeMap::const_iterator it = properties.begin();
     for (it = properties.begin(); it != properties.end(); it++) {
       writer->Key(it->first.c_str());
@@ -323,12 +421,25 @@ public:
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) const override {
     python_t arg0 = va_arg(ap.va, python_t);
+    writer->StartArray();
+    // Args
     YggGeneric* args = (YggGeneric*)(arg0.args);
     (*nargs)--;
     if (args_type_ == NULL) {
       ygglog_throw_error("PyInstMetaschemaType::encode_data: Args type is not initialized.");
     }
-    return args_type_->encode_data(writer, args);
+    if (!(args_type_->encode_data(writer, args)))
+      return false;
+    // Kwargs
+    YggGeneric* kwargs = (YggGeneric*)(arg0.kwargs);
+    (*nargs)--;
+    if (kwargs_type_ == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::encode_data: Kwargs type is not initialized.");
+    }
+    if (!(kwargs_type_->encode_data(writer, kwargs)))
+      return false;
+    writer->EndArray();
+    return true;
   }
 
   // Decoding
@@ -349,9 +460,28 @@ public:
     if (args_type_ == NULL) {
       ygglog_throw_error("PyInstMetaschemaType::decode_data: Args type is not initialize.");
     }
+    if (kwargs_type_ == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::decode_data: Kwargs type is not initialize.");
+    }
+    if (!(data.IsArray())) {
+      ygglog_error("PyInstMetaschemaType::decode_data: Raw data is not an array.");
+      return false;
+    }
+    if (data.Size() != 2) {
+      ygglog_error("PyInstMetaschemaType::decode_data: 2 items expected, but %lu found.",
+		   data.Size());
+      return false;
+    }
+    // Args
     YggGeneric* cargs = new YggGeneric(args_type_, NULL, 0);
-    if (!(args_type_->decode_data(data, cargs))) {
+    if (!(args_type_->decode_data(data[(rapidjson::SizeType)0], cargs))) {
       ygglog_error("PyInstMetaschemaType::decode_data: Error decoding arguments.");
+      return false;
+    }
+    // Kwargs
+    YggGeneric* ckwargs = new YggGeneric(kwargs_type_, NULL, 0);
+    if (!(kwargs_type_->decode_data(data[(rapidjson::SizeType)1], ckwargs))) {
+      ygglog_error("PyInstMetaschemaType::decode_data: Error decoding keyword arguments.");
       return false;
     }
     // Decode the object
@@ -372,11 +502,15 @@ public:
     (*nargs)--;
     strncpy(arg->name, class_name_, PYTHON_NAME_SIZE);
     arg->args = cargs;
+    arg->kwargs = ckwargs;
     arg->obj = NULL;
     // Get the class/function and call it
     PyObject *py_class = import_python(arg->name);
-    PyObject *py_args = PyTuple_New(0);
-    PyObject *py_kwargs = args_type_->c2python((YggGeneric*)(arg->args));
+    PyObject *py_args = PyList_AsTuple(args_type_->c2python((YggGeneric*)(arg->args)));
+    PyObject *py_kwargs = kwargs_type_->c2python((YggGeneric*)(arg->kwargs));
+    if (py_class == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::decode_data: Failed to get Python class.");
+    }
     if (py_args == NULL) {
       ygglog_throw_error("PyInstMetaschemaType::decode_data: Failed to construct arguments for Python callable.");
     }
@@ -392,7 +526,8 @@ public:
 
 private:
   char class_name_[PYTHON_NAME_SIZE];
-  JSONObjectMetaschemaType *args_type_;
+  JSONArrayMetaschemaType *args_type_;
+  JSONObjectMetaschemaType *kwargs_type_;
   
 };
 

@@ -1,8 +1,8 @@
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.properties.MetaschemaProperty import (
     MetaschemaProperty)
-from yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties import (
-    PropertiesMetaschemaProperty)
+from yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties import (
+    ItemsMetaschemaProperty)
 
 
 class ArgsMetaschemaProperty(MetaschemaProperty):
@@ -10,7 +10,7 @@ class ArgsMetaschemaProperty(MetaschemaProperty):
 
     name = 'args'
     schema = {'description': ('Arguments required to recreate a class instance.'),
-              'type': 'object'}
+              'type': 'array'}
     _instance_dict_attr = ['input_arguments', 'input_args']
 
     @classmethod
@@ -40,10 +40,10 @@ class ArgsMetaschemaProperty(MetaschemaProperty):
         # if isinstance(typedef, dict) and ('args' in typedef):
         #     typedef_args = typedef['args']
         args = cls.instance2args(instance)
-        return PropertiesMetaschemaProperty.encode(args, typedef_args)
+        return ItemsMetaschemaProperty.encode(args, typedef_args)
 
     @classmethod
     def compare(cls, *args, **kwargs):
         r"""Comparison method for 'args' container property."""
-        for e in PropertiesMetaschemaProperty.compare(*args, **kwargs):
+        for e in ItemsMetaschemaProperty.compare(*args, **kwargs):
             yield e
