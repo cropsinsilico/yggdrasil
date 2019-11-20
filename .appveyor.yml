@@ -136,8 +136,8 @@ before_test:
 test_script:
   - "type .coveragerc"
   - "if %YGG_RUN_EXAMPLES% == 0 yggtest -c setup.cfg --cov-config=.coveragerc"
-  - "if ((%YGG_RUN_EXAMPLES% == 1) && (%YGG_ENABLE_LONG_TESTS% == 0)) yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples"
-  - "if ((%YGG_RUN_EXAMPLES% == 1) && (%YGG_ENABLE_LONG_TESTS% == 1)) yggtest -c setup.cfg --cov-config=.coveragerc examples\\tests\\test_types.py --with-examples"
+  - "if (%YGG_RUN_EXAMPLES% == 1) if (%YGG_ENABLE_LONG_TESTS% == 0) yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples"
+  - "if (%YGG_RUN_EXAMPLES% == 1) if (%YGG_ENABLE_LONG_TESTS% == 1) yggtest -c setup.cfg --cov-config=.coveragerc examples\\tests\\test_types.py --with-examples"
 
 after_test:
   - "codecov"
