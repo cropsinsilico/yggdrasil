@@ -99,7 +99,7 @@ def requires_language(language, installed=True):
     """
     drv = import_component('model', language)
     test_language = os.environ.get('YGG_TEST_LANGUAGE', None)
-    if test_language is not None:
+    if test_language is not None:  # pragma: debug
         test_language = test_language.lower()
         
     def wrapper(function):
@@ -869,9 +869,9 @@ class YggTestClass(YggTestBase):
     @classmethod
     def get_import_cls(cls):
         r"""Import the tested class from its module"""
-        if cls._mod is None:
+        if cls._mod is None:  # pragma: debug
             raise Exception("No module registered.")
-        if cls._cls is None:
+        if cls._cls is None:  # pragma: debug
             raise Exception("No class registered.")
         mod_tot = cls._mod
         if cls._mod_base is not None:
