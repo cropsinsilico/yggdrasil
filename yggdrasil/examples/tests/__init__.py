@@ -13,6 +13,7 @@ from yggdrasil.tests import YggTestBase
 
 _ext2lang = {v: k for k, v in ext_map.items()}
 _test_registry = {}
+_default_comm = tools.get_default_comm()
 
 
 def make_iter_test(**kwargs):
@@ -108,7 +109,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     @property
     def yaml(self):
         r"""str: The full path to the yaml file for this example."""
-        if self.name not in yamls:
+        if self.name not in yamls:  # pragma: debug
             return None
         if self.language not in yamls[self.name]:
             return None
@@ -194,6 +195,14 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
             for x in self.languages_tested:
                 if not tools.is_lang_installed(x):
                     raise unittest.SkipTest("%s not installed." % x)
+            # Check that comm is installed
+            if self.comm in ['ipc', 'IPCComm']:
+                from yggdrasil.communication.IPCComm import (
+                    ipcrm_queues, ipc_queues)
+                qlist = ipc_queues()
+                if qlist:  # pragma: debug
+                    print('Existing queues:', qlist)
+                    ipcrm_queues()
             # Run
             os.environ.update(self.env)
             self.runner = runner.get_runner(self.yaml, namespace=self.namespace)
@@ -224,8 +233,11 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
         r"""Run a test for the specified parameters."""
         if not tools.check_environ_bool('YGG_ENABLE_EXAMPLE_TESTS'):
             raise unittest.SkipTest("Example tests not enabled.")
+        if comm and (not tools.is_comm_installed(comm)):
+            raise unittest.SkipTest("%s library not installed."
+                                    % comm)
         test_language = os.environ.get('YGG_TEST_LANGUAGE', None)
-        if test_language == 'c++':
+        if test_language == 'c++':  # pragma: debug
             test_language = 'cpp'
         if test_language:  # pragma: debug
             if (((test_language != language)
@@ -234,6 +246,15 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                                         % language)
         self.language = language
         self.datatype = datatype
-        self.run_example()
-        self.language = None
-        self.datatype = None
+        if comm is None:
+            self.comm = _default_comm
+        else:
+            self.comm = comm
+        self.set_default_comm(default_comm=comm)
+        try:
+            self.run_example()
+        finally:
+            self.language = None
+            self.datatype = None
+            self.comm = None
+            self.reset_default_comm()

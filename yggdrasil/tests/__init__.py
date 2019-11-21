@@ -495,7 +495,7 @@ class YggTestBase(unittest.TestCase):
         self.attr_list = copy.deepcopy(self.__class__.attr_list)
         self._teardown_complete = False
         self._new_default_comm = None
-        self._old_default_comm = None
+        self._old_default_comm = []
         self._old_loglevel = None
         self._old_encoding = None
         self.debug_flag = False
@@ -574,7 +574,7 @@ class YggTestBase(unittest.TestCase):
 
     def set_default_comm(self, default_comm=None):
         r"""Set the default comm."""
-        self._old_default_comm = os.environ.get('YGG_DEFAULT_COMM', None)
+        self._old_default_comm.append(os.environ.get('YGG_DEFAULT_COMM', None))
         if default_comm is None:
             default_comm = self._new_default_comm
         if default_comm is not None:
@@ -584,11 +584,12 @@ class YggTestBase(unittest.TestCase):
 
     def reset_default_comm(self):
         r"""Reset the default comm to the original value."""
-        if self._old_default_comm is None:
+        prev = self._old_default_comm.pop()
+        if prev is None:
             if 'YGG_DEFAULT_COMM' in os.environ:
                 del os.environ['YGG_DEFAULT_COMM']
         else:  # pragma: debug
-            os.environ['YGG_DEFAULT_COMM'] = self._old_default_comm
+            os.environ['YGG_DEFAULT_COMM'] = prev
 
     def setUp(self, *args, **kwargs):
         self.setup(*args, **kwargs)
