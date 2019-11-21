@@ -66,7 +66,7 @@ install:
         "https://cran.rstudio.com/bin/windows/Rtools/Rtools35.exe",
         "C:\\projects\\rtools.exe")
       }
-  - if "%INSTALLR%" == "1" "C:\\projects\\rtools.exe /VERYSILENT /DIR=C:\Rtools"
+  - if "%INSTALLR%" == "1" "C:\\projects\\rtools.exe /VERYSILENT /DIR=C:\\Rtools"
   - if "%INSTALLR%" == "1" "set PATH=c:\\Rtools\\bin;%PATH%"
 
   # Install & start RabbitMQ
