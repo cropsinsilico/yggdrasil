@@ -118,7 +118,7 @@ class YamlTestBase(YggTestClass):
 
     def test_load_yaml_git(self):
         yml = "https://github.com/cropsinsilico/example-fakemodel/fakemodel.yml"
-        self.assertRaises(OSError, yamlfile.load_yaml, yml)
+        self.assertRaises(Exception, yamlfile.load_yaml, yml)
         self.assertTrue('model' in yamlfile.load_yaml('git:' + yml))
 
 
