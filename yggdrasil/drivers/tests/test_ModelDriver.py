@@ -298,6 +298,14 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                 'test_function', inputs=inputs, outputs=outputs,
                 function_contents=function_contents,
                 flag_var=flag_var, outputs_in_inputs=outputs_in_inputs)
+            # Add second definition to test ability to locate specific
+            # function in the presence of others
+            definition.append('')
+            definition += self.import_cls.write_function_def(
+                'test_function_decoy', inputs=inputs,
+                outputs=outputs, flag_var=flag_var,
+                function_contents=function_contents,
+                outputs_in_inputs=outputs_in_inputs)
             parsed = self.import_cls.parse_function_definition(
                 None, 'test_function', contents='\n'.join(definition),
                 outputs_in_inputs=outputs_in_inputs,

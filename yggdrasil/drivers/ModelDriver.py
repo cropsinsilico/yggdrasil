@@ -1300,10 +1300,14 @@ class ModelDriver(Driver):
                                   == counts[cls.brackets[1]]))):
                             first_zero = x.span(0)[1]
                             break
-                    if (first_zero != 0) and first_zero != len(contents):
-                        contents = contents[:first_zero]
-                        match = re.search(function_regex, contents)
-                        assert(match)
+                    assert((first_zero == 0) or (first_zero == len(contents)))
+                    # This is currently commented as regex's are
+                    # sufficient so far, but this may be needed in the
+                    # future to isolate single definitions.
+                    # if (first_zero != 0) and first_zero != len(contents):
+                    #     contents = contents[:first_zero]
+                    #     match = re.search(function_regex, contents)
+                    #     assert(match)
             out = match.groupdict()
             for k in list(out.keys()):
                 if out[k] is None:
@@ -1883,6 +1887,7 @@ checking if the model flag indicates
                            outputs_in_inputs=False,
                            opening_msg=None, closing_msg=None,
                            print_inputs=False, print_outputs=False,
+                           skip_interface=False,
                            **kwargs):
         r"""Write a function definition.
 
@@ -1922,6 +1927,8 @@ checking if the model flag indicates
             print_outputs (bool, optional): If True, the output variables
                 will be printed after the function contents. Defaults to
                 False.
+            skip_interface (bool, optional): If True, the line including
+                the interface will be skipped. Defaults to False.
             **kwargs: Additional keyword arguments are passed to
                 cls.format_function_param.
 
@@ -1937,7 +1944,7 @@ checking if the model flag indicates
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
         out = []
-        if 'interface' in cls.function_param:
+        if ('interface' in cls.function_param) and (not skip_interface):
             ygglib = cls.interface_library
             if ygglib in cls.internal_libraries:
                 ygglib = cls.internal_libraries[ygglib]['source']
