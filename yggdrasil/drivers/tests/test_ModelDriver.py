@@ -348,10 +348,18 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             if 'declare' in self.import_cls.function_param:
                 lines.append(self.import_cls.function_param['declare'].format(
                     type_name='int', variable='x'))
-            cond = self.import_cls.function_param['true']
-            block_contents = self.import_cls.function_param['assign'].format(
-                name='x', value='1')
-            lines += self.import_cls.write_if_block(cond, block_contents)
+            cond = [self.import_cls.function_param['true'],
+                    self.import_cls.function_param['false']]
+            block_contents = [
+                self.import_cls.function_param['assign'].format(
+                    name='x', value='1'),
+                self.import_cls.function_param['assign'].format(
+                    name='x', value='2')]
+            else_contents = self.import_cls.function_param['assign'].format(
+                name='x', value='-1')
+            lines += self.import_cls.write_if_block(
+                cond, block_contents,
+                else_block_contents=else_contents)
             self.run_generated_code(lines)
 
     def test_write_for_loop(self):

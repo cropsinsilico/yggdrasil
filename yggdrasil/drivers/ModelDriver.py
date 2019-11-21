@@ -2473,7 +2473,7 @@ checking if the model flag indicates
             if i == 0:
                 out.append(cls.format_function_param('if_begin', cond=icond))
             else:
-                out.append(cls.format_functioN_param('if_elif', cond=icond))
+                out.append(cls.format_function_param('if_elif', cond=icond))
             if not isinstance(iblock_contents, (list, tuple)):
                 iblock_contents = [iblock_contents]
             for x in iblock_contents:
