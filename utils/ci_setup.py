@@ -43,7 +43,7 @@ def call_script(lines):
             call_cmd = [fname]
         else:
             call_cmd = ['./%s' % fname]
-            os.chmod(fname, 0755)
+            os.chmod(fname, 0o755)
         subprocess.check_call(call_cmd, **call_kws)
     finally:
         if os.path.isfile(fname):
