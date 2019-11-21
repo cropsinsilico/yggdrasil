@@ -41,7 +41,7 @@ def test_load_yaml():
         # Remove file
         if os.path.isfile(fname):
             os.remove(fname)
-            
+
 
 def test_load_yaml_error():
     r"""Test error on loading invalid file."""
@@ -115,6 +115,11 @@ class YamlTestBase(YggTestClass):
             yamlfile.parse_yaml(self.files[0])
         else:
             yamlfile.parse_yaml(self.files)
+
+    def test_load_yaml_git(self):
+        yml = "https://github.com/cropsinsilico/example-fakemodel/fakemodel.yml"
+        self.assertRaises(OSError, yamlfile.load_yaml, yml)
+        self.assertTrue('model' in yamlfile.load_yaml('git:' + yml))
 
 
 class YamlTestBaseError(YamlTestBase):
