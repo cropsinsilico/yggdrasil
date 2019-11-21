@@ -584,12 +584,13 @@ class YggTestBase(unittest.TestCase):
 
     def reset_default_comm(self):
         r"""Reset the default comm to the original value."""
-        prev = self._old_default_comm.pop()
-        if prev is None:
-            if 'YGG_DEFAULT_COMM' in os.environ:
-                del os.environ['YGG_DEFAULT_COMM']
-        else:  # pragma: debug
-            os.environ['YGG_DEFAULT_COMM'] = prev
+        if self._old_default_comm:
+            prev = self._old_default_comm.pop()
+            if prev is None:
+                if 'YGG_DEFAULT_COMM' in os.environ:
+                    del os.environ['YGG_DEFAULT_COMM']
+            else:  # pragma: debug
+                os.environ['YGG_DEFAULT_COMM'] = prev
 
     def setUp(self, *args, **kwargs):
         self.setup(*args, **kwargs)
