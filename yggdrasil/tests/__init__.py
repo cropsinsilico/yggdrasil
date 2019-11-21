@@ -673,7 +673,7 @@ class YggTestBase(unittest.TestCase):
                     x.sleep()
                 x.stop_timeout()
             ncurr_fd = self.fd_count
-        fds_created = ncurr_fd - self.nprev_fd
+        fds_created = max(0, ncurr_fd - self.nprev_fd)
         # print("FDS CREATED: %d" % fds_created)
         if not self._first_test:
             self.assert_equal(fds_created, 0)
