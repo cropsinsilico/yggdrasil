@@ -1398,7 +1398,7 @@ class ModelDriver(Driver):
                 model does not use a flag variable.
 
         """
-        if outputs_in_inputs is None:
+        if outputs_in_inputs is None:  # pragma: debug
             outputs_in_inputs = cls.outputs_in_inputs
         if (((isinstance(model_file, str) and os.path.isfile(model_file))
              or (contents is not None))):
@@ -1425,26 +1425,15 @@ class ModelDriver(Driver):
             for x in io_var:
                 if x.get('vars', []):
                     continue
-                if x['name'] in io_map:
-                    x['vars'] = [x['name']]
+                var_name = x['name'].split(':')[-1]
+                if var_name in io_map:
+                    x['vars'] = [var_name]
                     for k in ['length', 'shape', 'ndim']:
                         kvar = '%s_var' % k
-                        if kvar in io_map[x['name']]:
-                            x['vars'].append(io_map[x['name']][kvar])
+                        if kvar in io_map[var_name]:
+                            x['vars'].append(io_map[var_name][kvar])
         # Move variables if outputs in inputs
         if outputs_in_inputs:
-            if ((((len(inputs) + len(outputs)) == len(info.get('inputs', [])))
-                 and (len(info.get('outputs', [])) == 0))):
-                for i, vdict in enumerate(info['inputs'][:len(inputs)]):
-                    if inputs[i].get('vars', False):
-                        assert(inputs[i]['vars'] == [vdict['name']])
-                    else:
-                        inputs[i]['vars'] = [vdict['name']]
-                for i, vdict in enumerate(info['inputs'][len(inputs):]):
-                    if outputs[i].get('vars', False):
-                        assert(outputs[i]['vars'] == [vdict['name']])
-                    else:
-                        outputs[i]['vars'] = [vdict['name']]
             for x in outputs:
                 for i, v in enumerate(x.get('vars', [])):
                     if v in info_map['inputs']:
@@ -1473,10 +1462,6 @@ class ModelDriver(Driver):
             # length variables
             for x in io_var:
                 for k in ['length', 'shape', 'ndim']:
-                    if k + '_map' in x:
-                        var_map = {v['name']: v for v in x['vars']}
-                        for k, v in x[k + '_map'].items():
-                            var_map[k][k + '_var'] = v
                     for v in x['vars']:
                         if k + '_var' in v:
                             v[k + '_var'] = info_map[io][v[k + '_var']]
@@ -1674,7 +1659,7 @@ checking if the model flag indicates
                 this language.
 
         """
-        if outputs_in_inputs is None:
+        if outputs_in_inputs is None:  # pragma: debug
             outputs_in_inputs = cls.outputs_in_inputs
         func_inputs = cls.channels2vars(inputs)
         func_outputs = cls.channels2vars(outputs)
