@@ -1625,7 +1625,7 @@ class CommBase(tools.YggClass):
             # if len(payload[1]) == 0:
             #     self.sleep()
         payload = (ret, data)
-        self.info("Read %d/%d bytes", len(data), leng_exp)
+        self.debug("Read %d/%d bytes", len(data), leng_exp)
         return payload
 
     def _recv_multipart_worker(self, info, **kwargs):
