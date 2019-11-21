@@ -30,16 +30,20 @@ def call_script(lines):
         script_ext = '.bat'
     else:
         script_ext = '.sh'
+        if lines[0] != '#!/bin/bash':
+            lines.insert(0, '#!/bin/bash')
     fname = 'ci_script_%s%s' % (str(uuid.uuid4()), script_ext)
     try:
         pprint.pprint(lines)
         with open(fname, 'w') as fd:
             fd.write('\n'.join(lines))
+            
         call_kws = {}
         if _is_win:  # pragma: windows
             call_cmd = [fname]
         else:
             call_cmd = ['./%s' % fname]
+            os.chmod(fname, 0755)
         subprocess.check_call(call_cmd, **call_kws)
     finally:
         if os.path.isfile(fname):

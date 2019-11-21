@@ -64,10 +64,10 @@ install:
   - ps: If ($INSTALLR -eq 1) {
       (new-object net.webclient).DownloadFile(
         "https://cran.rstudio.com/bin/windows/Rtools/Rtools35.exe",
-        "C:\projects\rtools.exe")
+        "C:\\projects\\rtools.exe")
       }
-  - if "%INSTALLR%" == "1" C:\projects\rtools.exe /VERYSILENT /DIR=C:\Rtools
-  - if "%INSTALLR%" == "1" set PATH=c:\Rtools\bin;%PATH%
+  - if "%INSTALLR%" == "1" "C:\\projects\\rtools.exe /VERYSILENT /DIR=C:\Rtools"
+  - if "%INSTALLR%" == "1" "set PATH=c:\\Rtools\\bin;%PATH%"
 
   # Install & start RabbitMQ
   - ps: If ($INSTALLRMQ -eq 1) { $webclient=New-Object System.Net.WebClient }
