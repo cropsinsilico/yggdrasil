@@ -14,6 +14,7 @@ if sys.version_info > (3, 0):
 else:
     from urlparse import urlparse
 
+
 def load_yaml(fname):
     r"""Parse a yaml file defining a run.
 
@@ -21,9 +22,11 @@ def load_yaml(fname):
         fname (str, file, dict): Path to a YAML file, an open file descriptor
             to a file containing a YAML, or a loaded YAML document. If fname starts with
             'git:' then the code will assume the file is in a remote git repository. The
-            remainder of fname can be the full url to the YAML file (http://mygit.repo/foo/bar/yaml/interesting.yaml)
-            or just the repo and YAML file (the server is assumed to be github.com if not given)
-            (foo/bar/yam/interesting.yaml will be interpreted as http://github.com/foo/bar/yam/interesting.yaml).
+            remainder of fname can be the full url to the YAML file
+            (http://mygit.repo/foo/bar/yaml/interesting.yaml) or just the repo and
+            YAML file (the server is assumed to be github.com if not given)
+            (foo/bar/yam/interesting.yaml will be interpreted as
+            http://github.com/foo/bar/yam/interesting.yaml).
 
     Returns:
         dict: Contents of yaml file.
@@ -58,9 +61,10 @@ def load_yaml(fname):
             # check to see if the file already exists, and clone if it does not
             if not os.path.exists(fname):
                 # create the url for cloning the repo
-                cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' + reponame
+                cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
+                    reponame
                 # clone the repo into the appropriate directory
-                repo = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
+                _ = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
                 # now that it is cloned, just pass the yaml file (and path) onwards
         fname = os.path.realpath(fname)
         if not os.path.isfile(fname):
