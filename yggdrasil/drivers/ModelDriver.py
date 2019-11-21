@@ -902,7 +902,7 @@ class ModelDriver(Driver):
                 if not cls.is_library_installed(lib, **kwargs):
                     return False
         return True
-
+    
     @classmethod
     def update_config_argparser(cls, parser):
         r"""Add arguments for configuration options specific to this
@@ -1673,12 +1673,15 @@ checking if the model flag indicates
                 flag_cond = cls.format_function_param(
                     'not_flag_cond', flag_var=flag_var,
                     replacement=format_not_flag_cond)
-            else:
-                flag_cond = '%s (%s)' % (
-                    cls.function_param['not'],
-                    cls.format_function_param(
-                        'flag_cond', default='{flag_var}', flag_var=flag_var,
-                        replacement=format_flag_cond))
+            else:  # pragma: debug
+                # flag_cond = '%s (%s)' % (
+                #     cls.function_param['not'],
+                #     cls.format_function_param(
+                #         'flag_cond', default='{flag_var}', flag_var=flag_var,
+                #         replacement=format_flag_cond))
+                raise RuntimeError("Untested code below. Uncomment "
+                                   "at your own risk if you find "
+                                   "use case for it.")
             if on_failure is None:
                 on_failure = [cls.format_function_param(
                     'error', error_msg="Model call failed.")]
@@ -1868,7 +1871,6 @@ checking if the model flag indicates
     def write_function_def(cls, function_name, inputs=[], outputs=[],
                            input_var=None, output_var=None,
                            function_contents=[],
-                           dont_declare_output=False,
                            outputs_in_inputs=False,
                            opening_msg=None, closing_msg=None,
                            print_inputs=False, print_outputs=False,
@@ -1892,11 +1894,6 @@ checking if the model flag indicates
                 created based on the contents of the outputs variable.
             function_contents (list, optional): List of lines comprising
                 the body of the function. Defaults to [].
-            dont_declare_output (bool, list, optional): If True, it is assumed
-                that any output variables are declared (for languages
-                that required declaration) in the function_contents.
-                If a list, only output variables that are not in the list
-                will be declared. Defaults to False.
             outputs_in_inputs (bool, optional): If True, the outputs are
                 presented in the function definition as inputs. Defaults
                 to False.
@@ -1968,14 +1965,7 @@ checking if the model flag indicates
             input_var=input_var, output_var=output_var, **kwargs))
         free_vars = []
         if 'declare' in cls.function_param:
-            decl_outputs = []
-            if isinstance(dont_declare_output, list):
-                for o in outputs:
-                    if o['name'] not in dont_declare_output:
-                        decl_outputs.append(o)
-            elif not dont_declare_output:
-                decl_outputs = outputs
-            for o in decl_outputs:
+            for o in outputs:
                 out += [cls.function_param['indent'] + x for
                         x in cls.write_declaration(
                             o, requires_freeing=free_vars)]
@@ -2150,19 +2140,6 @@ checking if the model flag indicates
         """
         return var
 
-    @classmethod
-    def requires_length_var(var):
-        r"""Determine if a variable requires a separate length variable.
-
-        Args:
-            var (dict): Dictionary of variable properties.
-
-        Returns:
-            bool: True if a length variable is required, False otherwise.
-
-        """
-        return False
-    
     @classmethod
     def get_native_type(cls, **kwargs):
         r"""Get the native type.
