@@ -261,7 +261,7 @@ if __name__ == "__main__":
     parser_dep = subparsers.add_parser(
         'deploy', help="Build and install package.")
     args = parser.parse_args()
-    if args.operation == 'setup':
+    if args.operation in ['env', 'setup']:
         setup_package_on_ci(args.method, args.python)
     elif args.operation == 'deploy':
         deploy_package_on_ci(args.method)
