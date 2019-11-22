@@ -183,9 +183,11 @@ def deploy_package_on_ci(method):
             if INSTALLLPY or _is_win:
                 cmds.append("conda install r-base")
             elif _is_linux:
-                cmds.append("sudo apt-get install r-base")
+                cmds += ["sudo apt-get install r-base",
+                         "sudo apt-get install libudunits2-dev"]
             elif _is_osx:
-                cmds.append("brew install r")
+                cmds += ["brew install r",
+                         "brew install udunits"]
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
