@@ -19,7 +19,9 @@ _comptype2key = {'comm': 'commtype',
                  'model': 'language',
                  'connection': 'connection_type',
                  # 'datatype': None,
-                 'serializer': 'seritype'}
+                 'serializer': 'seritype',
+                 'filter': 'filtertype',
+                 'transform': 'transformtype'}
 # 'compiler': 'toolname',
 # 'linker': 'toolname',
 # 'archiver': 'toolname'}
@@ -127,7 +129,8 @@ def import_all_components(comptype):
                                     % (mod, xbase))
 
 
-def import_component(comptype, subtype=None, without_schema=False):
+def import_component(comptype, subtype=None, without_schema=False,
+                     **kwargs):
     r"""Dynamically import a component by name.
 
     Args:
@@ -141,6 +144,8 @@ def import_component(comptype, subtype=None, without_schema=False):
             import the component and subtype must be the name of a component
             class. Defaults to False. subtype must be provided if without_schema
             is True.
+        **kwargs: Additional keyword arguments are used to determine the
+            subtype if it is None.
 
     Returns:
         class: Component class.
@@ -158,6 +163,9 @@ def import_component(comptype, subtype=None, without_schema=False):
     # if isinstance(mod, list):
     #     mod = '.'.join(mod)
     # Set direct import shortcuts for unregistered classes
+    if (((subtype is None) and (comptype in _comptype2key)
+         and (_comptype2key[comptype] in kwargs))):
+        subtype = kwargs[_comptype2key[comptype]]
     if (comptype == 'comm') and (subtype is None):
         subtype = 'DefaultComm'
     if (((comptype in ['comm', 'file']) and (subtype is not None)
@@ -204,7 +212,8 @@ def import_component(comptype, subtype=None, without_schema=False):
         except ImportError:  # pragma: debug
             import_all_components(comptype)
             return import_component(comptype, subtype=subtype,
-                                    without_schema=without_schema)
+                                    without_schema=without_schema,
+                                    **kwargs)
         out_cls = getattr(out_mod, class_name)
     # Check for an aliased class
     if hasattr(out_cls, '_get_alias'):
@@ -245,11 +254,12 @@ def create_component(comptype, subtype=None, **kwargs):
         subtype = kwargs[s.subtype_key]
     if subtype is None:
         subtype = s.identify_subtype(kwargs)
-    cls = import_component(comptype, subtype=subtype)
+    cls = import_component(comptype, subtype=subtype, **kwargs)
     return cls(**kwargs)
 
 
-def get_component_base_class(comptype, subtype=None, without_schema=False):
+def get_component_base_class(comptype, subtype=None, without_schema=False,
+                             **kwargs):
     r"""Determine the base class for a component type.
 
     Args:
@@ -260,6 +270,8 @@ def get_component_base_class(comptype, subtype=None, without_schema=False):
             import the component and subtype must be the name of a component
             class. Defaults to False. subtype must be provided if without_schema
             is True.
+        **kwargs: Additional keyword arguments are used to determine the
+            subtype if it is None.
     
     Returns:
         ComponentBase: Component base class.
@@ -269,14 +281,16 @@ def get_component_base_class(comptype, subtype=None, without_schema=False):
         base_class_name = _registry_base_classes[comptype]
     else:
         default_class = import_component(comptype, subtype=subtype,
-                                         without_schema=without_schema)
+                                         without_schema=without_schema,
+                                         **kwargs)
         base_class_name = default_class._schema_base_class
-    base_class = import_component(comptype, base_class_name,
+    base_class = import_component(comptype, subtype=base_class_name,
                                   without_schema=True)
     return base_class
 
 
-def isinstance_component(x, comptype, subtype=None, without_schema=False):
+def isinstance_component(x, comptype, subtype=None, without_schema=False,
+                         **kwargs):
     r"""Determine if an object is an instance of a component type.
 
     Args:
@@ -288,6 +302,8 @@ def isinstance_component(x, comptype, subtype=None, without_schema=False):
             import the component and subtype must be the name of a component
             class. Defaults to False. subtype must be provided if without_schema
             is True.
+        **kwargs: Additional keyword arguments are used to determine the
+            subtype if it is None.
 
     Returns:
         bool: True if the object is an instance of the specified component(s).
@@ -300,7 +316,8 @@ def isinstance_component(x, comptype, subtype=None, without_schema=False):
         else:
             return False
     base_class = get_component_base_class(comptype, subtype=subtype,
-                                          without_schema=without_schema)
+                                          without_schema=without_schema,
+                                          **kwargs)
     return isinstance(x, base_class)
 
 
