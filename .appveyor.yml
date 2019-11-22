@@ -64,7 +64,7 @@ install:
   - ps: If ($env:INSTALLR -eq 1) {
       (new-object net.webclient).DownloadFile(
         "https://cran.rstudio.com/bin/windows/Rtools/Rtools35.exe",
-        "C:\projects\\tools.exe")
+        "C:\projects\tools.exe")
       }
   - if "%INSTALLR%" == "1" C:\projects\rtools.exe /VERYSILENT /DIR=C:\Rtools
   - if "%INSTALLR%" == "1" set PATH=c:\Rtools\bin;%PATH%
