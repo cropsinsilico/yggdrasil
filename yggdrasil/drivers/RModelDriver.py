@@ -46,7 +46,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'array': 'list',
         'object': 'list',
         'boolean': 'logical',
-        'null': 'NULL',
+        'null': 'NA',
         'uint': 'integer',
         'complex': 'complex',
         'bytes': 'char (utf-8)',
