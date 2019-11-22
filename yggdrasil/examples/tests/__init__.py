@@ -97,7 +97,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
         r"""list: Languages covered by the example."""
         if self.name not in source:  # pragma: debug
             return None
-        if self.language not in yamls[self.name]:  # pragma: debug
+        if self.yaml is None:  # pragma: debug
             return None
         if self.language in ['all', 'all_nomatlab']:
             out = [_ext2lang[os.path.splitext(x)[-1]] for x in
@@ -111,9 +111,11 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
         r"""str: The full path to the yaml file for this example."""
         if self.name not in yamls:  # pragma: debug
             return None
-        if self.language not in yamls[self.name]:
-            return None
-        return yamls[self.name][self.language]
+        if self.language in yamls[self.name]:
+            return yamls[self.name][self.language]
+        elif self.language.lower() in yamls[self.name]:
+            return yamls[self.name][self.language.lower()]
+        return None
 
     @property
     def yamldir(self):
