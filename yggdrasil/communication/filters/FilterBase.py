@@ -51,7 +51,7 @@ class FilterBase(ComponentBase):
             if backwards.PY2 and units.has_units(x):
                 out = self.evaluate_filter(units.get_data(x))
             else:
-                raise
+                raise  # pragma: debug
         if isinstance(out, np.ndarray):
             assert(out.dtype == bool)
             out = bool(out.all())
@@ -73,4 +73,5 @@ class FilterBase(ComponentBase):
                 pass/fail for those keywords.
         
         """
-        return [{'error': [(1, NotImplementedError)]}]
+        return [{'error': [(1, NotImplementedError)],
+                 'kwargs': {'initial_state': {'a': int(1)}}}]
