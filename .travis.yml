@@ -305,6 +305,7 @@ jobs:
       python: 3.6
       env: YGG_ENABLE_LONG_TESTS=1 YGG_RUN_EXAMPLES=1 YGG_TYPES_LANGUAGES="matlab python"
     - os: linux
+      env: YGG_ENABLE_LONG_TESTS=0
       python: 3.8-dev
       dist: xenial
       sudo: true
