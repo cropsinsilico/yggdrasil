@@ -104,7 +104,7 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
 
         """
         # Schemas should already be in JSON serializable format
-        return obj
+        return cls.normalize(obj)
 
     @classmethod
     def decode_data(cls, obj, typedef):
