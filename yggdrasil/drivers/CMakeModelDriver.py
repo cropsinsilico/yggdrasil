@@ -53,7 +53,7 @@ class CMakeConfigure(BuildToolBase):
                                         'x64', '.dir']
 
     @classmethod
-    def generator(cls, return_default=False, default=None, **kwargs):
+    def generator(cls, return_default=False, default=None, **kwargs):  # pragma: debug
         r"""Determine the generator that should be used.
 
         Args:
@@ -85,7 +85,7 @@ class CMakeConfigure(BuildToolBase):
         return out
 
     @classmethod
-    def generator2toolset(cls, generator):
+    def generator2toolset(cls, generator):  # pragma: windows
         r"""Determine the toolset string option that corresponds to the provided
         generator name.
 
