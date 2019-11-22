@@ -14,7 +14,6 @@ addons:
   homebrew: &native_deps_brew
     packages:
       - valgrind
-      - ccache
     update: true
 
 os:
@@ -53,9 +52,9 @@ before_install:
     if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
        export PATH=/usr/lib/ccache:$PATH
     fi
-    if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-       export PATH=/usr/local/opt/ccache/libexec:$PATH
-    fi
+    # if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+    #    export PATH=/usr/local/opt/ccache/libexec:$PATH
+    # fi
 
     if [[ -n "$TRAVIS_PYTHON_VERSION" ]]; then
       if [[ -n "$YGG_CONDA" ]]; then
@@ -141,7 +140,9 @@ before_install:
 install:
   - |
     # setup environment
-    ccache -s
+    if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+      ccache -s
+    fi
 
     # Build and install
     if [[ -n "$YGG_CONDA" ]]; then
