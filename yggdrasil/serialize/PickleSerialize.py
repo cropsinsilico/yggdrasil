@@ -88,6 +88,14 @@ class PickleSerialize(DefaultSerialize):
             out['contents'] = ("S'Test message\\n'\np1\n."
                                + "S'Test message 2\\n'\np1\n.")
         else:  # pragma: Python 3
-            out['contents'] = (b'\x80\x03C\rTest message\nq\x00.'
-                               + b'\x80\x03C\x0fTest message 2\nq\x00.')
+            if sys.version_info[1] < 8:
+                out['contents'] = (
+                    b'\x80\x03C\rTest message\nq\x00.'
+                    + b'\x80\x03C\x0fTest message 2\nq\x00.')
+            else:
+                out['contents'] = (
+                    b'\x80\x04\x95\x11\x00\x00\x00\x00\x00\x00\x00C\r'
+                    + b'Test message\n\x94.\x80\x04\x95\x13'
+                    + b'\x00\x00\x00\x00\x00\x00\x00C\x0f'
+                    + b'Test message 2\n\x94.')
         return out
