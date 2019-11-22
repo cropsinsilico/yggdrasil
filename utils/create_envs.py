@@ -97,8 +97,8 @@ if __name__ == "__main__":
     parser.add_argument('--method', choices=['conda', 'pip', 'both'], default='both',
                         help=("Method(s) that should be used to install the "
                               "dependencies."))
-    parser.add_argument('--version', '--python',
-                        choices=['2.7', '3.6', '3.7', '2&3'], default='2&3',
+    parser.add_argument('--version', '--python', default='2&3',
+                        choices=['2.7', '3.6', '3.7', '3.8', '2&3'],
                         help=("Python version(s) to create environments for."))
     parser.add_argument('--name', default=None,
                         help=("Name of the conda env that should be created or "
