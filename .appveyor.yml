@@ -61,26 +61,26 @@ install:
   - "git submodule update --init --recursive"
 
   # Install R tools
-  - ps: If ($INSTALLR -eq 1) {
+  - ps: If ($env:INSTALLR -eq 1) {
       (new-object net.webclient).DownloadFile(
         "https://cran.rstudio.com/bin/windows/Rtools/Rtools35.exe",
-        "C:\\projects\\rtools.exe")
+        "C:\projects\\tools.exe")
       }
-  - if "%INSTALLR%" == "1" "C:\\projects\\rtools.exe /VERYSILENT /DIR=C:\\Rtools"
-  - if "%INSTALLR%" == "1" "set PATH=c:\\Rtools\\bin;%PATH%"
+  - if "%INSTALLR%" == "1" C:\projects\rtools.exe /VERYSILENT /DIR=C:\Rtools
+  - if "%INSTALLR%" == "1" set PATH=c:\Rtools\bin;%PATH%
 
   # Install & start RabbitMQ
-  - ps: If ($INSTALLRMQ -eq 1) { $webclient=New-Object System.Net.WebClient }
+  - ps: If ($env:INSTALLRMQ -eq 1) { $webclient=New-Object System.Net.WebClient }
   - if "%INSTALLRMQ%" == "1" ECHO Downloading Erlang...
-  - ps: If ($INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:erlang_download_url", "$env:erlang_exe_path") }
+  - ps: If ($env:INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:erlang_download_url", "$env:erlang_exe_path") }
   - if "%INSTALLRMQ%" == "1" ECHO Starting Erlang...
   - if "%INSTALLRMQ%" == "1" start /B /WAIT %erlang_exe_path% /S /D=%erlang_home_dir%
   - if "%INSTALLRMQ%" == "1" set ERLANG_HOME=%erlang_home_dir%
   - if "%INSTALLRMQ%" == "1" ECHO Downloading RabbitMQ...
-  - ps: If ($INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:rabbitmq_installer_download_url", "$env:rabbitmq_installer_path") }
+  - ps: If ($env:INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:rabbitmq_installer_download_url", "$env:rabbitmq_installer_path") }
   - if "%INSTALLRMQ%" == "1" ECHO Installing and starting RabbitMQ with default config...
   - if "%INSTALLRMQ%" == "1" start /B /WAIT %rabbitmq_installer_path% /S
-  - ps: If ($INSTALLRMQ -eq 1) { (Get-Service -Name RabbitMQ).Status }
+  - ps: If ($env:INSTALLRMQ -eq 1) { (Get-Service -Name RabbitMQ).Status }
 
   # Setup environment
   - "python utils\\ci_setup.py conda env %PYTHON_VERSION%"
