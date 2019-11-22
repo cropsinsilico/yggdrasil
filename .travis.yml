@@ -124,7 +124,7 @@ before_install:
 
     # Activate environment
     if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
-      conda activate test-environment
+      source activate test-environment
     fi
     if [[ -n "$YGG_PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then
       source venv/bin/activate
