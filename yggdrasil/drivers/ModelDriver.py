@@ -1434,6 +1434,14 @@ class ModelDriver(Driver):
                             x['vars'].append(io_map[var_name][kvar])
         # Move variables if outputs in inputs
         if outputs_in_inputs:
+            if ((((len(inputs) + len(outputs)) == len(info.get('inputs', [])))
+                 and (len(info.get('outputs', [])) == 0))):
+                for i, vdict in enumerate(info['inputs'][:len(inputs)]):
+                    inputs[i].setdefault('vars', [vdict['name']])
+                    assert(inputs[i]['vars'] == [vdict['name']])
+                for i, vdict in enumerate(info['inputs'][len(inputs):]):
+                    outputs[i].setdefault('vars', [vdict['name']])
+                    assert(outputs[i]['vars'] == [vdict['name']])
             for x in outputs:
                 for i, v in enumerate(x.get('vars', [])):
                     if v in info_map['inputs']:

@@ -78,6 +78,27 @@ enable_long_tests = tools.check_environ_bool("YGG_ENABLE_LONG_TESTS")
 skip_extra_examples = tools.check_environ_bool("YGG_SKIP_EXTRA_EXAMPLES")
 
 
+def check_enabled_languages(language):
+    r"""Determine if the specified language is enabled by the value
+    or values specified in YGG_TEST_LANGUAGE.
+
+    Args:
+        language (str): Language to check.
+
+    Raises:
+        unittest.SkipTest: If the specified language is not enabled.
+
+    """
+    enabled = os.environ.get('YGG_TEST_LANGUAGE', None)
+    if enabled is not None:
+        enabled = [x.lower() for x in enabled.split(',')]
+        if ('c++' in enabled) or ('cpp' in enabled):
+            enabled += ['c++', 'cpp']
+        if language.lower() not in enabled:
+            raise unittest.SkipTest("Tests for language %s not enabled.",
+                                    language)
+
+
 def requires_language(language, installed=True):
     r"""Decorator factroy for marking tests that require a specific
     language.

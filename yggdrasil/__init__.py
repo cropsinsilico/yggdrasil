@@ -140,9 +140,9 @@ def run_tsts(**kwargs):  # pragma: no cover
         else:
             parser.add_argument(*pos_dest, action='store_true',
                                 dest=dest, **kws)
-                                
-    parser.add_argument('--language', default=None,
-                        help='Language that should be tested.')
+    parser.add_argument('--language', '--languages', default=[],
+                        nargs="+", type=str,
+                        help='Language(s) that should be tested.')
     args, extra_argv = parser.parse_known_args()
     initial_dir = os.getcwd()
     package_dir = os.path.dirname(os.path.abspath(__file__))
@@ -203,11 +203,11 @@ def run_tsts(**kwargs):  # pragma: no cover
             os.environ['YGG_ENABLE_EXAMPLE_TESTS'] = 'True'
         if args.language:
             from yggdrasil.components import import_component
-            drv = import_component('model', args.language)
-            args.language = drv.language.lower()
+            args.language = [import_component('model', x).language
+                             for x in args.language]
             old_env['YGG_TEST_LANGUAGE'] = os.environ.get(
                 'YGG_TEST_LANGUAGE', None)
-            os.environ['YGG_TEST_LANGUAGE'] = args.language
+            os.environ['YGG_TEST_LANGUAGE'] = ','.join(args.language)
         if args.longrunning:
             old_env['YGG_ENABLE_LONG_TESTS'] = os.environ.get(
                 'YGG_ENABLE_LONG_TESTS', None)

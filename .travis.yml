@@ -37,6 +37,7 @@ env:
     BUILDDOCS=0
     YGG_RUN_EXAMPLES=0
     YGG_ENABLE_LONG_TESTS=0
+    YGG_TYPES_LANGUAGES=
   matrix:
     - YGG_ENABLE_LONG_TESTS=1
     - YGG_RUN_EXAMPLES=1
@@ -245,7 +246,7 @@ script:
   - |
     if [[ $YGG_RUN_EXAMPLES == '1' ]]; then
       if [[ $YGG_ENABLE_LONG_TESTS == '1' ]]; then
-        yggtest -c setup.cfg --cov-config=.coveragerc examples/tests/test_types.py --with-examples
+        yggtest -c setup.cfg --cov-config=.coveragerc examples/tests/test_types.py --with-examples --language $YGG_TYPES_LANGUAGES
       else
         yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples
       fi
@@ -299,7 +300,10 @@ jobs:
       sudo: true
     - os: linux
       python: 3.6
-      env: YGG_ENABLE_LONG_TESTS=1 YGG_RUN_EXAMPLES=1
+      env: YGG_ENABLE_LONG_TESTS=1 YGG_RUN_EXAMPLES=1 YGG_TYPES_LANGUAGES="r c cpp"
+    - os: linux
+      python: 3.6
+      env: YGG_ENABLE_LONG_TESTS=1 YGG_RUN_EXAMPLES=1 YGG_TYPES_LANGUAGES="matlab python"
     - os: linux
       python: 3.8-dev
       dist: xenial

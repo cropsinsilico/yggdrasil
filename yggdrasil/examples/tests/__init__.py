@@ -8,7 +8,7 @@ import itertools
 from yggdrasil.components import ComponentMeta
 from yggdrasil import runner, tools, platform, backwards
 from yggdrasil.examples import yamls, source, ext_map
-from yggdrasil.tests import YggTestBase
+from yggdrasil.tests import YggTestBase, check_enabled_languages
 
 
 _ext2lang = {v: k for k, v in ext_map.items()}
@@ -236,14 +236,8 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
         if comm and (not tools.is_comm_installed(comm)):
             raise unittest.SkipTest("%s library not installed."
                                     % comm)
-        test_language = os.environ.get('YGG_TEST_LANGUAGE', None)
-        if test_language == 'c++':  # pragma: debug
-            test_language = 'cpp'
-        if test_language:  # pragma: debug
-            if (((test_language != language)
-                 and (language is not None))):
-                raise unittest.SkipTest("Tests for language %s not enabled."
-                                        % language)
+        if language is not None:
+            check_enabled_languages(language)
         self.language = language
         self.datatype = datatype
         if comm is None:
