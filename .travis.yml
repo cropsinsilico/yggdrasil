@@ -131,8 +131,10 @@ before_install:
         export YGG_USE_SUDO_FOR_R=1
         if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
           sudo apt-get install r-base
+          sudo apt-get install libudunits2-dev
         elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
           brew install r
+          brew install udunits
         fi
       fi
     fi
@@ -248,7 +250,11 @@ script:
         yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples
       fi
     else
-      yggtest -c setup.cfg --cov-config=.coveragerc
+      if [[ $YGG_ENABLE_LONG_TESTS == '1' ]]; then
+        yggtest -c setup.cfg --cov-config=.coveragerc examples/tests/test_timing.py
+      else
+        yggtest -c setup.cfg --cov-config=.coveragerc
+      fi
     fi
 
 
