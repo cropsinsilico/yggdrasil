@@ -2129,7 +2129,7 @@ checking if the model flag indicates
             out.append(cls.function_param['exec_suffix'])
             out.append('')
         if (((cls.function_param.get('functions_defined_last', False))
-             and (function_definitions is not None))):
+             and (function_definitions is not None))):  # pragma: matlab
             out += function_definitions
             out.append('')
         return out

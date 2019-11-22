@@ -996,14 +996,6 @@ def standardize(instance, keys, is_singular=False, suffixes=None, altkeys=None):
                 instance[k][i] = {'name': instance[k][i]}
 
 
-def normalize_instance(normalizer, value, instance, schema):
-    r"""Creates an instance from the JSON document."""
-    from yggdrasil.components import create_component
-    if isinstance(instance, dict):
-        instance = create_component(schema['title'], **instance)
-    return instance
-
-
 def normalize_function_file(cond, working_dir):
     r"""Normalize functions which use relative paths.
 

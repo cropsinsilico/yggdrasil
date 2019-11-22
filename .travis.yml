@@ -36,12 +36,15 @@ env:
     INSTALLLPY=0
     INSTALLR=1
     BUILDDOCS=0
+    YGG_RUN_ALL_TESTS=1
     YGG_RUN_EXAMPLES=0
+    YGG_RUN_TYPES_EXAMPLES=0
+    YGG_RUN_TIME_TESTS=0
     YGG_ENABLE_LONG_TESTS=0
     YGG_TYPES_LANGUAGES=
   matrix:
     - YGG_ENABLE_LONG_TESTS=1
-    - YGG_RUN_EXAMPLES=1
+    - YGG_RUN_EXAMPLES=1 YGG_RUN_ALL_TESTS=0
     - YGG_CONDA=yes
 
 before_install:
@@ -150,18 +153,18 @@ install:
 script:
   - sh ci/pretest_script.sh || travis_terminate 1;
   - |
+    if [[ $YGG_RUN_TYPES_EXAMPLES == '1' ]]; then
+      yggtest -c setup.cfg --cov-config=.coveragerc examples/tests/test_types.py --with-examples --long-running --language $YGG_TYPES_LANGUAGES
+    fi
     if [[ $YGG_RUN_EXAMPLES == '1' ]]; then
-      if [[ $YGG_ENABLE_LONG_TESTS == '1' ]]; then
-        yggtest -c setup.cfg --cov-config=.coveragerc examples/tests/test_types.py --with-examples --language $YGG_TYPES_LANGUAGES
-      else
-        yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples
-      fi
-    else
-      if [[ $YGG_ENABLE_LONG_TESTS == '1' ]]; then
-        yggtest -c setup.cfg --cov-config=.coveragerc tests/test_timing.py
-      else
-        yggtest -c setup.cfg --cov-config=.coveragerc
-      fi
+      yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples
+    fi
+    if [[ $YGG_RUN_ALL_TESTS == '1' ]]; then
+      yggtest -c setup.cfg --cov-config=.coveragerc
+    fi
+    if [[ $YGG_RUN_TIME_TESTS == '1' ]]; then
+      yggtest -c setup.cfg --cov-config=.coveragerc --long-running tests/test_timing.py
+    
     fi
 
 
@@ -206,11 +209,12 @@ jobs:
       sudo: true
     - os: linux
       python: 3.6
-      env: YGG_ENABLE_LONG_TESTS=1 YGG_RUN_EXAMPLES=1 YGG_TYPES_LANGUAGES="r c cpp"
+      env: YGG_RUN_TYPES_EXAMPLES=1 YGG_RUN_ALL_TESTS=0 YGG_TYPES_LANGUAGES="r c cpp"
     - os: linux
       python: 3.6
-      env: YGG_ENABLE_LONG_TESTS=1 YGG_RUN_EXAMPLES=1 YGG_TYPES_LANGUAGES="matlab python"
+      env: YGG_RUN_TYPES_EXAMPLES=1 YGG_RUN_ALL_TESTS=0 YGG_TYPES_LANGUAGES="matlab python"
     - os: linux
+      env: YGG_ENABLE_LONG_TESTS=1
       python: 3.8-dev
       dist: xenial
       sudo: true
