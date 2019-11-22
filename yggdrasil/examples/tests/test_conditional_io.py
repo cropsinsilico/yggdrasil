@@ -10,11 +10,6 @@ class TestExampleConditionalIO(ExampleTstBase):
     example_name = 'conditional_io'
 
     @property
-    def input_files(self):
-        r"""list: Input files for the run."""
-        return [os.path.join(self.yamldir, 'Input', 'input.txt')]
-
-    @property
     def expected_output_files(self):
         r"""list: Examples of expected output for the run."""
         return [os.path.join(self.yamldir, 'Output', 'output.txt')]

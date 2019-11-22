@@ -66,6 +66,11 @@ public:
       YggGeneric* args = (YggGeneric*)(x.args);
       out.args = args->copy();
     }
+    out.kwargs = NULL;
+    if (x.kwargs != NULL) {
+      YggGeneric* kwargs = (YggGeneric*)(x.kwargs);
+      out.kwargs = kwargs->copy();
+    }
     out.obj = NULL;
     if (x.obj != NULL) {
       // Increment reference count for underlying Python object
@@ -84,6 +89,11 @@ public:
 	YggGeneric* args = (YggGeneric*)(x->args);
 	delete args;
 	x->args = NULL;
+      }
+      if (x->kwargs != NULL) {
+	YggGeneric* kwargs = (YggGeneric*)(x->kwargs);
+	delete kwargs;
+	x->kwargs = NULL;
       }
       if (x->obj != NULL) {
 	Py_DECREF(x->obj);
@@ -209,6 +219,7 @@ public:
     }
     idata->name[0] = '\0';
     idata->args = NULL;
+    idata->kwargs = NULL;
     idata->obj = pyobj;
     convert_python2c(py_name, &(idata->name), T_BYTES,
 		     "PyObjMetaschemaType::python2c: ",
@@ -309,6 +320,7 @@ public:
     (*nargs)--;
     strncpy(arg->name, (char*)encoded_bytes, nbytes_expected);
     arg->args = NULL;
+    arg->kwargs = NULL;
     arg->obj = import_python(arg->name);
     return true;
   }

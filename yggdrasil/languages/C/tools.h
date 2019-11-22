@@ -177,6 +177,7 @@ typedef struct va_list_t {
 typedef struct python_t {
   char name[PYTHON_NAME_SIZE];
   void *args;
+  void *kwargs;
   PyObject *obj;
 } python_t;
 
@@ -190,6 +191,7 @@ python_t init_python() {
   python_t out;
   out.name[0] = '\0';
   out.args = NULL;
+  out.kwargs = NULL;
   out.obj = NULL;
   return out;
 };

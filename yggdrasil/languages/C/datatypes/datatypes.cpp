@@ -894,14 +894,19 @@ extern "C" {
   }
   dtype_t* create_dtype_pyinst(const char* class_name,
 			       const dtype_t* args_dtype,
+			       const dtype_t* kwargs_dtype,
 			       const bool use_generic=true) {
     PyInstMetaschemaType* obj = NULL;
-    JSONObjectMetaschemaType* args_type = NULL;
+    JSONArrayMetaschemaType* args_type = NULL;
+    JSONObjectMetaschemaType* kwargs_type = NULL;
     try {
       if (args_dtype != NULL) {
-	args_type = dynamic_cast<JSONObjectMetaschemaType*>(dtype2class(args_dtype));
+	args_type = dynamic_cast<JSONArrayMetaschemaType*>(dtype2class(args_dtype));
       }
-      obj = new PyInstMetaschemaType(class_name, args_type, use_generic);
+      if (kwargs_dtype != NULL) {
+	kwargs_type = dynamic_cast<JSONObjectMetaschemaType*>(dtype2class(kwargs_dtype));
+      }
+      obj = new PyInstMetaschemaType(class_name, args_type, kwargs_type, use_generic);
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_pyinst: C++ exception thrown.");

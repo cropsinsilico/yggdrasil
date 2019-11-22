@@ -179,7 +179,8 @@ class ComponentSchema(object):
                 return subtype
             except ValidationError:
                 pass
-        raise ValueError("Could not determine subtype for document: %s" % doc)
+        raise ValueError("Could not determine subtype "
+                         "for document: %s" % doc)  # pragma: debug
 
     def get_subtype_schema(self, subtype, unique=False, relaxed=False,
                            allow_instance=False):
@@ -233,8 +234,15 @@ class ComponentSchema(object):
         if relaxed:
             out['additionalProperties'] = True
         if allow_instance:
+            if subtype == 'base':
+                comp_cls = self.base_subtype_class
+            else:
+                from yggdrasil.components import import_component
+                comp_cls = import_component(
+                    self.schema_type, subtype=subtype,
+                    without_schema=True)
             out = {'oneOf': [out, {'type': 'instance',
-                                   'class': self.base_subtype_class}]}
+                                   'class': comp_cls}]}
         return out
 
     def get_schema(self, relaxed=False, allow_instance=False):
@@ -679,15 +687,17 @@ class SchemaRegistry(object):
             kwargs.setdefault('schema_registry', self)
         return metaschema.validate_instance(obj, self.schema, **kwargs)
 
-    def validate_component(self, comp_name, obj):
+    def validate_component(self, comp_name, obj, **kwargs):
         r"""Validate an object against a specific component.
 
         Args:
             comp_name (str): Name of the component to validate against.
             obj (object): Object to validate.
+            **kwargs: Additional keyword arguments are passed to
+                get_component_schema.
 
         """
-        comp_schema = self.get_component_schema(comp_name)
+        comp_schema = self.get_component_schema(comp_name, **kwargs)
         return metaschema.validate_instance(obj, comp_schema)
 
     def normalize(self, obj, backwards_compat=False, **kwargs):

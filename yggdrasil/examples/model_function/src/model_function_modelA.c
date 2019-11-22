@@ -1,13 +1,13 @@
 #include <stdio.h>
 
-int model_function(char *in, uint64_t length_in,
-		   char** out, uint64_t* length_out) {
+int model_function(char *inputA, uint64_t length_inputA,
+		   char** outputA, uint64_t* length_outputA) {
 
-  length_out[0] = length_in;
-  out[0] = (char*)malloc(length_in);
-  memcpy(out[0], in, length_in);
-  out[0][length_in] = '\0';
-  printf("Model A: %s (length = %d)\n", *out, (int)(*length_out));
+  length_outputA[0] = length_inputA;
+  outputA[0] = (char*)malloc(length_inputA);
+  memcpy(outputA[0], inputA, length_inputA);
+  outputA[0][length_inputA] = '\0';
+  printf("Model A: %s (length = %d)\n", *outputA, (int)(*length_outputA));
   return 0;
 
 }

@@ -83,9 +83,13 @@ public:
     // Precision
     if (!(type_doc.HasMember("precision")))
       ygglog_throw_error("ScalarMetaschemaType: Precision missing.");
-    if (!(type_doc["precision"].IsInt()))
-      ygglog_throw_error("ScalarMetaschemaType: Precision must be integer.");
-    set_precision(type_doc["precision"].GetInt(), true);
+    if (type_doc["precision"].IsInt()) {
+      set_precision(type_doc["precision"].GetInt(), true);
+    } else if (type_doc["precision"].IsDouble()) {
+      set_precision((size_t)(type_doc["precision"].GetDouble(), true));
+    } else {
+      ygglog_throw_error("ScalarMetaschemaType: Precision must be a number.");
+    }
     // Units
     if (type_doc.HasMember("units")) {
       if (!type_doc["units"].IsString())
@@ -1401,9 +1405,13 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     ScalarMetaschemaType(type_doc, use_generic) {
     if (!(type_doc.HasMember("length")))
       ygglog_throw_error("OneDArrayMetaschemaType: 1darray types must include 'length'.");
-    if (!(type_doc["length"].IsInt()))
-      ygglog_throw_error("OneDArrayMetaschemaType: 1darray 'length' value must be an int.");
-    length_ = type_doc["length"].GetInt();
+    if (type_doc["length"].IsInt()) {
+      length_ = type_doc["length"].GetInt();
+    } else if (type_doc["length"].IsDouble()) {
+      length_ = (size_t)(type_doc["length"].GetDouble());
+    } else {
+      ygglog_throw_error("OneDArrayMetaschemaType: 1darray 'length' value must be a number.");
+    }
     update_type("1darray");
     if (length_ == 0)
       _variable_length = true;
@@ -1644,9 +1652,13 @@ NDArrayMetaschemaType::NDArrayMetaschemaType(const rapidjson::Value &type_doc,
   size_t ndim = type_doc["shape"].Size();
   size_t i;
   for (i = 0; i < ndim; i++) {
-    if (!(type_doc["shape"][(rapidjson::SizeType)i].IsInt()))
-      ygglog_throw_error("NDArrayMetaschemaType: ndarray 'shape' elements must be integers.");
-    shape_.push_back(type_doc["shape"][(rapidjson::SizeType)i].GetInt());
+    if (type_doc["shape"][(rapidjson::SizeType)i].IsInt()) {
+      shape_.push_back(type_doc["shape"][(rapidjson::SizeType)i].GetInt());
+    } else if (type_doc["shape"][(rapidjson::SizeType)i].IsDouble()) {
+      shape_.push_back(type_doc["shape"][(rapidjson::SizeType)i].GetDouble());
+    } else {
+      ygglog_throw_error("NDArrayMetaschemaType: ndarray 'shape' elements must be numbers.");
+    }
   }
   update_type("ndarray");
 };

@@ -171,9 +171,7 @@ class PythonModelDriver(InterpretedModelDriver):
         """
         if key == 'import':
             fname = kwargs.get('filename', None)
-            if fname is None:
-                key = 'import_nofile'
-            else:
+            if fname is not None:
                 kwargs['filename'] = os.path.splitext(os.path.basename(fname))[0]
         kwargs['default'] = default
         return super(PythonModelDriver, cls).format_function_param(key, **kwargs)

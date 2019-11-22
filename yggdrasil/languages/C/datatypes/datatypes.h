@@ -440,13 +440,17 @@ dtype_t* create_dtype_pyobj(const char* type, const bool use_generic);
 /*!
   @brief Construct a type object for Python object instances.
   @param[in] class_name char* Python class name.
-  @param[in] args_dtype dtype_t* Datatype describing the arguments creating the instance.
+  @param[in] args_dtype dtype_t* Datatype describing the arguments
+  creating the instance.
+  @param[in] kwargs_dtype dtype_t* Datatype describing the keyword 
+  arguments creating the instance.
   @param[in] use_generic bool If true, serialized/deserialized
   objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
  */
 dtype_t* create_dtype_pyinst(const char* class_name,
 			     const dtype_t* args_dtype,
+			     const dtype_t* kwargs_dtype,
 			     const bool use_generic);
 
   

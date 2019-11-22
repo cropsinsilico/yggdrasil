@@ -338,7 +338,7 @@ class MetaschemaType(object):
         if typename1 and typename0 and (typename1 != typename0):
             raise MetaschemaTypeError(
                 "Cannot update typedef for type '%s' to be '%s'."
-                % (typename0, typename1))
+                % (typename0, typename1))  # pragma: debug
         # Copy over valid properties
         all_keys = [k for k in kwargs.keys()]
         # req_keys = self.definition_schema().get('required', [])

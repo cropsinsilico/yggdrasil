@@ -103,4 +103,7 @@ class TransformBase(ComponentBase):
                 keywords.
         
         """
-        return [{'in/out': [(1, NotImplementedError)]}]
+        return [{'in/out': [(1, NotImplementedError)],
+                 'kwargs': {'initial_state': {'test': 1},
+                            'original_datatype': {
+                                'type': 'int'}}}]

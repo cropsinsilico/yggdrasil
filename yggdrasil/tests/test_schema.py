@@ -1,42 +1,64 @@
 import os
 import pprint
 import tempfile
-from yggdrasil import schema
+from jsonschema import ValidationError
+from yggdrasil import schema, components
 from yggdrasil.tests import assert_raises, assert_equal
 
 
+def filter_func_ex(x):
+    r"""Test function for normalizing filters."""
+    return False
+
+
+filter_func_ex_name = '%s:filter_func_ex' % __file__
+
+
 _normalize_objects = [
-    ({'models': [{'name': 'modelA',
-                  'language': 'c',
-                  'args': 'model.c',
-                  'outputs': [{'name': 'outputA',
-                               'column_names': ['a', 'b'],
-                               'column_units': ['cm', 'g']}],
-                  'working_dir': os.getcwd()}],
-      'connections': [{'inputs': 'outputA',
-                       'outputs': 'fileA.txt',
-                       'seritype': 'direct',
-                       'working_dir': os.getcwd()}]},
-     {'models': [{'name': 'modelA',
-                  'language': 'c',
-                  'args': ['model.c'],
-                  'inputs': [{'commtype': 'default',
-                              'datatype': {'type': 'bytes'},
-                              'is_default': True,
-                              'name': 'modelA:input'}],
-                  'outputs': [{'name': 'modelA:outputA',
-                               'commtype': 'default',
-                               'datatype': {'type': 'bytes'}}],
-                  'working_dir': os.getcwd()}],
-      'connections': [{'inputs': [{'name': 'modelA:outputA',
-                                   'datatype': {'type': 'bytes'},
-                                   'commtype': 'default'}],
-                       'outputs': [{'name': 'fileA.txt',
-                                    'filetype': 'binary',
-                                    'working_dir': os.getcwd(),
-                                    'serializer': {'seritype': 'direct'},
-                                    'field_names': ['a', 'b'],
-                                    'field_units': ['cm', 'g']}]}]})]
+    ({'models': [{
+        'name': 'modelA',
+        'language': 'c',
+        'args': 'model.c',
+        'outputs': [
+            {'name': 'outputA',
+             'column_names': ['a', 'b'],
+             'column_units': ['cm', 'g'],
+             'filter': {
+                 'function': filter_func_ex_name}}],
+        'working_dir': os.getcwd()}],
+      'connections': [{
+          'inputs': 'outputA',
+          'outputs': 'fileA.txt',
+          'seritype': 'direct',
+          'working_dir': os.getcwd()}]},
+     {'models': [{
+         'name': 'modelA',
+         'language': 'c',
+         'args': ['model.c'],
+         'inputs': [{'commtype': 'default',
+                     'datatype': {'type': 'bytes'},
+                     'is_default': True,
+                     'name': 'modelA:input'}],
+         'outputs': [{'name': 'modelA:outputA',
+                      'commtype': 'default',
+                      'datatype': {'type': 'bytes'},
+                      'filter': {
+                          'function': filter_func_ex}}],
+         'working_dir': os.getcwd()}],
+      'connections': [{
+          'inputs': [
+              {'name': 'modelA:outputA',
+               'datatype': {'type': 'bytes'},
+               'commtype': 'default',
+               'filter': {
+                   'function': filter_func_ex}}],
+          'outputs': [
+              {'name': 'fileA.txt',
+               'filetype': 'binary',
+               'working_dir': os.getcwd(),
+               'serializer': {'seritype': 'direct'},
+               'field_names': ['a', 'b'],
+               'field_units': ['cm', 'g']}]}]})]
                                     
 
 def test_SchemaRegistry():
@@ -126,3 +148,26 @@ def test_normalize():
 def test_cdriver2commtype_error():
     r"""Test error when invalid driver supplied."""
     assert_raises(ValueError, schema.cdriver2commtype, 'invalid')
+
+
+def test_get_schema_subtype():
+    r"""Test get_schema_subtype for allow_instance=True."""
+    component = 'serializer'
+    subtype = 'direct'
+    doc = {'seritype': subtype}
+    valid = components.create_component(component, seritype=subtype)
+    invalid = components.create_component(component, seritype='json')
+    s = schema.get_schema()
+    kwargs = {'subtype': subtype, 'allow_instance': True}
+    s.validate_component(component, doc, **kwargs)
+    s.validate_component(component, valid, **kwargs)
+    assert_raises(ValidationError, s.validate_component,
+                  component, invalid, **kwargs)
+    s.validate_component(component, doc, subtype=subtype)
+    assert_raises(ValidationError, s.validate_component,
+                  component, valid, subtype=subtype)
+    # Test for base
+    s.validate_component(component, valid, subtype='base',
+                         allow_instance=True)
+    s.validate_component(component, invalid, subtype='base',
+                         allow_instance=True)

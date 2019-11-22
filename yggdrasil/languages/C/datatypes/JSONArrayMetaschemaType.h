@@ -35,6 +35,7 @@ public:
     // Always generic
     MetaschemaType("array", use_generic) {
     strncpy(format_str_, format_str, 1000);
+    strncpy(item_key_, "items", 100);
     update_items(items, true);
   }
   /*!
@@ -45,16 +46,20 @@ public:
     item types. Defaults to empty string.
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
+    @param[in] item_key const char Key to use for items. Defaults to "items".
    */
   JSONArrayMetaschemaType(const rapidjson::Value &type_doc,
 			  const char *format_str = "",
-			  const bool use_generic=true) :
+			  const bool use_generic=true,
+			  const char item_key[100]="items") :
     // Always generic
     MetaschemaType(type_doc, use_generic) {
     strncpy(format_str_, format_str, 1000);
-    if (!(type_doc.HasMember("items")))
+    item_key_[0] = '\0';
+    strncpy(item_key_, item_key, 100);
+    if (!(type_doc.HasMember(item_key_)))
       ygglog_throw_error("JSONArrayMetaschemaType: Items missing.");
-    if (!(type_doc["items"].IsArray()))
+    if (!(type_doc[item_key_].IsArray()))
       ygglog_throw_error("JSONArrayMetaschemaType: Items must be an array.");
     if (type_doc.HasMember("format_str")) {
       if (!(type_doc["format_str"].IsString()))
@@ -62,8 +67,8 @@ public:
       strncpy(format_str_, type_doc["format_str"].GetString(), 1000);
     }
     rapidjson::SizeType i;
-    for (i = 0; i < type_doc["items"].Size(); i++) {
-      MetaschemaType* iitem = (MetaschemaType*)type_from_doc_c(&(type_doc["items"][i]), MetaschemaType::use_generic());
+    for (i = 0; i < type_doc[item_key_].Size(); i++) {
+      MetaschemaType* iitem = (MetaschemaType*)type_from_doc_c(&(type_doc[item_key_][i]), MetaschemaType::use_generic());
       if (iitem == NULL)
 	ygglog_throw_error("JSONArrayMetaschemaType: Error reconstructing item %lu from JSON document.", i);
       items_.push_back(iitem);
@@ -74,11 +79,15 @@ public:
     @param[in] pyobj PyObject* Python object.
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
+    @param[in] item_key const char Key to use for items. Defaults to "items".
    */
-  JSONArrayMetaschemaType(PyObject* pyobj, const bool use_generic=true) :
+  JSONArrayMetaschemaType(PyObject* pyobj, const bool use_generic=true,
+			  const char item_key[100]="items") :
     // Always generic
     MetaschemaType(pyobj, use_generic) {
-    PyObject* pyitems = get_item_python_dict(pyobj, "items",
+    item_key_[0] = '\0';
+    strncpy(item_key_, item_key, 100);
+    PyObject* pyitems = get_item_python_dict(pyobj, item_key_,
   					     "JSONArrayMetaschemaType: items: ",
   					     T_ARRAY);
     if (pyitems == NULL) {
@@ -194,7 +203,7 @@ public:
 			   "JSONArrayMetaschemaType::as_python_dict: items: ",
 			   T_OBJECT);
     }
-    set_item_python_dict(out, "items", pyitems,
+    set_item_python_dict(out, item_key_, pyitems,
 			 "JSONArrayMetaschemaType::as_python_dict: ",
 			 T_ARRAY);
     return out;
@@ -501,7 +510,7 @@ public:
       writer->Key("format_str");
       writer->String(format_str_, (rapidjson::SizeType)strlen(format_str_));
     }
-    writer->Key("items");
+    writer->Key(item_key_);
     writer->StartArray();
     size_t i;
     for (i = 0; i < items_.size(); i++) {
@@ -644,6 +653,7 @@ public:
   }
 
 private:
+  char item_key_[100];
   MetaschemaTypeVector items_;
   char format_str_[1000];
 };

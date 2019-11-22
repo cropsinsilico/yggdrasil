@@ -131,13 +131,15 @@ def get_python_c_library(allow_failure=False, libtype=None):
             libtype = 'shared'
         libtype2key = {'shared': 'LDLIBRARY', 'static': 'LIBRARY'}
         base = cvars.get(libtype2key[libtype], None)
-    if base is None:
+        if platform._is_mac and base.endswith('/Python'):  # pragma: osx
+            base = 'libpython%s.dylib' % cvars['py_version_short']
+    if base is None:  # pragma: debug
         raise RuntimeError(("Could not determine base name for the Python "
                             "C API library.\n"
                             "sysconfig.get_paths():\n%s\n"
                             "sysconfig.get_config_vars():\n%s\n")
                            % (pprint.pformat(paths),
-                              pprint.pformat(cvars)))  # pragma: debug
+                              pprint.pformat(cvars)))
     dir_try = []
     if cvars['prefix']:
         dir_try.append(cvars['prefix'])
@@ -157,7 +159,7 @@ def get_python_c_library(allow_failure=False, libtype=None):
         x = os.path.join(idir, base)
         if os.path.isfile(x):
             return x
-    if allow_failure:
+    if allow_failure:  # pragma: debug
         return base
     raise RuntimeError(("Could not determine the location of the Python "
                         "C API library: %s.\n"

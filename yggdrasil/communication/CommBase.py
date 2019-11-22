@@ -1486,8 +1486,7 @@ class CommBase(tools.YggClass):
         """
         if self.single_use and self._used:  # pragma: debug
             raise RuntimeError("This comm is single use and it was already used.")
-        if self.language_driver.language2python is not None:
-            args = self.language_driver.language2python(args)
+        args = self.language_driver.language2python(args)
         if not self.evaluate_filter(*args):
             # Return True to indicate success because nothing should be done
             self.debug("Sent message skipped based on filter: %.100s", str(args))
@@ -1498,7 +1497,7 @@ class CommBase(tools.YggClass):
                 self._used = True
                 if self.serializer.initialized:
                     self._send_serializer = False
-        except MetaschemaTypeError as e:
+        except MetaschemaTypeError as e:  # pragma: debug
             self._type_errors.append(e)
             try:
                 self.exception('Failed to send: %.100s.', str(args))
@@ -1626,7 +1625,7 @@ class CommBase(tools.YggClass):
             # if len(payload[1]) == 0:
             #     self.sleep()
         payload = (ret, data)
-        self.info("Read %d/%d bytes", len(data), leng_exp)
+        self.debug("Read %d/%d bytes", len(data), leng_exp)
         return payload
 
     def _recv_multipart_worker(self, info, **kwargs):
@@ -1728,8 +1727,7 @@ class CommBase(tools.YggClass):
             self.debug('Linger close on single use')
             self.linger_close()
         out = (flag, msg)
-        if self.language_driver.python2language is not None:
-            out = self.language_driver.python2language(out)
+        out = self.language_driver.python2language(out)
         return out
 
     def recv_multipart(self, *args, **kwargs):

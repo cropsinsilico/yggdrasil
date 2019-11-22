@@ -29,7 +29,7 @@ class BuildToolBase(CompilerBase):
             if x != build_language:
                 return x
         raise ValueError("Could not determine a default target language "
-                         "for build tool '%s'" % cls.toolname)
+                         "for build tool '%s'" % cls.toolname)  # pragma: debug
 
     @classmethod
     def set_env(cls, language=None, language_driver=None, **kwargs):

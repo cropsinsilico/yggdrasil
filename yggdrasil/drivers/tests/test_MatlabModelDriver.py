@@ -22,9 +22,8 @@ def test_is_matlab_running():
 
 @unittest.skipIf(MatlabModelDriver._matlab_engine_installed,
                  "Matlab installed.")
-@requires_language('matlab', installed=True)
-def test_matlab_not_installed():  # pragma: no matlab
-    r"""Assert that errors are raised when Matlab is not installed."""
+def test_matlab_engine_not_installed():  # pragma: no matlab
+    r"""Assert that errors are raised when Matlab engine is not installed."""
     assert_raises(RuntimeError, MatlabModelDriver.start_matlab_engine)
     assert_raises(RuntimeError, MatlabModelDriver.stop_matlab_engine,
                   None, None, None, None)

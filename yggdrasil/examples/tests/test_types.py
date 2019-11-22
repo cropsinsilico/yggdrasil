@@ -4,11 +4,13 @@ import pprint
 from yggdrasil.components import import_component
 from yggdrasil.languages import get_language_ext
 from yggdrasil.metaschema.datatypes import get_type_class
+from yggdrasil.tests import long_running
 from yggdrasil.examples import _example_dir
 from yggdrasil.examples.tests import ExampleTstBase
 from yggdrasil.metaschema.datatypes import encode_type
 
 
+@long_running
 class TestExampleTypes(ExampleTstBase):
     r"""Test the Types example."""
 

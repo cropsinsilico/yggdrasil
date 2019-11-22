@@ -902,7 +902,7 @@ class ModelDriver(Driver):
                 if not cls.is_library_installed(lib, **kwargs):
                     return False
         return True
-
+    
     @classmethod
     def update_config_argparser(cls, parser):
         r"""Add arguments for configuration options specific to this
@@ -1300,10 +1300,14 @@ class ModelDriver(Driver):
                                   == counts[cls.brackets[1]]))):
                             first_zero = x.span(0)[1]
                             break
-                    if (first_zero != 0) and first_zero != len(contents):
-                        contents = contents[:first_zero]
-                        match = re.search(function_regex, contents)
-                        assert(match)
+                    assert((first_zero == 0) or (first_zero == len(contents)))
+                    # This is currently commented as regex's are
+                    # sufficient so far, but this may be needed in the
+                    # future to isolate single definitions.
+                    # if (first_zero != 0) and first_zero != len(contents):
+                    #     contents = contents[:first_zero]
+                    #     match = re.search(function_regex, contents)
+                    #     assert(match)
             out = match.groupdict()
             for k in list(out.keys()):
                 if out[k] is None:
@@ -1394,7 +1398,7 @@ class ModelDriver(Driver):
                 model does not use a flag variable.
 
         """
-        if outputs_in_inputs is None:
+        if outputs_in_inputs is None:  # pragma: debug
             outputs_in_inputs = cls.outputs_in_inputs
         if (((isinstance(model_file, str) and os.path.isfile(model_file))
              or (contents is not None))):
@@ -1421,26 +1425,23 @@ class ModelDriver(Driver):
             for x in io_var:
                 if x.get('vars', []):
                     continue
-                if x['name'] in io_map:
-                    x['vars'] = [x['name']]
+                var_name = x['name'].split(':')[-1]
+                if var_name in io_map:
+                    x['vars'] = [var_name]
                     for k in ['length', 'shape', 'ndim']:
                         kvar = '%s_var' % k
-                        if kvar in io_map[x['name']]:
-                            x['vars'].append(io_map[x['name']][kvar])
+                        if kvar in io_map[var_name]:
+                            x['vars'].append(io_map[var_name][kvar])
         # Move variables if outputs in inputs
         if outputs_in_inputs:
             if ((((len(inputs) + len(outputs)) == len(info.get('inputs', [])))
                  and (len(info.get('outputs', [])) == 0))):
                 for i, vdict in enumerate(info['inputs'][:len(inputs)]):
-                    if inputs[i].get('vars', False):
-                        assert(inputs[i]['vars'] == [vdict['name']])
-                    else:
-                        inputs[i]['vars'] = [vdict['name']]
+                    inputs[i].setdefault('vars', [vdict['name']])
+                    assert(inputs[i]['vars'] == [vdict['name']])
                 for i, vdict in enumerate(info['inputs'][len(inputs):]):
-                    if outputs[i].get('vars', False):
-                        assert(outputs[i]['vars'] == [vdict['name']])
-                    else:
-                        outputs[i]['vars'] = [vdict['name']]
+                    outputs[i].setdefault('vars', [vdict['name']])
+                    assert(outputs[i]['vars'] == [vdict['name']])
             for x in outputs:
                 for i, v in enumerate(x.get('vars', [])):
                     if v in info_map['inputs']:
@@ -1469,10 +1470,6 @@ class ModelDriver(Driver):
             # length variables
             for x in io_var:
                 for k in ['length', 'shape', 'ndim']:
-                    if k + '_map' in x:
-                        var_map = {v['name']: v for v in x['vars']}
-                        for k, v in x[k + '_map'].items():
-                            var_map[k][k + '_var'] = v
                     for v in x['vars']:
                         if k + '_var' in v:
                             v[k + '_var'] = info_map[io][v[k + '_var']]
@@ -1670,7 +1667,7 @@ checking if the model flag indicates
                 this language.
 
         """
-        if outputs_in_inputs is None:
+        if outputs_in_inputs is None:  # pragma: debug
             outputs_in_inputs = cls.outputs_in_inputs
         func_inputs = cls.channels2vars(inputs)
         func_outputs = cls.channels2vars(outputs)
@@ -1684,12 +1681,15 @@ checking if the model flag indicates
                 flag_cond = cls.format_function_param(
                     'not_flag_cond', flag_var=flag_var,
                     replacement=format_not_flag_cond)
-            else:
-                flag_cond = '%s (%s)' % (
-                    cls.function_param['not'],
-                    cls.format_function_param(
-                        'flag_cond', default='{flag_var}', flag_var=flag_var,
-                        replacement=format_flag_cond))
+            else:  # pragma: debug
+                # flag_cond = '%s (%s)' % (
+                #     cls.function_param['not'],
+                #     cls.format_function_param(
+                #         'flag_cond', default='{flag_var}', flag_var=flag_var,
+                #         replacement=format_flag_cond))
+                raise RuntimeError("Untested code below. Uncomment "
+                                   "at your own risk if you find "
+                                   "use case for it.")
             if on_failure is None:
                 on_failure = [cls.format_function_param(
                     'error', error_msg="Model call failed.")]
@@ -1879,10 +1879,10 @@ checking if the model flag indicates
     def write_function_def(cls, function_name, inputs=[], outputs=[],
                            input_var=None, output_var=None,
                            function_contents=[],
-                           dont_declare_output=False,
                            outputs_in_inputs=False,
                            opening_msg=None, closing_msg=None,
                            print_inputs=False, print_outputs=False,
+                           skip_interface=False,
                            **kwargs):
         r"""Write a function definition.
 
@@ -1902,11 +1902,6 @@ checking if the model flag indicates
                 created based on the contents of the outputs variable.
             function_contents (list, optional): List of lines comprising
                 the body of the function. Defaults to [].
-            dont_declare_output (bool, list, optional): If True, it is assumed
-                that any output variables are declared (for languages
-                that required declaration) in the function_contents.
-                If a list, only output variables that are not in the list
-                will be declared. Defaults to False.
             outputs_in_inputs (bool, optional): If True, the outputs are
                 presented in the function definition as inputs. Defaults
                 to False.
@@ -1922,6 +1917,8 @@ checking if the model flag indicates
             print_outputs (bool, optional): If True, the output variables
                 will be printed after the function contents. Defaults to
                 False.
+            skip_interface (bool, optional): If True, the line including
+                the interface will be skipped. Defaults to False.
             **kwargs: Additional keyword arguments are passed to
                 cls.format_function_param.
 
@@ -1937,7 +1934,7 @@ checking if the model flag indicates
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
         out = []
-        if 'interface' in cls.function_param:
+        if ('interface' in cls.function_param) and (not skip_interface):
             ygglib = cls.interface_library
             if ygglib in cls.internal_libraries:
                 ygglib = cls.internal_libraries[ygglib]['source']
@@ -1976,14 +1973,7 @@ checking if the model flag indicates
             input_var=input_var, output_var=output_var, **kwargs))
         free_vars = []
         if 'declare' in cls.function_param:
-            decl_outputs = []
-            if isinstance(dont_declare_output, list):
-                for o in outputs:
-                    if o['name'] not in dont_declare_output:
-                        decl_outputs.append(o)
-            elif not dont_declare_output:
-                decl_outputs = outputs
-            for o in decl_outputs:
+            for o in outputs:
                 out += [cls.function_param['indent'] + x for
                         x in cls.write_declaration(
                             o, requires_freeing=free_vars)]
@@ -2158,19 +2148,6 @@ checking if the model flag indicates
         """
         return var
 
-    @classmethod
-    def requires_length_var(var):
-        r"""Determine if a variable requires a separate length variable.
-
-        Args:
-            var (dict): Dictionary of variable properties.
-
-        Returns:
-            bool: True if a length variable is required, False otherwise.
-
-        """
-        return False
-    
     @classmethod
     def get_native_type(cls, **kwargs):
         r"""Get the native type.
@@ -2504,7 +2481,7 @@ checking if the model flag indicates
             if i == 0:
                 out.append(cls.format_function_param('if_begin', cond=icond))
             else:
-                out.append(cls.format_functioN_param('if_elif', cond=icond))
+                out.append(cls.format_function_param('if_elif', cond=icond))
             if not isinstance(iblock_contents, (list, tuple)):
                 iblock_contents = [iblock_contents]
             for x in iblock_contents:

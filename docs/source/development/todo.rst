@@ -31,7 +31,9 @@ Refactor
 * Move all specialized strings to a file that is read in and passed as definitions during compilation for C/C++ (or loaded at import in python/matlab)
 * Change C client/server use of direction/serializer info to be more transparent
 * Split drivers into separate directories for model drivers and connection drivers
-  
+* Change configuration so that it is only run on import if the configuration file dosn't exist, otherwise config must be done explicitly
+* Change how CLI arguments are added to the arg parser for the language installer to use subparsers
+
 New feature/example
 -------------------
 

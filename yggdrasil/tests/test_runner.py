@@ -17,6 +17,13 @@ def test_get_runner():
     cr.sleep()
 
 
+def test_get_run():
+    r"""Use run function to start a run."""
+    namespace = "test_run_%s" % str(uuid.uuid4)
+    runner.run([ex_yamls['hello']['python']],
+               namespace=namespace)
+
+
 # def test_runner_error():
 #     r"""Start a runner for a model with an error."""
 #     cr = runner.get_runner([sc_yamls['error']])

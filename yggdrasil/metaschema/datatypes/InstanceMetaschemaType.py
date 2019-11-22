@@ -1,9 +1,13 @@
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
+from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
+    JSONArrayMetaschemaType)
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
 from yggdrasil.metaschema.properties.ArgsMetaschemaProperty import (
     ArgsMetaschemaProperty)
+from yggdrasil.metaschema.properties.KwargsMetaschemaProperty import (
+    KwargsMetaschemaProperty)
 
 
 class InstanceMetaschemaType(MetaschemaType):
@@ -11,10 +15,10 @@ class InstanceMetaschemaType(MetaschemaType):
 
     name = 'instance'
     description = 'Type for Python class instances.'
-    properties = ['class', 'args']
+    properties = ['class', 'args', 'kwargs']
     definition_properties = ['class']
-    metadata_properties = ['class', 'args']
-    extract_properties = ['class', 'args']
+    metadata_properties = ['class', 'args', 'kwargs']
+    extract_properties = ['class', 'args', 'kwargs']
     python_types = (object, )
     cross_language_support = False
 
@@ -35,6 +39,7 @@ class InstanceMetaschemaType(MetaschemaType):
         # against the object class
         try:
             ArgsMetaschemaProperty.instance2args(obj)
+            KwargsMetaschemaProperty.instance2kwargs(obj)
             return True
         except MetaschemaTypeError:
             if raise_errors:
@@ -55,11 +60,18 @@ class InstanceMetaschemaType(MetaschemaType):
 
         """
         args = ArgsMetaschemaProperty.instance2args(obj)
-        if isinstance(typedef, dict) and ('args' in typedef):
-            typedef_args = {'properties': typedef['args']}
-        else:
-            typedef_args = None
-        return JSONObjectMetaschemaType.encode_data(args, typedef_args)
+        kwargs = KwargsMetaschemaProperty.instance2kwargs(obj)
+        typedef_args = None
+        typedef_kwargs = None
+        if isinstance(typedef, dict):
+            if 'args' in typedef:
+                typedef_args = {'items': typedef['args']}
+            if 'kwargs' in typedef:
+                typedef_kwargs = {'properties': typedef['kwargs']}
+        out = [
+            JSONArrayMetaschemaType.encode_data(args, typedef_args),
+            JSONObjectMetaschemaType.encode_data(kwargs, typedef_kwargs)]
+        return out
 
     @classmethod
     def decode_data(cls, obj, typedef):
@@ -76,6 +88,10 @@ class InstanceMetaschemaType(MetaschemaType):
         """
         # TODO: Normalization can be removed if metadata is normalized
         typedef = cls.normalize_definition(typedef)
-        args = JSONObjectMetaschemaType.decode_data(
-            obj, {'properties': typedef.get('args', {})})
-        return typedef['class'](**args)
+        assert(isinstance(obj, list))
+        assert(len(obj) == 2)
+        args = JSONArrayMetaschemaType.decode_data(
+            obj[0], {'items': typedef.get('args', [])})
+        kwargs = JSONObjectMetaschemaType.decode_data(
+            obj[1], {'properties': typedef.get('kwargs', {})})
+        return typedef['class'](*args, **kwargs)
