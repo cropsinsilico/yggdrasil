@@ -1999,6 +1999,7 @@ checking if the model flag indicates
                            'print', message=closing_msg))
         # This is not currently used by the tests, but may be
         # needed in the future
+        assert(not free_vars)
         # for x in free_vars:
         #     out.append(cls.function_param['indent']
         #                + cls.format_function_param(
@@ -2206,7 +2207,7 @@ checking if the model flag indicates
             list: The lines declaring the variable.
 
         """
-        if isinstance(var, str):
+        if isinstance(var, str):  # pragma: no cover
             var = {'name': var}
         type_name = cls.get_native_type(**var)
         out = [cls.format_function_param('declare',
@@ -2238,7 +2239,7 @@ checking if the model flag indicates
             list: The lines freeing the variable.
 
         """
-        if isinstance(var, str):
+        if isinstance(var, str):  # pragma: no cover
             var = {'name': var}
         out = []
         if not var.get('dont_free', False):
