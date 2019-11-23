@@ -29,6 +29,7 @@ environment:
     INSTALLAPY: 0
     INSTALLLPY: 0
     INSTALLR: 1
+    INSTALLC: 1
     BUILDDOCS: 0
     YGG_RUN_EXAMPLES: 0
     YGG_ENABLE_LONG_TESTS: 0
@@ -45,6 +46,7 @@ environment:
     - platform: x64
       PYTHON_VERSION: "2.7"
       INSTALLZMQ: 0
+      INSTALLC: 0
     - platform: x64
       PYTHON_VERSION: "2.7"
       YGG_ENABLE_LONG_TESTS: 1
@@ -93,7 +95,7 @@ install:
   - "source activate test-environment"
   
   # Setup Visual C++ toolset
-  - call "ci\\install-compilers.bat"
+  - if "%INSTALLC%" == "1" call "ci\\install-compilers.bat"
 
   # Build and install
   - "python utils\\ci_setup.py deploy"
