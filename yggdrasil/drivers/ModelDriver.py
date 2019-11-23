@@ -1836,7 +1836,7 @@ checking if the model flag indicates
             elif 'print_generic' in cls.function_param:
                 print_key = 'print_generic'
             if print_key:
-                if prefix_msg is None:
+                if prefix_msg is not None:
                     out.append(prefix_msg)
                 out += [cls.format_function_param(
                     print_key, object=var['name'])]
@@ -1997,10 +1997,12 @@ checking if the model flag indicates
             out.append(cls.function_param['indent']
                        + cls.format_function_param(
                            'print', message=closing_msg))
-        for x in free_vars:
-            out.append(cls.function_param['indent']
-                       + cls.format_function_param(
-                           'free', variable=x))
+        # This is not currently used by the tests, but may be
+        # needed in the future
+        # for x in free_vars:
+        #     out.append(cls.function_param['indent']
+        #                + cls.format_function_param(
+        #                    'free', variable=x))
         if output_var and ('return' in cls.function_param):
             out.append(cls.function_param['indent']
                        + cls.format_function_param(
@@ -2041,12 +2043,9 @@ checking if the model flag indicates
             if flag_var is None:
                 flag_var = 'flag'
             outputs = [flag_var]
-        if 'output_var' in kwargs:
-            nout = len(cls.split_variables(kwargs['output_var']))
-        else:
-            nout = len(outputs)
         kwargs.setdefault('input_var', cls.prepare_input_variables(inputs))
         kwargs.setdefault('output_var', cls.prepare_output_variables(outputs))
+        nout = len(cls.split_variables(kwargs['output_var']))
         if include_arg_count:
             narg = len(cls.split_variables(kwargs['input_var']))
             kwargs['input_var'] = cls.prepare_input_variables(
