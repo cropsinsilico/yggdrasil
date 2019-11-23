@@ -116,7 +116,7 @@ class TestExampleTypes(ExampleTstBase):
             'model', function_contents=function_contents,
             inputs=inputs, outputs=outputs,
             outputs_in_inputs=drv.outputs_in_inputs,
-            opening_msg='IN MODEL',
+            opening_msg='IN MODEL', closing_msg='MODEL EXIT',
             print_inputs=True, print_outputs=True)
         with open(modelfile, 'w') as fd:
             print(modelfile)
