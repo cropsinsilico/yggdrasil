@@ -1,3 +1,4 @@
+from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
 from yggdrasil.metaschema.datatypes.MultiMetaschemaType import (
     create_multitype_class)
@@ -32,3 +33,8 @@ class TestMultiMetaschemaType(parent.TestMetaschemaType):
         out = super(TestMultiMetaschemaType, self).typedef
         out['type'] = self._types
         return out
+
+    def test_type_mismatch_error(self):
+        r"""Test that error is raised when there is a type mismatch."""
+        self.assert_raises(MetaschemaTypeError, self.import_cls,
+                           type=['invalid'])
