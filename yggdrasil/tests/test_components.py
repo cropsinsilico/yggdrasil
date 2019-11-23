@@ -10,6 +10,8 @@ def test_import_component():
     # Test explict type (but still new to registry)
     components.import_component('serializer', 'direct')
     components.import_component('serializer', 'direct')
+    # Using key specific to component
+    components.import_component('serializer', seritype='direct')
     # Test using class name
     components.import_component('serializer', 'PandasSerialize')
     # Test access to file through comm (including error)
