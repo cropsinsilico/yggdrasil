@@ -6,7 +6,7 @@ from yggdrasil import schema, components
 from yggdrasil.tests import assert_raises, assert_equal
 
 
-def filter_func_ex(x):
+def filter_func_ex(x):  # pragma: no cover
     r"""Test function for normalizing filters."""
     return False
 
