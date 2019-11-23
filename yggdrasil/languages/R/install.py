@@ -260,11 +260,8 @@ def install(args=None, with_sudo=None, skip_requirements=None,
     if args is None:
         args = update_argparser().parse_args()
     if with_sudo is None:
-        with_sudo = (
-            (os.environ.get('YGG_USE_SUDO_FOR_R', '0') == '1')
-            or (os.environ.get('TRAVIS_OS_NAME', '')
-                in ['linux', 'osx'])
-            or args.sudo or ('sudo' in sys.argv))
+        with_sudo = ((os.environ.get('YGG_USE_SUDO_FOR_R', '0') == '1')
+                     or args.sudo or ('sudo' in sys.argv))
         # or args.sudoR)
     if skip_requirements is None:
         skip_requirements = args.skip_r_requirements
@@ -288,6 +285,7 @@ def install(args=None, with_sudo=None, skip_requirements=None,
         if not skip_requirements:
             requirements = requirements_from_description()
             if not install_packages(requirements, update=update_requirements, **kwargs):
+                logger.error("Failed to install dependencies")
                 restore_makevars(makevars, old_makevars)
                 return False
             logger.info("Installed dependencies.")
