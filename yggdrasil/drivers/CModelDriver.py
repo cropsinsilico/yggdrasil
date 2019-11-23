@@ -870,19 +870,16 @@ class CModelDriver(CompiledModelDriver):
         return out.replace(' ', '')
         
     @classmethod
-    def get_json_type(cls, native_type=None):
+    def get_json_type(cls, native_type):
         r"""Get the JSON type from the native language type.
 
         Args:
-            native_type (str, optional): The native language type. Defaults
-                to None.
+            native_type (str): The native language type.
 
         Returns:
             str, dict: The JSON type.
 
         """
-        if native_type is None:
-            return super(CModelDriver, cls).get_json_type(native_type)
         out = {}
         regex_var = r'(?P<type>.+?(?P<precision>\d*)(?:_t)?)\s*(?P<pointer>\**)'
         if backwards.PY2:  # pragma: Python 2

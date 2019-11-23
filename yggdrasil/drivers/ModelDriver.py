@@ -2176,19 +2176,16 @@ checking if the model flag indicates
         return cls.type_map[type_name]
 
     @classmethod
-    def get_json_type(cls, native_type=None):
+    def get_json_type(cls, native_type):
         r"""Get the JSON type from the native language type.
 
         Args:
-            native_type (str, optional): The native language type. Defaults
-                to None.
+            native_type (str): The native language type.
 
         Returns:
             str, dict: The JSON type.
 
         """
-        if native_type is None:
-            return 'bytes'
         return cls.get_inverse_type_map()[native_type]
     
     @classmethod
