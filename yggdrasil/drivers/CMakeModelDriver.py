@@ -52,8 +52,11 @@ class CMakeConfigure(BuildToolBase):
             cls.remove_product_exts += ['Debug', 'Release', 'Win32', 'Win64',
                                         'x64', '.dir']
 
+    # The method generator and generator2toolset will only be called
+    # if the VC 15 build tools are installed by MSVC 19+ which is not
+    # currently supported by Appveyor CI.
     @classmethod
-    def generator(cls, return_default=False, default=None, **kwargs):  # pragma: debug
+    def generator(cls, return_default=False, default=None, **kwargs):  # pragma: no cover
         r"""Determine the generator that should be used.
 
         Args:
@@ -85,7 +88,7 @@ class CMakeConfigure(BuildToolBase):
         return out
 
     @classmethod
-    def generator2toolset(cls, generator):  # pragma: windows
+    def generator2toolset(cls, generator):  # pragma: no cover
         r"""Determine the toolset string option that corresponds to the provided
         generator name.
 
