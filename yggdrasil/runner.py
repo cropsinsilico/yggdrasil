@@ -531,7 +531,7 @@ def run(*args, **kwargs):
     try:
         yggRunner.run()
         yggRunner.debug("runner returns, exiting")
-    except Exception as ex:
+    except Exception as ex:  # pragma: debug
         yggRunner.pprint("yggrun exception: %s" % type(ex))
         print(traceback.format_exc())
     print('')
