@@ -2240,17 +2240,17 @@ checking if the model flag indicates
         """
         if isinstance(var, str):
             var = {'name': var}
-        if var.get('dont_free', False):
-            return []
-        if ((isinstance(var.get('datatype', False), dict)
-             and (('free_%s' % var['datatype']['type'])
-                  in cls.function_param))):
-            out = [cls.format_function_param(
-                'free_%s' % var['datatype']['type'],
-                variable=var['name'], **kwargs)]
-        else:
-            out = [cls.format_function_param(
-                'free', variable=var['name'], **kwargs)]
+        out = []
+        if not var.get('dont_free', False):
+            if ((isinstance(var.get('datatype', False), dict)
+                 and (('free_%s' % var['datatype']['type'])
+                      in cls.function_param))):
+                out = [cls.format_function_param(
+                    'free_%s' % var['datatype']['type'],
+                    variable=var['name'], **kwargs)]
+            else:
+                out = [cls.format_function_param(
+                    'free', variable=var['name'], **kwargs)]
         return out
 
     @classmethod
@@ -2340,26 +2340,26 @@ checking if the model flag indicates
             list: Split variables.
 
         """
-        if not var_str:
-            return []
-        pairs = [(r'\[', r'\]'),
-                 (r'\(', r'\)'),
-                 (r'\{', r'\}'),
-                 (r"'", r"'"),
-                 (r'"', r'"')]
-        regex_ele = r''
-        present = False
-        for p in pairs:
-            if not any([(str(ip)[-1] in var_str) for ip in p]):
-                continue
-            present = True
-            regex_ele += (r'(?:%s[.\n]*?%s)|' % p)
-        if present:
-            regex_ele += '(?:.+?)'
-            regex_ele = r'\s*(%s)\s*(?:,|$)' % regex_ele
-            out = [x.group(1) for x in re.finditer(regex_ele, var_str)]
-        else:
-            out = [x.strip() for x in var_str.split(',')]
+        out = []
+        if var_str:
+            pairs = [(r'\[', r'\]'),
+                     (r'\(', r'\)'),
+                     (r'\{', r'\}'),
+                     (r"'", r"'"),
+                     (r'"', r'"')]
+            regex_ele = r''
+            present = False
+            for p in pairs:
+                if not any([(str(ip)[-1] in var_str) for ip in p]):
+                    continue
+                present = True
+                regex_ele += (r'(?:%s[.\n]*?%s)|' % p)
+            if present:
+                regex_ele += '(?:.+?)'
+                regex_ele = r'\s*(%s)\s*(?:,|$)' % regex_ele
+                out = [x.group(1) for x in re.finditer(regex_ele, var_str)]
+            else:
+                out = [x.strip() for x in var_str.split(',')]
         return out
 
     @classmethod
