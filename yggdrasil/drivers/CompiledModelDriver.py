@@ -2024,7 +2024,7 @@ class CompiledModelDriver(ModelDriver):
                 out = get_compilation_tool(tooltype, toolname)(**kwargs)
             else:
                 out_tool = cls.get_tool('compiler', default=None)
-                if out_tool is None:
+                if out_tool is None:  # pragma: debug
                     if default is False:
                         raise NotImplementedError("%s not set for language '%s'."
                                                   % (tooltype.title(), cls.language))
