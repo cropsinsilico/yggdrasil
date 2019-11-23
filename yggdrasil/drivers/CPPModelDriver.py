@@ -166,26 +166,6 @@ class CPPModelDriver(CModelDriver):
             try_contents, except_contents, **kwargs)
 
     @classmethod
-    def input2output(cls, var):
-        r"""Perform conversion necessary to turn a variable extracted from a
-        function definition from an input to an output.
-
-        Args:
-            var (dict): Variable definition.
-
-        Returns:
-            dict: Updated variable definition.
-
-        """
-        if var['name'].startswith('&'):
-            var['name'] = var['name'][1:]
-        elif var['native_type'].endswith('&'):
-            var['native_type'] = var['native_type'][:-1]
-        else:
-            return super(CPPModelDriver, cls).input2output(var)
-        return super(CModelDriver, cls).input2output(var)
-
-    @classmethod
     def prepare_output_variables(cls, vars_list, in_definition=False,
                                  in_inputs=False, for_yggdrasil=False):
         r"""Concatenate a set of output variables such that it can be passed as
