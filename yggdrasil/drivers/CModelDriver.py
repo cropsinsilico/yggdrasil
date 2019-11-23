@@ -716,12 +716,12 @@ class CModelDriver(CompiledModelDriver):
         for x in outputs:
             for v in x['vars']:
                 if cls.requires_length_var(v) and (not v.get('length_var', False)):
-                    if v['datatype']['type'] in ['1darray', 'ndarray']:
+                    if v['datatype']['type'] in ['1darray', 'ndarray']:  # pragma: debug
                         raise RuntimeError("Length must be defined for arrays.")
                     v['length_var'] = 'strlen(%s)' % v['name']
                 elif (cls.requires_shape_var(v)
                       and not (v.get('ndim_var', False)
-                               and v.get('shape_var', False))):
+                               and v.get('shape_var', False))):  # pragma: debug
                     raise RuntimeError("Shape must be defined for ND arrays.")
         # Flag input variables for reallocation
         for x in inputs:
@@ -853,12 +853,11 @@ class CModelDriver(CompiledModelDriver):
         elif 'X' in out:
             precision = json_type['precision']
             if json_type['type'] == 'complex':
-                if precision == 64:
-                    out = out.replace('X', 'float')
-                elif precision == 128:
-                    out = out.replace('X', 'double')
-                elif precision == 256:
-                    out = out.replace('X', 'long_double')
+                precision_map = {64: 'float',
+                                 128: 'double',
+                                 256: 'long_double'}
+                if precision in precision_map:
+                    out = out.replace('X', precision_map[precision])
                 else:  # pragma: debug
                     raise ValueError("Unsupported precision for complex types: %d"
                                      % precision)
@@ -897,12 +896,12 @@ class CModelDriver(CompiledModelDriver):
             out['type'] = 'null'
         elif grp['type'].startswith('complex'):
             out['type'] = 'complex'
-            if grp['type'].endswith('long_double'):
-                out['precision'] = 256
-            elif grp['type'].endswith('double'):
-                out['precision'] = 128
-            elif grp['type'].endswith('float'):
-                out['precision'] = 64
+            precision_map = {'long_double': 256,
+                             'double': 128,
+                             'float': 64}
+            prec_str = grp['type'].split('complex_')[-1]
+            if prec_str in precision_map:
+                out['precision'] = precision_map[prec_str]
             else:  # pragma: debug
                 raise ValueError("Cannot determine precision for complex type '%s'"
                                  % grp['type'])
@@ -1035,7 +1034,7 @@ class CModelDriver(CompiledModelDriver):
             list: The lines declaring the variable.
 
         """
-        if isinstance(var, str):
+        if isinstance(var, str):  # pragma: no cover
             var = {'name': var}
         type_name = cls.get_native_type(**var)
         if var.get('allow_realloc', False):
@@ -1066,7 +1065,7 @@ class CModelDriver(CompiledModelDriver):
             str: Modified name for declaration.
 
         """
-        if isinstance(var, str):
+        if isinstance(var, str):  # pragma: no cover
             return var
         assert(isinstance(var, dict))
         out = var['name']
