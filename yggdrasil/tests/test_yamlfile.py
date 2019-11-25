@@ -120,6 +120,8 @@ class YamlTestBase(YggTestClass):
         yml = "https://github.com/cropsinsilico/example-fakemodel/fakemodel.yml"
         self.assertRaises(Exception, yamlfile.load_yaml, yml)
         self.assertTrue('model' in yamlfile.load_yaml('git:' + yml))
+        yml = "cropsinsilico/example-fakemodel/fakemodel.yml"
+        self.assertTrue('model' in yamlfile.load_yaml('git:' + yml))
 
 
 class YamlTestBaseError(YamlTestBase):
