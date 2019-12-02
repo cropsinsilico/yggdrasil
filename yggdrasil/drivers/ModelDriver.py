@@ -1837,7 +1837,8 @@ checking if the model flag indicates
                 print_key = 'print_generic'
             if print_key:
                 if prefix_msg is not None:
-                    out.append(prefix_msg)
+                    out.append(cls.format_function_param(
+                        'print', message=prefix_msg))
                 out += [cls.format_function_param(
                     print_key, object=var['name'])]
         return out
