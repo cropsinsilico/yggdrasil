@@ -112,7 +112,9 @@ class CCompilerBase(CompilerBase):
             out['SDKROOT'] = _osx_sysroot
             grp = re.search(r'MacOSX(?P<target>[0-9]+\.[0-9]+)?',
                             _osx_sysroot).groupdict()
-            if grp['target']:
+            # This is only utilized on local installs where a
+            # non-default SDK is installed in addition to the default
+            if grp['target']:  # pragma: debug
                 out['MACOSX_DEPLOYMENT_TARGET'] = grp['target']
         return out
     
