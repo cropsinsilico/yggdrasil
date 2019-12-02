@@ -92,7 +92,7 @@ install:
   - "python utils\\ci_setup.py conda env %PYTHON_VERSION%"
 
   # Activate environment
-  - "conda activate test-environment"
+  - "activate test-environment"
   
   # Setup Visual C++ toolset
   - if "%INSTALLC%" == "1" call "ci\\install-compilers.bat"
