@@ -23,10 +23,10 @@ def load_yaml(fname):
             to a file containing a YAML, or a loaded YAML document. If fname starts with
             'git:' then the code will assume the file is in a remote git repository. The
             remainder of fname can be the full url to the YAML file
-            (http://mygit.repo/foo/bar/yaml/interesting.yaml) or just the repo and
+            (http://mygit.repo/foo/bar/yaml/interesting.yml) or just the repo and
             YAML file (the server is assumed to be github.com if not given)
             (foo/bar/yam/interesting.yaml will be interpreted as
-            http://github.com/foo/bar/yam/interesting.yaml).
+            http://github.com/foo/bar/yam/interesting.yml).
 
     Returns:
         dict: Contents of yaml file.
