@@ -50,10 +50,7 @@ def call_script(lines):
         else:
             call_cmd = ['./%s' % fname]
             os.chmod(fname, 0o755)
-        print(subprocess.check_output(call_cmd, **call_kws))
-    except subprocess.CalledProcessError as e:
-        print(e.output)
-        raise
+        subprocess.check_call(call_cmd, **call_kws)
     finally:
         if os.path.isfile(fname):
             os.remove(fname)

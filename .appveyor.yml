@@ -102,8 +102,9 @@ install:
   - if "%INSTALLC%" == "1" call "ci\\install-compilers.bat"
 
   # Build and install
-  - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda deploy"
-  - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip deploy"
+  - "python utils\\ci_setup.py conda deploy"
+  # - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda deploy"
+  # - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip deploy"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
