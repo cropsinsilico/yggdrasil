@@ -28,10 +28,17 @@ def call_script(lines):
         return
     if _is_win:  # pragma: windows
         script_ext = '.bat'
+        error_check = 'if %errorlevel% neq 0 exit /b %errorlevel%'
+        for i in range(len(lines), 0, -1):
+            lines.insert(i, error_check)
+        lines.append(error_check)
     else:
         script_ext = '.sh'
         if lines[0] != '#!/bin/bash':
             lines.insert(0, '#!/bin/bash')
+        error_check = 'set -e'
+        if error_check not in lines:
+            lines.insert(1, error_check)
     fname = 'ci_script_%s%s' % (str(uuid.uuid4()), script_ext)
     try:
         pprint.pprint(lines)
@@ -149,10 +156,12 @@ def deploy_package_on_ci(method):
         if PY2:
             cmds.append("conda install contextlib2 pathlib2 "
                         "\"configparser >=3.5\"")
+        index_dir = os.path.join("${CONDA_PREFIX}", "conda-bld")
         cmds += [
             # Install from conda build
-            "conda build recipe/meta.yaml --python %s" % PYVER,
-            "conda index ${CONDA_PREFIX}/conda-bld",
+            "conda build %s --python %s" % (
+                os.path.join('recipe', 'meta.yaml'), PYVER),
+            "conda index %s" % index_dir,
             "conda install -c file:/${CONDA_PREFIX}/conda-bld yggdrasil",
             "conda list"
         ]

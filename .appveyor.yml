@@ -89,7 +89,11 @@ install:
   - ps: If ($env:INSTALLRMQ -eq 1) { (Get-Service -Name RabbitMQ).Status }
 
   # Setup environment
+  # Currently conda is used reguardless of the installation method as
+  # that is how python is installed by appveyor
   - "python utils\\ci_setup.py conda env %PYTHON_VERSION%"
+  # - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda env %PYTHON_VERSION%"
+  # - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip env %PYTHON_VERSION%"
 
   # Activate environment
   - "activate test-environment"
@@ -98,7 +102,8 @@ install:
   - if "%INSTALLC%" == "1" call "ci\\install-compilers.bat"
 
   # Build and install
-  - "python utils\\ci_setup.py conda deploy"
+  - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda deploy"
+  - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip deploy"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
