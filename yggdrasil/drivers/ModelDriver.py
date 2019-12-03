@@ -1243,6 +1243,55 @@ class ModelDriver(Driver):
         return fmt.format(**kwargs)
 
     @classmethod
+    def parse_var_definition(cls, io, value, outputs_in_inputs=None):
+        r"""Extract information about input/output variables from a
+        string definition.
+
+        Args:
+            io (str): Description of variables contained in the provided
+                string. Must be 'inputs' or 'outputs'.
+            value (str): String containing one or more variable definitions.
+            outputs_in_inputs (bool, optional): If True, the outputs are
+                presented in the function definition as inputs. Defaults
+                to False.
+
+        Returns:
+            list: List of information about the variables contained in
+                the provided string.
+
+        Raises:
+            AssertionError: If io is not 'inputs' or 'outputs'.
+            NotImplementedError: If the def_regex for the specified
+                io is not defined.
+
+        """
+        if outputs_in_inputs is None:
+            outputs_in_inputs = cls.outputs_in_inputs
+        assert(io in ['inputs', 'outputs'])
+        if ('%s_def_regex' % io) not in cls.function_param:  # pragma: debug
+            raise NotImplementedError(
+                ("'%s_def_regex' not defined for "
+                 "language %s.") % (io, cls.language))
+        new_val = []
+        io_re = cls.format_function_param('%s_def_regex' % io)
+        for ivar in cls.split_variables(value):
+            x = re.search(io_re, ivar)
+            if x is None:
+                igrp = {'name': ivar}
+            else:
+                igrp = x.groupdict()
+                for k in list(igrp.keys()):
+                    if igrp[k] is None:
+                        del igrp[k]
+            if 'native_type' in igrp:
+                igrp['native_type'] = igrp['native_type'].replace(' ', '')
+                igrp['datatype'] = cls.get_json_type(igrp['native_type'])
+            if (io == 'outputs') and outputs_in_inputs:
+                igrp = cls.input2output(igrp)
+            new_val.append(igrp)
+        return new_val
+
+    @classmethod
     def parse_function_definition(cls, model_file, model_function,
                                   contents=None, match=None,
                                   expected_outputs=[], outputs_in_inputs=None):
@@ -1313,21 +1362,9 @@ class ModelDriver(Driver):
                 if out[k] is None:
                     del out[k]
             for io in ['inputs', 'outputs']:
-                if (io in out) and ('%s_def_regex' % io
-                                    in cls.function_param):
-                    new_val = []
-                    x = cls.format_function_param('%s_def_regex' % io)
-                    for x in re.finditer(cls.format_function_param('%s_def_regex' % io),
-                                         out[io]):
-                        igrp = x.groupdict()
-                        for k in list(igrp.keys()):
-                            if igrp[k] is None:
-                                del igrp[k]
-                        if 'native_type' in igrp:
-                            igrp['native_type'] = igrp['native_type'].replace(' ', '')
-                            igrp['datatype'] = cls.get_json_type(igrp['native_type'])
-                        new_val.append(igrp)
-                    out[io] = new_val
+                if io in out:
+                    out[io] = cls.parse_var_definition(
+                        io, out[io], outputs_in_inputs=outputs_in_inputs)
         if outputs_in_inputs and expected_outputs and (not out.get('outputs', False)):
             input_map = {x['name']: x for x in out['inputs']}
             out['outputs'] = []
@@ -1960,8 +1997,9 @@ checking if the model flag indicates
                     x, prefix_msg=('OUTPUT[%s]:' % x['name']),
                     in_inputs=outputs_in_inputs)
         if outputs_in_inputs:
-            input_var = cls.prepare_input_variables(
-                [input_var, output_var])
+            if output_var:
+                input_var = cls.prepare_input_variables(
+                    [input_var, output_var])
             flag_var = kwargs.get('flag_var', 'flag')
             if isinstance(flag_var, str):
                 flag_var = {'name': flag_var}
@@ -2056,7 +2094,7 @@ checking if the model flag indicates
             'function_call', default='{function_name}({input_var})',
             function_name=function_name, **kwargs)
         if nout == 0:
-            out = [call_str]
+            out = [call_str + cls.function_param.get('line_end', '')]
         elif (nout > 1) and ('assign_mult' in cls.function_param):
             out = [cls.format_function_param(
                 'assign_mult', name=kwargs['output_var'], value=call_str)]
@@ -2142,6 +2180,26 @@ checking if the model flag indicates
 
         Args:
             var (dict): Variable definition.
+
+        Returns:
+            dict: Updated variable definition.
+
+        """
+        return var
+
+    @classmethod
+    def output2input(cls, var, in_definition=True):
+        r"""Perform conversion necessary to turn an output variable
+        into an corresponding input that can be used to format a
+        function definition.
+
+        Args:
+            var (dict): Variable definition.
+            in_definition (bool, optional): If True, the returned
+                dictionary corresponds to an input variable in a
+                function definition. If False, the returned value
+                will correspond to an input to a function. Defaults to
+                True.
 
         Returns:
             dict: Updated variable definition.
@@ -2444,6 +2502,9 @@ checking if the model flag indicates
             str: Concatentated variables list.
 
         """
+        if in_inputs:
+            vars_list = [cls.output2input(x, in_definition=in_definition)
+                         for x in vars_list]
         out = cls.prepare_variables(vars_list, in_definition=in_definition,
                                     for_yggdrasil=for_yggdrasil)
         if ((('multiple_outputs' in cls.function_param)

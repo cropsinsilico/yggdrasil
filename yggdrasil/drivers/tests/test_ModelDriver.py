@@ -287,13 +287,20 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             flag_var = {'name': 'flag',
                         'datatype': 'flag',
                         'value': self.import_cls.function_param['true']}
-            function_contents = self.import_cls.write_assign_to_output(
-                'y', 'x',
-                outputs_in_inputs=outputs_in_inputs)
+            function_contents = []
+            if len(inputs) == len(outputs):
+                for i, o in zip(inputs, outputs):
+                    function_contents += self.import_cls.write_assign_to_output(
+                        o['name'], i['name'],
+                        outputs_in_inputs=outputs_in_inputs)
+            output_var = self.import_cls.prepare_output_variables(
+                outputs, in_inputs=self.import_cls.outputs_in_inputs,
+                in_definition=True)
             definition = self.import_cls.write_function_def(
-                'test_function', inputs=inputs, outputs=outputs,
+                'test_function', inputs=inputs, output_var=output_var,
                 function_contents=function_contents,
-                flag_var=flag_var, outputs_in_inputs=outputs_in_inputs)
+                flag_var=flag_var, outputs_in_inputs=outputs_in_inputs,
+                print_inputs=True, print_outputs=True)
             # Add second definition to test ability to locate specific
             # function in the presence of others
             definition.append('')
@@ -301,19 +308,22 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                 'test_function_decoy', inputs=inputs,
                 outputs=outputs, flag_var=flag_var,
                 function_contents=function_contents,
-                outputs_in_inputs=outputs_in_inputs)
+                outputs_in_inputs=outputs_in_inputs,
+                skip_interface=True)
             parsed = self.import_cls.parse_function_definition(
                 None, 'test_function', contents='\n'.join(definition),
                 outputs_in_inputs=outputs_in_inputs,
                 expected_outputs=outputs)
             self.assert_equal(len(parsed.get('inputs', [])), len(inputs))
             self.assert_equal(len(parsed.get('outputs', [])), len(outputs))
-            for xp, x0 in zip(parsed['inputs'], inputs):
-                assert(xp['name'] == x0['name'])
-                x0.update(xp)
-            for xp, x0 in zip(parsed['outputs'], outputs):
-                assert(xp['name'] == x0['name'])
-                x0.update(xp)
+            if inputs:
+                for xp, x0 in zip(parsed['inputs'], inputs):
+                    assert(xp['name'] == x0['name'])
+                    x0.update(xp)
+            if outputs:
+                for xp, x0 in zip(parsed['outputs'], outputs):
+                    assert(xp['name'] == x0['name'])
+                    x0.update(xp)
             # Lines required to set up the function call
             lines = []
             if 'declare' in self.import_cls.function_param:

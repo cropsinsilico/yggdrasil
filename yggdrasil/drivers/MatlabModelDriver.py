@@ -479,6 +479,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'fprintf': 'fprintf(\'{message}\', {variables});',
         'error': 'error(\'{error_msg}\');',
         'block_end': 'end',
+        'line_end': ';',
         'if_begin': 'if ({cond})',
         'if_elif': 'elseif ({cond})',
         'if_else': 'else',

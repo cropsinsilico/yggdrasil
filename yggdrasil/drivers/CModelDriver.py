@@ -368,6 +368,7 @@ class CModelDriver(CompiledModelDriver):
         'free_function': 'destroy_python({variable});',
         'free_instance': 'free_generic({variable});',
         'free_any': 'free_generic({variable});',
+        'print_float': 'printf("%f\\n", {object});',
         'print_complex': 'print_complex({object});',
         'print_array': 'display_json_array({object});',
         'print_object': 'display_json_object({object});',
@@ -391,6 +392,7 @@ class CModelDriver(CompiledModelDriver):
         'fprintf': 'printf(\"{message}\\n\", {variables});',
         'error': 'printf(\"{error_msg}\\n\"); return -1;',
         'block_end': '}',
+        'line_end': ';',
         'if_begin': 'if ({cond}) {{',
         'if_elif': '}} else if ({cond}) {{',
         'if_else': '}} else {{',
@@ -408,8 +410,8 @@ class CModelDriver(CompiledModelDriver):
             r'(?P<flag_type>.+?)\s*{function_name}\s*'
             r'\((?P<inputs>(?:[^{{])*?)\)\s*\{{'
             r'(?P<body>(?:.*?\n?)*?)'
-            r'(?:return *(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
-            r'|(?:\}})'),
+            r'(?:(?:return *(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
+            r'|(?:\}}))'),
         'inputs_def_regex': (
             r'\s*(?P<native_type>(?:[^\s\*])+(\s+)?'
             r'(?P<ptr>\*+)?)(?(ptr)(?(1)(?:\s*)|(?:\s+)))'
@@ -611,54 +613,57 @@ class CModelDriver(CompiledModelDriver):
         return out
     
     @classmethod
-    def parse_function_definition(cls, model_file, model_function, **kwargs):
-        r"""Get information about the inputs & outputs to a model from its
-        defintition if possible.
+    def parse_var_definition(cls, io, value, **kwargs):
+        r"""Extract information about input/output variables from a
+        string definition.
 
         Args:
-            model_file (str): Full path to the file containing the model
-                function's declaration.
-            model_function (str): Name of the model function.
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
+            io (str): Description of variables contained in the provided
+                string. Must be 'inputs' or 'outputs'.
+            value (str): String containing one or more variable definitions.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
 
         Returns:
-            dict: Parameters extracted from the function definitions.
+            list: List of information about the variables contained in
+                the provided string.
+
+        Raises:
+            AssertionError: If io is not 'inputs' or 'outputs'.
+            NotImplementedError: If the def_regex for the specified
+                io is not defined.
 
         """
-        out = super(CModelDriver, cls).parse_function_definition(
-            model_file, model_function, **kwargs)
-        # Check for length variables
-        for io in ['inputs', 'outputs']:
-            io_map = {x['name']: x for x in out.get(io, [])}
-            for i, x in enumerate(out.get(io, [])):
-                if (x['name'] + '_length') in io_map:
-                    x['length_var'] = x['name'] + '_length'
-                elif ('length_' + x['name']) in io_map:
-                    x['length_var'] = 'length_' + x['name']
-                elif (((x['name'] + '_ndim') in io_map)
-                      and ((x['name'] + '_shape') in io_map)):
-                    x['ndim_var'] = x['name'] + '_ndim'
-                    x['shape_var'] = x['name'] + '_shape'
+        out = super(CModelDriver, cls).parse_var_definition(io, value, **kwargs)
+        io_map = {x['name']: x for x in out}
+        for i, x in enumerate(out):
+            if (x['name'] + '_length') in io_map:
+                x['length_var'] = x['name'] + '_length'
+            elif ('length_' + x['name']) in io_map:
+                x['length_var'] = 'length_' + x['name']
+            elif (((x['name'] + '_ndim') in io_map)
+                  and ((x['name'] + '_shape') in io_map)):
+                x['ndim_var'] = x['name'] + '_ndim'
+                x['shape_var'] = x['name'] + '_shape'
+                x['datatype']['type'] = 'ndarray'
+            elif ((('ndim_' + x['name']) in io_map)
+                  and (('shape_' + x['name']) in io_map)):
+                x['ndim_var'] = 'ndim_' + x['name']
+                x['shape_var'] = 'shape_' + x['name']
+                x['datatype']['type'] = 'ndarray'
+            elif 'shape' in x:
+                x['datatype']['shape'] = [
+                    int(float(s.strip('[]')))
+                    for s in x.pop('shape').split('][')]
+                if 'subtype' not in x['datatype']:
+                    assert(x['datatype']['type'] in _valid_types)
+                    x['datatype']['subtype'] = x['datatype']['type']
+                if len(x['datatype']['shape']) == 1:
+                    x['datatype']['length'] = x['datatype'].pop(
+                        'shape')[0]
+                    x['datatype']['type'] = '1darray'
+                else:
                     x['datatype']['type'] = 'ndarray'
-                elif ((('ndim_' + x['name']) in io_map)
-                      and (('shape_' + x['name']) in io_map)):
-                    x['ndim_var'] = 'ndim_' + x['name']
-                    x['shape_var'] = 'shape_' + x['name']
-                    x['datatype']['type'] = 'ndarray'
-                elif 'shape' in x:
-                    x['datatype']['shape'] = [
-                        int(float(s.strip('[]')))
-                        for s in x.pop('shape').split('][')]
-                    if 'subtype' not in x['datatype']:
-                        assert(x['datatype']['type'] in _valid_types)
-                        x['datatype']['subtype'] = x['datatype']['type']
-                    if len(x['datatype']['shape']) == 1:
-                        x['datatype']['length'] = x['datatype'].pop(
-                            'shape')[0]
-                        x['datatype']['type'] = '1darray'
-                    else:
-                        x['datatype']['type'] = 'ndarray'
         return out
         
     @classmethod
@@ -754,9 +759,6 @@ class CModelDriver(CompiledModelDriver):
 
         """
         out = super(CModelDriver, cls).input2output(var)
-        if out['native_type'] != out.get('native_type_cast', out['native_type']):
-            out['native_type'] = out['native_type_cast']
-            del out['native_type_cast']
         if out.get('ptr', ''):
             assert(out['native_type'].endswith('*'))
             out['ptr'] = out['ptr'][:-1]
@@ -764,6 +766,37 @@ class CModelDriver(CompiledModelDriver):
             out['datatype'] = cls.get_json_type(out['native_type'])
         return out
 
+    @classmethod
+    def output2input(cls, var, in_definition=True):
+        r"""Perform conversion necessary to turn an output variable
+        into an corresponding input that can be used to format a
+        function definition.
+
+        Args:
+            var (dict): Variable definition.
+            in_definition (bool, optional): If True, the returned
+                dictionary corresponds to an input variable in a
+                function definition. If False, the returned value
+                will correspond to an input to a function. Defaults to
+                True.
+
+        Returns:
+            dict: Updated variable definition.
+
+        """
+        out = super(CModelDriver, cls).output2input(var)
+        if isinstance(var, dict):
+            if in_definition:
+                out = dict(out, name='*' + out['name'])
+                if ((('shape' in out.get('datatype', {}))
+                     or ('length' in out.get('datatype', {})))):
+                    out['name'] = '(%s)' % out['name']
+            else:
+                out = dict(out, name='&' + out['name'])
+                if 'shape' in out.get('datatype', {}):
+                    out['name'] += len(out['datatype']['shape']) * '[0]'
+        return out
+        
     @classmethod
     def allows_realloc(cls, var):
         r"""Determine if a variable allows the receive call to perform
@@ -986,8 +1019,6 @@ class CModelDriver(CompiledModelDriver):
             for v in x['vars']:
                 if v.get('allow_realloc', False):
                     v['name'] = '*' + v['name']
-                if 'native_type_cast' in v:
-                    v['name'] = '(%s)(%s)' % (v['native_type_cast'], v['name'])
         return super(CModelDriver, cls).write_model_function_call(
             model_function, flag_var, new_inputs, outputs, **kwargs)
         
@@ -1143,14 +1174,11 @@ class CModelDriver(CompiledModelDriver):
                     for k in ['length', 'ndim', 'shape']:
                         kvar = k + '_var'
                         if x.get(kvar, False):
-                            if x['name'].startswith('*'):
+                            if ((x['name'].startswith('*')
+                                 or x['name'].startswith('&'))):
                                 new_vars_list.append(
                                     dict(x[kvar],
-                                         name='*' + x[kvar]['name']))
-                            elif x['name'].startswith('&'):
-                                new_vars_list.append(
-                                    dict(x[kvar],
-                                         name='&' + x[kvar]['name']))
+                                         name=x['name'][0] + x[kvar]['name']))
                             else:
                                 new_vars_list.append(x[kvar])
         if in_definition:
@@ -1193,23 +1221,7 @@ class CModelDriver(CompiledModelDriver):
             str: Concatentated variables list.
 
         """
-        if in_inputs:
-            if in_definition:
-                vars_list = [
-                    dict(y, name='*' + y['name'])
-                    for y in vars_list]
-                for y in vars_list:
-                    if ((('shape' in y.get('datatype', {}))
-                         or ('length' in y.get('datatype', {})))):
-                        y['name'] = '(%s)' % y['name']
-            else:
-                vars_list = [dict(y, name='&' + y['name'])
-                             for y in vars_list]
-                if for_yggdrasil:
-                    for y in vars_list:
-                        if 'shape' in y.get('datatype', {}):
-                            y['name'] += len(y['datatype']['shape']) * '[0]'
-        else:
+        if not in_inputs:
             # If the output is a True output and not passed as an input
             # parameter, then the output should not include the type
             # information that is added if in_definition is True.
@@ -1265,7 +1277,8 @@ class CModelDriver(CompiledModelDriver):
         if not dont_add_lengths:
             for io in ['input', 'output']:
                 if io + '_var' in kwargs:
-                    io_var = cls.split_variables(kwargs.pop(io + '_var'))
+                    io_var = cls.parse_var_definition(
+                        io + 's', kwargs.pop(io + '_var'))
                 else:
                     io_var = kwargs.get(io + 's', [])
                 for x in io_var:
@@ -1309,21 +1322,15 @@ class CModelDriver(CompiledModelDriver):
             output_type = cls.get_native_type(datatype='flag')
         else:
             if 'output_var' in kwargs:
-                outputs = cls.split_variables(kwargs['output_var'])
-            else:
-                outputs = kwargs.get('outputs', [])
+                kwargs['outputs'] = cls.parse_var_definition(
+                    'outputs', kwargs.pop('output_var'))
+            outputs = kwargs.get('outputs', [])
             nout = len(outputs)
             if nout == 0:
                 output_type = 'void'
             elif nout == 1:
-                output = outputs[0]
-                if isinstance(output, str):
-                    output = re.search(cls.format_function_param(
-                        'output_def_regex'), output).groupdict()
-                    output_type = output['native_type']
-                else:
-                    output_type = cls.get_native_type(**output)
-            else:
+                output_type = cls.get_native_type(**(outputs[0]))
+            else:  # pragma: debug
                 raise ValueError("C does not support more than one "
                                  "output variable.")
         kwargs['output_type'] = output_type

@@ -84,8 +84,8 @@ class CPPModelDriver(CModelDriver):
             r'(?:\s*(?:[^\s])+(?:\s+)(?:\()?&(?:[^{{])+)+'
             r'))?\)\s*\{{'
             r'(?P<body>(?:.*?\n?)*?)'
-            r'(?:return +(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
-            r'|(?:\}})'),
+            r'(?:(?:return +(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
+            r'|(?:\}}))'),
         outputs_def_regex=(
             r'\s*(?P<native_type>(?:[^\s])+)(\s+)?'
             r'(\()?(?P<ref>&)(?(1)(?:\s*)|(?:\s+))'
@@ -166,48 +166,32 @@ class CPPModelDriver(CModelDriver):
             try_contents, except_contents, **kwargs)
 
     @classmethod
-    def prepare_output_variables(cls, vars_list, in_definition=False,
-                                 in_inputs=False, for_yggdrasil=False):
-        r"""Concatenate a set of output variables such that it can be passed as
-        a single string to the function_call parameter.
+    def output2input(cls, var, in_definition=True):
+        r"""Perform conversion necessary to turn an output variable
+        into an corresponding input that can be used to format a
+        function definition.
 
         Args:
-            vars_list (list): List of variable names to concatenate as output
-                from a function call.
-            in_definition (bool, optional): If True, the returned sequence
-                will be of the format required for specifying output
-                variables in a function definition. Defaults to False.
-            in_inputs (bool, optional): If True, the output variables should
-                be formated to be included as input variables. Defaults to
-                False.
-            for_yggdrasil (bool, optional): If True, the variables will be
-                prepared in the formated expected by calls to yggdarsil
-                send/recv methods. Defaults to False.
+            var (dict): Variable definition.
+            in_definition (bool, optional): If True, the returned
+                dictionary corresponds to an input variable in a
+                function definition. If False, the returned value
+                will correspond to an input to a function. Defaults to
+                True.
 
         Returns:
-            str: Concatentated variables list.
+            dict: Updated variable definition.
 
         """
-        if in_inputs:
+        out = super(CModelDriver, cls).output2input(var)
+        if isinstance(var, dict):
             if in_definition:
-                vars_list = [dict(y, name='&' + y['name'])
-                             for y in vars_list]
-                for y in vars_list:
-                    if ((('shape' in y.get('datatype', {}))
-                         or ('length' in y.get('datatype', {})))):
-                        y['name'] = '(%s)' % y['name']
+                out = dict(out, name='&' + out['name'])
+                if ((('shape' in out.get('datatype', {}))
+                     or ('length' in out.get('datatype', {})))):
+                    out['name'] = '(%s)' % out['name']
             else:
-                vars_list = copy.deepcopy(vars_list)
-                for y in vars_list:
-                    if not (y.get('ref', False)
-                            or (for_yggdrasil
-                                and (y.get('is_length_var', False)))):
-                        y['name'] = '&' + y['name']
-        else:
-            # If the output is a True output and not passed as an input
-            # parameter, then the output should not include the type
-            # information that is added if in_definition is True.
-            in_definition = False
-        return super(CModelDriver, cls).prepare_output_variables(
-            vars_list, in_definition=in_definition, in_inputs=in_inputs,
-            for_yggdrasil=for_yggdrasil)
+                if not (out.get('ref', False)
+                        or out.get('is_length_var', False)):
+                    out = dict(out, name='&' + out['name'])
+        return out
