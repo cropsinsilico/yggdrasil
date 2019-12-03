@@ -1,5 +1,5 @@
 echo Installing C/C++ compilation tools...
-if "%YGG_CONDA%" != "1" (
+if NOT "%YGG_CONDA%" == "1" (
   :: Get version and call appropriate script to intialize command line tools
   :: TODO: Generic case. This is specific to 64bit VS 2015/2017 (14.0/16.0)
   set "MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
