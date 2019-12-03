@@ -1338,24 +1338,18 @@ class CModelDriver(CompiledModelDriver):
             function_name, **kwargs)
         
     @classmethod
-    def write_native_type_definition(cls, name, datatype, as_seri=False,
-                                     requires_freeing=None, no_decl=False,
-                                     use_generic=False):
+    def write_native_type_definition(cls, name, datatype,
+                                     requires_freeing=None, no_decl=False):
         r"""Get lines declaring the data type within the language.
 
         Args:
             name (str): Name of variable that definition should be stored in.
             datatype (dict): Type definition.
-            as_seri (bool, optional): If True, the type variable is wrapped as
-                a serialization structure. Defaults to False.
             requires_freeing (list, optional): List that variables requiring
                 freeing should be appended to. Defaults to None.
             no_decl (bool, optional): If True, the variable is defined without
                 declaring it (assumes that variable has already been declared).
                 Defaults to False.
-            use_generic (bool, optional): If True variables serialized
-                and/or deserialized by the type will be assumed to be
-                generic objects. Defaults to False.
 
         Returns:
             list: Lines required to define a type definition.
@@ -1364,10 +1358,7 @@ class CModelDriver(CompiledModelDriver):
         out = []
         fmt = None
         keys = {}
-        if use_generic:
-            keys['use_generic'] = 'true'
-        else:
-            keys['use_generic'] = 'false'
+        keys['use_generic'] = 'false'
         typename = datatype['type']
         if datatype['type'] == 'array':
             if 'items' in datatype:
@@ -1382,8 +1373,7 @@ class CModelDriver(CompiledModelDriver):
                 for i, x in enumerate(datatype['items']):
                     out += cls.write_native_type_definition(
                         '%s_items[%d]' % (name, i), x,
-                        requires_freeing=requires_freeing, no_decl=True,
-                        use_generic=use_generic)
+                        requires_freeing=requires_freeing, no_decl=True)
                 assert(isinstance(requires_freeing, list))
                 requires_freeing += [keys['items']]
             else:
@@ -1407,8 +1397,7 @@ class CModelDriver(CompiledModelDriver):
                     out += ['%s[%d] = \"%s\"' % (keys['keys'], i, k)]
                     out += cls.write_native_type_definition(
                         '%s[%d]' % (keys['values'], i), v,
-                        requires_freeing=requires_freeing,
-                        use_generic=use_generic)
+                        requires_freeing=requires_freeing)
                 assert(isinstance(requires_freeing, list))
                 requires_freeing += [keys['values'], keys['keys']]
             else:
@@ -1470,21 +1459,15 @@ class CModelDriver(CompiledModelDriver):
         else:  # pragma: debug
             raise ValueError("Cannot create C version of type '%s'"
                              % typename)
-        # if keys['use_generic'] == 'true':
-        #     fmt = 'create_dtype_empty({use_generic})'
-        if as_seri:
-            def_line = ('seri_t* %s = init_serializer(\"%s\", %s);'
-                        % (name, typename, fmt.format(**keys)))
-        else:
-            def_line = '%s = %s;' % (name, fmt.format(**keys))
-            if not no_decl:
-                def_line = 'dtype_t* ' + def_line
+        def_line = '%s = %s;' % (name, fmt.format(**keys))
+        if not no_decl:
+            def_line = 'dtype_t* ' + def_line
         out.append(def_line)
         return out
 
     @classmethod
     def write_channel_def(cls, key, datatype=None, requires_freeing=None,
-                          use_generic=False, **kwargs):
+                          **kwargs):
         r"""Write an channel declaration/definition.
 
         Args:
@@ -1493,9 +1476,6 @@ class CModelDriver(CompiledModelDriver):
                 Defaults to None and is ignored.
             requires_freeing (list, optional): List that variables requiring
                 freeing should be appended to. Defaults to None.
-            use_generic (bool, optional): If True variables serialized
-                and/or deserialized by the channel will be assumed to be
-                generic objects. Defaults to False.
             **kwargs: Additional keyword arguments are passed as parameters
                 to format_function_param.
 
@@ -1508,8 +1488,7 @@ class CModelDriver(CompiledModelDriver):
             kwargs['channel_type'] = '%s_type' % kwargs['channel']
             out += cls.write_native_type_definition(
                 kwargs['channel_type'], datatype,
-                requires_freeing=requires_freeing,
-                use_generic=use_generic)
+                requires_freeing=requires_freeing)
         out += super(CModelDriver, cls).write_channel_def(key, datatype=datatype,
                                                           **kwargs)
         return out
