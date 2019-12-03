@@ -217,7 +217,7 @@ def deploy_package_on_ci(method):
             elif _is_linux:
                 cmds.append("./ci/install-czmq-linux.sh")
             elif _is_osx:
-                cmds.append("./ci/install-czmq-osx.sh")
+                cmds.append("bash ci/install-czmq-osx.sh")
             elif _is_win:
                 cmds.append("call ci\\install-czmq-windows.bat")
             else:
