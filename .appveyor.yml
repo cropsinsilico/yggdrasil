@@ -98,7 +98,7 @@ install:
   - if "%INSTALLC%" == "1" call "ci\\install-compilers.bat"
 
   # Build and install
-  - "python utils\\ci_setup.py deploy"
+  - "python utils\\ci_setup.py conda deploy"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
