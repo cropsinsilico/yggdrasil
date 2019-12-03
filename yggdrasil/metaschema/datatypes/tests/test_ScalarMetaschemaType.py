@@ -118,6 +118,8 @@ for t in _valid_types.keys():
     iattr_exp = copy.deepcopy(iattr_imp)
     iattr_exp['_cls'] = '%sMetaschemaType' % t.title()
     iattr_exp['_explicit'] = True
+    if t == 'float':
+        iattr_exp['_prec'] = 64
     cls_imp = type('TestScalarMetaschemaType_%s' % t,
                    (TestScalarMetaschemaType, ), iattr_imp)
     cls_exp = type('Test%s' % iattr_exp['_cls'],
