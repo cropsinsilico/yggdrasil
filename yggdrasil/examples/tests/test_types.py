@@ -1,6 +1,7 @@
 import os
 import copy
 import pprint
+import yaml
 from yggdrasil.components import import_component
 from yggdrasil.languages import get_language_ext
 from yggdrasil.metaschema.datatypes import get_type_class
@@ -68,7 +69,8 @@ class TestExampleTypes(ExampleTstBase):
 
     @classmethod
     def setup_model(cls, language, typename, language_ext=None,
-                    using_pointers=False, using_generics=False):
+                    using_pointers=False, using_generics=False,
+                    **kwargs):
         r"""Write the model file for the specified combination of
         language and type.
 
@@ -85,6 +87,9 @@ class TestExampleTypes(ExampleTstBase):
                 language has a dedicated generic class, the generic
                 type will be used rather than explict types. Defaults
                 to False.
+            **kwargs: Additional keyword arguments are passed to
+                the write_function_def class method of the language
+                driver.
 
         Returns:
             str: Full path to the file that was written.
@@ -117,7 +122,7 @@ class TestExampleTypes(ExampleTstBase):
             inputs=inputs, outputs=outputs,
             outputs_in_inputs=drv.outputs_in_inputs,
             opening_msg='IN MODEL', closing_msg='MODEL EXIT',
-            print_inputs=True, print_outputs=True)
+            print_inputs=True, print_outputs=True, **kwargs)
         with open(modelfile, 'w') as fd:
             print(modelfile)
             print('\n'.join(lines))
@@ -138,6 +143,18 @@ class TestExampleTypes(ExampleTstBase):
             elif typename in ['string', 'bytes', 'unicode']:
                 in_vars += ', x_length'
                 out_vars += ', y_length'
+            elif typename in ['array', 'object']:
+                indent = '\n        '
+                in_vars = (
+                    in_vars + indent[:-2] + 'datatype:' + indent
+                    + yaml.dump(inputs[0]['datatype']).replace(
+                        '\n', indent))
+                out_vars = (
+                    out_vars + indent[:-2] + 'datatype:' + indent
+                    + yaml.dump(outputs[0]['datatype']).replace(
+                        '\n', indent))
+                in_vars = in_vars.replace("units: ''", '')
+                out_vars = out_vars.replace("units: ''", '')
             os.environ['TEST_MODEL_IO'] = (
                 'inputs:\n'
                 '      name: input\n'

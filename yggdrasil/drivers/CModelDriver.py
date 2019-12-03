@@ -764,6 +764,10 @@ class CModelDriver(CompiledModelDriver):
             out['ptr'] = out['ptr'][:-1]
             out['native_type'] = out['native_type'][:-1]
             out['datatype'] = cls.get_json_type(out['native_type'])
+            if (((out['datatype']['type'] == '1darray')
+                 and var.get('ndim_var', False)
+                 and var.get('shape_var', False))):
+                out['datatype']['type'] = 'ndarray'
         return out
 
     @classmethod
@@ -1338,7 +1342,7 @@ class CModelDriver(CompiledModelDriver):
             function_name, **kwargs)
         
     @classmethod
-    def write_native_type_definition(cls, name, datatype,
+    def write_native_type_definition(cls, name, datatype, name_base=None,
                                      requires_freeing=None, no_decl=False):
         r"""Get lines declaring the data type within the language.
 
@@ -1360,11 +1364,14 @@ class CModelDriver(CompiledModelDriver):
         keys = {}
         keys['use_generic'] = 'false'
         typename = datatype['type']
+        if name_base is None:
+            name_base = name
         if datatype['type'] == 'array':
+            keys['use_generic'] = 'true'
             if 'items' in datatype:
                 assert(isinstance(datatype['items'], list))
                 keys['nitems'] = len(datatype['items'])
-                keys['items'] = '%s_items' % name
+                keys['items'] = '%s_items' % name_base
                 fmt = ('create_dtype_json_array({nitems}, {items}, '
                        '{use_generic})')
                 out += [('dtype_t** %s = '
@@ -1372,7 +1379,8 @@ class CModelDriver(CompiledModelDriver):
                         % (keys['items'], keys['nitems'])]
                 for i, x in enumerate(datatype['items']):
                     out += cls.write_native_type_definition(
-                        '%s_items[%d]' % (name, i), x,
+                        '%s[%d]' % (keys['items'], i), x,
+                        name_base=('%s_item%d' % (name_base, i)),
                         requires_freeing=requires_freeing, no_decl=True)
                 assert(isinstance(requires_freeing, list))
                 requires_freeing += [keys['items']]
@@ -1384,8 +1392,8 @@ class CModelDriver(CompiledModelDriver):
             if 'properties' in datatype:
                 assert(isinstance(datatype['properties'], dict))
                 keys['nitems'] = len(datatype['properties'])
-                keys['keys'] = '%s_keys' % name
-                keys['values'] = '%s_vals' % name
+                keys['keys'] = '%s_keys' % name_base
+                keys['values'] = '%s_vals' % name_base
                 fmt = ('create_dtype_json_object({nitems}, {keys}, '
                        '{values}, {use_generic})')
                 out += [('dtype_t** %s = '
@@ -1394,10 +1402,11 @@ class CModelDriver(CompiledModelDriver):
                         ('char** %s = (char**)malloc(%d*sizeof(char*));')
                         % (keys['keys'], keys['nitems'])]
                 for i, (k, v) in enumerate(datatype['properties'].items()):
-                    out += ['%s[%d] = \"%s\"' % (keys['keys'], i, k)]
+                    out += ['%s[%d] = \"%s\";' % (keys['keys'], i, k)]
                     out += cls.write_native_type_definition(
                         '%s[%d]' % (keys['values'], i), v,
-                        requires_freeing=requires_freeing)
+                        name_base=('%s_prop%d' % (name_base, i)),
+                        requires_freeing=requires_freeing, no_decl=True)
                 assert(isinstance(requires_freeing, list))
                 requires_freeing += [keys['values'], keys['keys']]
             else:
@@ -1417,7 +1426,7 @@ class CModelDriver(CompiledModelDriver):
             for k in ['subtype', 'precision']:
                 keys[k] = datatype[k]
             if 'shape' in datatype:
-                shape_var = '%s_shape' % name
+                shape_var = '%s_shape' % name_base
                 out += ['size_t %s[%d] = {%s};' % (
                     shape_var, len(datatype['shape']),
                     ', '.join([str(s) for s in datatype['shape']]))]

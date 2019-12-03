@@ -14,6 +14,7 @@ from yggdrasil import platform, tools, backwards, languages
 from yggdrasil.config import ygg_cfg, locate_file, update_language_config
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
+from yggdrasil.metaschema.datatypes import is_default_typedef
 from threading import Event
 try:
     from Queue import Queue, Empty
@@ -1521,12 +1522,23 @@ class ModelDriver(Driver):
                     for v in x['vars']:
                         if not v.get('is_length_var', False):
                             non_length.append(v)
-                    if (len(non_length) == 1):
-                        x['datatype'] = non_length[0]['datatype']
+                    if ((x.get('datatype', None)
+                         and (not is_default_typedef(x['datatype'])))):
+                        if (len(non_length) == 1):
+                            non_length[0]['datatype'] = x['datatype']
+                        else:
+                            assert(x['datatype']['type'] == 'array')
+                            assert(len(x['datatype']['items'])
+                                   == len(non_length))
+                            for v, t in zip(non_length, x['datatype']['items']):
+                                v['datatype'] = t
                     else:
-                        x['datatype'] = {
-                            'type': 'array',
-                            'items': [v['datatype'] for v in non_length]}
+                        if (len(non_length) == 1):
+                            x['datatype'] = non_length[0]['datatype']
+                        else:
+                            x['datatype'] = {
+                                'type': 'array',
+                                'items': [v['datatype'] for v in non_length]}
                     for v in x['vars']:
                         if 'native_type' not in v:
                             v['native_type'] = cls.get_native_type(**v)

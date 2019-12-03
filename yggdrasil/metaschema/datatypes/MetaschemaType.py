@@ -9,7 +9,7 @@ from yggdrasil.metaschema import (get_metaschema, get_validator, encoder,
                                   validate_instance)
 from yggdrasil.metaschema.datatypes import (
     MetaschemaTypeError, MetaschemaTypeMeta, compare_schema, YGG_MSG_HEAD,
-    get_type_class, conversions)
+    get_type_class, conversions, is_default_typedef)
 from yggdrasil.metaschema.properties import get_metaschema_property
 
 
@@ -612,7 +612,7 @@ class MetaschemaType(object):
         conv_func = None
         if isinstance(metadata, dict):
             metatype = metadata.get('type', None)
-            if (metatype not in [None, 'bytes']) and (typedef == {'type': 'bytes'}):
+            if (metatype not in [None, 'bytes']) and is_default_typedef(typedef):
                 new_cls = get_type_class(metatype)
                 return new_cls.decode(metadata, data, dont_check=dont_check)
             if metatype != cls.name:
@@ -717,7 +717,7 @@ class MetaschemaType(object):
             if metadata is None:
                 metadata = dict(size=len(msg))
                 if (((len(msg) > 0) and (msg != tools.YGG_MSG_EOF)
-                     and (self._typedef != {'type': 'bytes'})
+                     and (not is_default_typedef(self._typedef))
                      and (not dont_decode))):
                     raise ValueError("Header marker not in message.")
         # Set flags based on data

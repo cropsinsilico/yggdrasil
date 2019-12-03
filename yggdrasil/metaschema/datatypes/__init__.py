@@ -22,6 +22,22 @@ class MetaschemaTypeError(TypeError):
     pass
 
 
+_default_typedef = {'type': 'bytes'}
+
+
+def is_default_typedef(typedef):
+    r"""Determine if a type definition is the default type definition.
+
+    Args:
+        typedef (dict): Type definition to test.
+
+    Returns:
+        bool: True if typedef is the default, False otherwise.
+
+    """
+    return (typedef == _default_typedef)
+
+
 def register_type(type_class):
     r"""Register a type class, recording methods for encoding/decoding.
 

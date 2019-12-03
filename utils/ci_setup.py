@@ -31,7 +31,6 @@ def call_script(lines):
         error_check = 'if %errorlevel% neq 0 exit /b %errorlevel%'
         for i in range(len(lines), 0, -1):
             lines.insert(i, error_check)
-        lines.append(error_check)
     else:
         script_ext = '.sh'
         if lines[0] != '#!/bin/bash':
@@ -51,7 +50,10 @@ def call_script(lines):
         else:
             call_cmd = ['./%s' % fname]
             os.chmod(fname, 0o755)
-        subprocess.check_call(call_cmd, **call_kws)
+        print(subprocess.check_output(call_cmd, **call_kws))
+    except subprocess.CalledProcessError as e:
+        print(e.output)
+        raise
     finally:
         if os.path.isfile(fname):
             os.remove(fname)
