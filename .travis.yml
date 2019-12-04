@@ -166,6 +166,12 @@ after_success:
     codecov
 
 
+stages:
+  - warm-up
+  - test
+  - deploy
+
+
 jobs:
   fast_finish: true
   include:
