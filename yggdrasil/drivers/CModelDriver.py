@@ -746,7 +746,7 @@ class CModelDriver(CompiledModelDriver):
                         v['allow_realloc'] = True
         for x in inputs + outputs:
             if x['datatype']['type'] == 'array':
-                if len(x['datatype']['items']) == len(x['vars']):
+                if len(x['datatype'].get('items', [])) == len(x['vars']):
                     x['use_generic'] = False
                 else:
                     x['use_generic'] = True
