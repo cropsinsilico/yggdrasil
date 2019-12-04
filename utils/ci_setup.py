@@ -15,6 +15,8 @@ INSTALLAPY = (os.environ.get('INSTALLAPY', '0') == '1')
 INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
 INSTALLRMQ = (os.environ.get('INSTALLRMQ', '0') == '1')
 BUILDDOCS = (os.environ.get('BUILDDOCS', '0') == '1')
+CONDA_PREFIX = os.environ.get('CONDA_PREFIX', False)
+_in_conda = bool(CONDA_PREFIX)
 
 
 def call_script(lines):
@@ -131,14 +133,16 @@ def deploy_package_on_ci(method):
     ]
     install_req = os.path.join("utils", "install_from_requirements.py")
     if method == 'conda':
+        if not _in_conda:  # pragma: debug
+            raise RuntimeError("Could not detect conda environment. "
+                               "Cannot proceed with a conda deployment.")
         cmds += [
-            "%s install -q conda-build conda-verify" % conda_cmd,
-            "%s info -a" % conda_cmd,
-            "%s install %s %s %s" % (
+            "%s install -q conda-build conda-verify %s %s %s" % (
                 conda_cmd,
                 os.environ.get('NUMPY', 'numpy'),
                 os.environ.get('MATPLOTLIB', 'matplotlib'),
                 os.environ.get('JSONSCHEMA', 'jsonschema')),
+            "%s info -a" % conda_cmd,
             "python %s conda requirements_testing.txt" % install_req
         ]
         if BUILDDOCS:
@@ -174,12 +178,21 @@ def deploy_package_on_ci(method):
             "%s list" % conda_cmd
         ]
     elif method == 'pip':
+        # Uninstall conda versions when inside conda env
         # May need to uninstall conda version of numpy and matplotlib
         # on LPy test
+        if _in_conda:
+            cmds += ["%s uninstall numpy" % conda_cmd]
         if _is_win:  # pragma: windows
+            if not _in_conda:  # pragma: debug
+                raise RuntimeError("Could not detect conda environment. "
+                                   "Cannot proceed with a conda deployment "
+                                   "(required on windows).")
             # Installing via pip causes import error
             cmds += [
-                "%s install %NUMPY% scipy" % conda_cmd,
+                "%s install %s scipy" % (
+                    conda_cmd,
+                    os.environ.get('NUMPY', 'numpy')),
                 "pip install %s %s" % (
                     os.environ.get('MATPLOTLIB', 'matplotlib'),
                     os.environ.get('JSONSCHEMA', 'jsonschema'))
@@ -215,6 +228,10 @@ def deploy_package_on_ci(method):
                 "pip install astropy"
             ]
         if INSTALLLPY:
+            if not _in_conda:  # pragma: debug
+                raise RuntimeError("Could not detect conda environment. "
+                                   "Cannot proceed with a conda deployment "
+                                   "(required for LPy).")
             cmds += [
                 "echo Installing LPy...",
                 "%s install openalea.lpy boost=1.66.0 -c openalea" % conda_cmd
@@ -254,6 +271,8 @@ def deploy_package_on_ci(method):
             "pip list",
             "python create_coveragerc.py"
         ]
+        if _in_conda:
+            cmds.append("%s list" % conda_cmd)
     else:  # pragma: debug
         raise ValueError("Method must be 'conda' or 'pip', not '%s'"
                          % method)
