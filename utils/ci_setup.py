@@ -70,18 +70,22 @@ def setup_package_on_ci(method, python):
     """
     cmds = []
     major, minor = [int(x) for x in python.split('.')]
+    if _is_win:
+        conda_cmd = 'call conda'
+    else:
+        conda_cmd = 'conda'
     if method == 'conda':
         cmds += [
             "echo Installing Python using conda...",
             # Configure conda
-            "conda config --set always_yes yes --set changeps1 no",
-            # "conda config --set channel_priority strict",
-            "conda config --add channels conda-forge",
-            "conda update -q conda",
-            "conda create -q -n test-environment python=%s" % python
+            "%s config --set always_yes yes --set changeps1 no" % conda_cmd,
+            # "%s config --set channel_priority strict" % conda_cmd,
+            "%s config --add channels conda-forge" % conda_cmd,
+            "%s update -q conda" % conda_cmd,
+            "%s create -q -n test-environment python=%s" % (conda_cmd, python)
         ]
     elif method == 'pip':
-        if INSTALLLPY:
+        if INSTALLLPY or _is_win:
             setup_package_on_ci('conda', python)
         elif _is_osx:
             cmds.append("echo Installing Python using virtualenv...")
@@ -109,6 +113,10 @@ def deploy_package_on_ci(method):
         ValueError: If method is not 'conda' or 'pip'.
 
     """
+    if _is_win:
+        conda_cmd = 'call conda'
+    else:
+        conda_cmd = 'conda'
     cmds = [
         # Check that we have the expected version of Python
         "python --version",
@@ -124,9 +132,10 @@ def deploy_package_on_ci(method):
     install_req = os.path.join("utils", "install_from_requirements.py")
     if method == 'conda':
         cmds += [
-            "conda install -q conda-build conda-verify",
-            "conda info -a",
-            "conda install %s %s %s" % (
+            "%s install -q conda-build conda-verify" % conda_cmd,
+            "%s info -a" % conda_cmd,
+            "%s install %s %s %s" % (
+                conda_cmd,
                 os.environ.get('NUMPY', 'numpy'),
                 os.environ.get('MATPLOTLIB', 'matplotlib'),
                 os.environ.get('JSONSCHEMA', 'jsonschema')),
@@ -139,30 +148,30 @@ def deploy_package_on_ci(method):
         if INSTALLAPY:
             cmds += [
                 "echo Installing AstroPy...",
-                "conda install astropy"
+                "%s install astropy" % conda_cmd
             ]
         if INSTALLLPY:
             cmds += [
                 "echo Installing LPy...",
-                "conda install openalea.lpy boost=1.66.0 -c openalea"
+                "%s install openalea.lpy boost=1.66.0 -c openalea" % conda_cmd
             ]
         if INSTALLRMQ:
             cmds += [
                 "echo Installing Pika...",
-                "conda install \"pika<1.0.0b1\""
+                "%s install \"pika<1.0.0b1\"" % conda_cmd
             ]
         # Temp fix to install missing dependencies from jsonschema
         if PY2:
-            cmds.append("conda install contextlib2 pathlib2 "
-                        "\"configparser >=3.5\"")
+            cmds.append(("%s install contextlib2 pathlib2 "
+                         "\"configparser >=3.5\"") % conda_cmd)
         index_dir = os.path.join("${CONDA_PREFIX}", "conda-bld")
         cmds += [
             # Install from conda build
-            "conda build %s --python %s" % (
-                os.path.join('recipe', 'meta.yaml'), PYVER),
-            "conda index %s" % index_dir,
-            "conda install -c file:/${CONDA_PREFIX}/conda-bld yggdrasil",
-            "conda list"
+            "%s build %s --python %s" % (
+                conda_cmd, os.path.join('recipe', 'meta.yaml'), PYVER),
+            "%s index %s" % (conda_cmd, index_dir),
+            "%s install -c file:/${CONDA_PREFIX}/conda-bld yggdrasil" % conda_cmd,
+            "%s list" % conda_cmd
         ]
     elif method == 'pip':
         # May need to uninstall conda version of numpy and matplotlib
@@ -170,7 +179,7 @@ def deploy_package_on_ci(method):
         if _is_win:  # pragma: windows
             # Installing via pip causes import error
             cmds += [
-                "conda install %NUMPY% scipy",
+                "%s install %NUMPY% scipy" % conda_cmd,
                 "pip install %s %s" % (
                     os.environ.get('MATPLOTLIB', 'matplotlib'),
                     os.environ.get('JSONSCHEMA', 'jsonschema'))
@@ -189,7 +198,7 @@ def deploy_package_on_ci(method):
         if INSTALLR:
             cmds.append("echo Installing R...")
             if INSTALLLPY or _is_win:
-                cmds.append("conda install r-base")
+                cmds.append("%s install r-base" % conda_cmd)
             elif _is_linux:
                 cmds += ["sudo apt-get install r-base",
                          "sudo apt-get install libudunits2-dev"]
@@ -208,12 +217,12 @@ def deploy_package_on_ci(method):
         if INSTALLLPY:
             cmds += [
                 "echo Installing LPy...",
-                "conda install openalea.lpy boost=1.66.0 -c openalea"
+                "%s install openalea.lpy boost=1.66.0 -c openalea" % conda_cmd
             ]
         if INSTALLZMQ:
             cmds.append("echo Installing ZeroMQ...")
             if INSTALLLPY:
-                cmds.append("conda install czmq zeromq")
+                cmds.append("%s install czmq zeromq" % conda_cmd)
             elif _is_linux:
                 cmds.append("./ci/install-czmq-linux.sh")
             elif _is_osx:

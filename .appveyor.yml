@@ -95,7 +95,7 @@ install:
   # - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda env %PYTHON_VERSION%"
   # - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip env %PYTHON_VERSION%"
 
-  # Activate environment
+  # Activate environment (should be conda reguardless)
   - "activate test-environment"
   
   # Setup Visual C++ toolset
