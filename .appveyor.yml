@@ -109,6 +109,7 @@ install:
   - "python utils\\ci_setup.py pip deploy"
   # - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda deploy"
   # - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip deploy"
+  - "echo %PATH%"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
