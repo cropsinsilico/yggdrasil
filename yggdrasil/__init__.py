@@ -143,6 +143,18 @@ def run_tsts(**kwargs):  # pragma: no cover
     parser.add_argument('--language', '--languages', default=[],
                         nargs="+", type=str,
                         help='Language(s) that should be tested.')
+    suite_args = ('--test-suite', '--test-suites')
+    suite_kws = dict(nargs='+', action="extend", type=str,
+                     choices=['examples', 'types', 'timing'],
+                     help='Test suite(s) that should be run.',
+                     dest='test_suites')
+    try:
+        parser.add_argument(*suite_args, **suite_kws)
+    except ValueError:
+        # 'extend' introduced in 3.8
+        suite_kws['action'] = 'append'
+        suite_kws.pop('nargs')
+        parser.add_argument(*suite_args, **suite_kws)
     args, extra_argv = parser.parse_known_args()
     initial_dir = os.getcwd()
     package_dir = os.path.dirname(os.path.abspath(__file__))
@@ -163,6 +175,19 @@ def run_tsts(**kwargs):  # pragma: no cover
                 opt_val = 1
         else:
             test_paths.append(x)
+    if args.test_suites:
+        for x in args.test_suites:
+            if x == 'examples':
+                args.withexamples = True
+                test_paths.append('examples')
+            elif x == 'types':
+                args.withexamples = True
+                args.longrunning = True
+                test_paths.append(os.path.join('examples', 'tests',
+                                               'test_types.py'))
+            elif x == 'timing':
+                args.longrunning = True
+                test_paths.append(os.path.join('tests', 'test_timing.py'))
     if _test_package_name == 'nose':
         argv += ['--detailed-errors', '--exe']
     if args.verbose:
@@ -218,6 +243,10 @@ def run_tsts(**kwargs):  # pragma: no cover
             os.environ['COVERAGE_PROCESS_START'] = 'True'
             with open(pth_file, 'w') as fd:
                 fd.write("import coverage; coverage.process_startup()")
+        if 'timing' in args.test_suites:
+            old_env['YGG_TEST_PRODUCTION_RUNS'] = os.environ.get(
+                'YGG_TEST_PRODUCTION_RUNS', None)
+            os.environ['YGG_TEST_PRODUCTION_RUNS'] = 'True'
         old_env['YGG_SKIP_COMPONENT_VALIDATION'] = os.environ.get(
             'YGG_SKIP_COMPONENT_VALIDATION', None)
         if old_env['YGG_SKIP_COMPONENT_VALIDATION'] is None:
