@@ -281,10 +281,10 @@ def run_tsts(**kwargs):  # pragma: no cover
         # Perform CI specific pretest operations
         if args.ci:
             top_dir = os.path.dirname(os.getcwd())
-            src_cmd = ('python -c \'import versioneer; '
-                       'print(versioneer.get_version())\'')
-            dst_cmd = ('python -c \'import yggdrasil; '
-                       'print(yggdrasil.__version__)\'')
+            src_cmd = ('python -c \"import versioneer; '
+                       'print(versioneer.get_version())\"')
+            dst_cmd = ('python -c \"import yggdrasil; '
+                       'print(yggdrasil.__version__)\"')
             src_ver = subprocess.check_output(src_cmd, shell=True)
             dst_ver = subprocess.check_output(dst_cmd, shell=True,
                                               cwd=top_dir)
