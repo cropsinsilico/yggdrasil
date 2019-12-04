@@ -41,9 +41,10 @@ env:
     YGG_RUN_TIME_TESTS=0
     YGG_ENABLE_LONG_TESTS=0
     YGG_TYPES_LANGUAGES=
+    YGG_TEST_FLAGS=
   matrix:
-    - YGG_ENABLE_LONG_TESTS=1
-    - YGG_RUN_EXAMPLES=1 YGG_RUN_ALL_TESTS=0
+    - YGG_TEST_FLAGS="--long-running"
+    - YGG_TEST_FLAGS="--test-suite=examples"
     - YGG_CONDA=yes
 
 before_install:
@@ -156,7 +157,7 @@ install:
 
 script:
   - sh ci/pretest_script.sh || travis_terminate 1;
-  - sh ci/test_script.sh || travis_terminate 1;
+  - yggtest --ci $YGG_TEST_FLAGS
 
 
 after_success:
@@ -169,6 +170,18 @@ jobs:
   fast_finish: true
   include:
 
+    # Warm-up cache
+    - stage: warm-up
+      os: osx
+      python: 2.7
+      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+      cache:
+        pip: false
+        directories:
+          - $HOME/Library/Caches/pip
+          - $HOME/Library/Caches/Homebrew
+      env: YGG_PYTHON=2.7
+      script: true
     # Tests
     - stage: test
       os: linux
@@ -177,53 +190,74 @@ jobs:
       env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 JSONSCHEMA=jsonschema==2.6.0 INSTALLZMQ=0 INSTALLRMQ=1 INSTALLLPY=1 INSTALLR=0
       services:
         - rabbitmq
+      script:
+        - sh ci/pretest_script.sh || travis_terminate 1;
+        - yggtest --ci
     - os: linux
       python: 3.4
-      env: YGG_ENABLE_LONG_TESTS=1
       script:
         - sh ci/pretest_script.sh || travis_terminate 1;
         - yggconfig --remove-file
-        - yggtest -c setup.cfg --cov-config=.coveragerc --long-running tests/test_backwards.py
+        - yggtest --ci --long-running tests/test_backwards.py
     - os: linux
       python: 3.6
-      env: INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=1 YGG_SKIP_COMPONENT_VALIDATION=0
+      env: INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=1
+      script:
+        - sh ci/pretest_script.sh || travis_terminate 1;
+        - yggtest --ci --validate-components
     # Python >=3.7 requires special dist
     - os: linux
       python: 3.6
-      env: YGG_DEFAULT_COMM=ZMQComm YGG_ENABLE_LONG_TESTS=1 YGG_TEST_PRODUCTION_RUNS=1 YGG_RUN_TIME_TESTS=1
+      env: YGG_DEFAULT_COMM=ZMQComm
       dist: xenial
       sudo: true
+      script:
+        - sh ci/pretest_script.sh || travis_terminate 1;
+        - yggtest --ci --timing
     - os: linux
       python: 3.6
-      env: YGG_RUN_TYPES_EXAMPLES=1 YGG_RUN_ALL_TESTS=0 YGG_TYPES_LANGUAGES="r c"
+      script:
+        - sh ci/pretest_script.sh || travis_terminate 1;
+        - yggtest --ci --types --languages r c
     - os: linux
       python: 3.6
-      env: YGG_RUN_TYPES_EXAMPLES=1 YGG_RUN_ALL_TESTS=0 YGG_TYPES_LANGUAGES="matlab python cpp"
+      script:
+        - sh ci/pretest_script.sh || travis_terminate 1;
+        - yggtest --ci --types --languages matlab python cpp
     - os: linux
       env: YGG_ENABLE_LONG_TESTS=1
       python: 3.8
       dist: xenial
       sudo: true
+      script:
+        - sh ci/pretest_script.sh || travis_terminate 1;
+        - yggtest --ci
 
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
     - os: osx
       python: 2.7
-      env: YGG_PYTHON=2.7  # YGG_ENABLE_LONG_TESTS=1
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
         pip: false
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
+      env: YGG_PYTHON=2.7
+      script:
+        - sh ci/pretest_script.sh || travis_terminate 1;
+        - yggtest --ci --long-running
     - os: osx
       python: 3.7
-      env: YGG_CONDA=3.7 INSTALLRMQ=1 YGG_ENABLE_LONG_TESTS=1
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
         pip: false
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
+      env: YGG_CONDA=3.7 INSTALLRMQ=1
+      script:
+        - sh ci/pretest_script.sh || travis_terminate 1;
+        - yggtest --ci --long-running
     - name: "Build docs"
       python: 3.6
       env: BUILDDOCS=1

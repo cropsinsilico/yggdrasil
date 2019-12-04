@@ -117,7 +117,13 @@ def run_tsts(**kwargs):  # pragma: no cover
          True, {'help': 'Stop after first test failure.'}),
         (['nologcapture'], ['logcapture'],
          True, {'help': ('Don\'t capture output from log '
-                         'messages generated during tests.')})]
+                         'messages generated during tests.')}),
+        (['validatecomponents', 'validate-components'],
+         ['skipcomponentvalidation', 'skip-component-validation'],
+         False,
+         {'help': ('Validate components on creation. This causes '
+                   'a decrease in performance so it is turned off '
+                   'by default.')})]
     for pos_dest, neg_dest, default, kws in arguments:
         dest = pos_dest[0]
         for x in [pos_dest, neg_dest]:
@@ -143,6 +149,10 @@ def run_tsts(**kwargs):  # pragma: no cover
     parser.add_argument('--language', '--languages', default=[],
                         nargs="+", type=str,
                         help='Language(s) that should be tested.')
+    parser.add_argument('--ci',
+                        help=('Perform addition operations required '
+                              'for testing on continuous integration '
+                              'services.'))
     suite_args = ('--test-suite', '--test-suites')
     suite_kws = dict(nargs='+', action="extend", type=str,
                      choices=['examples', 'types', 'timing'],
@@ -159,6 +169,9 @@ def run_tsts(**kwargs):  # pragma: no cover
     initial_dir = os.getcwd()
     package_dir = os.path.dirname(os.path.abspath(__file__))
     error_code = 0
+    # Peform ci tests/operations
+    # Call bash script?
+    extra_argv += ['-c', 'setup.cfg', '--cov-config=.coveragerc']
     # Separate out paths from options
     argv = [test_cmd]
     test_paths = []
@@ -247,10 +260,11 @@ def run_tsts(**kwargs):  # pragma: no cover
             old_env['YGG_TEST_PRODUCTION_RUNS'] = os.environ.get(
                 'YGG_TEST_PRODUCTION_RUNS', None)
             os.environ['YGG_TEST_PRODUCTION_RUNS'] = 'True'
-        old_env['YGG_SKIP_COMPONENT_VALIDATION'] = os.environ.get(
-            'YGG_SKIP_COMPONENT_VALIDATION', None)
-        if old_env['YGG_SKIP_COMPONENT_VALIDATION'] is None:
-            os.environ['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
+        if not args.validatecomponents:
+            old_env['YGG_SKIP_COMPONENT_VALIDATION'] = os.environ.get(
+                'YGG_SKIP_COMPONENT_VALIDATION', None)
+            if old_env['YGG_SKIP_COMPONENT_VALIDATION'] is None:
+                os.environ['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
         error_code = subprocess.call(argv)
     except BaseException:
         logger.exception('Error in running test.')

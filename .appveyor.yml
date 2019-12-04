@@ -31,12 +31,8 @@ environment:
     INSTALLR: 1
     INSTALLC: 1
     BUILDDOCS: 0
-    YGG_RUN_ALL_TESTS: 1
-    YGG_RUN_EXAMPLES: 0
-    YGG_RUN_TYPES_EXAMPLES: 0
-    YGG_RUN_TIME_TESTS: 0
-    YGG_ENABLE_LONG_TESTS: 0
     YGG_CONDA: 1
+    YGG_TEST_FLAGS:
 
   erlang_download_url: "http://erlang.org/download/otp_win64_20.2.exe"
   erlang_exe_path: "C:\\Users\\appveyor\\erlang.exe"
@@ -52,18 +48,16 @@ environment:
       INSTALLC: 0
     - platform: x64
       PYTHON_VERSION: "2.7"
-      YGG_ENABLE_LONG_TESTS: 1
+      YGG_TEST_FLAGS: "--long-running"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_ENABLE_LONG_TESTS: 1
+      YGG_TEST_FLAGS: "--long-running"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_RUN_EXAMPLES: 1
-      YGG_RUN_ALL_TESTS: 0
+      YGG_TEST_FLAGS: "--test-suite=examples"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_RUN_TYPES_EXAMPLES: 1
-      YGG_RUN_ALL_TESTS: 0
+      YGG_TEST_FLAGS: "--test-suite=types"
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
@@ -104,7 +98,7 @@ install:
   # Setup environment
   # Currently conda is used reguardless of the installation method as
   # that is how python is installed by appveyor
-  - "python utils\\ci_setup.py conda env %PYTHON_VERSION%"
+  - "python utils\\ci_setup.py pip env %PYTHON_VERSION%"
   # - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda env %PYTHON_VERSION%"
   # - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip env %PYTHON_VERSION%"
 
@@ -138,10 +132,7 @@ before_test:
 
 test_script:
   - "type .coveragerc"
-  - "if %YGG_RUN_TYPES_EXAMPLES% == 1 yggtest -c setup.cfg --cov-config=.coveragerc examples\\tests\\test_types.py --with-examples --long-running"
-  - "if %YGG_RUN_EXAMPLES% == 1 yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples"
-  - "if %YGG_RUN_ALL_TESTS% == 1 yggtest -c setup.cfg --cov-config=.coveragerc"
-  - "if %YGG_RUN_TIME_TESTS% == 1 yggtest -c setup.cfg --cov-config=.coveragerc --long-running tests\\test_timing.py"
+  - "yggtest --ci %YGG_TEST_FLAGS%"
 
 after_test:
   - "codecov"

@@ -33,7 +33,6 @@ Refactor
 * Split drivers into separate directories for model drivers and connection drivers
 * Change configuration so that it is only run on import if the configuration file dosn't exist, otherwise config must be done explicitly
 * Change how CLI arguments are added to the arg parser for the language installer to use subparsers
-* Add shortcuts for running timing/types tests and add those explicitly to the tests sections in the CI yamls rather than using environment variables to control the tests
 
 New feature/example
 -------------------
