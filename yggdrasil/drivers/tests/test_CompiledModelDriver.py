@@ -20,16 +20,19 @@ def test_find_compilation_tool():
 def test_get_compilation_tool():
     r"""Test get_compilation_tool for different name variations."""
     from yggdrasil.drivers.CModelDriver import CModelDriver
-    tooltype = 'compiler'
-    out = CModelDriver.get_tool('compiler').__class__
-    toolname = out.toolname.lower()
-    toolpath = os.path.join('somedir', toolname)
-    toolfile = toolpath + '.exe'
-    vals = [toolname.upper(), toolpath, toolfile, toolfile.upper()]
-    for v in vals:
-        assert_equal(CompiledModelDriver.get_compilation_tool(tooltype, v), out)
-    assert_raises(ValueError, CompiledModelDriver.get_compilation_tool,
-                  'compiler', 'invalid')
+    if CModelDriver.is_language_installed():
+        tooltype = 'compiler'
+        out = CModelDriver.get_tool('compiler').__class__
+        toolname = out.toolname.lower()
+        toolpath = os.path.join('somedir', toolname)
+        toolfile = toolpath + '.exe'
+        vals = [toolname.upper(), toolpath, toolfile, toolfile.upper()]
+        for v in vals:
+            assert_equal(CompiledModelDriver.get_compilation_tool(tooltype, v), out)
+        assert_raises(ValueError, CompiledModelDriver.get_compilation_tool,
+                      'compiler', 'invalid')
+    else:
+        assert_raises(NotImplementedError, CModelDriver.get_tool, 'compiler')
 
 
 def test_CompilationToolBase():
