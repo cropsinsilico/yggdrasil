@@ -440,7 +440,7 @@ class CModelDriver(CompiledModelDriver):
         CompiledModelDriver.after_registration(cls)
         archiver = cls.get_tool('archiver', default=None)
         linker = cls.get_tool('linker', default=None)
-        if archiver is not None:
+        if archiver:
             if _python_lib.endswith(archiver.library_ext):
                 cls.external_libraries['python']['libtype'] = 'static'
                 cls.external_libraries['python']['static'] = _python_lib
@@ -458,7 +458,7 @@ class CModelDriver(CompiledModelDriver):
                 else:
                     tool = linker
                     kwargs = {'build_library': True}
-                if tool is not None:
+                if tool:
                     cls.external_libraries[x][libtype] = tool.get_output_file(
                         x, **kwargs)
         # Platform specific regex internal library
