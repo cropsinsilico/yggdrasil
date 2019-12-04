@@ -31,7 +31,10 @@ environment:
     INSTALLR: 1
     INSTALLC: 1
     BUILDDOCS: 0
+    YGG_RUN_ALL_TESTS: 1
     YGG_RUN_EXAMPLES: 0
+    YGG_RUN_TYPES_EXAMPLES: 0
+    YGG_RUN_TIME_TESTS: 0
     YGG_ENABLE_LONG_TESTS: 0
     YGG_CONDA: 1
 
@@ -56,10 +59,11 @@ environment:
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_RUN_EXAMPLES: 1
+      YGG_RUN_ALL_TESTS: 0
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_ENABLE_LONG_TESTS: 1
-      YGG_RUN_EXAMPLES: 1
+      YGG_RUN_TYPES_EXAMPLES: 1
+      YGG_RUN_ALL_TESTS: 0
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
@@ -124,9 +128,10 @@ before_test:
 
 test_script:
   - "type .coveragerc"
-  - "if %YGG_RUN_EXAMPLES% == 0 yggtest -c setup.cfg --cov-config=.coveragerc"
-  - "if (%YGG_RUN_EXAMPLES% == 1) if (%YGG_ENABLE_LONG_TESTS% == 0) yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples"
-  - "if (%YGG_RUN_EXAMPLES% == 1) if (%YGG_ENABLE_LONG_TESTS% == 1) yggtest -c setup.cfg --cov-config=.coveragerc examples\\tests\\test_types.py --with-examples"
+  - "if %YGG_RUN_TYPES_EXAMPLES% == 1 yggtest -c setup.cfg --cov-config=.coveragerc examples\\tests\\test_types.py --with-examples --long-running"
+  - "if %YGG_RUN_EXAMPLES% == 1 yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples"
+  - "if %YGG_RUN_ALL_TESTS% == 1 yggtest -c setup.cfg --cov-config=.coveragerc"
+  - "if %YGG_RUN_TIME_TESTS% == 1 yggtest -c setup.cfg --cov-config=.coveragerc --long-running tests\\test_timing.py"
 
 after_test:
   - "codecov"
