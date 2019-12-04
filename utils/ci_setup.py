@@ -15,8 +15,6 @@ INSTALLAPY = (os.environ.get('INSTALLAPY', '0') == '1')
 INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
 INSTALLRMQ = (os.environ.get('INSTALLRMQ', '0') == '1')
 BUILDDOCS = (os.environ.get('BUILDDOCS', '0') == '1')
-CONDA_PREFIX = os.environ.get('CONDA_PREFIX', False)
-_in_conda = bool(CONDA_PREFIX)
 
 
 def call_script(lines):
@@ -77,9 +75,6 @@ def setup_package_on_ci(method, python):
     else:
         conda_cmd = 'conda'
     if method == 'conda':
-        # if not _in_conda:  # pragma: debug
-        #     raise RuntimeError("Could not detect conda environment. "
-        #                        "Cannot proceed with a conda env setup.")
         cmds += [
             "echo Installing Python using conda...",
             # Configure conda
@@ -136,9 +131,6 @@ def deploy_package_on_ci(method):
     ]
     install_req = os.path.join("utils", "install_from_requirements.py")
     if method == 'conda':
-        if not _in_conda:  # pragma: debug
-            raise RuntimeError("Could not detect conda environment. "
-                               "Cannot proceed with a conda deployment.")
         cmds += [
             "%s install -q conda-build conda-verify %s %s %s" % (
                 conda_cmd,
@@ -181,6 +173,7 @@ def deploy_package_on_ci(method):
             "%s list" % conda_cmd
         ]
     elif method == 'pip':
+        _in_conda = (_is_win or INSTALLLPY)
         # May need to uninstall conda version of numpy and matplotlib
         # on LPy test
         if _in_conda:
