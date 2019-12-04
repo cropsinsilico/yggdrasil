@@ -75,7 +75,7 @@ def setup_package_on_ci(method, python):
             "echo Installing Python using conda...",
             # Configure conda
             "conda config --set always_yes yes --set changeps1 no",
-            "conda config --set channel_priority strict",
+            # "conda config --set channel_priority strict",
             "conda config --add channels conda-forge",
             "conda update -q conda",
             "conda create -q -n test-environment python=%s" % python
