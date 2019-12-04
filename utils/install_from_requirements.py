@@ -38,6 +38,7 @@ def prune(fname_in, fname_out=None, excl_suffix=None):
                 if req.marker and (not req.marker.evaluate()):
                     continue
                 new_lines.append(req.name + str(req.specifier))
+                print('prune', line, line.endswith(excl_suffix), req.name)
             except InvalidRequirement as e:
                 print(e)
                 continue
