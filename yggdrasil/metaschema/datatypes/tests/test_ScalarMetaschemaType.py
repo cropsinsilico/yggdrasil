@@ -1,6 +1,6 @@
 import copy
 import numpy as np
-from yggdrasil import units
+from yggdrasil import units, platform
 from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     _valid_types)
@@ -62,20 +62,24 @@ class TestScalarMetaschemaType(parent.TestMetaschemaType):
             new_dtype = 'U%d' % (cls._prec * 2 // 32)
         else:
             new_dtype = '%s%d' % (cls._type, cls._prec * 2)
-        prec_array = cls._array.astype(new_dtype)
-        if 'Array' not in cls._cls:
-            cls._prec_value = prec_array[0]
+        if platform._is_win and (new_dtype == 'float128'):  # pragma: windows
+            cls._prec_value = None
         else:
-            cls._prec_value = prec_array
+            prec_array = cls._array.astype(new_dtype)
+            if 'Array' not in cls._cls:
+                cls._prec_value = prec_array[0]
+            else:
+                cls._prec_value = prec_array
         cls._compatible_objects = [
             (cls._value, cls._value, None)]
-        if not cls._explicit:
-            cls._compatible_objects.append(
-                (cls._value, cls._prec_value, {'subtype': cls._type,
-                                               'precision': cls._prec * 2}))
-        else:
-            cls._compatible_objects.append(
-                (cls._value, cls._prec_value, {'precision': cls._prec * 2}))
+        if cls._prec_value is not None:
+            if not cls._explicit:
+                cls._compatible_objects.append(
+                    (cls._value, cls._prec_value, {'subtype': cls._type,
+                                                   'precision': cls._prec * 2}))
+            else:
+                cls._compatible_objects.append(
+                    (cls._value, cls._prec_value, {'precision': cls._prec * 2}))
         if 'Array' not in cls._cls:
             if cls._explicit:
                 if cls._type == 'bytes':
@@ -142,8 +146,9 @@ class TestScalarMetaschemaType_prec(TestScalarMetaschemaType):
             x['precision'] = cls._prec / 2  # compatible precision
         # Version with incorrect precision
         cls._invalid_encoded.append(copy.deepcopy(cls._valid_encoded[0]))
-        cls._invalid_encoded[-1]['precision'] = cls._prec * 2
-        cls._invalid_decoded.append(cls._prec_value)
+        if cls._prec_value is not None:
+            cls._invalid_encoded[-1]['precision'] = cls._prec * 2
+            cls._invalid_decoded.append(cls._prec_value)
 
 
 class TestScalarMetaschemaType_units(TestScalarMetaschemaType):
