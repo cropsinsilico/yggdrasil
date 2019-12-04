@@ -77,6 +77,9 @@ def setup_package_on_ci(method, python):
     else:
         conda_cmd = 'conda'
     if method == 'conda':
+        if not _in_conda:  # pragma: debug
+            raise RuntimeError("Could not detect conda environment. "
+                               "Cannot proceed with a conda env setup.")
         cmds += [
             "echo Installing Python using conda...",
             # Configure conda
@@ -178,17 +181,11 @@ def deploy_package_on_ci(method):
             "%s list" % conda_cmd
         ]
     elif method == 'pip':
-        # Uninstall conda versions when inside conda env
         # May need to uninstall conda version of numpy and matplotlib
         # on LPy test
         if _in_conda:
-            cmds += ["%s uninstall numpy" % conda_cmd]
-        if _is_win:  # pragma: windows
-            if not _in_conda:  # pragma: debug
-                raise RuntimeError("Could not detect conda environment. "
-                                   "Cannot proceed with a conda deployment "
-                                   "(required on windows).")
-            # Installing via pip causes import error
+            # Installing via pip causes import error on Windows and
+            # a conflict when installing LPy
             cmds += [
                 "%s install %s scipy" % (
                     conda_cmd,
@@ -210,7 +207,7 @@ def deploy_package_on_ci(method):
                 "pip install -r requirements_documentation.txt")
         if INSTALLR:
             cmds.append("echo Installing R...")
-            if INSTALLLPY or _is_win:
+            if _in_conda:
                 cmds.append("%s install r-base" % conda_cmd)
             elif _is_linux:
                 cmds += ["sudo apt-get install r-base",
