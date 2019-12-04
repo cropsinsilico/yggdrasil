@@ -8,6 +8,7 @@ import logging
 import argparse
 import subprocess
 import importlib
+import contextlib
 from ._version import get_versions
 _test_package_name = None
 _test_package = None
@@ -29,6 +30,17 @@ if platform._is_win:  # pragma: windows
     # This is required to fix crash on Windows in case of Ctrl+C
     # https://github.com/ContinuumIO/anaconda-issues/issues/905#issuecomment-232498034
     os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = 'T'
+
+
+@contextlib.contextmanager
+def working_directory(path):
+    """Changes working directory and returns to previous on exit."""
+    prev_cwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(prev_cwd)
 
 
 def expand_and_add(path, path_list, dir_list):  # pragma: no cover
@@ -171,7 +183,8 @@ def run_tsts(**kwargs):  # pragma: no cover
     error_code = 0
     # Peform ci tests/operations
     # Call bash script?
-    extra_argv += ['-c', 'setup.cfg', '--cov-config=.coveragerc']
+    if args.ci:
+        extra_argv += ['-c', 'setup.cfg', '--cov-config=.coveragerc']
     # Separate out paths from options
     argv = [test_cmd]
     test_paths = []
@@ -256,7 +269,7 @@ def run_tsts(**kwargs):  # pragma: no cover
             os.environ['COVERAGE_PROCESS_START'] = 'True'
             with open(pth_file, 'w') as fd:
                 fd.write("import coverage; coverage.process_startup()")
-        if 'timing' in args.test_suites:
+        if args.test_suites and ('timing' in args.test_suites):
             old_env['YGG_TEST_PRODUCTION_RUNS'] = os.environ.get(
                 'YGG_TEST_PRODUCTION_RUNS', None)
             os.environ['YGG_TEST_PRODUCTION_RUNS'] = 'True'
@@ -265,6 +278,33 @@ def run_tsts(**kwargs):  # pragma: no cover
                 'YGG_SKIP_COMPONENT_VALIDATION', None)
             if old_env['YGG_SKIP_COMPONENT_VALIDATION'] is None:
                 os.environ['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
+        # Perform CI specific pretest operations
+        if args.ci:
+            top_dir = os.path.dirname(os.getcwd())
+            src_cmd = ('python -c \'import versioneer; '
+                       'print(versioneer.get_version())\'')
+            dst_cmd = ('python -c \'import yggdrasil; '
+                       'print(yggdrasil.__version__)\'')
+            src_ver = subprocess.check_output(src_cmd, shell=True)
+            dst_ver = subprocess.check_output(dst_cmd, shell=True,
+                                              cwd=top_dir)
+            if src_ver != dst_ver:  # pragma: debug
+                raise RuntimeError(("Versions do not match:\n"
+                                    "\tSource version: %s\n"
+                                    "\tBuild  version: %s\n")
+                                   % (src_ver, dst_ver))
+            if os.environ.get("INSTALLR", None) == "1":
+                from yggdrasil import tools
+                print(tools.which("R"))
+                print(tools.which("Rscript"))
+            subprocess.check_call(["flake8", "yggdrasil"])
+            if os.environ.get("YGG_CONDA", None):
+                subprocess.check_call(["python", "create_coveragerc.py"])
+            if not os.path.isfile(".coveragerc"):
+                raise RuntimeError(".coveragerc file dosn't exist.")
+            with open(".coveragerc", "r") as fd:
+                print(fd.read())
+            subprocess.check_call(["ygginfo", "--verbose"])
         error_code = subprocess.call(argv)
     except BaseException:
         logger.exception('Error in running test.')

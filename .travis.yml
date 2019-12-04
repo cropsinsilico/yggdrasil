@@ -156,7 +156,6 @@ install:
     fi
 
 script:
-  - sh ci/pretest_script.sh || travis_terminate 1;
   - yggtest --ci $YGG_TEST_FLAGS
 
 
@@ -197,19 +196,16 @@ jobs:
       services:
         - rabbitmq
       script:
-        - sh ci/pretest_script.sh || travis_terminate 1;
         - yggtest --ci
     - os: linux
       python: 3.4
       script:
-        - sh ci/pretest_script.sh || travis_terminate 1;
         - yggconfig --remove-file
         - yggtest --ci --long-running tests/test_backwards.py
     - os: linux
       python: 3.6
       env: INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=1
       script:
-        - sh ci/pretest_script.sh || travis_terminate 1;
         - yggtest --ci --validate-components
     # Python >=3.7 requires special dist
     - os: linux
@@ -218,17 +214,14 @@ jobs:
       dist: xenial
       sudo: true
       script:
-        - sh ci/pretest_script.sh || travis_terminate 1;
         - yggtest --ci --timing
     - os: linux
       python: 3.6
       script:
-        - sh ci/pretest_script.sh || travis_terminate 1;
         - yggtest --ci --types --languages r c
     - os: linux
       python: 3.6
       script:
-        - sh ci/pretest_script.sh || travis_terminate 1;
         - yggtest --ci --types --languages matlab python cpp
     - os: linux
       env: YGG_ENABLE_LONG_TESTS=1
@@ -236,7 +229,6 @@ jobs:
       dist: xenial
       sudo: true
       script:
-        - sh ci/pretest_script.sh || travis_terminate 1;
         - yggtest --ci
 
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
@@ -250,7 +242,6 @@ jobs:
           - $HOME/Library/Caches/Homebrew
       env: YGG_PYTHON=2.7
       script:
-        - sh ci/pretest_script.sh || travis_terminate 1;
         - yggtest --ci --long-running
     - os: osx
       python: 3.7
@@ -262,7 +253,6 @@ jobs:
           - $HOME/Library/Caches/Homebrew
       env: YGG_CONDA=3.7 INSTALLRMQ=1
       script:
-        - sh ci/pretest_script.sh || travis_terminate 1;
         - yggtest --ci --long-running
     - name: "Build docs"
       python: 3.6
