@@ -194,10 +194,11 @@ def deploy_package_on_ci(method):
                     os.environ.get('MATPLOTLIB', 'matplotlib'),
                     os.environ.get('JSONSCHEMA', 'jsonschema'))]
         cmds.append(
-            "pip install -r requirements_testing.txt")
+            "python %s pip requirements_testing.txt" % install_req)
         if BUILDDOCS:
             cmds.append(
-                "pip install -r requirements_documentation.txt")
+                "python %s pip requirements_documentation.txt" % (
+                    install_req))
         if INSTALLR:
             cmds.append("echo Installing R...")
             if _in_conda:
