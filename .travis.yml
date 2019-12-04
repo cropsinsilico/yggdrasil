@@ -208,7 +208,7 @@ jobs:
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
     - os: osx
       python: 2.7
-      env: YGG_PYTHON=2.7 YGG_ENABLE_LONG_TESTS=1
+      env: YGG_PYTHON=2.7  # YGG_ENABLE_LONG_TESTS=1
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
         pip: false
