@@ -175,18 +175,18 @@ jobs:
   fast_finish: true
   include:
 
-    # Warm-up cache
-    - stage: warm-up
-      os: osx
-      python: 2.7
-      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-      cache:
-        pip: false
-        directories:
-          - $HOME/Library/Caches/pip
-          - $HOME/Library/Caches/Homebrew
-      env: YGG_PYTHON=2.7
-      script: true
+    # # Warm-up cache
+    # - stage: warm-up
+    #   os: osx
+    #   python: 2.7
+    #   language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+    #   cache:
+    #     pip: false
+    #     directories:
+    #       - $HOME/Library/Caches/pip
+    #       - $HOME/Library/Caches/Homebrew
+    #   env: YGG_PYTHON=2.7
+    #   script: true
     # Tests
     - stage: test
       os: linux

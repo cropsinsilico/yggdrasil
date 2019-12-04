@@ -126,12 +126,7 @@ cache:
 # Not a .NET project
 build: false
 
-before_test:
-  - "ygginfo --verbose"
-  - "flake8 yggdrasil"
-
 test_script:
-  - "type .coveragerc"
   - "yggtest --ci %YGG_TEST_FLAGS%"
 
 after_test:
