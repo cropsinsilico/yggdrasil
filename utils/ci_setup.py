@@ -77,9 +77,9 @@ def setup_package_on_ci(method, python):
     else:
         conda_cmd = 'conda'
     if method == 'conda':
-        if not _in_conda:  # pragma: debug
-            raise RuntimeError("Could not detect conda environment. "
-                               "Cannot proceed with a conda env setup.")
+        # if not _in_conda:  # pragma: debug
+        #     raise RuntimeError("Could not detect conda environment. "
+        #                        "Cannot proceed with a conda env setup.")
         cmds += [
             "echo Installing Python using conda...",
             # Configure conda
