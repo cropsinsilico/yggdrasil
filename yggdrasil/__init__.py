@@ -149,7 +149,7 @@ def run_tsts(**kwargs):  # pragma: no cover
     parser.add_argument('--language', '--languages', default=[],
                         nargs="+", type=str,
                         help='Language(s) that should be tested.')
-    parser.add_argument('--ci',
+    parser.add_argument('--ci', action='store_true',
                         help=('Perform addition operations required '
                               'for testing on continuous integration '
                               'services.'))
