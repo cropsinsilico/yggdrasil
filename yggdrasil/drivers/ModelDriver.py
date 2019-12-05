@@ -1275,7 +1275,7 @@ class ModelDriver(Driver):
                  "language %s.") % (io, cls.language))
         new_val = []
         io_re = cls.format_function_param('%s_def_regex' % io)
-        for ivar in cls.split_variables(value):
+        for i, ivar in enumerate(cls.split_variables(value)):
             x = re.search(io_re, ivar)
             if x is None:
                 igrp = {'name': ivar}
@@ -1287,6 +1287,7 @@ class ModelDriver(Driver):
             if 'native_type' in igrp:
                 igrp['native_type'] = igrp['native_type'].replace(' ', '')
                 igrp['datatype'] = cls.get_json_type(igrp['native_type'])
+            igrp['position'] = i
             if (io == 'outputs') and outputs_in_inputs:
                 igrp = cls.input2output(igrp)
             new_val.append(igrp)
@@ -1367,16 +1368,24 @@ class ModelDriver(Driver):
                     out[io] = cls.parse_var_definition(
                         io, out[io], outputs_in_inputs=outputs_in_inputs)
         if outputs_in_inputs and expected_outputs and (not out.get('outputs', False)):
-            input_map = {x['name']: x for x in out['inputs']}
-            out['outputs'] = []
+            missing_expected_outputs = []
             for o in expected_outputs:
                 if isinstance(o, dict):
                     o = o['name']
-                if o not in input_map:  # pragma: debug
-                    raise ValueError(("Could not locate output variable "
-                                      "%s in input variables.") % o)
-                out['outputs'].append(cls.input2output(input_map[o]))
-                out['inputs'].remove(input_map[o])
+                missing_expected_outputs.append(o)
+            out['outputs'] = []
+            for x in out['inputs']:
+                if x['name'] not in expected_outputs:
+                    continue
+                missing_expected_outputs.remove(x['name'])
+                out['outputs'].append(cls.input2output(x))
+            if missing_expected_outputs:  # pragma: debug
+                raise ValueError(("Could not locate %d output "
+                                  "variable(s) in input:  %s")
+                                 % (len(missing_expected_outputs),
+                                    missing_expected_outputs))
+            for x in out['outputs']:
+                out['inputs'].remove(x)
         if out.get('flag_var', None):
             flag_var = {'name': out.pop('flag_var'),
                         'datatype': {'type': 'flag'}}
@@ -1406,6 +1415,10 @@ class ModelDriver(Driver):
         variables = []
         for x in channels:
             variables += x['vars']
+        
+        def get_pos(x):
+            return x['position']
+        variables = sorted(variables, key=get_pos)
         return variables
 
     @classmethod

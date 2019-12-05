@@ -68,9 +68,41 @@ class TestExampleTypes(ExampleTstBase):
         testclass.assert_result_equal(x_recv, x_sent)
 
     @classmethod
+    def get_varstr(cls, vars_list, language, using_pointers=False):
+        r"""Determine the vars string that should be used in the yaml.
+
+        Args:
+            vars_list (list): List of variables.
+            language (str): Language being tested.
+            using_pointers (bool, optional): If True and the tested
+                language supports pointers, pointers will be used rather
+                than explicit arrays. Defaults to False.
+
+        Returns:
+            str: Variable string.
+
+        """
+        out = []
+        for v in vars_list:
+            out.append(v['name'])
+            typename = v['datatype']['type']
+            if language == 'c':
+                if using_pointers:
+                    if typename in ['string', 'bytes',
+                                    'unicode', '1darray']:
+                        out.append('%s_length' % v['name'])
+                    elif typename in ['ndarray']:
+                        out += ['%s_ndim' % v['name'],
+                                '%s_shape' % v['name']]
+                elif typename in ['string', 'bytes', 'unicode']:
+                    out.append('%s_length' % v['name'])
+        return ', '.join(out)
+        
+
+    @classmethod
     def setup_model(cls, language, typename, language_ext=None,
                     using_pointers=False, using_generics=False,
-                    **kwargs):
+                    split_array=False, **kwargs):
         r"""Write the model file for the specified combination of
         language and type.
 
@@ -87,6 +119,9 @@ class TestExampleTypes(ExampleTstBase):
                 language has a dedicated generic class, the generic
                 type will be used rather than explict types. Defaults
                 to False.
+            split_array (bool, optional): If True and the tested datatype
+                is an array, the variables will be split and specified
+                explicitly in the yaml. Defaults to False.
             **kwargs: Additional keyword arguments are passed to
                 the write_function_def class method of the language
                 driver.
@@ -95,6 +130,7 @@ class TestExampleTypes(ExampleTstBase):
             str: Full path to the file that was written.
 
         """
+        yaml_fields = {'vars': False, 'dtype': False}
         if language_ext is None:
             language_ext = get_language_ext(language)
         modelfile = os.path.join(_example_dir, cls.example_name,
@@ -106,8 +142,16 @@ class TestExampleTypes(ExampleTstBase):
             testdata = cls.get_test_data(typename)
             testtype = encode_type(testdata)
             using_generics = False
-        inputs = [{'name': 'x', 'datatype': copy.deepcopy(testtype)}]
-        outputs = [{'name': 'y', 'datatype': copy.deepcopy(testtype)}]
+        if split_array and (typename == 'array'):
+            inputs = [{'name': 'x%d' % i, 'datatype': x} for i, x in
+                      enumerate(copy.deepcopy(testtype['items']))]
+            outputs = [{'name': 'y%d' % i, 'datatype': x} for i, x in
+                       enumerate(copy.deepcopy(testtype['items']))]
+        else:
+            inputs = [{'name': 'x',
+                       'datatype': copy.deepcopy(testtype)}]
+            outputs = [{'name': 'y',
+                        'datatype': copy.deepcopy(testtype)}]
         # Write the model
         function_contents = []
         for i, o in zip(inputs, outputs):
@@ -119,7 +163,8 @@ class TestExampleTypes(ExampleTstBase):
                 o, i, outputs_in_inputs=drv.outputs_in_inputs)
         lines = drv.write_function_def(
             'model', function_contents=function_contents,
-            inputs=inputs, outputs=outputs,
+            inputs=copy.deepcopy(inputs),
+            outputs=copy.deepcopy(outputs),
             outputs_in_inputs=drv.outputs_in_inputs,
             opening_msg='IN MODEL', closing_msg='MODEL EXIT',
             print_inputs=True, print_outputs=True, **kwargs)
@@ -131,37 +176,33 @@ class TestExampleTypes(ExampleTstBase):
         os.environ['TEST_LANGUAGE_EXT'] = language_ext
         os.environ['TEST_TYPENAME'] = typename
         if language == 'c' and (not using_generics):
-            in_vars = 'x'
-            out_vars = 'y'
-            if using_pointers:
-                if typename in ['string', 'bytes', 'unicode', '1darray']:
-                    in_vars += ', x_length'
-                    out_vars += ', y_length'
-                elif typename in ['ndarray']:
-                    in_vars += ', x_ndim, x_shape'
-                    out_vars += ', y_ndim, y_shape'
-            elif typename in ['string', 'bytes', 'unicode']:
-                in_vars += ', x_length'
-                out_vars += ', y_length'
-            elif typename in ['array', 'object']:
-                indent = '\n        '
-                in_vars = (
-                    in_vars + indent[:-2] + 'datatype:' + indent
-                    + yaml.dump(inputs[0]['datatype']).replace(
-                        '\n', indent))
-                out_vars = (
-                    out_vars + indent[:-2] + 'datatype:' + indent
-                    + yaml.dump(outputs[0]['datatype']).replace(
-                        '\n', indent))
-                in_vars = in_vars.replace("units: ''", '')
-                out_vars = out_vars.replace("units: ''", '')
-            os.environ['TEST_MODEL_IO'] = (
-                'inputs:\n'
-                '      name: input\n'
-                '      vars: ' + in_vars + '\n'
-                '    outputs:\n'
-                '      name: output\n'
-                '      vars: ' + out_vars + '\n')
+            yaml_fields['vars'] = True
+            if typename in ['array', 'object']:
+                yaml_fields['dtype'] = True
+        if any(list(yaml_fields.values())):
+            lines = []
+            for io, io_vars in zip(['input', 'output'],
+                                   [inputs, outputs]):
+                lines += [io + 's:',
+                          '  name: %s' % io]
+                if yaml_fields['vars']:
+                    lines.append(
+                        '  vars: %s' % cls.get_varstr(
+                            io_vars, language,
+                            using_pointers=using_pointers))
+                if yaml_fields['dtype']:
+                    if len(io_vars) == 1:
+                        dtype = io_vars[0]['datatype']
+                    else:
+                        dtype = {'type': 'array',
+                                 'items': [x['datatype'] for
+                                           x in io_vars]}
+                    lines.append('  datatype:')
+                    for x in yaml.dump(dtype).splitlines():
+                        if "units: ''" in x:
+                            continue
+                        lines.append('    ' + x)
+            os.environ['TEST_MODEL_IO'] = '\n    '.join(lines) + '\n'
         else:
             os.environ['TEST_MODEL_IO'] = ''
         return modelfile
@@ -187,4 +228,10 @@ class TestExampleTypes(ExampleTstBase):
             self._output_files = [self.setup_model(self.language,
                                                    self.datatype,
                                                    using_pointers=True)]
+            super(TestExampleTypes, self).run_example()
+        # Version splitting array
+        if self.datatype == 'array':
+            self._output_files = [self.setup_model(self.language,
+                                                   self.datatype,
+                                                   split_array=True)]
             super(TestExampleTypes, self).run_example()
