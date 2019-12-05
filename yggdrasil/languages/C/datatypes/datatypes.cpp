@@ -825,7 +825,7 @@ extern "C" {
       return NULL;
     }
   }
-  dtype_t* create_dtype_json_object(const size_t nitems, const char** keys,
+  dtype_t* create_dtype_json_object(const size_t nitems, char** keys,
 				    dtype_t** values,
 				    const bool use_generic=true) {
     JSONObjectMetaschemaType* obj = NULL;

@@ -168,6 +168,7 @@ after_success:
 stages:
   - warm-up
   - test
+  - test-with-cache
   - deploy
 
 
@@ -214,15 +215,15 @@ jobs:
       dist: xenial
       sudo: true
       script:
-        - yggtest --ci --timing
+        - yggtest --ci --test_suite=timing
     - os: linux
       python: 3.6
       script:
-        - yggtest --ci --types --languages r c
+        - yggtest --ci --test_suite=types --languages r c
     - os: linux
       python: 3.6
       script:
-        - yggtest --ci --types --languages matlab python cpp
+        - yggtest --ci --test_suite=types --languages matlab python cpp
     - os: linux
       env: YGG_ENABLE_LONG_TESTS=1
       python: 3.8
@@ -240,9 +241,10 @@ jobs:
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
-      env: YGG_PYTHON=2.7
-      script:
-        - yggtest --ci --long-running
+          - $HOME/R/Library
+      env: YGG_PYTHON=2.7 R_LIBS_USER=$HOME/R/Library
+      script: true
+      #  - yggtest --ci --long-running
     - os: osx
       python: 3.7
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
@@ -268,6 +270,21 @@ jobs:
             - *native_deps_apt
             - doxygen
           update: true
+
+    # Mac test after cache
+    - stage: test-with-cache
+      os: osx
+      python: 2.7
+      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+      cache:
+        pip: false
+        directories:
+          - $HOME/Library/Caches/pip
+          - $HOME/Library/Caches/Homebrew
+          - $HOME/R/Library
+      env: YGG_PYTHON=2.7 R_LIBS_USER=$HOME/R/Library
+      script:
+        - yggtest --ci --long-running
 
     # Docs
     - stage: deploy

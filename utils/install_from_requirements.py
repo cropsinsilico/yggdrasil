@@ -29,6 +29,7 @@ def prune(fname_in, fname_out=None, excl_suffix=None):
         with open(ifname_in, 'r') as fd:
             old_lines = fd.readlines()
         for line in old_lines:
+            line = line.strip()
             if line.startswith('#'):
                 continue
             if excl_suffix and line.endswith(excl_suffix):
