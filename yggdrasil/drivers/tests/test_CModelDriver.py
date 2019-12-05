@@ -1,5 +1,4 @@
 import os
-import copy
 import unittest
 from yggdrasil import platform
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
@@ -43,7 +42,7 @@ class TestCModelDriverNoInit(TestCModelParam,
     def get_test_types(self):
         r"""Return the list of tuples mapping json type to expected native type."""
         out = super(TestCModelDriverNoInit, self).get_test_types()
-        for i, (k, v) in enumerate(copy.deepcopy(out)):
+        for i, (k, v) in enumerate(out):
             if v == '*':
                 knew = {'type': k, 'subtype': 'float',
                         'precision': 32}

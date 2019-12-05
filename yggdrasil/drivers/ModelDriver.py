@@ -1405,10 +1405,7 @@ class ModelDriver(Driver):
             channels = [channels]
         variables = []
         for x in channels:
-            if 'vars' in x:
-                variables += x['vars']
-            else:
-                variables.append(x)
+            variables += x['vars']
         return variables
 
     @classmethod

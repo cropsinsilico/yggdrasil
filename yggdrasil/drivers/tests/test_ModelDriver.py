@@ -170,7 +170,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         r"""Return the list of tuples mapping json type to expected native type."""
         if self.import_cls.type_map is None:
             return []
-        out = list(self.import_cls.type_map.items())
+        out = copy.deepcopy(list(self.import_cls.type_map.items()))
         if 'flag' not in self.import_cls.type_map:
             out.append(('flag', self.import_cls.type_map['boolean']))
         return out
@@ -200,6 +200,9 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             if not isinstance(a, dict):
                 self.assert_equal(
                     self.import_cls.get_native_type(datatype={'type': a}), b)
+                if a in ['float', 'int', 'uint']:
+                    self.assert_equal(self.import_cls.get_native_type(
+                        datatype={'type': 'scalar', 'subtype': a}), b)
                 
     def test_write_declaration(self):
         r"""Test write_declaration for all supported native types."""
