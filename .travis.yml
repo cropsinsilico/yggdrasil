@@ -215,15 +215,15 @@ jobs:
       dist: xenial
       sudo: true
       script:
-        - yggtest --ci --test_suite=timing
+        - yggtest --ci --test-suite=timing
     - os: linux
       python: 3.6
       script:
-        - yggtest --ci --test_suite=types --languages r c
+        - yggtest --ci --test-suite=types --languages r c
     - os: linux
       python: 3.6
       script:
-        - yggtest --ci --test_suite=types --languages matlab python cpp
+        - yggtest --ci --test-suite=types --languages matlab python cpp
     - os: linux
       env: YGG_ENABLE_LONG_TESTS=1
       python: 3.8
