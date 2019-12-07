@@ -98,7 +98,6 @@ class TestExampleTypes(ExampleTstBase):
                     out.append('%s_length' % v['name'])
         return ', '.join(out)
         
-
     @classmethod
     def setup_model(cls, language, typename, language_ext=None,
                     using_pointers=False, using_generics=False,
