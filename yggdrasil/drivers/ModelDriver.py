@@ -1383,7 +1383,7 @@ class ModelDriver(Driver):
                 missing_expected_outputs.append(o)
             out['outputs'] = []
             for x in out['inputs']:
-                if x['name'] not in expected_outputs:
+                if x['name'] not in missing_expected_outputs:
                     continue
                 missing_expected_outputs.remove(x['name'])
                 out['outputs'].append(cls.input2output(x))
