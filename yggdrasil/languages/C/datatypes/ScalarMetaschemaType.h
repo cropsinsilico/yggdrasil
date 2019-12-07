@@ -1758,7 +1758,7 @@ NDArrayMetaschemaType::NDArrayMetaschemaType(const rapidjson::Value &type_doc,
     if (type_doc["shape"][(rapidjson::SizeType)i].IsInt()) {
       shape_.push_back(type_doc["shape"][(rapidjson::SizeType)i].GetInt());
     } else if (type_doc["shape"][(rapidjson::SizeType)i].IsDouble()) {
-      shape_.push_back(type_doc["shape"][(rapidjson::SizeType)i].GetDouble());
+      shape_.push_back((size_t)(type_doc["shape"][(rapidjson::SizeType)i].GetDouble()));
     } else {
       ygglog_throw_error("NDArrayMetaschemaType: ndarray 'shape' elements must be numbers.");
     }

@@ -444,9 +444,12 @@ static inline
 void va_list_t_skip(va_list_t *ap, size_t nbytes) {
   if (nbytes == sizeof(void*)) {
     va_arg(ap->va, void*);
+  } else if (nbytes == sizeof(size_t)) {
+    va_arg(ap->va, size_t);
   } else {
-    printf("WARNING: Getting argument of size %d.\n", nbytes);
-    va_arg(ap->va, char[nbytes]);
+    printf("WARNING: Cannot get argument of size %zd.\n", nbytes);
+    va_arg(ap->va, void*);
+    // va_arg(ap->va, char[nbytes]);
   }
 };
 
