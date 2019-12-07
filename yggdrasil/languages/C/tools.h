@@ -172,7 +172,6 @@ typedef struct va_list_t {
 } va_list_t;
 
 
-  
 /*! @brief Structure used to wrap Python objects. */
 typedef struct python_t {
   char name[PYTHON_NAME_SIZE];
@@ -436,6 +435,18 @@ int is_send(const char *buf) {
   return not_empty_match("send", buf);
 };
 
+  
+/*! @brief Method for skipping a number of bytes in the argument list.
+  @param[in] ap va_list_t* Structure containing variable argument list.
+  @param[in] nbytes size_t Number of bytes that should be skipped.
+ */
+static inline
+void va_list_t_skip(va_list_t *ap, size_t nbytes) {
+  printf("skipping %d bytes\n", sizeof(char[nbytes]));
+  va_arg(ap->va, char[nbytes]);
+};
+
+  
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }
 #endif

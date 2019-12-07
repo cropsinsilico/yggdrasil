@@ -369,6 +369,11 @@ class CModelDriver(CompiledModelDriver):
         'free_instance': 'free_generic({variable});',
         'free_any': 'free_generic({variable});',
         'print_float': 'printf("%f\\n", {object});',
+        'print_int': 'printf("%i\\n", {object});',
+        'print_uint': 'printf("%u\\n", {object});',
+        'print_string': 'printf("%s\\n", {object});',
+        'print_unicode': 'printf("%s\\n", {object});',
+        'print_bytes': 'printf("%s\\n", {object});',
         'print_complex': 'print_complex({object});',
         'print_array': 'display_json_array({object});',
         'print_object': 'display_json_object({object});',
@@ -746,7 +751,10 @@ class CModelDriver(CompiledModelDriver):
                         v['allow_realloc'] = True
         for x in inputs + outputs:
             if x['datatype']['type'] == 'array':
-                if len(x['datatype'].get('items', [])) == len(x['vars']):
+                nvars_items = len(x['datatype'].get('items', []))
+                nvars = sum([(not ix.get('is_length_var', False))
+                             for ix in x['vars']])
+                if nvars_items == nvars:
                     x['use_generic'] = False
                 else:
                     x['use_generic'] = True
@@ -1390,8 +1398,12 @@ class CModelDriver(CompiledModelDriver):
                          '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
                         % (keys['items'], keys['nitems'])]
                 for i, x in enumerate(datatype['items']):
+                    # Prevent recusion
+                    x_copy = copy.deepcopy(x)
+                    x_copy.pop('items', None)
+                    x_copy.pop('properties', None)
                     out += cls.write_native_type_definition(
-                        '%s[%d]' % (keys['items'], i), x,
+                        '%s[%d]' % (keys['items'], i), x_copy,
                         name_base=('%s_item%d' % (name_base, i)),
                         requires_freeing=requires_freeing, no_decl=True,
                         use_generic=use_generic)
@@ -1399,7 +1411,8 @@ class CModelDriver(CompiledModelDriver):
                 requires_freeing += [keys['items']]
             else:
                 keys['use_generic'] = 'true'
-                fmt = 'create_dtype_empty({use_generic})'
+                fmt = ('create_dtype_json_array(0, NULL, '
+                       '{use_generic})')
         elif datatype['type'] == 'object':
             keys['use_generic'] = 'true'
             if 'properties' in datatype:
@@ -1415,16 +1428,21 @@ class CModelDriver(CompiledModelDriver):
                         ('char** %s = (char**)malloc(%d*sizeof(char*));')
                         % (keys['keys'], keys['nitems'])]
                 for i, (k, v) in enumerate(datatype['properties'].items()):
+                    # Prevent recusion
+                    v_copy = copy.deepcopy(v)
+                    v_copy.pop('items', None)
+                    v_copy.pop('properties', None)
                     out += ['%s[%d] = \"%s\";' % (keys['keys'], i, k)]
                     out += cls.write_native_type_definition(
-                        '%s[%d]' % (keys['values'], i), v,
+                        '%s[%d]' % (keys['values'], i), v_copy,
                         name_base=('%s_prop%d' % (name_base, i)),
                         requires_freeing=requires_freeing, no_decl=True,
                         use_generic=use_generic)
                 assert(isinstance(requires_freeing, list))
                 requires_freeing += [keys['values'], keys['keys']]
             else:
-                fmt = 'create_dtype_empty({use_generic})'
+                fmt = ('create_dtype_json_object(0, NULL, NULL, '
+                       '{use_generic})')
         elif datatype['type'] in ['ply', 'obj']:
             fmt = 'create_dtype_%s({use_generic})' % datatype['type']
         elif datatype['type'] == '1darray':

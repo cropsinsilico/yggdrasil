@@ -431,6 +431,33 @@ public:
     return nbits() / 8;
   }
   /*!
+    @brief Get the number of bytes occupied by a variable of the type in a variable argument list.
+    @returns std::vector<size_t> Number of bytes/variables occupied by the type.
+   */
+  std::vector<size_t> nbytes_va_core() const override {
+    std::vector<size_t> out;
+    if (!(use_generic())) {
+      switch (type_code()) {
+      case T_1DARRAY:
+      case T_NDARRAY: {
+	out.push_back(sizeof(unsigned char*));
+	return out;
+      }
+      case T_SCALAR: {
+	switch (subtype_code_) {
+	case T_BYTES:
+	case T_UNICODE: {
+	  out.push_back(sizeof(char*));
+	  out.push_back(sizeof(size_t));
+	  return out;
+	}
+	}
+      }
+      }
+    }
+    return MetaschemaType::nbytes_va_core();
+  }
+  /*!
     @brief Determine the dimensions of the equivalent numpy array.
     @param[in, out] nd int* Address of integer where number of dimensions should be stored.
     @param[in, out] dims npy_intp** Address of pointer to memory where dimensions should be stored.
@@ -476,8 +503,72 @@ public:
    */
   virtual size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
     size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
-    if (type_code() == T_SCALAR) {
+    if (use_generic())
+      return out;
+    size_t bytes_precision = nbytes();
+    switch (type_code()) {
+    case T_SCALAR: {
       switch (subtype_code_) {
+      case T_INT: {
+	switch (precision_) {
+	case 8:
+	case 16: {
+	  va_arg(ap.va, int);
+	  break;
+	}
+	case 32: {
+	  va_arg(ap.va, int32_t);
+	  break;
+	}
+	case 64: {
+	  va_arg(ap.va, int64_t);
+	  break;
+	}
+	}
+	out = out + 1;
+	break;
+      }
+      case T_UINT: {
+	switch (precision_) {
+	case 8:
+	case 16: {
+	  va_arg(ap.va, unsigned int);
+	  break;
+	}
+	case 32: {
+	  va_arg(ap.va, uint32_t);
+	  break;
+	}
+	case 64: {
+	  va_arg(ap.va, uint64_t);
+	  break;
+	}
+	}
+	out = out + 1;
+	break;
+      }
+      case T_FLOAT: {
+	if (sizeof(float) == bytes_precision) {
+	  va_arg(ap.va, double);
+	} else if (sizeof(double) == bytes_precision) {
+	  va_arg(ap.va, double);
+	} else if (sizeof(long double) == bytes_precision) {
+	  va_arg(ap.va, long double);
+	}
+	out = out + 1;
+	break;
+      }
+      case T_COMPLEX: {
+	if (sizeof(float) == (bytes_precision / 2)) {
+	  va_arg(ap.va, complex_float_t);
+	} else if (sizeof(double) == (bytes_precision / 2)) {
+	  va_arg(ap.va, complex_double_t);
+	} else if (sizeof(long double) == (bytes_precision / 2)) {
+	  va_arg(ap.va, complex_long_double_t);
+	}
+	out = out + 1;
+	break;
+      }
       case T_BYTES:
       case T_UNICODE: {
 	if (_variable_precision) {
@@ -485,10 +576,15 @@ public:
 	  UNUSED(arg0); // Parameter extract to get next
 	  const size_t arg0_siz = va_arg(ap.va, size_t);
 	  set_precision(8 * arg0_siz);
-	  out = out + 1;
+	} else {
+	  va_arg(ap.va, char*);
+	  va_arg(ap.va, size_t);
 	}
+	out = out + 2;
+	break;
       }
       }
+    }
     }
     return out;
   }
@@ -1538,13 +1634,18 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
    */
   size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
     size_t out = ScalarMetaschemaType::update_from_serialization_args(nargs, ap);
+    if (use_generic())
+      return out;
     if ((_variable_length) && (*nargs >= 2)) {
       unsigned char* temp = va_arg(ap.va, unsigned char*);
       UNUSED(temp); // Parameter extract to get next
       size_t new_length = va_arg(ap.va, size_t);
-      nskip_after_++;
+      skip_after_.push_back(sizeof(size_t));
       set_length(new_length);
       out = out + 2;
+    } else {
+      va_arg(ap.va, unsigned char*);
+      out = out + 1;
     }
     return out;
   }
@@ -1557,12 +1658,14 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
    */
   size_t update_from_deserialization_args(size_t *nargs, va_list_t &ap) override {
     size_t out = MetaschemaType::update_from_deserialization_args(nargs, ap);
+    if (use_generic())
+      return out;
     if ((_variable_length) && (*nargs >= 2)) {
       unsigned char** temp = va_arg(ap.va, unsigned char**);
       UNUSED(temp); // Parameter extracted to get next
       size_t * const new_length = va_arg(ap.va, size_t*);
       new_length[0] = length_;
-      nskip_after_++;
+      skip_after_.push_back(sizeof(size_t*));
       out = out + 2;
     }
     return out;
@@ -1776,28 +1879,35 @@ void NDArrayMetaschemaType::update(const MetaschemaType* new_info) {
 };
 size_t NDArrayMetaschemaType::update_from_serialization_args(size_t *nargs, va_list_t &ap) {
   size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
+  if (use_generic())
+    return out;
   if ((_variable_shape) && (*nargs >= 3)) {
     unsigned char* temp = va_arg(ap.va, unsigned char*);
     UNUSED(temp); // Parameter extracted to get next
     size_t new_ndim = va_arg(ap.va, size_t);
-    nskip_after_++;
+    skip_after_.push_back(sizeof(size_t));
     size_t* new_shape_ptr = va_arg(ap.va, size_t*);
-    nskip_after_++;
+    skip_after_.push_back(sizeof(size_t*));
     std::vector<size_t> new_shape(new_shape_ptr, new_shape_ptr + new_ndim);
     set_shape(new_shape);
     out = out + 3;
+  } else {
+    va_arg(ap.va, unsigned char*);
+    out = out + 1;
   }
   return out;
 };
 size_t NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va_list_t &ap) {
   size_t out = MetaschemaType::update_from_deserialization_args(nargs, ap);
+  if (use_generic())
+    return out;
   if ((_variable_shape) && (*nargs >= 3)) {
     unsigned char** temp = va_arg(ap.va, unsigned char**);
     UNUSED(temp); // Parameter extracted to get next
     size_t * const new_ndim = va_arg(ap.va, size_t*);
-    nskip_after_++;
+    skip_after_.push_back(sizeof(size_t*));
     size_t** new_shape = va_arg(ap.va, size_t**);
-    nskip_after_++;
+    skip_after_.push_back(sizeof(size_t**));
     new_ndim[0] = ndim();
     size_t* new_shape_temp = (size_t*)realloc(new_shape[0], ndim()*sizeof(size_t));
     if (new_shape_temp == NULL) {

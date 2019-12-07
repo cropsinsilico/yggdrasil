@@ -107,6 +107,21 @@ public:
     display_obj_indent(arg, indent);
   }
   /*!
+    @brief Update the type object with info from provided variable arguments for serialization.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On output
+    the number of unused arguments will be assigned to this address.
+    @param[in] ap va_list_t Variable argument list.
+    @returns size_t Number of arguments in ap consumed.
+   */
+  size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
+    size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
+    if (use_generic())
+      return out;
+    va_arg(ap.va, obj_t);
+    out++;
+    return out;
+  }
+  /*!
     @brief Get the item size.
     @returns size_t Size of item in bytes.
    */

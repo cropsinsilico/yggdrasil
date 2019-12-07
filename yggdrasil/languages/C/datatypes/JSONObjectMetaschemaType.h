@@ -55,10 +55,12 @@ public:
       ygglog_throw_error("JSONObjectMetaschemaType: Properties missing.");
     if (!(type_doc[prop_key_].IsObject()))
       ygglog_throw_error("JSONObjectMetaschemaType: Properties must be an object.");
+    MetaschemaTypeMap properties;
     for (rapidjson::Value::ConstMemberIterator itr = type_doc[prop_key_].MemberBegin(); itr != type_doc[prop_key_].MemberEnd(); ++itr) {
       MetaschemaType* iprop = (MetaschemaType*)type_from_doc_c(&(itr->value), MetaschemaType::use_generic());
-      properties_[itr->name.GetString()] = iprop;
+      properties[itr->name.GetString()] = iprop;
     }
+    update_properties(properties, true);
   }
   /*!
     @brief Constructor for JSONObjectMetaschemaType from Python dictionary.
@@ -305,19 +307,24 @@ public:
 	  ygglog_throw_error("JSONObjectMetaschemaType::update_properties: New property map dosn't include old property '%s'.",
 			     it->first.c_str());
 	}
-	it->second->update(new_it->second);
+	if (it->second == NULL) {
+	  ygglog_throw_error("JSONObjectMetaschemaType::update_properties: Existing value for property '%s' is NULL.", it->first.c_str());
+	} else {
+	  it->second->update(new_it->second);
+	}
       }
     } else {
       MetaschemaTypeMap::const_iterator it;
       for (it = new_properties.begin(); it != new_properties.end(); it++) {
-	properties_[it->first] = it->second->copy();
+	if (it->second == NULL) {
+	  ygglog_throw_error("JSONObjectMetaschemaType::update_properties: New value for property '%s' is NULL.", it->first.c_str());
+	} else {
+	  properties_[it->first] = it->second->copy();
+	}
       }
     }
     // Force children to follow parent use_generic
-    MetaschemaTypeMap::iterator it;
-    for (it = properties_.begin(); it != properties_.end(); it++) {
-      it->second->update_use_generic(use_generic());
-    }
+    update_use_generic(use_generic());
   }
   /*!
     @brief Update the instance's use_generic flag.
@@ -328,7 +335,16 @@ public:
     // Force children to follow parent use_generic
     MetaschemaTypeMap::iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
-      it->second->update_use_generic(use_generic());
+      if (it->second == NULL) {
+	ygglog_throw_error("JSONObjectMetaschemaType::update_use_generic: Value for property %s is NULL.", it->first.c_str());
+      } else {
+	if ((it->second->type_code() == T_ARRAY) ||
+	    (it->second->type_code() == T_OBJECT)) {
+	  it->second->update_use_generic(true);
+	} else {
+	  it->second->update_use_generic(use_generic());
+	}
+      }
     }
   }
   /*!
@@ -341,14 +357,24 @@ public:
   size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
     size_t iout;
     size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
+    if (use_generic())
+      return out;
     MetaschemaTypeMap::const_iterator it;
     size_t new_nargs;
     for (it = properties_.begin(); it != properties_.end(); it++) {
       new_nargs = nargs[0] - out;
       iout = it->second->update_from_serialization_args(&new_nargs, ap);
       if (iout == 0) {
-	for (iout = 0; iout < it->second->nargs_exp(); iout++) {
-	  va_arg(ap.va, void*);
+	iout += it->second->nargs_exp();
+	// Can't use void* because serialization uses non-pointer arguments
+	std::vector<size_t> iva_skip = it->second->nbytes_va();
+	if (iva_skip.size() != iout) {
+	  ygglog_throw_error("JSONObjectMetaschemaType::update_from_serialization_args: nargs = %lu, size(skip) = %lu",
+			     iout, iva_skip.size());
+	}
+	size_t iskip;
+	for (iskip = 0; iskip < iva_skip.size(); iskip++) {
+	  va_list_t_skip(&ap, iva_skip[iskip]);
 	}
       }
       out = out + iout;
@@ -365,6 +391,8 @@ public:
   size_t update_from_deserialization_args(size_t *nargs, va_list_t &ap) override {
     size_t iout;
     size_t out = MetaschemaType::update_from_deserialization_args(nargs, ap);
+    if (use_generic())
+      return out;
     MetaschemaTypeMap::const_iterator it;
     size_t new_nargs;
     for (it = properties_.begin(); it != properties_.end(); it++) {
@@ -372,6 +400,7 @@ public:
       iout = it->second->update_from_deserialization_args(&new_nargs, ap);
       if (iout == 0) {
 	for (iout = 0; iout < it->second->nargs_exp(); iout++) {
+	  // Can use void* here since all variables will be pointers
 	  va_arg(ap.va, void*);
 	}
       }
@@ -387,14 +416,35 @@ public:
     return sizeof(YggGenericMap);
   }
   /*!
+    @brief Get the number of bytes occupied by a variable of the type in a variable argument list.
+    @returns std::vector<size_t> Number of bytes/variables occupied by the type.
+   */
+  std::vector<size_t> nbytes_va_core() const override {
+    if (!(use_generic())) {
+      MetaschemaTypeMap::const_iterator it;
+      std::vector<size_t> out;
+      std::vector<size_t> iout;
+      for (it = properties_.begin(); it != properties_.end(); it++) {
+	iout = it->second->nbytes_va();
+	out.insert(out.end(), iout.begin(), iout.end());
+      }
+      return out;
+    }
+    return MetaschemaType::nbytes_va_core();
+  }
+  /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
   size_t nargs_exp() const override {
     size_t nargs = 0;
-    MetaschemaTypeMap::const_iterator it;
-    for (it = properties_.begin(); it != properties_.end(); it++) {
-      nargs = nargs + it->second->nargs_exp();
+    if (use_generic()) {
+      nargs = 1;
+    } else {
+      MetaschemaTypeMap::const_iterator it;
+      for (it = properties_.begin(); it != properties_.end(); it++) {
+	nargs = nargs + it->second->nargs_exp();
+      }
     }
     return nargs;
   }
@@ -488,7 +538,7 @@ public:
     MetaschemaTypeMap::const_iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
       writer->Key(it->first.c_str());
-      if (!(it->second->encode_data(writer, nargs, ap)))
+      if (!(it->second->encode_data_wrap(writer, nargs, ap)))
 	return false;
     }
     writer->EndObject();
@@ -556,7 +606,7 @@ public:
 		     it->first.c_str());
 	return false;
       }
-      if (!(it->second->decode_data(data[it->first.c_str()], allow_realloc, nargs, ap)))
+      if (!(it->second->decode_data_wrap(data[it->first.c_str()], allow_realloc, nargs, ap)))
 	return false;
     }
     return true;
@@ -584,6 +634,10 @@ public:
     }
     if (arg[0] == NULL) {
       arg[0] = new YggGenericMap();
+      for (it = properties_.begin(); it != properties_.end(); it++) {
+	(**arg)[it->first] = (new YggGeneric(it->second, NULL, 0));
+      }
+    } else if ((arg[0])->size() == 0) {
       for (it = properties_.begin(); it != properties_.end(); it++) {
 	(**arg)[it->first] = (new YggGeneric(it->second, NULL, 0));
       }

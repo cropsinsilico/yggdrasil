@@ -298,9 +298,11 @@ public:
    */
   size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
     size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
+    if (use_generic())
+      return out;
+    python_t arg = va_arg(ap.va, python_t);
+    out++;
     if (args_type_ == NULL) {
-      python_t arg = va_arg(ap.va, python_t);
-      out++;
       update_class_name(arg.name);
       // Args
       if ((args_type_ == NULL) && (arg.obj != NULL)) {

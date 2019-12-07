@@ -31,8 +31,7 @@ public:
   MetaschemaType(const char* type, const bool use_generic=false,
 		 const bool always_generic=false) :
     type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
-    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic),
-    nskip_before_(0), nskip_after_(0) {
+    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic) {
     if (always_generic_)
       update_use_generic(true);
     update_type(type);
@@ -48,8 +47,7 @@ public:
 		 const bool use_generic=false,
 		 const bool always_generic=false) :
     type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
-    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic),
-    nskip_before_(0), nskip_after_(0) {
+    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic) {
     if (always_generic_)
       update_use_generic(true);
     if (!(type_doc.IsObject()))
@@ -69,8 +67,7 @@ public:
   MetaschemaType(PyObject* pyobj, const bool use_generic=false,
 		 const bool always_generic=false) :
     type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
-    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic),
-    nskip_before_(0), nskip_after_(0) {
+    nbytes_(0), use_generic_(use_generic), always_generic_(always_generic) {
     if (always_generic_)
       update_use_generic(true);
     if (!(PyDict_Check(pyobj))) {
@@ -284,10 +281,34 @@ public:
     @returns size_t Number of arguments in ap consumed.
    */
   virtual size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) {
-    UNUSED(nargs);
-    UNUSED(ap);
-    nskip_before_ = 0;
-    nskip_after_ = 0;
+    skip_before_.clear();
+    skip_after_.clear();
+    if (use_generic()) {
+      generic_t gen_arg = pop_generic(nargs, ap, true);
+      update_from_serialization_args((YggGeneric*)(gen_arg.obj));
+      return 1;
+    } else {
+      switch (type_code_) {
+      case T_BOOLEAN:
+      case T_INTEGER: {
+	va_arg(ap.va, int);
+	return 1;
+      }
+      case T_NULL: {
+	va_arg(ap.va, void*);
+	return 1;
+      }
+      case T_NUMBER: {
+	va_arg(ap.va, double);
+	return 1;
+      }
+      case T_STRING: {
+	va_arg(ap.va, char*);
+	va_arg(ap.va, size_t);
+	return 2;
+      }
+      }
+    }
     return 0;
   }
   /*!
@@ -298,10 +319,13 @@ public:
     @returns size_t Number of arguments in ap consumed.
    */
   virtual size_t update_from_deserialization_args(size_t *nargs, va_list_t &ap) {
-    UNUSED(nargs);
-    UNUSED(ap);
-    nskip_before_ = 0;
-    nskip_after_ = 0;
+    skip_before_.clear();
+    skip_after_.clear();
+    if (use_generic()) {
+      generic_t* gen_arg = pop_generic_ptr(nargs, ap, true);
+      update_from_deserialization_args((YggGeneric*)(gen_arg->obj));
+      return 1;
+    }
     return 0;
   }
   /*!
@@ -401,6 +425,42 @@ public:
     }
     ygglog_throw_error("MetaschemaType::nbytes: Cannot get number of bytes for type '%s'.", type_);
     return 0;
+  }
+  /*!
+    @brief Get the number of bytes occupied by a variable of the type in a variable argument list.
+    @returns std::vector<size_t> Number of bytes/variables occupied by the type.
+   */
+  virtual std::vector<size_t> nbytes_va_core() const {
+    std::vector<size_t> out;
+    if (use_generic()) {
+      out.push_back(sizeof(generic_t));
+    } else {   
+      switch (type_code_) {
+      case T_NULL: {
+	out.push_back(sizeof(void*));
+	break;
+      }	
+      case T_STRING: {
+	out.push_back(sizeof(char*));
+	out.push_back(sizeof(size_t));
+	break;
+      }
+      default: {
+	out.push_back(nbytes());
+      }
+      }
+    }
+    return out;
+  }
+  /*!
+    @brief Get the number of bytes occupied by a variable of the type in a variable argument list.
+    @returns std::vector<size_t> Number of bytes/variables occupied by the type.
+   */
+  std::vector<size_t> nbytes_va() const {
+    std::vector<size_t> out = nbytes_va_core();
+    out.insert(out.begin(), skip_before_.begin(), skip_before_.end());
+    out.insert(out.end(), skip_after_.begin(), skip_after_.end());
+    return out;
   }
   /*!
     @brief Get the number of arguments expected to be filled/used by the type.
@@ -507,6 +567,45 @@ public:
 			     precision);
     return pyobj;
   }
+  /*!
+    @brief Return the recovered generic structure if one is present in
+    the variable argument list by removing it.
+    @param[in] nargs size_t* Pointer to number of arguments present in ap
+    that will be decremented by 1.
+    @param[in] ap va_list_t Variable argument list.
+    @returns generic_t Generic structure if one is present.
+  */
+  generic_t pop_generic(size_t* nargs, va_list_t &ap, bool skip_nargs_dec=false) const {
+    if (skip_nargs_dec)
+      (*nargs)++;
+    generic_t gen_arg = pop_generic_va(nargs, &ap);
+    if (!(is_generic_init(gen_arg))) {
+      ygglog_throw_error("MetaschemaType::pop_generic: Type expects generic object, but one was not provided.");
+    }
+    return gen_arg;
+  }
+  /*!
+    @brief Return the recovered generic structure if one is present in
+    the variable argument list by removing it.
+    @param[in] nargs size_t* Pointer to number of arguments present in ap
+    that will be decremented by 1.
+    @param[in] ap va_list_t Variable argument list.
+    @param[in] skip_nargs_dec bool If true, nargs will not be modified.
+    Defaults to false.
+    @returns generic_t* Generic structure if one is present, NULL otherwise.
+  */
+  generic_t* pop_generic_ptr(size_t* nargs, va_list_t &ap, bool skip_nargs_dec=false) const {
+    if (skip_nargs_dec)
+      (*nargs)++;
+    generic_t* gen_arg = pop_generic_va_ptr(nargs, &ap);
+    if (gen_arg == NULL) {
+      ygglog_throw_error("MetaschemaType::pop_generic_ptr: Type expects pointer to generic object, but one was not provided.");
+    }
+    if (gen_arg->obj == NULL) {
+      gen_arg->obj = (void*)(new YggGeneric(this, NULL, 0));
+    }
+    return gen_arg;
+  }
   
   // Encoding
   /*!
@@ -603,28 +702,51 @@ public:
     return out;
   }
   /*!
-    @brief Encode data, but remove args before and after that were
-    used by update_from_serialization_args and should not remain in
-    the variable argument list.
+    @brief Encode arguments describine an instance of this type into a JSON string
+    first checking if the arguments should be generic.
     @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
     @param[in,out] nargs size_t * Pointer to the number of arguments contained in
     ap. On return it will be set to the number of arguments used.
     @param[in] ap va_list_t Variable number of arguments that should be encoded
     as a JSON string.
     @returns bool true if the encoding was successful, false otherwise.
-  */
-  bool encode_data_remove_args(rapidjson::Writer<rapidjson::StringBuffer> *writer,
-			       size_t *nargs, va_list_t &ap) const {
+   */
+  bool encode_data_wrap(rapidjson::Writer<rapidjson::StringBuffer> *writer,
+			size_t *nargs, va_list_t &ap) const {
+    bool out;
     size_t i;
-    for (i = 0; i < nskip_before_; i++) {
-      va_arg(ap.va, void*);
+    for (i = 0; i < skip_before_.size(); i++) {
+      va_list_t_skip(&ap, skip_before_[i]);
       (*nargs)--;
     }
-    bool out = encode_data(writer, nargs, ap);
-    for (i = 0; i < nskip_after_; i++) {
-      va_arg(ap.va, void*);
+    if (use_generic()) {
+      generic_t gen_arg = pop_generic(nargs, ap);
+      out = encode_data(writer, (YggGeneric*)(gen_arg.obj));
+    } else {
+      out = encode_data(writer, nargs, ap);
+    }
+    for (i = 0; i < skip_after_.size(); i++) {
+      va_list_t_skip(&ap, skip_after_[i]);
       (*nargs)--;
     }
+    return out;
+  }
+  /*!
+    @brief Encode arguments describine an instance of this type into a JSON string
+    first checking if the arguments should be generic.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @param[in,out] nargs size_t * Pointer to the number of arguments contained in
+    ap. On return it will be set to the number of arguments used.
+    @param[in] ... Variable number of arguments that should be encoded
+    as a JSON string.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
+  bool encode_data_wrap(rapidjson::Writer<rapidjson::StringBuffer> *writer,
+			size_t *nargs, ...) const {
+    va_list_t ap_s;
+    va_start(ap_s.va, nargs);
+    bool out = encode_data_wrap(writer, nargs, ap_s);
+    va_end(ap_s.va);
     return out;
   }
   /*!
@@ -742,6 +864,11 @@ public:
    */
   virtual int serialize(char **buf, size_t *buf_siz,
 			const int allow_realloc, size_t *nargs, va_list_t &ap) {
+    if (use_generic()) {
+      generic_t gen_arg = pop_generic(nargs, ap);
+      return serialize(buf, buf_siz, allow_realloc,
+		       (YggGeneric*)(gen_arg.obj));
+    }
     va_list_t ap_copy;
     va_copy(ap_copy.va, ap.va);
     update_from_serialization_args(nargs, ap_copy);
@@ -751,7 +878,7 @@ public:
     }
     rapidjson::StringBuffer body_buf;
     rapidjson::Writer<rapidjson::StringBuffer> body_writer(body_buf);
-    bool out = encode_data_remove_args(&body_writer, nargs, ap);
+    bool out = encode_data_wrap(&body_writer, nargs, ap);
     if (!(out)) {
       return -1;
     }
@@ -934,8 +1061,10 @@ public:
     va_end(ap_s.va);
     return out;
   }
+  
   /*!
-    @brief Decode variables from a JSON string.
+    @brief Decode variables from a JSON string, first checking if the
+    type expects a generic object and extracting it if it does.
     @param[in] data rapidjson::Value Reference to entry in JSON string.
     @param[in] allow_realloc int If 1, the passed variables will be reallocated
     to contain the deserialized data.
@@ -946,18 +1075,45 @@ public:
     address where deserialized data should be assigned.
     @returns bool true if the data was successfully decoded, false otherwise.
    */
-  bool decode_data_remove_args(rapidjson::Value &data, const int allow_realloc,
-			       size_t *nargs, va_list_t &ap) const {
+  bool decode_data_wrap(rapidjson::Value &data, const int allow_realloc,
+			size_t *nargs, va_list_t &ap) const {
+    bool out;
     size_t i;
-    for (i = 0; i < nskip_before_; i++) {
+    for (i = 0; i < skip_before_.size(); i++) {
       va_arg(ap.va, void*);
       (*nargs)--;
     }
-    bool out = decode_data(data, allow_realloc, nargs, ap);
-    for (i = 0; i < nskip_after_; i++) {
+    if (use_generic()) {
+      generic_t* gen_arg = pop_generic_ptr(nargs, ap);
+      out = decode_data(data, (YggGeneric*)(gen_arg->obj));
+    } else {
+      out = decode_data(data, allow_realloc, nargs, ap);
+    }
+    for (i = 0; i < skip_after_.size(); i++) {
       va_arg(ap.va, void*);
       (*nargs)--;
     }
+    return out;
+  }
+  /*!
+    @brief Decode variables from a JSON string, first checking if the
+    type expects a generic object and extracting it if it does.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[in] allow_realloc int If 1, the passed variables will be reallocated
+    to contain the deserialized data.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On return,
+    the number of arguments assigned from the deserialized data will be assigned
+    to this address.
+    @param[out] ... Variable number of arguments that contain addresses 
+    where deserialized data should be assigned.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
+  bool decode_data_wrap(rapidjson::Value &data, const int allow_realloc,
+			size_t *nargs, ...) const {
+    va_list_t ap_s;
+    va_start(ap_s.va, nargs);
+    bool out = decode_data_wrap(data, allow_realloc, nargs, ap_s);
+    va_end(ap_s.va);
     return out;
   }
   /*!
@@ -996,6 +1152,10 @@ public:
    */
   virtual int deserialize(const char *buf, const size_t buf_siz,
 			  const int allow_realloc, size_t* nargs, va_list_t &ap) {
+    if (use_generic()) {
+      generic_t* gen_arg = pop_generic_ptr(nargs, ap);
+      return deserialize(buf, buf_siz, (YggGeneric*)(gen_arg->obj));
+    }
     const size_t nargs_orig = *nargs;
     va_list_t ap_copy;
     va_copy(ap_copy.va, ap.va);
@@ -1007,7 +1167,7 @@ public:
     // Parse body
     rapidjson::Document body_doc;
     body_doc.Parse(buf, buf_siz);
-    bool out = decode_data_remove_args(body_doc, allow_realloc, nargs, ap);
+    bool out = decode_data_wrap(body_doc, allow_realloc, nargs, ap);
     if (!(out)) {
       ygglog_error("MetaschemaType::deserialize: One or more errors while parsing body.");
       return -1;
@@ -1070,8 +1230,8 @@ private:
   const bool use_generic_;
 protected:
   bool always_generic_;
-  size_t nskip_before_;
-  size_t nskip_after_;
+  std::vector<size_t> skip_before_;
+  std::vector<size_t> skip_after_;
 };
 
 

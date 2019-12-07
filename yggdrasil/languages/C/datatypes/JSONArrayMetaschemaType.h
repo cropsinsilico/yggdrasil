@@ -32,7 +32,6 @@ public:
   JSONArrayMetaschemaType(const MetaschemaTypeVector items,
 			  const char *format_str = "",
 			  const bool use_generic=true) :
-    // Always generic
     MetaschemaType("array", use_generic) {
     strncpy(format_str_, format_str, 1000);
     strncpy(item_key_, "items", 100);
@@ -52,7 +51,6 @@ public:
 			  const char *format_str = "",
 			  const bool use_generic=true,
 			  const char item_key[100]="items") :
-    // Always generic
     MetaschemaType(type_doc, use_generic) {
     strncpy(format_str_, format_str, 1000);
     item_key_[0] = '\0';
@@ -67,12 +65,14 @@ public:
       strncpy(format_str_, type_doc["format_str"].GetString(), 1000);
     }
     rapidjson::SizeType i;
+    MetaschemaTypeVector items;
     for (i = 0; i < type_doc[item_key_].Size(); i++) {
       MetaschemaType* iitem = (MetaschemaType*)type_from_doc_c(&(type_doc[item_key_][i]), MetaschemaType::use_generic());
       if (iitem == NULL)
 	ygglog_throw_error("JSONArrayMetaschemaType: Error reconstructing item %lu from JSON document.", i);
-      items_.push_back(iitem);
+      items.push_back(iitem);
     }
+    update_items(items, true);
   }
   /*!
     @brief Constructor for JSONArrayMetaschemaType from Python dictionary.
@@ -292,6 +292,9 @@ public:
   bool all_arrays() const {
     bool out = true;
     size_t i;
+    if (items_.size() == 0) {
+      out = false;
+    }
     for (i = 0; i < items_.size(); i++) {
       if (strcmp(items_[i]->type(), "1darray") != 0) {
 	out = false;
@@ -326,17 +329,23 @@ public:
 			   items_.size(), new_items.size());
       }
       for (i = 0; i < items_.size(); i++) {
-	items_[i]->update(new_items[i]);
+	if (items_[i] == NULL) {
+	  ygglog_throw_error("JSONArrayMetaschemaType::update_items: Existing item %d is NULL.", i);
+	} else {
+	  items_[i]->update(new_items[i]);
+	}
       }
     } else {
       for (i = 0; i < new_items.size(); i++) {
-	items_.push_back(new_items[i]->copy());
+	if (new_items[i] == NULL) {
+	  ygglog_throw_error("JSONArrayMetaschemaType::update_items: New item %d is NULL.", i);
+	} else {
+	  items_.push_back(new_items[i]->copy());
+	}
       }
     }
     // Force children to follow parent use_generic
-    for (i = 0; i < items_.size(); i++) {
-      items_[i]->update_use_generic(use_generic());
-    }
+    update_use_generic(use_generic());
   }
   /*!
     @brief Update the instance's use_generic flag.
@@ -344,10 +353,20 @@ public:
    */
   void update_use_generic(const bool new_use_generic) override {
     MetaschemaType::update_use_generic(new_use_generic);
-    // Force children to follow parent use_generic
+    // Force children to follow parent use_generic (except for
+    // arrays and objects which must be generic as children).
     size_t i;
     for (i = 0; i < items_.size(); i++) {
-      items_[i]->update_use_generic(use_generic());
+      if (items_[i] == NULL) {
+	ygglog_throw_error("JSONArrayMetaschemaType::update_use_generic: Item %d is NULL.", i);
+      } else {
+	if ((items_[i]->type_code() == T_ARRAY) ||
+	    (items_[i]->type_code() == T_OBJECT)) {
+	  items_[i]->update_use_generic(true);
+	} else {
+	  items_[i]->update_use_generic(use_generic());
+	}
+      }
     }
   }
   /*!
@@ -360,9 +379,11 @@ public:
   size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
     size_t i, iout;
     size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
+    if (use_generic())
+      return out;
     if ((all_arrays()) && (*nargs >= (nitems() + 1))) {
       size_t nrows = va_arg(ap.va, size_t);
-      nskip_before_++;
+      skip_before_.push_back(sizeof(size_t));
       out++;
       for (i = 0; i < items_.size(); i++) {
 	if (items_[i]->type_code() != T_1DARRAY) {
@@ -380,8 +401,16 @@ public:
       new_nargs = nargs[0] - out;
       iout = items_[i]->update_from_serialization_args(&new_nargs, ap);
       if (iout == 0) {
-	for (iout = 0; iout < items_[i]->nargs_exp(); iout++) {
-	  va_arg(ap.va, void*);
+	iout += items_[i]->nargs_exp();
+	// Can't use void* because serialization uses non-pointer arguments
+	std::vector<size_t> iva_skip = items_[i]->nbytes_va();
+	if (iva_skip.size() != iout) {
+	  ygglog_throw_error("JSONArrayMetaschemaType::update_from_serialization_args: nargs = %lu, size(skip) = %lu",
+			     iout, iva_skip.size());
+	}
+	size_t iskip;
+	for (iskip = 0; iskip < iva_skip.size(); iskip++) {
+	  va_list_t_skip(&ap, iva_skip[iskip]);
 	}
       }
       out = out + iout;
@@ -398,10 +427,12 @@ public:
   size_t update_from_deserialization_args(size_t *nargs, va_list_t &ap) override {
     size_t i, iout;
     size_t out = MetaschemaType::update_from_deserialization_args(nargs, ap);
+    if (use_generic())
+      return out;
     if ((all_arrays()) && (*nargs >= (nitems() + 1))) {
       size_t *nrows = va_arg(ap.va, size_t*);
       size_t inrows;
-      nskip_before_++;
+      skip_before_.push_back(sizeof(size_t*));
       out++;
       *nrows = items_[0]->nelements();
       for (i = 1; i < items_.size(); i++) {
@@ -418,6 +449,7 @@ public:
       iout = items_[i]->update_from_deserialization_args(&new_nargs, ap);
       if (iout == 0) {
 	for (iout = 0; iout < items_[i]->nargs_exp(); iout++) {
+	  // Can use void* here since all variables will be pointers
 	  va_arg(ap.va, void*);
 	}
       }
@@ -433,17 +465,38 @@ public:
     return sizeof(YggGenericVector);
   }
   /*!
+    @brief Get the number of bytes occupied by a variable of the type in a variable argument list.
+    @returns std::vector<size_t> Number of bytes/variables occupied by the type.
+   */
+  std::vector<size_t> nbytes_va_core() const override {
+    if (!(use_generic())) {
+      size_t i;
+      std::vector<size_t> out;
+      std::vector<size_t> iout;
+      for (i = 0; i < items_.size(); i++) {
+	iout = items_[i]->nbytes_va();
+	out.insert(out.end(), iout.begin(), iout.end());
+      }
+      return out;
+    }
+    return MetaschemaType::nbytes_va_core();
+  }
+  /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
   size_t nargs_exp() const override {
     size_t nargs = 0;
-    size_t i;
-    for (i = 0; i < items_.size(); i++) {
-      nargs = nargs + items_[i]->nargs_exp();
+    if (use_generic()) {
+      nargs = 1;
+    } else {
+      size_t i;
+      for (i = 0; i < items_.size(); i++) {
+	nargs = nargs + items_[i]->nargs_exp();
+      }
+      if (all_arrays())
+	nargs++;
     }
-    if (all_arrays())
-      nargs++;
     return nargs;
   }
   /*!
@@ -534,7 +587,7 @@ public:
     size_t i;
     writer->StartArray();
     for (i = 0; i < items_.size(); i++) {
-      if (!(items_[i]->encode_data_remove_args(writer, nargs, ap)))
+      if (!(items_[i]->encode_data_wrap(writer, nargs, ap)))
 	return false;
     }
     writer->EndArray();
@@ -599,7 +652,7 @@ public:
       return false;
     }
     for (i = 0; i < (size_t)(items_.size()); i++) {
-      if (!(items_[i]->decode_data(data[(rapidjson::SizeType)i], allow_realloc, nargs, ap)))
+      if (!(items_[i]->decode_data_wrap(data[(rapidjson::SizeType)i], allow_realloc, nargs, ap)))
 	return false;
     }
     return true;
@@ -638,13 +691,16 @@ public:
       for (i = 0; i < (size_t)(items_.size()); i++) {
 	arg[0]->push_back((new YggGeneric(items_[i], NULL, 0)));
       }
+    } else if ((arg[0])->size() == 0) {
+      for (i = 0; i < (size_t)(items_.size()); i++) {
+	arg[0]->push_back((new YggGeneric(items_[i], NULL, 0)));
+      }
     }
     if (items_.size() != (arg[0])->size()) {
       ygglog_error("JSONArrayMetaschemaType::decode_data: %lu items found, but destination has %lu.",
 		   items_.size(), (arg[0])->size());
       return false;
     }
-    
     for (i = 0; i < (size_t)(items_.size()); i++) {
       if (!(items_[i]->decode_data(data[(rapidjson::SizeType)i], (**arg)[i])))
 	return false;

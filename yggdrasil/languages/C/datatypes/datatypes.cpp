@@ -561,6 +561,34 @@ extern "C" {
     }
   }
 
+  generic_t pop_generic_va(size_t* nargs, va_list_t* ap) {
+    generic_t out;
+    if ((*nargs) < 1) {
+      ygglog_error("pop_generic_va: Not enough args (nargs = %lu).", *nargs);
+      return out;
+    }
+    (*nargs)--;
+    out = va_arg(ap->va, generic_t);
+    return out;
+  }
+
+  generic_t* pop_generic_va_ptr(size_t* nargs, va_list_t* ap) {
+    if ((*nargs) < 1) {
+      ygglog_error("pop_generic_va_ptr: Not enough args (nargs = %lu).", *nargs);
+      return NULL;
+    }
+    (*nargs)--;
+    generic_t *out = va_arg(ap->va, generic_t*);
+    if (out == NULL) {
+      ygglog_error("pop_generic_va_ptr: Object is NULL.");
+      return NULL;
+    } else if (!(is_generic_init(*out))) {
+      ygglog_error("pop_generic_va_ptr: Generic object not intialized.");
+      return NULL;
+    }
+    return out;
+  }
+
   void destroy_python(python_t *x) {
     try {
       PyObjMetaschemaType::free_python_t(x);
@@ -1157,18 +1185,6 @@ extern "C" {
 			const int allow_realloc, size_t *nargs, va_list_t ap) {
     try {
       MetaschemaType* type = dtype2class(dtype);
-      if (type->use_generic()) {
-	generic_t* gen_arg = get_generic_va_ptr(*nargs, ap);
-	if ((gen_arg == NULL) || (!(is_generic_init(*gen_arg)))) {
-	  ygglog_throw_error("deserialize_dtype: Type expects pointer to generic object, but one was not provided.");
-	} else {
-	  if (gen_arg->obj == NULL) {
-	    gen_arg->obj = (void*)(new YggGeneric(type, NULL));
-	  }
-	  return type->deserialize(buf, buf_siz,
-				   (YggGeneric*)(gen_arg->obj));
-	}
-      }
       return type->deserialize(buf, buf_siz, allow_realloc, nargs, ap);
     } catch (...) {
       ygglog_error("deserialize_dtype: C++ exception thrown.");
@@ -1180,16 +1196,6 @@ extern "C" {
 		      const int allow_realloc, size_t *nargs, va_list_t ap) {
     try {
       MetaschemaType* type = dtype2class(dtype);
-      if (type->use_generic()) {
-	generic_t gen_arg = get_generic_va(*nargs, ap);
-	if (!(is_generic_init(gen_arg))) {
-	  ygglog_throw_error("serialize_dtype: Type expects generic object, but one was not provided.");
-	}
-	if (is_generic_init(gen_arg)) {
-	  return type->serialize(buf, buf_siz, allow_realloc,
-				 (YggGeneric*)(gen_arg.obj));
-	}
-      }
       return type->serialize(buf, buf_siz, allow_realloc, nargs, ap);
     } catch (...) {
       ygglog_error("serialize_dtype: C++ exception thrown.");

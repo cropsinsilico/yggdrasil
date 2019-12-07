@@ -1537,6 +1537,7 @@ class ModelDriver(Driver):
                         if (len(non_length) == 1):
                             non_length[0]['datatype'] = x['datatype']
                         else:
+                            # TODO: Remove types associated with length?
                             assert(x['datatype']['type'] == 'array')
                             assert(len(x['datatype']['items'])
                                    == len(non_length))

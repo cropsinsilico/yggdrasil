@@ -177,6 +177,28 @@ generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap);
 
 
 /*!
+  @brief Return the recovered generic structure if one is present in
+  the variable argument list by removing it.
+  @param[in] nargs size_t* Pointer to number of arguments present in ap
+  that will be decremented by 1.
+  @param[in] ap va_list_t* Pointer to variable argument list.
+  @returns generic_t Generic structure if one is present.
+ */
+generic_t pop_generic_va(size_t* nargs, va_list_t* ap);
+
+
+/*!
+  @brief Return the recovered generic structure if one is present in
+  the variable argument list by removing it.
+  @param[in] nargs size_t* Pointer to number of arguments present in ap
+  that will be decremented by 1.
+  @param[in] ap va_list_t* Pointer to variable argument list.
+  @returns generic_t* Generic structure if one is present, NULL otherwise.
+ */
+generic_t* pop_generic_va_ptr(size_t* nargs, va_list_t* ap);
+
+
+/*!
   @brief Destroy a structure containing a Python object.
   @param[in] x python_t* Pointer to Python object structure that should be freed.
 */
