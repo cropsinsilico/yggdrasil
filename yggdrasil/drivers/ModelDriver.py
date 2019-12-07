@@ -1425,7 +1425,7 @@ class ModelDriver(Driver):
             variables += x['vars']
         
         def get_pos(x):
-            return x['position']
+            return x.get('position', 0)
         variables = sorted(variables, key=get_pos)
         return variables
 
