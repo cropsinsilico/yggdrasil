@@ -1798,7 +1798,7 @@ checking if the model flag indicates
         else:
             recv_var_par = cls.split_variables(recv_var_str)
         expanded_recv_var = None
-        if (len(recv_var) > 1) and ('multiple_outputs' in cls.function_param):
+        if (len(recv_var_par) > 1) and ('multiple_outputs' in cls.function_param):
             expanded_recv_var = recv_var_str
             recv_var_str = 'temp_%s' % recv_var_par[0]['name']
         if isinstance(flag_var, dict):
