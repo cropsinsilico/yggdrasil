@@ -72,6 +72,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'recv_function': '{channel}$recv',
         'send_function': '{channel}$send',
         'multiple_outputs': 'c({outputs})',
+        'multiple_outputs_def': 'list({outputs})',
         'true': 'TRUE',
         'false': 'FALSE',
         'not': '!',

@@ -1273,6 +1273,14 @@ class ModelDriver(Driver):
             raise NotImplementedError(
                 ("'%s_def_regex' not defined for "
                  "language %s.") % (io, cls.language))
+        if 'multiple_outputs' in cls.function_param:
+            multi_re = cls.function_param['multiple_outputs']
+            for x in '[]()':
+                multi_re = multi_re.replace(x, '\\' + x)
+            multi_re = multi_re.format(outputs='(.*?)')
+            match = re.search(multi_re, value)
+            if match is not None:
+                value = match.group(1)
         new_val = []
         io_re = cls.format_function_param('%s_def_regex' % io)
         for i, ivar in enumerate(cls.split_variables(value)):
@@ -1787,6 +1795,12 @@ checking if the model flag indicates
             recv_var_str = cls.prepare_output_variables(
                 recv_var_par, in_inputs=cls.outputs_in_inputs,
                 for_yggdrasil=True)
+        else:
+            recv_var_par = cls.split_variables(recv_var_str)
+        expanded_recv_var = None
+        if (len(recv_var) > 1) and ('multiple_outputs' in cls.function_param):
+            expanded_recv_var = recv_var_str
+            recv_var_str = 'temp_%s' % recv_var_par[0]['name']
         if isinstance(flag_var, dict):
             flag_var = flag_var['name']
         if cls.outputs_in_inputs:
@@ -1818,7 +1832,16 @@ checking if the model flag indicates
             if_block = [cls.format_function_param('error', error_msg=fail_message)]
         lines += cls.write_if_block(flag_cond, if_block)
         # Check if single element should be expanded
-        if len(cls.split_variables(recv_var_str)) == 1:
+        if expanded_recv_var:
+            lines.append(cls.format_function_param(
+                'print_generic', object=recv_var_str))
+            if 'assign_mult' in cls.function_param:
+                lines.append(cls.format_function_param(
+                    'assign_mult', name=expanded_recv_var, value=recv_var_str))
+            else:
+                lines.append(cls.format_function_param(
+                    'assign', name=expanded_recv_var, value=recv_var_str))
+        elif len(recv_var_par) == 1:
             lines += cls.write_expand_single_element(recv_var_str)
         return lines
     
@@ -2530,9 +2553,11 @@ checking if the model flag indicates
                          for x in vars_list]
         out = cls.prepare_variables(vars_list, in_definition=in_definition,
                                     for_yggdrasil=for_yggdrasil)
-        if ((('multiple_outputs' in cls.function_param)
-             and isinstance(vars_list, list) and (len(vars_list) > 1))):
-            out = cls.format_function_param('multiple_outputs', outputs=out)
+        if isinstance(vars_list, list) and (len(vars_list) > 1):
+            if in_definition and ('multiple_outputs_def' in cls.function_param):
+                out = cls.format_function_param('multiple_outputs_def', outputs=out)
+            elif 'multiple_outputs' in cls.function_param:
+                out = cls.format_function_param('multiple_outputs', outputs=out)
         return out
 
     @classmethod
