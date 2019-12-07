@@ -442,8 +442,12 @@ int is_send(const char *buf) {
  */
 static inline
 void va_list_t_skip(va_list_t *ap, size_t nbytes) {
-  printf("skipping %d bytes\n", sizeof(char[nbytes]));
-  va_arg(ap->va, char[nbytes]);
+  if (nbytes == sizeof(void*)) {
+    va_arg(ap->va, void*);
+  } else {
+    printf("WARNING: Getting argument of size %d.\n", nbytes);
+    va_arg(ap->va, char[nbytes]);
+  }
 };
 
   
