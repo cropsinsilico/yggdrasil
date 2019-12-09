@@ -51,6 +51,7 @@ environment:
       YGG_TEST_FLAGS: "--long-running"
     - platform: x64
       PYTHON_VERSION: "3.6"
+      INSTALLZMQ: 0
       YGG_TEST_FLAGS: "--long-running"
     - platform: x64
       PYTHON_VERSION: "3.6"
