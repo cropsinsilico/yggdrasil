@@ -225,7 +225,7 @@ jobs:
       script:
         - yggtest --ci --test-suite=types --languages matlab python cpp
     - os: linux
-      env: YGG_ENABLE_LONG_TESTS=1
+      env: YGG_ENABLE_LONG_TESTS=1 YGG_DEFAULT_COMM=ZMQComm
       python: 3.8
       dist: xenial
       sudo: true
