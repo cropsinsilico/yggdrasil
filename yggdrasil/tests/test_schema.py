@@ -59,7 +59,15 @@ _normalize_objects = [
                'serializer': {'seritype': 'direct'},
                'field_names': ['a', 'b'],
                'field_units': ['cm', 'g']}]}]})]
-                                    
+
+
+def test_get_json_schema():
+    r"""Test getting pure JSON version of schema."""
+    test_file = 'strict_json_schema.json'
+    schema.get_json_schema(test_file)
+    assert(os.path.isfile(test_file))
+    os.remove(test_file)
+    
 
 def test_SchemaRegistry():
     r"""Test schema registry."""

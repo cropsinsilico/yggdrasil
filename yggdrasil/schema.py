@@ -2,6 +2,7 @@ import os
 import copy
 import pprint
 import yaml
+import json
 from collections import OrderedDict
 from jsonschema.exceptions import ValidationError
 from yggdrasil import metaschema, backwards
@@ -121,6 +122,72 @@ def get_schema(fname=None):
         out = _schema
     else:
         out = load_schema(fname)
+    return out
+
+
+def convert_extended2base(s):
+    r"""Covert schema from the extended form to a strictly JSON form.
+
+    Args:
+        s (object): Object to updated.
+
+    Returns:
+        object: Updated JSON object.
+
+    """
+    # TODO: Automate this on classes
+    type_map = {'int': 'integer', 'uint': 'integer',
+                'float': 'number', 'complex': 'string',
+                'unicode': 'string', 'bytes': 'string',
+                'function': 'string', 'class': 'string',
+                'instance': 'string', '1darray': 'array',
+                'ndarray': 'array', 'obj': 'object',
+                'ply': 'object'}
+    if isinstance(s, (list, tuple)):
+        s = [convert_extended2base(x) for x in s]
+    elif isinstance(s, (dict, OrderedDict)):
+        if 'type' in s:
+            if isinstance(s['type'], str):
+                if s['type'] in ['schema']:
+                    s = {"$ref": "#/definitions/schema"}
+                elif s['type'] in type_map:
+                    s['type'] = type_map[s['type']]
+                    s.pop('class', None)
+                # Scalars not currently included in the schema
+                # elif s['type'] in ['scalar']:
+                #     s.pop("precision", None)
+                #     s.pop("units", None)
+                #     s['type'] = type_map[s.pop('subtype')]
+            elif isinstance(s['type'], list):
+                assert('schema' not in s['type'])
+                assert('scalar' not in s['type'])
+                s['type'] = [type_map.get(t, t) for t in s['type']]
+                if all([t == s['type'][0] for t in s['type']]):
+                    s['type'] = s['type'][0]
+        s = {k: convert_extended2base(v) for k, v in s.items()}
+    return s
+
+
+def get_json_schema(fname_dst=None):
+    r"""Return the yggdrasil schema as a strictly JSON schema without
+    any of the extended datatypes.
+
+    Args:
+        fname_dst (str, optional): Full path to file where the JSON
+            schema should be saved. Defaults to None and no file is
+            created.
+
+    Returns:
+        dict: Converted structure.
+
+    """
+    s = get_schema()
+    out = copy.deepcopy(s.schema)
+    out['definitions']['schema'] = copy.deepcopy(metaschema._metaschema)
+    out = convert_extended2base(out)
+    if fname_dst is not None:
+        with open(fname_dst, 'w') as fd:
+            json.dump(out, fd)
     return out
 
 
