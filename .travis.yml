@@ -243,8 +243,8 @@ jobs:
           - $HOME/Library/Caches/Homebrew
           - $HOME/R/Library
       env: YGG_PYTHON=2.7 R_LIBS_USER=$HOME/R/Library
-      script: true
-      #  - yggtest --ci --long-running
+      script:
+        - yggtest --ci --test-suite=timing  # --long-running
     - os: osx
       python: 3.7
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
@@ -271,20 +271,20 @@ jobs:
             - doxygen
           update: true
 
-    # Mac test after cache
-    - stage: test-with-cache
-      os: osx
-      python: 2.7
-      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-      cache:
-        pip: false
-        directories:
-          - $HOME/Library/Caches/pip
-          - $HOME/Library/Caches/Homebrew
-          - $HOME/R/Library
-      env: YGG_PYTHON=2.7 R_LIBS_USER=$HOME/R/Library
-      script:
-        - yggtest --ci --long-running
+    # # Mac test after cache
+    # - stage: test-with-cache
+    #   os: osx
+    #   python: 2.7
+    #   language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+    #   cache:
+    #     pip: false
+    #     directories:
+    #       - $HOME/Library/Caches/pip
+    #       - $HOME/Library/Caches/Homebrew
+    #       - $HOME/R/Library
+    #   env: YGG_PYTHON=2.7 R_LIBS_USER=$HOME/R/Library
+    #   script:
+    #     - yggtest --ci --test-suite=timing  # --long-running
 
     # Docs
     - stage: deploy
