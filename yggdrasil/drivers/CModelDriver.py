@@ -660,9 +660,7 @@ class CModelDriver(CompiledModelDriver):
                 x['datatype']['shape'] = [
                     int(float(s.strip('[]')))
                     for s in x.pop('shape').split('][')]
-                if 'subtype' not in x['datatype']:
-                    assert(x['datatype']['type'] in _valid_types)
-                    x['datatype']['subtype'] = x['datatype']['type']
+                assert(x['datatype']['subtype'] in _valid_types)
                 if len(x['datatype']['shape']) == 1:
                     x['datatype']['length'] = x['datatype'].pop(
                         'shape')[0]
@@ -1271,13 +1269,16 @@ class CModelDriver(CompiledModelDriver):
         
     @classmethod
     def write_function_def(cls, function_name, dont_add_lengths=False,
-                           **kwargs):
+                           use_length_prefix=False, **kwargs):
         r"""Write a function definition.
 
         Args:
             function_name (str): Name fo the function being defined.
             dont_add_lengths (bool, optional): If True, length variables
                 are not added for arrays. Defaults to False.
+            use_length_prefix (bool, optional): If True and length variables
+                are added, they will be named using prefixes. Otherwise,
+                suffixes will be used. Defaults to False.
             **kwargs: Additional keyword arguments are passed to the
                 parent class's method.
 
@@ -1297,12 +1298,20 @@ class CModelDriver(CompiledModelDriver):
                 else:
                     io_var = kwargs.get(io + 's', [])
                 for x in io_var:
+                    if use_length_prefix:
+                        v_length = 'length_' + x['name']
+                        v_ndim = 'ndim_' + x['name']
+                        v_shape = 'shape_' + x['name']
+                    else:
+                        v_length = x['name'] + '_length'
+                        v_ndim = x['name'] + '_ndim'
+                        v_shape = x['name'] + '_shape'
                     if x.get('is_length_var', False):
                         continue
                     if cls.requires_length_var(x):
                         if not x.get('length_var', False):
                             x['length_var'] = {
-                                'name': x['name'] + '_length',
+                                'name': v_length,
                                 'datatype': {'type': 'uint',
                                              'precision': 64},
                                 'is_length_var': True}
@@ -1310,21 +1319,21 @@ class CModelDriver(CompiledModelDriver):
                     elif cls.requires_shape_var(x):
                         if not x.get('ndim_var', False):
                             x['ndim_var'] = {
-                                'name': x['name'] + '_ndim',
+                                'name': v_ndim,
                                 'datatype': {'type': 'uint',
                                              'precision': 64},
                                 'is_length_var': True}
                             io_var.append(x['ndim_var'])
                         if not x.get('shape_var', False):
                             x['shape_var'] = {
-                                'name': x['name'] + '_shape',
+                                'name': v_shape,
                                 'datatype': {'type': '1darray',
                                              'subtype': 'uint',
                                              'precision': 64},
                                 'is_length_var': True}
                             io_var.append(x['shape_var'])
                         length_var = {
-                            'name': x['name'] + '_length',
+                            'name': v_length,
                             'datatype': {'type': 'uint',
                                          'precision': 64},
                             'is_length_var': True}
@@ -1538,7 +1547,8 @@ class CModelDriver(CompiledModelDriver):
     @classmethod
     def write_assign_to_output(cls, dst_var, src_var,
                                outputs_in_inputs=False,
-                               dont_add_lengths=False, **kwargs):
+                               dont_add_lengths=False,
+                               use_length_prefix=False, **kwargs):
         r"""Write lines assigning a value to an output variable.
 
         Args:
@@ -1553,6 +1563,9 @@ class CModelDriver(CompiledModelDriver):
                 Defaults to False.
             dont_add_lengths (bool, optional): If True, length variables
                 are not added for arrays. Defaults to False.
+            use_length_prefix (bool, optional): If True and length variables
+                are added, they will be named using prefixes. Otherwise,
+                suffixes will be used. Defaults to False.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method.
 
@@ -1570,9 +1583,15 @@ class CModelDriver(CompiledModelDriver):
                 dst_var_length = dst_var.get('length_var', None)
             if not dont_add_lengths:
                 if src_var_length is None:
-                    src_var_length = src_var['name'] + '_length'
+                    if use_length_prefix:
+                        src_var_length = 'length_' + src_var['name']
+                    else:
+                        src_var_length = src_var['name'] + '_length'
                 if dst_var_length is None:
-                    dst_var_length = dst_var['name'] + '_length'
+                    if use_length_prefix:
+                        dst_var_length = 'length_' + dst_var['name']
+                    else:
+                        dst_var_length = dst_var['name'] + '_length'
                 out += cls.write_assign_to_output(
                     dst_var_length, src_var_length,
                     outputs_in_inputs=outputs_in_inputs)
@@ -1598,31 +1617,73 @@ class CModelDriver(CompiledModelDriver):
             if dont_add_lengths:  # pragma: debug
                 raise RuntimeError("Shape must be set in order "
                                    "to write ND array assignments.")
-            dst_var_ndim = {'name': dst_var['name'] + '_ndim',
-                            'datatype': {'type': 'uint',
-                                         'precision': 64}}
-            src_var_ndim = {'name': src_var['name'] + '_ndim',
-                            'datatype': {'type': 'uint',
-                                         'precision': 64}}
+            # Dimensions
+            src_var_ndim = None
+            dst_var_ndim = None
+            if isinstance(src_var, dict):
+                src_var_ndim = src_var.get('ndim_var', None)
+            if isinstance(dst_var, dict):
+                dst_var_ndim = dst_var.get('ndim_var', None)
+            if src_var_ndim is None:
+                if use_length_prefix:
+                    src_var_ndim = 'ndim_' + src_var['name']
+                else:
+                    src_var_ndim = src_var['name'] + '_ndim'
+            if dst_var_ndim is None:
+                if use_length_prefix:
+                    dst_var_ndim = 'ndim_' + dst_var['name']
+                else:
+                    dst_var_ndim = dst_var['name'] + '_ndim'
+            if isinstance(src_var_ndim, str):
+                src_var_ndim = {'name': src_var_ndim,
+                                'datatype': {'type': 'uint',
+                                             'precision': 64}}
+            if isinstance(dst_var_ndim, str):
+                dst_var_ndim = {'name': dst_var_ndim,
+                                'datatype': {'type': 'uint',
+                                             'precision': 64}}
+
             out += cls.write_assign_to_output(
                 dst_var_ndim, src_var_ndim,
                 outputs_in_inputs=outputs_in_inputs)
-            dst_var_shape = {'name': dst_var['name'] + '_shape',
-                             'datatype': {'type': '1darray',
-                                          'subtype': 'uint',
-                                          'precision': 64},
-                             'length_var': dst_var_ndim['name']}
-            src_var_shape = {'name': src_var['name'] + '_shape',
-                             'datatype': {'type': '1darray',
-                                          'subtype': 'uint',
-                                          'precision': 64},
-                             'length_var': src_var_ndim['name']}
+            # Shape
+            src_var_shape = None
+            dst_var_shape = None
+            if isinstance(src_var, dict):
+                src_var_shape = src_var.get('shape_var', None)
+            if isinstance(dst_var, dict):
+                dst_var_shape = dst_var.get('shape_var', None)
+            if src_var_shape is None:
+                if use_length_prefix:
+                    src_var_shape = 'shape_' + src_var['name']
+                else:
+                    src_var_shape = src_var['name'] + '_shape'
+            if dst_var_shape is None:
+                if use_length_prefix:
+                    dst_var_shape = 'shape_' + dst_var['name']
+                else:
+                    dst_var_shape = dst_var['name'] + '_shape'
+            if isinstance(src_var_shape, str):
+                src_var_shape = {'name': src_var_shape,
+                                 'datatype': {'type': '1darray',
+                                              'subtype': 'uint',
+                                              'precision': 64},
+                                 'length_var': src_var_ndim['name']}
+            if isinstance(dst_var_shape, str):
+                dst_var_shape = {'name': dst_var_shape,
+                                 'datatype': {'type': '1darray',
+                                              'subtype': 'uint',
+                                              'precision': 64},
+                                 'length_var': dst_var_ndim['name']}
             out += cls.write_assign_to_output(
                 dst_var_shape, src_var_shape,
                 outputs_in_inputs=outputs_in_inputs,
                 dont_add_lengths=True)
             src_var_dtype = cls.get_native_type(**src_var).rsplit('*', 1)[0]
-            src_var_length = src_var['name'] + '_length'
+            if use_length_prefix:
+                src_var_length = 'length_' + src_var['name']
+            else:
+                src_var_length = src_var['name'] + '_length'
             out += (('{length} = 1;\n'
                      'size_t cdim;\n'
                      'for (cdim = 0; cdim < {ndim}; cdim++) {{\n'

@@ -68,7 +68,8 @@ class TestExampleTypes(ExampleTstBase):
         testclass.assert_result_equal(x_recv, x_sent)
 
     @classmethod
-    def get_varstr(cls, vars_list, language, using_pointers=False):
+    def get_varstr(cls, vars_list, language, using_pointers=False,
+                   length_prefix=False, dont_add_lengths=False):
         r"""Determine the vars string that should be used in the yaml.
 
         Args:
@@ -77,31 +78,46 @@ class TestExampleTypes(ExampleTstBase):
             using_pointers (bool, optional): If True and the tested
                 language supports pointers, pointers will be used rather
                 than explicit arrays. Defaults to False.
+            length_prefix (bool, optional): If True, the length variables
+                will be given prefixes instead of suffixes. Defaults to
+                False.
+            dont_add_lengths (bool, optional): If True, lengths will not
+                be added to the definition or assignments. Defaults to
+                False.
 
         Returns:
             str: Variable string.
 
         """
         out = []
+        if length_prefix:
+            length_fmt = 'length_%s'
+            ndim_fmt = 'ndim_%s'
+            shape_fmt = 'shape_%s'
+        else:
+            length_fmt = '%s_length'
+            ndim_fmt = '%s_ndim'
+            shape_fmt = '%s_shape'
         for v in vars_list:
             out.append(v['name'])
             typename = v['datatype']['type']
-            if language == 'c':
+            if (language == 'c') and (not dont_add_lengths):
                 if using_pointers:
                     if typename in ['string', 'bytes',
                                     'unicode', '1darray']:
-                        out.append('%s_length' % v['name'])
+                        out.append(length_fmt % v['name'])
                     elif typename in ['ndarray']:
-                        out += ['%s_ndim' % v['name'],
-                                '%s_shape' % v['name']]
+                        out += [ndim_fmt % v['name'],
+                                shape_fmt % v['name']]
                 elif typename in ['string', 'bytes', 'unicode']:
-                    out.append('%s_length' % v['name'])
+                    out.append(length_fmt % v['name'])
         return ', '.join(out)
         
     @classmethod
     def setup_model(cls, language, typename, language_ext=None,
                     using_pointers=False, using_generics=False,
-                    split_array=False, **kwargs):
+                    split_array=False, dont_add_lengths=False,
+                    length_prefix=False, assign_kws=None, **kwargs):
         r"""Write the model file for the specified combination of
         language and type.
 
@@ -121,6 +137,14 @@ class TestExampleTypes(ExampleTstBase):
             split_array (bool, optional): If True and the tested datatype
                 is an array, the variables will be split and specified
                 explicitly in the yaml. Defaults to False.
+            dont_add_lengths (bool, optional): If True, lengths will not
+                be added to the definition or assignments. Defaults to
+                False.
+            length_prefix (bool, optional): If True, the length variables
+                will be given prefixes instead of suffixes. Defaults to
+                False.
+            assign_kws (dict, optional): Keyword arguments for the calls
+                to write_assign_to_output. Defaults to {}.
             **kwargs: Additional keyword arguments are passed to
                 the write_function_def class method of the language
                 driver.
@@ -129,6 +153,14 @@ class TestExampleTypes(ExampleTstBase):
             str: Full path to the file that was written.
 
         """
+        if assign_kws is None:
+            assign_kws = {}
+        if language in ['c', 'c++', 'cpp']:
+            # dont_add_lengths is only valid for C/C++
+            kwargs['dont_add_lengths'] = dont_add_lengths
+            kwargs['use_length_prefix'] = length_prefix
+            assign_kws.setdefault('dont_add_lengths', dont_add_lengths)
+            assign_kws.setdefault('use_length_prefix', length_prefix)
         yaml_fields = {'vars': False, 'dtype': False}
         if language_ext is None:
             language_ext = get_language_ext(language)
@@ -159,7 +191,8 @@ class TestExampleTypes(ExampleTstBase):
                     i['datatype'].pop(k, None)
                     o['datatype'].pop(k, None)
             function_contents += drv.write_assign_to_output(
-                o, i, outputs_in_inputs=drv.outputs_in_inputs)
+                o, i, outputs_in_inputs=drv.outputs_in_inputs,
+                **assign_kws)
         lines = drv.write_function_def(
             'model', function_contents=function_contents,
             inputs=copy.deepcopy(inputs),
@@ -188,7 +221,9 @@ class TestExampleTypes(ExampleTstBase):
                     lines.append(
                         '  vars: %s' % cls.get_varstr(
                             io_vars, language,
-                            using_pointers=using_pointers))
+                            using_pointers=using_pointers,
+                            length_prefix=length_prefix,
+                            dont_add_lengths=dont_add_lengths))
                 if yaml_fields['dtype']:
                     if len(io_vars) == 1:
                         dtype = io_vars[0]['datatype']
@@ -228,6 +263,24 @@ class TestExampleTypes(ExampleTstBase):
                                                    self.datatype,
                                                    using_pointers=True)]
             super(TestExampleTypes, self).run_example()
+            # C Specific tests
+            if self.language == 'c':
+                if self.datatype == 'string':
+                    # Version using pointers & no lengths
+                    self._output_files = [
+                        self.setup_model(self.language,
+                                         self.datatype,
+                                         using_pointers=True,
+                                         dont_add_lengths=True)]
+                    super(TestExampleTypes, self).run_example()
+                elif self.datatype == 'ndarray':
+                    # Version using pointers & prefixes
+                    self._output_files = [
+                        self.setup_model(self.language,
+                                         self.datatype,
+                                         using_pointers=True,
+                                         length_prefix=True)]
+                    super(TestExampleTypes, self).run_example()
         # Version splitting array
         if self.datatype == 'array':
             self._output_files = [self.setup_model(self.language,
