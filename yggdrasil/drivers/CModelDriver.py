@@ -976,10 +976,7 @@ class CModelDriver(CompiledModelDriver):
                 nptr -= 1
             if nptr > 0:
                 out['subtype'] = out['type']
-                if nptr == 1:
-                    out['type'] = '1darray'
-                else:
-                    out['type'] = 'ndarray'
+                out['type'] = '1darray'
         if out['type'] in _valid_types:
             out['subtype'] = out['type']
             out['type'] = 'scalar'
