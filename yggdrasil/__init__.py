@@ -8,7 +8,6 @@ import logging
 import argparse
 import subprocess
 import importlib
-import contextlib
 from ._version import get_versions
 _test_package_name = None
 _test_package = None
@@ -30,17 +29,6 @@ if platform._is_win:  # pragma: windows
     # This is required to fix crash on Windows in case of Ctrl+C
     # https://github.com/ContinuumIO/anaconda-issues/issues/905#issuecomment-232498034
     os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = 'T'
-
-
-@contextlib.contextmanager
-def working_directory(path):
-    """Changes working directory and returns to previous on exit."""
-    prev_cwd = os.getcwd()
-    os.chdir(path)
-    try:
-        yield
-    finally:
-        os.chdir(prev_cwd)
 
 
 def expand_and_add(path, path_list, dir_list):  # pragma: no cover
