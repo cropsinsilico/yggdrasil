@@ -159,8 +159,10 @@ class TestPlyDict(YggTestClassInfo):
             self.assert_equal(o1, o2)
 
     @unittest.skipIf(not LPyModelDriver.is_installed(), "LPy library not installed.")
-    def test_to_from_scene(self, _as_obj=False):  # pragma: lpy
+    def test_to_from_scene(self, _as_obj=False, data=None):  # pragma: lpy
         r"""Test conversion to/from PlantGL scene."""
+        if data is None:
+            data = self._simple_test
         o1 = self.instance
         cls = o1.__class__
         s = o1.to_scene(name='test')
@@ -168,7 +170,7 @@ class TestPlyDict(YggTestClassInfo):
         # Direct equivalence won't happen unless test is just for simple mesh
         # as faces with more than 3 vertices will be triangulated.
         cls = self.import_cls
-        o1 = cls(self._simple_test)
+        o1 = cls(data)
         s = o1.to_scene(name='test')
         o2 = cls.from_scene(s)
         # import pprint

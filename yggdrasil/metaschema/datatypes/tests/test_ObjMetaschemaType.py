@@ -93,10 +93,20 @@ class TestObjDict(parent.TestPlyDict):
         super(TestObjDict, self).test_apply_scalar_map(_as_obj=True)
 
     @unittest.skipIf(not LPyModelDriver.is_installed(), "LPy library not installed.")
-    def test_to_from_scene(self):  # pragma: lpy
+    def test_to_from_scene(self, data=None):  # pragma: lpy
         r"""Test conversion to/from PlantGL scene."""
-        super(TestObjDict, self).test_to_from_scene(_as_obj=True)
+        super(TestObjDict, self).test_to_from_scene(_as_obj=True, data=data)
 
+    @unittest.skipIf(not LPyModelDriver.is_installed(), "LPy library not installed.")
+    def test_to_from_scene_incomplete(self):  # pragma: lpy
+        r"""Test conversion to/from PlantGL scene with faces missing
+        texcoords/normals on last element."""
+        data = copy.deepcopy(self._simple_test)
+        for f in data['faces'][-1]:
+            f.pop('texcoord_index', None)
+            f.pop('normal_index', None)
+        self.test_to_from_scene(data=data)
+        
 
 class TestObjMetaschemaType(parent.TestPlyMetaschemaType):
     r"""Test class for ObjMetaschemaType class with float."""
