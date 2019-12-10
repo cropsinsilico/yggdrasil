@@ -296,6 +296,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                     function_contents += self.import_cls.write_assign_to_output(
                         o['name'], i['name'],
                         outputs_in_inputs=outputs_in_inputs)
+                    function_contents += self.import_cls.write_print_output_var(
+                        o['name'], in_inputs=outputs_in_inputs)
             output_var = self.import_cls.prepare_output_variables(
                 outputs, in_inputs=self.import_cls.outputs_in_inputs,
                 in_definition=True)

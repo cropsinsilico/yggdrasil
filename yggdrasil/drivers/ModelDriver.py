@@ -1909,21 +1909,25 @@ checking if the model flag indicates
 
         """
         out = []
+        print_key = None
+        varname = var
         if isinstance(var, dict):
+            varname = var['name']
             typename = var.get(
                 'datatype',
                 {'type': var.get('type', None)}).get('type', None)
-            print_key = None
             if ('print_%s' % typename) in cls.function_param:
                 print_key = ('print_%s' % typename)
             elif 'print_generic' in cls.function_param:
                 print_key = 'print_generic'
-            if print_key:
-                if prefix_msg is not None:
-                    out.append(cls.format_function_param(
-                        'print', message=prefix_msg))
-                out += [cls.format_function_param(
-                    print_key, object=var['name'])]
+        elif 'print_generic' in cls.function_param:
+            print_key = 'print_generic'
+        if print_key:
+            if prefix_msg is not None:
+                out.append(cls.format_function_param(
+                    'print', message=prefix_msg))
+            out += [cls.format_function_param(
+                print_key, object=varname)]
         return out
 
     @classmethod
