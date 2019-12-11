@@ -812,7 +812,7 @@ class CModelDriver(CompiledModelDriver):
                     out['name'] = '(%s)' % out['name']
             else:
                 out = dict(out, name='&' + out['name'])
-                if 'shape' in out.get('datatype', {}):
+                if ('shape' in out.get('datatype', {})) and (not platform._is_win):
                     out['name'] += len(out['datatype']['shape']) * '[0]'
         return out
         
