@@ -269,7 +269,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         assert_raises(RuntimeError, self.import_cls.run_code, lines)
 
     def test_write_function_def(self, inputs=None, outputs=None,
-                                outputs_in_inputs=None):
+                                outputs_in_inputs=None, **kwargs):
         r"""Test writing and running a function definition."""
         if self.import_cls.function_param is None:
             self.assert_raises(NotImplementedError,
@@ -305,7 +305,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                 'test_function', inputs=inputs, output_var=output_var,
                 function_contents=function_contents,
                 flag_var=flag_var, outputs_in_inputs=outputs_in_inputs,
-                print_inputs=True, print_outputs=True)
+                print_inputs=True, print_outputs=True, **kwargs)
             # Add second definition to test ability to locate specific
             # function in the presence of others
             definition.append('')

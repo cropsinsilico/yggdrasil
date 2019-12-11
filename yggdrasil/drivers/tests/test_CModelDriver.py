@@ -76,7 +76,8 @@ class TestCModelDriverNoInit(TestCModelParam,
                                  'precision': 32,
                                  'units': 'cm'}}]
         self.test_write_function_def(inputs=inputs, outputs=outputs,
-                                     outputs_in_inputs=False)
+                                     outputs_in_inputs=False,
+                                     dont_add_lengths=True)
         
     def test_write_function_def_void(self):
         r"""Test writing and running a function definition with no output."""
@@ -87,6 +88,29 @@ class TestCModelDriverNoInit(TestCModelParam,
         outputs = []
         self.test_write_function_def(inputs=inputs, outputs=outputs,
                                      outputs_in_inputs=False)
+        
+    def test_write_function_def_string(self):
+        r"""Test writing and running a function definition with no length var."""
+        inputs = [{'name': 'x', 'value': '"hello"',
+                   'length_var': 'length_x',
+                   'datatype': {'type': 'string',
+                                'precision': 20,
+                                'units': ''}},
+                  {'name': 'length_x', 'value': 5,
+                   'datatype': {'type': 'uint',
+                                'precision': 64},
+                   'is_length_var': True}]
+        outputs = [{'name': 'y',
+                    'length_var': 'length_y',
+                    'datatype': {'type': 'string',
+                                 'precision': 20,
+                                 'units': ''}},
+                   {'name': 'length_y',
+                    'datatype': {'type': 'uint',
+                                 'precision': 64},
+                    'is_length_var': True}]
+        self.test_write_function_def(inputs=inputs, outputs=outputs,
+                                     dont_add_lengths=True)
         
     
 class TestCModelDriverNoStart(TestCModelParam,
