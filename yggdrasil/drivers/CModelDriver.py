@@ -731,7 +731,10 @@ class CModelDriver(CompiledModelDriver):
                 if cls.requires_length_var(v) and (not v.get('length_var', False)):
                     if v['datatype']['type'] in ['1darray', 'ndarray']:  # pragma: debug
                         raise RuntimeError("Length must be defined for arrays.")
-                    v['length_var'] = 'strlen(%s)' % v['name']
+                    elif v['datatype'].get('subtype', v['datatype']['type']) == 'bytes':
+                        v['length_var'] = 'strlen(%s)' % v['name']
+                    else:
+                        v['length_var'] = 'strlen4(%s)' % v['name']
                 elif (cls.requires_shape_var(v)
                       and not (v.get('ndim_var', False)
                                and v.get('shape_var', False))):  # pragma: debug
@@ -1603,7 +1606,11 @@ class CModelDriver(CompiledModelDriver):
                      in ['1darray', 'ndarray'])):  # pragma: debug
                     raise RuntimeError("Length must be set in order "
                                        "to write array assignments.")
-                src_var_length = 'strlen(%s)' % src_var['name']
+                elif (dst_var['datatype'].get('subtype', dst_var['datatype']['type'])
+                      in ['bytes']):
+                    src_var_length = 'strlen(%s)' % src_var['name']
+                else:
+                    src_var_length = 'strlen4(%s)' % src_var['name']
             src_var_dtype = cls.get_native_type(**src_var)
             if src_var_dtype in ['bytes_t', 'unicode_t', 'string_t']:
                 src_var_dtype = 'char*'

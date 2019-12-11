@@ -265,7 +265,7 @@ class TestExampleTypes(ExampleTstBase):
             super(TestExampleTypes, self).run_example()
             # C Specific tests
             if self.language == 'c':
-                if self.datatype == 'string':
+                if self.datatype in ['string', 'bytes', 'unicode']:
                     # Version using pointers & no lengths
                     self._output_files = [
                         self.setup_model(self.language,

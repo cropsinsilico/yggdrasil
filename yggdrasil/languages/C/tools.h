@@ -341,6 +341,22 @@ void yggError(const char* fmt, ...) {
 #endif
 
 /*!
+  @brief Get the length (in bytes) of a character array containing 4 byte
+  unicode characters.
+  @param[in] strarg char* Pointer to character array.
+  @returns size_t Length of strarg in bytes.
+ */
+static inline
+size_t strlen4(char* strarg) {
+  if(!strarg)
+    return 0; //strarg is NULL pointer
+  char* str = strarg;
+  for(;*str;str+=4)
+    ; // empty body
+  return (str - strarg);
+}
+
+/*!
   @brief Called snprintf and realloc buffer if the formatted string is
   larger than the provided buffer.
   @param[in] dst char** Pointer to buffer where formatted message
