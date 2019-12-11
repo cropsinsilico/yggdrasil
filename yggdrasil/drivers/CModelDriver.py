@@ -708,21 +708,24 @@ class CModelDriver(CompiledModelDriver):
                                        'is_length_var': True,
                                        'dependent': True}
                 elif cls.requires_shape_var(v):
-                    if not v.get('ndim_var', False):
-                        v['ndim_var'] = {
-                            'name': v['name'] + '_ndim',
-                            'datatype': {'type': 'uint',
-                                         'precision': 64},
-                            'is_length_var': True,
-                            'dependent': True}
-                    if not v.get('shape_var', False):
-                        v['shape_var'] = {
-                            'name': v['name'] + '_ndim',
-                            'datatype': {'type': '1darray',
-                                         'subtype': 'uint',
-                                         'precision': 64},
-                            'is_length_var': True,
-                            'dependent': True}
+                    if not (v.get('ndim_var', False)
+                            and v.get('shape_var', False)):  # pragma: debug
+                        raise RuntimeError("Uncomment logic that follows.")
+                    # if not v.get('ndim_var', False):
+                    #     v['ndim_var'] = {
+                    #         'name': v['name'] + '_ndim',
+                    #         'datatype': {'type': 'uint',
+                    #                      'precision': 64},
+                    #         'is_length_var': True,
+                    #         'dependent': True}
+                    # if not v.get('shape_var', False):
+                    #     v['shape_var'] = {
+                    #         'name': v['name'] + '_ndim',
+                    #         'datatype': {'type': '1darray',
+                    #                      'subtype': 'uint',
+                    #                      'precision': 64},
+                    #         'is_length_var': True,
+                    #         'dependent': True}
         for x in outputs:
             for v in x['vars']:
                 if cls.requires_length_var(v) and (not v.get('length_var', False)):
