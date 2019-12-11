@@ -308,7 +308,7 @@ class ObjDict(PlyDict):
                 entry = []
                 for _f in f:
                     if 'texcoord_index' not in _f:
-                        if i > 0:
+                        if i > 0:  # pragma: debug
                             warnings.warn(("'texcoord_index' missing from face"
                                            + "%d, texcoord indices will be "
                                            + "ignored.") % i)
@@ -334,7 +334,7 @@ class ObjDict(PlyDict):
                 entry = []
                 for _f in f:
                     if 'normal_index' not in _f:
-                        if i > 0:
+                        if i > 0:  # pragma: debug
                             warnings.warn(("'normal_index' missing from face"
                                            + "%d, normal indices will be "
                                            + "ignored.") % i)

@@ -102,9 +102,10 @@ class TestObjDict(parent.TestPlyDict):
         r"""Test conversion to/from PlantGL scene with faces missing
         texcoords/normals on last element."""
         data = copy.deepcopy(self._simple_test)
-        for f in data['faces'][-1]:
-            f.pop('texcoord_index', None)
-            f.pop('normal_index', None)
+        for f in data['faces']:
+            for ff in f:
+                ff.pop('texcoord_index', None)
+                ff.pop('normal_index', None)
         self.test_to_from_scene(data=data)
         
 
