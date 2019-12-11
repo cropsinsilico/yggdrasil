@@ -3,8 +3,16 @@ import copy
 import pprint
 import pystache
 import yaml
+import git
+import sys
+
 from yggdrasil import backwards
 from yggdrasil.schema import standardize, get_schema
+
+if sys.version_info > (3, 0):
+    from urllib.parse import urlparse
+else:
+    from urlparse import urlparse
 
 
 def load_yaml(fname):
@@ -12,7 +20,13 @@ def load_yaml(fname):
 
     Args:
         fname (str, file, dict): Path to a YAML file, an open file descriptor
-            to a file containing a YAML, or a loaded YAML document.
+            to a file containing a YAML, or a loaded YAML document. If fname starts with
+            'git:' then the code will assume the file is in a remote git repository. The
+            remainder of fname can be the full url to the YAML file
+            (http://mygit.repo/foo/bar/yaml/interesting.yml) or just the repo and
+            YAML file (the server is assumed to be github.com if not given)
+            (foo/bar/yam/interesting.yaml will be interpreted as
+            http://github.com/foo/bar/yam/interesting.yml).
 
     Returns:
         dict: Contents of yaml file.
@@ -24,6 +38,34 @@ def load_yaml(fname):
         yamlparsed.setdefault('working_dir', os.getcwd())
         return yamlparsed
     elif isinstance(fname, str):
+        # pull foreign file
+        if fname.startswith('git:'):
+            # drop the git prefix
+            fname = fname[4:]
+            # make sure we start with a full url
+            if 'http' not in fname:
+                url = 'http://github.com/' + fname
+            else:
+                url = fname
+            # get the constituent url parts
+            parsed = urlparse(url)
+            # get the path component
+            splitpath = parsed.path.split('/')
+            # the first part is the 'owner' of the repo
+            owner = splitpath[1]
+            # the second part is the repo name
+            reponame = splitpath[2]
+            # the full path is the file name and location
+            # turn the file path into an os based format
+            fname = os.path.join(*splitpath)
+            # check to see if the file already exists, and clone if it does not
+            if not os.path.exists(fname):
+                # create the url for cloning the repo
+                cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
+                    reponame
+                # clone the repo into the appropriate directory
+                _ = git.Repo.clone_from(cloneurl, os.path.join(owner, reponame))
+                # now that it is cloned, just pass the yaml file (and path) onwards
         fname = os.path.realpath(fname)
         if not os.path.isfile(fname):
             raise IOError("Unable locate yaml file %s" % fname)
@@ -223,8 +265,8 @@ def parse_model(yml, existing):
             x['model_driver'] = [yml['name']]
             existing = parse_component(x, io[:-1], existing=existing)
     return existing
-            
-    
+
+
 def parse_connection(yml, existing):
     r"""Parse a yaml entry for a connection between I/O channels.
 
@@ -331,7 +373,7 @@ def parse_connection(yml, existing):
         xi['driver'] = 'InputDriver'
 
     # Parse drivers
-    
+
     # Transfer connection keywords to one connection driver
     conn_keys_gen = ['inputs', 'outputs']
     conn_keys = list(set(schema['connection'].properties) - set(conn_keys_gen))
