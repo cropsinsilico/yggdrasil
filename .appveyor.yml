@@ -58,7 +58,10 @@ environment:
       YGG_TEST_FLAGS: "--test-suite=examples"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=types"
+      YGG_TEST_FLAGS: "--test-suite=types --languages r c"
+    - platform: x64
+      PYTHON_VERSION: "3.6"
+      YGG_TEST_FLAGS: "--test-suite=types --languages matlab python cpp"
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
