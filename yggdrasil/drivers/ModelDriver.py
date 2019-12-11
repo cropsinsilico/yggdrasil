@@ -1284,10 +1284,9 @@ class ModelDriver(Driver):
         new_val = []
         io_re = cls.format_function_param('%s_def_regex' % io)
         for i, ivar in enumerate(cls.split_variables(value)):
+            igrp = {'name': ivar}
             x = re.search(io_re, ivar)
-            if x is None:
-                igrp = {'name': ivar}
-            else:
+            if x is not None:
                 igrp = x.groupdict()
                 for k in list(igrp.keys()):
                     if igrp[k] is None:
