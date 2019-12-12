@@ -273,7 +273,7 @@ class TestExampleTypes(ExampleTstBase):
                                          using_pointers=True,
                                          dont_add_lengths=True)]
                     super(TestExampleTypes, self).run_example()
-                elif self.datatype == 'ndarray':
+                elif self.datatype in ['1darray', 'ndarray']:
                     # Version using pointers & prefixes
                     self._output_files = [
                         self.setup_model(self.language,

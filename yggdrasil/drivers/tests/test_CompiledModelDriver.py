@@ -33,6 +33,8 @@ def test_get_compilation_tool():
                       'compiler', 'invalid')
     else:
         assert_raises(NotImplementedError, CModelDriver.get_tool, 'compiler')
+    assert_equal(CompiledModelDriver.get_compilation_tool('compiler', 'invalid',
+                                                          default='invalid'), 'invalid')
 
 
 def test_CompilationToolBase():

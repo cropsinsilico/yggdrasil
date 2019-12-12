@@ -293,9 +293,7 @@ class CompilationToolBase(object):
                     old_val = getattr(cls, k, [])
                     for ienv in env:
                         new_val = os.environ.get(ienv, '').split()
-                        for v in new_val:
-                            if v not in old_val:
-                                old_val.append(v)
+                        old_val += [v for v in new_val if v not in old_val]
                 else:
                     setattr(cls, k, os.environ.get(env, getattr(cls, k)))
         # Set default_executable to name
