@@ -400,6 +400,7 @@ public:
 					       "PyInstMetaschemaType::python2c: ",
 					       T_OBJECT);
     // TODO: Use name from Python object?
+    idata->name[0] = '\0';
     strcpy(idata->name, class_name_);
     idata->args = args_type_->python2c(py_args);
     idata->kwargs = kwargs_type_->python2c(py_kwargs);
@@ -544,6 +545,7 @@ public:
       p = &arg;
     }
     (*nargs)--;
+    arg->name[0] = '\0';
     strncpy(arg->name, class_name_, PYTHON_NAME_SIZE);
     arg->args = cargs;
     arg->kwargs = ckwargs;

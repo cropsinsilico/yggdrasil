@@ -249,6 +249,9 @@ public:
    */
   PyObject* c2python(YggGeneric *cobj) const override {
     python_t *arg = (python_t*)(cobj->get_data());
+    if (arg == NULL) {
+      ygglog_throw_error("PyObjMetaschemaType::c2python: Python structure is NULL.");
+    }
     PyObject *pyobj = arg->obj;
     return pyobj;
   }
@@ -284,6 +287,10 @@ public:
 		   YggGeneric* x) const override {
     size_t nargs = 1;
     python_t arg;
+    arg.name[0] = '\0';
+    arg.args = NULL;
+    arg.kwargs = NULL;
+    arg.obj = NULL;
     x->get_data(arg);
     return MetaschemaType::encode_data(writer, &nargs, arg);
   }
@@ -333,6 +340,7 @@ public:
       p = &arg;
     }
     (*nargs)--;
+    arg->name[0] = '\0';
     strncpy(arg->name, (char*)encoded_bytes, nbytes_expected);
     arg->args = NULL;
     arg->kwargs = NULL;
