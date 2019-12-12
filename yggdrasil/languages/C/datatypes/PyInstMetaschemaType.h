@@ -151,8 +151,16 @@ public:
       return false;
     if (strcmp(class_name_, pRef->class_name()) != 0)
       return false;
+    if ((args_type_ == NULL) || (pRef->args_type() == NULL)) {
+      if (args_type_ != (pRef->args_type()))
+        return false;
+    }
     if (*args_type_ != *(pRef->args_type()))
       return false;
+    if ((kwargs_type_ == NULL) || (pRef->kwargs_type() == NULL)) {
+      if (kwargs_type_ != (pRef->kwargs_type()))
+        return false;
+    }
     if (*kwargs_type_ != (*pRef->kwargs_type()))
       return false;
     return true;
@@ -194,10 +202,16 @@ public:
     set_item_python_dict_c(out, "class", class_name_,
 			   "PyInstMetaschemaType::as_python_dict: ",
 			   T_STRING, PYTHON_NAME_SIZE);
+    if (args_type_ == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::as_python_dict: Args type is NULL.");
+    }
     PyObject* pyargs = args_type_->as_python_dict();
     set_item_python_dict(out, "args", pyargs,
 			 "PyInstMetaschemaType::as_python_dict: ",
 			 T_ARRAY);
+    if (kwargs_type_ == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::as_python_dict: Kwargs type is NULL.");
+    }
     PyObject* pykwargs = kwargs_type_->as_python_dict();
     set_item_python_dict(out, "kwargs", pykwargs,
 			 "PyInstMetaschemaType::as_python_dict: ",
@@ -232,6 +246,9 @@ public:
    */
   void update(const MetaschemaType* new_info) override {
     PyObjMetaschemaType::update(new_info);
+    if (new_info == NULL) {
+      return;
+    }
     const PyInstMetaschemaType* new_info_inst = dynamic_cast<const PyInstMetaschemaType*>(new_info);
     update_class_name(new_info_inst->class_name());
     update_args_type(new_info_inst->args_type());
@@ -242,6 +259,9 @@ public:
     @param[in] new_class_name const char * String for new class name.
    */
   void update_class_name(const char* new_class_name, bool force=false) {
+    if (new_class_name == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::update_class_name: New class name is NULL.");
+    }
     if ((!(force)) && (strlen(class_name_) > 0) && (strcmp(class_name_, new_class_name) != 0)) {
       ygglog_throw_error("PyInstMetaschemaType::update_class_name: Cannot update class name from %s to %s.",
     			 class_name_, new_class_name);
@@ -255,6 +275,9 @@ public:
    */
   void update_args_type(const JSONArrayMetaschemaType* new_args_type,
 			bool force=false) {
+    if (new_args_type == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::update_args_type: New args_type is NULL.");
+    }
     if ((!(force)) && (args_type_ != NULL) && (*new_args_type != *args_type_)) {
       ygglog_throw_error("PyInstMetaschemaType::update_args_type: Cannot update args type.");
     }
@@ -271,6 +294,9 @@ public:
    */
   void update_kwargs_type(const JSONObjectMetaschemaType* new_kwargs_type,
 			bool force=false) {
+    if (new_kwargs_type == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::update_kwargs_type: New kwargs_type is NULL.");
+    }
     if ((!(force)) && (kwargs_type_ != NULL) && (*new_kwargs_type != *kwargs_type_)) {
       ygglog_throw_error("PyInstMetaschemaType::update_kwargs_type: Cannot update kwargs type.");
     }
@@ -287,7 +313,10 @@ public:
   void update_use_generic(const bool new_use_generic) override {
     MetaschemaType::update_use_generic(new_use_generic);
     // Force children to follow parent use_generic
-    args_type_->update_use_generic(use_generic());
+    if (args_type_ != NULL)
+      args_type_->update_use_generic(use_generic());
+    if (kwargs_type_ != NULL)
+      kwargs_type_->update_use_generic(use_generic());
   }
   /*!
     @brief Update the type object with info from provided variable arguments for serialization.
@@ -345,6 +374,10 @@ public:
     @returns YggGeneric* Pointer to C object.
    */
   YggGeneric* python2c(PyObject* pyobj) const override {
+    if (args_type_ == NULL)
+      ygglog_throw_error("PyInstMetaschemaType::python2c: Args type is NULL.");
+    if (kwargs_type_ == NULL)
+      ygglog_throw_error("PyInstMetaschemaType::python2c: Kwargs type is NULL.");
     YggGeneric* cobj = new YggGeneric(this, NULL, 0);
     void** data = cobj->get_data_pointer();
     python_t* idata = (python_t*)realloc(data[0], nbytes());
@@ -386,6 +419,9 @@ public:
     if (args_type_ == NULL) {
       ygglog_throw_error("PyInstMetaschemaType::encode_type_prop: Args type is not initialized.");
     }
+    if (kwargs_type_ == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::encode_type_prop: Kwargs type is not initialized.");
+    }
     writer->Key("class");
     writer->String(class_name_);
     // Args
@@ -394,6 +430,9 @@ public:
     MetaschemaTypeVector items = args_type_->items();
     size_t i;
     for (i = 0; i < items.size(); i++) {
+      if (items[i] == NULL) {
+        ygglog_throw_error("PyInstMetaschemaType::encode_type_prop: Args type item %lu is NULL.", i);
+      }
       if (!(items[i]->encode_type(writer)))
 	return false;
     }
@@ -405,6 +444,9 @@ public:
     MetaschemaTypeMap::const_iterator it = properties.begin();
     for (it = properties.begin(); it != properties.end(); it++) {
       writer->Key(it->first.c_str());
+      if ((it->second) == NULL) {
+        ygglog_throw_error("PyInstMetaschemaType::encode_type_prop: Kwargs type item %s is NULL.", it->first.c_str());
+      }
       if (!(it->second->encode_type(writer)))
 	return false;
     }
