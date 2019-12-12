@@ -42,26 +42,26 @@ environment:
   rabbitmq_installer_path: "C:\\Users\\appveyor\\rabbitmq-server-3.7.3.exe"
 
   matrix:
-    - platform: x64
-      PYTHON_VERSION: "2.7"
-      INSTALLZMQ: 0
-      INSTALLC: 0
-    - platform: x64
-      PYTHON_VERSION: "2.7"
-      YGG_TEST_FLAGS: "--long-running"
-    - platform: x64
-      PYTHON_VERSION: "3.6"
-      INSTALLZMQ: 0
-      YGG_TEST_FLAGS: "--long-running"
-    - platform: x64
-      PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=examples"
+    # - platform: x64
+    #   PYTHON_VERSION: "2.7"
+    #   INSTALLZMQ: 0
+    #   INSTALLC: 0
+    # - platform: x64
+    #   PYTHON_VERSION: "2.7"
+    #   YGG_TEST_FLAGS: "--long-running"
+    # - platform: x64
+    #   PYTHON_VERSION: "3.6"
+    #   INSTALLZMQ: 0
+    #   YGG_TEST_FLAGS: "--long-running"
+    # - platform: x64
+    #   PYTHON_VERSION: "3.6"
+    #   YGG_TEST_FLAGS: "--test-suite=examples"
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_TEST_FLAGS: "--test-suite=types --languages r c"
-    - platform: x64
-      PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=types --languages matlab python cpp"
+    # - platform: x64
+    #   PYTHON_VERSION: "3.6"
+    #   YGG_TEST_FLAGS: "--test-suite=types --languages matlab python cpp"
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
