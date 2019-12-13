@@ -17,6 +17,7 @@ class TestExampleTypes(ExampleTstBase):
 
     example_name = 'types'
     iter_over = ['language', 'type']
+    iter_flaky = [('c', 'instance'), ('cpp', 'instance')]
 
     def __init__(self, *args, **kwargs):
         self.datatype = None

@@ -1,5 +1,6 @@
 import unittest
 import copy
+import flaky
 from yggdrasil.tests import assert_raises
 from yggdrasil.config import ygg_cfg
 from yggdrasil.communication import new_comm
@@ -11,6 +12,7 @@ _rmq_installed = RMQComm.is_installed(language='python')
 
 
 @unittest.skipIf(not _rmq_installed, "RMQ Server not running")
+@flaky.flaky
 class TestRMQComm(test_AsyncComm.TestAsyncComm):
     r"""Test for RMQComm communication class."""
 

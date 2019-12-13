@@ -5,6 +5,7 @@ import unittest
 import tempfile
 import shutil
 import itertools
+import flaky
 from yggdrasil.components import ComponentMeta
 from yggdrasil import runner, tools, platform, backwards
 from yggdrasil.examples import yamls, source, ext_map
@@ -28,6 +29,7 @@ class ExampleMeta(ComponentMeta):
         iter_lists = []
         iter_keys = []
         test_name_fmt = 'test'
+        iter_flaky = dct.get('iter_flaky', [])
         iter_over = dct.get('iter_over', ['language'])
         for x in iter_over:
             test_name_fmt += '_%s'
@@ -50,6 +52,8 @@ class ExampleMeta(ComponentMeta):
                     itest_func = make_iter_test(**{k: v for k, v in
                                                    zip(iter_keys, x)})
                     itest_func.__name__ = itest_name
+                    if x in iter_flaky:
+                        itest_func = flaky.flaky(itest_func)
                     dct[itest_name] = itest_func
         out = super(ExampleMeta, cls).__new__(cls, name, bases, dct)
         if out.example_name is not None:
@@ -68,6 +72,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     expects_error = False
     env = {}
     iter_over = ['language']
+    iter_flaky = []
 
     def __init__(self, *args, **kwargs):
         tools.YggClass.__init__(self, self.example_name)

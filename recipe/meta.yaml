@@ -45,6 +45,7 @@ requirements:
   run:
     - cmake
     - czmq
+    - flaky
     - GitPython
     - jsonschema
     - matplotlib

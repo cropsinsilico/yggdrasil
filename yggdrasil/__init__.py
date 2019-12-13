@@ -123,7 +123,9 @@ def run_tsts(**kwargs):  # pragma: no cover
          False,
          {'help': ('Validate components on creation. This causes '
                    'a decrease in performance so it is turned off '
-                   'by default.')})]
+                   'by default.')}),
+        (['noflaky', 'no-flaky'], ['flaky'],
+         False, {'help': 'Don\'t re-run flaky tests.'})]
     for pos_dest, neg_dest, default, kws in arguments:
         dest = pos_dest[0]
         for x in [pos_dest, neg_dest]:
@@ -218,6 +220,12 @@ def run_tsts(**kwargs):  # pragma: no cover
             argv.append('--cover-package=yggdrasil')
         elif _test_package_name == 'pytest':
             argv.append('--cov=%s' % package_dir)
+    if args.noflaky:
+        if _test_package_name == 'pytest':
+            argv += ['-p', 'no:flaky']
+    else:
+        if _test_package_name == 'nose':
+            argv.append('--with-flaky')
     # Get expanded tests to allow for paths that are relative to either the
     # yggdrasil root directory or the current working directory
     expanded_test_paths = []

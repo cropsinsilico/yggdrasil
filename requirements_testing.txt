@@ -2,6 +2,7 @@ codecov
 coverage
 coveralls
 flake8
+flaky
 nose
 pytest
 pytest-cov<2.6; python_version < '3.4'
