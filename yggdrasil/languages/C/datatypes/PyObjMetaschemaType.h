@@ -239,6 +239,7 @@ public:
     convert_python2c(py_name, &(idata->name), T_BYTES,
 		     "PyObjMetaschemaType::python2c: ",
 		     PYTHON_NAME_SIZE);
+    Py_DECREF(py_name);
     data[0] = (void*)idata;
     return cobj;
   }

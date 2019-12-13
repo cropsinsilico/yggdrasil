@@ -329,6 +329,7 @@ public:
     size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
     if (use_generic())
       return out;
+    ygglog_throw_error("PyObjMetaschemaType::update_from_serialization_args: Not implemented");
     python_t arg = va_arg(ap.va, python_t);
     out++;
     if (args_type_ == NULL) {
@@ -399,6 +400,7 @@ public:
     PyObject *py_kwargs = get_item_python_list(py_enc, 1,
 					       "PyInstMetaschemaType::python2c: ",
 					       T_OBJECT);
+    Py_DECREF(py_enc);
     // TODO: Use name from Python object?
     idata->name[0] = '\0';
     strcpy(idata->name, class_name_);
@@ -406,6 +408,8 @@ public:
     idata->kwargs = kwargs_type_->python2c(py_kwargs);
     idata->obj = pyobj;
     data[0] = (void*)idata;
+    Py_DECREF(py_args);
+    Py_DECREF(py_kwargs);
     return cobj;
   }
 
@@ -473,6 +477,9 @@ public:
     if (args_type_ == NULL) {
       ygglog_throw_error("PyInstMetaschemaType::encode_data: Args type is not initialized.");
     }
+    if (args == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::encode_data: Args is not initialized.");
+    }
     if (!(args_type_->encode_data(writer, args)))
       return false;
     // Kwargs
@@ -480,6 +487,9 @@ public:
     (*nargs)--;
     if (kwargs_type_ == NULL) {
       ygglog_throw_error("PyInstMetaschemaType::encode_data: Kwargs type is not initialized.");
+    }
+    if (kwargs == NULL) {
+      ygglog_throw_error("PyInstMetaschemaType::encode_data: Kwargs is not initialized.");
     }
     if (!(kwargs_type_->encode_data(writer, kwargs)))
       return false;
@@ -567,6 +577,9 @@ public:
     if (arg->obj == NULL) {
       ygglog_throw_error("PyInstMetaschemaType::decode_data: Failed to call constructor.");
     }
+    Py_DECREF(py_class);
+    Py_DECREF(py_args);
+    Py_DECREF(py_kwargs);
     return true;
   }
 
