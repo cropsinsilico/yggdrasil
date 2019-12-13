@@ -61,13 +61,31 @@ _normalize_objects = [
                'field_units': ['cm', 'g']}]}]})]
 
 
+def test_get_form_schema():
+    r"""Test getting schema for generating a YAML form."""
+    s = schema.get_schema()
+    s.form_schema
+
+
+def test_get_model_form_schema():
+    r"""Test getting schema for generating a YAML form."""
+    test_file = 'strict_json_schema.json'
+    schema.get_model_form_schema(test_file)
+    assert(os.path.isfile(test_file))
+    with open(test_file, 'r') as fd:
+        contents = fd.read()
+    for k in ['oneOf', 'anyOf', 'allOf']:
+        assert(k not in contents)
+    os.remove(test_file)
+
+
 def test_get_json_schema():
     r"""Test getting pure JSON version of schema."""
     test_file = 'strict_json_schema.json'
     schema.get_json_schema(test_file)
     assert(os.path.isfile(test_file))
     os.remove(test_file)
-    
+
 
 def test_SchemaRegistry():
     r"""Test schema registry."""
