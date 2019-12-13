@@ -16,3 +16,4 @@ scipy
 six
 sysv_ipc; platform_system != 'Windows'
 unyt; python_version >= '3.4'
+GitPython
