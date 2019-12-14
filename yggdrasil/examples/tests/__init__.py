@@ -53,7 +53,7 @@ class ExampleMeta(ComponentMeta):
                                                    zip(iter_keys, x)})
                     itest_func.__name__ = itest_name
                     if x in iter_flaky:
-                        itest_func = flaky.flaky(itest_func)
+                        itest_func = flaky.flaky(max_runs=3)(itest_func)
                     dct[itest_name] = itest_func
         out = super(ExampleMeta, cls).__new__(cls, name, bases, dct)
         if out.example_name is not None:
