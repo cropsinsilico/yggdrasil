@@ -17,9 +17,13 @@ _test_registry = {}
 _default_comm = tools.get_default_comm()
 
 
-def make_iter_test(**kwargs):
+def make_iter_test(is_flaky=False, **kwargs):
     def itest(self):
+        if is_flaky:
+            self.sleep(1.0)
         self.run_iteration(**kwargs)
+    if is_flaky:
+        itest = flaky.flaky(max_runs=3)(itest)
     return itest
 
 
@@ -49,11 +53,10 @@ class ExampleMeta(ComponentMeta):
             for x in itertools.product(*iter_lists):
                 itest_name = backwards.as_str(test_name_fmt % x)
                 if itest_name not in dct:
-                    itest_func = make_iter_test(**{k: v for k, v in
+                    itest_func = make_iter_test(is_flaky=(x in iter_flaky),
+                                                **{k: v for k, v in
                                                    zip(iter_keys, x)})
                     itest_func.__name__ = itest_name
-                    if x in iter_flaky:
-                        itest_func = flaky.flaky(max_runs=3)(itest_func)
                     dct[itest_name] = itest_func
         out = super(ExampleMeta, cls).__new__(cls, name, bases, dct)
         if out.example_name is not None:
