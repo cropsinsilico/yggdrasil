@@ -21,8 +21,8 @@ class TestRMQAsyncClientParam(parent.TestClientParam):
         self.route_timeout = 60.0
 
 
-@flaky
 @unittest.skipIf(not _rmq_installed, "RMQ Server not running")
+@flaky.flaky
 class TestRMQAsyncClientDriverNoStart(TestRMQAsyncClientParam,
                                       parent.TestClientDriverNoStart):
     r"""Test class for RMQAsyncClientDriver class without start."""
