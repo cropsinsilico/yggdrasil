@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Autowrapping Model Functions &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>Autowrapping Model Functions &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="YAML Files" href="yaml.html" />
+    <link rel="next" title="Conditional I/O" href="conditional_io.html" />
     <link rel="prev" title="Server/Client I/O" href="server_client_io.html" /> 
 </head>
 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -93,6 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -191,7 +193,7 @@
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/model_function.html">Example in other languages</a>)</p>
-<p>In order to allow yggdrasil to wrap model functions, the corresponding entry in the YAML specification file should include an entry for the <code class="docutils literal notranslate"><span class="pre">function</span></code> parameter which should be the name of the model function within the model file (in this provided via the <code class="docutils literal notranslate"><span class="pre">args</span></code> parameter). In addition, the number of input and output channels listed for the model must match the number of inputs and outputs that the model accepts and returns.</p>
+<p>In order to allow yggdrasil to wrap model functions, the corresponding entry in the YAML specification file should include a value for the <code class="docutils literal notranslate"><span class="pre">function</span></code> parameter which should be the name of the model function within the model file (provided via the <code class="docutils literal notranslate"><span class="pre">args</span></code> parameter). If no inputs or outputs are provided, yggdrasil will attempt to parse the definition for the target model function in order to determine the model’s inputs and outputs. If inputs and/or outputs are provided in the YAML they must either match the number of inputs and/or outputs in the function defintion (as below) or there must only be one and all of the model’s inputs and/or outputs will be bundled as an array.</p>
 <p>Model YAML:</p>
 <div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -240,6 +242,15 @@
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/model_function.html">Example in other languages</a>)</p>
 </div>
+<div class="section" id="notes-on-autowrapping-c-c-model-functions">
+<h1>Notes on Autowrapping C/C++ Model Functions<a class="headerlink" href="#notes-on-autowrapping-c-c-model-functions" title="Permalink to this headline">¶</a></h1>
+<p>The autowrapping of C/C++ models differs from other languages in several respects.</p>
+<ol class="arabic simple">
+<li><p>The output variables are expected to be assigned by pointers as inputs (or references in the case of C++). yggdrasil assumes that no input variables come after the output variables.</p></li>
+<li><p>For C models, the user must explicitly specify the names of the output variables as it is not possible for yggdrasil to determine whether a variable is an input or output based on the function definition alone since input variables can also be pointers. In the case of C++ models, yggdrasil can identify output variables based on the presence of the “pass by reference” operator <code class="docutils literal notranslate"><span class="pre">&amp;</span></code>. If a C++ model definition defines an output variable as a pointer instead, the user must explicitly declare the output variables as in the case of a C model.</p></li>
+<li><p>For input and output strings, yggdrasil assumes that the string variable (or pointer) is immediately followed by a variable (or pointer) that contains (or will contain) the string length.</p></li>
+</ol>
+</div>
 
 
            </div>
@@ -249,7 +260,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="yaml.html" class="btn btn-neutral float-right" title="YAML Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="conditional_io.html" class="btn btn-neutral float-right" title="Conditional I/O" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="server_client_io.html" class="btn btn-neutral float-left" title="Server/Client I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

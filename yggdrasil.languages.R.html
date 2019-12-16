@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.languages.R package &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.languages.R package &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -180,7 +182,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>R_cmd</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – List of R commands to run.</p></li>
+<li><p><strong>R_cmd</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – List of R commands to run.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to make_call.</p></li>
 </ul>
 </dd>
@@ -188,7 +190,7 @@
 <dd class="field-even"><p>True if the call was successful, False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -200,16 +202,16 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.Namespace" title="(in Python v3.7)"><em>argparse.Namespace</em></a><em>, </em><em>optional</em>) – Arguments parsed from the
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.Namespace" title="(in Python v3.8)"><em>argparse.Namespace</em></a><em>, </em><em>optional</em>) – Arguments parsed from the
 command line. Default to None and is created from sys.argv.</p></li>
-<li><p><strong>with_sudo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the R installation script will be
+<li><p><strong>with_sudo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the R installation script will be
 called with sudo. Defaults to None and will be set based on args
 and environment variable YGG_USE_SUDO_FOR_R. Only valid for unix
 style operating systems.</p></li>
-<li><p><strong>skip_requirements</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the requirements will not
+<li><p><strong>skip_requirements</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the requirements will not
 be installed. Defaults to None and is set based on if the flag
 ‘–skip-r-requirements’ is in args.</p></li>
-<li><p><strong>update_requirements</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the requirements will be
+<li><p><strong>update_requirements</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the requirements will be
 updated. Defaults to False. Setting this to True, sets
 skip_requirements to False.</p></li>
 </ul>
@@ -218,7 +220,7 @@ skip_requirements to False.</p></li>
 <dd class="field-even"><p>True if install succeded, False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -230,12 +232,12 @@ skip_requirements to False.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>package_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – One or more R packages that should be
+<li><p><strong>package_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – One or more R packages that should be
 installed.</p></li>
-<li><p><strong>update</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, existing packages will be removed
+<li><p><strong>update</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, existing packages will be removed
 and then re-installed. If False, nothing will be done for existing
 packages. Defaults to False.</p></li>
-<li><p><strong>repos</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Mirror where packages should be installed from.
+<li><p><strong>repos</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Mirror where packages should be installed from.
 Defaults to ‘<a class="reference external" href="http://cloud.r-project.org">http://cloud.r-project.org</a>’.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to call_R.</p></li>
 </ul>
@@ -244,7 +246,7 @@ Defaults to ‘<a class="reference external" href="http://cloud.r-project.org">h
 <dd class="field-even"><p>True if call was successful, False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -256,9 +258,9 @@ Defaults to ‘<a class="reference external" href="http://cloud.r-project.org">h
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>R_cmd</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – List of command line executable to call and any arguments
+<li><p><strong>R_cmd</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – List of command line executable to call and any arguments
 that should be passed to it.</p></li>
-<li><p><strong>with_sudo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the R installation script will be
+<li><p><strong>with_sudo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the R installation script will be
 called with sudo. Defaults to False. Only valid for unix style
 operating systems.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to subprocess.check_output.</p></li>
@@ -268,7 +270,7 @@ operating systems.</p></li>
 <dd class="field-even"><p>True if the call was successful, False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -280,14 +282,14 @@ operating systems.</p></li>
 description.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Full path to the description file. Defaults to
+<dd class="field-odd"><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Full path to the description file. Defaults to
 desc_file.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>List of R requirements from the Imports &amp; Depends sections.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -299,9 +301,9 @@ desc_file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>makevars</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file where the temporary Makevars file
+<li><p><strong>makevars</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Full path to the file where the temporary Makevars file
 was written. If None, nothing is done.</p></li>
-<li><p><strong>old_makevars</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file where the old Makevars file
+<li><p><strong>old_makevars</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Full path to the file where the old Makevars file
 is as defined by the environment variable R_MAKEVARS_USER.</p></li>
 </ul>
 </dd>
@@ -314,7 +316,7 @@ is as defined by the environment variable R_MAKEVARS_USER.</p></li>
 <dd><p>Update argument parser with language specific arguments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parser</strong> (<a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.7)"><em>argparse.ArgumentParser</em></a><em>, </em><em>optional</em>) – Existing argument parser
+<dd class="field-odd"><p><strong>parser</strong> (<a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.8)"><em>argparse.ArgumentParser</em></a><em>, </em><em>optional</em>) – Existing argument parser
 that should be updated. Default to None and a new argument parser
 will be created.</p>
 </dd>
@@ -322,7 +324,7 @@ will be created.</p>
 <dd class="field-even"><p>Argument parser with language specific arguments.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.7)">argparse.ArgumentParser</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.8)">argparse.ArgumentParser</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -334,7 +336,7 @@ will be created.</p>
 environment variables of the same name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Full path to file where the files should be
+<dd class="field-odd"><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Full path to file where the files should be
 saved. Defaults to os.path.join(“~”, “.R”, “Makevars”).</p>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -347,7 +349,7 @@ not written and/or the environment variable wasn’t set.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
 </dd>
 </dl>
 </dd></dl>

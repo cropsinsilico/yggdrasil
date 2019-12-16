@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.CMakeModelDriver &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.drivers.CMakeModelDriver &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -171,18 +173,19 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sysconfig</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">components</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">CompilerBase</span><span class="p">,</span> <span class="n">LinkerBase</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.BuildModelDriver</span> <span class="k">import</span> <span class="n">BuildModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="k">import</span> <span class="n">LinkerBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.BuildModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">BuildModelDriver</span><span class="p">,</span> <span class="n">BuildToolBase</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="k">import</span> <span class="n">CModelDriver</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="CMakeConfigure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure">[docs]</a><span class="k">class</span> <span class="nc">CMakeConfigure</span><span class="p">(</span><span class="n">CompilerBase</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeConfigure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure">[docs]</a><span class="k">class</span> <span class="nc">CMakeConfigure</span><span class="p">(</span><span class="n">BuildToolBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;CMake configuration tool.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;cmake&#39;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">]</span>
@@ -191,7 +194,10 @@
     <span class="n">flag_options</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;definitions&#39;</span><span class="p">,</span> <span class="s1">&#39;-D</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span>
                                 <span class="p">(</span><span class="s1">&#39;sourcedir&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>  <span class="c1"># &#39;-S&#39;</span>
                                 <span class="p">(</span><span class="s1">&#39;builddir&#39;</span><span class="p">,</span> <span class="s1">&#39;-B</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span>
-                                <span class="p">(</span><span class="s1">&#39;configuration&#39;</span><span class="p">,</span> <span class="s1">&#39;-DCMAKE_BUILD_TYPE=</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)])</span>
+                                <span class="p">(</span><span class="s1">&#39;configuration&#39;</span><span class="p">,</span> <span class="s1">&#39;-DCMAKE_BUILD_TYPE=</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span>
+                                <span class="p">(</span><span class="s1">&#39;generator&#39;</span><span class="p">,</span> <span class="s1">&#39;-G</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span>
+                                <span class="p">(</span><span class="s1">&#39;toolset&#39;</span><span class="p">,</span> <span class="s1">&#39;-T</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span>
+                                <span class="p">(</span><span class="s1">&#39;platform&#39;</span><span class="p">,</span> <span class="s1">&#39;-A</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)])</span>
     <span class="n">output_key</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">compile_only_flag</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">default_builddir</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
@@ -207,10 +213,8 @@
 <span class="sd">        to registration including things like platform dependent properties and</span>
 <span class="sd">        checking environment variables for default settings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">CompilerBase</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">BuildToolBase</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_64bit</span><span class="p">:</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">default_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-DCMAKE_GENERATOR_PLATFORM=x64&#39;</span><span class="p">)</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">product_files</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;ALL_BUILD.vcxproj&#39;</span><span class="p">,</span>
                                   <span class="s1">&#39;ALL_BUILD.vcxproj.filters&#39;</span><span class="p">,</span>
                                   <span class="s1">&#39;Debug&#39;</span><span class="p">,</span> <span class="s1">&#39;Release&#39;</span><span class="p">,</span> <span class="s1">&#39;Win32&#39;</span><span class="p">,</span> <span class="s1">&#39;Win64&#39;</span><span class="p">,</span> <span class="s1">&#39;x64&#39;</span><span class="p">,</span>
@@ -218,6 +222,76 @@
                                   <span class="s1">&#39;ZERO_CHECK.vcxproj.filters&#39;</span><span class="p">]</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">remove_product_exts</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;Debug&#39;</span><span class="p">,</span> <span class="s1">&#39;Release&#39;</span><span class="p">,</span> <span class="s1">&#39;Win32&#39;</span><span class="p">,</span> <span class="s1">&#39;Win64&#39;</span><span class="p">,</span>
                                         <span class="s1">&#39;x64&#39;</span><span class="p">,</span> <span class="s1">&#39;.dir&#39;</span><span class="p">]</span></div>
+
+    <span class="c1"># The method generator and generator2toolset will only be called</span>
+    <span class="c1"># if the VC 15 build tools are installed by MSVC 19+ which is not</span>
+    <span class="c1"># currently supported by Appveyor CI.</span>
+<div class="viewcode-block" id="CMakeConfigure.generator"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.generator">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">generator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">return_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the generator that should be used.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            return_default (bool, optional): If True, the default generator will</span>
+<span class="sd">                be returned even if the environment variable is set. Defaults to</span>
+<span class="sd">                False.</span>
+<span class="sd">            default (str, optional): Value that should be returned if a generator</span>
+<span class="sd">                cannot be located. Defaults to None.</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to cls.call.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Name of the generator.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">default</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_default</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CMAKE_GENERATOR&#39;</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;--help&#39;</span><span class="p">],</span> <span class="n">skip_flags</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">allow_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;Generators&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Generator call failed:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">lines</span><span class="p">)</span>
+            <span class="n">gen_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">lines</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;Generators&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gen_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">):</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">break</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="CMakeConfigure.generator2toolset"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.generator2toolset">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">generator2toolset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">generator</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the toolset string option that corresponds to the provided</span>
+<span class="sd">        generator name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            generator (str): Name of the generator.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Name of the toolset.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotImplementedError: If the platform is not windows.</span>
+<span class="sd">            ValueError: If the generator is not a flavor of Visual Studio.</span>
+<span class="sd">            ValueError: If a tool set cannot be located for the specified generator.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;generator2toolset only available on Windows&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">generator</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Visual Studio&quot;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Toolsets only available for Visual Studio generators.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">generator</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s1">&#39;Win64&#39;</span><span class="p">,</span> <span class="s1">&#39;ARM&#39;</span><span class="p">,</span> <span class="s1">&#39;IA64&#39;</span><span class="p">)):</span>
+            <span class="n">generator</span> <span class="o">=</span> <span class="p">(</span><span class="n">generator</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">vs_generator_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Visual Studio 16 2019&#39;</span><span class="p">:</span> <span class="s1">&#39;v142&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;Visual Studio 15 2017&#39;</span><span class="p">:</span> <span class="s1">&#39;v141&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;Visual Studio 14 2015&#39;</span><span class="p">:</span> <span class="s1">&#39;v140&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;Visual Studio 12 2013&#39;</span><span class="p">:</span> <span class="s1">&#39;v120&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;Visual Studio 11 2012&#39;</span><span class="p">:</span> <span class="s1">&#39;v110&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;Visual Studio 10 2010&#39;</span><span class="p">:</span> <span class="s1">&#39;v100&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;Visual Studio 9 2008&#39;</span><span class="p">:</span> <span class="s1">&#39;v90&#39;</span><span class="p">}</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">vs_generator_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed to locate toolset for generator: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">generator</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
         
 <div class="viewcode-block" id="CMakeConfigure.append_product"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.append_product">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">append_product</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -289,6 +363,42 @@
                 <span class="n">builddir</span><span class="o">=</span><span class="n">builddir</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
+<div class="viewcode-block" id="CMakeConfigure.call"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.call">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call the tool with the provided arguments. If the first argument</span>
+<span class="sd">        resembles the name of the tool executable, the executable will not be</span>
+<span class="sd">        added.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): The arguments that should be passed to the tool.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method and the associated linker/archiver&#39;s call method</span>
+<span class="sd">                if dont_link is False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Output to stdout from the command execution if skip_flags is</span>
+<span class="sd">                True, produced file otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeConfigure</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                <span class="n">error_MSB4019</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;error MSB4019: The imported project &#39;</span>
+                                 <span class="sa">r</span><span class="s1">&#39;&quot;C:\Microsoft.Cpp.Default.props&quot; was not found.&#39;</span><span class="p">)</span>
+                <span class="c1"># This will only be called if the VC 15 build tools</span>
+                <span class="c1"># are installed by MSVC 19+ which is not currently</span>
+                <span class="c1"># supported by Appveyor CI.</span>
+                <span class="k">if</span> <span class="n">error_MSB4019</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                    <span class="n">old_generator</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CMAKE_GENERATOR&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="n">new_generator</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">generator</span><span class="p">(</span><span class="n">return_default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">old_generator</span> <span class="ow">and</span> <span class="p">(</span><span class="n">old_generator</span> <span class="o">!=</span> <span class="n">new_generator</span><span class="p">):</span>
+                        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;generator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_generator</span>
+                        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;toolset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">generator2toolset</span><span class="p">(</span><span class="n">old_generator</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeConfigure</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">raise</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
 <div class="viewcode-block" id="CMakeConfigure.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sourcedir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">builddir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of configuration/generation flags.</span>
@@ -333,6 +443,13 @@
         <span class="c1">#                                  % os.path.join(conda_prefix, &#39;lib&#39;))</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeConfigure</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="n">sourcedir</span><span class="o">=</span><span class="n">sourcedir</span><span class="p">,</span>
                                                    <span class="n">builddir</span><span class="o">=</span><span class="n">builddir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;platform&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
+            <span class="n">generator</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;generator&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">generator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">generator</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">generator</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">generator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">generator</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s1">&#39;Win64&#39;</span><span class="p">,</span> <span class="s1">&#39;ARM&#39;</span><span class="p">))):</span>
+                <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_64bit</span><span class="p">:</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-DCMAKE_GENERATOR_PLATFORM=x64&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="CMakeConfigure.get_executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeConfigure.get_executable_command">[docs]</a>    <span class="nd">@classmethod</span>
@@ -353,7 +470,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">new_args</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">args</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">version_flags</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">args</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">version_flags</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;--help&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">):</span>
             <span class="n">new_args</span> <span class="o">=</span> <span class="n">args</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;skip_flags&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="n">sourcedir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sourcedir&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -457,15 +574,22 @@
         <span class="c1"># Suppress warnings on windows about the security of strcpy etc.</span>
         <span class="c1"># and target x64 if the current platform is 64bit</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-            <span class="n">new_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;/W4&quot;</span><span class="p">,</span> <span class="s2">&quot;/EHsc&quot;</span><span class="p">,</span> <span class="s1">&#39;/TP&#39;</span><span class="p">,</span> <span class="s2">&quot;/nologo&quot;</span><span class="p">,</span>
-                         <span class="s2">&quot;-D_CRT_SECURE_NO_WARNINGS&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">configuration</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;debug&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="n">new_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;/MTd&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">new_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;/MT&quot;</span><span class="p">)</span>
+            <span class="n">compiler</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span>
+            <span class="n">new_flags</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">default_flags</span>
+            <span class="n">def_flags</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_env_flags</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="s1">&#39;/MD&#39;</span> <span class="ow">in</span> <span class="n">def_flags</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;-MD&#39;</span> <span class="ow">in</span> <span class="n">def_flags</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">configuration</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;debug&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="n">new_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;/MTd&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;/MT&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">new_flags</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">compile_flags</span><span class="p">:</span>
                     <span class="n">compile_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">python_flags</span> <span class="o">=</span> <span class="n">sysconfig</span><span class="o">.</span><span class="n">get_config_var</span><span class="p">(</span><span class="s1">&#39;LIBS&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">python_flags</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">python_flags</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-l&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">linker_flags</span><span class="p">):</span>
+                    <span class="n">linker_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="c1"># Compilation flags</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">compile_flags</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-D&#39;</span><span class="p">):</span>
@@ -822,8 +946,11 @@
             <span class="c1"># used</span>
             <span class="n">conda_prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tool_instance</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get_conda_prefix</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">conda_prefix</span><span class="p">:</span>
-                <span class="n">newlines_before</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conda_prefix</span><span class="p">,</span> <span class="s1">&#39;lib&#39;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                    <span class="n">conda_lib</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conda_prefix</span><span class="p">,</span> <span class="s1">&#39;libs&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\\\</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">conda_lib</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conda_prefix</span><span class="p">,</span> <span class="s1">&#39;lib&#39;</span><span class="p">)</span>
+                <span class="n">newlines_before</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">conda_lib</span><span class="p">)</span>
             <span class="c1"># Explicitly set Release/Debug directories to builddir on windows</span>
             <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
                 <span class="k">for</span> <span class="n">artifact</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;runtime&#39;</span><span class="p">,</span> <span class="s1">&#39;library&#39;</span><span class="p">,</span> <span class="s1">&#39;archive&#39;</span><span class="p">]:</span>
@@ -929,25 +1056,6 @@
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="s1">&#39;CMAKE_OSX_DEPLOYMENT_TARGET=</span><span class="si">%s</span><span class="s1">&#39;</span>
                     <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;MACOSX_DEPLOYMENT_TARGET&#39;</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">out</span></div>
-    
-<div class="viewcode-block" id="CMakeModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
-<span class="sd">                class&#39;s method.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            dict: Environment variables for the model process.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span><span class="p">,</span> <span class="s1">&#39;update_ld_library_path&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span><span class="o">.</span><span class="n">update_ld_library_path</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-        <span class="c1"># C++ may also need the C libraries</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_language</span> <span class="o">==</span> <span class="s1">&#39;c++&#39;</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">CModelDriver</span><span class="o">.</span><span class="n">update_ld_library_path</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 

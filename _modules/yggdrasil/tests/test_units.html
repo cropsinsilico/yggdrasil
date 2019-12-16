@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests.test_units &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.tests.test_units &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -246,7 +248,14 @@
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">are_compatible</span><span class="p">(</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">are_compatible</span><span class="p">(</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">are_compatible</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;hr&#39;</span><span class="p">))</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">are_compatible</span><span class="p">(</span><span class="s1">&#39;hr&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">))</span></div></div>
+        <span class="k">assert</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">are_compatible</span><span class="p">(</span><span class="s1">&#39;hr&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TestUnits.test_convert_R_unit_string"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestUnits.test_convert_R_unit_string">[docs]</a>    <span class="k">def</span> <span class="nf">test_convert_R_unit_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test convert_R_unit_string.&quot;&quot;&quot;</span>
+        <span class="n">pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;g2&#39;</span><span class="p">,</span> <span class="s1">&#39;g**2&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;g2 km s-2&#39;</span><span class="p">,</span> <span class="s1">&#39;g**2 km s**-2&#39;</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">convert_R_unit_string</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">y</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

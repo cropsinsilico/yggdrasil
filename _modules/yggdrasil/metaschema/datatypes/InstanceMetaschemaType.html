@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes.InstanceMetaschemaType &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.InstanceMetaschemaType &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
@@ -171,10 +173,14 @@
   <h1>Source code for yggdrasil.metaschema.datatypes.InstanceMetaschemaType</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">MetaschemaTypeError</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.MetaschemaType</span> <span class="k">import</span> <span class="n">MetaschemaType</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">JSONArrayMetaschemaType</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">JSONObjectMetaschemaType</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ArgsMetaschemaProperty</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">ArgsMetaschemaProperty</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.KwargsMetaschemaProperty</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">KwargsMetaschemaProperty</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="InstanceMetaschemaType"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.InstanceMetaschemaType.InstanceMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">InstanceMetaschemaType</span><span class="p">(</span><span class="n">MetaschemaType</span><span class="p">):</span>
@@ -182,10 +188,10 @@
 
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;instance&#39;</span>
     <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Type for Python class instances.&#39;</span>
-    <span class="n">properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">]</span>
+    <span class="n">properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;kwargs&#39;</span><span class="p">]</span>
     <span class="n">definition_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span>
-    <span class="n">metadata_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">]</span>
-    <span class="n">extract_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">]</span>
+    <span class="n">metadata_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;kwargs&#39;</span><span class="p">]</span>
+    <span class="n">extract_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;kwargs&#39;</span><span class="p">]</span>
     <span class="n">python_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="p">)</span>
     <span class="n">cross_language_support</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -206,6 +212,7 @@
         <span class="c1"># against the object class</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ArgsMetaschemaProperty</span><span class="o">.</span><span class="n">instance2args</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="n">KwargsMetaschemaProperty</span><span class="o">.</span><span class="n">instance2kwargs</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">except</span> <span class="n">MetaschemaTypeError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">raise_errors</span><span class="p">:</span>
@@ -226,11 +233,18 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">args</span> <span class="o">=</span> <span class="n">ArgsMetaschemaProperty</span><span class="o">.</span><span class="n">instance2args</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;args&#39;</span> <span class="ow">in</span> <span class="n">typedef</span><span class="p">):</span>
-            <span class="n">typedef_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]}</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">typedef_args</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">JSONObjectMetaschemaType</span><span class="o">.</span><span class="n">encode_data</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">typedef_args</span><span class="p">)</span></div>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">KwargsMetaschemaProperty</span><span class="o">.</span><span class="n">instance2kwargs</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="n">typedef_args</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">typedef_kwargs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;args&#39;</span> <span class="ow">in</span> <span class="n">typedef</span><span class="p">:</span>
+                <span class="n">typedef_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]}</span>
+            <span class="k">if</span> <span class="s1">&#39;kwargs&#39;</span> <span class="ow">in</span> <span class="n">typedef</span><span class="p">:</span>
+                <span class="n">typedef_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]}</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">JSONArrayMetaschemaType</span><span class="o">.</span><span class="n">encode_data</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">typedef_args</span><span class="p">),</span>
+            <span class="n">JSONObjectMetaschemaType</span><span class="o">.</span><span class="n">encode_data</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">typedef_kwargs</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="InstanceMetaschemaType.decode_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.InstanceMetaschemaType.InstanceMetaschemaType.decode_data">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">decode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
@@ -247,9 +261,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO: Normalization can be removed if metadata is normalized</span>
         <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">normalize_definition</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="n">JSONObjectMetaschemaType</span><span class="o">.</span><span class="n">decode_data</span><span class="p">(</span>
-            <span class="n">obj</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="p">{})})</span>
-        <span class="k">return</span> <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">](</span><span class="o">**</span><span class="n">args</span><span class="p">)</span></div></div>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">JSONArrayMetaschemaType</span><span class="o">.</span><span class="n">decode_data</span><span class="p">(</span>
+            <span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="p">[])})</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">JSONObjectMetaschemaType</span><span class="o">.</span><span class="n">decode_data</span><span class="p">(</span>
+            <span class="n">obj</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;kwargs&#39;</span><span class="p">,</span> <span class="p">{})})</span>
+        <span class="k">return</span> <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

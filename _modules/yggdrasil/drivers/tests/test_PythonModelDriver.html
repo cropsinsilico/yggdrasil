@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests.test_PythonModelDriver &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_PythonModelDriver &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
@@ -179,17 +181,7 @@
 <div class="viewcode-block" id="TestPythonModelDriverNoInit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_PythonModelDriver.TestPythonModelDriverNoInit">[docs]</a><span class="k">class</span> <span class="nc">TestPythonModelDriverNoInit</span><span class="p">(</span><span class="n">TestPythonModelParam</span><span class="p">,</span>
                                   <span class="n">parent</span><span class="o">.</span><span class="n">TestInterpretedModelDriverNoInit</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for PythonModelDriver without init.&quot;&quot;&quot;</span>
-    
-<div class="viewcode-block" id="TestPythonModelDriverNoInit.test_write_model_wrapper"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_PythonModelDriver.TestPythonModelDriverNoInit.test_write_model_wrapper">[docs]</a>    <span class="k">def</span> <span class="nf">test_write_model_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test writing a model based on yaml parameters.&quot;&quot;&quot;</span>
-        <span class="n">inputs</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;outside_loop&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
-                  <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">}}]</span>
-        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">}},</span>
-                   <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;outside_loop&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">write_model_wrapper</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
-                                            <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
-                                            <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestPythonModelDriverNoInit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_write_model_wrapper</span><span class="p">()</span></div></div>
+    <span class="k">pass</span></div>
         
 
 <div class="viewcode-block" id="TestPythonModelDriverNoStart"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_PythonModelDriver.TestPythonModelDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestPythonModelDriverNoStart</span><span class="p">(</span><span class="n">TestPythonModelParam</span><span class="p">,</span>

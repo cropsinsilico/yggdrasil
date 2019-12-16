@@ -12,6 +12,14 @@ yggdrasil.tests.test\_backwards module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.tests.test\_command\_line module
+------------------------------------------
+
+.. automodule:: yggdrasil.tests.test_command_line
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.tests.test\_components module
 ---------------------------------------
 

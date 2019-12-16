@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests.test_CModelDriver &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_CModelDriver &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
@@ -168,7 +170,6 @@
             
   <h1>Source code for yggdrasil.drivers.tests.test_CModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span>
 <span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_CompiledModelDriver</span> <span class="k">as</span> <span class="nn">parent</span>
@@ -212,15 +213,18 @@
 <div class="viewcode-block" id="TestCModelDriverNoInit.get_test_types"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.get_test_types">[docs]</a>    <span class="k">def</span> <span class="nf">get_test_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the list of tuples mapping json type to expected native type.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestCModelDriverNoInit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_test_types</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">out</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
                 <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">}</span>
-                <span class="n">vnew</span> <span class="o">=</span> <span class="s1">&#39;float64_t*&#39;</span>
+                        <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">}</span>
+                <span class="n">vnew</span> <span class="o">=</span> <span class="s1">&#39;float*&#39;</span>
                 <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">knew</span><span class="p">,</span> <span class="n">vnew</span><span class="p">)</span>
             <span class="k">elif</span> <span class="s1">&#39;X&#39;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
                 <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">}</span>
-                <span class="n">vnew</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;64&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;complex&#39;</span><span class="p">:</span>
+                    <span class="n">vnew</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">vnew</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;64&#39;</span><span class="p">)</span>
                 <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">knew</span><span class="p">,</span> <span class="n">vnew</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
     
@@ -230,7 +234,54 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">write_try_except</span><span class="p">,</span>
                                <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">super</span><span class="p">(</span><span class="n">TestCModelDriverNoInit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_write_try_except</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+            <span class="nb">super</span><span class="p">(</span><span class="n">TestCModelDriverNoInit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_write_try_except</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestCModelDriverNoInit.test_write_function_def_single"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.test_write_function_def_single">[docs]</a>    <span class="k">def</span> <span class="nf">test_write_function_def_single</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test writing and running a function definition with single output.&quot;&quot;&quot;</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                   <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}]</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                 <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_write_function_def</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+                                     <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                     <span class="n">dont_add_lengths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestCModelDriverNoInit.test_write_function_def_void"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.test_write_function_def_void">[docs]</a>    <span class="k">def</span> <span class="nf">test_write_function_def_void</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test writing and running a function definition with no output.&quot;&quot;&quot;</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                   <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}]</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_write_function_def</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+                                     <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestCModelDriverNoInit.test_write_function_def_string"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.test_write_function_def_string">[docs]</a>    <span class="k">def</span> <span class="nf">test_write_function_def_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test writing and running a function definition with no length var.&quot;&quot;&quot;</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="s1">&#39;&quot;hello&quot;&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;length_var&#39;</span><span class="p">:</span> <span class="s1">&#39;length_x&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+                                <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}},</span>
+                  <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;length_x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                   <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;uint&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">},</span>
+                   <span class="s1">&#39;is_length_var&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}]</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;length_var&#39;</span><span class="p">:</span> <span class="s1">&#39;length_y&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+                                 <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}},</span>
+                   <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;length_y&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;uint&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">},</span>
+                    <span class="s1">&#39;is_length_var&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_write_function_def</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+                                     <span class="n">dont_add_lengths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
         
     
 <div class="viewcode-block" id="TestCModelDriverNoStart"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestCModelDriverNoStart</span><span class="p">(</span><span class="n">TestCModelParam</span><span class="p">,</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>C++ Interface &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>C++ Interface &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -93,6 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -196,7 +198,7 @@
 <dd><em>#include &lt;YggInterface.hpp&gt;</em><p>Flag for checking if YggInterface.hpp has already been included. </p>
 <p>C++ interface to yggInput_t functionality.</p>
 <p>The <a class="reference internal" href="#class_ygg_input"><span class="std std-ref">YggInput</span></a> class is a basic wrapper around the C yggInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic input via an IPC queue. </p>
-<p>Subclassed by <a class="reference internal" href="#class_ygg_ascii_file_input"><span class="std std-ref">YggAsciiFileInput</span></a>, <a class="reference internal" href="#class_ygg_obj_input"><span class="std std-ref">YggObjInput</span></a>, <a class="reference internal" href="#class_ygg_ply_input"><span class="std std-ref">YggPlyInput</span></a></p>
+<p>Subclassed by <a class="reference internal" href="#class_ygg_any_input"><span class="std std-ref">YggAnyInput</span></a>, <a class="reference internal" href="#class_ygg_ascii_file_input"><span class="std std-ref">YggAsciiFileInput</span></a>, <a class="reference internal" href="#class_ygg_generic_input"><span class="std std-ref">YggGenericInput</span></a>, <a class="reference internal" href="#class_ygg_j_s_o_n_array_input"><span class="std std-ref">YggJSONArrayInput</span></a>, <a class="reference internal" href="#class_ygg_j_s_o_n_object_input"><span class="std std-ref">YggJSONObjectInput</span></a>, <a class="reference internal" href="#class_ygg_obj_input"><span class="std std-ref">YggObjInput</span></a>, <a class="reference internal" href="#class_ygg_ply_input"><span class="std std-ref">YggPlyInput</span></a></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
@@ -226,6 +228,20 @@
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to name of input queue. This should be the argument to an input driver in the yaml specification file. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">fmt</span></code>: character pointer to format string for parsing messages. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N8YggInput8YggInputEPKcP7dtype_t">
+<span id="_CPPv3N8YggInput8YggInputEPKcP7dtype_t"></span><span id="_CPPv2N8YggInput8YggInputEPKcP7dtype_t"></span><span id="YggInput::YggInput__cCP.dtype_tP"></span><span class="target" id="class_ygg_input_1abbe2d7834803896167c977b7489b3302"></span><code class="sig-name descname">YggInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>datatype</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput8YggInputEPKcP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for YggIntput with explicit datatype. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to name of input queue. This should be the argument to an input driver in the yaml specification file. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">datatype</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type informaiton. containing type information. </p></li>
 </ul>
 </dd>
 </dl>
@@ -337,7 +353,7 @@
 
 </div>
 <div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric">Private Members</p>
+<p class="breathe-sectiondef-title rubric">Public Members</p>
 <dl class="member">
 <dt id="_CPPv4N8YggInput3_piE">
 <span id="_CPPv3N8YggInput3_piE"></span><span id="_CPPv2N8YggInput3_piE"></span><span id="YggInput::_pi__yggInput_t"></span><span class="target" id="class_ygg_input_1a98af900e623b307b31c6c980394632a7"></span>yggInput_t <code class="sig-name descname">_pi</code><a class="headerlink" href="#_CPPv4N8YggInput3_piE" title="Permalink to this definition">¶</a><br /></dt>
@@ -351,7 +367,7 @@
 <span id="_CPPv39YggOutput"></span><span id="_CPPv29YggOutput"></span><span id="YggOutput"></span><span class="target" id="class_ygg_output"></span><em class="property">class </em><code class="sig-name descname">YggOutput</code><a class="headerlink" href="#_CPPv49YggOutput" title="Permalink to this definition">¶</a><br /></dt>
 <dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggOutput_t functionality. </p>
 <p>The <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a> class is a basic wrapper around the C yggOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic output via an IPC queue. </p>
-<p>Subclassed by <a class="reference internal" href="#class_ygg_ascii_file_output"><span class="std std-ref">YggAsciiFileOutput</span></a>, <a class="reference internal" href="#class_ygg_obj_output"><span class="std std-ref">YggObjOutput</span></a>, <a class="reference internal" href="#class_ygg_ply_output"><span class="std std-ref">YggPlyOutput</span></a></p>
+<p>Subclassed by <a class="reference internal" href="#class_ygg_any_output"><span class="std std-ref">YggAnyOutput</span></a>, <a class="reference internal" href="#class_ygg_ascii_file_output"><span class="std std-ref">YggAsciiFileOutput</span></a>, <a class="reference internal" href="#class_ygg_generic_output"><span class="std std-ref">YggGenericOutput</span></a>, <a class="reference internal" href="#class_ygg_j_s_o_n_array_output"><span class="std std-ref">YggJSONArrayOutput</span></a>, <a class="reference internal" href="#class_ygg_j_s_o_n_object_output"><span class="std std-ref">YggJSONObjectOutput</span></a>, <a class="reference internal" href="#class_ygg_obj_output"><span class="std std-ref">YggObjOutput</span></a>, <a class="reference internal" href="#class_ygg_ply_output"><span class="std std-ref">YggPlyOutput</span></a></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
@@ -375,6 +391,20 @@
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to name of output queue. This should be the argument to an output driver in the yaml specification file. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">fmt</span></code>: character pointer to format string for formatting variables. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N9YggOutput9YggOutputEPKcP7dtype_t">
+<span id="_CPPv3N9YggOutput9YggOutputEPKcP7dtype_t"></span><span id="_CPPv2N9YggOutput9YggOutputEPKcP7dtype_t"></span><span id="YggOutput::YggOutput__cCP.dtype_tP"></span><span class="target" id="class_ygg_output_1a0fb4628536eac0775a73e2d6a0a52d81"></span><code class="sig-name descname">YggOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>datatype</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput9YggOutputEPKcP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a> with explicit datatype. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to name of output queue. This should be the argument to an output driver in the yaml specification file. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">datatype</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type informaiton. </p></li>
 </ul>
 </dd>
 </dl>
@@ -973,6 +1003,230 @@
 <dl class="function">
 <dt id="_CPPv4N11YggObjInput11YggObjInputE10yggInput_t">
 <span id="_CPPv3N11YggObjInput11YggObjInputE10yggInput_t"></span><span id="_CPPv2N11YggObjInput11YggObjInputE10yggInput_t"></span><span id="YggObjInput::YggObjInput__yggInput_t"></span><span class="target" id="class_ygg_obj_input_1a303b39acf282878baa14eeaa7cc93ad7"></span><code class="sig-name descname">YggObjInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggObjInput11YggObjInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv416YggGenericOutput">
+<span id="_CPPv316YggGenericOutput"></span><span id="_CPPv216YggGenericOutput"></span><span id="YggGenericOutput"></span><span class="target" id="class_ygg_generic_output"></span><em class="property">class </em><code class="sig-name descname">YggGenericOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv49YggOutput" title="YggOutput">YggOutput</a><a class="headerlink" href="#_CPPv416YggGenericOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggGenericOutput_t functionality. The <a class="reference internal" href="#class_ygg_generic_output"><span class="std std-ref">YggGenericOutput</span></a> class is a basic wrapper around the C yggGenericOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N16YggGenericOutput16YggGenericOutputEPKc">
+<span id="_CPPv3N16YggGenericOutput16YggGenericOutputEPKc"></span><span id="_CPPv2N16YggGenericOutput16YggGenericOutputEPKc"></span><span id="YggGenericOutput::YggGenericOutput__cCP"></span><span class="target" id="class_ygg_generic_output_1ae798e92ca4ee16168f65b7893fb4ca0d"></span><code class="sig-name descname">YggGenericOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16YggGenericOutput16YggGenericOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_generic_output"><span class="std std-ref">YggGenericOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an output channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N16YggGenericOutput16YggGenericOutputE11yggOutput_t">
+<span id="_CPPv3N16YggGenericOutput16YggGenericOutputE11yggOutput_t"></span><span id="_CPPv2N16YggGenericOutput16YggGenericOutputE11yggOutput_t"></span><span id="YggGenericOutput::YggGenericOutput__yggOutput_t"></span><span class="target" id="class_ygg_generic_output_1a7c2f3f5b94ebe544cadc404bda4b8475"></span><code class="sig-name descname">YggGenericOutput</code><span class="sig-paren">(</span>yggOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16YggGenericOutput16YggGenericOutputE11yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv415YggGenericInput">
+<span id="_CPPv315YggGenericInput"></span><span id="_CPPv215YggGenericInput"></span><span id="YggGenericInput"></span><span class="target" id="class_ygg_generic_input"></span><em class="property">class </em><code class="sig-name descname">YggGenericInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv48YggInput" title="YggInput">YggInput</a><a class="headerlink" href="#_CPPv415YggGenericInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggGenericInput_t functionality. The <a class="reference internal" href="#class_ygg_generic_input"><span class="std std-ref">YggGenericInput</span></a> class is a basic wrapper around the C yggGenericInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N15YggGenericInput15YggGenericInputEPKc">
+<span id="_CPPv3N15YggGenericInput15YggGenericInputEPKc"></span><span id="_CPPv2N15YggGenericInput15YggGenericInputEPKc"></span><span id="YggGenericInput::YggGenericInput__cCP"></span><span class="target" id="class_ygg_generic_input_1a3a1429caa5c941f459d55764380a744c"></span><code class="sig-name descname">YggGenericInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15YggGenericInput15YggGenericInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_generic_input"><span class="std std-ref">YggGenericInput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N15YggGenericInput15YggGenericInputE10yggInput_t">
+<span id="_CPPv3N15YggGenericInput15YggGenericInputE10yggInput_t"></span><span id="_CPPv2N15YggGenericInput15YggGenericInputE10yggInput_t"></span><span id="YggGenericInput::YggGenericInput__yggInput_t"></span><span class="target" id="class_ygg_generic_input_1a0b6a5311aa1f48f88224247c7238dedc"></span><code class="sig-name descname">YggGenericInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15YggGenericInput15YggGenericInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv412YggAnyOutput">
+<span id="_CPPv312YggAnyOutput"></span><span id="_CPPv212YggAnyOutput"></span><span id="YggAnyOutput"></span><span class="target" id="class_ygg_any_output"></span><em class="property">class </em><code class="sig-name descname">YggAnyOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv49YggOutput" title="YggOutput">YggOutput</a><a class="headerlink" href="#_CPPv412YggAnyOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAnyOutput_t functionality. The <a class="reference internal" href="#class_ygg_any_output"><span class="std std-ref">YggAnyOutput</span></a> class is a basic wrapper around the C yggAnyOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N12YggAnyOutput12YggAnyOutputEPKc">
+<span id="_CPPv3N12YggAnyOutput12YggAnyOutputEPKc"></span><span id="_CPPv2N12YggAnyOutput12YggAnyOutputEPKc"></span><span id="YggAnyOutput::YggAnyOutput__cCP"></span><span class="target" id="class_ygg_any_output_1a54ea8ff9b045967317278fe85ededb7f"></span><code class="sig-name descname">YggAnyOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggAnyOutput12YggAnyOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_any_output"><span class="std std-ref">YggAnyOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an output channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N12YggAnyOutput12YggAnyOutputE11yggOutput_t">
+<span id="_CPPv3N12YggAnyOutput12YggAnyOutputE11yggOutput_t"></span><span id="_CPPv2N12YggAnyOutput12YggAnyOutputE11yggOutput_t"></span><span id="YggAnyOutput::YggAnyOutput__yggOutput_t"></span><span class="target" id="class_ygg_any_output_1a9bdf87042db5800069fb6f1d79ce17fd"></span><code class="sig-name descname">YggAnyOutput</code><span class="sig-paren">(</span>yggOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggAnyOutput12YggAnyOutputE11yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv411YggAnyInput">
+<span id="_CPPv311YggAnyInput"></span><span id="_CPPv211YggAnyInput"></span><span id="YggAnyInput"></span><span class="target" id="class_ygg_any_input"></span><em class="property">class </em><code class="sig-name descname">YggAnyInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv48YggInput" title="YggInput">YggInput</a><a class="headerlink" href="#_CPPv411YggAnyInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAnyInput_t functionality. The <a class="reference internal" href="#class_ygg_any_input"><span class="std std-ref">YggAnyInput</span></a> class is a basic wrapper around the C yggAnyInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N11YggAnyInput11YggAnyInputEPKc">
+<span id="_CPPv3N11YggAnyInput11YggAnyInputEPKc"></span><span id="_CPPv2N11YggAnyInput11YggAnyInputEPKc"></span><span id="YggAnyInput::YggAnyInput__cCP"></span><span class="target" id="class_ygg_any_input_1ae386bfbd2774d6340c6e4c63cf7a5d40"></span><code class="sig-name descname">YggAnyInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggAnyInput11YggAnyInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_any_input"><span class="std std-ref">YggAnyInput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N11YggAnyInput11YggAnyInputE10yggInput_t">
+<span id="_CPPv3N11YggAnyInput11YggAnyInputE10yggInput_t"></span><span id="_CPPv2N11YggAnyInput11YggAnyInputE10yggInput_t"></span><span id="YggAnyInput::YggAnyInput__yggInput_t"></span><span class="target" id="class_ygg_any_input_1a4870df02c8a0f4d4c1a74ed284401193"></span><code class="sig-name descname">YggAnyInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggAnyInput11YggAnyInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv418YggJSONArrayOutput">
+<span id="_CPPv318YggJSONArrayOutput"></span><span id="_CPPv218YggJSONArrayOutput"></span><span id="YggJSONArrayOutput"></span><span class="target" id="class_ygg_j_s_o_n_array_output"></span><em class="property">class </em><code class="sig-name descname">YggJSONArrayOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv49YggOutput" title="YggOutput">YggOutput</a><a class="headerlink" href="#_CPPv418YggJSONArrayOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggJSONArrayOutput_t functionality. The <a class="reference internal" href="#class_ygg_j_s_o_n_array_output"><span class="std std-ref">YggJSONArrayOutput</span></a> class is a basic wrapper around the C yggJSONArrayOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N18YggJSONArrayOutput18YggJSONArrayOutputEPKc">
+<span id="_CPPv3N18YggJSONArrayOutput18YggJSONArrayOutputEPKc"></span><span id="_CPPv2N18YggJSONArrayOutput18YggJSONArrayOutputEPKc"></span><span id="YggJSONArrayOutput::YggJSONArrayOutput__cCP"></span><span class="target" id="class_ygg_j_s_o_n_array_output_1a070c025415903b9fbbc557d2deaf30ba"></span><code class="sig-name descname">YggJSONArrayOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggJSONArrayOutput18YggJSONArrayOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_array_output"><span class="std std-ref">YggJSONArrayOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an output channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N18YggJSONArrayOutput18YggJSONArrayOutputE11yggOutput_t">
+<span id="_CPPv3N18YggJSONArrayOutput18YggJSONArrayOutputE11yggOutput_t"></span><span id="_CPPv2N18YggJSONArrayOutput18YggJSONArrayOutputE11yggOutput_t"></span><span id="YggJSONArrayOutput::YggJSONArrayOutput__yggOutput_t"></span><span class="target" id="class_ygg_j_s_o_n_array_output_1a4a3bbdfd434674f0ab27e9b67e93bc15"></span><code class="sig-name descname">YggJSONArrayOutput</code><span class="sig-paren">(</span>yggOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggJSONArrayOutput18YggJSONArrayOutputE11yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv417YggJSONArrayInput">
+<span id="_CPPv317YggJSONArrayInput"></span><span id="_CPPv217YggJSONArrayInput"></span><span id="YggJSONArrayInput"></span><span class="target" id="class_ygg_j_s_o_n_array_input"></span><em class="property">class </em><code class="sig-name descname">YggJSONArrayInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv48YggInput" title="YggInput">YggInput</a><a class="headerlink" href="#_CPPv417YggJSONArrayInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggJSONArrayInput_t functionality. The <a class="reference internal" href="#class_ygg_j_s_o_n_array_input"><span class="std std-ref">YggJSONArrayInput</span></a> class is a basic wrapper around the C yggJSONArrayInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N17YggJSONArrayInput17YggJSONArrayInputEPKc">
+<span id="_CPPv3N17YggJSONArrayInput17YggJSONArrayInputEPKc"></span><span id="_CPPv2N17YggJSONArrayInput17YggJSONArrayInputEPKc"></span><span id="YggJSONArrayInput::YggJSONArrayInput__cCP"></span><span class="target" id="class_ygg_j_s_o_n_array_input_1aca27550e0c3b7cb11b82a5dd78de6a45"></span><code class="sig-name descname">YggJSONArrayInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17YggJSONArrayInput17YggJSONArrayInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_array_input"><span class="std std-ref">YggJSONArrayInput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N17YggJSONArrayInput17YggJSONArrayInputE10yggInput_t">
+<span id="_CPPv3N17YggJSONArrayInput17YggJSONArrayInputE10yggInput_t"></span><span id="_CPPv2N17YggJSONArrayInput17YggJSONArrayInputE10yggInput_t"></span><span id="YggJSONArrayInput::YggJSONArrayInput__yggInput_t"></span><span class="target" id="class_ygg_j_s_o_n_array_input_1a4a62695c50d9dfbe356bfb55d82bef83"></span><code class="sig-name descname">YggJSONArrayInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17YggJSONArrayInput17YggJSONArrayInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv419YggJSONObjectOutput">
+<span id="_CPPv319YggJSONObjectOutput"></span><span id="_CPPv219YggJSONObjectOutput"></span><span id="YggJSONObjectOutput"></span><span class="target" id="class_ygg_j_s_o_n_object_output"></span><em class="property">class </em><code class="sig-name descname">YggJSONObjectOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv49YggOutput" title="YggOutput">YggOutput</a><a class="headerlink" href="#_CPPv419YggJSONObjectOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggJSONObjectOutput_t functionality. The <a class="reference internal" href="#class_ygg_j_s_o_n_object_output"><span class="std std-ref">YggJSONObjectOutput</span></a> class is a basic wrapper around the C yggJSONObjectOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N19YggJSONObjectOutput19YggJSONObjectOutputEPKc">
+<span id="_CPPv3N19YggJSONObjectOutput19YggJSONObjectOutputEPKc"></span><span id="_CPPv2N19YggJSONObjectOutput19YggJSONObjectOutputEPKc"></span><span id="YggJSONObjectOutput::YggJSONObjectOutput__cCP"></span><span class="target" id="class_ygg_j_s_o_n_object_output_1a345d5c25b82e58e845ba6e76e3379b4e"></span><code class="sig-name descname">YggJSONObjectOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19YggJSONObjectOutput19YggJSONObjectOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_object_output"><span class="std std-ref">YggJSONObjectOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an output channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N19YggJSONObjectOutput19YggJSONObjectOutputE11yggOutput_t">
+<span id="_CPPv3N19YggJSONObjectOutput19YggJSONObjectOutputE11yggOutput_t"></span><span id="_CPPv2N19YggJSONObjectOutput19YggJSONObjectOutputE11yggOutput_t"></span><span id="YggJSONObjectOutput::YggJSONObjectOutput__yggOutput_t"></span><span class="target" id="class_ygg_j_s_o_n_object_output_1addc083b51641e99b7c565873e828c84e"></span><code class="sig-name descname">YggJSONObjectOutput</code><span class="sig-paren">(</span>yggOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19YggJSONObjectOutput19YggJSONObjectOutputE11yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv418YggJSONObjectInput">
+<span id="_CPPv318YggJSONObjectInput"></span><span id="_CPPv218YggJSONObjectInput"></span><span id="YggJSONObjectInput"></span><span class="target" id="class_ygg_j_s_o_n_object_input"></span><em class="property">class </em><code class="sig-name descname">YggJSONObjectInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv48YggInput" title="YggInput">YggInput</a><a class="headerlink" href="#_CPPv418YggJSONObjectInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggJSONObjectInput_t functionality. The <a class="reference internal" href="#class_ygg_j_s_o_n_object_input"><span class="std std-ref">YggJSONObjectInput</span></a> class is a basic wrapper around the C yggJSONObjectInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N18YggJSONObjectInput18YggJSONObjectInputEPKc">
+<span id="_CPPv3N18YggJSONObjectInput18YggJSONObjectInputEPKc"></span><span id="_CPPv2N18YggJSONObjectInput18YggJSONObjectInputEPKc"></span><span id="YggJSONObjectInput::YggJSONObjectInput__cCP"></span><span class="target" id="class_ygg_j_s_o_n_object_input_1a56e7663ae4d100f9f3323037bc17e342"></span><code class="sig-name descname">YggJSONObjectInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggJSONObjectInput18YggJSONObjectInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_object_input"><span class="std std-ref">YggJSONObjectInput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N18YggJSONObjectInput18YggJSONObjectInputE10yggInput_t">
+<span id="_CPPv3N18YggJSONObjectInput18YggJSONObjectInputE10yggInput_t"></span><span id="_CPPv2N18YggJSONObjectInput18YggJSONObjectInputE10yggInput_t"></span><span id="YggJSONObjectInput::YggJSONObjectInput__yggInput_t"></span><span class="target" id="class_ygg_j_s_o_n_object_input_1ab542635200144aa8b9ddc8739ec2b144"></span><code class="sig-name descname">YggJSONObjectInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggJSONObjectInput18YggJSONObjectInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
 </dd></dl>
 

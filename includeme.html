@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>Overview &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -93,6 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -172,7 +174,9 @@
 <h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
 <p><img alt="tag version" src="https://img.shields.io/github/tag-date/cropsinsilico/yggdrasil.svg?style=flat-square" /> <a class="reference external" href="https://pypi.org/project/yggdrasil-framework"><img alt="PyPI version" src="https://img.shields.io/pypi/v/yggdrasil-framework.svg?style=flat-square" /></a> <a class="reference external" href="https://travis-ci.org/cropsinsilico/yggdrasil"><img alt="Travis Build Status" src="https://img.shields.io/travis/cropsinsilico/yggdrasil/master.svg?style=flat-square" /></a> <a class="reference external" href="https://ci.appveyor.com/project/langmm/yggdrasil/branch/master"><img alt="Appveyor Build status" src="https://img.shields.io/appveyor/ci/langmm/yggdrasil.svg?style=flat-square" /></a>
 <a class="reference external" href="https://codecov.io/gh/cropsinsilico/yggdrasil"><img alt="codecov" src="https://img.shields.io/codecov/c/github/cropsinsilico/yggdrasil/master.svg?style=flat-square" /></a> <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/"><img alt="PEP8" src="https://img.shields.io/badge/code%20style-pep8-blue.svg?style=flat-square" /></a> <img alt="license" src="https://img.shields.io/pypi/l/yggdrasil-framework.svg?style=flat-square" /> <a class="reference external" href="https://anaconda.org/conda-forge/yggdrasil"><img alt="platform" src="https://img.shields.io/conda/pn/conda-forge/yggdrasil.svg?color=magenta&amp;label=conda%20platforms&amp;style=flat-square" /></a></p>
-<p>The CiS framework, yggdrasil, provides support for combining scientific models
+<p>The Crops in Silico (CiS) framework, yggdrasil,
+yggdrasil, original create as a framework for the Crops in Silico (CiS)
+project, provides support for combining scientific models
 written in different programming languages. To combine two models,
 modelers add simple communications interfaces to the model code and
 provide simple declarative specification files that identify the models

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests package &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.drivers.tests package &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -301,6 +303,24 @@ include file.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.test_write_function_def_single">
+<code class="sig-name descname">test_write_function_def_single</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_CModelDriver.html#TestCModelDriverNoInit.test_write_function_def_single"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.test_write_function_def_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test writing and running a function definition with single output.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.test_write_function_def_string">
+<code class="sig-name descname">test_write_function_def_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_CModelDriver.html#TestCModelDriverNoInit.test_write_function_def_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.test_write_function_def_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test writing and running a function definition with no length var.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.test_write_function_def_void">
+<code class="sig-name descname">test_write_function_def_void</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_CModelDriver.html#TestCModelDriverNoInit.test_write_function_def_void"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.test_write_function_def_void" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test writing and running a function definition with no output.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.test_write_try_except">
 <code class="sig-name descname">test_write_try_except</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_CModelDriver.html#TestCModelDriverNoInit.test_write_try_except"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.test_write_try_except" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test writing a try/except block.</p>
@@ -382,111 +402,8 @@ include file.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-yggdrasil.drivers.tests.test_ClientDriver">
-<span id="yggdrasil-drivers-tests-test-clientdriver-module"></span><h2>yggdrasil.drivers.tests.test_ClientDriver module<a class="headerlink" href="#module-yggdrasil.drivers.tests.test_ClientDriver" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_ClientDriver.</code><code class="sig-name descname">TestClientDriver</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ClientDriver.html#TestClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientParam" title="yggdrasil.drivers.tests.test_ClientDriver.TestClientParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ClientDriver.TestClientParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver" title="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver</span></code></a></p>
-<p>Test class for ClientDriver class.</p>
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver.setup">
-<code class="sig-name descname">setup</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ClientDriver.html#TestClientDriver.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wait for drivers to start.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver.test_send_recv">
-<code class="sig-name descname">test_send_recv</code><span class="sig-paren">(</span><em class="sig-param">msg_send=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ClientDriver.html#TestClientDriver.test_send_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver.test_send_recv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test routing of a short message between client and server.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver.test_send_recv_nolimit">
-<code class="sig-name descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ClientDriver.html#TestClientDriver.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test routing of a large message between client and server.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientDriverNoInit">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_ClientDriver.</code><code class="sig-name descname">TestClientDriverNoInit</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ClientDriver.html#TestClientDriverNoInit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientDriverNoInit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientParam" title="yggdrasil.drivers.tests.test_ClientDriver.TestClientParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ClientDriver.TestClientParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit" title="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit</span></code></a></p>
-<p>Test class for ClientDriver class without init.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientDriverNoStart">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_ClientDriver.</code><code class="sig-name descname">TestClientDriverNoStart</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ClientDriver.html#TestClientDriverNoStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientDriverNoStart" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientParam" title="yggdrasil.drivers.tests.test_ClientDriver.TestClientParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ClientDriver.TestClientParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart" title="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart</span></code></a></p>
-<p>Test class for ClientDriver class without start.</p>
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientDriverNoStart.test_error_attributes">
-<code class="sig-name descname">test_error_attributes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ClientDriver.html#TestClientDriverNoStart.test_error_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientDriverNoStart.test_error_attributes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test error raised when trying to access attributes set on recv.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientParam">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_ClientDriver.</code><code class="sig-name descname">TestClientParam</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ClientDriver.html#TestClientParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam" title="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam</span></code></a></p>
-<p>Test parameters for ClientDriver class.</p>
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientParam.create_server">
-<code class="sig-name descname">create_server</code><span class="sig-paren">(</span><em class="sig-param">comm_address=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ClientDriver.html#TestClientParam.create_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientParam.create_server" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a new ServerDriver instance.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientParam.inst_kwargs">
-<em class="property">property </em><code class="sig-name descname">inst_kwargs</code><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientParam.inst_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Keyword arguments for tested class.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientParam.recv_comm_kwargs">
-<em class="property">property </em><code class="sig-name descname">recv_comm_kwargs</code><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientParam.recv_comm_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Keyword arguments for recv comm.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientParam.send_comm_kwargs">
-<em class="property">property </em><code class="sig-name descname">send_comm_kwargs</code><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientParam.send_comm_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Keyword arguments for send comm.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientParam.setup">
-<code class="sig-name descname">setup</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ClientDriver.html#TestClientParam.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientParam.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Recover new client message on start-up.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ClientDriver.TestClientParam.teardown">
-<code class="sig-name descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ClientDriver.html#TestClientParam.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientParam.teardown" title="Permalink to this definition">¶</a></dt>
-<dd><p>Recover end client message on teardown.</p>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="yggdrasil-drivers-tests-test-clientdriver-module">
+<h2>yggdrasil.drivers.tests.test_ClientDriver module<a class="headerlink" href="#yggdrasil-drivers-tests-test-clientdriver-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-yggdrasil.drivers.tests.test_ClientResponseDriver">
 <span id="yggdrasil-drivers-tests-test-clientresponsedriver-module"></span><h2>yggdrasil.drivers.tests.test_ClientResponseDriver module<a class="headerlink" href="#module-yggdrasil.drivers.tests.test_ClientResponseDriver" title="Permalink to this headline">¶</a></h2>
@@ -527,7 +444,7 @@ include file.</p>
 <dd><p>Driver arguments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -538,7 +455,7 @@ include file.</p>
 <dd><p>Keyword arguments for tested class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -896,7 +813,7 @@ include file.</p>
 <dd><p>Keyword arguments for tested class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -970,9 +887,32 @@ include file.</p>
 <dd><p>Keyword arguments for tested class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverTranslate.map_sent2recv">
+<code class="sig-name descname">map_sent2recv</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ConnectionDriver.html#TestConnectionDriverTranslate.map_sent2recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverTranslate.map_sent2recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a sent object into a received one.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverTranslate.test_msg">
+<em class="property">property </em><code class="sig-name descname">test_msg</code><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverTranslate.test_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test message that should be used for any send/recv tests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverTranslate.test_send_recv_nolimit">
+<code class="sig-name descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ConnectionDriver.html#TestConnectionDriverTranslate.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverTranslate.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending/receiving large message.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1000,7 +940,7 @@ include file.</p>
 <dd><p>Comm classes that should be cleaned up following the test.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1051,7 +991,7 @@ wrapped in ErrorClass.</p>
 <dd><p>Keyword arguments for connection input comm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1067,7 +1007,7 @@ wrapped in ErrorClass.</p>
 <dd><p>Keyword arguments for tested class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1078,7 +1018,7 @@ wrapped in ErrorClass.</p>
 <dd><p>True if the connection is for input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1089,9 +1029,15 @@ wrapped in ErrorClass.</p>
 <dd><p>True if the connection is for output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam.map_sent2recv">
+<code class="sig-name descname">map_sent2recv</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ConnectionDriver.html#TestConnectionParam.map_sent2recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam.map_sent2recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a sent object into a received one.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1100,7 +1046,7 @@ wrapped in ErrorClass.</p>
 <dd><p>Maximum message size.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1111,7 +1057,7 @@ wrapped in ErrorClass.</p>
 <dd><p>Small test message for sending.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1133,7 +1079,7 @@ wrapped in ErrorClass.</p>
 <dd><p>Keyword arguments for connection output comm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1149,7 +1095,7 @@ wrapped in ErrorClass.</p>
 <dd><p>Keyword arguments for recv comm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1165,10 +1111,10 @@ a False flag, the recieved message is checked against the EOF message.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>recv_inst</strong> (<a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase" title="yggdrasil.communication.CommBase.CommBase"><em>yggdrasil.communication.CommBase.CommBase</em></a>) – Communication
 instance that should be received from.</p></li>
-<li><p><strong>expected_result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – A list of messages that the
+<li><p><strong>expected_result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – A list of messages that the
 recieved messages should be compared against. Defaults to None
 and is ignored.</p></li>
-<li><p><strong>break_on_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, messages will stop being
+<li><p><strong>break_on_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, messages will stop being
 received from the communication instance when an empty message
 is received. Defaults to False.</p></li>
 </ul>
@@ -1177,7 +1123,7 @@ is received. Defaults to False.</p></li>
 <dd class="field-even"><p>Received messages.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1188,7 +1134,7 @@ is received. Defaults to False.</p></li>
 <dd><p>Keyword arguments for send comm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1211,7 +1157,7 @@ is received. Defaults to False.</p></li>
 <dd><p>Test message that should be used for any send/recv tests.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1434,12 +1380,6 @@ is received. Defaults to False.</p></li>
 </dd></dl>
 
 <dl class="function">
-<dt id="yggdrasil.drivers.tests.test_ConnectionDriver.direct_translate">
-<code class="sig-prename descclassname">yggdrasil.drivers.tests.test_ConnectionDriver.</code><code class="sig-name descname">direct_translate</code><span class="sig-paren">(</span><em class="sig-param">msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ConnectionDriver.html#direct_translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.direct_translate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test translator that just returns passed message.</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="yggdrasil.drivers.tests.test_ConnectionDriver.test_ConnectionDriverOnexit_errors">
 <code class="sig-prename descclassname">yggdrasil.drivers.tests.test_ConnectionDriver.</code><code class="sig-name descname">test_ConnectionDriverOnexit_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ConnectionDriver.html#test_ConnectionDriverOnexit_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ConnectionDriver.test_ConnectionDriverOnexit_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test that errors are raised for invalid onexit.</p>
@@ -1546,7 +1486,7 @@ is received. Defaults to False.</p></li>
 <dd><p>Name of driver class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1557,7 +1497,7 @@ is received. Defaults to False.</p></li>
 <dd><p>Driver arguments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1568,7 +1508,7 @@ is received. Defaults to False.</p></li>
 <dd><p>PSI namespace to run drivers in.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1584,7 +1524,7 @@ is received. Defaults to False.</p></li>
 <dd><p>Driver class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1612,7 +1552,7 @@ is received. Defaults to False.</p></li>
 <dd><p>Driver arguments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1623,7 +1563,7 @@ is received. Defaults to False.</p></li>
 <dd><p>Keyword arguments for creating a class instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1634,7 +1574,7 @@ is received. Defaults to False.</p></li>
 <dd><p>Absolute path to module containing driver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1645,7 +1585,7 @@ is received. Defaults to False.</p></li>
 <dd><p>Name of the test driver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1669,7 +1609,7 @@ is received. Defaults to False.</p></li>
 False otherwise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1680,7 +1620,7 @@ False otherwise.</p>
 <dd><p>True if driver shouldn’t be started. False otherwise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1691,7 +1631,7 @@ False otherwise.</p>
 <dd><p>Working directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1881,7 +1821,7 @@ False otherwise.</p>
 <dd><p>Contents that should be written to the file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1903,7 +1843,7 @@ False otherwise.</p>
 <dd><p>Keyword arguments for send comm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2096,7 +2036,7 @@ False otherwise.</p>
 <dd><p>Contents that should be read to the file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2144,7 +2084,7 @@ False otherwise.</p>
 <dd><p>Keyword arguments for creating a class instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2162,7 +2102,7 @@ False otherwise.</p>
 <dd><p>Keyword arguments for creating a class instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2342,6 +2282,12 @@ False otherwise.</p>
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_LPyModelDriver.</code><code class="sig-name descname">TestLPyModelDriverNoInit</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_LPyModelDriver.html#TestLPyModelDriverNoInit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelDriverNoInit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelParam" title="yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriverNoInit" title="yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriverNoInit"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriverNoInit</span></code></a></p>
 <p>Test runner for LPyModelDriver class without initing the driver.</p>
+<dl class="method">
+<dt id="yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelDriverNoInit.run_model_instance">
+<code class="sig-name descname">run_model_instance</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_LPyModelDriver.html#TestLPyModelDriverNoInit.run_model_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_LPyModelDriver.TestLPyModelDriverNoInit.run_model_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a driver for a model and run it.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -2436,83 +2382,8 @@ False otherwise.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-yggdrasil.drivers.tests.test_MatlabModelDriver">
-<span id="yggdrasil-drivers-tests-test-matlabmodeldriver-module"></span><h2>yggdrasil.drivers.tests.test_MatlabModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.tests.test_MatlabModelDriver" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_MatlabModelDriver.</code><code class="sig-name descname">TestMatlabModelDriver</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_MatlabModelDriver.html#TestMatlabModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam" title="yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriver" title="yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriver</span></code></a></p>
-<p>Test runner for MatlabModelDriver.</p>
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelDriver.test_a">
-<code class="sig-name descname">test_a</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_MatlabModelDriver.html#TestMatlabModelDriver.test_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelDriver.test_a" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dummy test to start matlab.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelDriver.test_z">
-<code class="sig-name descname">test_z</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_MatlabModelDriver.html#TestMatlabModelDriver.test_z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelDriver.test_z" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dummy test to stop matlab.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelDriverNoInit">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_MatlabModelDriver.</code><code class="sig-name descname">TestMatlabModelDriverNoInit</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_MatlabModelDriver.html#TestMatlabModelDriverNoInit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelDriverNoInit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam" title="yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriverNoInit" title="yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriverNoInit"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriverNoInit</span></code></a></p>
-<p>Test runner for MatlabModelDriver without instance.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelDriverNoStart">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_MatlabModelDriver.</code><code class="sig-name descname">TestMatlabModelDriverNoStart</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_MatlabModelDriver.html#TestMatlabModelDriverNoStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelDriverNoStart" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam" title="yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriverNoStart" title="yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriverNoStart"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriverNoStart</span></code></a></p>
-<p>Test runner for MatlabModelDriver without starting the driver.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_MatlabModelDriver.</code><code class="sig-name descname">TestMatlabModelParam</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_MatlabModelDriver.html#TestMatlabModelParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelParam" title="yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelParam</span></code></a></p>
-<p>Test parameters for MatlabModelDriver.</p>
-<dl class="attribute">
-<dt id="yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam.driver">
-<code class="sig-name descname">driver</code><em class="property"> = 'MatlabModelDriver'</em><a class="headerlink" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.TestMatlabModelParam.driver" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.drivers.tests.test_MatlabModelDriver.test_is_matlab_running">
-<code class="sig-prename descclassname">yggdrasil.drivers.tests.test_MatlabModelDriver.</code><code class="sig-name descname">test_is_matlab_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_MatlabModelDriver.html#test_is_matlab_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.test_is_matlab_running" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test if there is Matlab engine running.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.drivers.tests.test_MatlabModelDriver.test_locate_matlabroot">
-<code class="sig-prename descclassname">yggdrasil.drivers.tests.test_MatlabModelDriver.</code><code class="sig-name descname">test_locate_matlabroot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_MatlabModelDriver.html#test_locate_matlabroot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.test_locate_matlabroot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test locate_matlabroot.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.drivers.tests.test_MatlabModelDriver.test_matlab_exit">
-<code class="sig-prename descclassname">yggdrasil.drivers.tests.test_MatlabModelDriver.</code><code class="sig-name descname">test_matlab_exit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_MatlabModelDriver.html#test_matlab_exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.test_matlab_exit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test error when model contains ‘exit’ call.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.drivers.tests.test_MatlabModelDriver.test_matlab_not_installed">
-<code class="sig-prename descclassname">yggdrasil.drivers.tests.test_MatlabModelDriver.</code><code class="sig-name descname">test_matlab_not_installed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_MatlabModelDriver.html#test_matlab_not_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.test_matlab_not_installed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assert that errors are raised when Matlab is not installed.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.drivers.tests.test_MatlabModelDriver.test_matlab_runner">
-<code class="sig-prename descclassname">yggdrasil.drivers.tests.test_MatlabModelDriver.</code><code class="sig-name descname">test_matlab_runner</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_MatlabModelDriver.html#test_matlab_runner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_MatlabModelDriver.test_matlab_runner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Use get_runner to start a Matlab run.</p>
-</dd></dl>
-
+<div class="section" id="yggdrasil-drivers-tests-test-matlabmodeldriver-module">
+<h2>yggdrasil.drivers.tests.test_MatlabModelDriver module<a class="headerlink" href="#yggdrasil-drivers-tests-test-matlabmodeldriver-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-yggdrasil.drivers.tests.test_ModelDriver">
 <span id="yggdrasil-drivers-tests-test-modeldriver-module"></span><h2>yggdrasil.drivers.tests.test_ModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.tests.test_ModelDriver" title="Permalink to this headline">¶</a></h2>
@@ -2536,7 +2407,7 @@ False otherwise.</p>
 
 <dl class="method">
 <dt id="yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.run_generated_code">
-<code class="sig-name descname">run_generated_code</code><span class="sig-paren">(</span><em class="sig-param">lines</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ModelDriver.html#TestModelDriverNoInit.run_generated_code"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.run_generated_code" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">run_generated_code</code><span class="sig-paren">(</span><em class="sig-param">lines</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ModelDriver.html#TestModelDriverNoInit.run_generated_code"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.run_generated_code" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write and run generated code.</p>
 </dd></dl>
 
@@ -2544,6 +2415,12 @@ False otherwise.</p>
 <dt id="yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.run_model_instance">
 <code class="sig-name descname">run_model_instance</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ModelDriver.html#TestModelDriverNoInit.run_model_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.run_model_instance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a driver for a model and run it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.test_cleanup_dependencies">
+<code class="sig-name descname">test_cleanup_dependencies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ModelDriver.html#TestModelDriverNoInit.test_cleanup_dependencies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.test_cleanup_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test cleanup_dependencies method.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2619,6 +2496,12 @@ False otherwise.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.test_write_function_def">
+<code class="sig-name descname">test_write_function_def</code><span class="sig-paren">(</span><em class="sig-param">inputs=None</em>, <em class="sig-param">outputs=None</em>, <em class="sig-param">outputs_in_inputs=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ModelDriver.html#TestModelDriverNoInit.test_write_function_def"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.test_write_function_def" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test writing and running a function definition.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.test_write_if_block">
 <code class="sig-name descname">test_write_if_block</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ModelDriver.html#TestModelDriverNoInit.test_write_if_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.test_write_if_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test writing an if block.</p>
@@ -2673,7 +2556,7 @@ False otherwise.</p>
 <dd><p>Keyword arguments for creating a class instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2725,12 +2608,6 @@ False otherwise.</p>
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_PythonModelDriver.</code><code class="sig-name descname">TestPythonModelDriverNoInit</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_PythonModelDriver.html#TestPythonModelDriverNoInit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_PythonModelDriver.TestPythonModelDriverNoInit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_PythonModelDriver.TestPythonModelParam" title="yggdrasil.drivers.tests.test_PythonModelDriver.TestPythonModelParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_PythonModelDriver.TestPythonModelParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriverNoInit" title="yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriverNoInit"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_InterpretedModelDriver.TestInterpretedModelDriverNoInit</span></code></a></p>
 <p>Test runner for PythonModelDriver without init.</p>
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_PythonModelDriver.TestPythonModelDriverNoInit.test_write_model_wrapper">
-<code class="sig-name descname">test_write_model_wrapper</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_PythonModelDriver.html#TestPythonModelDriverNoInit.test_write_model_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_PythonModelDriver.TestPythonModelDriverNoInit.test_write_model_wrapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test writing a model based on yaml parameters.</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -2753,101 +2630,17 @@ False otherwise.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-yggdrasil.drivers.tests.test_RMQAsyncClientDriver">
-<span id="yggdrasil-drivers-tests-test-rmqasyncclientdriver-module"></span><h2>yggdrasil.drivers.tests.test_RMQAsyncClientDriver module<a class="headerlink" href="#module-yggdrasil.drivers.tests.test_RMQAsyncClientDriver" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_RMQAsyncClientDriver.TestRMQAsyncClientDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_RMQAsyncClientDriver.</code><code class="sig-name descname">TestRMQAsyncClientDriver</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RMQAsyncClientDriver.html#TestRMQAsyncClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RMQAsyncClientDriver.TestRMQAsyncClientDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_RMQAsyncClientDriver.TestRMQAsyncClientParam" title="yggdrasil.drivers.tests.test_RMQAsyncClientDriver.TestRMQAsyncClientParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_RMQAsyncClientDriver.TestRMQAsyncClientParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver" title="yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver</span></code></a></p>
-<p>Test class for RMQAsyncClientDriver class.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_RMQAsyncClientDriver.TestRMQAsyncClientDriverNoStart">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_RMQAsyncClientDriver.</code><code class="sig-name descname">TestRMQAsyncClientDriverNoStart</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RMQAsyncClientDriver.html#TestRMQAsyncClientDriverNoStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RMQAsyncClientDriver.TestRMQAsyncClientDriverNoStart" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_RMQAsyncClientDriver.TestRMQAsyncClientParam" title="yggdrasil.drivers.tests.test_RMQAsyncClientDriver.TestRMQAsyncClientParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_RMQAsyncClientDriver.TestRMQAsyncClientParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientDriverNoStart" title="yggdrasil.drivers.tests.test_ClientDriver.TestClientDriverNoStart"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ClientDriver.TestClientDriverNoStart</span></code></a></p>
-<p>Test class for RMQAsyncClientDriver class without start.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_RMQAsyncClientDriver.TestRMQAsyncClientParam">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_RMQAsyncClientDriver.</code><code class="sig-name descname">TestRMQAsyncClientParam</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RMQAsyncClientDriver.html#TestRMQAsyncClientParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RMQAsyncClientDriver.TestRMQAsyncClientParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientParam" title="yggdrasil.drivers.tests.test_ClientDriver.TestClientParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ClientDriver.TestClientParam</span></code></a></p>
-<p>Test parameters for RMQAsyncClientDriver class.</p>
-</dd></dl>
-
+<div class="section" id="yggdrasil-drivers-tests-test-rmqasyncclientdriver-module">
+<h2>yggdrasil.drivers.tests.test_RMQAsyncClientDriver module<a class="headerlink" href="#yggdrasil-drivers-tests-test-rmqasyncclientdriver-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-yggdrasil.drivers.tests.test_RMQAsyncServerDriver">
-<span id="yggdrasil-drivers-tests-test-rmqasyncserverdriver-module"></span><h2>yggdrasil.drivers.tests.test_RMQAsyncServerDriver module<a class="headerlink" href="#module-yggdrasil.drivers.tests.test_RMQAsyncServerDriver" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_RMQAsyncServerDriver.TestRMQAsyncServerDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_RMQAsyncServerDriver.</code><code class="sig-name descname">TestRMQAsyncServerDriver</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RMQAsyncServerDriver.html#TestRMQAsyncServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RMQAsyncServerDriver.TestRMQAsyncServerDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_RMQAsyncServerDriver.TestRMQAsyncServerParam" title="yggdrasil.drivers.tests.test_RMQAsyncServerDriver.TestRMQAsyncServerParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_RMQAsyncServerDriver.TestRMQAsyncServerParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver" title="yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver</span></code></a></p>
-<p>Test class for RMQAsyncServerDriver class.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_RMQAsyncServerDriver.TestRMQAsyncServerDriverNoStart">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_RMQAsyncServerDriver.</code><code class="sig-name descname">TestRMQAsyncServerDriverNoStart</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RMQAsyncServerDriver.html#TestRMQAsyncServerDriverNoStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RMQAsyncServerDriver.TestRMQAsyncServerDriverNoStart" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_RMQAsyncServerDriver.TestRMQAsyncServerParam" title="yggdrasil.drivers.tests.test_RMQAsyncServerDriver.TestRMQAsyncServerParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_RMQAsyncServerDriver.TestRMQAsyncServerParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoStart" title="yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoStart"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoStart</span></code></a></p>
-<p>Test class for RMQAsyncServerDriver class without start.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_RMQAsyncServerDriver.TestRMQAsyncServerParam">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_RMQAsyncServerDriver.</code><code class="sig-name descname">TestRMQAsyncServerParam</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RMQAsyncServerDriver.html#TestRMQAsyncServerParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RMQAsyncServerDriver.TestRMQAsyncServerParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerParam" title="yggdrasil.drivers.tests.test_ServerDriver.TestServerParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ServerDriver.TestServerParam</span></code></a></p>
-<p>Test parameters for RMQAsyncServerDriver class.</p>
-</dd></dl>
-
+<div class="section" id="yggdrasil-drivers-tests-test-rmqasyncserverdriver-module">
+<h2>yggdrasil.drivers.tests.test_RMQAsyncServerDriver module<a class="headerlink" href="#yggdrasil-drivers-tests-test-rmqasyncserverdriver-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-yggdrasil.drivers.tests.test_RMQClientDriver">
-<span id="yggdrasil-drivers-tests-test-rmqclientdriver-module"></span><h2>yggdrasil.drivers.tests.test_RMQClientDriver module<a class="headerlink" href="#module-yggdrasil.drivers.tests.test_RMQClientDriver" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_RMQClientDriver.TestRMQClientDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_RMQClientDriver.</code><code class="sig-name descname">TestRMQClientDriver</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RMQClientDriver.html#TestRMQClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RMQClientDriver.TestRMQClientDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_RMQClientDriver.TestRMQClientParam" title="yggdrasil.drivers.tests.test_RMQClientDriver.TestRMQClientParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_RMQClientDriver.TestRMQClientParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver" title="yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ClientDriver.TestClientDriver</span></code></a></p>
-<p>Test class for RMQClientDriver class.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_RMQClientDriver.TestRMQClientDriverNoStart">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_RMQClientDriver.</code><code class="sig-name descname">TestRMQClientDriverNoStart</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RMQClientDriver.html#TestRMQClientDriverNoStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RMQClientDriver.TestRMQClientDriverNoStart" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_RMQClientDriver.TestRMQClientParam" title="yggdrasil.drivers.tests.test_RMQClientDriver.TestRMQClientParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_RMQClientDriver.TestRMQClientParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientDriverNoStart" title="yggdrasil.drivers.tests.test_ClientDriver.TestClientDriverNoStart"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ClientDriver.TestClientDriverNoStart</span></code></a></p>
-<p>Test class for RMQClientDriver class without start.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_RMQClientDriver.TestRMQClientParam">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_RMQClientDriver.</code><code class="sig-name descname">TestRMQClientParam</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RMQClientDriver.html#TestRMQClientParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RMQClientDriver.TestRMQClientParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ClientDriver.TestClientParam" title="yggdrasil.drivers.tests.test_ClientDriver.TestClientParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ClientDriver.TestClientParam</span></code></a></p>
-<p>Test parameters for RMQClientDriver class.</p>
-</dd></dl>
-
+<div class="section" id="yggdrasil-drivers-tests-test-rmqclientdriver-module">
+<h2>yggdrasil.drivers.tests.test_RMQClientDriver module<a class="headerlink" href="#yggdrasil-drivers-tests-test-rmqclientdriver-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-yggdrasil.drivers.tests.test_RMQServerDriver">
-<span id="yggdrasil-drivers-tests-test-rmqserverdriver-module"></span><h2>yggdrasil.drivers.tests.test_RMQServerDriver module<a class="headerlink" href="#module-yggdrasil.drivers.tests.test_RMQServerDriver" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_RMQServerDriver.TestRMQServerDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_RMQServerDriver.</code><code class="sig-name descname">TestRMQServerDriver</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RMQServerDriver.html#TestRMQServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RMQServerDriver.TestRMQServerDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_RMQServerDriver.TestRMQServerParam" title="yggdrasil.drivers.tests.test_RMQServerDriver.TestRMQServerParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_RMQServerDriver.TestRMQServerParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver" title="yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver</span></code></a></p>
-<p>Test class for RMQServerDriver class.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_RMQServerDriver.TestRMQServerDriverNoStart">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_RMQServerDriver.</code><code class="sig-name descname">TestRMQServerDriverNoStart</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RMQServerDriver.html#TestRMQServerDriverNoStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RMQServerDriver.TestRMQServerDriverNoStart" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_RMQServerDriver.TestRMQServerParam" title="yggdrasil.drivers.tests.test_RMQServerDriver.TestRMQServerParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_RMQServerDriver.TestRMQServerParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoStart" title="yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoStart"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoStart</span></code></a></p>
-<p>Test class for RMQServerDriver class without start.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_RMQServerDriver.TestRMQServerParam">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_RMQServerDriver.</code><code class="sig-name descname">TestRMQServerParam</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RMQServerDriver.html#TestRMQServerParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RMQServerDriver.TestRMQServerParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerParam" title="yggdrasil.drivers.tests.test_ServerDriver.TestServerParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ServerDriver.TestServerParam</span></code></a></p>
-<p>Test parameters for RMQServerDriver class.</p>
-</dd></dl>
-
+<div class="section" id="yggdrasil-drivers-tests-test-rmqserverdriver-module">
+<h2>yggdrasil.drivers.tests.test_RMQServerDriver module<a class="headerlink" href="#yggdrasil-drivers-tests-test-rmqserverdriver-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-yggdrasil.drivers.tests.test_RModelDriver">
 <span id="yggdrasil-drivers-tests-test-rmodeldriver-module"></span><h2>yggdrasil.drivers.tests.test_RModelDriver module<a class="headerlink" href="#module-yggdrasil.drivers.tests.test_RModelDriver" title="Permalink to this headline">¶</a></h2>
@@ -2867,12 +2660,6 @@ False otherwise.</p>
 <dt id="yggdrasil.drivers.tests.test_RModelDriver.TestRModelDriverNoInit.test_is_library_installed">
 <code class="sig-name descname">test_is_library_installed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RModelDriver.html#TestRModelDriverNoInit.test_is_library_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RModelDriver.TestRModelDriverNoInit.test_is_library_installed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test is_library_installed for invalid library.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_RModelDriver.TestRModelDriverNoInit.test_language2python">
-<code class="sig-name descname">test_language2python</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_RModelDriver.html#TestRModelDriverNoInit.test_language2python"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_RModelDriver.TestRModelDriverNoInit.test_language2python" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test language2python.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2903,117 +2690,8 @@ False otherwise.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-yggdrasil.drivers.tests.test_ServerDriver">
-<span id="yggdrasil-drivers-tests-test-serverdriver-module"></span><h2>yggdrasil.drivers.tests.test_ServerDriver module<a class="headerlink" href="#module-yggdrasil.drivers.tests.test_ServerDriver" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_ServerDriver.</code><code class="sig-name descname">TestServerDriver</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ServerDriver.html#TestServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerParam" title="yggdrasil.drivers.tests.test_ServerDriver.TestServerParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ServerDriver.TestServerParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver" title="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver</span></code></a></p>
-<p>Test class for ServerDriver class.</p>
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver.setup">
-<code class="sig-name descname">setup</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ServerDriver.html#TestServerDriver.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wait for drivers to start.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver.test_client_count">
-<code class="sig-name descname">test_client_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ServerDriver.html#TestServerDriver.test_client_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver.test_client_count" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test to ensure client count is correct.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver.test_send_recv">
-<code class="sig-name descname">test_send_recv</code><span class="sig-paren">(</span><em class="sig-param">msg_send=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ServerDriver.html#TestServerDriver.test_send_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver.test_send_recv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test routing of a short message between client and server.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver.test_send_recv_nolimit">
-<code class="sig-name descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ServerDriver.html#TestServerDriver.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriver.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test routing of a large message between client and server.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoInit">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_ServerDriver.</code><code class="sig-name descname">TestServerDriverNoInit</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ServerDriver.html#TestServerDriverNoInit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoInit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerParam" title="yggdrasil.drivers.tests.test_ServerDriver.TestServerParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ServerDriver.TestServerParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit" title="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit</span></code></a></p>
-<p>Test class for ServerDriver class without init.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoStart">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_ServerDriver.</code><code class="sig-name descname">TestServerDriverNoStart</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ServerDriver.html#TestServerDriverNoStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoStart" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerParam" title="yggdrasil.drivers.tests.test_ServerDriver.TestServerParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ServerDriver.TestServerParam</span></code></a>, <a class="reference internal" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart" title="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoStart</span></code></a></p>
-<p>Test class for ServerDriver class without start.</p>
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoStart.test_error_attributes">
-<code class="sig-name descname">test_error_attributes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ServerDriver.html#TestServerDriverNoStart.test_error_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerDriverNoStart.test_error_attributes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test error raised when trying to access attributes set on recv.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerParam">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.tests.test_ServerDriver.</code><code class="sig-name descname">TestServerParam</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ServerDriver.html#TestServerParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam" title="yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam</span></code></a></p>
-<p>Test parameters for ServerDriver class.</p>
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerParam.create_client">
-<code class="sig-name descname">create_client</code><span class="sig-paren">(</span><em class="sig-param">comm_address=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ServerDriver.html#TestServerParam.create_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerParam.create_client" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a new ClientDriver instance.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerParam.inst_kwargs">
-<em class="property">property </em><code class="sig-name descname">inst_kwargs</code><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerParam.inst_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Keyword arguments for tested class.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerParam.recv_comm_kwargs">
-<em class="property">property </em><code class="sig-name descname">recv_comm_kwargs</code><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerParam.recv_comm_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Keyword arguments for recv comm.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerParam.send_comm_kwargs">
-<em class="property">property </em><code class="sig-name descname">send_comm_kwargs</code><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerParam.send_comm_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Keyword arguments for send comm.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerParam.setup">
-<code class="sig-name descname">setup</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ServerDriver.html#TestServerParam.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerParam.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Recover new server message on start-up.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.drivers.tests.test_ServerDriver.TestServerParam.teardown">
-<code class="sig-name descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ServerDriver.html#TestServerParam.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ServerDriver.TestServerParam.teardown" title="Permalink to this definition">¶</a></dt>
-<dd><p>Recover end server message on teardown.</p>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="yggdrasil-drivers-tests-test-serverdriver-module">
+<h2>yggdrasil.drivers.tests.test_ServerDriver module<a class="headerlink" href="#yggdrasil-drivers-tests-test-serverdriver-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-yggdrasil.drivers.tests.test_ServerResponseDriver">
 <span id="yggdrasil-drivers-tests-test-serverresponsedriver-module"></span><h2>yggdrasil.drivers.tests.test_ServerResponseDriver module<a class="headerlink" href="#module-yggdrasil.drivers.tests.test_ServerResponseDriver" title="Permalink to this headline">¶</a></h2>
@@ -3054,7 +2732,7 @@ False otherwise.</p>
 <dd><p>Driver arguments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -3065,7 +2743,7 @@ False otherwise.</p>
 <dd><p>Keyword arguments for tested class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>

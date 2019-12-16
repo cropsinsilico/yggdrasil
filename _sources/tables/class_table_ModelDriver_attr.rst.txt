@@ -1,32 +1,33 @@
 .. _class_table_ModelDriver_attr_rst:
 
-================   ================================================================================   ========   =================================
-Option             Description                                                                        Required   Type                             
-================   ================================================================================   ========   =================================
-args               Argument(s) for running the model on the command line.                                        list                             
-client_of          The names of server models that this model is a client of.                                    list                             
-function           The name of the model function that should be wrapped.                                        str                              
-is_server          If True, the model is assumed to be a server and an instance of                               bool                             
-                   :class:`yggdrasil.drivers.ServerDriver` is started.                                                                            
-model_args         Runtime arguments for running the model on the command line.                                  list                             
-model_file         Full path to the model executable or interpretable script.                                    str                              
-model_index        Index of model in list of models being run.                                                   int                              
-model_src          Full path to the model source code. For interpreted languages, this will be the               str                              
-                   same as model_file.                                                                                                            
-modified_files     List of pairs of originals and copies of files that should be restored during                 list                             
-                   cleanup.                                                                                                                       
-overwrite          If True, any existing compilation products will be overwritten by compilation                 bool                             
-                   and cleaned up following the run. Otherwise, existing products will be used and                                                
-                   will remain after the run.                                                                                                     
-process            Process used to run the model.                                                                :class:`yggdrasil.tools.YggPopen`
-products           Files created by running the model. This includes compilation products such as                list                             
-                   executables and/or object files.                                                                                               
-source_products    Files created by running the model that are source files. These files will be                 list                             
-                   removed without checking their extension so users should avoid adding files to                                                 
-                   this list unless they are sure they should be deleted.                                                                         
-strace_flags       Flags to pass to strace/dtrace.                                                               list                             
-valgrind_flags     Flags to pass to valgrind.                                                                    list                             
-with_strace        If True, the command is run with strace or dtrace.                                            bool                             
-with_valgrind      If True, the command is run with valgrind.                                                    bool                             
-wrapper_products   Files created in order to wrap the model.                                                     list                             
-================   ================================================================================   ========   =================================
+===================   ================================================================================   ========   =================================
+Option                Description                                                                        Required   Type                             
+===================   ================================================================================   ========   =================================
+args                  Argument(s) for running the model on the command line.                                        list                             
+client_of             The names of server models that this model is a client of.                                    list                             
+function              The name of the model function that should be wrapped.                                        str                              
+is_server             If True, the model is assumed to be a server and an instance of                               bool                             
+                      :class:`yggdrasil.drivers.ServerDriver` is started.                                                                            
+model_args            Runtime arguments for running the model on the command line.                                  list                             
+model_file            Full path to the model executable or interpretable script.                                    str                              
+model_function_info   Parameters recovered by parsing the provided model function definition.                       dict                             
+model_index           Index of model in list of models being run.                                                   int                              
+model_src             Full path to the model source code. For interpreted languages, this will be the               str                              
+                      same as model_file.                                                                                                            
+modified_files        List of pairs of originals and copies of files that should be restored during                 list                             
+                      cleanup.                                                                                                                       
+overwrite             If True, any existing compilation products will be overwritten by compilation                 bool                             
+                      and cleaned up following the run. Otherwise, existing products will be used and                                                
+                      will remain after the run.                                                                                                     
+process               Process used to run the model.                                                                :class:`yggdrasil.tools.YggPopen`
+products              Files created by running the model. This includes compilation products such as                list                             
+                      executables and/or object files.                                                                                               
+source_products       Files created by running the model that are source files. These files will be                 list                             
+                      removed without checking their extension so users should avoid adding files to                                                 
+                      this list unless they are sure they should be deleted.                                                                         
+strace_flags          Flags to pass to strace/dtrace.                                                               list                             
+valgrind_flags        Flags to pass to valgrind.                                                                    list                             
+with_strace           If True, the command is run with strace or dtrace.                                            bool                             
+with_valgrind         If True, the command is run with valgrind.                                                    bool                             
+wrapper_products      Files created in order to wrap the model.                                                     list                             
+===================   ================================================================================   ========   =================================

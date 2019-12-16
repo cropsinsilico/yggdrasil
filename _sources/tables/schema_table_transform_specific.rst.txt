@@ -1,0 +1,21 @@
+.. _schema_table_transform_specific_rst:
+
+================   ========   ================================================================================   ============================
+Option             Type       Description                                                                        Valid For 'Transformtype' Of
+================   ========   ================================================================================   ============================
+function           function   The handle for a callable Python object (e.g. function) that should be used to     ['function']                
+                              transform messages or a string of the form "<function file>:<function name>"                                   
+                              identifying a function where "<function file>" is the module or Python file                                    
+                              containing the function and "<function name>" is the name of the function. The                                 
+                              function should take the message as input and return the transformed message.                                  
+map                object     A mapping from original field name to new field names.                             ['map_fields']              
+original_order     array      The original order of fields that should be used for selecting from                ['select_fields']           
+                              lists/tuples.                                                                                                  
+selected           array      A list of fields that should be selected.                                          ['select_fields']           
+single_as_scalar   boolean    If True and only a single field is selected, the transformed messages will be      ['select_fields']           
+                              scalars rather than arrays with single elements. Defaults to False.                                            
+statement          string     Python statement in terms of the message as represented by the string "%x%" that   ['statement']               
+                              should evaluate to the transformed message. The statement should only use a                                    
+                              limited set of builtins and the math library (See yggdrasil.tools.safe_eval). If                               
+                              more complex relationships are required, use the FunctionTransform class.                                      
+================   ========   ================================================================================   ============================

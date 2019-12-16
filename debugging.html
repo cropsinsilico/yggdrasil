@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Debugging &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>Debugging &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -93,6 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -100,6 +102,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Debugging</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#tips-for-debugging">Tips for Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#possible-errors">Possible Errors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#macos-errors">MacOS Errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#matlab-errors">Matlab Errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#c-errors">C++ Errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#r-errors">R Errors</a></li>
@@ -206,6 +209,30 @@ related to bugs in order to help us assist you.</p></li>
 </div>
 <div class="section" id="possible-errors">
 <h2>Possible Errors<a class="headerlink" href="#possible-errors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="macos-errors">
+<h3>MacOS Errors<a class="headerlink" href="#macos-errors" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>You get <code class="docutils literal notranslate"><span class="pre">Undefined</span> <span class="pre">symbol</span></code> errors following a warning similar to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ld</span><span class="p">:</span> <span class="n">warning</span><span class="p">:</span> <span class="n">ignoring</span> <span class="n">file</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX10</span><span class="o">.</span><span class="mf">14.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libSystem</span><span class="o">.</span><span class="n">tbd</span><span class="p">,</span> <span class="n">file</span> <span class="n">was</span> <span class="n">built</span> <span class="k">for</span> <span class="n">unsupported</span> <span class="n">file</span> <span class="nb">format</span> <span class="p">(</span> <span class="mh">0x2D</span> <span class="mh">0x2D</span> <span class="mh">0x2D</span> <span class="mh">0x20</span> <span class="mh">0x21</span> <span class="mh">0x74</span> <span class="mh">0x61</span> <span class="mh">0x70</span> <span class="mh">0x69</span> <span class="mh">0x2D</span> <span class="mh">0x74</span> <span class="mh">0x62</span> <span class="mh">0x64</span> <span class="mh">0x2D</span> <span class="mh">0x76</span> <span class="mh">0x33</span> <span class="p">)</span> <span class="n">which</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">the</span> <span class="n">architecture</span> <span class="n">being</span> <span class="n">linked</span> <span class="p">(</span><span class="n">x86_64</span><span class="p">):</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX10</span><span class="o">.</span><span class="mf">14.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libSystem</span><span class="o">.</span><span class="n">tbd</span>
+</pre></div>
+</div>
+<ul>
+<li><p><em>Possible Cause:</em> You are trying to use the conda-forge supplied compilers on a newer Mac OS (see discussion <a class="reference external" href="https://github.com/conda-forge/compilers-feedstock/issues/6">here</a>). The newer Mac SDKs cannot be packaged by conda-forge due to licensing issues. As a result, the libraries are not correctly linked and you will get the above warning and <code class="docutils literal notranslate"><span class="pre">Undefined</span> <span class="pre">symbol</span></code> errors. This can be solved by downloading an older SDK (10.9 works well) and pointing the conda compilers to it using the steps below.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-10.9}
+$ export CONDA_BUILD_SYSROOT=&quot;$(xcode-select -p)/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk&quot;
+$ curl -L -O https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz
+$ tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C &quot;$(dirname &quot;$CONDA_BUILD_SYSROOT&quot;)&quot;  # This may require sudo
+</pre></div>
+</div>
+<p>You will need to set the <code class="docutils literal notranslate"><span class="pre">CONDA_BUILD_SYSROOT</span></code> environment variable in every process in which you will be running yggdrasil. Alternatively, you can permanently add it to your yggdrasil configuration file using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggconfig --macos-sdkroot &lt;path to sdk&gt;
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</div>
 <div class="section" id="matlab-errors">
 <h3>Matlab Errors<a class="headerlink" href="#matlab-errors" title="Permalink to this headline">¶</a></h3>
 <ul>

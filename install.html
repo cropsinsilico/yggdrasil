@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>Installation &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -90,6 +90,7 @@
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#conda-installation-recommended">Conda Installation (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#development-installation">Development Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manual-installation">Manual Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#user-defined-rapidjson">User Defined rapidjson</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-on-windows">Additional Steps on Windows</a></li>
@@ -102,6 +103,8 @@
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -179,9 +182,26 @@
             
   <div class="section" id="installation">
 <span id="install-rst"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Windows Users</strong></p>
+<p>If you will be running C/C++ models on a Windows operatoring system, you will first need to install Microsoft Visual Studio, regardless of the installation method you end up using. Visual Studio Community can be downloaded for free from <a class="reference external" href="https://visualstudio.microsoft.com/vs/community/">here</a>. During installation, we recommend selecting the components below. If you forget to add something during the initial download, you can always modify the installation via the “Visual Studio Installer” program.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>“Desktop development with C++” - Workload under “Windows” section</p></li>
+<li><p>“MSVC v140 - VS 2015 C++ build tools (v14.00)” - Individual component under “Compilers, build tools, and runtimes” section.</p></li>
+</ul>
+</div></blockquote>
+<p>If you <em>do not use conda</em> to install yggdrasil, you will also need to initialize the command line build tools in any prompt you will be calling yggdrasil from. This can be done by calling yggdrasil from a developer prompt, or by locating the <code class="docutils literal notranslate"><span class="pre">vsvarsall.bat</span></code> script that comes with Visual Studio. Information on the developer prompt and how to locate the <code class="docutils literal notranslate"><span class="pre">vsvarsall.bat</span></code> script can be found <a class="reference external" href="https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019">here</a>. The script used must be the one associated with Visual Studio 2015 build tools, which can be installed from within Visual Studio 2019. On a 64bit Windows machine, the command to initialize these tools within a prompt will probably look something like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ call &quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat&quot; amd64
+</pre></div>
+</div>
+</div>
 <div class="section" id="conda-installation-recommended">
 <h2>Conda Installation (recommended)<a class="headerlink" href="#conda-installation-recommended" title="Permalink to this headline">¶</a></h2>
-<p>There are conda distributions available for yggdrasil from
+<p>Download and install Miniconda (or Anaconda) from
+<a class="reference external" href="https://www.anaconda.com/download/">here</a>.
+There are conda distributions available for yggdrasil from
 <a class="reference external" href="https://github.com/conda-forge/yggdrasil-feedstock">conda-forge</a>.
 You can install yggdrasil from conda-forge by calling:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -c conda-forge yggdrasil
@@ -190,14 +210,24 @@ You can install yggdrasil from conda-forge by calling:</p>
 <p>from your terminal prompt (or Anaconda prompt on Windows). This will
 install yggdrasil and all of its dependencies in your active
 conda environment from the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> channel.</p>
+<p>Although not required, we recommend permanently adding conda-forge to
+the list of accepted channels by running the following command from
+the terminal (or Anaconda Prompt on Windows).:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda config --add channels conda-forge
+</pre></div>
+</div>
+</div>
+<div class="section" id="development-installation">
+<h2>Development Installation<a class="headerlink" href="#development-installation" title="Permalink to this headline">¶</a></h2>
+<p>If you would like to contribute to yggdrasil, instructions on setting up a development environment can be found <a class="reference internal" href="development/general.html#dev-env-rst"><span class="std std-ref">here</span></a>.</p>
 </div>
 <div class="section" id="manual-installation">
-<h2>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">¶</a></h2>
+<span id="manual-install-rst"></span><h2>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Before installing yggdrasil from <code class="docutils literal notranslate"><span class="pre">pip</span></code> or the cloned repository, you
-should install the non-Python dependencies, particularly the
-ZeroMQ C and C++ libraries (see below).</p>
+should manually install the non-Python dependencies, particularly the
+ZeroMQ C and C++ libraries and R packages (see below).</p>
 </div>
 <p>If you do not want to use conda, yggdrasil can also be installed
 from either <a class="reference external" href="https://pypi.org/project/yggdrasil-framework/">PyPI</a>
@@ -212,7 +242,7 @@ using <code class="docutils literal notranslate"><span class="pre">pip</span></c
 </div>
 <p>and then building the distribution.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd yggdrasil
-$ python setup.py install
+$ pip install .
 </pre></div>
 </div>
 <p>If the <code class="docutils literal notranslate"><span class="pre">--recurse-submodules</span></code> option was not included when cloning the repo,
@@ -224,7 +254,7 @@ $ git submodule update
 </pre></div>
 </div>
 <p>If you do not have admin privileges on the target machine, <code class="docutils literal notranslate"><span class="pre">--user</span></code> can be
-added to the end of either the <code class="docutils literal notranslate"><span class="pre">pip</span></code> or <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> installation commands.
+added to the end of either of the <code class="docutils literal notranslate"><span class="pre">pip</span></code> installation commands.
 When using the <code class="docutils literal notranslate"><span class="pre">--user</span></code> flag, you may need to add the directory containing the
 entry point scripts to your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable in order to use
 yggdrasil command line tools (e.g. <code class="docutils literal notranslate"><span class="pre">yggrun</span></code>) without specifying
@@ -256,8 +286,8 @@ Windows (&gt;=7), the following command will permanently modify your path:</p>
 <p>If you would like to use an existing installation of the
 <a class="reference external" href="http://rapidjson.org/">rapidjson</a>
 header-only library, you can pass the flag
-<code class="docutils literal notranslate"><span class="pre">--rapidjson-include-dir=&lt;user_defined_dir&gt;</span></code> to either the <code class="docutils literal notranslate"><span class="pre">pip</span></code>
-or <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> installation commands from above with the location of the
+<code class="docutils literal notranslate"><span class="pre">--rapidjson-include-dir=&lt;user_defined_dir&gt;</span></code> to either of the <code class="docutils literal notranslate"><span class="pre">pip</span></code>
+installation commands from above with the location of the
 existing rapidjson include directory.</p>
 </div>
 <div class="section" id="additional-steps-on-windows">
@@ -345,17 +375,19 @@ message indicating which versions of Python you can use.</p>
 <div class="section" id="additional-steps-for-r-models">
 <h2>Additional Steps for R Models<a class="headerlink" href="#additional-steps-for-r-models" title="Permalink to this headline">¶</a></h2>
 <p>To run R models, you will need to install the
-<a class="reference external" href="https://www.r-project.org/">R interpreter</a> and the R packages
-<a class="reference external" href="https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/">reticulate</a>
-package for calling Python from R and
-<a class="reference external" href="install.packages(&quot;zeallot&quot;)">zeallot</a>.:</p>
+<a class="reference external" href="https://www.r-project.org/">R interpreter</a>. If you installed yggdrasil using conda, this will be installed for you, but if you are not using conda, you will need to install this yourself.</p>
+<p>Even if you install the R interpreter yourself, yggdrasil will attempt to install the R dependencies it needs via <a class="reference external" href="https://cran.r-project.org/">CRAN</a> when it is installed. If this fails, you may need to install these yourself from within the R interpreter. yggdrasil’s R dependencies include <a class="reference external" href="https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/">reticulate</a> for calling Python from R, <a class="reference external" href="https://cran.r-project.org/web/packages/zeallot/index.html">zeallot</a> for allowing assignment of output to multiple variables, <a class="reference external" href="https://cran.r-project.org/web/packages/units/index.html">units</a> for tracking physical units in R, <a class="reference external" href="https://cran.r-project.org/web/packages/bit64/index.html">bit64</a> for 64bit integers, and <a class="reference external" href="https://cran.r-project.org/web/packages/R6/index.html">R6</a> for creating interface classes with teardown methods.</p>
+<p>These packages can by installed from CRAN from the R interpreter.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s2">&quot;reticulate&quot;</span><span class="p">)</span>
 <span class="o">&gt;</span> <span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s2">&quot;zeallot&quot;</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s2">&quot;units&quot;</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s2">&quot;bit64&quot;</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s2">&quot;R6&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you have issues installing on MacOS, check to make sure that <code class="docutils literal notranslate"><span class="pre">which</span> <span class="pre">ar</span></code> returns
+<p>If you have issues installing R packages on MacOS, check to make sure that <code class="docutils literal notranslate"><span class="pre">which</span> <span class="pre">ar</span></code> returns
 the system default (<code class="docutils literal notranslate"><span class="pre">/usr/bin/ar</span></code>). If you have another version of <code class="docutils literal notranslate"><span class="pre">ar</span></code>
 installed (e.g. through homebrew’s binutils), it may cause conflicts.</p>
 </div>
@@ -364,7 +396,7 @@ installed (e.g. through homebrew’s binutils), it may cause conflicts.</p>
 <h2>Additional Steps for RabbitMQ Message Passing<a class="headerlink" href="#additional-steps-for-rabbitmq-message-passing" title="Permalink to this headline">¶</a></h2>
 <p>RabbitMQ connections allow messages to be passed between models when the
 models are not running on the same machine. To use these connections,
-the framework must have access to a
+the framework you must install the <a class="reference external" href="https://pika.readthedocs.io/en/stable/">pika</a> Python package and have access to a
 RabbitMQ server. If you have access to an existing RabbitMQ server,
 the information for that server be provided via the yggdrasil
 config file (See

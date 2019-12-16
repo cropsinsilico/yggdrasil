@@ -1,0 +1,53 @@
+yggdrasil.communication.filters package
+=======================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   yggdrasil.communication.filters.tests
+
+Submodules
+----------
+
+yggdrasil.communication.filters.DirectFilter module
+---------------------------------------------------
+
+.. automodule:: yggdrasil.communication.filters.DirectFilter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.communication.filters.FilterBase module
+-------------------------------------------------
+
+.. automodule:: yggdrasil.communication.filters.FilterBase
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.communication.filters.FunctionFilter module
+-----------------------------------------------------
+
+.. automodule:: yggdrasil.communication.filters.FunctionFilter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.communication.filters.StatementFilter module
+------------------------------------------------------
+
+.. automodule:: yggdrasil.communication.filters.StatementFilter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.communication.filters
+   :members:
+   :undoc-members:
+   :show-inheritance:

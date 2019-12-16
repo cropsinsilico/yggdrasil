@@ -3,13 +3,13 @@
 ==================   =================   ================================================================================   ==================================================================================
 Option               Type                Description                                                                        Valid For 'Filetype' Of                                                           
 ==================   =================   ================================================================================   ==================================================================================
-comment              string              One or more characters indicating a comment. Defaults to '# '.                     ['pandas', 'json', 'obj', 'mat', 'ply', 'ascii', 'table', 'map', 'pickle', 'yaml']
-datatype             schema              JSON schema defining the type of object that the serializer will be used to        ['pandas', 'json', 'obj', 'mat', 'ply', 'ascii', 'table', 'map', 'pickle', 'yaml']
+comment              string              One or more characters indicating a comment. Defaults to '# '.                     ['ascii', 'map', 'json', 'pickle', 'table', 'obj', 'mat', 'yaml', 'pandas', 'ply']
+datatype             schema              JSON schema defining the type of object that the serializer will be used to        ['ascii', 'map', 'json', 'pickle', 'table', 'obj', 'mat', 'yaml', 'pandas', 'ply']
                                          serialize/deserialize. Defaults to default_datatype.                                                                                                                 
 default_flow_style   boolean             If True, nested collections will be serialized in the block style. If False,       ['yaml']                                                                          
                                          they will always be serialized in the flow style. See `PyYAML Documentation                                                                                          
                                          <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.                                                                                                                     
-delimiter            string              Delimiter that should be used to separate name/value pairs in the map. Defaults    ['table', 'map', 'pandas']                                                        
+delimiter            string              Delimiter that should be used to separate name/value pairs in the map. Defaults    ['table', 'pandas', 'map']                                                        
                                          to \t.                                                                                                                                                               
 dont_write_header    boolean             If True, headers will not be added to serialized tables. Defaults to False.        ['pandas']                                                                        
 encoding             string              Encoding that should be used to serialize the object. Defaults to 'utf-8'.         ['yaml']                                                                          
@@ -18,7 +18,7 @@ format_str           string              If provided, this string will be used t
                                          Defaults to None and messages are assumed to already be bytes.                                                                                                       
 indent               ['string', 'int']   String or number of spaces that should be used to indent each level within the     ['json', 'yaml']                                                                  
                                          seiralized structure. Defaults to '\t'.                                                                                                                              
-newline              string              One or more characters indicating a newline. Defaults to '\n'.                     ['pandas', 'json', 'obj', 'mat', 'ply', 'ascii', 'table', 'map', 'pickle', 'yaml']
+newline              string              One or more characters indicating a newline. Defaults to '\n'.                     ['ascii', 'map', 'json', 'pickle', 'table', 'obj', 'mat', 'yaml', 'pandas', 'ply']
 read_meth            string              Method that should be used to read data from the file. Defaults to 'read'.         ['binary']                                                                        
                                          Ignored if direction is 'send'.                                                                                                                                      
 serializer                               Class with serialize and deserialize methods that should be used to process sent   ['binary']                                                                        

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.MatlabModelDriver &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.drivers.MatlabModelDriver &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -574,6 +576,9 @@
 <span class="sd">        name (str): Driver name.</span>
 <span class="sd">        args (str or list): Argument(s) for running the model in matlab.</span>
 <span class="sd">            Generally, this should be the full path to a Matlab script.</span>
+<span class="sd">        use_symunit (bool, optional): If True, input/output variables with</span>
+<span class="sd">            units will be represented in Matlab using symunit. Defaults to</span>
+<span class="sd">            False.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are passed to parent class&#39;s</span>
 <span class="sd">            __init__ method.</span>
 
@@ -592,6 +597,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is written in Matlab.&#39;</span><span class="p">)</span>
+    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;use_symunit&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}</span>
     <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;matlab&#39;</span>
     <span class="n">language_ext</span> <span class="o">=</span> <span class="s1">&#39;.m&#39;</span>
     <span class="n">base_languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;python&#39;</span><span class="p">]</span>
@@ -621,28 +628,58 @@
         <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="s1">&#39;containers.Map&#39;</span><span class="p">,</span>
         <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="s1">&#39;containers.Map&#39;</span><span class="p">}</span>
     <span class="n">function_param</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;istype&#39;</span><span class="p">:</span> <span class="s1">&#39;isa(</span><span class="si">{variable}</span><span class="s1">, </span><span class="se">\&#39;</span><span class="si">{type}</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;len&#39;</span><span class="p">:</span> <span class="s1">&#39;length(</span><span class="si">{variable}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{variable}</span><span class="s1">{{</span><span class="si">{index}</span><span class="s1">}}&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;first_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
         <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = YggInterface(</span><span class="se">\&#39;</span><span class="s1">YggInput</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">);&#39;</span><span class="p">,</span>
         <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = YggInterface(</span><span class="se">\&#39;</span><span class="s1">YggOutput</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">);&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="s1">&#39;[</span><span class="si">{flag_var}</span><span class="s1">, </span><span class="si">{recv_var}</span><span class="s1">] = </span><span class="si">{channel}</span><span class="s1">.recv();&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{flag_var}</span><span class="s1"> = </span><span class="si">{channel}</span><span class="s1">.send(</span><span class="si">{send_var}</span><span class="s1">);&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;function_call&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{output_var}</span><span class="s1"> = </span><span class="si">{function_name}</span><span class="s1">(</span><span class="si">{input_var}</span><span class="s1">);&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;define&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{variable}</span><span class="s1"> = </span><span class="si">{value}</span><span class="s1">;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;recv_function&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1">.recv&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;send_function&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1">.send&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;multiple_outputs&#39;</span><span class="p">:</span> <span class="s1">&#39;[</span><span class="si">{outputs}</span><span class="s1">]&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;eol&#39;</span><span class="p">:</span> <span class="s1">&#39;;&#39;</span><span class="p">,</span>
         <span class="s1">&#39;comment&#39;</span><span class="p">:</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span>
         <span class="s1">&#39;true&#39;</span><span class="p">:</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;false&#39;</span><span class="p">:</span> <span class="s1">&#39;false&#39;</span><span class="p">,</span>
         <span class="s1">&#39;not&#39;</span><span class="p">:</span> <span class="s1">&#39;not&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;and&#39;</span><span class="p">:</span> <span class="s1">&#39;&amp;&amp;&#39;</span><span class="p">,</span>
         <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span><span class="p">,</span>
         <span class="s1">&#39;quote&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;print_generic&#39;</span><span class="p">:</span> <span class="s1">&#39;disp(</span><span class="si">{object}</span><span class="s1">);&#39;</span><span class="p">,</span>
         <span class="s1">&#39;print&#39;</span><span class="p">:</span> <span class="s1">&#39;disp(</span><span class="se">\&#39;</span><span class="si">{message}</span><span class="se">\&#39;</span><span class="s1">);&#39;</span><span class="p">,</span>
         <span class="s1">&#39;fprintf&#39;</span><span class="p">:</span> <span class="s1">&#39;fprintf(</span><span class="se">\&#39;</span><span class="si">{message}</span><span class="se">\&#39;</span><span class="s1">, </span><span class="si">{variables}</span><span class="s1">);&#39;</span><span class="p">,</span>
         <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;error(</span><span class="se">\&#39;</span><span class="si">{error_msg}</span><span class="se">\&#39;</span><span class="s1">);&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;block_end&#39;</span><span class="p">:</span> <span class="s1">&#39;end;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;block_end&#39;</span><span class="p">:</span> <span class="s1">&#39;end&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;line_end&#39;</span><span class="p">:</span> <span class="s1">&#39;;&#39;</span><span class="p">,</span>
         <span class="s1">&#39;if_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;if (</span><span class="si">{cond}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;if_elif&#39;</span><span class="p">:</span> <span class="s1">&#39;elseif (</span><span class="si">{cond}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;if_else&#39;</span><span class="p">:</span> <span class="s1">&#39;else&#39;</span><span class="p">,</span>
         <span class="s1">&#39;for_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;for </span><span class="si">{iter_var}</span><span class="s1"> = </span><span class="si">{iter_begin}</span><span class="s1">:</span><span class="si">{iter_end}</span><span class="s1">&#39;</span><span class="p">,</span>
         <span class="s1">&#39;while_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;while (</span><span class="si">{cond}</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;break&#39;</span><span class="p">:</span> <span class="s1">&#39;break;&#39;</span><span class="p">,</span>
         <span class="s1">&#39;try_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;try&#39;</span><span class="p">,</span>
         <span class="s1">&#39;try_except&#39;</span><span class="p">:</span> <span class="s1">&#39;catch </span><span class="si">{error_var}</span><span class="s1">&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;assign&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> = </span><span class="si">{value}</span><span class="s1">;&#39;</span><span class="p">}</span>
+        <span class="s1">&#39;assign&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> = </span><span class="si">{value}</span><span class="s1">;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;functions_defined_last&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;function_def_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;function </span><span class="si">{output_var}</span><span class="s1"> = </span><span class="si">{function_name}</span><span class="s1">(</span><span class="si">{input_var}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;function_def_regex&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;function *(\[ *)?(?P&lt;outputs&gt;.*?)(?(1)\]) *&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;= </span><span class="si">{function_name}</span><span class="s1"> *\((?P&lt;inputs&gt;(?:.|\n)*?)\)\n&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:(?P&lt;body&gt;&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:\s*if(?:.*?\n?)*?end;?)|&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:\s*for(?:.*?\n?)*?end;?)|&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:\s*parfor(?:.*?\n?)*?end;?)|&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:\s*switch(?:.*?\n?)*?end;?)|&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:\s*try(?:.*?\n?)*?end;?)|&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:\s*while(?:.*?\n?)*?end;?)|&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:\s*arguments(?:.*?\n?)*?end;?)|&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:(?:.*?\n?)*?)&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;)&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:\s*end;?))?&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;inputs_def_regex&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\s*(?P&lt;name&gt;.+?)\s*(?:(?:,(?: *... *\n)?)|$)&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;outputs_def_regex&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\s*(?P&lt;name&gt;.+?)\s*(?:,|$)&#39;</span><span class="p">)}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span> <span class="o">=</span> <span class="n">_matlab_engine_installed</span>
@@ -712,6 +749,25 @@
                 <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Wrote wrapper to: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="MatlabModelDriver.run_code"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.run_code">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_code</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run code by first writing it as an executable and then calling</span>
+<span class="sd">        the driver.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lines (list): Lines of code to be wrapped as an executable.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the</span>
+<span class="sd">                write_executable method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;process_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;process_kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dont_wrap_error&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">write_error_wrapper</span><span class="p">(</span>
+                <span class="kc">None</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span>
+                <span class="n">matlab_engine</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;matlab_engine&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;process_kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;dont_wrap_error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">run_code</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
 <div class="viewcode-block" id="MatlabModelDriver.run_executable"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.run_executable">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">run_executable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">dont_wrap_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fname_wrapper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">matlab_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -776,7 +832,8 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">matlab_engine</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;for_matlab&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">run_executable</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">InterpretedModelDriver</span><span class="o">.</span><span class="n">run_executable</span><span class="o">.</span><span class="vm">__func__</span><span class="p">(</span>
+                    <span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug_flags&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Debugging via valgrind, strace, etc. disabled &quot;</span>
@@ -854,7 +911,9 @@
                                    <span class="s1">&#39;10&#39;</span><span class="p">],</span>
             <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;The version (release number) of installed Matlab.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">],</span>
             <span class="s1">&#39;matlabroot&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;The path to the default installation of matlab.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]}</span>
-        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;true&#39;</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;matlabroot&#39;</span><span class="p">)</span>
+                       <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">))))):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">opts</span><span class="p">[</span><span class="s1">&#39;matlabroot&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">opts</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_matlab_info</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
@@ -1024,6 +1083,8 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_env</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_symunit</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;YGG_MATLAB_SYMUNIT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span><span class="p">:</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;YGG_MATLAB_ENGINE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span>
         <span class="c1"># TODO: Move the following to InterpretedModelDriver once another</span>
@@ -1067,25 +1128,7 @@
 <span class="sd">            str: Decoded format string.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">decode_escape</span><span class="p">(</span><span class="n">format_str</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="MatlabModelDriver.prepare_output_variables"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.prepare_output_variables">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">prepare_output_variables</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">vars_list</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concatenate a set of output variables such that it can be passed as</span>
-<span class="sd">        a single string to the function_call parameter.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            vars_list (list): List of variable names to concatenate as output</span>
-<span class="sd">                from a function call.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            str: Concatentated variables list.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">prepare_output_variables</span><span class="p">(</span><span class="n">vars_list</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vars_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vars_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">out</span>
-        <span class="k">return</span> <span class="n">out</span></div></div>
+        <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">decode_escape</span><span class="p">(</span><span class="n">format_str</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

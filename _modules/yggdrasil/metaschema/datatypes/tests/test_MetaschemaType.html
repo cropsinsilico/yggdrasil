@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes.tests.test_MetaschemaType &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.tests.test_MetaschemaType &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../units.html">Units</a></li>
@@ -171,39 +173,49 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.metaschema.datatypes.tests.test_MetaschemaType</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">jsonschema</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="n">YGG_MSG_HEAD</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">YggTestClassInfo</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">YggTestClassInfo</span><span class="p">,</span> <span class="n">assert_equal</span>
 
 
-<div class="viewcode-block" id="TestMetaschemaType"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">TestMetaschemaType</span><span class="p">(</span><span class="n">YggTestClassInfo</span><span class="p">):</span>
+<div class="viewcode-block" id="TstMetaschemaTypeMeta"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TstMetaschemaTypeMeta">[docs]</a><span class="k">class</span> <span class="nc">TstMetaschemaTypeMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Meta class for setting up test information.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">):</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_explicit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">_empty_msg</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">_typedef</span><span class="o">=</span><span class="p">{},</span>
+                    <span class="n">_invalid_validate</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span>
+                    <span class="n">_valid_encoded</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">_invalid_encoded</span><span class="o">=</span><span class="p">[{}],</span>
+                    <span class="n">_valid_decoded</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;nothing&#39;</span><span class="p">],</span>
+                    <span class="n">_invalid_decoded</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">_compatible_objects</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">_encode_type_kwargs</span><span class="o">=</span><span class="p">{},</span>
+                    <span class="n">_encode_data_kwargs</span><span class="o">=</span><span class="p">{},</span>
+                    <span class="n">_valid_normalize</span><span class="o">=</span><span class="p">[(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)])</span>
+        <span class="n">attr</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">class_dict</span><span class="p">)</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">after_class_creation</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span></div>
+    
+
+<div class="viewcode-block" id="TestMetaschemaType"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType">[docs]</a><span class="nd">@six</span><span class="o">.</span><span class="n">add_metaclass</span><span class="p">(</span><span class="n">TstMetaschemaTypeMeta</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">TestMetaschemaType</span><span class="p">(</span><span class="n">YggTestClassInfo</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for MetaschemaType class.&quot;&quot;&quot;</span>
 
+    <span class="n">_mod_base</span> <span class="o">=</span> <span class="s1">&#39;yggdrasil.metaschema.datatypes&#39;</span>
     <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;MetaschemaType&#39;</span>
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;MetaschemaType&#39;</span>
-    <span class="n">_explicit</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestMetaschemaType</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_empty_msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_typedef</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_validate</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_encoded</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_encoded</span> <span class="o">=</span> <span class="p">[{}]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;nothing&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_decoded</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_compatible_objects</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_encode_type_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_encode_data_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_normalize</span> <span class="o">=</span> <span class="p">[(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">mod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Absolute name of module containing class to be tested.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s1">&#39;yggdrasil.metaschema.datatypes.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mod</span>
+<div class="viewcode-block" id="TestMetaschemaType.after_class_creation"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.after_class_creation">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">after_class_creation</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to be taken during class construction.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">typedef</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -217,7 +229,8 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for creating a class instance.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typedef</span>
 
-<div class="viewcode-block" id="TestMetaschemaType.assert_result_equal"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.assert_result_equal">[docs]</a>    <span class="k">def</span> <span class="nf">assert_result_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<div class="viewcode-block" id="TestMetaschemaType.assert_result_equal"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.assert_result_equal">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">assert_result_equal</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that serialized/deserialized objects equal.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
@@ -229,7 +242,7 @@
                     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
                     <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
                     <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Key &#39;</span><span class="si">%s</span><span class="s2">&#39; not in second dictionary.&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">y</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
@@ -248,7 +261,7 @@
                 <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Sizes do not match. </span><span class="si">%d</span><span class="s2"> vs. </span><span class="si">%d</span><span class="s2">&quot;</span>
                                      <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span>
             <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">iy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">iy</span><span class="p">)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">iy</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -259,7 +272,19 @@
                 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Compared objects are different types. &quot;</span>
                                      <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> vs. </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
+            <span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestMetaschemaType.test_issubtype"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_issubtype">[docs]</a>    <span class="k">def</span> <span class="nf">test_issubtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test issubtype.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">==</span> <span class="s1">&#39;MetaschemaType&#39;</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">issubtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">issubtype</span><span class="p">(</span><span class="s1">&#39;invalid&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">issubtype</span><span class="p">(</span><span class="s1">&#39;invalid&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">issubtype</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]))</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_validate"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_validate">[docs]</a>    <span class="k">def</span> <span class="nf">test_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test validation.&quot;&quot;&quot;</span>

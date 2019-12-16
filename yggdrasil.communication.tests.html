@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.tests package &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.communication.tests package &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -225,6 +227,12 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm.map_sent2recv">
+<code class="sig-name descname">map_sent2recv</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm.map_sent2recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm.map_sent2recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a sent object into a received one.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm.test_send_recv_comment">
 <code class="sig-name descname">test_send_recv_comment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm.test_send_recv_comment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm.test_send_recv_comment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disabled: Test send/recv with commented message.</p>
@@ -297,7 +305,21 @@
 pair.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.add_filter">
+<code class="sig-name descname">add_filter</code><span class="sig-paren">(</span><em class="sig-param">comm</em>, <em class="sig-param">filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.add_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.add_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a filter to a comm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase" title="yggdrasil.communication.CommBase.CommBase"><em>CommBase</em></a>) – Communication instance to add a filter to.</p></li>
+<li><p><strong>filter</strong> (<a class="reference internal" href="yggdrasil.communication.filters.html#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><em>FilterBase</em></a><em>, </em><em>optional</em>) – Filter class. Defaults to None and is ignored.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -325,7 +347,7 @@ pair.</p>
 <dd><p>Comm classes that should be cleaned up following the test.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -336,7 +358,7 @@ pair.</p>
 <dd><p>Communication class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -354,8 +376,48 @@ pair.</p>
 
 <dl class="method">
 <dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.do_send_recv">
-<code class="sig-name descname">do_send_recv</code><span class="sig-paren">(</span><em class="sig-param">send_meth='send'</em>, <em class="sig-param">recv_meth='recv'</em>, <em class="sig-param">msg_send=None</em>, <em class="sig-param">msg_recv=None</em>, <em class="sig-param">n_msg_send_meth='n_msg_send'</em>, <em class="sig-param">n_msg_recv_meth='n_msg_recv'</em>, <em class="sig-param">reverse_comms=False</em>, <em class="sig-param">send_kwargs=None</em>, <em class="sig-param">recv_kwargs=None</em>, <em class="sig-param">n_send=1</em>, <em class="sig-param">n_recv=1</em>, <em class="sig-param">print_status=False</em>, <em class="sig-param">close_on_send_eof=None</em>, <em class="sig-param">close_on_recv_eof=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.do_send_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.do_send_recv" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">do_send_recv</code><span class="sig-paren">(</span><em class="sig-param">send_meth='send'</em>, <em class="sig-param">recv_meth='recv'</em>, <em class="sig-param">msg_send=None</em>, <em class="sig-param">msg_recv=None</em>, <em class="sig-param">n_msg_send_meth='n_msg_send'</em>, <em class="sig-param">n_msg_recv_meth='n_msg_recv'</em>, <em class="sig-param">reverse_comms=False</em>, <em class="sig-param">send_kwargs=None</em>, <em class="sig-param">recv_kwargs=None</em>, <em class="sig-param">n_send=1</em>, <em class="sig-param">n_recv=1</em>, <em class="sig-param">print_status=False</em>, <em class="sig-param">close_on_send_eof=None</em>, <em class="sig-param">close_on_recv_eof=None</em>, <em class="sig-param">no_recv=False</em>, <em class="sig-param">recv_timeout=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.do_send_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.do_send_recv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generic send/recv of a message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.get_filter_function">
+<code class="sig-name descname">get_filter_function</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.get_filter_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.get_filter_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a filter function that filters out the provided message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Message to filter out.</p></li>
+<li><p><strong>direction</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Direction that messages will pass through the filter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Filter function.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.get_filter_statement">
+<code class="sig-name descname">get_filter_statement</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.get_filter_statement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.get_filter_statement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a filter statement that filters out the provided message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Message to filter out.</p></li>
+<li><p><strong>direction</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Direction that messages will pass through the filter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Filter statement.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -370,7 +432,7 @@ pair.</p>
 <dd><p>Arguments for tested class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -381,7 +443,7 @@ pair.</p>
 <dd><p>Keyword arguments for tested class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -392,7 +454,7 @@ pair.</p>
 <dd><p>Is the communication class installed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -409,7 +471,7 @@ pair.</p>
 <dd><p>Maximum message size.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -420,7 +482,40 @@ pair.</p>
 <dd><p>Absolute module import.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.msg_filter_pass">
+<em class="property">property </em><code class="sig-name descname">msg_filter_pass</code><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.msg_filter_pass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Message that won’t be filtered out on send or recv.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.msg_filter_recv">
+<em class="property">property </em><code class="sig-name descname">msg_filter_recv</code><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.msg_filter_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Message to filter out on the recv side.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.msg_filter_send">
+<em class="property">property </em><code class="sig-name descname">msg_filter_send</code><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.msg_filter_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Message to filter out on the send side.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -431,7 +526,7 @@ pair.</p>
 <dd><p>Small test message for sending.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -442,7 +537,7 @@ pair.</p>
 <dd><p>Name of the test connection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -464,10 +559,10 @@ a False flag, the recieved message is checked against the EOF message.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>recv_inst</strong> (<a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase" title="yggdrasil.communication.CommBase.CommBase"><em>yggdrasil.communication.CommBase.CommBase</em></a>) – Communication
 instance that should be received from.</p></li>
-<li><p><strong>expected_result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) – A list of messages that the
+<li><p><strong>expected_result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – A list of messages that the
 recieved messages should be compared against. Defaults to None
 and is ignored.</p></li>
-<li><p><strong>break_on_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, messages will stop being
+<li><p><strong>break_on_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, messages will stop being
 received from the communication instance when an empty message
 is received. Defaults to False.</p></li>
 </ul>
@@ -476,7 +571,7 @@ is received. Defaults to False.</p></li>
 <dd class="field-even"><p>Received messages.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -493,7 +588,7 @@ is received. Defaults to False.</p></li>
 <dd><p>Keyword arguments for send instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -502,6 +597,12 @@ is received. Defaults to False.</p></li>
 <dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.setup">
 <code class="sig-name descname">setup</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize comm object pair.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.setup_filters">
+<code class="sig-name descname">setup_filters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.setup_filters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.setup_filters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add filters to send/recv instances for testing filters.</p>
 </dd></dl>
 
 <dl class="method">
@@ -570,7 +671,7 @@ is received. Defaults to False.</p></li>
 <dd><p>Test message that should be used for any send/recv tests.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -581,7 +682,7 @@ is received. Defaults to False.</p></li>
 <dd><p>Test message that should be used for any send/recv tests.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -630,6 +731,30 @@ close returns false.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_filter_eof">
+<code class="sig-name descname">test_send_recv_filter_eof</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_filter_eof"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_filter_eof" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of EOF with filter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_filter_pass">
+<code class="sig-name descname">test_send_recv_filter_pass</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_filter_pass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_filter_pass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv with filter that passes both messages.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_filter_recv_filter">
+<code class="sig-name descname">test_send_recv_filter_recv_filter</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_filter_recv_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_filter_recv_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv with filter that blocks recv.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_filter_send_filter">
+<code class="sig-name descname">test_send_recv_filter_send_filter</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_filter_send_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_filter_send_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv with filter that blocks send.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_nolimit">
 <code class="sig-name descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test send/recv of a large message.</p>
@@ -673,7 +798,7 @@ close returns false.</p>
 <dd><p>Keyword arguments for send instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -709,6 +834,18 @@ close returns false.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="yggdrasil.communication.tests.test_FileComm.TestFileComm.test_send_recv_filter_recv_filter">
+<code class="sig-name descname">test_send_recv_filter_recv_filter</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_FileComm.html#TestFileComm.test_send_recv_filter_recv_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_FileComm.TestFileComm.test_send_recv_filter_recv_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv with filter that blocks recv.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_FileComm.TestFileComm.test_send_recv_filter_send_filter">
+<code class="sig-name descname">test_send_recv_filter_send_filter</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_FileComm.html#TestFileComm.test_send_recv_filter_send_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_FileComm.TestFileComm.test_send_recv_filter_send_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv with filter that blocks send.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.communication.tests.test_FileComm.TestFileComm.test_send_recv_nolimit">
 <code class="sig-name descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_FileComm.html#TestFileComm.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_FileComm.TestFileComm.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disabled: Test send/recv of a large message.</p>
@@ -739,7 +876,7 @@ close returns false.</p>
 <dd><p>Keyword arguments for tested class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -750,7 +887,7 @@ close returns false.</p>
 <dd><p>Testing options.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -771,6 +908,20 @@ close returns false.</p>
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.communication.tests.test_ForkComm.</code><code class="sig-name descname">TestForkComm</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase" title="yggdrasil.communication.tests.test_CommBase.TestCommBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_CommBase.TestCommBase</span></code></a></p>
 <p>Tests for ForkComm communication class.</p>
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.add_filter">
+<code class="sig-name descname">add_filter</code><span class="sig-paren">(</span><em class="sig-param">comm</em>, <em class="sig-param">filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkComm.add_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.add_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a filter to a comm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase" title="yggdrasil.communication.CommBase.CommBase"><em>CommBase</em></a>) – Communication instance to add a filter to.</p></li>
+<li><p><strong>filter</strong> (<a class="reference internal" href="yggdrasil.communication.filters.html#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><em>FilterBase</em></a><em>, </em><em>optional</em>) – Filter class. Defaults to None and is ignored.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.attr_list">
 <code class="sig-name descname">attr_list</code><em class="property"> = ['name', 'address', 'direction', 'serializer', 'recv_timeout', 'close_on_eof_recv', 'opp_address', 'opp_comms', 'maxMsgSize', 'comm_list', 'curr_comm_index']</em><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.attr_list" title="Permalink to this definition">¶</a></dt>
@@ -782,7 +933,7 @@ close returns false.</p>
 <dd><p>Comm classes that should be cleaned up following the test.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -809,7 +960,7 @@ close returns false.</p>
 <dd><p>Keyword arguments for send instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -839,6 +990,12 @@ close returns false.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_send_recv_filter_recv_filter">
+<code class="sig-name descname">test_send_recv_filter_recv_filter</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkComm.test_send_recv_filter_recv_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_send_recv_filter_recv_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv with filter that blocks recv.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_work_comm">
 <code class="sig-name descname">test_work_comm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkComm.test_work_comm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_work_comm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disabled: Test creating/removing a work comm.</p>
@@ -857,7 +1014,7 @@ close returns false.</p>
 <dd><p>Keyword arguments for tested class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1071,74 +1228,11 @@ close returns false.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-yggdrasil.communication.tests.test_RMQAsyncComm">
-<span id="yggdrasil-communication-tests-test-rmqasynccomm-module"></span><h2>yggdrasil.communication.tests.test_RMQAsyncComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_RMQAsyncComm" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.communication.tests.test_RMQAsyncComm.</code><code class="sig-name descname">TestRMQAsyncComm</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQAsyncComm.html#TestRMQAsyncComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_RMQComm.TestRMQComm" title="yggdrasil.communication.tests.test_RMQComm.TestRMQComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_RMQComm.TestRMQComm</span></code></a></p>
-<p>Test for RMQAsyncComm communication class.</p>
-<dl class="attribute">
-<dt id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.attr_list">
-<code class="sig-name descname">attr_list</code><em class="property"> = ['name', 'address', 'direction', 'serializer', 'recv_timeout', 'close_on_eof_recv', 'opp_address', 'opp_comms', 'maxMsgSize', 'dont_backlog', 'backlog_send_ready', 'backlog_recv_ready', 'connection', 'channel', 'times_connected', 'rmq_thread', 'rmq_lock']</em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.attr_list" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.comm">
-<code class="sig-name descname">comm</code><em class="property"> = 'RMQAsyncComm'</em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.comm" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.test_reconnect">
-<code class="sig-name descname">test_reconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQAsyncComm.html#TestRMQAsyncComm.test_reconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.test_reconnect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test reconnect after unexpected disconnect.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.communication.tests.test_RMQAsyncComm.test_not_running">
-<code class="sig-prename descclassname">yggdrasil.communication.tests.test_RMQAsyncComm.</code><code class="sig-name descname">test_not_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQAsyncComm.html#test_not_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.test_not_running" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test raise of an error if a RMQ server is not running.</p>
-</dd></dl>
-
+<div class="section" id="yggdrasil-communication-tests-test-rmqasynccomm-module">
+<h2>yggdrasil.communication.tests.test_RMQAsyncComm module<a class="headerlink" href="#yggdrasil-communication-tests-test-rmqasynccomm-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-yggdrasil.communication.tests.test_RMQComm">
-<span id="yggdrasil-communication-tests-test-rmqcomm-module"></span><h2>yggdrasil.communication.tests.test_RMQComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_RMQComm" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="yggdrasil.communication.tests.test_RMQComm.TestRMQComm">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.communication.tests.test_RMQComm.</code><code class="sig-name descname">TestRMQComm</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQComm.html#TestRMQComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.TestRMQComm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_AsyncComm.TestAsyncComm" title="yggdrasil.communication.tests.test_AsyncComm.TestAsyncComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_AsyncComm.TestAsyncComm</span></code></a></p>
-<p>Test for RMQComm communication class.</p>
-<dl class="attribute">
-<dt id="yggdrasil.communication.tests.test_RMQComm.TestRMQComm.attr_list">
-<code class="sig-name descname">attr_list</code><em class="property"> = ['name', 'address', 'direction', 'serializer', 'recv_timeout', 'close_on_eof_recv', 'opp_address', 'opp_comms', 'maxMsgSize', 'dont_backlog', 'backlog_send_ready', 'backlog_recv_ready', 'connection', 'channel']</em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.TestRMQComm.attr_list" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.communication.tests.test_RMQComm.TestRMQComm.comm">
-<code class="sig-name descname">comm</code><em class="property"> = 'RMQComm'</em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.TestRMQComm.comm" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.communication.tests.test_RMQComm.TestRMQComm.timeout">
-<code class="sig-name descname">timeout</code><em class="property"> = 10.0</em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.TestRMQComm.timeout" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.communication.tests.test_RMQComm.test_not_running">
-<code class="sig-prename descclassname">yggdrasil.communication.tests.test_RMQComm.</code><code class="sig-name descname">test_not_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQComm.html#test_not_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.test_not_running" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test raise of an error if a RMQ server is not running.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.communication.tests.test_RMQComm.test_running">
-<code class="sig-prename descclassname">yggdrasil.communication.tests.test_RMQComm.</code><code class="sig-name descname">test_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQComm.html#test_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.test_running" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test checking for server w/ URL.</p>
-</dd></dl>
-
+<div class="section" id="yggdrasil-communication-tests-test-rmqcomm-module">
+<h2>yggdrasil.communication.tests.test_RMQComm module<a class="headerlink" href="#yggdrasil-communication-tests-test-rmqcomm-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-yggdrasil.communication.tests.test_ServerComm">
 <span id="yggdrasil-communication-tests-test-servercomm-module"></span><h2>yggdrasil.communication.tests.test_ServerComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_ServerComm" title="Permalink to this headline">¶</a></h2>
@@ -1147,6 +1241,20 @@ close returns false.</p>
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.communication.tests.test_ServerComm.</code><code class="sig-name descname">TestServerComm</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ServerComm.html#TestServerComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ServerComm.TestServerComm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase" title="yggdrasil.communication.tests.test_CommBase.TestCommBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_CommBase.TestCommBase</span></code></a></p>
 <p>Tests for ServerComm communication class.</p>
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_ServerComm.TestServerComm.add_filter">
+<code class="sig-name descname">add_filter</code><span class="sig-paren">(</span><em class="sig-param">comm</em>, <em class="sig-param">filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ServerComm.html#TestServerComm.add_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ServerComm.TestServerComm.add_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a filter to a comm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase" title="yggdrasil.communication.CommBase.CommBase"><em>CommBase</em></a>) – Communication instance to add a filter to.</p></li>
+<li><p><strong>filter</strong> (<a class="reference internal" href="yggdrasil.communication.filters.html#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><em>FilterBase</em></a><em>, </em><em>optional</em>) – Filter class. Defaults to None and is ignored.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.communication.tests.test_ServerComm.TestServerComm.attr_list">
 <code class="sig-name descname">attr_list</code><em class="property"> = ['name', 'address', 'direction', 'serializer', 'recv_timeout', 'close_on_eof_recv', 'opp_address', 'opp_comms', 'maxMsgSize', 'response_kwargs', 'icomm', 'ocomm']</em><a class="headerlink" href="#yggdrasil.communication.tests.test_ServerComm.TestServerComm.attr_list" title="Permalink to this definition">¶</a></dt>
@@ -1163,7 +1271,7 @@ close returns false.</p>
 <dd><p>Keyword arguments for send instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1387,6 +1495,12 @@ close returns false.</p>
 <dt id="yggdrasil.communication.tests.test_ZMQComm.TestZMQCommREQ.socket_type">
 <code class="sig-name descname">socket_type</code><em class="property"> = 'REQ'</em><a class="headerlink" href="#yggdrasil.communication.tests.test_ZMQComm.TestZMQCommREQ.socket_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_ZMQComm.TestZMQCommREQ.test_send_recv_condition">
+<code class="sig-name descname">test_send_recv_condition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ZMQComm.html#TestZMQCommREQ.test_send_recv_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ZMQComm.TestZMQCommREQ.test_send_recv_condition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv with conditional.</p>
+</dd></dl>
 
 </dd></dl>
 

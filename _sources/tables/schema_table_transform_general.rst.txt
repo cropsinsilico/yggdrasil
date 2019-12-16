@@ -1,0 +1,10 @@
+.. _schema_table_transform_general_rst:
+
+=================   ======   ========   ================================================================================
+Option              Type     Required   Description                                                                     
+=================   ======   ========   ================================================================================
+initial_state       object   X          Dictionary of initial state variables that should be set when the transform is  
+                                        created.                                                                        
+original_datatype   schema   X          Datatype associated with expected messages. Defaults to None.                   
+transformtype                X           (Options described :ref:`here <schema_table_transform_subtype_rst>`)           
+=================   ======   ========   ================================================================================

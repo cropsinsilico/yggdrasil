@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>formatted_io4 Example &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>formatted_io4 Example &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -93,6 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -123,6 +125,7 @@
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson1.html">rpc_lesson1 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson2.html">rpc_lesson2 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="model_function.html">model_function Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conditional_io.html">conditional_io Example</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
@@ -274,7 +277,7 @@
     <span class="c1">// Receive input from input channel</span>
     <span class="c1">// If there is an error, the flag will be negative</span>
     <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nrows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">yggRecvRealloc</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nrows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
@@ -379,7 +382,7 @@
     <span class="c1">// Receive input from input channel</span>
     <span class="c1">// If there is an error, the flag will be negative</span>
     <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nrows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">yggRecvRealloc</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nrows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
@@ -545,7 +548,7 @@
     <span class="c1">// Receive input from input channel</span>
     <span class="c1">// If there is an error, the flag will be negative</span>
     <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nrows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recvRealloc</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nrows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
@@ -648,7 +651,7 @@
     <span class="c1">// Receive input from input channel</span>
     <span class="c1">// If there is an error, the flag will be negative</span>
     <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nrows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recvRealloc</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nrows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>

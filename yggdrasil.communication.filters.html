@@ -1,0 +1,470 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>yggdrasil.communication.filters package &mdash; yggdrasil 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>yggdrasil.communication.filters package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/yggdrasil.communication.filters.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="yggdrasil-communication-filters-package">
+<h1>yggdrasil.communication.filters package<a class="headerlink" href="#yggdrasil-communication-filters-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="yggdrasil.communication.filters.tests.html">yggdrasil.communication.filters.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="yggdrasil.communication.filters.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yggdrasil.communication.filters.tests.html#module-yggdrasil.communication.filters.tests.test_FilterBase">yggdrasil.communication.filters.tests.test_FilterBase module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yggdrasil.communication.filters.tests.html#module-yggdrasil.communication.filters.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-yggdrasil.communication.filters.DirectFilter">
+<span id="yggdrasil-communication-filters-directfilter-module"></span><h2>yggdrasil.communication.filters.DirectFilter module<a class="headerlink" href="#module-yggdrasil.communication.filters.DirectFilter" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yggdrasil.communication.filters.DirectFilter.DirectFilter">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.communication.filters.DirectFilter.</code><code class="sig-name descname">DirectFilter</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/DirectFilter.html#DirectFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.DirectFilter.DirectFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.filters.FilterBase.FilterBase</span></code></a></p>
+<p>Class that always passes messages.</p>
+<dl class="method">
+<dt id="yggdrasil.communication.filters.DirectFilter.DirectFilter.evaluate_filter">
+<code class="sig-name descname">evaluate_filter</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/DirectFilter.html#DirectFilter.evaluate_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.DirectFilter.DirectFilter.evaluate_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call filter on the provided message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Message object to filter.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if the message will pass through the filter, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.filters.DirectFilter.DirectFilter.get_testing_options">
+<em class="property">classmethod </em><code class="sig-name descname">get_testing_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/DirectFilter.html#DirectFilter.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.DirectFilter.DirectFilter.get_testing_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get testing options for the filter class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Mutiple dictionaries of keywords and messages that will</dt><dd><p>pass/fail for those keywords.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-yggdrasil.communication.filters.FilterBase">
+<span id="yggdrasil-communication-filters-filterbase-module"></span><h2>yggdrasil.communication.filters.FilterBase module<a class="headerlink" href="#module-yggdrasil.communication.filters.FilterBase" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yggdrasil.communication.filters.FilterBase.FilterBase">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.communication.filters.FilterBase.</code><code class="sig-name descname">FilterBase</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/FilterBase.html#FilterBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.FilterBase.FilterBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.components.ComponentBase</span></code></p>
+<p>Base class for message filters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>initial_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>, </em><em>optional</em>) – Dictionary of initial state variables
+that should be set when the filter is created.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="yggdrasil.communication.filters.FilterBase.FilterBase.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/FilterBase.html#FilterBase.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.FilterBase.FilterBase.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call filter on the provided message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Message object to filter.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if the message will pass through the filter, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.filters.FilterBase.FilterBase.evaluate_filter">
+<code class="sig-name descname">evaluate_filter</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/FilterBase.html#FilterBase.evaluate_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.FilterBase.FilterBase.evaluate_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call filter on the provided message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Message object to filter.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if the message will pass through the filter, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.filters.FilterBase.FilterBase.get_testing_options">
+<em class="property">classmethod </em><code class="sig-name descname">get_testing_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/FilterBase.html#FilterBase.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.FilterBase.FilterBase.get_testing_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get testing options for the filter class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Mutiple dictionaries of keywords and messages that will</dt><dd><p>pass/fail for those keywords.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-yggdrasil.communication.filters.FunctionFilter">
+<span id="yggdrasil-communication-filters-functionfilter-module"></span><h2>yggdrasil.communication.filters.FunctionFilter module<a class="headerlink" href="#module-yggdrasil.communication.filters.FunctionFilter" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yggdrasil.communication.filters.FunctionFilter.FunctionFilter">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.communication.filters.FunctionFilter.</code><code class="sig-name descname">FunctionFilter</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/FunctionFilter.html#FunctionFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.FunctionFilter.FunctionFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.filters.FilterBase.FilterBase</span></code></a></p>
+<p>Class for filtering messages based on a provided function using Python syntax.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>function</strong> (<em>func</em>) – The handle for a callable Python object (e.g. function)
+that should be used to determine if a message should be filtered or
+a string of the form “&lt;function file&gt;:&lt;function name&gt;” identifying
+a function where “&lt;function file&gt;” is the module or Python file
+containing the function and “&lt;function name&gt;” is the name of the function.
+The function should take the message as input and return a boolean, True
+if the message should pass through the filter, False if it should not.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="yggdrasil.communication.filters.FunctionFilter.FunctionFilter.evaluate_filter">
+<code class="sig-name descname">evaluate_filter</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/FunctionFilter.html#FunctionFilter.evaluate_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.FunctionFilter.FunctionFilter.evaluate_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call filter on the provided message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Message object to filter.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if the message will pass through the filter, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.filters.FunctionFilter.FunctionFilter.get_testing_options">
+<em class="property">classmethod </em><code class="sig-name descname">get_testing_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/FunctionFilter.html#FunctionFilter.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.FunctionFilter.FunctionFilter.get_testing_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get testing options for the filter class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Mutiple dictionaries of keywords and messages that will</dt><dd><p>pass/fail for those keywords.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-yggdrasil.communication.filters.StatementFilter">
+<span id="yggdrasil-communication-filters-statementfilter-module"></span><h2>yggdrasil.communication.filters.StatementFilter module<a class="headerlink" href="#module-yggdrasil.communication.filters.StatementFilter" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yggdrasil.communication.filters.StatementFilter.StatementFilter">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.communication.filters.StatementFilter.</code><code class="sig-name descname">StatementFilter</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/StatementFilter.html#StatementFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.StatementFilter.StatementFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.filters.FilterBase.FilterBase</span></code></a></p>
+<p>Class for filtering messages based on a provided statement using Python syntax.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>statement</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Python statement in terms of the message as represented by
+the string “%x%” that should evaluate to a boolean, True if the message
+should pass through the filter, False if it should not. The statement
+should only use a limited set of builtins and the math library (See
+yggdrasil.tools.safe_eval). If more complex relationships are required,
+use the FunctionFilter class.</p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="yggdrasil.communication.filters.StatementFilter.StatementFilter.statement">
+<code class="sig-name descname">statement</code><a class="headerlink" href="#yggdrasil.communication.filters.StatementFilter.StatementFilter.statement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Python statement that will be evaluated to determine if
+messages should or should not pass the filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.filters.StatementFilter.StatementFilter.evaluate_filter">
+<code class="sig-name descname">evaluate_filter</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/StatementFilter.html#StatementFilter.evaluate_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.StatementFilter.StatementFilter.evaluate_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call filter on the provided message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Message object to filter.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if the message will pass through the filter, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.filters.StatementFilter.StatementFilter.get_testing_options">
+<em class="property">classmethod </em><code class="sig-name descname">get_testing_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/filters/StatementFilter.html#StatementFilter.get_testing_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.filters.StatementFilter.StatementFilter.get_testing_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get testing options for the filter class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Mutiple dictionaries of keywords and messages that will</dt><dd><p>pass/fail for those keywords.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-yggdrasil.communication.filters">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.communication.filters" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

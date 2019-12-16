@@ -52,6 +52,14 @@ yggdrasil.metaschema.properties.tests.test\_JSONObjectMetaschemaProperties modul
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.metaschema.properties.tests.test\_KwargsMetaschemaProperty module
+---------------------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.properties.tests.test_KwargsMetaschemaProperty
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.metaschema.properties.tests.test\_MetaschemaProperty module
 ---------------------------------------------------------------------
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>General Development Notes &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>General Development Notes &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -93,6 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -103,6 +105,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Development</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">General Development Notes</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#development-workflow">Development Workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setting-up-a-dev-environment">Setting Up a Dev Environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#testing">Testing</a></li>
 </ul>
 </li>
@@ -197,6 +200,65 @@ the proposed changes and/or features so that discussion can help identify
 potential sticking points, features that already exist but are poorly documented,
 and features that would break a significant portion of the code.</p>
 </div>
+<div class="section" id="setting-up-a-dev-environment">
+<span id="dev-env-rst"></span><h2>Setting Up a Dev Environment<a class="headerlink" href="#setting-up-a-dev-environment" title="Permalink to this headline">¶</a></h2>
+<p>The following is only one method for setting up a development environment. You are welcome to select another method (e.g. using virtual env), but this is what has worked for me.</p>
+<ol class="arabic">
+<li><p>[WINDOWS ONLY] Download and install Visual Studio Community from <a class="reference external" href="https://visualstudio.microsoft.com/vs/community/">here</a>. During installation, we recommend selecting the components below. If you forget to add something during the initial download, you can always modify the installation via the “Visual Studio Installer” program.</p>
+<ul class="simple">
+<li><p>“Desktop development with C++” - Workload under “Windows” section</p></li>
+<li><p>“MSVC v140 - VS 2015 C++ build tools (v14.00)” - Individual component under “Compilers, build tools, and runtimes” section.</p></li>
+</ul>
+<p>If you will be developing on Python 2, you will need additional compilers that can be found <a class="reference external" href="https://www.microsoft.com/en-us/download/details.aspx?id=44266">here</a>.</p>
+</li>
+<li><p>[OPTIONAL] Download and install Miniconda (or Anaconda) from <a class="reference external" href="https://www.anaconda.com/download/">here</a>. Once downloaded, run the following command from the terminal (or Anaconda Prompt on Windows) to add the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> channel to the list of conda channels that will be searched when conda installs packages.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda config --add channels conda-forge
+</pre></div>
+</div>
+</li>
+<li><p>Create a fork of the yggdrasil Github repository for you Github account (<code class="docutils literal notranslate"><span class="pre">Fork</span></code> button located in the upper right corner of the yggdrasil <a class="reference external" href="https://github.com/cropsinsilico/yggdrasil">Github repository</a>).</p></li>
+<li><p>Clone your fork of the yggdrasil repository using git and then change directory into the cloned repository. NOTE: If you do not have <code class="docutils literal notranslate"><span class="pre">git</span></code> you can either <a class="reference external" href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">install it yourself</a> or using conda (<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">git</span></code>).:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone --recurse-submodules https://github.com/&lt;your Github username&gt;/yggdrasil.git
+$ cd yggdrasil
+</pre></div>
+</div>
+</li>
+<li><p>[OPTIONAL] Create a conda environment for development and activate that environment. You can create an environment using any of the supported versions of Python and may need more than one for testing.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n ygg python=3.6
+$ conda activate ygg
+</pre></div>
+</div>
+<p>yggdrasil provides a python script, <code class="docutils literal notranslate"><span class="pre">utils/create_envs.py</span></code> for creating development environments and installing yggdrasil in develoment mode for a combination of dependency installation methods (pip vs. conda) and versions of Python. For example, to create a conda environment with Python 3.6 (as above) and install yggdrasil’s dependencies using conda, the following commands can
+be executed from the root directory of your local yggdrasil repository.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python utils/create_envs.py --name=ygg
+$ conda activate ygg
+</pre></div>
+</div>
+<p><strong>If you use ``utils/create_envs.py`` to create your dev environment, you can skip to the last step.</strong></p>
+</li>
+<li><p>Install the requirements using conda via the helper script <code class="docutils literal notranslate"><span class="pre">utils/install_from_requirements.py</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python utils/install_from_requirements.py conda requirements.txt requirements_condaonly.txt requirements_testing.txt
+</pre></div>
+</div>
+<p>Alternatively, if you did not install conda, you can install the Python dependencies using <code class="docutils literal notranslate"><span class="pre">pip</span></code> via the same script.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python utils/install_from_requirements.py pip requirements.txt requirements_testing.txt
+</pre></div>
+</div>
+<p>However, if you use this method, you will need to manually install the non-Python dependencies as described <a class="reference internal" href="../install.html#manual-install-rst"><span class="std std-ref">here</span></a>. This should be done BEFORE installing yggdrasil in the next step.</p>
+<p>There are also two additional requirements files, <code class="docutils literal notranslate"><span class="pre">requirements_documentation.txt</span></code> and <code class="docutils literal notranslate"><span class="pre">requirements_optional.txt</span></code>, that can optionally be added to the end of either of these commands. <code class="docutils literal notranslate"><span class="pre">requirements_documentation.txt</span></code> includes packages required for building the documentation and <code class="docutils literal notranslate"><span class="pre">requirements_optional.txt</span></code> includes packages required for optional yggdrasil features (e.g. using <code class="docutils literal notranslate"><span class="pre">astropy</span></code> table parsing or <code class="docutils literal notranslate"><span class="pre">pika</span></code> for RabbitMQ communication).</p>
+</li>
+<li><p>Run the yggdrasil installation script in development mode.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py develop
+</pre></div>
+</div>
+</li>
+<li><p>Run the yggdrasil configuration script.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggconfig
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
 <div class="section" id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
 <p>All development should be accompanied by tests. yggdrasil aims to
@@ -208,6 +270,7 @@ the module directory containing the class being tested. In some cases
 yggdrasil will automatically generate tests if certain class
 attributes and/or methods are defined (e.g. serialization, communication,
 and connection driver classes).</p>
+<p>Tests can be run using the <code class="docutils literal notranslate"><span class="pre">yggtest</span></code> command. If no arguments are provided, <code class="docutils literal notranslate"><span class="pre">yggtest</span></code> will run all of the tests (excluding the examples). If you only want to run some tests, you can provide the path to file or directory containing the tests you would like to run; these paths can be absolute, relative to the current directory, or relative to the top level directory of the yggdrasil source tree. To also run example tests, include the <code class="docutils literal notranslate"><span class="pre">--with-examples</span></code> flag.</p>
 </div>
 </div>
 

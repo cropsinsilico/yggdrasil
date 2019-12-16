@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests.test_schema &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.tests.test_schema &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -170,39 +172,73 @@
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">schema</span>
+<span class="kn">from</span> <span class="nn">jsonschema</span> <span class="k">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">schema</span><span class="p">,</span> <span class="n">components</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
 
 
+<div class="viewcode-block" id="filter_func_ex"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_schema.filter_func_ex">[docs]</a><span class="k">def</span> <span class="nf">filter_func_ex</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test function for normalizing filters.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<span class="n">filter_func_ex_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:filter_func_ex&#39;</span> <span class="o">%</span> <span class="vm">__file__</span>
+
+
 <span class="n">_normalize_objects</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">({</span><span class="s1">&#39;models&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;modelA&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="s1">&#39;model.c&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;outputA&#39;</span><span class="p">,</span>
-                               <span class="s1">&#39;column_names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">],</span>
-                               <span class="s1">&#39;column_units&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">]}],</span>
-                  <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()}],</span>
-      <span class="s1">&#39;connections&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="s1">&#39;outputA&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="s1">&#39;fileA.txt&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;seritype&#39;</span><span class="p">:</span> <span class="s1">&#39;direct&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()}]},</span>
-     <span class="p">{</span><span class="s1">&#39;models&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;modelA&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;model.c&#39;</span><span class="p">],</span>
-                  <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;outputA&#39;</span><span class="p">,</span>
-                                             <span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span>
-                                             <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">}}],</span>
-                  <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()}],</span>
-      <span class="s1">&#39;connections&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;outputA&#39;</span><span class="p">,</span>
-                                   <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">},</span>
-                                   <span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="s1">&#39;default&#39;</span><span class="p">}],</span>
-                       <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;fileA.txt&#39;</span><span class="p">,</span>
-                                    <span class="s1">&#39;filetype&#39;</span><span class="p">:</span> <span class="s1">&#39;binary&#39;</span><span class="p">,</span>
-                                    <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
-                                    <span class="s1">&#39;serializer&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;seritype&#39;</span><span class="p">:</span> <span class="s1">&#39;direct&#39;</span><span class="p">},</span>
-                                    <span class="s1">&#39;field_names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">],</span>
-                                    <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">]}]}]})]</span>
-                                    
+    <span class="p">({</span><span class="s1">&#39;models&#39;</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;modelA&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="s1">&#39;model.c&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;outputA&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;column_names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">],</span>
+             <span class="s1">&#39;column_units&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">],</span>
+             <span class="s1">&#39;filter&#39;</span><span class="p">:</span> <span class="p">{</span>
+                 <span class="s1">&#39;function&#39;</span><span class="p">:</span> <span class="n">filter_func_ex_name</span><span class="p">}}],</span>
+        <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()}],</span>
+      <span class="s1">&#39;connections&#39;</span><span class="p">:</span> <span class="p">[{</span>
+          <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="s1">&#39;outputA&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="s1">&#39;fileA.txt&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;seritype&#39;</span><span class="p">:</span> <span class="s1">&#39;direct&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()}]},</span>
+     <span class="p">{</span><span class="s1">&#39;models&#39;</span><span class="p">:</span> <span class="p">[{</span>
+         <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;modelA&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;model.c&#39;</span><span class="p">],</span>
+         <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">},</span>
+                     <span class="s1">&#39;is_default&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;modelA:input&#39;</span><span class="p">}],</span>
+         <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;modelA:outputA&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">},</span>
+                      <span class="s1">&#39;filter&#39;</span><span class="p">:</span> <span class="p">{</span>
+                          <span class="s1">&#39;function&#39;</span><span class="p">:</span> <span class="n">filter_func_ex</span><span class="p">}}],</span>
+         <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()}],</span>
+      <span class="s1">&#39;connections&#39;</span><span class="p">:</span> <span class="p">[{</span>
+          <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;modelA:outputA&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">},</span>
+               <span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;filter&#39;</span><span class="p">:</span> <span class="p">{</span>
+                   <span class="s1">&#39;function&#39;</span><span class="p">:</span> <span class="n">filter_func_ex</span><span class="p">}}],</span>
+          <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;fileA.txt&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;filetype&#39;</span><span class="p">:</span> <span class="s1">&#39;binary&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
+               <span class="s1">&#39;serializer&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;seritype&#39;</span><span class="p">:</span> <span class="s1">&#39;direct&#39;</span><span class="p">},</span>
+               <span class="s1">&#39;field_names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">],</span>
+               <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">]}]}]})]</span>
+
+
+<div class="viewcode-block" id="test_get_json_schema"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_schema.test_get_json_schema">[docs]</a><span class="k">def</span> <span class="nf">test_get_json_schema</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test getting pure JSON version of schema.&quot;&quot;&quot;</span>
+    <span class="n">test_file</span> <span class="o">=</span> <span class="s1">&#39;strict_json_schema.json&#39;</span>
+    <span class="n">schema</span><span class="o">.</span><span class="n">get_json_schema</span><span class="p">(</span><span class="n">test_file</span><span class="p">)</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">test_file</span><span class="p">))</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">test_file</span><span class="p">)</span></div>
+    
 
 <div class="viewcode-block" id="test_SchemaRegistry"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_schema.test_SchemaRegistry">[docs]</a><span class="k">def</span> <span class="nf">test_SchemaRegistry</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test schema registry.&quot;&quot;&quot;</span>
@@ -291,6 +327,29 @@
 <div class="viewcode-block" id="test_cdriver2commtype_error"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_schema.test_cdriver2commtype_error">[docs]</a><span class="k">def</span> <span class="nf">test_cdriver2commtype_error</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when invalid driver supplied.&quot;&quot;&quot;</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">schema</span><span class="o">.</span><span class="n">cdriver2commtype</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_get_schema_subtype"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_schema.test_get_schema_subtype">[docs]</a><span class="k">def</span> <span class="nf">test_get_schema_subtype</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_schema_subtype for allow_instance=True.&quot;&quot;&quot;</span>
+    <span class="n">component</span> <span class="o">=</span> <span class="s1">&#39;serializer&#39;</span>
+    <span class="n">subtype</span> <span class="o">=</span> <span class="s1">&#39;direct&#39;</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;seritype&#39;</span><span class="p">:</span> <span class="n">subtype</span><span class="p">}</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">create_component</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">seritype</span><span class="o">=</span><span class="n">subtype</span><span class="p">)</span>
+    <span class="n">invalid</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">create_component</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">seritype</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">get_schema</span><span class="p">()</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="n">subtype</span><span class="p">,</span> <span class="s1">&#39;allow_instance&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">validate_component</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">validate_component</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">valid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="n">ValidationError</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">validate_component</span><span class="p">,</span>
+                  <span class="n">component</span><span class="p">,</span> <span class="n">invalid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">validate_component</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="n">ValidationError</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">validate_component</span><span class="p">,</span>
+                  <span class="n">component</span><span class="p">,</span> <span class="n">valid</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">)</span>
+    <span class="c1"># Test for base</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">validate_component</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">valid</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="s1">&#39;base&#39;</span><span class="p">,</span>
+                         <span class="n">allow_instance</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">validate_component</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">invalid</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="s1">&#39;base&#39;</span><span class="p">,</span>
+                         <span class="n">allow_instance</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

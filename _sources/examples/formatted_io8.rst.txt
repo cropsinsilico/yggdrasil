@@ -1,6 +1,50 @@
 formatted_io8 Example
 =====================
 
+C Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io8/src/formatted_io8_modelB.c
+   :language: c
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io8/src/formatted_io8_modelA.c
+   :language: c
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io8/formatted_io8_c.yml
+   :language: yaml
+   :linenos:
+
+
+
+C++ Version
+-----------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io8/src/formatted_io8_modelA.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io8/src/formatted_io8_modelB.cpp
+   :language: c++
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io8/formatted_io8_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
 Matlab Version
 --------------
 

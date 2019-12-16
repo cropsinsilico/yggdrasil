@@ -1,0 +1,9 @@
+.. _schema_table_filter_general_rst:
+
+=============   ======   ========   ================================================================================
+Option          Type     Required   Description                                                                     
+=============   ======   ========   ================================================================================
+filtertype               X           (Options described :ref:`here <schema_table_filter_subtype_rst>`)              
+initial_state   object   X          Dictionary of initial state variables that should be set when the filter is     
+                                    created.                                                                        
+=============   ======   ========   ================================================================================

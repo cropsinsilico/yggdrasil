@@ -28,6 +28,14 @@ yggdrasil.examples.tests.test\_backwards module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.examples.tests.test\_conditional\_io module
+-----------------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_conditional_io
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.examples.tests.test\_fakeplant module
 -----------------------------------------------
 
@@ -216,6 +224,14 @@ yggdrasil.examples.tests.test\_timed\_pipe module
 -------------------------------------------------
 
 .. automodule:: yggdrasil.examples.tests.test_timed_pipe
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.examples.tests.test\_types module
+-------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_types
    :members:
    :undoc-members:
    :show-inheritance:

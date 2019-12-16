@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Release Steps &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>Release Steps &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -93,6 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -200,7 +202,7 @@ $ git push origin [BRANCH]
 </div>
 </li>
 <li><p>[on branch/fork] Make sure all CI tests pass (<a class="reference external" href="https://travis-ci.org/cropsinsilico/yggdrasil">travis</a>, <a class="reference external" href="https://ci.appveyor.com/project/langmm/yggdrasil">appveyor</a>).:</p></li>
-<li><p>[on branch/fork] Update docs to reflect new features and make sure they build locally:</p>
+<li><p>[on branch/fork] Update docs to reflect new features and make sure they build locally (you will need to install <code class="docutils literal notranslate"><span class="pre">doxygen</span></code> and the requirements listed in <code class="docutils literal notranslate"><span class="pre">requirements_documentation.txt</span></code> to build the docs).:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd docs
 $ make autodoc
 </pre></div>

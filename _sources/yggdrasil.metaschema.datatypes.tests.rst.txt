@@ -84,6 +84,14 @@ yggdrasil.metaschema.datatypes.tests.test\_MetaschemaType module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.metaschema.datatypes.tests.test\_MultiMetaschemaType module
+---------------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.tests.test_MultiMetaschemaType
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.metaschema.datatypes.tests.test\_ObjMetaschemaType module
 -------------------------------------------------------------------
 

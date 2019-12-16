@@ -16,6 +16,7 @@ Welcome to yggdrasil's documentation!
    formatted_io
    server_client_io
    autowrap
+   conditional_io
    yaml
    config
    units

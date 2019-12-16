@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests.test_MakeModelDriver &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_MakeModelDriver &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
@@ -168,27 +170,25 @@
             
   <h1>Source code for yggdrasil.drivers.tests.test_MakeModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">scripts</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">scripts</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span><span class="p">,</span> <span class="n">requires_language</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_CompiledModelDriver</span> <span class="k">as</span> <span class="nn">parent</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.MakeModelDriver</span> <span class="k">import</span> <span class="n">MakeModelDriver</span><span class="p">,</span> <span class="n">MakeCompiler</span>
 
 
-<span class="n">_driver_installed</span> <span class="o">=</span> <span class="n">MakeModelDriver</span><span class="o">.</span><span class="n">is_installed</span><span class="p">()</span>
-
-
-<div class="viewcode-block" id="test_MakeCompiler"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_MakeModelDriver.test_MakeCompiler">[docs]</a><span class="k">def</span> <span class="nf">test_MakeCompiler</span><span class="p">():</span>
+<div class="viewcode-block" id="test_MakeCompiler"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_MakeModelDriver.test_MakeCompiler">[docs]</a><span class="nd">@requires_language</span><span class="p">(</span><span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="n">installed</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">test_MakeCompiler</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test MakeCompiler class.&quot;&quot;&quot;</span>
     <span class="n">assert_equal</span><span class="p">(</span><span class="n">MakeCompiler</span><span class="o">.</span><span class="n">get_output_file</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;clean&#39;</span><span class="p">),</span> <span class="s1">&#39;clean&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_MakeModelDriver_no_C_library"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_MakeModelDriver.test_MakeModelDriver_no_C_library">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library installed&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="test_MakeModelDriver_no_C_library"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_MakeModelDriver.test_MakeModelDriver_no_C_library">[docs]</a><span class="nd">@requires_language</span><span class="p">(</span><span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="n">installed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">test_MakeModelDriver_no_C_library</span><span class="p">():</span>  <span class="c1"># pragma: windows</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test MakeModelDriver error when C library not installed.&quot;&quot;&quot;</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">MakeModelDriver</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;make&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="test_MakeModelDriver_error_notarget"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_MakeModelDriver.test_MakeModelDriver_error_notarget">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="test_MakeModelDriver_error_notarget"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_MakeModelDriver.test_MakeModelDriver_error_notarget">[docs]</a><span class="nd">@requires_language</span><span class="p">(</span><span class="s1">&#39;make&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">test_MakeModelDriver_error_notarget</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test MakeModelDriver error for invalid target.&quot;&quot;&quot;</span>
     <span class="n">makedir</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;make&#39;</span><span class="p">])</span>
@@ -196,7 +196,7 @@
                   <span class="n">makedir</span><span class="o">=</span><span class="n">makedir</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_MakeModelDriver_error_nofile"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_MakeModelDriver.test_MakeModelDriver_error_nofile">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="test_MakeModelDriver_error_nofile"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_MakeModelDriver.test_MakeModelDriver_error_nofile">[docs]</a><span class="nd">@requires_language</span><span class="p">(</span><span class="s1">&#39;make&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">test_MakeModelDriver_error_nofile</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test MakeModelDriver error for missing Makefile.&quot;&quot;&quot;</span>
     <span class="n">makedir</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;make&#39;</span><span class="p">])</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>JSON Metaschema &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>JSON Metaschema &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -93,6 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -524,7 +526,11 @@ metaschema include:</p>
 293
 294
 295
-296</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+296
+297
+298
+299
+300</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="nt">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;http://json-schema.org/draft-04/schema#&quot;</span><span class="p">,</span>
     <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="p">{},</span>
     <span class="nt">&quot;definitions&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -630,7 +636,7 @@ metaschema include:</p>
         <span class="p">},</span>
         <span class="nt">&quot;args&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Arguments required to recreate a class instance.&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span>
         <span class="p">},</span>
         <span class="nt">&quot;class&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="nt">&quot;anyOf&quot;</span><span class="p">:</span> <span class="p">[</span>
@@ -699,6 +705,10 @@ metaschema include:</p>
                 <span class="p">}</span>
             <span class="p">],</span>
             <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="p">{}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Keyword arguments required to recreate a class instance.&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span>
         <span class="p">},</span>
         <span class="nt">&quot;length&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of elements in the 1D array.&quot;</span><span class="p">,</span>

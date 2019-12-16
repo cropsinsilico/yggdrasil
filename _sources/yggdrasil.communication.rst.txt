@@ -6,7 +6,9 @@ Subpackages
 
 .. toctree::
 
+   yggdrasil.communication.filters
    yggdrasil.communication.tests
+   yggdrasil.communication.transforms
 
 Submodules
 ----------

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Serialization &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>Serialization &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -93,6 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -210,9 +212,9 @@ expansion type to the core set of JSON types.</p>
 <table class="docutils align-default" id="datatype-mapping-table-rst">
 <colgroup>
 <col style="width: 5%" />
-<col style="width: 19%" />
-<col style="width: 9%" />
-<col style="width: 17%" />
+<col style="width: 20%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
 <col style="width: 12%" />
 <col style="width: 12%" />
 <col style="width: 27%" />
@@ -238,8 +240,8 @@ expansion type to the core set of JSON types.</p>
 </tr>
 <tr class="row-odd"><td><p>array</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">vector_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">std::vector&lt;void*&gt;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">json_array_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">json_array_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">cell</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td><p>Support for dynamic arrays in C/C++ is
@@ -271,8 +273,8 @@ still under development.</p></td>
 </tr>
 <tr class="row-odd"><td><p>float</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">floatX_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">floatX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">single,</span> <span class="pre">double</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">numpy.floatX</span></code></p></td>
 <td><p>Precision X is preserved.</p></td>
@@ -294,9 +296,9 @@ still under development.</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>null</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">NA</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">void*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">void*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">NaN</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
 <td></td>
@@ -320,8 +322,8 @@ floating point or integer values.</p></td>
 </tr>
 <tr class="row-odd"><td><p>object</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">map_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">std::map&lt;char*,void*&gt;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">json_object_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">json_object_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">dict</span></code></p></td>
 <td><p>Support for dynamic objects in C/C++ is
@@ -347,16 +349,16 @@ float, bytes, and unicode.</p></td>
 </tr>
 <tr class="row-even"><td><p>schema</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">map_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">MetaschemaType</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">schema_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">schema_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">dict</span></code></p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>string</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">character</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
 <td><p>Encoding dependent on JSON library.</p></td>
@@ -371,8 +373,8 @@ float, bytes, and unicode.</p></td>
 </tr>
 <tr class="row-odd"><td><p>unicode</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">unicode_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">unicode_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
 <td><p>Precision X is preserved.</p></td>

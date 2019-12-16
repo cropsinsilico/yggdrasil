@@ -99,6 +99,14 @@ yggdrasil.metaschema.datatypes.MetaschemaType module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.metaschema.datatypes.MultiMetaschemaType module
+---------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.MultiMetaschemaType
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.metaschema.datatypes.ObjMetaschemaType module
 -------------------------------------------------------
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema package &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.metaschema package &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -186,6 +188,7 @@
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.datatypes.tests.html#module-yggdrasil.metaschema.datatypes.tests.test_JSONMetaschemaType">yggdrasil.metaschema.datatypes.tests.test_JSONMetaschemaType module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.datatypes.tests.html#module-yggdrasil.metaschema.datatypes.tests.test_JSONObjectMetaschemaType">yggdrasil.metaschema.datatypes.tests.test_JSONObjectMetaschemaType module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.datatypes.tests.html#module-yggdrasil.metaschema.datatypes.tests.test_MetaschemaType">yggdrasil.metaschema.datatypes.tests.test_MetaschemaType module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.datatypes.tests.html#module-yggdrasil.metaschema.datatypes.tests.test_MultiMetaschemaType">yggdrasil.metaschema.datatypes.tests.test_MultiMetaschemaType module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.datatypes.tests.html#module-yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType">yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.datatypes.tests.html#module-yggdrasil.metaschema.datatypes.tests.test_PlyMetaschemaType">yggdrasil.metaschema.datatypes.tests.test_PlyMetaschemaType module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.datatypes.tests.html#module-yggdrasil.metaschema.datatypes.tests.test_ScalarMetaschemaType">yggdrasil.metaschema.datatypes.tests.test_ScalarMetaschemaType module</a></li>
@@ -208,6 +211,7 @@
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.datatypes.html#module-yggdrasil.metaschema.datatypes.JSONMetaschemaType">yggdrasil.metaschema.datatypes.JSONMetaschemaType module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.datatypes.html#module-yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType">yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.datatypes.html#module-yggdrasil.metaschema.datatypes.MetaschemaType">yggdrasil.metaschema.datatypes.MetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.datatypes.html#module-yggdrasil.metaschema.datatypes.MultiMetaschemaType">yggdrasil.metaschema.datatypes.MultiMetaschemaType module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.datatypes.html#module-yggdrasil.metaschema.datatypes.ObjMetaschemaType">yggdrasil.metaschema.datatypes.ObjMetaschemaType module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.datatypes.html#module-yggdrasil.metaschema.datatypes.PlyMetaschemaType">yggdrasil.metaschema.datatypes.PlyMetaschemaType module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.datatypes.html#module-yggdrasil.metaschema.datatypes.ScalarMetaschemaType">yggdrasil.metaschema.datatypes.ScalarMetaschemaType module</a></li>
@@ -226,6 +230,7 @@
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.properties.tests.html#module-yggdrasil.metaschema.properties.tests.test_ClassMetaschemaProperty">yggdrasil.metaschema.properties.tests.test_ClassMetaschemaProperty module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.properties.tests.html#module-yggdrasil.metaschema.properties.tests.test_JSONArrayMetaschemaProperties">yggdrasil.metaschema.properties.tests.test_JSONArrayMetaschemaProperties module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.properties.tests.html#module-yggdrasil.metaschema.properties.tests.test_JSONObjectMetaschemaProperties">yggdrasil.metaschema.properties.tests.test_JSONObjectMetaschemaProperties module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.properties.tests.html#module-yggdrasil.metaschema.properties.tests.test_KwargsMetaschemaProperty">yggdrasil.metaschema.properties.tests.test_KwargsMetaschemaProperty module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.properties.tests.html#module-yggdrasil.metaschema.properties.tests.test_MetaschemaProperty">yggdrasil.metaschema.properties.tests.test_MetaschemaProperty module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.properties.tests.html#module-yggdrasil.metaschema.properties.tests.test_ScalarMetaschemaProperties">yggdrasil.metaschema.properties.tests.test_ScalarMetaschemaProperties module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.properties.tests.html#module-yggdrasil.metaschema.properties.tests.test_TypeMetaschemaProperty">yggdrasil.metaschema.properties.tests.test_TypeMetaschemaProperty module</a></li>
@@ -242,6 +247,7 @@
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.properties.html#module-yggdrasil.metaschema.properties.DefaultProperty">yggdrasil.metaschema.properties.DefaultProperty module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.properties.html#module-yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties">yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.properties.html#module-yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties">yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.properties.html#module-yggdrasil.metaschema.properties.KwargsMetaschemaProperty">yggdrasil.metaschema.properties.KwargsMetaschemaProperty module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.properties.html#module-yggdrasil.metaschema.properties.MetaschemaProperty">yggdrasil.metaschema.properties.MetaschemaProperty module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.properties.html#module-yggdrasil.metaschema.properties.ScalarMetaschemaProperties">yggdrasil.metaschema.properties.ScalarMetaschemaProperties module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="yggdrasil.metaschema.properties.html#module-yggdrasil.metaschema.properties.TitleMetaschemaProperty">yggdrasil.metaschema.properties.TitleMetaschemaProperty module</a></li>
@@ -321,7 +327,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – JSON serialization to decode.</p></li>
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – JSON serialization to decode.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to json.loads.</p></li>
 </ul>
 </dd>
@@ -329,7 +335,7 @@
 <dd class="field-even"><p>Deserialized Python object.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -341,8 +347,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – YAML serialization to decode.</p></li>
-<li><p><strong>sorted_dict_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.7)"><em>type</em></a><em>, </em><em>optional</em>) – Class that should be used to
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – YAML serialization to decode.</p></li>
+<li><p><strong>sorted_dict_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em>, </em><em>optional</em>) – Class that should be used to
 contain mapping objects while preserving order. Defaults to
 None and is ignored.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to yaml.load.</p></li>
@@ -352,7 +358,7 @@ None and is ignored.</p></li>
 <dd class="field-even"><p>Deserialized Python object.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -364,12 +370,12 @@ None and is ignored.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – Python object to encode.</p></li>
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Python object to encode.</p></li>
 <li><p><strong>fd</strong> (<em>file</em><em>, </em><em>optional</em>) – File descriptor for file that encoded object
 should be written to. Defaults to None and string is returned.</p></li>
-<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Indentation for new lines in encoded
+<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Indentation for new lines in encoded
 string. Defaults to None.</p></li>
-<li><p><strong>sort_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the keys will be output in sorted
+<li><p><strong>sort_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the keys will be output in sorted
 order. Defaults to True.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to json.dumps.</p></li>
 </ul>
@@ -378,7 +384,7 @@ order. Defaults to True.</p></li>
 <dd class="field-even"><p>Encoded object.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)">bytes</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -390,10 +396,10 @@ order. Defaults to True.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – Python object to encode.</p></li>
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Python object to encode.</p></li>
 <li><p><strong>fd</strong> (<em>file</em><em>, </em><em>optional</em>) – File descriptor for file that encoded object
 should be written to. Defaults to None and string is returned.</p></li>
-<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Indentation for new lines in encoded
+<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Indentation for new lines in encoded
 string. Defaults to None.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to yaml.dump.</p></li>
 </ul>
@@ -402,7 +408,7 @@ string. Defaults to None.</p></li>
 <dd class="field-even"><p>Encoded object.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)">bytes</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -414,13 +420,13 @@ string. Defaults to None.</p></li>
 Tabs are set to be equivalent to 4 spaces.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – String indent.</p>
+<dd class="field-odd"><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – String indent.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Number of whitespaces that is equivalent to the provided string.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -431,7 +437,7 @@ Tabs are set to be equivalent to 4 spaces.</p>
 <dd><p>Import a function/class based on its representation as a string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – String that may or may not contain a represetnation of an
+<dd class="field-odd"><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – String that may or may not contain a represetnation of an
 importable class or function.</p>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -442,7 +448,7 @@ importable class or function.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>, class, function</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, class, function</p>
 </dd>
 </dl>
 </dd></dl>
@@ -453,14 +459,14 @@ importable class or function.</p>
 <dl class="class">
 <dt id="yggdrasil.metaschema.normalizer.UndefinedProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.normalizer.</code><code class="sig-name descname">UndefinedProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/normalizer.html#UndefinedProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.normalizer.UndefinedProperty" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class to be used as a flag for undefined properties.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.metaschema.normalizer.UninitializedNormalized">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.normalizer.</code><code class="sig-name descname">UninitializedNormalized</code><a class="reference internal" href="_modules/yggdrasil/metaschema/normalizer.html#UninitializedNormalized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.normalizer.UninitializedNormalized" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class to be used as a flag for uninitialized normalized value.</p>
 </dd></dl>
 
@@ -472,13 +478,13 @@ the jsonschema validation class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>normalizers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Keys are tuples representing paths that
+<li><p><strong>normalizers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>, </em><em>optional</em>) – Keys are tuples representing paths that
 exist within the schema at which the normalization functions stored
 in lists as their value counterparts should be executed. Defaults to
 empty dictionary.</p></li>
-<li><p><strong>no_defaults</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, defaults will not be set during
+<li><p><strong>no_defaults</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, defaults will not be set during
 normalization. Defaults to False.</p></li>
-<li><p><strong>required_defaults</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, defaults will be set for
+<li><p><strong>required_defaults</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, defaults will be set for
 required properties, even if no_defaults is True. Defaults to False.</p></li>
 <li><p><strong>*args</strong> – Additional arguments are passed to jsonschema.validators.create.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to
@@ -497,7 +503,7 @@ jsonschema.validators.create.</p></li>
 <dd><p>Create the meta schema for validating ygg schema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the existing meta schema will be
+<dd class="field-odd"><p><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the existing meta schema will be
 overwritten. If False and the metaschema exists, an error will be
 raised. Defaults to False.</p>
 </dd>
@@ -510,10 +516,10 @@ property definitions.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><strong>RuntimeError</strong></a> – If the file already exists and overwrite is False.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.8)"><strong>RuntimeError</strong></a> – If the file already exists and overwrite is False.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -532,7 +538,7 @@ property definitions.</p>
 </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 <div class="admonition note">
@@ -550,9 +556,9 @@ all of the necessary modules have been loaded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the existing validator will be
+<li><p><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the existing validator will be
 overwritten. Defaults to False.</p></li>
-<li><p><strong>normalizers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional normalizers to add.</p></li>
+<li><p><strong>normalizers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional normalizers to add.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to normalizer.create.</p></li>
 </ul>
 </dd>
@@ -578,8 +584,8 @@ overwritten. Defaults to False.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – Object to be normalized using the provided schema.</p></li>
-<li><p><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Schema to use to normalize the provided object.</p></li>
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Object to be normalized using the provided schema.</p></li>
+<li><p><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Schema to use to normalize the provided object.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to normalize.</p></li>
 </ul>
 </dd>
@@ -587,7 +593,7 @@ overwritten. Defaults to False.</p></li>
 <dd class="field-even"><p>Normalized instance.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -599,8 +605,8 @@ overwritten. Defaults to False.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – Object to be validated using the provided schema.</p></li>
-<li><p><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Schema to use to validate the provided object.</p></li>
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Object to be validated using the provided schema.</p></li>
+<li><p><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Schema to use to validate the provided object.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to validate.</p></li>
 </ul>
 </dd>
@@ -616,7 +622,7 @@ overwritten. Defaults to False.</p></li>
 <dd><p>Validate a schema against the metaschema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Schema to be validated.</p>
+<dd class="field-odd"><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Schema to be validated.</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><strong>ValidationError</strong> – If the schema is not valid.</p>

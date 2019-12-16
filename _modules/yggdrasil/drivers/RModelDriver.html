@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.RModelDriver &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.drivers.RModelDriver &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -215,7 +217,7 @@
         <span class="s1">&#39;array&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span>
         <span class="s1">&#39;object&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span>
         <span class="s1">&#39;boolean&#39;</span><span class="p">:</span> <span class="s1">&#39;logical&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;null&#39;</span><span class="p">:</span> <span class="s1">&#39;NULL&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;null&#39;</span><span class="p">:</span> <span class="s1">&#39;NA&#39;</span><span class="p">,</span>
         <span class="s1">&#39;uint&#39;</span><span class="p">:</span> <span class="s1">&#39;integer&#39;</span><span class="p">,</span>
         <span class="s1">&#39;complex&#39;</span><span class="p">:</span> <span class="s1">&#39;complex&#39;</span><span class="p">,</span>
         <span class="s1">&#39;bytes&#39;</span><span class="p">:</span> <span class="s1">&#39;char (utf-8)&#39;</span><span class="p">,</span>
@@ -227,6 +229,10 @@
         <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">}</span>
     <span class="n">function_param</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;import&#39;</span><span class="p">:</span> <span class="s1">&#39;source(</span><span class="se">\&quot;</span><span class="si">{filename}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;istype&#39;</span><span class="p">:</span> <span class="s1">&#39;is(</span><span class="si">{variable}</span><span class="s1">, </span><span class="se">\&quot;</span><span class="si">{type}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;len&#39;</span><span class="p">:</span> <span class="s1">&#39;length(</span><span class="si">{variable}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{variable}</span><span class="s1">[[</span><span class="si">{index}</span><span class="s1">]]&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;first_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
         <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="s1">&#39;library(yggdrasil)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> &lt;- YggInterface(</span><span class="se">\&quot;</span><span class="s1">YggInput</span><span class="se">\&quot;</span><span class="s1">, </span><span class="se">\&quot;</span><span class="si">{channel_name}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> &lt;- YggInterface(</span><span class="se">\&quot;</span><span class="s1">YggOutput</span><span class="se">\&quot;</span><span class="s1">, </span><span class="se">\&quot;</span><span class="si">{channel_name}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
@@ -234,26 +240,45 @@
                         <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="si">{channel_name}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">),</span>
         <span class="s1">&#39;table_output&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> &lt;- YggInterface(</span><span class="se">\&quot;</span><span class="s1">YggAsciiTableOutput</span><span class="se">\&quot;</span><span class="s1">, &#39;</span>
                          <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="si">{channel_name}</span><span class="se">\&quot;</span><span class="s1">, </span><span class="se">\&quot;</span><span class="si">{format_str}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">),</span>
-        <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="s1">&#39;c(</span><span class="si">{flag_var}</span><span class="s1">, </span><span class="si">{recv_var}</span><span class="s1">) %&lt;-% </span><span class="si">{channel}</span><span class="s1">$recv()&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{flag_var}</span><span class="s1"> &lt;- </span><span class="si">{channel}</span><span class="s1">$send(</span><span class="si">{send_var}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;function_call&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{output_var}</span><span class="s1"> &lt;- </span><span class="si">{function_name}</span><span class="s1">(</span><span class="si">{input_var}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;define&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{variable}</span><span class="s1"> &lt;- </span><span class="si">{value}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;recv_function&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1">$recv&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;send_function&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1">$send&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;multiple_outputs&#39;</span><span class="p">:</span> <span class="s1">&#39;c(</span><span class="si">{outputs}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;multiple_outputs_def&#39;</span><span class="p">:</span> <span class="s1">&#39;list(</span><span class="si">{outputs}</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;true&#39;</span><span class="p">:</span> <span class="s1">&#39;TRUE&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;false&#39;</span><span class="p">:</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">,</span>
         <span class="s1">&#39;not&#39;</span><span class="p">:</span> <span class="s1">&#39;!&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;and&#39;</span><span class="p">:</span> <span class="s1">&#39;&amp;&amp;&#39;</span><span class="p">,</span>
         <span class="s1">&#39;comment&#39;</span><span class="p">:</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
         <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span><span class="p">,</span>
         <span class="s1">&#39;quote&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;print_generic&#39;</span><span class="p">:</span> <span class="s1">&#39;print(</span><span class="si">{object}</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;print&#39;</span><span class="p">:</span> <span class="s1">&#39;print(</span><span class="se">\&quot;</span><span class="si">{message}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;fprintf&#39;</span><span class="p">:</span> <span class="s1">&#39;print(sprintf(</span><span class="se">\&quot;</span><span class="si">{message}</span><span class="se">\&quot;</span><span class="s1">, </span><span class="si">{variables}</span><span class="s1">))&#39;</span><span class="p">,</span>
         <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;stop(</span><span class="se">\&quot;</span><span class="si">{error_msg}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;block_end&#39;</span><span class="p">:</span> <span class="s1">&#39;}&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;if_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;if(</span><span class="si">{cond}</span><span class="s1">) {{&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;if_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;if (</span><span class="si">{cond}</span><span class="s1">) {{&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;if_elif&#39;</span><span class="p">:</span> <span class="s1">&#39;}} else if (</span><span class="si">{cond}</span><span class="s1">) {{&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;if_else&#39;</span><span class="p">:</span> <span class="s1">&#39;}} else {{&#39;</span><span class="p">,</span>
         <span class="s1">&#39;for_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;for (</span><span class="si">{iter_var}</span><span class="s1"> in </span><span class="si">{iter_begin}</span><span class="s1">:</span><span class="si">{iter_end}</span><span class="s1">) {{&#39;</span><span class="p">,</span>
         <span class="s1">&#39;while_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;while (</span><span class="si">{cond}</span><span class="s1">) {{&#39;</span><span class="p">,</span>
         <span class="s1">&#39;try_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;tryCatch({&#39;</span><span class="p">,</span>
         <span class="s1">&#39;try_except&#39;</span><span class="p">:</span> <span class="s1">&#39;}}, error = function(</span><span class="si">{error_var}</span><span class="s1">) {{&#39;</span><span class="p">,</span>
         <span class="s1">&#39;try_end&#39;</span><span class="p">:</span> <span class="s1">&#39;})&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;assign&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> &lt;- </span><span class="si">{value}</span><span class="s1">&#39;</span><span class="p">}</span>
+        <span class="s1">&#39;assign&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> &lt;- </span><span class="si">{value}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;assign_mult&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> %&lt;-% </span><span class="si">{value}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;function_def_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{function_name}</span><span class="s1"> &lt;- function(</span><span class="si">{input_var}</span><span class="s1">) {{&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;return&#39;</span><span class="p">:</span> <span class="s1">&#39;return(</span><span class="si">{output_var}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;function_def_regex&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;</span><span class="si">{function_name}</span><span class="s1"> *(?:(?:\&lt;-)|(?:=)) *function&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\((?P&lt;inputs&gt;(?:.|(?:\r?\n))*?)\)\s*\{{&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;body&gt;(?:.|(?:\r?\n))*?)&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:return\((list\()?&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;outputs&gt;(?:.|(?:\r?\n))*?)(?(3)\))\)&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:.|(?:\r?\n))*?\}})&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;|(?:\}})&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;inputs_def_regex&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;\s*(?P&lt;name&gt;.+?)\s*(?:,|$)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;outputs_def_regex&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;\s*(?P&lt;name&gt;.+?)\s*(?:,|$)&#39;</span><span class="p">}</span>
+    <span class="n">brackets</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;{&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RModelDriver.is_library_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.is_library_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_library_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lib</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -309,10 +334,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_env</span><span class="p">()</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;RETICULATE_PYTHON&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PythonModelDriver</span><span class="o">.</span><span class="n">get_interpreter</span><span class="p">()</span>
-        <span class="n">c_linker</span> <span class="o">=</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;linker&#39;</span><span class="p">)</span>
-        <span class="n">search_dirs</span> <span class="o">=</span> <span class="n">c_linker</span><span class="o">.</span><span class="n">get_search_path</span><span class="p">(</span><span class="n">conda_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">update_ld_library_path</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">paths_to_add</span><span class="o">=</span><span class="n">search_dirs</span><span class="p">,</span>
-                                                  <span class="n">add_to_front</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">is_language_installed</span><span class="p">():</span>
+            <span class="n">c_linker</span> <span class="o">=</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;linker&#39;</span><span class="p">)</span>
+            <span class="n">search_dirs</span> <span class="o">=</span> <span class="n">c_linker</span><span class="o">.</span><span class="n">get_search_path</span><span class="p">(</span><span class="n">conda_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">update_ld_library_path</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">paths_to_add</span><span class="o">=</span><span class="n">search_dirs</span><span class="p">,</span>
+                                                      <span class="n">add_to_front</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
 <div class="viewcode-block" id="RModelDriver.comm_atexit"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.comm_atexit">[docs]</a>    <span class="nd">@classmethod</span>
@@ -331,28 +357,6 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="s1">&#39;dont_backlog&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
             <span class="n">comm</span><span class="o">.</span><span class="n">linger_close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="RModelDriver.language2python"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.language2python">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">language2python</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">robj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare an R object for serialization in Python.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">           robj (object): Python object prepared in R.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            object: Python object in a form that is serialization friendly.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;language2python: </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">robj</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">robj</span><span class="p">)))</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">robj</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">tuple</span><span class="p">([</span><span class="bp">cls</span><span class="o">.</span><span class="n">language2python</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">robj</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">robj</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">language2python</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">robj</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">robj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language2python</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">robj</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">robj</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">robj</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">robj</span></div>
-
 <div class="viewcode-block" id="RModelDriver.python2language"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.python2language">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">python2language</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pyobj</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare a python object for transformation in R.</span>
@@ -370,13 +374,13 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pyobj</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">python2language</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pyobj</span><span class="p">]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pyobj</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">python2language</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="bp">cls</span><span class="o">.</span><span class="n">python2language</span><span class="p">(</span><span class="n">k</span><span class="p">),</span>
+                                 <span class="bp">cls</span><span class="o">.</span><span class="n">python2language</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
                                 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pyobj</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pyobj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">{</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="bp">cls</span><span class="o">.</span><span class="n">python2language</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">python2language</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="bp">cls</span><span class="o">.</span><span class="n">python2language</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pyobj</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pyobj</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">string_types</span><span class="p">)</span>
-                                     <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">string_</span><span class="p">])):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pyobj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">string_</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">pyobj</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pyobj</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="c1"># R dosn&#39;t have int64 and will cast 64bit ints as floats if passed</span>

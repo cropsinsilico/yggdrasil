@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting started &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>Getting started &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -92,6 +92,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#running-a-model">Running a model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-multiple-models">Running multiple models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-remote-models">Running remote models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#model-file-input-output">Model file input/output</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#model-to-model-communication-with-connections">Model-to-model communication (with connections)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#model-to-model-communication-with-drivers">Model-to-model communication (with drivers)</a></li>
@@ -100,6 +101,8 @@
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -249,6 +252,23 @@ commandline entry point <cite>yggrun</cite> followed by the path to the YAML.:</
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson2.html">Example in other languages</a>)</p>
+</div>
+<div class="section" id="running-remote-models">
+<h2>Running remote models<a class="headerlink" href="#running-remote-models" title="Permalink to this headline">¶</a></h2>
+<p>Models stored on remote Git repositories can be run by prepending ‘git:’ to the YAML file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggrun git:http://github.com/foo/bar/yam/remote_model.yml
+</pre></div>
+</div>
+<p><cite>yggrun</cite> will clone the repo (foo/bar in this example) and then process remote_model.yml as normal. The
+host site need not be specified if it is github.com:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggrun git:foo/bar/yam/remote_model.yml
+</pre></div>
+</div>
+<p>will behave identically to the first example. Remote and local models can be mixed on
+the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggrun model1.yml git:foo/bar/yam/remote_model.yml model2.yml
+</pre></div>
+</div>
 </div>
 <div class="section" id="model-file-input-output">
 <h2>Model file input/output<a class="headerlink" href="#model-file-input-output" title="Permalink to this headline">¶</a></h2>

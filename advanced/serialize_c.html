@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>C Serialize API &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>C Serialize API &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -93,6 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -589,9 +591,8 @@
 
 <dl class="member">
 <dt id="_CPPv4N6seri_t4infoE">
-<span id="_CPPv3N6seri_t4infoE"></span><span id="_CPPv2N6seri_t4infoE"></span><span id="seri_t::info__voidP"></span><span class="target" id="structseri__t_1a406959b4201dd246c916cc78e8551802"></span>void *<code class="sig-name descname">info</code><a class="headerlink" href="#_CPPv4N6seri_t4infoE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N6seri_t4infoE"></span><span id="_CPPv2N6seri_t4infoE"></span><span id="seri_t::info__voidP"></span><span class="target" id="structseri__t_1afe8d056809d1f3155b50603a620a52ab"></span>void *<code class="sig-name descname">info</code><a class="headerlink" href="#_CPPv4N6seri_t4infoE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Pointer to any extra info serializer requires. </p>
-<p>JSON type. </p>
 </dd></dl>
 
 <dl class="member">
@@ -603,129 +604,9 @@
 </div>
 </dd></dl>
 
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric">Typedefs</p>
-<dl class="type">
-<dt id="_CPPv46seri_t">
-<span id="_CPPv36seri_t"></span><span class="target" id="serialize_8h_1a5f7f77b5c4ebbe2a03fe91f3c3afea12"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <code class="sig-name descname">seri_t</code><br /></dt>
-<dd><p>Serializer structure. </p>
-</dd></dl>
-
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric">Functions</p>
-<dl class="function">
-<dt id="_CPPv416empty_serializerv">
-<span id="_CPPv316empty_serializerv"></span><span id="_CPPv216empty_serializerv"></span><span id="empty_serializer"></span><span class="target" id="serialize_8h_1ab759dfd09c898159a5307eddd5273975"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <code class="sig-name descname">empty_serializer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416empty_serializerv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Create an empty serializer structure. </p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p><a class="reference internal" href="#structseri__t"><span class="std std-ref">seri_t</span></a> Empty serializer. </p>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv415free_serializerP6seri_t">
-<span id="_CPPv315free_serializerP6seri_t"></span><span id="_CPPv215free_serializerP6seri_t"></span><span id="free_serializer__seri_tP"></span><span class="target" id="serialize_8h_1a976acf277d49735779610014d4619dfe"></span><em class="property">static</em> int <code class="sig-name descname">free_serializer</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> *<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415free_serializerP6seri_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Free serializer. </p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>int -1 if there was an error, 0 otherwise. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">s</span></code>: seri_t* Serializer that should be freed. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv416update_precisionP6seri_tPKcPv">
-<span id="_CPPv316update_precisionP6seri_tPKcPv"></span><span id="_CPPv216update_precisionP6seri_tPKcPv"></span><span id="update_precision__seri_tP.cCP.voidP"></span><span class="target" id="serialize_8h_1a78a48df755df04beee2bdff2a3dd9c2b"></span><em class="property">static</em> int <code class="sig-name descname">update_precision</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> *<em>s</em>, <em class="property">const</em> char *<em>type</em>, void *<em>info</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416update_precisionP6seri_tPKcPv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Update serializer with precision from provided information. </p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>int -1 if there is an error, 0 otherwise. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">s</span></code>: <a class="reference internal" href="#structseri__t"><span class="std std-ref">seri_t</span></a> * Address of serializer that should be updated. If NULL, one is created. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">type</span></code>: char* Type that should be updated for the serializer. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">info</span></code>: void * Information about serializer type. Assumes that any necessary copy has taken place and mearly assigns the pointer. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv417update_serializerP6seri_tPKcPv">
-<span id="_CPPv317update_serializerP6seri_tPKcPv"></span><span id="_CPPv217update_serializerP6seri_tPKcPv"></span><span id="update_serializer__seri_tP.cCP.voidP"></span><span class="target" id="serialize_8h_1a173df9f7d4c886b71481f0370de20449"></span><em class="property">static</em> int <code class="sig-name descname">update_serializer</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> *<em>s</em>, <em class="property">const</em> char *<em>type</em>, void *<em>info</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417update_serializerP6seri_tPKcPv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Update serializer with provided information. </p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>int -1 if there is an error, 0 otherwise. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">s</span></code>: <a class="reference internal" href="#structseri__t"><span class="std std-ref">seri_t</span></a> * Address of serializer that should be updated. If NULL, one is created. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">type</span></code>: char* Type that should be updated for the serializer. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">info</span></code>: void * Information about serializer type. Assumes that any necessary copy has taken place and mearly assigns the pointer. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv415init_serializerPKcPv">
-<span id="_CPPv315init_serializerPKcPv"></span><span id="_CPPv215init_serializerPKcPv"></span><span id="init_serializer__cCP.voidP"></span><span class="target" id="serialize_8h_1aca2fcb952fadc77612792a695e8a068b"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> *<code class="sig-name descname">init_serializer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>type</em>, void *<em>info</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415init_serializerPKcPv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Initialize serialier. </p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>seri_t* Address of serializer. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">type</span></code>: char* Type that should be updated for the serializer. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">info</span></code>: void * Information for the serializer. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv49serializeK6seri_tPPcP6size_tKiP6size_t9va_list_t">
-<span id="_CPPv39serializeK6seri_tPPcP6size_tKiP6size_t9va_list_t"></span><span id="_CPPv29serializeK6seri_tPPcP6size_tKiP6size_t9va_list_t"></span><span id="serialize__seri_tC.cPP.sP.iC.sP.va_list_t"></span><span class="target" id="serialize_8h_1a8da70b937d580de4077cb19971b91976"></span><em class="property">static</em> int <code class="sig-name descname">serialize</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, char **<em>buf</em>, size_t *<em>buf_siz</em>, <em class="property">const</em> int <em>allow_realloc</em>, size_t *<em>nargs</em>, va_list_t <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49serializeK6seri_tPPcP6size_tKiP6size_t9va_list_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Serialize arguments to create a message. </p>
-<p><dl class="simple">
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">s</span></code>: <a class="reference internal" href="#structseri__t"><span class="std std-ref">seri_t</span></a> Structure sepcifying how to serialize arguments. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">buf</span></code>: character pointer to pointer to memory where serialized message should be stored. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">buf_siz</span></code>: size_t Size of memory allocated to buf. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">allow_realloc</span></code>: int If 1, buf will be realloced if it is not big enough to hold the serialized emssage. If 0, an error will be returned. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[inout]</span> <span class="pre">nargs</span></code>: int Number of arguments remaining in argument list. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">ap</span></code>: va_list Arguments to be formatted. returns: int The length of the serialized message or -1 if there is an error. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv411deserializeK6seri_tPKcK6size_tKiP6size_t9va_list_t">
-<span id="_CPPv311deserializeK6seri_tPKcK6size_tKiP6size_t9va_list_t"></span><span id="_CPPv211deserializeK6seri_tPKcK6size_tKiP6size_t9va_list_t"></span><span id="deserialize__seri_tC.cCP.sC.iC.sP.va_list_t"></span><span class="target" id="serialize_8h_1afc6be9affbb8067e81a0809f5457b2ac"></span><em class="property">static</em> int <code class="sig-name descname">deserialize</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, <em class="property">const</em> char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_siz</em>, <em class="property">const</em> int <em>allow_realloc</em>, size_t *<em>nargs</em>, va_list_t <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411deserializeK6seri_tPKcK6size_tKiP6size_t9va_list_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Deserialize message to populate arguments. </p>
-<p><dl class="simple">
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">s</span></code>: <a class="reference internal" href="#structseri__t"><span class="std std-ref">seri_t</span></a> Structure sepcifying how to deserialize message. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">buf</span></code>: character pointer to serialized message. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">buf_siz</span></code>: size_t Size of buf. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">allow_realloc</span></code>: int If 1, variables being filled are assumed to be pointers to pointers for heap memory. If 0, variables are assumed to be pointers to stack memory. If allow_realloc is set to 1, but stack variables are passed, a segfault can occur. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[inout]</span> <span class="pre">nargs</span></code>: int Number of arguments remaining in argument list. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">ap</span></code>: va_list Arguments to be parsed from message. returns: int The number of populated arguments. -1 indicates an error. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>autodoxygenfile: Cannot find file “serialize.h </p>
 </div>
 </div>
 

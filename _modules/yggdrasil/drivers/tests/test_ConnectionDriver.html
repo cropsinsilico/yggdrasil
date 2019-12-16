@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests.test_ConnectionDriver &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_ConnectionDriver &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
@@ -222,9 +224,15 @@
     <span class="k">def</span> <span class="nf">is_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is for output.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm_name</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span><span class="p">)</span>
-        
+    
+<div class="viewcode-block" id="TestConnectionParam.map_sent2recv"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam.map_sent2recv">[docs]</a>    <span class="k">def</span> <span class="nf">map_sent2recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a sent object into a received one.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
 <div class="viewcode-block" id="TestConnectionParam.assert_msg_equal"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam.assert_msg_equal">[docs]</a>    <span class="k">def</span> <span class="nf">assert_msg_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that two messages are equivalent.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">is_eof</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">map_sent2recv</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestConnectionParam.assert_msg_lists_equal"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionParam.assert_msg_lists_equal">[docs]</a>    <span class="k">def</span> <span class="nf">assert_msg_lists_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
@@ -562,11 +570,6 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="direct_translate"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.direct_translate">[docs]</a><span class="k">def</span> <span class="nf">direct_translate</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test translator that just returns passed message.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">msg</span></div>
-
-
 <span class="n">invalid_translate</span> <span class="o">=</span> <span class="kc">True</span>
 
 
@@ -577,10 +580,25 @@
     <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for tested class.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestConnectionDriverTranslate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_kwargs</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;translator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">direct_translate</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;translator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;transformtype&#39;</span><span class="p">:</span> <span class="s1">&#39;select_fields&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;selected&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span>
+                             <span class="s1">&#39;single_as_scalar&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;onexit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;printStatus&#39;</span>
-        <span class="k">return</span> <span class="n">out</span></div>
+        <span class="k">return</span> <span class="n">out</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Test message that should be used for any send/recv tests.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">2</span><span class="p">)}</span>
+
+<div class="viewcode-block" id="TestConnectionDriverTranslate.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverTranslate.test_send_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving large message.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+    
+<div class="viewcode-block" id="TestConnectionDriverTranslate.map_sent2recv"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverTranslate.map_sent2recv">[docs]</a>    <span class="k">def</span> <span class="nf">map_sent2recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a sent object into a received one.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span></div></div>
+    
 
 <div class="viewcode-block" id="test_ConnectionDriverOnexit_errors"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.test_ConnectionDriverOnexit_errors">[docs]</a><span class="k">def</span> <span class="nf">test_ConnectionDriverOnexit_errors</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test that errors are raised for invalid onexit.&quot;&quot;&quot;</span>

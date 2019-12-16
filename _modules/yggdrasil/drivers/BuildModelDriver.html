@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.BuildModelDriver &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.drivers.BuildModelDriver &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -171,7 +173,60 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">components</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="k">import</span> <span class="n">CompiledModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">CompiledModelDriver</span><span class="p">,</span> <span class="n">CompilerBase</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BuildToolBase"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.BuildToolBase">[docs]</a><span class="k">class</span> <span class="nc">BuildToolBase</span><span class="p">(</span><span class="n">CompilerBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for build tools.&quot;&quot;&quot;</span>
+
+    <span class="n">is_build_tool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">build_language</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="BuildToolBase.get_default_target_language"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.BuildToolBase.get_default_target_language">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_default_target_language</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the default target language for the build tool.</span>
+<span class="sd">        Unless otherwise specified, this will be the first language in</span>
+<span class="sd">        the &#39;languages&#39; attribute that is not the build tool.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Name of the default target language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">build_language</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">build_language</span>
+        <span class="k">if</span> <span class="n">build_language</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">build_language</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">toolname</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">languages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="n">build_language</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">x</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not determine a default target language &quot;</span>
+                         <span class="s2">&quot;for build tool &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">toolname</span><span class="p">)</span>  <span class="c1"># pragma: debug</span></div>
+
+<div class="viewcode-block" id="BuildToolBase.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.BuildToolBase.set_env">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">language_driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            language (str, optional): Language that is being compiled. Defaults</span>
+<span class="sd">                to the first language in cls.languages that isn&#39;t toolname.</span>
+<span class="sd">            language_driver (ModelDriver, optional): Driver for language that</span>
+<span class="sd">                should be used. Defaults to None and will be imported based</span>
+<span class="sd">                on language.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Environment variables for the model process.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">BuildToolBase</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">language_driver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">language</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">language</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_default_target_language</span><span class="p">()</span>
+            <span class="n">language_driver</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+        <span class="n">compiler</span> <span class="o">=</span> <span class="n">language_driver</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="n">existing</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
 
 
 <div class="viewcode-block" id="BuildModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.BuildModelDriver">[docs]</a><span class="k">class</span> <span class="nc">BuildModelDriver</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="p">):</span>
@@ -249,8 +304,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span>
-                                                           <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">)))</span>
         <span class="c1"># Build file</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildfile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">buildfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildfile_base</span>
@@ -343,6 +399,8 @@
 <span class="sd">                method.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">()</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;working_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compile_working_dir</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BuildModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">compile_model</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
@@ -350,7 +408,28 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove compiled executable.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">compile_model</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s1">&#39;clean&#39;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">BuildModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BuildModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BuildModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.BuildModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Environment variables for the model process.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;for_compile&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;compile_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;compile_kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;language&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_language</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;compile_kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;language_driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">BuildModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;for_compile&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span><span class="p">,</span> <span class="s1">&#39;update_ld_library_path&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span><span class="o">.</span><span class="n">update_ld_library_path</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
            </div>

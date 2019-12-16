@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>YAML Validation Schema &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>YAML Validation Schema &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -93,6 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -2110,7 +2112,327 @@ defining a run.</p>
 1921
 1922
 1923
-1924</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+1924
+1925
+1926
+1927
+1928
+1929
+1930
+1931
+1932
+1933
+1934
+1935
+1936
+1937
+1938
+1939
+1940
+1941
+1942
+1943
+1944
+1945
+1946
+1947
+1948
+1949
+1950
+1951
+1952
+1953
+1954
+1955
+1956
+1957
+1958
+1959
+1960
+1961
+1962
+1963
+1964
+1965
+1966
+1967
+1968
+1969
+1970
+1971
+1972
+1973
+1974
+1975
+1976
+1977
+1978
+1979
+1980
+1981
+1982
+1983
+1984
+1985
+1986
+1987
+1988
+1989
+1990
+1991
+1992
+1993
+1994
+1995
+1996
+1997
+1998
+1999
+2000
+2001
+2002
+2003
+2004
+2005
+2006
+2007
+2008
+2009
+2010
+2011
+2012
+2013
+2014
+2015
+2016
+2017
+2018
+2019
+2020
+2021
+2022
+2023
+2024
+2025
+2026
+2027
+2028
+2029
+2030
+2031
+2032
+2033
+2034
+2035
+2036
+2037
+2038
+2039
+2040
+2041
+2042
+2043
+2044
+2045
+2046
+2047
+2048
+2049
+2050
+2051
+2052
+2053
+2054
+2055
+2056
+2057
+2058
+2059
+2060
+2061
+2062
+2063
+2064
+2065
+2066
+2067
+2068
+2069
+2070
+2071
+2072
+2073
+2074
+2075
+2076
+2077
+2078
+2079
+2080
+2081
+2082
+2083
+2084
+2085
+2086
+2087
+2088
+2089
+2090
+2091
+2092
+2093
+2094
+2095
+2096
+2097
+2098
+2099
+2100
+2101
+2102
+2103
+2104
+2105
+2106
+2107
+2108
+2109
+2110
+2111
+2112
+2113
+2114
+2115
+2116
+2117
+2118
+2119
+2120
+2121
+2122
+2123
+2124
+2125
+2126
+2127
+2128
+2129
+2130
+2131
+2132
+2133
+2134
+2135
+2136
+2137
+2138
+2139
+2140
+2141
+2142
+2143
+2144
+2145
+2146
+2147
+2148
+2149
+2150
+2151
+2152
+2153
+2154
+2155
+2156
+2157
+2158
+2159
+2160
+2161
+2162
+2163
+2164
+2165
+2166
+2167
+2168
+2169
+2170
+2171
+2172
+2173
+2174
+2175
+2176
+2177
+2178
+2179
+2180
+2181
+2182
+2183
+2184
+2185
+2186
+2187
+2188
+2189
+2190
+2191
+2192
+2193
+2194
+2195
+2196
+2197
+2198
+2199
+2200
+2201
+2202
+2203
+2204
+2205
+2206
+2207
+2208
+2209
+2210
+2211
+2212
+2213
+2214
+2215
+2216
+2217
+2218
+2219
+2220
+2221
+2222
+2223
+2224
+2225
+2226
+2227
+2228
+2229
+2230
+2231
+2232
+2233
+2234
+2235
+2236
+2237
+2238
+2239
+2240
+2241
+2242
+2243
+2244</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="nt">definitions</span><span class="p">:</span>
   <span class="nt">comm</span><span class="p">:</span>
     <span class="nt">allOf</span><span class="p">:</span>
@@ -2164,21 +2486,55 @@ defining a run.</p>
           <span class="nt">items</span><span class="p">:</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">filter</span><span class="p">:</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/filter&#39;</span>
+        <span class="nt">is_default</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+        <span class="nt">length_map</span><span class="p">:</span>
+          <span class="nt">additionalProperties</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Map from pointer variable names to</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
         <span class="nt">name</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Name used for component in log messages.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">recv_converter</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Converter that should be used on received objects. Defaults</span>
             <span class="l l-Scalar l-Scalar-Plain">to None.</span>
-          <span class="nt">type</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">oneOf</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/transform&#39;</span>
+          <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="p p-Indicator">-</span> <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">oneOf</span><span class="p">:</span>
+              <span class="p p-Indicator">-</span> <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/transform&#39;</span>
+              <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
         <span class="nt">send_converter</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Converter that should be used on sent objects. Defaults to</span>
             <span class="l l-Scalar l-Scalar-Plain">None.</span>
-          <span class="nt">type</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">oneOf</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/transform&#39;</span>
+          <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="p p-Indicator">-</span> <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">oneOf</span><span class="p">:</span>
+              <span class="p p-Indicator">-</span> <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/transform&#39;</span>
+              <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">vars</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Names of variables to be sent/received by this comm. Defaults</span>
+            <span class="l l-Scalar l-Scalar-Plain">to [].</span>
+          <span class="nt">items</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
       <span class="nt">required</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">commtype</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">datatype</span>
@@ -2302,7 +2658,9 @@ defining a run.</p>
             <span class="l l-Scalar l-Scalar-Plain">messages are passed directly. This can also be a list of functions/strings</span>
             <span class="l l-Scalar l-Scalar-Plain">that will be called on the messages in the order they are provided.</span>
           <span class="nt">items</span><span class="p">:</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+            <span class="nt">oneOf</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+            <span class="p p-Indicator">-</span> <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/transform&#39;</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
       <span class="nt">required</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">inputs</span>
@@ -2516,6 +2874,8 @@ defining a run.</p>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">yaml</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">filter</span><span class="p">:</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/filter&#39;</span>
         <span class="nt">format_str</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If provided, this string will be used to format messages from</span>
             <span class="l l-Scalar l-Scalar-Plain">a list of arguments and parse messages to get a list of arguments in C</span>
@@ -2534,6 +2894,9 @@ defining a run.</p>
           <span class="nt">type</span><span class="p">:</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">int</span>
+        <span class="nt">is_default</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
         <span class="nt">is_series</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, input/output will be done to a series of files. If</span>
@@ -2541,6 +2904,11 @@ defining a run.</p>
             <span class="l l-Scalar l-Scalar-Plain">each output will be to a new file in the series. The addressed is assumed</span>
             <span class="l l-Scalar l-Scalar-Plain">to contain a format for the index of the file. Defaults to False.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+        <span class="nt">length_map</span><span class="p">:</span>
+          <span class="nt">additionalProperties</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Map from pointer variable names to</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
         <span class="nt">name</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Name used for component in log messages.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
@@ -2561,15 +2929,33 @@ defining a run.</p>
         <span class="nt">recv_converter</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Converter that should be used on received objects. Defaults</span>
             <span class="l l-Scalar l-Scalar-Plain">to None.</span>
-          <span class="nt">type</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">oneOf</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/transform&#39;</span>
+          <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="p p-Indicator">-</span> <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">oneOf</span><span class="p">:</span>
+              <span class="p p-Indicator">-</span> <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/transform&#39;</span>
+              <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
         <span class="nt">send_converter</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Converter that should be used on sent objects. Defaults to</span>
             <span class="l l-Scalar l-Scalar-Plain">None.</span>
-          <span class="nt">type</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">oneOf</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/transform&#39;</span>
+          <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="p p-Indicator">-</span> <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">oneOf</span><span class="p">:</span>
+              <span class="p p-Indicator">-</span> <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/transform&#39;</span>
+              <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
         <span class="nt">serializer</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span>
             <span class="nt">seritype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">direct</span>
@@ -2590,6 +2976,12 @@ defining a run.</p>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, the astropy package will be used to serialize/deserialize</span>
             <span class="l l-Scalar l-Scalar-Plain">table. Defaults to False.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+        <span class="nt">vars</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Names of variables to be sent/received by this comm. Defaults</span>
+            <span class="l l-Scalar l-Scalar-Plain">to [].</span>
+          <span class="nt">items</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
         <span class="nt">wait_for_creation</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Time (in seconds) that should be waited before opening for</span>
@@ -2601,9 +2993,9 @@ defining a run.</p>
             <span class="l l-Scalar l-Scalar-Plain">is used.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
       <span class="nt">required</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">working_dir</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">filetype</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">working_dir</span>
       <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">file_base</span>
       <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
     <span class="p p-Indicator">-</span> <span class="nt">anyOf</span><span class="p">:</span>
@@ -2988,6 +3380,89 @@ defining a run.</p>
         <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
     <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for file components.</span>
     <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">file</span>
+  <span class="nt">filter</span><span class="p">:</span>
+    <span class="nt">allOf</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">dependencies</span><span class="p">:</span>
+        <span class="nt">driver</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">args</span>
+      <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Base schema for all subtypes of filter components.</span>
+      <span class="nt">properties</span><span class="p">:</span>
+        <span class="nt">filtertype</span><span class="p">:</span>
+          <span class="nt">enum</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">direct</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">statement</span>
+        <span class="nt">function</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The handle for a callable Python object (e.g. function) that</span>
+            <span class="l l-Scalar l-Scalar-Plain">should be used to determine if a message should be filtered or a string</span>
+            <span class="l l-Scalar l-Scalar-Plain">of the form &quot;&lt;function file&gt;:&lt;function name&gt;&quot; identifying a function where</span>
+            <span class="l l-Scalar l-Scalar-Plain">&quot;&lt;function file&gt;&quot; is the module or Python file containing the function</span>
+            <span class="l l-Scalar l-Scalar-Plain">and &quot;&lt;function name&gt;&quot; is the name of the function. The function should</span>
+            <span class="l l-Scalar l-Scalar-Plain">take the message as input and return a boolean, True if the message should</span>
+            <span class="l l-Scalar l-Scalar-Plain">pass through the filter, False if it should not.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+        <span class="nt">initial_state</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Dictionary of initial state variables that should be set when</span>
+            <span class="l l-Scalar l-Scalar-Plain">the filter is created.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+        <span class="nt">statement</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Python statement in terms of the message as represented by</span>
+            <span class="l l-Scalar l-Scalar-Plain">the string &quot;%x%&quot; that should evaluate to a boolean, True if the message</span>
+            <span class="l l-Scalar l-Scalar-Plain">should pass through the filter, False if it should not. The statement</span>
+            <span class="l l-Scalar l-Scalar-Plain">should only use a limited set of builtins and the math library (See yggdrasil.tools.safe_eval).</span>
+            <span class="l l-Scalar l-Scalar-Plain">If more complex relationships are required, use the FunctionFilter class.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">filter_base</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="p p-Indicator">-</span> <span class="nt">anyOf</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for filter component [&#39;direct&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">filtertype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">direct</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">DirectFilter</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for filter component [&#39;statement&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">filtertype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">statement</span>
+          <span class="nt">statement</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Python statement in terms of the message as represented by</span>
+              <span class="l l-Scalar l-Scalar-Plain">the string &quot;%x%&quot; that should evaluate to a boolean, True if the message</span>
+              <span class="l l-Scalar l-Scalar-Plain">should pass through the filter, False if it should not. The statement</span>
+              <span class="l l-Scalar l-Scalar-Plain">should only use a limited set of builtins and the math library (See</span>
+              <span class="l l-Scalar l-Scalar-Plain">yggdrasil.tools.safe_eval). If more complex relationships are required,</span>
+              <span class="l l-Scalar l-Scalar-Plain">use the FunctionFilter class.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">required</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">statement</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">StatementFilter</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for filter component [&#39;function&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">filtertype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+          <span class="nt">function</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The handle for a callable Python object (e.g. function) that</span>
+              <span class="l l-Scalar l-Scalar-Plain">should be used to determine if a message should be filtered or a string</span>
+              <span class="l l-Scalar l-Scalar-Plain">of the form &quot;&lt;function file&gt;:&lt;function name&gt;&quot; identifying a function</span>
+              <span class="l l-Scalar l-Scalar-Plain">where &quot;&lt;function file&gt;&quot; is the module or Python file containing the</span>
+              <span class="l l-Scalar l-Scalar-Plain">function and &quot;&lt;function name&gt;&quot; is the name of the function. The function</span>
+              <span class="l l-Scalar l-Scalar-Plain">should take the message as input and return a boolean, True if the message</span>
+              <span class="l l-Scalar l-Scalar-Plain">should pass through the filter, False if it should not.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+        <span class="nt">required</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FunctionFilter</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for filter components.</span>
+    <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">filter</span>
   <span class="nt">model</span><span class="p">:</span>
     <span class="nt">allOf</span><span class="p">:</span>
     <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
@@ -3067,7 +3542,8 @@ defining a run.</p>
             <span class="l l-Scalar l-Scalar-Plain">model must contain it&#39;s own calls to the |yggdrasil| interface.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">inputs</span><span class="p">:</span>
-          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+          <span class="nt">default</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">default</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model inputs described as comm objects.</span>
           <span class="nt">items</span><span class="p">:</span>
             <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/comm&#39;</span>
@@ -3138,11 +3614,18 @@ defining a run.</p>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Name used for component in log messages.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">outputs</span><span class="p">:</span>
-          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+          <span class="nt">default</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">default</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model outputs described as comm objects.</span>
           <span class="nt">items</span><span class="p">:</span>
             <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/comm&#39;</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">outputs_in_inputs</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, outputs from wrapped model functions are passed by</span>
+            <span class="l l-Scalar l-Scalar-Plain">pointer as inputs for modification and the return value will be a flag.</span>
+            <span class="l l-Scalar l-Scalar-Plain">If False, outputs are limited to return values. Defaults to the value</span>
+            <span class="l l-Scalar l-Scalar-Plain">of the class attribute outputs_in_inputs.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
         <span class="nt">overwrite</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, any existing model products (compilation products,</span>
@@ -3212,6 +3695,11 @@ defining a run.</p>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Language that the target is written in. Defaults to None and</span>
             <span class="l l-Scalar l-Scalar-Plain">will be set based on the source files provided.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">use_symunit</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, input/output variables with units will be represented</span>
+            <span class="l l-Scalar l-Scalar-Plain">in Matlab using symunit. Defaults to False.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
         <span class="nt">valgrind_flags</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">--leak-check=full</span>
@@ -3234,62 +3722,13 @@ defining a run.</p>
             <span class="l l-Scalar l-Scalar-Plain">is used.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
       <span class="nt">required</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">args</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">working_dir</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">args</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">language</span>
       <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_base</span>
       <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
     <span class="p p-Indicator">-</span> <span class="nt">anyOf</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;c&#39;] subtype.</span>
-        <span class="nt">properties</span><span class="p">:</span>
-          <span class="nt">compiler</span><span class="p">:</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Command or path to executable that should be used to compile</span>
-              <span class="l l-Scalar l-Scalar-Plain">the model. If not provided, the compiler will be determined based on</span>
-              <span class="l l-Scalar l-Scalar-Plain">configuration options for the language (if present) and the registered</span>
-              <span class="l l-Scalar l-Scalar-Plain">compilers that are available on the current operating system.</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-          <span class="nt">compiler_flags</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags that should be passed to the compiler during compilation.</span>
-              <span class="l l-Scalar l-Scalar-Plain">If nto provided, the compiler flags will be determined based on configuration</span>
-              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present), the compiler defaults, and the</span>
-              <span class="l l-Scalar l-Scalar-Plain">default_compiler_flags class attribute.</span>
-            <span class="nt">items</span><span class="p">:</span>
-              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-          <span class="nt">language</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is written in C.</span>
-            <span class="nt">enum</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-          <span class="nt">linker</span><span class="p">:</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Command or path to executable that should be used to link</span>
-              <span class="l l-Scalar l-Scalar-Plain">the model. If not provided, the linker will be determined based on configuration</span>
-              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present) and the registered linkers that</span>
-              <span class="l l-Scalar l-Scalar-Plain">are available on the current operating system</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-          <span class="nt">linker_flags</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags that should be passed to the linker during compilation.</span>
-              <span class="l l-Scalar l-Scalar-Plain">If nto provided, the linker flags will be determined based on configuration</span>
-              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present), the linker defaults, and the</span>
-              <span class="l l-Scalar l-Scalar-Plain">default_linker_flags class attribute.</span>
-            <span class="nt">items</span><span class="p">:</span>
-              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-          <span class="nt">source_files</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Source files that should be compiled into an executable.</span>
-              <span class="l l-Scalar l-Scalar-Plain">Defaults to an empty list and the driver will search for a source file</span>
-              <span class="l l-Scalar l-Scalar-Plain">based on the model executable (the first model argument).</span>
-            <span class="nt">items</span><span class="p">:</span>
-              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CModelDriver</span>
-        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
       <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
         <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;make&#39;] subtype.</span>
         <span class="nt">properties</span><span class="p">:</span>
@@ -3473,7 +3912,61 @@ defining a run.</p>
               <span class="l l-Scalar l-Scalar-Plain">should only be used for subclasses that will not be invoking the model</span>
               <span class="l l-Scalar l-Scalar-Plain">via the command line. Defaults to False.</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+          <span class="nt">use_symunit</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, input/output variables with units will be represented</span>
+              <span class="l l-Scalar l-Scalar-Plain">in Matlab using symunit. Defaults to False.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
         <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;c&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">compiler</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Command or path to executable that should be used to compile</span>
+              <span class="l l-Scalar l-Scalar-Plain">the model. If not provided, the compiler will be determined based on</span>
+              <span class="l l-Scalar l-Scalar-Plain">configuration options for the language (if present) and the registered</span>
+              <span class="l l-Scalar l-Scalar-Plain">compilers that are available on the current operating system.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">compiler_flags</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags that should be passed to the compiler during compilation.</span>
+              <span class="l l-Scalar l-Scalar-Plain">If nto provided, the compiler flags will be determined based on configuration</span>
+              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present), the compiler defaults, and the</span>
+              <span class="l l-Scalar l-Scalar-Plain">default_compiler_flags class attribute.</span>
+            <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is written in C.</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">linker</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Command or path to executable that should be used to link</span>
+              <span class="l l-Scalar l-Scalar-Plain">the model. If not provided, the linker will be determined based on configuration</span>
+              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present) and the registered linkers that</span>
+              <span class="l l-Scalar l-Scalar-Plain">are available on the current operating system</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">linker_flags</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags that should be passed to the linker during compilation.</span>
+              <span class="l l-Scalar l-Scalar-Plain">If nto provided, the linker flags will be determined based on configuration</span>
+              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present), the linker defaults, and the</span>
+              <span class="l l-Scalar l-Scalar-Plain">default_linker_flags class attribute.</span>
+            <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+          <span class="nt">source_files</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Source files that should be compiled into an executable.</span>
+              <span class="l l-Scalar l-Scalar-Plain">Defaults to an empty list and the driver will search for a source file</span>
+              <span class="l l-Scalar l-Scalar-Plain">based on the model executable (the first model argument).</span>
+            <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CModelDriver</span>
         <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
       <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
         <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;c++&#39;, &#39;cpp&#39;] subtype.</span>
@@ -4019,6 +4512,155 @@ defining a run.</p>
         <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
     <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for serializer components.</span>
     <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">serializer</span>
+  <span class="nt">transform</span><span class="p">:</span>
+    <span class="nt">allOf</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">dependencies</span><span class="p">:</span>
+        <span class="nt">driver</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">args</span>
+      <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Base schema for all subtypes of transform components.</span>
+      <span class="nt">properties</span><span class="p">:</span>
+        <span class="nt">function</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The handle for a callable Python object (e.g. function) that</span>
+            <span class="l l-Scalar l-Scalar-Plain">should be used to transform messages or a string of the form &quot;&lt;function</span>
+            <span class="l l-Scalar l-Scalar-Plain">file&gt;:&lt;function name&gt;&quot; identifying a function where &quot;&lt;function file&gt;&quot;</span>
+            <span class="l l-Scalar l-Scalar-Plain">is the module or Python file containing the function and &quot;&lt;function name&gt;&quot;</span>
+            <span class="l l-Scalar l-Scalar-Plain">is the name of the function. The function should take the message as input</span>
+            <span class="l l-Scalar l-Scalar-Plain">and return the transformed message.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+        <span class="nt">initial_state</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Dictionary of initial state variables that should be set when</span>
+            <span class="l l-Scalar l-Scalar-Plain">the transform is created.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+        <span class="nt">map</span><span class="p">:</span>
+          <span class="nt">additionalProperties</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A mapping from original field name to new field names.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+        <span class="nt">original_datatype</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Datatype associated with expected messages. Defaults to None.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">schema</span>
+        <span class="nt">original_order</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The original order of fields that should be used for selecting</span>
+            <span class="l l-Scalar l-Scalar-Plain">from lists/tuples.</span>
+          <span class="nt">items</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">selected</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A list of fields that should be selected.</span>
+          <span class="nt">items</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">single_as_scalar</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True and only a single field is selected, the transformed</span>
+            <span class="l l-Scalar l-Scalar-Plain">messages will be scalars rather than arrays with single elements. Defaults</span>
+            <span class="l l-Scalar l-Scalar-Plain">to False.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+        <span class="nt">statement</span><span class="p">:</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Python statement in terms of the message as represented by</span>
+            <span class="l l-Scalar l-Scalar-Plain">the string &quot;%x%&quot; that should evaluate to the transformed message. The</span>
+            <span class="l l-Scalar l-Scalar-Plain">statement should only use a limited set of builtins and the math library</span>
+            <span class="l l-Scalar l-Scalar-Plain">(See yggdrasil.tools.safe_eval). If more complex relationships are required,</span>
+            <span class="l l-Scalar l-Scalar-Plain">use the FunctionTransform class.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">transformtype</span><span class="p">:</span>
+          <span class="nt">enum</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">direct</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">map_fields</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">select_fields</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">statement</span>
+      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">transform_base</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="p p-Indicator">-</span> <span class="nt">anyOf</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for transform component [&#39;select_fields&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">original_order</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The original order of fields that should be used for selecting</span>
+              <span class="l l-Scalar l-Scalar-Plain">from lists/tuples.</span>
+            <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+          <span class="nt">selected</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A list of fields that should be selected.</span>
+            <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+          <span class="nt">single_as_scalar</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True and only a single field is selected, the transformed</span>
+              <span class="l l-Scalar l-Scalar-Plain">messages will be scalars rather than arrays with single elements. Defaults</span>
+              <span class="l l-Scalar l-Scalar-Plain">to False.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+          <span class="nt">transformtype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">select_fields</span>
+        <span class="nt">required</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">selected</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">SelectFieldsTransform</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for transform component [&#39;function&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">function</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The handle for a callable Python object (e.g. function) that</span>
+              <span class="l l-Scalar l-Scalar-Plain">should be used to transform messages or a string of the form &quot;&lt;function</span>
+              <span class="l l-Scalar l-Scalar-Plain">file&gt;:&lt;function name&gt;&quot; identifying a function where &quot;&lt;function file&gt;&quot;</span>
+              <span class="l l-Scalar l-Scalar-Plain">is the module or Python file containing the function and &quot;&lt;function</span>
+              <span class="l l-Scalar l-Scalar-Plain">name&gt;&quot; is the name of the function. The function should take the message</span>
+              <span class="l l-Scalar l-Scalar-Plain">as input and return the transformed message.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+          <span class="nt">transformtype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+        <span class="nt">required</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">function</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FunctionTransform</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for transform component [&#39;statement&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">statement</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Python statement in terms of the message as represented by</span>
+              <span class="l l-Scalar l-Scalar-Plain">the string &quot;%x%&quot; that should evaluate to the transformed message. The</span>
+              <span class="l l-Scalar l-Scalar-Plain">statement should only use a limited set of builtins and the math library</span>
+              <span class="l l-Scalar l-Scalar-Plain">(See yggdrasil.tools.safe_eval). If more complex relationships are required,</span>
+              <span class="l l-Scalar l-Scalar-Plain">use the FunctionTransform class.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">transformtype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">statement</span>
+        <span class="nt">required</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">statement</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">StatementTransform</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for transform component [&#39;direct&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">transformtype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">direct</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">DirectTransform</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for transform component [&#39;map_fields&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">map</span><span class="p">:</span>
+            <span class="nt">additionalProperties</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A mapping from original field name to new field names.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+          <span class="nt">transformtype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">map_fields</span>
+        <span class="nt">required</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">map</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MapFieldsTransform</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for transform components.</span>
+    <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">transform</span>
 <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for yggdrasil YAML input files.</span>
 <span class="nt">properties</span><span class="p">:</span>
   <span class="nt">models</span><span class="p">:</span>

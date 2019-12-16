@@ -1,6 +1,50 @@
 formatted_io9 Example
 =====================
 
+C Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io9/src/formatted_io9_modelB.c
+   :language: c
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io9/src/formatted_io9_modelA.c
+   :language: c
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io9/formatted_io9_c.yml
+   :language: yaml
+   :linenos:
+
+
+
+C++ Version
+-----------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io9/src/formatted_io9_modelA.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io9/src/formatted_io9_modelB.cpp
+   :language: c++
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/formatted_io9/formatted_io9_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
 Matlab Version
 --------------
 

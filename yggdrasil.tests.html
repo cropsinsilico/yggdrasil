@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests package &mdash; yggdrasil 0.10.0 documentation</title>
+  <title>yggdrasil.tests package &mdash; yggdrasil 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.10.0
+                1.0.0
               </div>
             
           
@@ -91,6 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -240,6 +242,15 @@
 </dd></dl>
 
 </div>
+<div class="section" id="module-yggdrasil.tests.test_command_line">
+<span id="yggdrasil-tests-test-command-line-module"></span><h2>yggdrasil.tests.test_command_line module<a class="headerlink" href="#module-yggdrasil.tests.test_command_line" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="yggdrasil.tests.test_command_line.test_update_config">
+<code class="sig-prename descclassname">yggdrasil.tests.test_command_line.</code><code class="sig-name descname">test_update_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_command_line.html#test_update_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_command_line.test_update_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test the yggconfig entry point.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="module-yggdrasil.tests.test_components">
 <span id="yggdrasil-tests-test-components-module"></span><h2>yggdrasil.tests.test_components module<a class="headerlink" href="#module-yggdrasil.tests.test_components" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
@@ -316,66 +327,8 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-yggdrasil.tests.test_runner">
-<span id="yggdrasil-tests-test-runner-module"></span><h2>yggdrasil.tests.test_runner module<a class="headerlink" href="#module-yggdrasil.tests.test_runner" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="yggdrasil.tests.test_runner.TestYggRunner">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_runner.</code><code class="sig-name descname">TestYggRunner</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_runner.html#TestYggRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_runner.TestYggRunner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.YggTestBase" title="yggdrasil.tests.YggTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.YggTestBase</span></code></a></p>
-<p>Tests of the YggRunner class.</p>
-<dl class="method">
-<dt id="yggdrasil.tests.test_runner.TestYggRunner.setup">
-<code class="sig-name descname">setup</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_runner.html#TestYggRunner.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_runner.TestYggRunner.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Record the number of open comms, threads, and file descriptors.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>nprev_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous comm channels.
-If not provided, it is determined to be the present number of
-default comms.</p></li>
-<li><p><strong>nprev_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous threads.
-If not provided, it is determined to be the present number of
-threads.</p></li>
-<li><p><strong>nprev_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous open file descriptors.
-If not provided, it is determined to be the present number of
-open file descriptors.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_runner.TestYggRunner.test_createIODriver">
-<code class="sig-name descname">test_createIODriver</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_runner.html#TestYggRunner.test_createIODriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_runner.TestYggRunner.test_createIODriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test createInputDriver and createOutputDriver.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.tests.test_runner.test_Arunner_interrupt">
-<code class="sig-prename descclassname">yggdrasil.tests.test_runner.</code><code class="sig-name descname">test_Arunner_interrupt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_runner.html#test_Arunner_interrupt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_runner.test_Arunner_interrupt" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start a runner then stop it with a keyboard interrupt.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.tests.test_runner.test_get_runner">
-<code class="sig-prename descclassname">yggdrasil.tests.test_runner.</code><code class="sig-name descname">test_get_runner</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_runner.html#test_get_runner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_runner.test_get_runner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Use get_runner to start a run.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.tests.test_runner.test_runner_error">
-<code class="sig-prename descclassname">yggdrasil.tests.test_runner.</code><code class="sig-name descname">test_runner_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_runner.html#test_runner_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_runner.test_runner_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test error on missing yaml.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.tests.test_runner.test_runner_terminate">
-<code class="sig-prename descclassname">yggdrasil.tests.test_runner.</code><code class="sig-name descname">test_runner_terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_runner.html#test_runner_terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_runner.test_runner_terminate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start a runner, then stop it early.</p>
-</dd></dl>
-
+<div class="section" id="yggdrasil-tests-test-runner-module">
+<h2>yggdrasil.tests.test_runner module<a class="headerlink" href="#yggdrasil-tests-test-runner-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-yggdrasil.tests.test_scanf">
 <span id="yggdrasil-tests-test-scanf-module"></span><h2>yggdrasil.tests.test_scanf module<a class="headerlink" href="#module-yggdrasil.tests.test_scanf" title="Permalink to this headline">¶</a></h2>
@@ -388,6 +341,12 @@ open file descriptors.</p></li>
 </div>
 <div class="section" id="module-yggdrasil.tests.test_schema">
 <span id="yggdrasil-tests-test-schema-module"></span><h2>yggdrasil.tests.test_schema module<a class="headerlink" href="#module-yggdrasil.tests.test_schema" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="yggdrasil.tests.test_schema.filter_func_ex">
+<code class="sig-prename descclassname">yggdrasil.tests.test_schema.</code><code class="sig-name descname">filter_func_ex</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_schema.html#filter_func_ex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_schema.filter_func_ex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test function for normalizing filters.</p>
+</dd></dl>
+
 <dl class="function">
 <dt id="yggdrasil.tests.test_schema.test_SchemaRegistry">
 <code class="sig-prename descclassname">yggdrasil.tests.test_schema.</code><code class="sig-name descname">test_SchemaRegistry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_schema.html#test_SchemaRegistry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_schema.test_SchemaRegistry" title="Permalink to this definition">¶</a></dt>
@@ -416,6 +375,18 @@ open file descriptors.</p></li>
 <dt id="yggdrasil.tests.test_schema.test_default_schema">
 <code class="sig-prename descclassname">yggdrasil.tests.test_schema.</code><code class="sig-name descname">test_default_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_schema.html#test_default_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_schema.test_default_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test getting default schema.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.tests.test_schema.test_get_json_schema">
+<code class="sig-prename descclassname">yggdrasil.tests.test_schema.</code><code class="sig-name descname">test_get_json_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_schema.html#test_get_json_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_schema.test_get_json_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test getting pure JSON version of schema.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.tests.test_schema.test_get_schema_subtype">
+<code class="sig-prename descclassname">yggdrasil.tests.test_schema.</code><code class="sig-name descname">test_get_schema_subtype</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_schema.html#test_get_schema_subtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_schema.test_get_schema_subtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test get_schema_subtype for allow_instance=True.</p>
 </dd></dl>
 
 <dl class="function">
@@ -465,348 +436,8 @@ open file descriptors.</p></li>
 </dd></dl>
 
 </div>
-<div class="section" id="module-yggdrasil.tests.test_timing">
-<span id="yggdrasil-tests-test-timing-module"></span><h2>yggdrasil.tests.test_timing module<a class="headerlink" href="#module-yggdrasil.tests.test_timing" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_timing.</code><code class="sig-name descname">TestTimedRun</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_timing.TimedRunTestBase" title="yggdrasil.tests.test_timing.TimedRunTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_timing.TimedRunTestBase</span></code></a></p>
-<p>Test class for the TimedRun class using existing data.</p>
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.comm_type">
-<code class="sig-name descname">comm_type</code><em class="property"> = 'zmq'</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.comm_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.count">
-<em class="property">property </em><code class="sig-name descname">count</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.count" title="Permalink to this definition">¶</a></dt>
-<dd><p>Number of messages to use for tests.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.language">
-<code class="sig-name descname">language</code><em class="property"> = 'python'</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.language" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.platform">
-<code class="sig-name descname">platform</code><em class="property"> = 'Linux'</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.platform" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.python_ver">
-<code class="sig-name descname">python_ver</code><em class="property"> = '2.7'</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.python_ver" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.size">
-<em class="property">property </em><code class="sig-name descname">size</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Size of messages to use for tests.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.test_fits">
-<code class="sig-name descname">test_fits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRun.test_fits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.test_fits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test fits to scaling on one platform.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.test_json">
-<code class="sig-name descname">test_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRun.test_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.test_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test loading/saving pyperf data as json.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.test_plot_scaling">
-<code class="sig-name descname">test_plot_scaling</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRun.test_plot_scaling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.test_plot_scaling" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test plot_scaling corner cases not covered by test_plot_scaling_joint.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.test_plot_scaling_joint">
-<code class="sig-name descname">test_plot_scaling_joint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRun.test_plot_scaling_joint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.test_plot_scaling_joint" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test plot_scaling_joint.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.test_plot_scalings">
-<code class="sig-name descname">test_plot_scalings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRun.test_plot_scalings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.test_plot_scalings" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test plot_scalings corner cases on test platform.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.test_production_runs">
-<code class="sig-name descname">test_production_runs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRun.test_production_runs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.test_production_runs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test production tests (those used in paper).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.test_pyperfjson_to_pandas">
-<code class="sig-name descname">test_pyperfjson_to_pandas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRun.test_pyperfjson_to_pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.test_pyperfjson_to_pandas" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test pyperfjson_to_pandas.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.test_save">
-<code class="sig-name descname">test_save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRun.test_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.test_save" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test save with/without overwrite.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.test_scaling_count">
-<code class="sig-name descname">test_scaling_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRun.test_scaling_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.test_scaling_count" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test running scaling with number of messages.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRun.test_scaling_size">
-<code class="sig-name descname">test_scaling_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRun.test_scaling_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRun.test_scaling_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test running scaling with size of messages.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTemp">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_timing.</code><code class="sig-name descname">TestTimedRunTemp</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTemp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_timing.TimedRunTestBase" title="yggdrasil.tests.test_timing.TimedRunTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_timing.TimedRunTestBase</span></code></a></p>
-<p>Test class for the TimedRun class using temporary data.</p>
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTemp.cleanup_files">
-<code class="sig-name descname">cleanup_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTemp.cleanup_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTemp.cleanup_files" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove the temporary file if it exists.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTemp.description_prefix">
-<em class="property">property </em><code class="sig-name descname">description_prefix</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTemp.description_prefix" title="Permalink to this definition">¶</a></dt>
-<dd><p>String prefix to prepend docstr test message with.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTemp.setup">
-<code class="sig-name descname">setup</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTemp.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTemp.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cleanup the file if it exists and then reload.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTemp.teardown">
-<code class="sig-name descname">teardown</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTemp.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTemp.teardown" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cleanup temporary files before destroying instance.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTemp.test_pyperf_func">
-<code class="sig-name descname">test_pyperf_func</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTemp.test_pyperf_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTemp.test_pyperf_func" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test pyperf_func.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTemp.test_run_overwrite">
-<code class="sig-name descname">test_run_overwrite</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTemp.test_run_overwrite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTemp.test_run_overwrite" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test performing a run twice, the second time with ovewrite.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTemp.time_run_kwargs">
-<em class="property">property </em><code class="sig-name descname">time_run_kwargs</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTemp.time_run_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Keyword arguments for time_run.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTempNoPyperf">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_timing.</code><code class="sig-name descname">TestTimedRunTempNoPyperf</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTempNoPyperf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTempNoPyperf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_timing.TestTimedRunTemp" title="yggdrasil.tests.test_timing.TestTimedRunTemp"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_timing.TestTimedRunTemp</span></code></a></p>
-<p>Test class for the TimedRun class using temporary data without pyperf.</p>
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTempNoPyperf.description_prefix">
-<em class="property">property </em><code class="sig-name descname">description_prefix</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTempNoPyperf.description_prefix" title="Permalink to this definition">¶</a></dt>
-<dd><p>String prefix to prepend docstr test message with.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTempNoPyperf.dont_use_pyperf">
-<code class="sig-name descname">dont_use_pyperf</code><em class="property"> = True</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTempNoPyperf.dont_use_pyperf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TestTimedRunTempNoPyperf.test_pyperf_func">
-<code class="sig-name descname">test_pyperf_func</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TestTimedRunTempNoPyperf.test_pyperf_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TestTimedRunTempNoPyperf.test_pyperf_func" title="Permalink to this definition">¶</a></dt>
-<dd><p>Disabled: Test pyperf_func.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_timing.</code><code class="sig-name descname">TimedRunTestBase</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TimedRunTestBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.YggTestClass" title="yggdrasil.tests.YggTestClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.YggTestClass</span></code></a></p>
-<p>Base test class for the TimedRun class.</p>
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.check_filename">
-<code class="sig-name descname">check_filename</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TimedRunTestBase.check_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.check_filename" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raise a unittest.SkipTest error if the filename dosn’t exist.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.comm_type">
-<code class="sig-name descname">comm_type</code><em class="property"> = None</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.comm_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.count">
-<code class="sig-name descname">count</code><em class="property"> = 1</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.count" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.dont_use_pyperf">
-<code class="sig-name descname">dont_use_pyperf</code><em class="property"> = False</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.dont_use_pyperf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.entry_name">
-<em class="property">property </em><code class="sig-name descname">entry_name</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.entry_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Name of the entry for the provided time_run_args.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.filename">
-<em class="property">property </em><code class="sig-name descname">filename</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.filename" title="Permalink to this definition">¶</a></dt>
-<dd><p>Name of the file where data is stored.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.get_raw_data">
-<code class="sig-name descname">get_raw_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TimedRunTestBase.get_raw_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.get_raw_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the raw contents of the data file.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.inst_args">
-<em class="property">property </em><code class="sig-name descname">inst_args</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.inst_args" title="Permalink to this definition">¶</a></dt>
-<dd><p>Arguments for creating a class instance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.inst_kwargs">
-<em class="property">property </em><code class="sig-name descname">inst_kwargs</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.inst_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Keyword arguments for creating a class instance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.language">
-<code class="sig-name descname">language</code><em class="property"> = 'c'</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.language" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.max_errors">
-<code class="sig-name descname">max_errors</code><em class="property"> = 5</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.max_errors" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.nrep">
-<code class="sig-name descname">nrep</code><em class="property"> = 1</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.nrep" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.platform">
-<code class="sig-name descname">platform</code><em class="property"> = None</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.platform" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.python_ver">
-<code class="sig-name descname">python_ver</code><em class="property"> = None</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.python_ver" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.size">
-<code class="sig-name descname">size</code><em class="property"> = 1</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.size" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.test_name">
-<code class="sig-name descname">test_name</code><em class="property"> = 'timed_pipe'</em><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.test_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.time_run">
-<code class="sig-name descname">time_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#TimedRunTestBase.time_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.time_run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform a timed run.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.time_run_args">
-<em class="property">property </em><code class="sig-name descname">time_run_args</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.time_run_args" title="Permalink to this definition">¶</a></dt>
-<dd><p>Arguments for time_run.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_timing.TimedRunTestBase.time_run_kwargs">
-<em class="property">property </em><code class="sig-name descname">time_run_kwargs</code><a class="headerlink" href="#yggdrasil.tests.test_timing.TimedRunTestBase.time_run_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Keyword arguments for time_run.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.tests.test_timing.test_get_source">
-<code class="sig-prename descclassname">yggdrasil.tests.test_timing.</code><code class="sig-name descname">test_get_source</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#test_get_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.test_get_source" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test getting source file for test.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.tests.test_timing.test_platform_error">
-<code class="sig-prename descclassname">yggdrasil.tests.test_timing.</code><code class="sig-name descname">test_platform_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_timing.html#test_platform_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_timing.test_platform_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test error when test cannot be performed.</p>
-</dd></dl>
-
+<div class="section" id="yggdrasil-tests-test-timing-module">
+<h2>yggdrasil.tests.test_timing module<a class="headerlink" href="#yggdrasil-tests-test-timing-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-yggdrasil.tests.test_tools">
 <span id="yggdrasil-tests-test-tools-module"></span><h2>yggdrasil.tests.test_tools module<a class="headerlink" href="#module-yggdrasil.tests.test_tools" title="Permalink to this headline">¶</a></h2>
@@ -916,6 +547,12 @@ open file descriptors.</p></li>
 </dd></dl>
 
 <dl class="method">
+<dt id="yggdrasil.tests.test_units.TestUnits.test_convert_R_unit_string">
+<code class="sig-name descname">test_convert_R_unit_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_units.html#TestUnits.test_convert_R_unit_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_units.TestUnits.test_convert_R_unit_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test convert_R_unit_string.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.tests.test_units.TestUnits.test_convert_to">
 <code class="sig-name descname">test_convert_to</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_units.html#TestUnits.test_convert_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_units.TestUnits.test_convert_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test convert_to.</p>
@@ -954,339 +591,8 @@ open file descriptors.</p></li>
 </dd></dl>
 
 </div>
-<div class="section" id="module-yggdrasil.tests.test_yamlfile">
-<span id="yggdrasil-tests-test-yamlfile-module"></span><h2>yggdrasil.tests.test_yamlfile module<a class="headerlink" href="#module-yggdrasil.tests.test_yamlfile" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlComponentError">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlComponentError</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlComponentError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlComponentError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error for non-dictionary component.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnection">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnection</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection between I/O channels.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionError">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionError</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error when there is not connection for a model I/O channel.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionError_forkin">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionError_forkin</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionError_forkin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionError_forkin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error when there is not connection for a fork input channel.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionError_readmeth">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionError_readmeth</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionError_readmeth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionError_readmeth" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error when read_meth is specified for non-file.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionError_writemeth">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionError_writemeth</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionError_writemeth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionError_writemeth" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error when write_meth is specified for non-file.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionFork">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionFork</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionFork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionFork" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection between I/O channels.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionInputAsciiFile">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionInputAsciiFile</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionInputAsciiFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputAsciiFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection with AsciiFile.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionInputAsciiMap">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionInputAsciiMap</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionInputAsciiMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputAsciiMap" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection with AsciiMap.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionInputAsciiTable">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionInputAsciiTable</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionInputAsciiTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputAsciiTable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection with AsciiTable.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionInputAsciiTableArray">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionInputAsciiTableArray</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionInputAsciiTableArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputAsciiTableArray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection with AsciiTable as array.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionInputFile">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionInputFile</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionInputFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection with File.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionInputFileReadMethError">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionInputFileReadMethError</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionInputFileReadMethError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputFileReadMethError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error for invalid read_meth.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionInputFileWriteMethError">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionInputFileWriteMethError</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionInputFileWriteMethError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputFileWriteMethError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error for invalid write_meth.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionInputFile_wait">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionInputFile_wait</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionInputFile_wait"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputFile_wait" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection with File where wait_for_creation specified.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionInputObj">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionInputObj</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionInputObj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputObj" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection with Obj file.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionInputPandas">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionInputPandas</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionInputPandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputPandas" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection with Pandas csv.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionInputPickle">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionInputPickle</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionInputPickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputPickle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection with Pickle.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionInputPly">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionInputPly</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionInputPly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputPly" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection with Ply file.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlConnectionTranslator">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlConnectionTranslator</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlConnectionTranslator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlConnectionTranslator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test connection between I/O channels.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlDuplicateError">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlDuplicateError</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlDuplicateError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlDuplicateError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error when there are two components with the same name.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlIODatatype">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlIODatatype</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlIODatatype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlIODatatype" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test specification of datatype via schema.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlIODrivers">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlIODrivers</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlIODrivers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlIODrivers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test full specification of IO drivers.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlMissingConnArgsError">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlMissingConnArgsError</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlMissingConnArgsError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlMissingConnArgsError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error when there is a missing arguments to a connection.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlMissingConnIOError">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlMissingConnIOError</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlMissingConnIOError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlMissingConnIOError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error when there is no model input/output matching connection.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlMissingConnInputError">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlMissingConnInputError</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlMissingConnInputError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlMissingConnInputError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error when there is no model output matching connection input.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlMissingConnInputFileError">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlMissingConnInputFileError</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlMissingConnInputFileError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlMissingConnInputFileError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error when there is no file for missing connection input.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlMissingIOArgsError_input">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlMissingIOArgsError_input</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlMissingIOArgsError_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlMissingIOArgsError_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error when there is a missing arguments to an input driver.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlMissingIOArgsError_output">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlMissingIOArgsError_output</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlMissingIOArgsError_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlMissingIOArgsError_output" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error when there is a missing arguments to an output driver.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlMissingModelArgsError">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlMissingModelArgsError</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlMissingModelArgsError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlMissingModelArgsError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="yggdrasil.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
-<p>Test error when there is a missing arguments to a model.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlModelOnly">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlModelOnly</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlModelOnly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlModelOnly" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test parsing of different numbers/styles of models.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.TestYamlServerClient">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">TestYamlServerClient</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#TestYamlServerClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.TestYamlServerClient" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test specification of server/client models.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.YamlTestBase">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">YamlTestBase</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#YamlTestBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.YggTestClass" title="yggdrasil.tests.YggTestClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.YggTestClass</span></code></a></p>
-<p>Test base for yamlfile.</p>
-<dl class="method">
-<dt id="yggdrasil.tests.test_yamlfile.YamlTestBase.contents">
-<em class="property">property </em><code class="sig-name descname">contents</code><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.contents" title="Permalink to this definition">¶</a></dt>
-<dd><p>Contents of files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_yamlfile.YamlTestBase.create_instance">
-<code class="sig-name descname">create_instance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#YamlTestBase.create_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.create_instance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Disabled: Create a new instance of the class.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_yamlfile.YamlTestBase.get_fname">
-<code class="sig-name descname">get_fname</code><span class="sig-paren">(</span><em class="sig-param">idx=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#YamlTestBase.get_fname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.get_fname" title="Permalink to this definition">¶</a></dt>
-<dd><p>Path to temporary file.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_yamlfile.YamlTestBase.nfiles">
-<em class="property">property </em><code class="sig-name descname">nfiles</code><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.nfiles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Number of files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_yamlfile.YamlTestBase.setup">
-<code class="sig-name descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#YamlTestBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write contents to temp file.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_yamlfile.YamlTestBase.teardown">
-<code class="sig-name descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#YamlTestBase.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.teardown" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove the temporary file if it exists.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_yamlfile.YamlTestBase.test_parse_yaml">
-<code class="sig-name descname">test_parse_yaml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#YamlTestBase.test_parse_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.test_parse_yaml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test successfully reading &amp; parsing yaml.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yggdrasil.tests.test_yamlfile.YamlTestBase.yaml_env">
-<em class="property">property </em><code class="sig-name descname">yaml_env</code><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBase.yaml_env" title="Permalink to this definition">¶</a></dt>
-<dd><p>Environment variable where file path is stored.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="yggdrasil.tests.test_yamlfile.YamlTestBaseError">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">YamlTestBaseError</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#YamlTestBaseError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.tests.test_yamlfile.YamlTestBase" title="yggdrasil.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.test_yamlfile.YamlTestBase</span></code></a></p>
-<p>Test error for yamlfile.</p>
-<dl class="method">
-<dt id="yggdrasil.tests.test_yamlfile.YamlTestBaseError.test_parse_yaml">
-<code class="sig-name descname">test_parse_yaml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#YamlTestBaseError.test_parse_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.YamlTestBaseError.test_parse_yaml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test error reading &amp; parsing yaml.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.tests.test_yamlfile.direct_translate">
-<code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">direct_translate</code><span class="sig-paren">(</span><em class="sig-param">msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#direct_translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.direct_translate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test translator that just returns passed message.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.tests.test_yamlfile.test_load_yaml">
-<code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">test_load_yaml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#test_load_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.test_load_yaml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test loading yaml.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.tests.test_yamlfile.test_load_yaml_error">
-<code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">test_load_yaml_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#test_load_yaml_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.test_load_yaml_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test error on loading invalid file.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="yggdrasil.tests.test_yamlfile.test_parse_component_error">
-<code class="sig-prename descclassname">yggdrasil.tests.test_yamlfile.</code><code class="sig-name descname">test_parse_component_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests/test_yamlfile.html#test_parse_component_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.test_yamlfile.test_parse_component_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test errors in parse_component.</p>
-</dd></dl>
-
+<div class="section" id="yggdrasil-tests-test-yamlfile-module">
+<h2>yggdrasil.tests.test_yamlfile module<a class="headerlink" href="#yggdrasil-tests-test-yamlfile-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-yggdrasil.tests">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.tests" title="Permalink to this headline">¶</a></h2>
@@ -1294,7 +600,7 @@ open file descriptors.</p></li>
 <dl class="class">
 <dt id="yggdrasil.tests.IOInfo">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.tests.</code><code class="sig-name descname">IOInfo</code><a class="reference internal" href="_modules/yggdrasil/tests.html#IOInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.IOInfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Simple class for useful IO attributes.</p>
 </dd></dl>
 
@@ -1323,9 +629,9 @@ teardown methods along with description prefix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>description_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – String to prepend docstring
+<li><p><strong>description_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – String to prepend docstring
 test message with. Default to empty string.</p></li>
-<li><p><strong>skip_unittest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the unittest parent
+<li><p><strong>skip_unittest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the unittest parent
 class will not be initialized. Defaults to False.</p></li>
 </ul>
 </dd>
@@ -1336,7 +642,7 @@ class will not be initialized. Defaults to False.</p></li>
 <dd><p>Random unique identifier.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1348,7 +654,7 @@ class will not be initialized. Defaults to False.</p></li>
 initialization.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1359,7 +665,7 @@ initialization.</p>
 <dd><p>Maximum time in seconds for timeouts.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1370,7 +676,7 @@ initialization.</p>
 <dd><p>Time in seconds that should be waited for sleeps.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1379,6 +685,23 @@ initialization.</p>
 <dt id="yggdrasil.tests.YggTestBase.assert_equal">
 <code class="sig-name descname">assert_equal</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestBase.assert_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestBase.assert_equal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assert that two values are equal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.tests.YggTestBase.assert_equal_file_contents">
+<code class="sig-name descname">assert_equal_file_contents</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestBase.assert_equal_file_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestBase.assert_equal_file_contents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that the contents of two files are equivalent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Contents of first file for comparison.</p></li>
+<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Contents of second file for comparison.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.8)"><strong>AssertionError</strong></a> – If the contents are not equal.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -1412,8 +735,8 @@ contents.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file that should be checked.</p></li>
-<li><p><strong>result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Contents of the file.</p></li>
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Full path to the file that should be checked.</p></li>
+<li><p><strong>result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Contents of the file.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1426,8 +749,8 @@ contents.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file that should be checked.</p></li>
-<li><p><strong>result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Contents of the file.</p></li>
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Full path to the file that should be checked.</p></li>
+<li><p><strong>result</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Contents of the file.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1439,7 +762,7 @@ contents.</p>
 <dd><p>Check that a file exists.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file that should be checked.</p>
+<dd class="field-odd"><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Full path to the file that should be checked.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1451,8 +774,8 @@ contents.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Full path to the file that should be checked.</p></li>
-<li><p><strong>fsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Size that the file should be in bytes.</p></li>
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Full path to the file that should be checked.</p></li>
+<li><p><strong>fsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Size that the file should be in bytes.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1464,7 +787,7 @@ contents.</p>
 <dd><p>Comm classes that should be cleaned up following the test.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1481,7 +804,7 @@ contents.</p>
 <dd><p>The number of comms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1504,7 +827,24 @@ contents.</p>
 <dd><p>The number of open file descriptors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.tests.YggTestBase.read_file">
+<code class="sig-name descname">read_file</code><span class="sig-paren">(</span><em class="sig-param">fname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestBase.read_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestBase.read_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in contents from a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Full path to the file that should be read.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>File contents.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1552,13 +892,13 @@ contents.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nprev_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous comm channels.
+<li><p><strong>nprev_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous comm channels.
 If not provided, it is determined to be the present number of
 default comms.</p></li>
-<li><p><strong>nprev_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous threads.
+<li><p><strong>nprev_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous threads.
 If not provided, it is determined to be the present number of
 threads.</p></li>
-<li><p><strong>nprev_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous open file descriptors.
+<li><p><strong>nprev_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of previous open file descriptors.
 If not provided, it is determined to be the present number of
 open file descriptors.</p></li>
 </ul>
@@ -1571,6 +911,11 @@ open file descriptors.</p></li>
 <code class="sig-name descname">shortDescription</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestBase.shortDescription"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestBase.shortDescription" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prefix first line of doc string.</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.tests.YggTestBase.skip_comm_check">
+<code class="sig-name descname">skip_comm_check</code><em class="property"> = False</em><a class="headerlink" href="#yggdrasil.tests.YggTestBase.skip_comm_check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.tests.YggTestBase.tearDown">
@@ -1585,11 +930,11 @@ open file descriptors.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ncurr_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of current comms. If not
+<li><p><strong>ncurr_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of current comms. If not
 provided, it is determined to be the present number of comms.</p></li>
-<li><p><strong>ncurr_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of current threads. If not
+<li><p><strong>ncurr_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of current threads. If not
 provided, it is determined to be the present number of threads.</p></li>
-<li><p><strong>ncurr_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of current open file descriptors.
+<li><p><strong>ncurr_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of current open file descriptors.
 If not provided, it is determined to be the present number of
 open file descriptors.</p></li>
 </ul>
@@ -1603,7 +948,7 @@ open file descriptors.</p></li>
 <dd><p>The number of active threads.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1627,7 +972,7 @@ open file descriptors.</p></li>
 <dd><p>Class to be tested.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1651,6 +996,12 @@ open file descriptors.</p></li>
 </dd></dl>
 
 <dl class="method">
+<dt id="yggdrasil.tests.YggTestClass.get_import_cls">
+<em class="property">classmethod </em><code class="sig-name descname">get_import_cls</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestClass.get_import_cls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestClass.get_import_cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import the tested class from its module</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.tests.YggTestClass.get_options">
 <code class="sig-name descname">get_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/tests.html#YggTestClass.get_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.tests.YggTestClass.get_options" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get testing options.</p>
@@ -1668,7 +1019,7 @@ open file descriptors.</p></li>
 <dd><p>Arguments for creating a class instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1679,7 +1030,7 @@ open file descriptors.</p></li>
 <dd><p>Keyword arguments for creating a class instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1690,7 +1041,7 @@ open file descriptors.</p></li>
 <dd><p>Instance of the test driver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1701,7 +1052,7 @@ open file descriptors.</p></li>
 <dd><p>Absolute name of module containing class to be tested.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1740,7 +1091,7 @@ open file descriptors.</p></li>
 <dd><p>Testing options.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>

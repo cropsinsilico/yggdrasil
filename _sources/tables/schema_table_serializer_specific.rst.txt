@@ -9,7 +9,7 @@ as_array             boolean             If True, each of the arguments being se
 default_flow_style   boolean             If True, nested collections will be serialized in the block style. If False,       ['yaml']                  
                                          they will always be serialized in the flow style. See `PyYAML Documentation                                  
                                          <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.                                                             
-delimiter            string              Delimiter that should be used to separate name/value pairs in the map. Defaults    ['table', 'map', 'pandas']
+delimiter            string              Delimiter that should be used to separate name/value pairs in the map. Defaults    ['table', 'pandas', 'map']
                                          to \t.                                                                                                       
 dont_write_header    boolean             If True, headers will not be added to serialized tables. Defaults to False.        ['pandas']                
 encoded_datatype     schema              JSON schema describing the type that serialized objects should conform to.         ['functional']            
