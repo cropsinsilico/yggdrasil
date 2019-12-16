@@ -405,6 +405,9 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         name (str): Driver name.
         args (str or list): Argument(s) for running the model in matlab.
             Generally, this should be the full path to a Matlab script.
+        use_symunit (bool, optional): If True, input/output variables with
+            units will be represented in Matlab using symunit. Defaults to
+            False.
         **kwargs: Additional keyword arguments are passed to parent class's
             __init__ method.
 
@@ -423,6 +426,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     """
 
     _schema_subtype_description = ('Model is written in Matlab.')
+    _schema_properties = {
+        'use_symunit': {'type': 'boolean', 'default': False}}
     language = 'matlab'
     language_ext = '.m'
     base_languages = ['python']
@@ -452,28 +457,58 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'obj': 'containers.Map',
         'schema': 'containers.Map'}
     function_param = {
+        'istype': 'isa({variable}, \'{type}\')',
+        'len': 'length({variable})',
+        'index': '{variable}{{{index}}}',
+        'first_index': 1,
         'input': '{channel} = YggInterface(\'YggInput\', \'{channel_name}\');',
         'output': '{channel} = YggInterface(\'YggOutput\', \'{channel_name}\');',
-        'recv': '[{flag_var}, {recv_var}] = {channel}.recv();',
-        'send': '{flag_var} = {channel}.send({send_var});',
-        'function_call': '{output_var} = {function_name}({input_var});',
-        'define': '{variable} = {value};',
+        'recv_function': '{channel}.recv',
+        'send_function': '{channel}.send',
+        'multiple_outputs': '[{outputs}]',
+        'eol': ';',
         'comment': '%',
         'true': 'true',
+        'false': 'false',
         'not': 'not',
+        'and': '&&',
         'indent': 2 * ' ',
         'quote': '\'',
+        'print_generic': 'disp({object});',
         'print': 'disp(\'{message}\');',
         'fprintf': 'fprintf(\'{message}\', {variables});',
         'error': 'error(\'{error_msg}\');',
-        'block_end': 'end;',
+        'block_end': 'end',
+        'line_end': ';',
         'if_begin': 'if ({cond})',
+        'if_elif': 'elseif ({cond})',
+        'if_else': 'else',
         'for_begin': 'for {iter_var} = {iter_begin}:{iter_end}',
         'while_begin': 'while ({cond})',
         'break': 'break;',
         'try_begin': 'try',
         'try_except': 'catch {error_var}',
-        'assign': '{name} = {value};'}
+        'assign': '{name} = {value};',
+        'functions_defined_last': True,
+        'function_def_begin': 'function {output_var} = {function_name}({input_var})',
+        'function_def_regex': (
+            r'function *(\[ *)?(?P<outputs>.*?)(?(1)\]) *'
+            r'= {function_name} *\((?P<inputs>(?:.|\n)*?)\)\n'
+            r'(?:(?P<body>'
+            r'(?:\s*if(?:.*?\n?)*?end;?)|'
+            r'(?:\s*for(?:.*?\n?)*?end;?)|'
+            r'(?:\s*parfor(?:.*?\n?)*?end;?)|'
+            r'(?:\s*switch(?:.*?\n?)*?end;?)|'
+            r'(?:\s*try(?:.*?\n?)*?end;?)|'
+            r'(?:\s*while(?:.*?\n?)*?end;?)|'
+            r'(?:\s*arguments(?:.*?\n?)*?end;?)|'
+            r'(?:(?:.*?\n?)*?)'
+            r')'
+            r'(?:\s*end;?))?'),
+        'inputs_def_regex': (
+            r'\s*(?P<name>.+?)\s*(?:(?:,(?: *... *\n)?)|$)'),
+        'outputs_def_regex': (
+            r'\s*(?P<name>.+?)\s*(?:,|$)')}
 
     def __init__(self, name, args, **kwargs):
         self.using_matlab_engine = _matlab_engine_installed
@@ -544,6 +579,25 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
             logger.debug("Wrote wrapper to: %s" % fname)
 
     @classmethod
+    def run_code(cls, lines, **kwargs):
+        r"""Run code by first writing it as an executable and then calling
+        the driver.
+
+        Args:
+            lines (list): Lines of code to be wrapped as an executable.
+            **kwargs: Additional keyword arguments are passed to the
+                write_executable method.
+
+        """
+        kwargs.setdefault('process_kwargs', {})
+        if not kwargs['process_kwargs'].get('dont_wrap_error', False):
+            lines = cls.write_error_wrapper(
+                None, lines,
+                matlab_engine=kwargs.get('matlab_engine', None))
+            kwargs['process_kwargs']['dont_wrap_error'] = True
+        return super(MatlabModelDriver, cls).run_code(lines, **kwargs)
+        
+    @classmethod
     def run_executable(cls, args, dont_wrap_error=False, fname_wrapper=None,
                        matlab_engine=None, **kwargs):
         r"""Run a program using the executable for this language and the
@@ -607,7 +661,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         try:
             if matlab_engine is None:
                 kwargs['for_matlab'] = True
-                out = super(MatlabModelDriver, cls).run_executable(args, **kwargs)
+                out = InterpretedModelDriver.run_executable.__func__(
+                    cls, args, **kwargs)
             else:
                 if kwargs.get('debug_flags', None):  # pragma: debug
                     logger.warn("Debugging via valgrind, strace, etc. disabled "
@@ -685,7 +740,9 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                                    '10'],
             'version': ['The version (release number) of installed Matlab.', ''],
             'matlabroot': ['The path to the default installation of matlab.', '']}
-        if cfg.get(cls.language, 'disable', 'False').lower() != 'true':
+        if ((cfg.get(cls.language, 'disable', 'False').lower() != 'true'
+             and (not (cfg.has_option(cls.language, 'matlabroot')
+                       and cfg.has_option(cls.language, 'version'))))):
             try:
                 opts['matlabroot'][1], opts['version'][1] = cls.get_matlab_info()
             except RuntimeError:  # pragma: no matlab
@@ -855,6 +912,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
 
         """
         out = super(MatlabModelDriver, self).set_env()
+        if self.use_symunit:
+            out['YGG_MATLAB_SYMUNIT'] = 'True'
         if self.using_matlab_engine:
             out['YGG_MATLAB_ENGINE'] = 'True'
         # TODO: Move the following to InterpretedModelDriver once another
@@ -899,21 +958,3 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
 
         """
         return backwards.decode_escape(format_str)
-
-    @classmethod
-    def prepare_output_variables(cls, vars_list):
-        r"""Concatenate a set of output variables such that it can be passed as
-        a single string to the function_call parameter.
-
-        Args:
-            vars_list (list): List of variable names to concatenate as output
-                from a function call.
-
-        Returns:
-            str: Concatentated variables list.
-
-        """
-        out = super(MatlabModelDriver, cls).prepare_output_variables(vars_list)
-        if isinstance(vars_list, list) and (len(vars_list) > 1):
-            out = '[%s]' % out
-        return out

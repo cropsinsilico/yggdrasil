@@ -52,21 +52,55 @@ definitions:
           items:
             type: string
           type: array
+        filter:
+          $ref: '#/definitions/filter'
+        is_default:
+          default: false
+          type: boolean
+        length_map:
+          additionalProperties:
+            type: string
+          description: Map from pointer variable names to
+          type: object
         name:
           description: Name used for component in log messages.
           type: string
         recv_converter:
           description: Converter that should be used on received objects. Defaults
             to None.
-          type:
-          - function
-          - string
+          oneOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              oneOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
         send_converter:
           description: Converter that should be used on sent objects. Defaults to
             None.
-          type:
-          - function
-          - string
+          oneOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              oneOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
+        vars:
+          description: Names of variables to be sent/received by this comm. Defaults
+            to [].
+          items:
+            type: string
+          type: array
       required:
       - commtype
       - datatype
@@ -190,7 +224,9 @@ definitions:
             messages are passed directly. This can also be a list of functions/strings
             that will be called on the messages in the order they are provided.
           items:
-            type: function
+            oneOf:
+            - type: function
+            - $ref: '#/definitions/transform'
           type: array
       required:
       - inputs
@@ -404,6 +440,8 @@ definitions:
           - table
           - yaml
           type: string
+        filter:
+          $ref: '#/definitions/filter'
         format_str:
           description: If provided, this string will be used to format messages from
             a list of arguments and parse messages to get a list of arguments in C
@@ -422,6 +460,9 @@ definitions:
           type:
           - string
           - int
+        is_default:
+          default: false
+          type: boolean
         is_series:
           default: false
           description: If True, input/output will be done to a series of files. If
@@ -429,6 +470,11 @@ definitions:
             each output will be to a new file in the series. The addressed is assumed
             to contain a format for the index of the file. Defaults to False.
           type: boolean
+        length_map:
+          additionalProperties:
+            type: string
+          description: Map from pointer variable names to
+          type: object
         name:
           description: Name used for component in log messages.
           type: string
@@ -449,15 +495,33 @@ definitions:
         recv_converter:
           description: Converter that should be used on received objects. Defaults
             to None.
-          type:
-          - function
-          - string
+          oneOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              oneOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
         send_converter:
           description: Converter that should be used on sent objects. Defaults to
             None.
-          type:
-          - function
-          - string
+          oneOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              oneOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
         serializer:
           default:
             seritype: direct
@@ -478,6 +542,12 @@ definitions:
           description: If True, the astropy package will be used to serialize/deserialize
             table. Defaults to False.
           type: boolean
+        vars:
+          description: Names of variables to be sent/received by this comm. Defaults
+            to [].
+          items:
+            type: string
+          type: array
         wait_for_creation:
           default: 0.0
           description: Time (in seconds) that should be waited before opening for
@@ -489,9 +559,9 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
-      - name
       - filetype
+      - name
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -876,6 +946,89 @@ definitions:
         type: object
     description: Schema for file components.
     title: file
+  filter:
+    allOf:
+    - additionalProperties: false
+      dependencies:
+        driver:
+        - args
+      description: Base schema for all subtypes of filter components.
+      properties:
+        filtertype:
+          enum:
+          - direct
+          - function
+          - statement
+        function:
+          description: The handle for a callable Python object (e.g. function) that
+            should be used to determine if a message should be filtered or a string
+            of the form "<function file>:<function name>" identifying a function where
+            "<function file>" is the module or Python file containing the function
+            and "<function name>" is the name of the function. The function should
+            take the message as input and return a boolean, True if the message should
+            pass through the filter, False if it should not.
+          type: function
+        initial_state:
+          description: Dictionary of initial state variables that should be set when
+            the filter is created.
+          type: object
+        statement:
+          description: Python statement in terms of the message as represented by
+            the string "%x%" that should evaluate to a boolean, True if the message
+            should pass through the filter, False if it should not. The statement
+            should only use a limited set of builtins and the math library (See yggdrasil.tools.safe_eval).
+            If more complex relationships are required, use the FunctionFilter class.
+          type: string
+      title: filter_base
+      type: object
+    - anyOf:
+      - additionalProperties: true
+        description: Schema for filter component ['direct'] subtype.
+        properties:
+          filtertype:
+            enum:
+            - direct
+        title: DirectFilter
+        type: object
+      - additionalProperties: true
+        description: Schema for filter component ['statement'] subtype.
+        properties:
+          filtertype:
+            enum:
+            - statement
+          statement:
+            description: Python statement in terms of the message as represented by
+              the string "%x%" that should evaluate to a boolean, True if the message
+              should pass through the filter, False if it should not. The statement
+              should only use a limited set of builtins and the math library (See
+              yggdrasil.tools.safe_eval). If more complex relationships are required,
+              use the FunctionFilter class.
+            type: string
+        required:
+        - statement
+        title: StatementFilter
+        type: object
+      - additionalProperties: true
+        description: Schema for filter component ['function'] subtype.
+        properties:
+          filtertype:
+            enum:
+            - function
+          function:
+            description: The handle for a callable Python object (e.g. function) that
+              should be used to determine if a message should be filtered or a string
+              of the form "<function file>:<function name>" identifying a function
+              where "<function file>" is the module or Python file containing the
+              function and "<function name>" is the name of the function. The function
+              should take the message as input and return a boolean, True if the message
+              should pass through the filter, False if it should not.
+            type: function
+        required:
+        - function
+        title: FunctionFilter
+        type: object
+    description: Schema for filter components.
+    title: filter
   model:
     allOf:
     - additionalProperties: false
@@ -955,7 +1108,8 @@ definitions:
             model must contain it's own calls to the |yggdrasil| interface.
           type: string
         inputs:
-          default: []
+          default:
+          - name: default
           description: Model inputs described as comm objects.
           items:
             $ref: '#/definitions/comm'
@@ -1026,11 +1180,18 @@ definitions:
           description: Name used for component in log messages.
           type: string
         outputs:
-          default: []
+          default:
+          - name: default
           description: Model outputs described as comm objects.
           items:
             $ref: '#/definitions/comm'
           type: array
+        outputs_in_inputs:
+          description: If True, outputs from wrapped model functions are passed by
+            pointer as inputs for modification and the return value will be a flag.
+            If False, outputs are limited to return values. Defaults to the value
+            of the class attribute outputs_in_inputs.
+          type: boolean
         overwrite:
           default: true
           description: If True, any existing model products (compilation products,
@@ -1100,6 +1261,11 @@ definitions:
           description: Language that the target is written in. Defaults to None and
             will be set based on the source files provided.
           type: string
+        use_symunit:
+          default: false
+          description: If True, input/output variables with units will be represented
+            in Matlab using symunit. Defaults to False.
+          type: boolean
         valgrind_flags:
           default:
           - --leak-check=full
@@ -1122,62 +1288,13 @@ definitions:
             is used.
           type: string
       required:
-      - args
       - working_dir
+      - args
       - name
       - language
       title: model_base
       type: object
     - anyOf:
-      - additionalProperties: true
-        description: Schema for model component ['c'] subtype.
-        properties:
-          compiler:
-            description: Command or path to executable that should be used to compile
-              the model. If not provided, the compiler will be determined based on
-              configuration options for the language (if present) and the registered
-              compilers that are available on the current operating system.
-            type: string
-          compiler_flags:
-            default: []
-            description: Flags that should be passed to the compiler during compilation.
-              If nto provided, the compiler flags will be determined based on configuration
-              options for the language (if present), the compiler defaults, and the
-              default_compiler_flags class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in C.
-            enum:
-            - c
-            type: string
-          linker:
-            description: Command or path to executable that should be used to link
-              the model. If not provided, the linker will be determined based on configuration
-              options for the language (if present) and the registered linkers that
-              are available on the current operating system
-            type: string
-          linker_flags:
-            default: []
-            description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
-              options for the language (if present), the linker defaults, and the
-              default_linker_flags class attribute.
-            items:
-              type: string
-            type: array
-          source_files:
-            default: []
-            description: Source files that should be compiled into an executable.
-              Defaults to an empty list and the driver will search for a source file
-              based on the model executable (the first model argument).
-            items:
-              type: string
-            type: array
-        title: CModelDriver
-        type: object
       - additionalProperties: true
         description: Schema for model component ['make'] subtype.
         properties:
@@ -1361,7 +1478,61 @@ definitions:
               should only be used for subclasses that will not be invoking the model
               via the command line. Defaults to False.
             type: boolean
+          use_symunit:
+            default: false
+            description: If True, input/output variables with units will be represented
+              in Matlab using symunit. Defaults to False.
+            type: boolean
         title: MatlabModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['c'] subtype.
+        properties:
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in C.
+            enum:
+            - c
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+        title: CModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['c++', 'cpp'] subtype.
@@ -1907,6 +2078,155 @@ definitions:
         type: object
     description: Schema for serializer components.
     title: serializer
+  transform:
+    allOf:
+    - additionalProperties: false
+      dependencies:
+        driver:
+        - args
+      description: Base schema for all subtypes of transform components.
+      properties:
+        function:
+          description: The handle for a callable Python object (e.g. function) that
+            should be used to transform messages or a string of the form "<function
+            file>:<function name>" identifying a function where "<function file>"
+            is the module or Python file containing the function and "<function name>"
+            is the name of the function. The function should take the message as input
+            and return the transformed message.
+          type: function
+        initial_state:
+          description: Dictionary of initial state variables that should be set when
+            the transform is created.
+          type: object
+        map:
+          additionalProperties:
+            type: string
+          description: A mapping from original field name to new field names.
+          type: object
+        original_datatype:
+          description: Datatype associated with expected messages. Defaults to None.
+          type: schema
+        original_order:
+          description: The original order of fields that should be used for selecting
+            from lists/tuples.
+          items:
+            type: string
+          type: array
+        selected:
+          description: A list of fields that should be selected.
+          items:
+            type: string
+          type: array
+        single_as_scalar:
+          default: false
+          description: If True and only a single field is selected, the transformed
+            messages will be scalars rather than arrays with single elements. Defaults
+            to False.
+          type: boolean
+        statement:
+          description: Python statement in terms of the message as represented by
+            the string "%x%" that should evaluate to the transformed message. The
+            statement should only use a limited set of builtins and the math library
+            (See yggdrasil.tools.safe_eval). If more complex relationships are required,
+            use the FunctionTransform class.
+          type: string
+        transformtype:
+          enum:
+          - direct
+          - function
+          - map_fields
+          - select_fields
+          - statement
+      title: transform_base
+      type: object
+    - anyOf:
+      - additionalProperties: true
+        description: Schema for transform component ['select_fields'] subtype.
+        properties:
+          original_order:
+            description: The original order of fields that should be used for selecting
+              from lists/tuples.
+            items:
+              type: string
+            type: array
+          selected:
+            description: A list of fields that should be selected.
+            items:
+              type: string
+            type: array
+          single_as_scalar:
+            default: false
+            description: If True and only a single field is selected, the transformed
+              messages will be scalars rather than arrays with single elements. Defaults
+              to False.
+            type: boolean
+          transformtype:
+            enum:
+            - select_fields
+        required:
+        - selected
+        title: SelectFieldsTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['function'] subtype.
+        properties:
+          function:
+            description: The handle for a callable Python object (e.g. function) that
+              should be used to transform messages or a string of the form "<function
+              file>:<function name>" identifying a function where "<function file>"
+              is the module or Python file containing the function and "<function
+              name>" is the name of the function. The function should take the message
+              as input and return the transformed message.
+            type: function
+          transformtype:
+            enum:
+            - function
+        required:
+        - function
+        title: FunctionTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['statement'] subtype.
+        properties:
+          statement:
+            description: Python statement in terms of the message as represented by
+              the string "%x%" that should evaluate to the transformed message. The
+              statement should only use a limited set of builtins and the math library
+              (See yggdrasil.tools.safe_eval). If more complex relationships are required,
+              use the FunctionTransform class.
+            type: string
+          transformtype:
+            enum:
+            - statement
+        required:
+        - statement
+        title: StatementTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['direct'] subtype.
+        properties:
+          transformtype:
+            enum:
+            - direct
+        title: DirectTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['map_fields'] subtype.
+        properties:
+          map:
+            additionalProperties:
+              type: string
+            description: A mapping from original field name to new field names.
+            type: object
+          transformtype:
+            enum:
+            - map_fields
+        required:
+        - map
+        title: MapFieldsTransform
+        type: object
+    description: Schema for transform components.
+    title: transform
 description: Schema for yggdrasil YAML input files.
 properties:
   models:

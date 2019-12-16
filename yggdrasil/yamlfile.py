@@ -157,10 +157,22 @@ def parse_yaml(files):
             existing = parse_component(yml, k[:-1], existing=existing)
     # Make sure that I/O channels initialized
     for io in ['input', 'output']:
+        remove = []
         for k, v in existing[io].items():
             if 'driver' not in v:
-                raise RuntimeError("No driver established for %s channel %s" % (
-                    io, k))
+                if v.get('is_default', False):
+                    remove.append(k)
+                else:
+                    raise RuntimeError("No driver established for %s channel %s" % (
+                        io, k))
+        # Remove unused default channels
+        for k in remove:
+            for m in existing[io][k]['model_driver']:
+                for i, x in enumerate(existing['model'][m][io + 's']):
+                    if x['name'] == k:
+                        existing['model'][m][io + 's'].pop(i)
+                        break
+            existing[io].pop(k)
     # Link io drivers back to models
     existing = link_model_io(existing)
     # print('drivers')
@@ -238,7 +250,7 @@ def parse_model(yml, existing):
     yml['driver'] = _lang2driver[yml.pop('language')]
     # Add server driver
     if yml.get('is_server', False):
-        srv = {'name': yml['name'],
+        srv = {'name': '%s:%s' % (yml['name'], yml['name']),
                'commtype': 'default',
                'datatype': {'type': 'bytes'},
                'driver': 'ServerDriver',
@@ -251,7 +263,7 @@ def parse_model(yml, existing):
         srv_names = yml['client_of']
         yml['client_of'] = srv_names
         for srv in srv_names:
-            cli = {'name': '%s_%s' % (srv, yml['name']),
+            cli = {'name': '%s:%s_%s' % (yml['name'], srv, yml['name']),
                    'commtype': 'default',
                    'datatype': {'type': 'bytes'},
                    'driver': 'ClientDriver',

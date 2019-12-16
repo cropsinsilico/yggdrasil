@@ -78,9 +78,6 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
     # Set converter based on language driver
     ldrv = import_component('model', language)
     converter = ldrv.python2language
-    if converter is None:
-        def converter(x):
-            return x
     # Create and start drivers to transport messages
     odrv = OutputDriver.OutputDriver(name, 'link')
     odrv.start()

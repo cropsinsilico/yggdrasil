@@ -22,19 +22,25 @@ function x_ml = python2matlab(x_py)
     x_ml = int64(py.int(x_py));
   elseif isa(x_py, 'py.numpy.int32')
     x_ml = int32(int64(py.int(x_py)));
+  elseif isa(x_py, 'py.numpy.uint8')
+    x_ml = uint8(python2matlab(py.int(x_py)));
+  elseif isa(x_py, 'py.numpy.uint32')
+    x_ml = uint32(python2matlab(py.int(x_py)));
+  elseif isa(x_py, 'py.numpy.uint64')
+    x_ml = uint64(python2matlab(py.int(x_py)));
   elseif isa(x_py, 'py.numpy.float64')
     x_ml = python2matlab(py.double(x_py));
   elseif isa(x_py, 'py.numpy.float32')
     x_ml = python2matlab(py.float(x_py));
   elseif isa(x_py, 'py.bytes')
-    x_ml = char(x_py.decode('utf-8'));
+    x_ml = string(char(x_py.decode('utf-8')));
   elseif isa(x_py, 'py.unicode')
     x_ml = char(x_py);
   elseif isa(x_py, 'py.string')
     x_ml = char(x_py);
   elseif isa(x_py, 'py.str')
     if version == '2.7';
-      x_ml = char(x_py.decode('utf-8'));
+      x_ml = string(char(x_py.decode('utf-8')));
     else;
       x_ml = char(x_py);
     end;
@@ -52,6 +58,12 @@ function x_ml = python2matlab(x_py)
     % x_ml = struct(x_py);
     dict_keys = python2matlab(py.list(keys(x_py)));
     dict_vals = python2matlab(py.list(values(x_py)));
+    [nr, nc] = size(dict_keys);
+    for i = 1:nr
+      for j = 1:nc
+	dict_keys{i, j} = char(dict_keys{i, j});
+      end;
+    end;
     x_ml = containers.Map(dict_keys, dict_vals);
   elseif (isa(x_py, 'py.list') || isa(x_py, 'py.tuple') || isa(x_py, 'py.set'))
     x_ml = cell(x_py);
@@ -60,6 +72,15 @@ function x_ml = python2matlab(x_py)
       for j = 1:nc
 	x_ml{i, j} = python2matlab(x_ml{i, j});
       end;
+    end;
+  elseif (isa(x_py, 'py.unyt.array.unyt_quantity') || isa(x_py, 'py.unyt.array.unyt_array'))
+    sym_env = getenv('YGG_MATLAB_SYMUNIT');
+    if ((length(sym_env) > 0) && (lower(sym_env) == 'true'))
+      x_ml_data = python2matlab(py.yggdrasil.units.get_data(x_py));
+      x_ml_unit = python2matlab(py.yggdrasil.units.get_units(x_py));
+      x_ml = x_ml_data * str2symunit(x_ml_unit);
+    else
+      x_ml = python2matlab(py.yggdrasil.units.get_data(x_py));
     end;
   elseif isa(x_py, 'py.numpy.void')
     x_ml = python2matlab(py.tuple(x_py));
@@ -83,15 +104,9 @@ function x_ml = python2matlab(x_py)
     end;
     % if ~is_struct
     if ismember(char_code, ['f', 'i'])
-      x_ml = cell2mat(x_ml);
-      % x_ml = py.array.array(char_code, x_py.tolist());
-      % if char_code == 'f'
-      %   x_ml = double(x_ml);
-      % elseif char_code == 'i'
-      %   x_ml = int64(x_ml);
-      % else
-      %   fprintf('Could not find Matlab type for code %s\n', char_code);
-      % end;
+      if isa(x_ml, 'cell')
+        x_ml = cell2mat(x_ml);
+      end;
     end;
   elseif (isa(x_py, 'numeric') || isa(x_py, 'logical'))
     x_ml = x_py;

@@ -57,11 +57,15 @@ int find_matches(const char *regex_text, const char *to_match,
       ret += (int)(m.size());
       *sind = (size_t*)realloc(*sind, ret*sizeof(size_t));
       *eind = (size_t*)realloc(*eind, ret*sizeof(size_t));
-      int i;
-      for (i = 0; i < ret; i++) {
-	(*sind)[i] = m.position(i);
-	(*eind)[i] = (*sind)[i] + m.length(i);
+      int i, j;
+      for (i = 0, j = 0; i < ret; i++) {
+        if (m.length(i) > 0) {
+        	(*sind)[j] = m.position(i);
+        	(*eind)[j] = (*sind)[j] + m.length(i);
+          j++;
+        }
       }
+      ret = j;
     }
     return ret;
   } catch (const std::regex_error& rerr) {

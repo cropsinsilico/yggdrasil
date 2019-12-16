@@ -1,0 +1,36 @@
+models:
+  - name: cpp_modelA
+    language: c++
+    args: ./src/conditional_io_modelA.cpp
+    function: modelA_function
+
+  - name: cpp_modelB1
+    language: c++
+    args: ./src/conditional_io_modelB1.cpp
+    function: modelB_function1
+
+  - name: cpp_modelB2
+    language: c++
+    args: ./src/conditional_io_modelB2.cpp
+    function: modelB_function2
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: cpp_modelA:input
+    filetype: table
+  - input: cpp_modelA:output  # Connection between model A output & model B input
+    outputs:
+      - name: cpp_modelB1:input
+        filter:
+          statement: "%x% <= 2"
+      - name: cpp_modelB2:input
+        filter:
+          function: ./src/conditional_io_modelB2.py:condition_function2
+  - inputs:
+      - cpp_modelB1:output  # Connection between model B, function 1 output and file
+      - cpp_modelB2:output  # Connection between model B, function 2 output and file
+    output: ./output.txt
+    filetype: table
+    field_names: InputMass,Mass
+    field_units: g,g**2
+    format_str: "%.1lf\t%.1lf\n"

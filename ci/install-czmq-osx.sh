@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 brew update
 brew install git libtool pkg-config autoconf automake \
      cmake ossp-uuid pcre valgrind

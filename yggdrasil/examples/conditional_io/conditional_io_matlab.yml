@@ -1,0 +1,36 @@
+models:
+  - name: matlab_modelA
+    language: matlab
+    args: ./src/conditional_io_modelA.m
+    function: conditional_io_modelA
+
+  - name: matlab_modelB1
+    language: matlab
+    args: ./src/conditional_io_modelB1.m
+    function: conditional_io_modelB1
+
+  - name: matlab_modelB2
+    language: matlab
+    args: ./src/conditional_io_modelB2.m
+    function: conditional_io_modelB2
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: matlab_modelA:input
+    filetype: table
+  - input: matlab_modelA:output  # Connection between model A output & model B input
+    outputs:
+      - name: matlab_modelB1:input
+        filter:
+          statement: "%x% <= 2"
+      - name: matlab_modelB2:input
+        filter:
+          function: ./src/conditional_io_modelB2.py:condition_function2
+  - inputs:
+      - matlab_modelB1:output  # Connection between model B, function 1 output and file
+      - matlab_modelB2:output  # Connection between model B, function 2 output and file
+    output: ./output.txt
+    filetype: table
+    field_names: InputMass,Mass
+    field_units: g,g**2
+    format_str: "%.1lf\t%.1lf\n"

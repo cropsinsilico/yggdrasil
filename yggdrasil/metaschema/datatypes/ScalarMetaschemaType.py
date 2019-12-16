@@ -307,6 +307,7 @@ for t in ScalarMetaschemaProperties._valid_types.keys():
                 '        Precision X is preserved.\n\n') % short_doc
     kwargs = {'target_globals': globals(),
               '__doc__': long_doc,
+              '__module__': ScalarMetaschemaType.__module__,
               'python_types': ScalarMetaschemaProperties._python_scalars[t]}
     create_fixed_type_class(t, short_doc, ScalarMetaschemaType,
                             {'subtype': t}, **kwargs)

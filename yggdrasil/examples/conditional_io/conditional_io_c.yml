@@ -1,0 +1,50 @@
+models:
+  - name: c_modelA
+    language: c
+    args: ./src/conditional_io_modelA.c
+    function: modelA_function
+    outputs:
+      - name: c_modelA:output
+        vars:
+          - out_val
+
+  - name: c_modelB1
+    language: c
+    args: ./src/conditional_io_modelB1.c
+    function: modelB_function1
+    outputs:
+      - name: c_modelB1:output
+        vars:
+          - in_val_copy
+          - out_val
+
+  - name: c_modelB2
+    language: c
+    args: ./src/conditional_io_modelB2.c
+    function: modelB_function2
+    outputs:
+      - name: c_modelB2:output
+        vars:
+          - in_val_copy
+          - out_val
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: c_modelA:input
+    filetype: table
+  - input: c_modelA:output  # Connection between model A output & model B input
+    outputs:
+      - name: c_modelB1:input
+        filter:
+          statement: "%x% <= 2"
+      - name: c_modelB2:input
+        filter:
+          function: ./src/conditional_io_modelB2.py:condition_function2
+  - inputs:
+      - c_modelB1:output  # Connection between model B, function 1 output and file
+      - c_modelB2:output  # Connection between model B, function 2 output and file
+    output: ./output.txt
+    filetype: table
+    field_names: InputMass,Mass
+    field_units: g,g**2
+    format_str: "%.1lf\t%.1lf\n"

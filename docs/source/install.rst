@@ -4,9 +4,26 @@
 Installation
 ############
 
+
+.. note::
+
+   **Windows Users**
+
+   If you will be running C/C++ models on a Windows operatoring system, you will first need to install Microsoft Visual Studio, regardless of the installation method you end up using. Visual Studio Community can be downloaded for free from `here <https://visualstudio.microsoft.com/vs/community/>`_. During installation, we recommend selecting the components below. If you forget to add something during the initial download, you can always modify the installation via the "Visual Studio Installer" program.
+
+    * "Desktop development with C++" - Workload under "Windows" section
+    * "MSVC v140 - VS 2015 C++ build tools (v14.00)" - Individual component under "Compilers, build tools, and runtimes" section.
+
+   If you *do not use conda* to install |yggdrasil|, you will also need to initialize the command line build tools in any prompt you will be calling |yggdrasil| from. This can be done by calling |yggdrasil| from a developer prompt, or by locating the ``vsvarsall.bat`` script that comes with Visual Studio. Information on the developer prompt and how to locate the ``vsvarsall.bat`` script can be found `here <https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019>`_. The script used must be the one associated with Visual Studio 2015 build tools, which can be installed from within Visual Studio 2019. On a 64bit Windows machine, the command to initialize these tools within a prompt will probably look something like this::
+
+     $ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+
+
 Conda Installation (recommended)
 --------------------------------
 
+Download and install Miniconda (or Anaconda) from 
+`here <https://www.anaconda.com/download/>`_. 
 There are conda distributions available for |yggdrasil| from 
 `conda-forge <https://github.com/conda-forge/yggdrasil-feedstock>`_. 
 You can install |yggdrasil| from conda-forge by calling::
@@ -17,14 +34,28 @@ from your terminal prompt (or Anaconda prompt on Windows). This will
 install |yggdrasil| and all of its dependencies in your active
 conda environment from the ``conda-forge`` channel.
 
+Although not required, we recommend permanently adding conda-forge to 
+the list of accepted channels by running the following command from 
+the terminal (or Anaconda Prompt on Windows).::
+
+  $ conda config --add channels conda-forge
+
+
+Development Installation
+------------------------
+
+If you would like to contribute to |yggdrasil|, instructions on setting up a development environment can be found :ref:`here <dev_env_rst>`.
+
+
+.. _manual_install_rst:
 
 Manual Installation
 -------------------
 
 .. note::
    Before installing |yggdrasil| from ``pip`` or the cloned repository, you 
-   should install the non-Python dependencies, particularly the
-   ZeroMQ C and C++ libraries (see below).
+   should manually install the non-Python dependencies, particularly the
+   ZeroMQ C and C++ libraries and R packages (see below).
 
 If you do not want to use conda, |yggdrasil| can also be installed 
 from either `PyPI <https://pypi.org/project/yggdrasil-framework/>`_ 
@@ -40,7 +71,7 @@ or by cloning the `Git <https://git-scm.com/>`_ repository on
 and then building the distribution.::
 
   $ cd yggdrasil
-  $ python setup.py install
+  $ pip install .
 
 If the ``--recurse-submodules`` option was not included when cloning the repo, 
 you will need to run the following from within the repository before calling
@@ -51,7 +82,7 @@ you will need to run the following from within the repository before calling
   $ git submodule update
 
 If you do not have admin privileges on the target machine, ``--user`` can be
-added to the end of either the ``pip`` or ``setup.py`` installation commands.
+added to the end of either of the ``pip`` installation commands.
 When using the ``--user`` flag, you may need to add the directory containing the 
 entry point scripts to your ``PATH`` environment variable in order to use 
 |yggdrasil| command line tools (e.g. ``yggrun``) without specifying 
@@ -85,8 +116,8 @@ User Defined rapidjson
 If you would like to use an existing installation of the
 `rapidjson <http://rapidjson.org/>`_ 
 header-only library, you can pass the flag
-``--rapidjson-include-dir=<user_defined_dir>`` to either the ``pip``
-or ``setup.py`` installation commands from above with the location of the
+``--rapidjson-include-dir=<user_defined_dir>`` to either of the ``pip``
+installation commands from above with the location of the
 existing rapidjson include directory.
 
 
@@ -167,16 +198,20 @@ Additional Steps for R Models
 -----------------------------
 
 To run R models, you will need to install the 
-`R interpreter <https://www.r-project.org/>`_ and the R packages 
-`reticulate <https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/>`_ 
-package for calling Python from R and 
-`zeallot <install.packages("zeallot")>`_.::
+`R interpreter <https://www.r-project.org/>`_. If you installed |yggdrasil| using conda, this will be installed for you, but if you are not using conda, you will need to install this yourself.
+
+Even if you install the R interpreter yourself, |yggdrasil| will attempt to install the R dependencies it needs via `CRAN <https://cran.r-project.org/>`_ when it is installed. If this fails, you may need to install these yourself from within the R interpreter. |yggdrasil|'s R dependencies include `reticulate <https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/>`_ for calling Python from R, `zeallot <https://cran.r-project.org/web/packages/zeallot/index.html>`_ for allowing assignment of output to multiple variables, `units <https://cran.r-project.org/web/packages/units/index.html>`_ for tracking physical units in R, `bit64 <https://cran.r-project.org/web/packages/bit64/index.html>`_ for 64bit integers, and `R6 <https://cran.r-project.org/web/packages/R6/index.html>`_ for creating interface classes with teardown methods.
+
+These packages can by installed from CRAN from the R interpreter.::
 
   > install.packages("reticulate")
   > install.packages("zeallot")
+  > install.packages("units")
+  > install.packages("bit64")
+  > install.packages("R6")
 
 .. note::
-   If you have issues installing on MacOS, check to make sure that ``which ar`` returns
+   If you have issues installing R packages on MacOS, check to make sure that ``which ar`` returns
    the system default (``/usr/bin/ar``). If you have another version of ``ar``
    installed (e.g. through homebrew's binutils), it may cause conflicts.
    
@@ -185,7 +220,7 @@ Additional Steps for RabbitMQ Message Passing
 
 RabbitMQ connections allow messages to be passed between models when the
 models are not running on the same machine. To use these connections, 
-the framework must have access to a
+the framework you must install the `pika <https://pika.readthedocs.io/en/stable/>`_ Python package and have access to a 
 RabbitMQ server. If you have access to an existing RabbitMQ server,
 the information for that server be provided via the |yggdrasil|
 config file (See

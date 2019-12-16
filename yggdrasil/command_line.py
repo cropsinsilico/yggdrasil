@@ -3,7 +3,6 @@ import os
 import sys
 import copy
 import logging
-import traceback
 import subprocess
 import argparse
 
@@ -174,14 +173,23 @@ def yggrun():
                         help='One or more yaml specification files.')
     args = parser.parse_args()
     prog = sys.argv[0].split(os.path.sep)[-1]
-    yggRunner = runner.get_runner(args.yamlfile, ygg_debug_prefix=prog)
-    try:
-        yggRunner.run()
-        yggRunner.debug("runner returns, exiting")
-    except Exception as ex:
-        yggRunner.pprint("yggrun exception: %s" % type(ex))
-        print(traceback.format_exc())
-    print('')
+    runner.run(args.yamlfile, ygg_debug_prefix=prog)
+
+
+def yggclean():
+    r"""Cleanup dependency files."""
+    from yggdrasil.tools import get_supported_lang
+    from yggdrasil.components import import_component
+    parser = argparse.ArgumentParser(
+        description='Remove dependency libraries compiled by yggdrasil.')
+    parser.add_argument('language', nargs='*', default=[],
+                        help=('One or more languages to clean up '
+                              'dependencies for.'))
+    args = parser.parse_args()
+    if (len(args.language) == 0) or ('all' in args.language):
+        args.language = get_supported_lang()
+    for l in args.language:
+        import_component('model', l).cleanup_dependencies()
 
 
 def yggcc():
@@ -283,7 +291,21 @@ def update_config():
                         help='One or more languages that should be disabled.')
     parser.add_argument('--enable-languages', nargs='+', default=[],
                         help='One or more languages that should be enabled.')
+    if ('-h' in sys.argv) or ('--help' in sys.argv):
+        prelang = tools.get_supported_lang()
+    else:
+        prelang = parser.parse_known_args()[0].languages
+    lang_args = {}
+    old_args = set([x.dest for x in parser._actions])
+    for l in prelang:
+        drv = import_component('model', l)
+        drv.update_config_argparser(parser)
+        new_args = set([x.dest for x in parser._actions])
+        lang_args[drv.language] = list(new_args - old_args)
+        old_args = new_args
     args = parser.parse_args()
+    lang_kwargs = {l: {k: getattr(args, k) for k in alist}
+                   for l, alist in lang_args.items()}
     if args.show_file:
         print('Config file located here: %s' % config.usr_config_file)
     if args.remove_file and os.path.isfile(config.usr_config_file):
@@ -293,7 +315,8 @@ def update_config():
     drv = [import_component('model', l) for l in args.languages]
     config.update_language_config(drv, overwrite=args.overwrite, verbose=True,
                                   disable_languages=args.disable_languages,
-                                  enable_languages=args.enable_languages)
+                                  enable_languages=args.enable_languages,
+                                  lang_kwargs=lang_kwargs)
 
 
 def yggtime_comm():

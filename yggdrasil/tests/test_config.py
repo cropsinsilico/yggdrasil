@@ -64,6 +64,7 @@ def test_locate_file():
     r"""Test file location method."""
     # Missing file
     assert(not config.locate_file('missing_file.fake'))
+    assert(not config.locate_file(['missing_file.fake']))
     # Single file
     sdir, spat, sans = make_temp_single()
     sout = config.locate_file(spat)
@@ -72,7 +73,7 @@ def test_locate_file():
     # Multiple files
     mdir, mpat, mans = make_temp_multiple()
     with assert_warns(RuntimeWarning):
-        mout = config.locate_file(mpat)
+        mout = config.locate_file([mpat])
         assert(isinstance(mout, backwards.string_types))
         assert_equal(mout, mans[0])
     

@@ -45,6 +45,8 @@ requirements:
   run:
     - cmake
     - czmq
+    - flaky
+    - GitPython
     - jsonschema
     - matplotlib
     - numpy
@@ -61,13 +63,15 @@ requirements:
     - r-bit64
     - r-r6
     - r-reticulate
+    - r-units
     - r-zeallot
     - scipy
     - six
     - sysv_ipc  # [unix]
     - unyt  # [not py2k]
     - zeromq
-    - GitPython
+    - {{ compiler('c') }}  # [win]
+    - {{ compiler('cxx') }}  # [win]
 
 test:
   imports:

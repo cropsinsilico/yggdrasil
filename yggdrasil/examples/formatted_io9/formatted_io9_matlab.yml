@@ -4,20 +4,20 @@ models:
     args: ./src/formatted_io9_modelA.m
     inputs:
       - name: inputA
-        type: object
+        type: any
     outputs:
       - name: outputA
-        type: object
+        type: any
 
   - name: matlab_modelB
     language: matlab
     args: ./src/formatted_io9_modelB.m
     inputs:
       - name: inputB
-        type: object
+        type: any
     outputs:
       - name: outputB
-        type: object
+        type: any
 
 connections:
   - input: outputA  # Connection between model A output & model B input

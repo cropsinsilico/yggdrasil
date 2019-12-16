@@ -61,6 +61,16 @@ class TestFileComm(parent.TestCommBase):
         out['in_temp'] = True
         return out
 
+    def test_send_recv_filter_send_filter(self, **kwargs):
+        r"""Test send/recv with filter that blocks send."""
+        kwargs.setdefault('msg_recv', self.recv_instance.eof_msg)
+        super(TestFileComm, self).test_send_recv_filter_send_filter(**kwargs)
+        
+    def test_send_recv_filter_recv_filter(self, **kwargs):
+        r"""Test send/recv with filter that blocks recv."""
+        kwargs.setdefault('msg_recv', self.recv_instance.eof_msg)
+        super(TestFileComm, self).test_send_recv_filter_recv_filter(**kwargs)
+        
     @unittest.skipIf(True, 'File comm')
     def test_send_recv_nolimit(self):
         r"""Disabled: Test send/recv of a large message."""

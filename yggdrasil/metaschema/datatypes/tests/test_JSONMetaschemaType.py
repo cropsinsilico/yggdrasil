@@ -8,15 +8,17 @@ class TestJSONBooleanMetaschemaType(parent.TestMetaschemaType):
     _mod = 'JSONMetaschemaType'
     _cls = 'JSONBooleanMetaschemaType'
 
-    def __init__(self, *args, **kwargs):
-        super(TestJSONBooleanMetaschemaType, self).__init__(*args, **kwargs)
-        self._valid_encoded = [{'type': self.import_cls.name}]
-        self._valid_decoded = [True, False]
-        self._invalid_validate = [None]
-        self._invalid_decoded = []
-        self._valid_normalize = [('True', True), ('true', True),
-                                 ('False', False), ('false', False),
-                                 ('hello', 'hello')]
+    @staticmethod
+    def after_class_creation(cls):
+        r"""Actions to be taken during class construction."""
+        parent.TestMetaschemaType.after_class_creation(cls)
+        cls._valid_encoded = [{'type': cls.get_import_cls().name}]
+        cls._valid_decoded = [True, False]
+        cls._invalid_validate = [None]
+        cls._invalid_decoded = []
+        cls._valid_normalize = [('True', True), ('true', True),
+                                ('False', False), ('false', False),
+                                ('hello', 'hello')]
 
 
 class TestJSONIntegerMetaschemaType(TestJSONBooleanMetaschemaType):
@@ -24,12 +26,14 @@ class TestJSONIntegerMetaschemaType(TestJSONBooleanMetaschemaType):
     
     _cls = 'JSONIntegerMetaschemaType'
 
-    def __init__(self, *args, **kwargs):
-        super(TestJSONIntegerMetaschemaType, self).__init__(*args, **kwargs)
-        self._valid_decoded = [int(1), np.int(1)]
-        self._invalid_validate = [None]
-        self._invalid_decoded = []
-        self._valid_normalize = [('1', 1), ('hello', 'hello')]
+    @staticmethod
+    def after_class_creation(cls):
+        r"""Actions to be taken during class construction."""
+        TestJSONBooleanMetaschemaType.after_class_creation(cls)
+        cls._valid_decoded = [int(1), np.int(1)]
+        cls._invalid_validate = [None]
+        cls._invalid_decoded = []
+        cls._valid_normalize = [('1', 1), ('hello', 'hello')]
 
 
 class TestJSONNullMetaschemaType(TestJSONBooleanMetaschemaType):
@@ -37,12 +41,14 @@ class TestJSONNullMetaschemaType(TestJSONBooleanMetaschemaType):
     
     _cls = 'JSONNullMetaschemaType'
 
-    def __init__(self, *args, **kwargs):
-        super(TestJSONNullMetaschemaType, self).__init__(*args, **kwargs)
-        self._valid_decoded = [None]
-        self._invalid_validate = ['hello']
-        self._invalid_decoded = []
-        self._valid_normalize = []
+    @staticmethod
+    def after_class_creation(cls):
+        r"""Actions to be taken during class construction."""
+        TestJSONBooleanMetaschemaType.after_class_creation(cls)
+        cls._valid_decoded = [None]
+        cls._invalid_validate = ['hello']
+        cls._invalid_decoded = []
+        cls._valid_normalize = []
 
 
 class TestJSONNumberMetaschemaType(TestJSONBooleanMetaschemaType):
@@ -50,12 +56,14 @@ class TestJSONNumberMetaschemaType(TestJSONBooleanMetaschemaType):
     
     _cls = 'JSONNumberMetaschemaType'
 
-    def __init__(self, *args, **kwargs):
-        super(TestJSONNumberMetaschemaType, self).__init__(*args, **kwargs)
-        self._valid_decoded = [int(1), np.int(1), float(1), np.float(1)]
-        self._invalid_validate = [None]
-        self._invalid_decoded = []
-        self._valid_normalize = [('1', 1.0), ('1.0', 1.0), ('hello', 'hello')]
+    @staticmethod
+    def after_class_creation(cls):
+        r"""Actions to be taken during class construction."""
+        TestJSONBooleanMetaschemaType.after_class_creation(cls)
+        cls._valid_decoded = [int(1), np.int(1), float(1), np.float(1)]
+        cls._invalid_validate = [None]
+        cls._invalid_decoded = []
+        cls._valid_normalize = [('1', 1.0), ('1.0', 1.0), ('hello', 'hello')]
 
 
 class TestJSONStringMetaschemaType(TestJSONBooleanMetaschemaType):
@@ -63,10 +71,12 @@ class TestJSONStringMetaschemaType(TestJSONBooleanMetaschemaType):
     
     _cls = 'JSONStringMetaschemaType'
 
-    def __init__(self, *args, **kwargs):
-        super(TestJSONStringMetaschemaType, self).__init__(*args, **kwargs)
-        self._valid_decoded = ['hello']
-        self._invalid_validate = [None]
-        self._invalid_decoded = []
-        self._valid_normalize = [(1, '1'), (1.0, '1.0'),
-                                 ([1, 2, 3], [1, 2, 3])]
+    @staticmethod
+    def after_class_creation(cls):
+        r"""Actions to be taken during class construction."""
+        TestJSONBooleanMetaschemaType.after_class_creation(cls)
+        cls._valid_decoded = ['hello']
+        cls._invalid_validate = [None]
+        cls._invalid_decoded = []
+        cls._valid_normalize = [(1, '1'), (1.0, '1.0'),
+                                ([1, 2, 3], [1, 2, 3])]

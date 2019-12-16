@@ -50,7 +50,10 @@ class JSONSerialize(SerializeBase):
             obj: Deserialized Python object.
 
         """
-        return decode_json(msg)
+        out = decode_json(msg)
+        if backwards.PY2:  # pragma: Python 2
+            out = backwards.as_str(out, recurse=True, allow_pass=True)
+        return out
 
     @classmethod
     def concatenate(cls, objects, **kwargs):

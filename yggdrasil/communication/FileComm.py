@@ -82,6 +82,7 @@ class FileComm(CommBase.CommBase):
     _schema_excluded_from_inherit = ['commtype', 'datatype', 'read_meth',
                                      'serializer']
     _schema_excluded_from_class_validation = ['serializer']
+    _schema_base_class = None
     _default_serializer = 'direct'
     _default_extension = '.txt'
     is_file = True
@@ -518,7 +519,7 @@ class FileComm(CommBase.CommBase):
             try:
                 out = 0
                 flag, msg = self._recv()
-                while len(msg) != 0 and msg != self.eof_msg:
+                while len(msg) != 0 and (not self.is_eof(msg)):
                     out += 1
                     flag, msg = self._recv()
             except ValueError:  # pragma: debug
@@ -569,11 +570,11 @@ class FileComm(CommBase.CommBase):
 
         """
         # Write header
-        if msg != self.eof_msg:
+        if not self.is_eof(msg):
             self.write_header()
         # Write message
         try:
-            if msg != self.eof_msg:
+            if not self.is_eof(msg):
                 self.fd.write(msg)
                 if self.append == 'ow':
                     self.fd.truncate()
@@ -582,7 +583,7 @@ class FileComm(CommBase.CommBase):
             if self.is_open:
                 raise
             return False
-        if msg != self.eof_msg and self.is_series:
+        if (not self.is_eof(msg)) and self.is_series:
             self.advance_in_series()
             self.debug("Advanced to %d", self._series_index)
         return True

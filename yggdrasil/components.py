@@ -11,6 +11,7 @@ from yggdrasil.doctools import docs2args
 
 _registry = {}
 _registry_defaults = {}
+_registry_base_classes = {}
 _registry_class2subtype = {}
 _registry_complete = False
 _comptype2key = {'comm': 'commtype',
@@ -18,7 +19,9 @@ _comptype2key = {'comm': 'commtype',
                  'model': 'language',
                  'connection': 'connection_type',
                  # 'datatype': None,
-                 'serializer': 'seritype'}
+                 'serializer': 'seritype',
+                 'filter': 'filtertype',
+                 'transform': 'transformtype'}
 # 'compiler': 'toolname',
 # 'linker': 'toolname',
 # 'archiver': 'toolname'}
@@ -26,7 +29,9 @@ _comptype2mod = {'serializer': 'serialize',
                  'comm': 'communication',
                  'file': 'communication',
                  'model': 'drivers',
-                 'connection': 'drivers'}
+                 'connection': 'drivers',
+                 'filter': 'communication.filters',
+                 'transform': 'communication.transforms'}
 # 'datatype': ['metaschema', 'datatypes'],
 # 'compiler': 'drivers',
 # 'linker': 'drivers',
@@ -68,13 +73,16 @@ def suspend_registry():
     r"""Suspend the registry by storing the global registries in a dictionary."""
     global _registry
     global _registry_defaults
+    global _registry_base_classes
     global _registry_class2subtype
     global _registry_complete
     out = {'_registry': _registry, '_registry_defaults': _registry_defaults,
+           '_registry_base_classes': _registry_base_classes,
            '_registry_class2subtype': _registry_class2subtype,
            '_registry_complete': _registry_complete}
     _registry = {}
     _registry_defaults = {}
+    _registry_base_classes = {}
     _registry_class2subtype = {}
     _registry_complete = False
     return out
@@ -84,10 +92,12 @@ def restore_registry(reg_dict):
     r"""Restore the registry to values in the provided dictionary."""
     global _registry
     global _registry_defaults
+    global _registry_base_classes
     global _registry_class2subtype
     global _registry_complete
     _registry = reg_dict['_registry']
     _registry_defaults = reg_dict['_registry_defaults']
+    _registry_base_classes = reg_dict['_registry_base_classes']
     _registry_class2subtype = reg_dict['_registry_class2subtype']
     _registry_complete = reg_dict['_registry_complete']
 
@@ -101,7 +111,7 @@ def import_all_components(comptype):
     """
     # Get module and directory
     mod = copy.deepcopy(_comptype2mod[comptype])
-    moddir = copy.deepcopy(_comptype2mod[comptype])
+    moddir = os.path.join(*copy.deepcopy(_comptype2mod[comptype]).split('.'))
     # The next three lines will be required if there are ever any components
     # nested in multiple directories (e.g. metaschema/datatypes)
     # if isinstance(mod, list):
@@ -119,7 +129,8 @@ def import_all_components(comptype):
                                     % (mod, xbase))
 
 
-def import_component(comptype, subtype=None, without_schema=False):
+def import_component(comptype, subtype=None, without_schema=False,
+                     **kwargs):
     r"""Dynamically import a component by name.
 
     Args:
@@ -133,6 +144,8 @@ def import_component(comptype, subtype=None, without_schema=False):
             import the component and subtype must be the name of a component
             class. Defaults to False. subtype must be provided if without_schema
             is True.
+        **kwargs: Additional keyword arguments are used to determine the
+            subtype if it is None.
 
     Returns:
         class: Component class.
@@ -150,6 +163,9 @@ def import_component(comptype, subtype=None, without_schema=False):
     # if isinstance(mod, list):
     #     mod = '.'.join(mod)
     # Set direct import shortcuts for unregistered classes
+    if (((subtype is None) and (comptype in _comptype2key)
+         and (_comptype2key[comptype] in kwargs))):
+        subtype = kwargs[_comptype2key[comptype]]
     if (comptype == 'comm') and (subtype is None):
         subtype = 'DefaultComm'
     if (((comptype in ['comm', 'file']) and (subtype is not None)
@@ -196,7 +212,8 @@ def import_component(comptype, subtype=None, without_schema=False):
         except ImportError:  # pragma: debug
             import_all_components(comptype)
             return import_component(comptype, subtype=subtype,
-                                    without_schema=without_schema)
+                                    without_schema=without_schema,
+                                    **kwargs)
         out_cls = getattr(out_mod, class_name)
     # Check for an aliased class
     if hasattr(out_cls, '_get_alias'):
@@ -235,8 +252,73 @@ def create_component(comptype, subtype=None, **kwargs):
         raise ValueError("Unrecognized component type: %s" % comptype)
     if s.subtype_key in kwargs:
         subtype = kwargs[s.subtype_key]
-    cls = import_component(comptype, subtype=subtype)
+    if subtype is None:
+        subtype = s.identify_subtype(kwargs)
+    cls = import_component(comptype, subtype=subtype, **kwargs)
     return cls(**kwargs)
+
+
+def get_component_base_class(comptype, subtype=None, without_schema=False,
+                             **kwargs):
+    r"""Determine the base class for a component type.
+
+    Args:
+        comptype (str): The name of a component to test against.
+        subtype (str, optional): Subtype to use to determine the component
+            base class. Defaults to None.
+        without_schema (bool, optional): If True, the schema is not used to
+            import the component and subtype must be the name of a component
+            class. Defaults to False. subtype must be provided if without_schema
+            is True.
+        **kwargs: Additional keyword arguments are used to determine the
+            subtype if it is None.
+    
+    Returns:
+        ComponentBase: Component base class.
+
+    """
+    if comptype in _registry_base_classes:
+        base_class_name = _registry_base_classes[comptype]
+    else:
+        default_class = import_component(comptype, subtype=subtype,
+                                         without_schema=without_schema,
+                                         **kwargs)
+        base_class_name = default_class._schema_base_class
+    base_class = import_component(comptype, subtype=base_class_name,
+                                  without_schema=True)
+    return base_class
+
+
+def isinstance_component(x, comptype, subtype=None, without_schema=False,
+                         **kwargs):
+    r"""Determine if an object is an instance of a component type.
+
+    Args:
+        x (object): Object to test.
+        comptype (str, list): The name of one or more components to test against.
+        subtype (str, optional): Subtype to use to determine the component
+            base class. Defaults to None.
+        without_schema (bool, optional): If True, the schema is not used to
+            import the component and subtype must be the name of a component
+            class. Defaults to False. subtype must be provided if without_schema
+            is True.
+        **kwargs: Additional keyword arguments are used to determine the
+            subtype if it is None.
+
+    Returns:
+        bool: True if the object is an instance of the specified component(s).
+
+    """
+    if isinstance(comptype, (list, tuple)):
+        for icomp in comptype:
+            if isinstance_component(x, icomp):
+                return True
+        else:
+            return False
+    base_class = get_component_base_class(comptype, subtype=subtype,
+                                          without_schema=without_schema,
+                                          **kwargs)
+    return isinstance(x, base_class)
 
 
 def inherit_schema(orig, new_properties=None, new_required=None,
@@ -331,6 +413,21 @@ class ComponentMeta(type):
                 for k, v in cls._schema_properties.items():
                     if k in args_dict:
                         v.setdefault('description', args_dict[k]['description'])
+            # Determine base class
+            global _registry_base_classes
+            if cls._schema_base_class is None:
+                if cls._schema_type in _registry_base_classes:
+                    cls._schema_base_class = _registry_base_classes[cls._schema_type]
+                else:
+                    base_comp = cls.__name__
+                    for i, x in enumerate(cls.__mro__):
+                        if x._schema_type != cls._schema_type:
+                            break
+                        base_comp = x.__name__
+                    else:  # pragma: debug
+                        raise RuntimeError(("Could not determine base class for %s "
+                                            "from %s.") % (cls, bases))
+                    cls._schema_base_class = base_comp
             # Register
             global _registry
             global _registry_defaults
@@ -342,6 +439,7 @@ class ComponentMeta(type):
             if yaml_typ not in _registry:
                 _registry[yaml_typ] = OrderedDict()
                 _registry_defaults[yaml_typ] = default_subtype
+                _registry_base_classes[yaml_typ] = cls._schema_base_class
                 _registry_class2subtype[yaml_typ] = {}
             elif default_subtype is not None:
                 assert(_registry_defaults[yaml_typ] == default_subtype)
@@ -353,7 +451,7 @@ class ComponentMeta(type):
                 cls.after_registration(cls)
                 cls.finalize_registration(cls)
         return cls
-    
+
     # def __getattribute__(cls, key):
     #     r"""If the class is an alias for another class and has been initialized,
     #     call getattr on the aliased class."""
@@ -414,6 +512,7 @@ class ComponentBase(object):
     _schema_subtype_key = None
     _schema_subtype_description = None
     _schema_subtype_default = None
+    _schema_base_class = None
     _schema_required = []
     _schema_properties = {}
     _schema_excluded_from_class = []
@@ -421,6 +520,12 @@ class ComponentBase(object):
     _schema_excluded_from_class_validation = []
     _schema_inherit = True
     _dont_register = False
+
+    def __new__(cls, *args, **kwargs):
+        obj = object.__new__(cls)
+        obj._input_args = args
+        obj._input_kwargs = kwargs
+        return obj
     
     def __init__(self, skip_component_schema_normalization=None, **kwargs):
         if skip_component_schema_normalization is None:
@@ -451,7 +556,9 @@ class ComponentBase(object):
         # Parse keyword arguments using schema
         if (comptype is not None) and (subtype is not None):
             from yggdrasil.schema import get_schema
-            s = get_schema().get_component_schema(comptype, subtype, relaxed=True)
+            s = get_schema().get_component_schema(
+                comptype, subtype, relaxed=True,
+                allow_instance_definitions=True)
             props = list(s['properties'].keys())
             if not skip_component_schema_normalization:
                 from yggdrasil import metaschema

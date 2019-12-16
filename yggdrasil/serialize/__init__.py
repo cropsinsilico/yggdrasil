@@ -517,7 +517,8 @@ def consolidate_array(arrs, dtype=None):
                                  + "is not compatible with the specified "
                                  + "data type (%s)." % dtype)
     elif isinstance(arrs, (list, tuple)):
-        if isinstance(arrs[0], (np.ndarray, np.void)):
+        if isinstance(arrs[0], (np.ndarray, np.void,
+                                units._unit_array)):
             if len(arrs[0].dtype) > 1:
                 out = combine_eles(arrs, dtype=dtype)
             else:

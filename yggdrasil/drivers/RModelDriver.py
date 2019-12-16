@@ -46,7 +46,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'array': 'list',
         'object': 'list',
         'boolean': 'logical',
-        'null': 'NULL',
+        'null': 'NA',
         'uint': 'integer',
         'complex': 'complex',
         'bytes': 'char (utf-8)',
@@ -58,6 +58,10 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'schema': 'list'}
     function_param = {
         'import': 'source(\"{filename}\")',
+        'istype': 'is({variable}, \"{type}\")',
+        'len': 'length({variable})',
+        'index': '{variable}[[{index}]]',
+        'first_index': 1,
         'interface': 'library(yggdrasil)',
         'input': '{channel} <- YggInterface(\"YggInput\", \"{channel_name}\")',
         'output': '{channel} <- YggInterface(\"YggOutput\", \"{channel_name}\")',
@@ -65,26 +69,45 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                         '\"{channel_name}\")'),
         'table_output': ('{channel} <- YggInterface(\"YggAsciiTableOutput\", '
                          '\"{channel_name}\", \"{format_str}\")'),
-        'recv': 'c({flag_var}, {recv_var}) %<-% {channel}$recv()',
-        'send': '{flag_var} <- {channel}$send({send_var})',
-        'function_call': '{output_var} <- {function_name}({input_var})',
-        'define': '{variable} <- {value}',
+        'recv_function': '{channel}$recv',
+        'send_function': '{channel}$send',
+        'multiple_outputs': 'c({outputs})',
+        'multiple_outputs_def': 'list({outputs})',
         'true': 'TRUE',
+        'false': 'FALSE',
         'not': '!',
+        'and': '&&',
         'comment': '#',
         'indent': 2 * ' ',
         'quote': '\"',
+        'print_generic': 'print({object})',
         'print': 'print(\"{message}\")',
         'fprintf': 'print(sprintf(\"{message}\", {variables}))',
         'error': 'stop(\"{error_msg}\")',
         'block_end': '}',
-        'if_begin': 'if({cond}) {{',
+        'if_begin': 'if ({cond}) {{',
+        'if_elif': '}} else if ({cond}) {{',
+        'if_else': '}} else {{',
         'for_begin': 'for ({iter_var} in {iter_begin}:{iter_end}) {{',
         'while_begin': 'while ({cond}) {{',
         'try_begin': 'tryCatch({',
         'try_except': '}}, error = function({error_var}) {{',
         'try_end': '})',
-        'assign': '{name} <- {value}'}
+        'assign': '{name} <- {value}',
+        'assign_mult': '{name} %<-% {value}',
+        'function_def_begin': '{function_name} <- function({input_var}) {{',
+        'return': 'return({output_var})',
+        'function_def_regex': (
+            r'{function_name} *(?:(?:\<-)|(?:=)) *function'
+            r'\((?P<inputs>(?:.|(?:\r?\n))*?)\)\s*\{{'
+            r'(?P<body>(?:.|(?:\r?\n))*?)'
+            r'(?:return\((list\()?'
+            r'(?P<outputs>(?:.|(?:\r?\n))*?)(?(3)\))\)'
+            r'(?:.|(?:\r?\n))*?\}})'
+            r'|(?:\}})'),
+        'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)',
+        'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
+    brackets = (r'{', r'}')
 
     @classmethod
     def is_library_installed(cls, lib, **kwargs):
@@ -140,10 +163,11 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         """
         out = super(RModelDriver, self).set_env()
         out['RETICULATE_PYTHON'] = PythonModelDriver.get_interpreter()
-        c_linker = CModelDriver.get_tool('linker')
-        search_dirs = c_linker.get_search_path(conda_only=True)
-        out = CModelDriver.update_ld_library_path(out, paths_to_add=search_dirs,
-                                                  add_to_front=True)
+        if CModelDriver.is_language_installed():
+            c_linker = CModelDriver.get_tool('linker')
+            search_dirs = c_linker.get_search_path(conda_only=True)
+            out = CModelDriver.update_ld_library_path(out, paths_to_add=search_dirs,
+                                                      add_to_front=True)
         return out
         
     @classmethod
@@ -163,28 +187,6 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             comm.linger_close()
 
     @classmethod
-    def language2python(cls, robj):
-        r"""Prepare an R object for serialization in Python.
-
-        Args:
-           robj (object): Python object prepared in R.
-
-        Returns:
-            object: Python object in a form that is serialization friendly.
-
-        """
-        logger.debug("language2python: %s, %s" % (robj, type(robj)))
-        if isinstance(robj, tuple):
-            return tuple([cls.language2python(x) for x in robj])
-        elif isinstance(robj, list):
-            return [cls.language2python(x) for x in robj]
-        elif isinstance(robj, dict):
-            return {k: cls.language2python(v) for k, v in robj.items()}
-        elif isinstance(robj, backwards.string_types):
-            return backwards.as_bytes(robj)
-        return robj
-
-    @classmethod
     def python2language(cls, pyobj):
         r"""Prepare a python object for transformation in R.
 
@@ -201,13 +203,13 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         elif isinstance(pyobj, list):
             return [cls.python2language(x) for x in pyobj]
         elif isinstance(pyobj, OrderedDict):
-            return OrderedDict([(backwards.as_str(k), cls.python2language(v))
+            return OrderedDict([(cls.python2language(k),
+                                 cls.python2language(v))
                                 for k, v in pyobj.items()])
         elif isinstance(pyobj, dict):
-            return {backwards.as_str(k): cls.python2language(v)
+            return {cls.python2language(k): cls.python2language(v)
                     for k, v in pyobj.items()}
-        elif isinstance(pyobj, tuple(list(backwards.string_types)
-                                     + [np.string_])):
+        elif isinstance(pyobj, np.string_):
             return backwards.as_str(pyobj)
         elif isinstance(pyobj, pd.DataFrame):
             # R dosn't have int64 and will cast 64bit ints as floats if passed

@@ -1,5 +1,4 @@
 import os
-import copy
 import unittest
 from yggdrasil import platform
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
@@ -43,15 +42,18 @@ class TestCModelDriverNoInit(TestCModelParam,
     def get_test_types(self):
         r"""Return the list of tuples mapping json type to expected native type."""
         out = super(TestCModelDriverNoInit, self).get_test_types()
-        for i, (k, v) in enumerate(copy.deepcopy(out)):
+        for i, (k, v) in enumerate(out):
             if v == '*':
                 knew = {'type': k, 'subtype': 'float',
-                        'precision': 64}
-                vnew = 'float64_t*'
+                        'precision': 32}
+                vnew = 'float*'
                 out[i] = (knew, vnew)
             elif 'X' in v:
                 knew = {'type': k, 'precision': 64}
-                vnew = v.replace('X', '64')
+                if k == 'complex':
+                    vnew = v.replace('X', 'float')
+                else:
+                    vnew = v.replace('X', '64')
                 out[i] = (knew, vnew)
         return out
     
@@ -62,6 +64,53 @@ class TestCModelDriverNoInit(TestCModelParam,
                                None, None)
         else:
             super(TestCModelDriverNoInit, self).test_write_try_except(**kwargs)
+
+    def test_write_function_def_single(self):
+        r"""Test writing and running a function definition with single output."""
+        inputs = [{'name': 'x', 'value': 1.0,
+                   'datatype': {'type': 'float',
+                                'precision': 32,
+                                'units': 'cm'}}]
+        outputs = [{'name': 'y',
+                    'datatype': {'type': 'float',
+                                 'precision': 32,
+                                 'units': 'cm'}}]
+        self.test_write_function_def(inputs=inputs, outputs=outputs,
+                                     outputs_in_inputs=False,
+                                     dont_add_lengths=True)
+        
+    def test_write_function_def_void(self):
+        r"""Test writing and running a function definition with no output."""
+        inputs = [{'name': 'x', 'value': 1.0,
+                   'datatype': {'type': 'float',
+                                'precision': 32,
+                                'units': 'cm'}}]
+        outputs = []
+        self.test_write_function_def(inputs=inputs, outputs=outputs,
+                                     outputs_in_inputs=False)
+        
+    def test_write_function_def_string(self):
+        r"""Test writing and running a function definition with no length var."""
+        inputs = [{'name': 'x', 'value': '"hello"',
+                   'length_var': 'length_x',
+                   'datatype': {'type': 'string',
+                                'precision': 20,
+                                'units': ''}},
+                  {'name': 'length_x', 'value': 5,
+                   'datatype': {'type': 'uint',
+                                'precision': 64},
+                   'is_length_var': True}]
+        outputs = [{'name': 'y',
+                    'length_var': 'length_y',
+                    'datatype': {'type': 'string',
+                                 'precision': 20,
+                                 'units': ''}},
+                   {'name': 'length_y',
+                    'datatype': {'type': 'uint',
+                                 'precision': 64},
+                    'is_length_var': True}]
+        self.test_write_function_def(inputs=inputs, outputs=outputs,
+                                     dont_add_lengths=True)
         
     
 class TestCModelDriverNoStart(TestCModelParam,

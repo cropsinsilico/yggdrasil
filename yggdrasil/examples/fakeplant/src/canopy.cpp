@@ -20,14 +20,14 @@ void grow_canopy(double tstep, double *growth_rate, double *layout,
 		
 int main(int argc, char *argv[]) {
 
-  int i, j, return_code = 0;
+  int i, return_code = 0;
   YggInput in_layout("plant_layout");
   YggAsciiArrayInput in_struct("init_canopy_structure");
   YggInput in_time("time");
   YggInput in_growth("growth_rate");
   char struct_format[200] = "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n";
   YggAsciiArrayOutput out_struct("canopy_structure", struct_format);
-  double time_prev, time_curr, time_step;
+  double time_prev, time_curr;
   time_curr = 0.0;
 
   // Malloc arrays for use
@@ -54,9 +54,9 @@ int main(int argc, char *argv[]) {
   }
   printf("canopy: layout = %f, %f, %f\n",
 	 layout[0], layout[1], layout[2]);
-  ret = in_struct.recv(10, &npatch, &x1[0], &x1[1], &x1[2],
-		       &x2[0], &x2[1], &x2[2],
-		       &x3[0], &x3[1], &x3[2]);
+  ret = in_struct.recvRealloc(10, &npatch, &x1[0], &x1[1], &x1[2],
+			      &x2[0], &x2[1], &x2[2],
+			      &x3[0], &x3[1], &x3[2]);
   if (ret < 0) {
     printf("canopy: Error receiving structure\n");
     free(layout);

@@ -6,7 +6,7 @@ import argparse
 import subprocess
 
 
-def prune(fname_in, fname_out=None):
+def prune(fname_in, fname_out=None, excl_suffix=None):
     r"""Prune a requirements.txt file to remove/select dependencies that are
     dependent on the current environment.
 
@@ -15,6 +15,8 @@ def prune(fname_in, fname_out=None):
             should be read.
         fname_out (str, optional): Full path to requirements file that should be
             created. Defaults to None and is set to <fname_in[0]>_pruned.txt.
+        excl_suffix (str, optional): Lines ending in this string will be
+            excluded. Defaults to None and is ignored.
 
     Returns:
         str: Full path to created file.
@@ -27,13 +29,18 @@ def prune(fname_in, fname_out=None):
         with open(ifname_in, 'r') as fd:
             old_lines = fd.readlines()
         for line in old_lines:
+            line = line.strip()
             if line.startswith('#'):
                 continue
+            if excl_suffix and line.endswith(excl_suffix):
+                continue
             try:
-                req = Requirement(line.strip())
+                req = Requirement(line.split('#')[0].strip())
                 if req.marker and (not req.marker.evaluate()):
                     continue
                 new_lines.append(req.name + str(req.specifier))
+                print('prune', line, line.endswith(excl_suffix), req.name,
+                      excl_suffix, type(line), type(excl_suffix))
             except InvalidRequirement as e:
                 print(e)
                 continue
@@ -91,7 +98,11 @@ def install_from_requirements(method, fname_in, conda_env=None):
     """
     if method not in ['pip', 'conda']:
         raise ValueError("Invalid method: '%s'" % method)
-    temp_file = prune(fname_in)
+    elif method == 'pip':
+        excl_suffix = '# conda'
+    elif method == 'conda':
+        excl_suffix = '# pip'
+    temp_file = prune(fname_in, excl_suffix=excl_suffix)
     try:
         if method == 'conda':
             args = ['conda', 'install', '-y']

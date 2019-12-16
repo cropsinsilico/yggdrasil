@@ -1,12 +1,11 @@
 import copy
 from collections import OrderedDict
 from yggdrasil import components, backwards, platform
-from yggdrasil.drivers.CompiledModelDriver import CompilerBase
-from yggdrasil.drivers.BuildModelDriver import BuildModelDriver
-from yggdrasil.drivers.CModelDriver import CModelDriver
+from yggdrasil.drivers.BuildModelDriver import (
+    BuildModelDriver, BuildToolBase)
 
 
-class MakeCompiler(CompilerBase):
+class MakeCompiler(BuildToolBase):
     r"""Make configuration tool.
 
     Args:
@@ -70,6 +69,7 @@ class MakeCompiler(CompilerBase):
     no_separate_linking = True
     default_archiver = False
     linker_attributes = {'executable_ext': ''}
+    build_language = 'make'
     
     @staticmethod
     def before_registration(cls):
@@ -77,7 +77,7 @@ class MakeCompiler(CompilerBase):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
-        CompilerBase.before_registration(cls)
+        BuildToolBase.before_registration(cls)
         if platform._is_win:  # pragma: windows
             cls.linker_attributes['executable_ext'] = '.exe'
 
@@ -206,19 +206,18 @@ class MakeCompiler(CompilerBase):
             dict: Environment variables for the model process.
 
         """
+        if language_driver is None:
+            if language is None:
+                language = cls.get_default_target_language()
+            language_driver = components.import_component('model', language)
+        kwargs['language_driver'] = language_driver
         out = super(MakeCompiler, cls).set_env(**kwargs)
-        if language is None:
-            # This should be the first language that is not the build tool
-            language = cls.languages[1]
-        drv = language_driver
-        if drv is None:
-            drv = components.import_component('model', language)
-        compiler = drv.get_tool('compiler')
-        compile_flags = drv.get_compiler_flags(
+        compiler = language_driver.get_tool('compiler')
+        compile_flags = language_driver.get_compiler_flags(
             for_model=True, skip_defaults=True, dont_skip_env_defaults=True,
             logging_level=logging_level, dont_link=True)
-        linker = drv.get_tool('linker')
-        linker_flags = drv.get_linker_flags(
+        linker = language_driver.get_tool('linker')
+        linker_flags = language_driver.get_linker_flags(
             for_model=True, skip_defaults=True, dont_skip_env_defaults=True)
         for k in ['env_compiler', 'env_compiler_flags',
                   'env_linker', 'env_linker_flags']:
@@ -363,16 +362,8 @@ class MakeModelDriver(BuildModelDriver):
         """
         if kwargs.get('for_compile', False):
             kwargs.setdefault('compile_kwargs', {})
-            kwargs['compile_kwargs']['language'] = self.target_language
-            kwargs['compile_kwargs']['language_driver'] = self.target_language_driver
             for k in ['env_compiler', 'env_compiler_flags',
                       'env_linker', 'env_linker_flags']:
                 kwargs['compile_kwargs'][k] = getattr(self, k)
         out = super(MakeModelDriver, self).set_env(**kwargs)
-        if not kwargs.get('for_compile', False):
-            if hasattr(self.target_language_driver, 'update_ld_library_path'):
-                self.target_language_driver.update_ld_library_path(out)
-            # C++ may also need the C libraries
-            if self.target_language == 'c++':
-                out = CModelDriver.update_ld_library_path(out)
         return out

@@ -19,9 +19,6 @@ call_python_method <- function(pyobj, method_name, ...) {
 }
 
 
-# YggInterfaceClass <- setRefClass("YggInterfaceClass",
-#   fields=list(pyobj="ANY"),
-#   methods=list(
 YggInterfaceClass <- R6::R6Class("YggInterfaceClass", list(
     pyobj = NULL,
     initialize = function(pyobj) {

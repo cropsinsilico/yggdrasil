@@ -122,6 +122,7 @@ class ForkComm(CommBase.CommBase):
     def opp_comms(self):
         r"""dict: Name/address pairs for opposite comms."""
         out = super(ForkComm, self).opp_comms
+        out.pop(self.name)
         for x in self.comm_list:
             out.update(**x.opp_comms)
         return out

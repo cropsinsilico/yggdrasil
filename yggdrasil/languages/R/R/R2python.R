@@ -8,6 +8,12 @@ R2python <- function(robj, not_bytes=FALSE) {
   if (is(robj, "list")) {
     robj <- lapply(robj, R2python, not_bytes=not_bytes)
     out <- reticulate::r_to_py(robj)
+  } else if (is(robj, "units")) {
+    x <- units(robj)
+    ygg_units <- reticulate::import('yggdrasil.units', convert=FALSE)
+    pyunits <- ygg_units$convert_R_unit_string(R2python(units::deparse_unit(robj), not_bytes=TRUE))
+    pydata <- R2python(units::drop_units(robj))
+    out <- ygg_units$add_units(pydata, pyunits)
   } else if (is(robj, "integer64")) {
     out <- call_python_method(np, 'int64',
       reticulate::r_to_py(as.integer(robj)))
@@ -25,14 +31,20 @@ R2python <- function(robj, not_bytes=FALSE) {
   } else if (is(robj, "numeric")) {
     out <- call_python_method(np, 'float32',
       reticulate::r_to_py(robj))
-  } else if (is(robj, "character")) {
+  } else if (is(robj, "raw") || is(robj, "ygg_bytes")) {
+    ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
     if (not_bytes) {
-      out <- reticulate::r_to_py(robj)
+      out <- ygg_back$as_str(reticulate::r_to_py(robj))
     } else {
-      out <- reticulate::r_to_py(charToRaw(robj))
+      out <- ygg_back$as_bytes(reticulate::r_to_py(robj))
     }
+  } else if (is(robj, "character")) {
+    ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
+    out <- ygg_back$as_str(reticulate::r_to_py(robj))
   } else if (is(robj, "data.frame")) {
     out <- reticulate::r_to_py(robj)
+  } else if (is.na(robj)) {
+    out <- reticulate::r_to_py(NULL)
   } else {
     # print("Default handling for class:")
     # print(class(robj))

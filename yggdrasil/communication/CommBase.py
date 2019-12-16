@@ -7,7 +7,8 @@ import logging
 from yggdrasil import backwards, tools, serialize
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
-from yggdrasil.components import import_component
+from yggdrasil.components import import_component, create_component
+from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
@@ -269,8 +270,21 @@ class CommBase(tools.YggClass):
             received objects. Defaults to None.
         send_converter (func, optional): Converter that should be used on
             sent objects. Defaults to None.
+        vars (list, optional): Names of variables to be sent/received by
+            this comm. Defaults to [].
+        length_map (dict, optional): Map from pointer variable names to
+
+            the names of variables where their length will be stored.
+            Defaults to {}.
         comm (str, optional): The comm that should be created. This only serves
             as a check that the correct class is being created. Defaults to None.
+        filter (:class:.FilterBase, optional): Callable class that will be used to
+            determine when messages should be sent/received. Defaults to None
+            and is ignored.
+        is_default (bool, optional): If True, this comm was created to handle
+            all input/output variables to/from a model. Defaults to False. This
+            variable is used internally and should not be set explicitly in
+            the YAML.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -308,6 +322,8 @@ class CommBase(tools.YggClass):
             comm.
         recv_converter (func): Converter that should be used on received objects.
         send_converter (func): Converter that should be used on sent objects.
+        filter (:class:.FilterBase): Callable class that will be used to determine when
+            messages should be sent/received.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -327,13 +343,32 @@ class CommBase(tools.YggClass):
                                                        'that should be used.')},
                           'datatype': {'type': 'schema',
                                        'default': {'type': 'bytes'}},
-                          'recv_converter': {'type': ['function', 'string']},
-                          'send_converter': {'type': ['function', 'string']},
+                          'recv_converter': {'oneOf': [
+                              {'$ref': '#/definitions/transform'},
+                              {'type': ['function', 'string']},
+                              {'type': 'array',
+                               'items': {'oneOf': [
+                                   {'$ref': '#/definitions/transform'},
+                                   {'type': ['function', 'string']}]}}]},
+                          'send_converter': {'oneOf': [
+                              {'$ref': '#/definitions/transform'},
+                              {'type': ['function', 'string']},
+                              {'type': 'array',
+                               'items': {'oneOf': [
+                                   {'$ref': '#/definitions/transform'},
+                                   {'type': ['function', 'string']}]}}]},
+                          'vars': {'type': 'array',
+                                   'items': {'type': 'string'}},
+                          'length_map': {
+                              'type': 'object',
+                              'additionalProperties': {'type': 'string'}},
                           'field_names': {'type': 'array',
                                           'items': {'type': 'string'}},
                           'field_units': {'type': 'array',
                                           'items': {'type': 'string'}},
-                          'as_array': {'type': 'boolean', 'default': False}}
+                          'as_array': {'type': 'boolean', 'default': False},
+                          'filter': {'$ref': '#/definitions/filter'},
+                          'is_default': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
@@ -365,7 +400,12 @@ class CommBase(tools.YggClass):
         self._name = name + suffix
         if address is None:
             if self.name not in os.environ:
-                raise RuntimeError('Cannot see %s in env.' % self.name)
+                model_name = os.environ.get('YGG_MODEL_NAME', '')
+                prefix = '%s:' % model_name
+                if model_name and (not self.name.startswith(prefix)):
+                    self._name = prefix + self.name
+                if self.name not in os.environ:
+                    raise RuntimeError('Cannot see %s in env.' % self.name)
             self.address = os.environ[self.name]
         else:
             self.address = address
@@ -400,6 +440,7 @@ class CommBase(tools.YggClass):
         self._bound = False
         self._last_send = None
         self._last_recv = None
+        self._type_errors = []
         self._timeout_drain = False
         self._server_class = CommServer
         self._server_kwargs = {}
@@ -467,13 +508,28 @@ class CommBase(tools.YggClass):
             self.serializer = seri_cls(**seri_kws)
         # Set send/recv converter based on the serializer
         for k in ['recv_converter', 'send_converter']:
-            v = getattr(self, k, None)
-            if v is None:
-                v = getattr(self.serializer, k, None)
-            if isinstance(v, str):
-                cls_conv = getattr(self.language_driver, k + 's')
-                v = cls_conv.get(v, None)
+            v = getattr(self, k, [])
+            if not v:
+                v = getattr(self.serializer, k, [])
+            if v:
+                if not isinstance(v, list):
+                    v = [v]
+                oldv = v
+                v = []
+                for iv in oldv:
+                    if isinstance(iv, str):
+                        cls_conv = getattr(self.language_driver, k + 's')
+                        iv = cls_conv.get(iv, None)
+                    if iv is not None:
+                        v.append(iv)
             setattr(self, k, v)
+        # Set filter
+        if isinstance(self.filter, dict):
+            from yggdrasil.schema import get_schema
+            filter_schema = get_schema().get('filter')
+            filter_kws = dict(self.filter,
+                              subtype=filter_schema.identify_subtype(self.filter))
+            self.filter = create_component('filter', **filter_kws)
 
     @staticmethod
     def before_registration(cls):
@@ -515,7 +571,8 @@ class CommBase(tools.YggClass):
         out = {'kwargs': out_seri['kwargs'],
                'send': copy.deepcopy(out_seri['objects']),
                'msg': out_seri['objects'][0],
-               'contents': out_seri['contents']}
+               'contents': out_seri['contents'],
+               'objects': out_seri['objects']}
         out['recv'] = copy.deepcopy(out['send'])
         out['dict'] = seri_cls.object2dict(out['msg'], **out['kwargs'])
         if not out_seri.get('exact_contents', True):
@@ -532,21 +589,27 @@ class CommBase(tools.YggClass):
                 out[k] = copy.deepcopy(out_seri[k])
         return out
 
-    def get_status_message(self, nindent=0):
+    def get_status_message(self, nindent=0, extra_lines=None):
         r"""Return lines composing a status message.
         
         Args:
             nindent (int, optional): Number of tabs that should be used to
                 indent each line. Defaults to 0.
+            extra_lines (list, optional): Additional lines that should be
+                added to the beginning of the default print message. Defaults to
+                empty list if not provided.
                 
         Returns:
             tuple(list, prefix): Lines composing the status message and the
                 prefix string used for the last message.
 
         """
+        if extra_lines is None:
+            extra_lines = []
         prefix = nindent * '\t'
         lines = ['', '%s%s:' % (prefix, self.name)]
         prefix += '\t'
+        lines += ['%s%s' % (prefix, x) for x in extra_lines]
         lines += ['%s%-15s: %s' % (prefix, 'address', self.address),
                   '%s%-15s: %s' % (prefix, 'direction', self.direction),
                   '%s%-15s: %s' % (prefix, 'open', self.is_open),
@@ -943,22 +1006,24 @@ class CommBase(tools.YggClass):
             object: Converted message.
  
         """
-        if (self.recv_converter is None):
-            return msg_in
-        elif isinstance(self.recv_converter, str):
-            if self.recv_converter in ['array', 'pandas']:
-                # These are referenced by string since they require the
-                # serializer customized with information from the received
-                # message(s) (e.g. column names).
-                msg_out = self.serializer.consolidate_array(msg_in)
-                if self.recv_converter == 'pandas':
-                    msg_out = serialize.numpy2pandas(msg_out)
-                return msg_out
-            else:  # pragma: debug
-                raise RuntimeError("Unrecognized recv_converter string: '%s'" %
-                                   self.recv_converter)
-        else:
-            return self.recv_converter(msg_in)
+        if self.recv_converter:
+            self.debug("Applying converters to received message.")
+        msg_out = msg_in
+        for iconv in self.recv_converter:
+            if isinstance(iconv, str):
+                if iconv in ['array', 'pandas']:
+                    # These are referenced by string since they require the
+                    # serializer customized with information from the received
+                    # message(s) (e.g. column names).
+                    msg_out = self.serializer.consolidate_array(msg_out)
+                    if iconv == 'pandas':
+                        msg_out = serialize.numpy2pandas(msg_out)
+                else:  # pragma: debug
+                    raise RuntimeError("Unrecognized recv_converter string: '%s'" %
+                                       iconv)
+            else:
+                msg_out = iconv(msg_out)
+        return msg_out
 
     def apply_send_converter(self, msg_in):
         r"""Apply send converter.
@@ -970,13 +1035,35 @@ class CommBase(tools.YggClass):
             object: Converted message.
  
         """
-        if (self.send_converter is None):
-            return msg_in
-        elif isinstance(self.send_converter, str):  # pragma: debug
-            raise RuntimeError("Unrecognized send_converter string: '%s'." %
-                               self.send_converter)
-        else:
-            return self.send_converter(msg_in)
+        if self.send_converter:
+            self.debug("Applying converters to message being sent.")
+        msg_out = msg_in
+        for iconv in self.send_converter:
+            if isinstance(iconv, str):  # pragma: debug
+                raise RuntimeError("Unrecognized send_converter string: '%s'." %
+                                   iconv)
+            else:
+                msg_out = iconv(msg_out)
+        return msg_out
+
+    def evaluate_filter(self, *msg_in):
+        r"""Evaluate the filter to determine how the message should be
+        handled.
+
+        Args:
+            *msg_in (object): Parts of message being evaluated.
+        
+        Returns:
+            bool: True if the filter evaluates to True, False otherwise.
+
+        """
+        out = True
+        if len(msg_in) == 1:
+            msg_in = msg_in[0]
+        if self.filter and (not self.is_eof(msg_in)):
+            out = self.filter(msg_in)
+        assert(isinstance(out, bool))
+        return out
         
     @property
     def empty_obj_recv(self):
@@ -1399,14 +1486,24 @@ class CommBase(tools.YggClass):
         """
         if self.single_use and self._used:  # pragma: debug
             raise RuntimeError("This comm is single use and it was already used.")
-        if self.language_driver.language2python is not None:
-            args = self.language_driver.language2python(args)
+        args = self.language_driver.language2python(args)
+        if not self.evaluate_filter(*args):
+            # Return True to indicate success because nothing should be done
+            self.debug("Sent message skipped based on filter: %.100s", str(args))
+            return True
         try:
             ret = self.send_multipart(args, **kwargs)
             if ret:
                 self._used = True
                 if self.serializer.initialized:
                     self._send_serializer = False
+        except MetaschemaTypeError as e:  # pragma: debug
+            self._type_errors.append(e)
+            try:
+                self.exception('Failed to send: %.100s.', str(args))
+            except ValueError:  # pragma: debug
+                self.exception('Failed to send (unyt array in message)')
+            return False
         except BaseException:
             # Handle error caused by calling repr on unyt array that isn't float64
             try:
@@ -1528,7 +1625,7 @@ class CommBase(tools.YggClass):
             # if len(payload[1]) == 0:
             #     self.sleep()
         payload = (ret, data)
-        self.info("Read %d/%d bytes", len(data), leng_exp)
+        self.debug("Read %d/%d bytes", len(data), leng_exp)
         return payload
 
     def _recv_multipart_worker(self, info, **kwargs):
@@ -1587,9 +1684,7 @@ class CommBase(tools.YggClass):
         if self.is_eof(msg_):
             flag = self.on_recv_eof()
             msg = msg_
-        elif ((self.recv_converter is not None)
-              and (not header.get('incomplete', False))):
-            self.debug("Converting message")
+        elif not header.get('incomplete', False):
             msg = self.apply_recv_converter(msg_)
         else:
             msg = msg_
@@ -1624,12 +1719,15 @@ class CommBase(tools.YggClass):
         except BaseException:
             self.exception('Failed to recv.')
             return (False, None)
+        if flag and (not self.evaluate_filter(msg)):
+            assert(not self.single_use)
+            self.debug("Recieved message skipped based on filter: %.100s", str(msg))
+            return self.recv(*args, **kwargs)
         if self.single_use and self._used:
             self.debug('Linger close on single use')
             self.linger_close()
         out = (flag, msg)
-        if self.language_driver.python2language is not None:
-            out = self.language_driver.python2language(out)
+        out = self.language_driver.python2language(out)
         return out
 
     def recv_multipart(self, *args, **kwargs):

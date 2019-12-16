@@ -1,3 +1,4 @@
+import re
 import numpy as np
 import logging
 from yggdrasil import backwards
@@ -26,6 +27,28 @@ else:
     _unit_array = _ureg_pint.Quantity
 
 
+def convert_R_unit_string(r_str):
+    r"""Convert R unit string to string that the Python package can
+    understand.
+
+    Args:
+        r_str (str): R units string to convert.
+
+    Returns:
+        str: Converted string.
+
+    """
+    out = []
+    regex = r'(?P<name>[A-Za-z]+)(?P<exp>-?[0-9]*)(?: |$)'
+    for x in re.finditer(regex, r_str):
+        xdict = x.groupdict()
+        if xdict['exp']:
+            out.append('{name}**{exp}'.format(**xdict))
+        else:
+            out.append(xdict['name'])
+    return ' '.join(out)
+
+
 def has_units(obj):
     r"""Determine if a Python object has associated units.
 
@@ -36,7 +59,10 @@ def has_units(obj):
         bool: True if the object has units, False otherwise.
 
     """
-    return hasattr(obj, 'units')
+    out = hasattr(obj, 'units')
+    if out and _use_unyt and (obj.units == as_unit('dimensionless')):
+        out = False
+    return out
 
 
 def get_units(obj):
@@ -96,6 +122,8 @@ def add_units(arr, unit_str, dtype=None):
         unit_str = backwards.as_str(unit_str)
     if is_null_unit(unit_str):
         return arr
+    if has_units(arr):
+        return convert_to(arr, unit_str)
     if dtype is None:
         if isinstance(arr, np.ndarray):
             dtype = arr.dtype
@@ -154,8 +182,10 @@ def as_unit(ustr):
     r"""Get unit object for the string.
 
     Args:
+        ustr (str): Unit string.
 
     Returns:
+        unyt.Unit or pint.quantity.Quantity: Unit object.
 
     Raises:
         ValueError: If the string is not a recognized unit.

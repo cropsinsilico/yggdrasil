@@ -1,11 +1,13 @@
 """Module for funneling messages from one comm to another."""
 import os
+import copy
 import numpy as np
 import threading
 from yggdrasil import backwards
 from yggdrasil.communication import new_comm
 from yggdrasil.drivers.Driver import Driver
-from yggdrasil.components import import_component
+from yggdrasil.components import (
+    import_component, create_component, isinstance_component)
 from yggdrasil.schema import get_schema
 
 
@@ -83,7 +85,10 @@ class ConnectionDriver(Driver):
                     'description': ('One or more name(s) of model input(s) '
                                     'and/or new comm/file objects that the '
                                     'connection should send messages to.')},
-        'translator': {'type': 'array', 'items': {'type': 'function'}},
+        'translator': {'type': 'array',
+                       'items': {'oneOf': [
+                           {'type': 'function'},
+                           {'$ref': '#/definitions/transform'}]}},
         'onexit': {'type': 'string'}}
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
 
@@ -106,6 +111,8 @@ class ConnectionDriver(Driver):
             translator = [translator]
         self.translator = []
         for t in translator:
+            if isinstance(t, dict):
+                t = create_component('transform', **t)
             if not hasattr(t, '__call__'):
                 raise ValueError("Translator %s not callable." % t)
             self.translator.append(t)
@@ -144,6 +151,8 @@ class ConnectionDriver(Driver):
         s = get_schema()
         if comm_kws is None:
             comm_kws = dict()
+        else:
+            comm_kws = copy.deepcopy(comm_kws)
         if io == 'input':
             direction = 'recv'
             comm_type = self._icomm_type
@@ -191,7 +200,7 @@ class ConnectionDriver(Driver):
         if any_files and (io == 'input'):
             kwargs.setdefault('timeout_send_1st', 60)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
-        setattr(self, attr_comm, new_comm(comm_kws.pop('name'), **comm_kws))
+        setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
         if touches_model:
             self.env.update(getattr(self, attr_comm).opp_comms)
@@ -529,37 +538,20 @@ class ConnectionDriver(Driver):
                    self.pprint(self.icomm.serializer.typedef, 2),
                    self.pprint(self.ocomm.serializer.serializer_info, 2),
                    self.pprint(self.ocomm.serializer.typedef, 2))
+        for t in self.translator:
+            if isinstance_component(t, 'transform'):
+                t.set_original_datatype(sinfo)
+                sinfo = t.transformed_datatype
         self.ocomm.serializer.initialize_serializer(sinfo)
         self.ocomm.serializer.update_serializer(skip_type=True,
                                                 **self.icomm._last_header)
-        if (((self.icomm.serializer.typedef['type'] == 'array')
+        if (((sinfo['type'] == 'array')
              and (self.ocomm.serializer.typedef['type'] != 'array')
-             and (len(self.icomm.serializer.typedef['items']) == 1))):
+             and (len(sinfo['items']) == 1))):
+            # if (((self.icomm.serializer.typedef['type'] == 'array')
+            #      and (self.ocomm.serializer.typedef['type'] != 'array')
+            #      and (len(self.icomm.serializer.typedef['items']) == 1))):
             self.translator.insert(0, _translate_list2element)
-        # inter_model = False
-        # if self.icomm.is_file:
-        #     # Remove the file information and only pass the type definition
-        #     typedef_in = self.icomm.serializer.typedef
-        #     sinfo = self.icomm.serializer.typedef
-        #     sinfo.pop('seritype', None)
-        # elif self.ocomm.is_file:
-        #     # Maintain the default serializer type for the file
-        #     sinfo = self.icomm.serializer.serializer_info
-        #     sinfo.pop('seritype')
-        #     sinfo.update(self.ocomm.serializer.serializer_info)
-        #     sinfo.update(self.icomm.serializer.typedef)
-        # else:
-        #     # Copy the serializer and prevent the type from being overwritten
-        #     # TODO: icomm is probably initialized so the serializer info
-        #     # from the output comm won't be used.
-        #     sinfo = self.ocomm.serializer.serializer_info
-        #     sinfo.pop('seritype', None)
-        #     self.ocomm.serializer = self.icomm.serializer
-        #     inter_model = True
-        # if (not inter_model) and self.ocomm.serializer.initialized:  # pragma: debug
-        #     self.ocomm.serializer.update_serializer(**sinfo)
-        # else:
-        #     self.ocomm.serializer.initialize_serializer(sinfo)
         self.debug('After update:\n'
                    + '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n'
                    + '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
@@ -600,14 +592,14 @@ class ConnectionDriver(Driver):
         T = self.start_timeout(self.timeout_send_1st)
         flag = self._send_message(*args, **kwargs)
         self.ocomm.suppress_special_debug = True
-        if not flag:
+        if (not flag) and (not self.ocomm._type_errors):
             self.debug("1st send failed, will keep trying for %f s in silence.",
                        float(self.timeout_send_1st))
-        while ((not T.is_out) and (not flag)
-               and self.ocomm.is_open):  # pragma: debug
-            flag = self._send_message(*args, **kwargs)
-            if not flag:
-                self.sleep()
+            while ((not T.is_out) and (not flag)
+                   and self.ocomm.is_open):  # pragma: debug
+                flag = self._send_message(*args, **kwargs)
+                if not flag:
+                    self.sleep()
         self.stop_timeout()
         self.ocomm.suppress_special_debug = False
         self._first_send_done = True

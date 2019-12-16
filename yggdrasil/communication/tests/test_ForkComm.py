@@ -41,10 +41,27 @@ class TestForkComm(parent.TestCommBase):
 
     def do_send_recv(self, *args, **kwargs):
         r"""Generic send/recv of a message."""
-        if 'eof' not in kwargs.get('send_meth', 'None'):
-            kwargs['n_recv'] = self.ncomm
+        if ((('eof' not in kwargs.get('send_meth', 'None'))
+             and (not kwargs.get('no_recv', False)))):
+            kwargs.setdefault('n_recv', self.ncomm)
         super(TestForkComm, self).do_send_recv(*args, **kwargs)
 
+    def add_filter(self, comm, filter=None):
+        r"""Add a filter to a comm.
+
+        Args:
+            comm (CommBase): Communication instance to add a filter to.
+            filter (FilterBase, optional): Filter class. Defaults to None and is ignored.
+
+        """
+        for x in comm.comm_list:
+            super(TestForkComm, self).add_filter(x, filter=filter)
+            
+    def test_send_recv_filter_recv_filter(self, **kwargs):
+        r"""Test send/recv with filter that blocks recv."""
+        kwargs.setdefault('n_recv', 1)
+        super(TestForkComm, self).test_send_recv_filter_recv_filter(**kwargs)
+        
     def test_purge(self, **kwargs):
         r"""Test purging messages from the comm."""
         kwargs['nrecv'] = self.ncomm

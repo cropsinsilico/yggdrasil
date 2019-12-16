@@ -2,7 +2,60 @@ import os
 import copy
 import glob
 from yggdrasil import components
-from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
+from yggdrasil.drivers.CompiledModelDriver import (
+    CompiledModelDriver, CompilerBase)
+
+
+class BuildToolBase(CompilerBase):
+    r"""Base class for build tools."""
+
+    is_build_tool = True
+    build_language = None
+
+    @classmethod
+    def get_default_target_language(cls):
+        r"""Determine the default target language for the build tool.
+        Unless otherwise specified, this will be the first language in
+        the 'languages' attribute that is not the build tool.
+
+        Returns:
+            str: Name of the default target language.
+
+        """
+        build_language = cls.build_language
+        if build_language is None:
+            build_language = cls.toolname
+        for x in cls.languages:
+            if x != build_language:
+                return x
+        raise ValueError("Could not determine a default target language "
+                         "for build tool '%s'" % cls.toolname)  # pragma: debug
+
+    @classmethod
+    def set_env(cls, language=None, language_driver=None, **kwargs):
+        r"""Get environment variables that should be set for the model process.
+
+        Args:
+            language (str, optional): Language that is being compiled. Defaults
+                to the first language in cls.languages that isn't toolname.
+            language_driver (ModelDriver, optional): Driver for language that
+                should be used. Defaults to None and will be imported based
+                on language.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(BuildToolBase, cls).set_env(**kwargs)
+        if language_driver is None:
+            if language is None:
+                language = cls.get_default_target_language()
+            language_driver = components.import_component('model', language)
+        compiler = language_driver.get_tool('compiler')
+        out = compiler.set_env(existing=out)
+        return out
 
 
 class BuildModelDriver(CompiledModelDriver):
@@ -80,8 +133,9 @@ class BuildModelDriver(CompiledModelDriver):
         if self.sourcedir is None:
             self.sourcedir = os.path.dirname(args[0])
         if not os.path.isabs(self.sourcedir):
-            self.sourcedir = os.path.realpath(os.path.join(self.working_dir,
-                                                           self.sourcedir))
+            self.sourcedir = os.path.normpath(
+                os.path.realpath(os.path.join(self.working_dir,
+                                              self.sourcedir)))
         # Build file
         if self.buildfile is None:
             self.buildfile = self.buildfile_base
@@ -174,6 +228,8 @@ class BuildModelDriver(CompiledModelDriver):
                 method.
 
         """
+        if self.target_language_driver is not None:
+            self.target_language_driver.compile_dependencies()
         kwargs['working_dir'] = self.compile_working_dir
         return super(BuildModelDriver, self).compile_model(**kwargs)
         
@@ -182,3 +238,24 @@ class BuildModelDriver(CompiledModelDriver):
         if (self.model_file is not None) and os.path.isfile(self.model_file):
             self.compile_model(target='clean')
         super(BuildModelDriver, self).cleanup()
+
+    def set_env(self, **kwargs):
+        r"""Get environment variables that should be set for the model process.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        if kwargs.get('for_compile', False) and (self.target_language is not None):
+            kwargs.setdefault('compile_kwargs', {})
+            kwargs['compile_kwargs']['language'] = self.target_language
+            kwargs['compile_kwargs']['language_driver'] = self.target_language_driver
+        out = super(BuildModelDriver, self).set_env(**kwargs)
+        if not kwargs.get('for_compile', False):
+            if hasattr(self.target_language_driver, 'update_ld_library_path'):
+                self.target_language_driver.update_ld_library_path(out)
+        return out

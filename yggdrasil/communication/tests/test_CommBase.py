@@ -3,6 +3,8 @@ import uuid
 from yggdrasil import backwards
 from yggdrasil.tests import YggTestClassInfo, assert_equal
 from yggdrasil.communication import new_comm, get_comm, CommBase
+from yggdrasil.communication.filters.StatementFilter import StatementFilter
+from yggdrasil.communication.filters.FunctionFilter import FunctionFilter
 
 
 def test_registry():
@@ -167,11 +169,6 @@ class TestCommBase(YggTestClassInfo):
         msg = self.instance.empty_obj_recv
         assert(self.instance.is_empty_recv(msg))
         assert(not self.instance.is_empty_recv(self.instance.eof_msg))
-        if self.recv_instance.recv_converter is None:
-            self.recv_instance.recv_converter = lambda x: x
-            msg = self.instance.empty_obj_recv
-            assert(self.instance.is_empty_recv(msg))
-            assert(not self.instance.is_empty_recv(self.instance.eof_msg))
             
     def test_error_name(self):
         r"""Test error on missing address."""
@@ -282,8 +279,7 @@ class TestCommBase(YggTestClassInfo):
 
     def assert_msg_equal(self, x, y):
         r"""Assert that two messages are equivalent."""
-        if not (isinstance(y, type(self.send_instance.eof_msg))
-                and (y == self.send_instance.eof_msg)):
+        if not self.send_instance.is_eof(y):
             y = self.map_sent2recv(y)
         self.assert_equal(x, y)
 
@@ -332,24 +328,26 @@ class TestCommBase(YggTestClassInfo):
                      n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',
                      reverse_comms=False, send_kwargs=None, recv_kwargs=None,
                      n_send=1, n_recv=1, print_status=False,
-                     close_on_send_eof=None, close_on_recv_eof=None):
+                     close_on_send_eof=None, close_on_recv_eof=None,
+                     no_recv=False, recv_timeout=None):
         r"""Generic send/recv of a message."""
         tkey = 'do_send_recv'
-        is_eof = ('eof' in send_meth)
+        is_eof_send = (('eof' in send_meth) or self.send_instance.is_eof(msg_send))
+        is_eof_recv = (is_eof_send or self.recv_instance.is_eof(msg_recv))
+        if recv_timeout is None:
+            recv_timeout = self.timeout
         if msg_send is None:
-            if is_eof:
+            if is_eof_send:
                 msg_send = self.send_instance.eof_msg
             else:
                 msg_send = self.test_msg
         if msg_recv is None:
             msg_recv = msg_send
-        # print('send', msg_send)
-        # print('recv', msg_recv)
         if send_kwargs is None:
             send_kwargs = dict()
         if recv_kwargs is None:
             recv_kwargs = dict()
-        if is_eof:
+        if is_eof_send:
             send_args = tuple()
         else:
             send_args = (msg_send,)
@@ -389,8 +387,8 @@ class TestCommBase(YggTestClassInfo):
                 assert(flag)
             # Wait for messages to be received
             for i in range(n_recv):
-                if not is_eof:
-                    T = recv_instance.start_timeout(self.timeout, key_suffix=tkey)
+                if not (is_eof_recv or no_recv):
+                    T = recv_instance.start_timeout(recv_timeout, key_suffix=tkey)
                     while ((not T.is_out) and (not recv_instance.is_closed)
                            and (getattr(recv_instance,
                                         n_msg_recv_meth) == 0)):  # pragma: debug
@@ -399,15 +397,15 @@ class TestCommBase(YggTestClassInfo):
                     assert(getattr(recv_instance, n_msg_recv_meth) >= 1)
                     # IPC nolimit sends multiple messages
                     # self.assert_equal(recv_instance.n_msg_recv, 1)
-                flag, msg_recv0 = frecv_meth(timeout=self.timeout, **recv_kwargs)
-                if is_eof and close_on_recv_eof:
+                flag, msg_recv0 = frecv_meth(timeout=recv_timeout, **recv_kwargs)
+                if is_eof_recv and close_on_recv_eof:
                     assert(not flag)
                     assert(recv_instance.is_closed)
                 else:
                     assert(flag)
                 self.assert_msg_equal(msg_recv0, msg_recv)
             # Wait for send to close
-            if is_eof and close_on_send_eof:
+            if is_eof_send and close_on_send_eof:
                 T = send_instance.start_timeout(self.timeout, key_suffix=tkey)
                 while (not T.is_out) and (not send_instance.is_closed):  # pragma: debug
                     send_instance.sleep()
@@ -427,7 +425,7 @@ class TestCommBase(YggTestClassInfo):
         #     send_instance.get_status_message()
         #     recv_instance.get_status_message()
         # Confirm recept of messages
-        if not (is_eof or reverse_comms):
+        if not (is_eof_send or reverse_comms):
             send_instance.wait_for_confirm(timeout=self.timeout)
             recv_instance.wait_for_confirm(timeout=self.timeout)
             assert(send_instance.is_confirmed)
@@ -457,6 +455,126 @@ class TestCommBase(YggTestClassInfo):
         else:
             assert(flag)
         assert(not msg_recv)
+
+    def add_filter(self, comm, filter=None):
+        r"""Add a filter to a comm.
+
+        Args:
+            comm (CommBase): Communication instance to add a filter to.
+            filter (FilterBase, optional): Filter class. Defaults to None and is ignored.
+
+        """
+        comm.filter = filter
+
+    @property
+    def msg_filter_send(self):
+        r"""object: Message to filter out on the send side."""
+        return self.get_options()['objects'][0]
+
+    @property
+    def msg_filter_recv(self):
+        r"""object: Message to filter out on the recv side."""
+        return self.get_options()['objects'][1]
+
+    @property
+    def msg_filter_pass(self):
+        r"""object: Message that won't be filtered out on send or recv."""
+        objs = self.get_options()['objects']
+        out = None
+        if len(objs) > 2:
+            out = objs[2]
+            assert(out != objs[0])
+            assert(out != objs[1])
+        return out
+
+    def get_filter_statement(self, msg, direction):
+        r"""Get a filter statement that filters out the provided message.
+
+        Args:
+            msg (object): Message to filter out.
+            direction (str): Direction that messages will pass through the filter.
+
+        Returns:
+            str: Filter statement.
+
+        """
+        # Uncomment this if statements are ever used on the
+        # receiving side during tests
+        # if direction == 'recv':
+        #     msg = self.map_sent2recv(msg)
+        if isinstance(msg, backwards.string_types):
+            statement = '%x% != ' + repr(msg)
+        else:
+            statement = 'repr(%x%) != r"""' + repr(msg) + '"""'
+        return StatementFilter(statement=statement)
+
+    def get_filter_function(self, msg, direction):
+        r"""Get a filter function that filters out the provided message.
+
+        Args:
+            msg (object): Message to filter out.
+            direction (str): Direction that messages will pass through the filter.
+
+        Returns:
+            function: Filter function.
+
+        """
+        if direction == 'recv':
+            msg = self.map_sent2recv(msg)
+
+        def fcond(x):
+            try:
+                self.assert_equal(x, msg)
+                return False
+            except AssertionError:
+                return True
+        return FunctionFilter(function=fcond)
+
+    def setup_filters(self):
+        r"""Add filters to send/recv instances for testing filters."""
+        self.add_filter(self.send_instance,
+                        self.get_filter_statement(self.msg_filter_send, 'send'))
+        self.add_filter(self.recv_instance,
+                        self.get_filter_function(self.msg_filter_recv, 'recv'))
+
+    def test_send_recv_filter_eof(self, **kwargs):
+        r"""Test send/recv of EOF with filter."""
+        if self.comm in ['CommBase', 'AsyncComm']:
+            return
+        self.setup_filters()
+        self.do_send_recv(send_meth='send_eof')
+
+    def test_send_recv_filter_pass(self, **kwargs):
+        r"""Test send/recv with filter that passes both messages."""
+        if self.comm in ['CommBase', 'AsyncComm']:
+            return
+        if not self.msg_filter_pass:
+            return
+        self.setup_filters()
+        kwargs.setdefault('msg_send', self.msg_filter_pass)
+        kwargs.setdefault('msg_recv', self.msg_filter_pass)
+        self.do_send_recv(**kwargs)
+        
+    def test_send_recv_filter_send_filter(self, **kwargs):
+        r"""Test send/recv with filter that blocks send."""
+        if self.comm in ['CommBase', 'AsyncComm']:
+            return
+        self.setup_filters()
+        kwargs.setdefault('msg_send', self.msg_filter_send)
+        kwargs.setdefault('msg_recv', self.recv_instance.empty_obj_recv)
+        kwargs.setdefault('recv_timeout', self.sleeptime)
+        kwargs.setdefault('no_recv', True)
+        self.do_send_recv(**kwargs)
+        
+    def test_send_recv_filter_recv_filter(self, **kwargs):
+        r"""Test send/recv with filter that blocks recv."""
+        if self.comm in ['CommBase', 'AsyncComm']:
+            return
+        self.setup_filters()
+        kwargs.setdefault('msg_send', self.msg_filter_recv)
+        kwargs.setdefault('msg_recv', self.recv_instance.empty_obj_recv)
+        kwargs.setdefault('recv_timeout', 10 * self.sleeptime)
+        self.do_send_recv(**kwargs)
 
     def test_send_recv(self):
         r"""Test send/recv of a small message."""

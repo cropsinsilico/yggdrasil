@@ -13,6 +13,7 @@ import threading
 import psutil
 import copy
 import pprint
+import types
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil import tools, backwards, platform, units
 from yggdrasil.communication import cleanup_comms
@@ -77,6 +78,70 @@ enable_long_tests = tools.check_environ_bool("YGG_ENABLE_LONG_TESTS")
 skip_extra_examples = tools.check_environ_bool("YGG_SKIP_EXTRA_EXAMPLES")
 
 
+def check_enabled_languages(language):
+    r"""Determine if the specified language is enabled by the value
+    or values specified in YGG_TEST_LANGUAGE.
+
+    Args:
+        language (str): Language to check.
+
+    Raises:
+        unittest.SkipTest: If the specified language is not enabled.
+
+    """
+    enabled = os.environ.get('YGG_TEST_LANGUAGE', None)
+    if enabled is not None:
+        enabled = [x.lower() for x in enabled.split(',')]
+        if ('c++' in enabled) or ('cpp' in enabled):
+            enabled += ['c++', 'cpp']
+        if language.lower() not in enabled:
+            raise unittest.SkipTest("Tests for language %s not enabled.",
+                                    language)
+
+
+def requires_language(language, installed=True):
+    r"""Decorator factroy for marking tests that require a specific
+    language.
+
+    Args:
+        language (str): Language that is required for the test being
+            decorated.
+        installed (bool, optional): If True, the returned decorator will
+            skip the decorated test when the language is not installed.
+            If False, the returned decorator will skip the decorated test
+            when the language is not installed. For any other values,
+            the test will only be skipped if tests for the specified
+            language are disabled by setting YGG_TEST_LANGUAGE to
+            another language. Defaults to True.
+
+    Returns:
+        function: Decorator for test.
+
+    """
+    drv = import_component('model', language)
+    test_language = os.environ.get('YGG_TEST_LANGUAGE', None)
+    if test_language is not None:  # pragma: debug
+        test_language = test_language.lower()
+        
+    def wrapper(function):
+        skips = []
+        if installed is True:
+            skips.append(unittest.skipIf(not drv.is_installed(),
+                                         "%s not installed"))
+        elif installed is False:
+            skips.append(unittest.skipIf(drv.is_installed(),
+                                         "%s installed"))
+        skips.append(unittest.skipIf(
+            (test_language is not None)
+            and (test_language != drv.language.lower()),
+            "Test for language %s not enabled." % drv.language))
+        for s in skips:
+            function = s(function)
+        return function
+    
+    return wrapper
+
+
 # Wrapped class to allow handling of arrays
 class WrappedTestCase(unittest.TestCase):  # pragma: no cover
     def __init__(self, *args, **kwargs):
@@ -85,6 +150,7 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
         self.addTypeEqualityFunc(units._unit_array, 'assertUnitsEqual')
         self.addTypeEqualityFunc(np.ndarray, 'assertArrayEqual')
         self.addTypeEqualityFunc(pd.DataFrame, 'assertArrayEqual')
+        self.addTypeEqualityFunc(types.FunctionType, 'assertFunctionEqual')
 
     def has_units(self, obj):
         if isinstance(obj, (list, tuple)):
@@ -99,12 +165,30 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
             return units.has_units(obj)
         return False
 
+    def is_func(self, obj):
+        return hasattr(obj, '__call__')
+
+    def has_func(self, obj):
+        if isinstance(obj, (list, tuple)):
+            for x in obj:
+                if self.has_func(x):
+                    return True
+        elif isinstance(obj, dict):
+            for x in obj.values():
+                if self.has_func(x):
+                    return True
+        else:
+            return self.is_func(obj)
+        return False
+
     def _getAssertEqualityFunc(self, first, second):
         # Allow comparison of tuple to list and units to anything
         if (type(first), type(second)) in [(list, tuple), (tuple, list)]:
             return self.assertSequenceEqual
         elif units.has_units(first) or units.has_units(second):
             return self.assertUnitsEqual
+        elif self.is_func(first) or self.is_func(second):
+            return self.assertFunctionEqual
         return super(WrappedTestCase, self)._getAssertEqualityFunc(first, second)
         
     def assertEqual(self, first, second, msg=None, dont_nest=False):
@@ -113,6 +197,9 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
         if (not dont_nest):
             # Do nested evaluation for objects containing units
             if (self.has_units(first) or self.has_units(second)):
+                self.assertEqualNested(first, second, msg=msg)
+                return
+            elif (self.has_func(first) or self.has_func(second)):
                 self.assertEqualNested(first, second, msg=msg)
                 return
         try:
@@ -236,7 +323,7 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
         r"""Assertion for equality in case of objects with units."""
         if units.has_units(first) and units.has_units(second):
             first = units.convert_to(first, units.get_units(second))
-        self.assertEqual(units.get_data(first), units.get_data(second))
+        self.assertEqual(units.get_data(first), units.get_data(second), msg=msg)
         
     def assertArrayEqual(self, first, second, msg=None):
         r"""Assertion for equality in case of arrays."""
@@ -246,6 +333,31 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
             standardMsg = str(e)
             msg = self._formatMessage(msg, standardMsg)
             raise self.failureException(msg)
+
+    def assertFunctionEqual(self, first, second, msg=None):
+        r"""Assertion for equality in case of Python function."""
+        if first == second:
+            return
+        self.assertHasAttr(first, '__call__',
+                           'First argument is not callable.')
+        self.assertHasAttr(second, '__call__',
+                           'Second argument is not callable.')
+        standardMsg = 'Function file differs.'
+        msg_k = self._formatMessage(msg, standardMsg)
+        first_name = first.__module__ + '.' + first.__name__
+        second_name = second.__module__ + '.' + second.__name__
+        self.assertTrue((first_name.endswith(second_name)
+                         or second_name.endswith(first_name)),
+                        msg=msg_k)
+        standardMsg = 'Function __dict__ differs.'
+        msg_k = self._formatMessage(msg, standardMsg)
+        self.assertEqual(first.__dict__, second.__dict__, msg=msg_k)
+            
+    def assertHasAttr(self, obj, intendedAttr, msg=None):
+        testBool = hasattr(obj, intendedAttr)
+        standardMsg = "Object lacks attribute '%s'" % intendedAttr
+        msg_k = self._formatMessage(msg, standardMsg)
+        self.assertTrue(testBool, msg=msg_k)
 
 
 if backwards.PY2:  # pragma: Python 2
@@ -392,6 +504,7 @@ class YggTestBase(unittest.TestCase):
 
     """
 
+    skip_comm_check = False
     attr_list = list()
 
     def __init__(self, *args, **kwargs):
@@ -403,7 +516,7 @@ class YggTestBase(unittest.TestCase):
         self.attr_list = copy.deepcopy(self.__class__.attr_list)
         self._teardown_complete = False
         self._new_default_comm = None
-        self._old_default_comm = None
+        self._old_default_comm = []
         self._old_loglevel = None
         self._old_encoding = None
         self.debug_flag = False
@@ -482,7 +595,7 @@ class YggTestBase(unittest.TestCase):
 
     def set_default_comm(self, default_comm=None):
         r"""Set the default comm."""
-        self._old_default_comm = os.environ.get('YGG_DEFAULT_COMM', None)
+        self._old_default_comm.append(os.environ.get('YGG_DEFAULT_COMM', None))
         if default_comm is None:
             default_comm = self._new_default_comm
         if default_comm is not None:
@@ -492,11 +605,13 @@ class YggTestBase(unittest.TestCase):
 
     def reset_default_comm(self):
         r"""Reset the default comm to the original value."""
-        if self._old_default_comm is None:
-            if 'YGG_DEFAULT_COMM' in os.environ:
-                del os.environ['YGG_DEFAULT_COMM']
-        else:  # pragma: debug
-            os.environ['YGG_DEFAULT_COMM'] = self._old_default_comm
+        if self._old_default_comm:
+            prev = self._old_default_comm.pop()
+            if prev is None:
+                if 'YGG_DEFAULT_COMM' in os.environ:
+                    del os.environ['YGG_DEFAULT_COMM']
+            else:  # pragma: debug
+                os.environ['YGG_DEFAULT_COMM'] = prev
 
     def setUp(self, *args, **kwargs):
         self.setup(*args, **kwargs)
@@ -519,6 +634,8 @@ class YggTestBase(unittest.TestCase):
                 open file descriptors.
 
         """
+        if self.skip_comm_check:
+            return
         self.set_default_comm()
         self.set_utf8_encoding()
         if self.debug_flag:  # pragma: debug
@@ -546,6 +663,8 @@ class YggTestBase(unittest.TestCase):
                 open file descriptors.
 
         """
+        if self.skip_comm_check:
+            return
         self._teardown_complete = True
         x = tools.YggClass('dummy', timeout=self.timeout, sleeptime=self.sleeptime)
         # Give comms time to close
@@ -576,7 +695,7 @@ class YggTestBase(unittest.TestCase):
                     x.sleep()
                 x.stop_timeout()
             ncurr_fd = self.fd_count
-        fds_created = ncurr_fd - self.nprev_fd
+        fds_created = max(0, ncurr_fd - self.nprev_fd)
         # print("FDS CREATED: %d" % fds_created)
         if not self._first_test:
             self.assert_equal(fds_created, 0)
@@ -607,6 +726,36 @@ class YggTestBase(unittest.TestCase):
         if self.description_prefix:
             out = '%s: %s' % (self.description_prefix, out)
         return out
+
+    def read_file(self, fname):
+        r"""Read in contents from a file.
+
+        Args:
+            fname (str): Full path to the file that should be read.
+
+        Returns:
+            object: File contents.
+
+        """
+        with open(fname, 'r') as fd:
+            out = fd.read()
+        return out
+
+    def assert_equal_file_contents(self, a, b):
+        r"""Assert that the contents of two files are equivalent.
+
+        Args:
+            a (object): Contents of first file for comparison.
+            b (object): Contents of second file for comparison.
+
+        Raises:
+            AssertionError: If the contents are not equal.
+
+        """
+        if a != b:  # pragma: debug
+            odiff = '\n'.join(list(difflib.Differ().compare(a, b)))
+            raise AssertionError(('File contents do not match expected result.'
+                                  'Diff:\n%s') % odiff)
 
     def check_file_exists(self, fname):
         r"""Check that a file exists.
@@ -659,12 +808,8 @@ class YggTestBase(unittest.TestCase):
             result (str): Contents of the file.
 
         """
-        with open(fname, 'r') as fd:
-            ocont = fd.read()
-        if ocont != result:  # pragma: debug
-            odiff = '\n'.join(list(difflib.Differ().compare(ocont, result)))
-            raise AssertionError(('File contents do not match expected result.'
-                                  'Diff:\n%s') % odiff)
+        ocont = self.read_file(fname)
+        self.assert_equal_file_contents(ocont, result)
 
     def check_file(self, fname, result):
         r"""Check that a file exists, is the correct size, and has the correct
@@ -684,6 +829,7 @@ class YggTestClass(YggTestBase):
     r"""Test class for a YggClass."""
 
     testing_option_kws = {}
+    _mod_base = None
     _mod = None
     _cls = None
     skip_init = False
@@ -727,7 +873,10 @@ class YggTestClass(YggTestBase):
     @property
     def mod(self):
         r"""str: Absolute name of module containing class to be tested."""
-        return self._mod
+        out = self._mod
+        if self._mod_base is not None:
+            out = self._mod_base + '.' + out
+        return out
 
     @property
     def inst_args(self):
@@ -739,6 +888,20 @@ class YggTestClass(YggTestBase):
         r"""dict: Keyword arguments for creating a class instance."""
         out = self._inst_kwargs
         return out
+
+    @classmethod
+    def get_import_cls(cls):
+        r"""Import the tested class from its module"""
+        if cls._mod is None:  # pragma: debug
+            raise Exception("No module registered.")
+        if cls._cls is None:  # pragma: debug
+            raise Exception("No class registered.")
+        mod_tot = cls._mod
+        if cls._mod_base is not None:
+            mod_tot = cls._mod_base + '.' + mod_tot
+        mod = importlib.import_module(mod_tot)
+        cls = getattr(mod, cls._cls)
+        return cls
 
     @property
     def import_cls(self):

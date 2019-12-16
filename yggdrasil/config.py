@@ -8,6 +8,7 @@ This module imports the configuration for yggdrasil.
 import os
 import sys
 import json
+import pprint
 import shutil
 import logging
 import warnings
@@ -159,7 +160,7 @@ ygg_cfg = YggConfigParser.from_files([def_config_file, usr_config_file,
 
 def update_language_config(drv, skip_warnings=False,
                            disable_languages=None, enable_languages=None,
-                           overwrite=False, verbose=False):
+                           lang_kwargs=None, overwrite=False, verbose=False):
     r"""Update configuration options for a language driver.
 
     Args:
@@ -175,6 +176,8 @@ def update_language_config(drv, skip_warnings=False,
             Defaults to False.
         verbose (bool, optional): If True, information about the config file
             will be displayed. Defaults to False.
+        lang_kwargs (dict, optional): Dictionary containing language
+            specific keyword arguments. Defaults to {}.
 
     """
     if verbose:
@@ -187,6 +190,8 @@ def update_language_config(drv, skip_warnings=False,
         disable_languages = []
     if enable_languages is None:
         enable_languages = []
+    if lang_kwargs is None:
+        lang_kwargs = {}
     if overwrite:
         shutil.copy(def_config_file, usr_config_file)
         ygg_cfg_usr.reload()
@@ -201,7 +206,8 @@ def update_language_config(drv, skip_warnings=False,
             ygg_cfg_usr.set(idrv.language, 'disable', 'False')
         if ygg_cfg_usr.get(idrv.language, 'disable', 'False').lower() == 'true':
             continue  # pragma: no cover
-        miss += idrv.configure(ygg_cfg_usr)
+        miss += idrv.configure(ygg_cfg_usr,
+                               **lang_kwargs.get(idrv.language, {}))
     ygg_cfg_usr.update_file()
     ygg_cfg.reload()
     if not skip_warnings:
@@ -307,10 +313,13 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
     if not out:
         return False
     first = out[0]
-    if len(out) > 1:
-        warnings.warn(("More than one (%d) match to %s. "
+    out = set(out)
+    out.remove(first)
+    if len(out) > 0:
+        warnings.warn(("More than one (%d) match to %s:\n%s\n "
                        + "Using first match (%s)") %
-                      (len(out), fname, first), RuntimeWarning)
+                      (len(out) + 1, fname, pprint.pformat(out),
+                       first), RuntimeWarning)
     return first
 
 
