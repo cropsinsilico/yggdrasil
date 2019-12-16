@@ -21,8 +21,7 @@ class SelectFieldsTransform(TransformBase):
                                        'items': {'type': 'string'}},
                           'original_order': {'type': 'array',
                                              'items': {'type': 'string'}},
-                          'single_as_scalar': {'type': 'boolean',
-                                               'default': False}}
+                          'single_as_scalar': {'type': 'boolean'}}
 
     def set_original_datatype(self, datatype):
         r"""Set datatype.

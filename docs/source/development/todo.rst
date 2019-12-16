@@ -33,6 +33,8 @@ Refactor
 * Split drivers into separate directories for model drivers and connection drivers
 * Change configuration so that it is only run on import if the configuration file dosn't exist, otherwise config must be done explicitly
 * Change how CLI arguments are added to the arg parser for the language installer to use subparsers
+* Remove send/recv converters in favor of transform
+* Add support for more than one filter
 
 New feature/example
 -------------------
@@ -64,6 +66,7 @@ New feature/example
 * Allow users to select from list of multiple possiblities when locating libraries to avoid conflict
 * Add CLI for running specific language version of a test
 * Write C/C++ as extension to rapidjson and wrap in Python
+* Add alias key to schema that is then translated into valid JSON schema
 
 Deprecation
 -----------

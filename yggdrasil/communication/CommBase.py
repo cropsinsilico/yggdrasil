@@ -368,6 +368,13 @@ class CommBase(tools.YggClass):
                                           'items': {'type': 'string'}},
                           'as_array': {'type': 'boolean', 'default': False},
                           'filter': {'$ref': '#/definitions/filter'},
+                          'transform': {'oneOf': [
+                              {'$ref': '#/definitions/transform'},
+                              {'type': ['function', 'string']},
+                              {'type': 'array',
+                               'items': {'oneOf': [
+                                   {'$ref': '#/definitions/transform'},
+                                   {'type': ['function', 'string']}]}}]},
                           'is_default': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
@@ -507,6 +514,10 @@ class CommBase(tools.YggClass):
             self.debug('seri_kws = %s', str(seri_kws))
             self.serializer = seri_cls(**seri_kws)
         # Set send/recv converter based on the serializer
+        if getattr(self, 'transform', []):
+            new_attr = '%s_converter' % self.direction
+            assert(not getattr(self, new_attr, []))
+            setattr(self, new_attr, self.transform)
         for k in ['recv_converter', 'send_converter']:
             v = getattr(self, k, [])
             if not v:
@@ -520,6 +531,13 @@ class CommBase(tools.YggClass):
                     if isinstance(iv, str):
                         cls_conv = getattr(self.language_driver, k + 's')
                         iv = cls_conv.get(iv, None)
+                    elif isinstance(iv, dict):
+                        from yggdrasil.schema import get_schema
+                        transform_schema = get_schema().get('transform')
+                        transform_kws = dict(
+                            iv,
+                            subtype=transform_schema.identify_subtype(iv))
+                        iv = create_component('transform', **transform_kws)
                     if iv is not None:
                         v.append(iv)
             setattr(self, k, v)

@@ -1,0 +1,9 @@
+# InputMassRate	OuputMassRate
+# g/s	g/s
+# %.1lf	%.1lf
+0.0	0.0
+5.0	15.0
+10.0	30.0
+15.0	45.0
+20.0	60.0
+25.0	75.0

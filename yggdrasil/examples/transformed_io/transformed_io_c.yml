@@ -1,0 +1,54 @@
+models:
+  - name: c_modelA
+    language: c
+    args: ./src/transformed_io_modelA.c
+    function: modelA_function
+    outputs:
+      - name: c_modelA:output
+        vars:
+          - out_val
+
+  - name: c_modelB
+    language: c
+    args: ./src/transformed_io_modelB.c
+    function: modelB_function
+    outputs:
+      - name: c_modelB:output
+        vars:
+          - in_val_copy
+          - out_val
+
+  - name: c_modelC
+    language: c
+    args: ./src/transformed_io_modelC.c
+    function: modelC_function
+    outputs:
+      - name: c_modelC:output
+        vars:
+          - in_val_copy
+          - out_val
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: c_modelA:input
+    filetype: table
+  - input: c_modelA:output  # Connection between model A output & model B input
+    outputs:
+      - name: c_modelB:input
+        transform:
+          statement: "%x%*5"
+      - name: c_modelC:input
+        transform:
+          function: ./src/transformed_io_modelC.py:transform_function
+  - inputs: c_modelB:output  # Connection between model B output and file
+    output: ./outputB.txt
+    filetype: table
+    field_names: InputMassRate,OuputMassRate
+    field_units: g/s,g/s
+    format_str: "%.1lf\t%.1lf\n"
+  - inputs: c_modelC:output  # Connection between model C output and file
+    output: ./outputC.txt
+    filetype: table
+    field_names: InputMassRate,OuputMassRateDensity
+    field_units: g/s,g/(s*(cm**2))
+    format_str: "%.1lf\t%.1lf\n"

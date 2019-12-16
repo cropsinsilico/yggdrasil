@@ -95,6 +95,19 @@ definitions:
                 - function
                 - string
             type: array
+        transform:
+          oneOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              oneOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
         vars:
           description: Names of variables to be sent/received by this comm. Defaults
             to [].
@@ -103,8 +116,8 @@ definitions:
           type: array
       required:
       - commtype
-      - datatype
       - name
+      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -229,8 +242,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -537,6 +550,19 @@ definitions:
           description: If True, the serialization of dictionaries will be in key sorted
             order. Defaults to True.
           type: boolean
+        transform:
+          oneOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              oneOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
         use_astropy:
           default: false
           description: If True, the astropy package will be used to serialize/deserialize
@@ -559,9 +585,9 @@ definitions:
             is used.
           type: string
       required:
-      - filetype
-      - name
       - working_dir
+      - name
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1288,10 +1314,10 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - args
-      - name
       - language
+      - working_dir
+      - name
       title: model_base
       type: object
     - anyOf:
@@ -2118,7 +2144,6 @@ definitions:
             type: string
           type: array
         single_as_scalar:
-          default: false
           description: If True and only a single field is selected, the transformed
             messages will be scalars rather than arrays with single elements. Defaults
             to False.
@@ -2155,7 +2180,6 @@ definitions:
               type: string
             type: array
           single_as_scalar:
-            default: false
             description: If True and only a single field is selected, the transformed
               messages will be scalars rather than arrays with single elements. Defaults
               to False.

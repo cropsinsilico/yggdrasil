@@ -150,10 +150,12 @@ def register_example(example_dir):
                         continue
                     elif (lang == 'all_nomatlab') and (lsrc == 'matlab'):
                         continue
-                    src_names += glob.glob(os.path.join(srcdir,
-                                                        '*' + ext_map[lsrc]))
+                    src_names += sorted(
+                        glob.glob(os.path.join(srcdir,
+                                               '*' + ext_map[lsrc])))
             else:
-                src_names = glob.glob(os.path.join(srcdir, '*' + ext_map[lang]))
+                src_names = sorted(
+                    glob.glob(os.path.join(srcdir, '*' + ext_map[lang])))
         out_yml[lang] = [os.path.join(example_dir, y) for y in yml_names]
         if src_is_abs:
             out_src[lang] = src_names
