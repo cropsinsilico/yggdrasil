@@ -12,8 +12,27 @@ In the example below, the process represented by model B changes depending on th
 
 .. include:: examples/conditional_io_src.rst
 
-   To instruct |yggdrasil| to pass output from model A to the correct model B function under the required conditions, the YAML should contain a connection two both model B function inputs with the ``condition`` or ``condition_function`` parameter added to both.
+   To instruct |yggdrasil| to pass output from model A to the correct model B function under the required conditions, the YAML should contain a connection to both model B function inputs with the ``filter`` parameter added to both.
    
 .. include:: examples/conditional_io_yml.rst
 
-``condition`` values can be simple expressions of equality/inequality (in Python syntax) that reference the connection input as ``%x%`` (e.g. the condition for ``inputB1`` above). Alternatively, you can provide a value for the ``condition_function`` parameters. ``condition_function`` values should be of the form ``<filename>:<function name>`` where ``filename`` is the full path to the location of a Python source file containing the desired function that should be used to determine if the condition is satisfied and ``function name`` is the name of the desired funtion (e.g. the condition for ``inputB2`` above). Functions used in such cases should take a single argument (the variable or tuple of variables being passed by the connection), and return a boolean (the validity of the condition being represented). The path to the file containing the function can be absolute or relative to the directory containing the yaml file.
+``filter`` values are maps with either ``statement`` or ``function`` parameters (see :ref:`here <schema_table_filter_general_rst>`) and any additional filter parameters (see :ref:`here <schema_table_filter_specific_rst>`). ``statement`` filters are simple expressions of equality/inequality (in Python syntax) that reference the connection input as ``%x%`` (e.g. the filter for ``python_modelB1:input`` above). Alternatively, you can provide a value for the ``function`` parameter which encodes a filter using a Python function. ``function`` values should be of the form ``<filename>:<function name>`` where ``filename`` is the full path to the location of a Python source file containing the desired function that should be used to determine if the condition is satisfied and ``function name`` is the name of the desired funtion (e.g. the filter for ``python_modelB2:input`` above). Functions used in such cases should take a single argument (the variable or tuple of variables being passed by the connection), and return a boolean (the validity of the condition being represented). The path to the file containing the function can be absolute or relative to the directory containing the yaml file.
+
+
+Filter Options
+--------------
+
+General Filter Options
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: ../tables/schema_table_filter_general.rst
+
+
+.. include:: ../tables/schema_table_filter_subtype.rst
+
+
+Type Specific Filter Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: ../tables/schema_table_filter_specific.rst
+

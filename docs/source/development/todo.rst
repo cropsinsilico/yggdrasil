@@ -50,7 +50,7 @@ New feature/example
 * Create a set of fundamental tests that every language implementation needs to pass including files containing serialized data that needs to be deserialized and then serialized.
 * Changes 'bytes' type to 'ascii' since that is really what it means
 * Allow model specification in JSON in addition to YAML
-* Add dedicated classes for schemas and change name of C MetaschemaType to schema?
+* Change name of C MetaschemaType to schema?
 * Add flag to turn off validation
 * Add 'production' flag that turns off debug message, validation, and debug compilation flags for performance
 * Allow use of different 'default' communication mechanisms on different connections based on the languages involved
@@ -61,8 +61,9 @@ New feature/example
 * Run connections on separate processes instead of threads
 * Assign meanings to error codes and implement across languages
 * Add parameters constraining valid values for inputs/outputs (e.g. range) using JSON paramaters
-* Add properties to C/C++
 * Allow users to select from list of multiple possiblities when locating libraries to avoid conflict
+* Add CLI for running specific language version of a test
+* Write C/C++ as extension to rapidjson and wrap in Python
 
 Deprecation
 -----------
@@ -76,3 +77,4 @@ Testing
 * Test outside of conda on windows?
 * Update base test class for comm and connection drivers to use comm installation bool for generating unittest skip errors
 * testing for R native functions
+* Split test_examples runs into separate tests to allow more efficient treatment of flaky datatypes (instance in C/C++).
