@@ -212,7 +212,7 @@ def cc_flags():
 
     """
     from yggdrasil.drivers import CModelDriver
-    print(' '.join(CModelDriver.CModelDriver.get_compiler_flags()))
+    print(' '.join(CModelDriver.CModelDriver.get_compiler_flags(for_model=True)))
 
 
 def ld_flags():
@@ -224,7 +224,7 @@ def ld_flags():
 
     """
     from yggdrasil.drivers import CModelDriver
-    print(' '.join(CModelDriver.CModelDriver.get_linker_flags()))
+    print(' '.join(CModelDriver.CModelDriver.get_linker_flags(for_model=True)))
 
 
 def rebuild_c_api():
