@@ -316,7 +316,7 @@ def YggPandasInput(name, **kwargs):
 
 
 def YggPandasOutput(name, **kwargs):
-    r"""Get class for handling pandasd output.
+    r"""Get class for handling Pandas output.
 
     Args:
         name (str): The name of the message queue where output should be sent.

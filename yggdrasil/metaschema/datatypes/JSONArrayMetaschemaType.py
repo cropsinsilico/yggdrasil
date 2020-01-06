@@ -64,6 +64,32 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         return obj
 
     @classmethod
+    def encode_type(cls, obj, **kwargs):
+        r"""Encode an object's type definition.
+
+        Args:
+            obj (object): Object to encode.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            dict: Encoded type definition.
+
+        """
+        names = None
+        if isinstance(obj, pd.DataFrame):
+            names = obj.columns
+        elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
+            names = obj.dtype.names
+        out = super(JSONArrayMetaschemaType, cls).encode_type(obj, **kwargs)
+        if names is not None:
+            assert('items' in out)
+            assert(len(out['items']) == len(names))
+            for n, x in zip(names, out['items']):
+                x.setdefault('title', n)
+        return out
+        
+    @classmethod
     def coerce_type(cls, obj, typedef=None, key_order=None,
                     dont_wrap_single=False, **kwargs):
         r"""Coerce objects of specific types to match the data type.

@@ -343,18 +343,18 @@ class CommBase(tools.YggClass):
                                                        'that should be used.')},
                           'datatype': {'type': 'schema',
                                        'default': {'type': 'bytes'}},
-                          'recv_converter': {'oneOf': [
+                          'recv_converter': {'anyOf': [
                               {'$ref': '#/definitions/transform'},
                               {'type': ['function', 'string']},
                               {'type': 'array',
-                               'items': {'oneOf': [
+                               'items': {'anyOf': [
                                    {'$ref': '#/definitions/transform'},
                                    {'type': ['function', 'string']}]}}]},
-                          'send_converter': {'oneOf': [
+                          'send_converter': {'anyOf': [
                               {'$ref': '#/definitions/transform'},
                               {'type': ['function', 'string']},
                               {'type': 'array',
-                               'items': {'oneOf': [
+                               'items': {'anyOf': [
                                    {'$ref': '#/definitions/transform'},
                                    {'type': ['function', 'string']}]}}]},
                           'vars': {'type': 'array',
@@ -368,11 +368,11 @@ class CommBase(tools.YggClass):
                                           'items': {'type': 'string'}},
                           'as_array': {'type': 'boolean', 'default': False},
                           'filter': {'$ref': '#/definitions/filter'},
-                          'transform': {'oneOf': [
+                          'transform': {'anyOf': [
                               {'$ref': '#/definitions/transform'},
                               {'type': ['function', 'string']},
                               {'type': 'array',
-                               'items': {'oneOf': [
+                               'items': {'anyOf': [
                                    {'$ref': '#/definitions/transform'},
                                    {'type': ['function', 'string']}]}}]},
                           'is_default': {'type': 'boolean', 'default': False}}

@@ -1692,6 +1692,27 @@ class ModelDriver(Driver):
             list: Lines required to declare and define an output channel.
 
         """
+        dir_map = {'input': 'recv', 'output': 'send'}
+        try_keys = [dir_map[key] + '_converter', 'transform']
+        try_vals = []
+        for k in try_keys:
+            if k in kwargs:
+                v = kwargs[k]
+                if not isinstance(v, list):
+                    v = [v]
+                try_vals += v
+        if try_vals:
+            if len(try_vals) > 1:  # pragma: debug
+                raise NotImplementedError("Multiple transformations "
+                                          "not supported for model "
+                                          "input/output channels.")
+            if not isinstance(try_vals[0], str):  # pragma: debug
+                raise NotImplementedError(("Transformations of the "
+                                           "type '%s' not supported "
+                                           "for model input/output "
+                                           "channels.")
+                                          % type(try_vals[0]))
+            key = '%s_%s' % (try_vals[0], key)
         out = [cls.format_function_param(key, **kwargs)]
         return out
 

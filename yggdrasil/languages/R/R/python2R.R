@@ -81,6 +81,9 @@ python2R <- function(pyobj) {
       } else {
         out <- reticulate::py_to_r(pyobj)
       }
+      if (length(dim(out)) == 1) {
+        out <- as.vector(out)
+      }
     }
   } else if (is(pyobj, "python.builtin.NoneType")) {
     out <- NA

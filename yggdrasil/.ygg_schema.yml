@@ -66,43 +66,43 @@ definitions:
           description: Name used for component in log messages.
           type: string
         recv_converter:
+          anyOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              anyOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
           description: Converter that should be used on received objects. Defaults
             to None.
-          oneOf:
+        send_converter:
+          anyOf:
           - $ref: '#/definitions/transform'
           - type:
             - function
             - string
           - items:
-              oneOf:
+              anyOf:
               - $ref: '#/definitions/transform'
               - type:
                 - function
                 - string
             type: array
-        send_converter:
           description: Converter that should be used on sent objects. Defaults to
             None.
-          oneOf:
-          - $ref: '#/definitions/transform'
-          - type:
-            - function
-            - string
-          - items:
-              oneOf:
-              - $ref: '#/definitions/transform'
-              - type:
-                - function
-                - string
-            type: array
         transform:
-          oneOf:
+          anyOf:
           - $ref: '#/definitions/transform'
           - type:
             - function
             - string
           - items:
-              oneOf:
+              anyOf:
               - $ref: '#/definitions/transform'
               - type:
                 - function
@@ -115,9 +115,9 @@ definitions:
             type: string
           type: array
       required:
-      - commtype
-      - name
       - datatype
+      - name
+      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -242,8 +242,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -506,35 +506,35 @@ definitions:
           - readline
           type: string
         recv_converter:
+          anyOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              anyOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
           description: Converter that should be used on received objects. Defaults
             to None.
-          oneOf:
+        send_converter:
+          anyOf:
           - $ref: '#/definitions/transform'
           - type:
             - function
             - string
           - items:
-              oneOf:
+              anyOf:
               - $ref: '#/definitions/transform'
               - type:
                 - function
                 - string
             type: array
-        send_converter:
           description: Converter that should be used on sent objects. Defaults to
             None.
-          oneOf:
-          - $ref: '#/definitions/transform'
-          - type:
-            - function
-            - string
-          - items:
-              oneOf:
-              - $ref: '#/definitions/transform'
-              - type:
-                - function
-                - string
-            type: array
         serializer:
           default:
             seritype: direct
@@ -551,13 +551,13 @@ definitions:
             order. Defaults to True.
           type: boolean
         transform:
-          oneOf:
+          anyOf:
           - $ref: '#/definitions/transform'
           - type:
             - function
             - string
           - items:
-              oneOf:
+              anyOf:
               - $ref: '#/definitions/transform'
               - type:
                 - function
@@ -1314,10 +1314,10 @@ definitions:
             is used.
           type: string
       required:
-      - args
-      - language
       - working_dir
       - name
+      - language
+      - args
       title: model_base
       type: object
     - anyOf:
