@@ -65,6 +65,9 @@ definitions:
         name:
           description: Name used for component in log messages.
           type: string
+        outside_loop:
+          default: false
+          type: boolean
         recv_converter:
           anyOf:
           - $ref: '#/definitions/transform'
@@ -115,9 +118,9 @@ definitions:
             type: string
           type: array
       required:
+      - commtype
       - datatype
       - name
-      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -410,11 +413,6 @@ definitions:
           description: Delimiter that should be used to separate name/value pairs
             in the map. Defaults to \t.
           type: string
-        dont_write_header:
-          default: false
-          description: If True, headers will not be added to serialized tables. Defaults
-            to False.
-          type: boolean
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -497,6 +495,14 @@ definitions:
             '
           description: One or more characters indicating a newline. Defaults to '\n'.
           type: string
+        no_header:
+          default: false
+          description: If True, headers will not be read or serialized from/to tables.
+            Defaults to False.
+          type: boolean
+        outside_loop:
+          default: false
+          type: boolean
         read_meth:
           default: read
           description: Method that should be used to read data from the file. Defaults
@@ -585,9 +591,9 @@ definitions:
             is used.
           type: string
       required:
+      - filetype
       - working_dir
       - name
-      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -800,11 +806,6 @@ definitions:
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
-          dont_write_header:
-            default: false
-            description: If True, headers will not be added to serialized tables.
-              Defaults to False.
-            type: boolean
           filetype:
             default: binary
             description: The file is a Pandas frame output as a table.
@@ -824,6 +825,11 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
+          no_header:
+            default: false
+            description: If True, headers will not be read or serialized from/to tables.
+              Defaults to False.
+            type: boolean
           use_astropy:
             default: false
             description: If True, the astropy package will be used to serialize/deserialize
@@ -1314,10 +1320,10 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
-      - name
       - language
       - args
+      - name
+      - working_dir
       title: model_base
       type: object
     - anyOf:
@@ -1761,11 +1767,6 @@ definitions:
           description: Character(s) that should be used to separate columns. Defaults
             to '\t'.
           type: string
-        dont_write_header:
-          default: false
-          description: If True, headers will not be added to serialized tables. Defaults
-            to False.
-          type: boolean
         encoded_datatype:
           description: JSON schema describing the type that serialized objects should
             conform to. Defaults to the class attribute default_encoded_datatype.
@@ -1818,6 +1819,11 @@ definitions:
             '
           description: One or more characters indicating a newline. Defaults to '\n'.
           type: string
+        no_header:
+          default: false
+          description: If True, headers will not be read or serialized from/to tables.
+            Defaults to False.
+          type: boolean
         seritype:
           default: default
           description: Serializer type.
@@ -1914,11 +1920,6 @@ definitions:
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
-          dont_write_header:
-            default: false
-            description: If True, headers will not be added to serialized tables.
-              Defaults to False.
-            type: boolean
           field_names:
             description: The names of fields in the format string. If not provided,
               names are set based on the order of the fields in the format string.
@@ -1937,6 +1938,11 @@ definitions:
               in C printf/scanf style. Defaults to None and messages are assumed to
               already be bytes.
             type: string
+          no_header:
+            default: false
+            description: If True, headers will not be read or serialized from/to tables.
+              Defaults to False.
+            type: boolean
           seritype:
             default: default
             description: Serializes tables using the pandas package.

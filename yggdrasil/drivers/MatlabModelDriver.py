@@ -493,7 +493,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'function_def_begin': 'function {output_var} = {function_name}({input_var})',
         'function_def_regex': (
             r'function *(\[ *)?(?P<outputs>.*?)(?(1)\]) *'
-            r'= {function_name} *\((?P<inputs>(?:.|\n)*?)\)\n'
+            r'= *{function_name} *\((?P<inputs>(?:.|\n)*?)\)\n'
             r'(?:(?P<body>'
             r'(?:\s*if(?:.*?\n?)*?end;?)|'
             r'(?:\s*for(?:.*?\n?)*?end;?)|'

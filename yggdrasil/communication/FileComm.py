@@ -619,8 +619,10 @@ class FileComm(CommBase.CommBase):
             elif self.append and self.is_open:
                 self.fd.seek(prev_pos)
                 out = self.empty_bytes_msg
+                flag = True
             else:
                 out = self.eof_msg
+                flag = False
         else:
             out = out.replace(self.platform_newline, self.serializer.newline)
             if flag and (not self.is_eof(out)):

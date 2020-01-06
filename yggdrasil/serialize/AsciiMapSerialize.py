@@ -63,8 +63,9 @@ class AsciiMapSerialize(SerializeBase):
         lines = (backwards.as_str(msg)).split(
             backwards.as_str(self.newline))
         for l in lines:
-            kv = l.split(self.delimiter)
+            kv = [x for x in l.split(self.delimiter) if x]
             if len(kv) <= 1:
+                # TODO: Allow empty?
                 continue
             elif len(kv) == 2:
                 if kv[1].startswith("'") and kv[1].endswith("'"):

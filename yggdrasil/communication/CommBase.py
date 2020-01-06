@@ -285,6 +285,10 @@ class CommBase(tools.YggClass):
             all input/output variables to/from a model. Defaults to False. This
             variable is used internally and should not be set explicitly in
             the YAML.
+        outside_loop (bool, optional): If True, and the comm is an
+            input/outputs to/from a model being wrapped. The receive/send
+            calls for this comm will be outside the loop for the model.
+            Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -375,7 +379,9 @@ class CommBase(tools.YggClass):
                                'items': {'anyOf': [
                                    {'$ref': '#/definitions/transform'},
                                    {'type': ['function', 'string']}]}}]},
-                          'is_default': {'type': 'boolean', 'default': False}}
+                          'is_default': {'type': 'boolean', 'default': False},
+                          'outside_loop': {'type': 'boolean',
+                                           'default': False}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None

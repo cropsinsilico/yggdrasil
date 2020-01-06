@@ -1592,6 +1592,7 @@ class ModelDriver(Driver):
                                       "language '%s'" % cls.language)
         lines = []
         flag_var = {'name': 'flag', 'datatype': {'type': 'flag'}}
+        iter_var = {'name': 'first_iter', 'datatype': {'type': 'flag'}}
         if outputs_in_inputs is None:
             outputs_in_inputs = cls.outputs_in_inputs
         # Update types based on the function definition for typed languages
@@ -1604,6 +1605,8 @@ class ModelDriver(Driver):
         if 'declare' in cls.function_param:
             lines += cls.write_declaration(flag_var,
                                            requires_freeing=free_vars)
+            lines += cls.write_declaration(iter_var,
+                                           requires_freeing=free_vars)
             if model_flag:
                 lines += cls.write_declaration(
                     model_flag, requires_freeing=free_vars)
@@ -1613,6 +1616,9 @@ class ModelDriver(Driver):
                         v, requires_freeing=free_vars)
         lines.append(cls.format_function_param(
             'assign', name=flag_var['name'],
+            value=cls.function_param['true']))
+        lines.append(cls.format_function_param(
+            'assign', name=iter_var['name'],
             value=cls.function_param['true']))
         # Declare/define input and output channels
         for x in inputs:
@@ -1633,6 +1639,7 @@ class ModelDriver(Driver):
             if not x.get('outside_loop', False):
                 loop_lines += cls.write_model_recv(x['channel'], x,
                                                    flag_var=flag_var,
+                                                   iter_var=iter_var,
                                                    allow_failure=True)
         # Call model
         loop_lines += cls.write_model_function_call(
@@ -1643,6 +1650,9 @@ class ModelDriver(Driver):
             if not x.get('outside_loop', False):
                 loop_lines += cls.write_model_send(x['channel'], x,
                                                    flag_var=flag_var)
+        loop_lines.append(cls.format_function_param(
+            'assign', name=iter_var['name'],
+            value=cls.function_param['false']))
         # Add break if there are not any inputs
         if not inputs:
             loop_lines.append(cls.format_function_param(
@@ -1786,7 +1796,8 @@ checking if the model flag indicates
 
     @classmethod
     def write_model_recv(cls, channel, recv_var, flag_var='flag',
-                         allow_failure=False, alt_recv_function=None):
+                         iter_var=None, allow_failure=False,
+                         alt_recv_function=None):
         r"""Write a model receive call include checking the return flag.
 
         Args:
@@ -1796,6 +1807,10 @@ checking if the model flag indicates
                 receieved information should be stored in.
             flag_var (str, optional): Name of flag variable that the flag should
                 be stored in. Defaults to 'flag',
+            iter_var (str, optional): Name of flag signifying when the
+                model is in it's first iteration. If allow_failure is
+                True and iter_var is provided, an error will be raised
+                if iter_var is True. Defaults to None.
             allow_failure (bool, optional): If True, the returned lines will
                 call a break if the flag is False. Otherwise, the returned
                 lines will issue an error. Defaults to False.
@@ -1823,6 +1838,8 @@ checking if the model flag indicates
             recv_var_str = 'temp_%s' % recv_var_par[0]['name']
         if isinstance(flag_var, dict):
             flag_var = flag_var['name']
+        if isinstance(iter_var, dict):
+            iter_var = iter_var['name']
         if cls.outputs_in_inputs:
             inputs = [recv_var_str]
             outputs = [flag_var]
@@ -1848,6 +1865,12 @@ checking if the model flag indicates
             fail_message = 'End of input from %s.' % recv_var_str
             if_block = [cls.format_function_param('print', message=fail_message),
                         cls.function_param.get('break', 'break')]
+            if iter_var is not None:
+                if_block = cls.write_if_block(
+                    iter_var,
+                    [cls.format_function_param(
+                        'error', error_msg='No input from %s.' % recv_var_str)],
+                    if_block)
         else:
             if_block = [cls.format_function_param('error', error_msg=fail_message)]
         lines += cls.write_if_block(flag_cond, if_block)
