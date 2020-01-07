@@ -271,3 +271,24 @@ class MultiMetaschemaType(MetaschemaType):
                    {'type': 'array',
                     'items': {'enum': types}}]}}}
         return out
+
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        typedef = copy.deepcopy(typedef)
+        types = typedef.pop('type', [])
+        for t in types:
+            try:
+                return cls.type_classes[t].generate_data(
+                    {'type': t, **typedef})
+            except BaseException:
+                pass
+        raise NotImplementedError  # pragma: debug

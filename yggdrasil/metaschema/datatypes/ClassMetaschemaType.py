@@ -86,3 +86,16 @@ class ClassMetaschemaType(MetaschemaType):
             raise AttributeError("Module %s has no %s %s"
                                  % (modobj, cls.name, fun))
         return getattr(modobj, fun)
+
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        return ClassMetaschemaType

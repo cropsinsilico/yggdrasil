@@ -95,3 +95,21 @@ class InstanceMetaschemaType(MetaschemaType):
         kwargs = JSONObjectMetaschemaType.decode_data(
             obj[1], {'properties': typedef.get('kwargs', {})})
         return typedef['class'](*args, **kwargs)
+
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        typedef = cls.normalize_definition(typedef)
+        args = JSONArrayMetaschemaType.generate_data(
+            {'type': 'array', 'items': typedef.get('args', [])})
+        kwargs = JSONObjectMetaschemaType.generate_data(
+            {'type': 'object', 'properties': typedef.get('kwargs', {})})
+        return typedef['class'](*args, **kwargs)

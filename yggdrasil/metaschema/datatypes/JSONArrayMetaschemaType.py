@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from yggdrasil.metaschema.datatypes import generate_data
 from yggdrasil.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
 
@@ -204,3 +205,23 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             return container
         return super(JSONArrayMetaschemaType, cls)._get_element(
             container, index, default)
+
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        if isinstance(typedef[cls._json_property], dict):
+            nitems = typedef.get('minItems', 1)
+            out = cls._container_type()
+            for i in range(nitems):
+                cls._assign(out, i, generate_data(typedef[cls._json_property]))
+        else:
+            out = super(JSONArrayMetaschemaType, cls)._generate_data(typedef)
+        return out

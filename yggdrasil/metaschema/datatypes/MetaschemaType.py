@@ -740,6 +740,36 @@ class MetaschemaType(object):
 
     # TESTING METHODS
     @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        raise NotImplementedError  # pragma: debug
+    
+    @classmethod
+    def generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        cls.validate_definition(typedef)
+        typedef = cls.normalize_definition(typedef)
+        if hasattr(cls, 'example_data'):
+            return cls.example_data
+        return cls._generate_data(typedef)
+    
+    @classmethod
     def import_test_class(cls):
         r"""Import the test class for this class.
 

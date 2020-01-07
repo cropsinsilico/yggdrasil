@@ -1,6 +1,7 @@
 import jsonschema
 import copy
-from yggdrasil.metaschema.datatypes import compare_schema
+from yggdrasil.metaschema.datatypes import (
+    compare_schema, generate_data, resolve_schema_references)
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
@@ -124,6 +125,10 @@ class FixedMetaschemaType(MetaschemaType):
                 else:
                     out[k] = v
             out['type'] = cls.base().name
+        if 'definitions' in cls.fixed_properties:
+            out['definitions'] = cls.fixed_properties['definitions']
+            out = resolve_schema_references(out)
+            out.pop('definitions')
         # if cls.base().is_fixed:
         #     out = cls.base().typedef_fixed2base(out)
         return out
@@ -289,3 +294,17 @@ class FixedMetaschemaType(MetaschemaType):
             kwargs = self.__class__.typedef_base2fixed(kwargs)
         out = super(FixedMetaschemaType, self).update_typedef(**kwargs)
         return out
+
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        typedef0 = cls.typedef_fixed2base(typedef)
+        return generate_data(typedef0)

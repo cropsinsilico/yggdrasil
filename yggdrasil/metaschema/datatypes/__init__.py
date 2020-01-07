@@ -471,35 +471,35 @@ def decode(msg):
     return obj
 
 
-# def resolve_schema_references(schema, resolver=None):
-#     r"""Resolve references within a schema.
-#
-#     Args:
-#         schema (dict): Schema with references to resolve.
-#         top_level (dict, optional): Reference to the top level schema.
-#
-#     Returns:
-#         dict: Schema with references replaced with internal references.
-#
-#     """
-#     if resolver is None:
-#         if 'definitions' not in schema:
-#             return schema
-#         out = copy.deepcopy(schema)
-#         resolver = jsonschema.RefResolver.from_schema(out)
-#     else:
-#         out = schema
-#     if isinstance(out, dict):
-#         if (len(out) == 1) and ('$ref' in out):
-#             scope, resolved = resolver.resolve(out['$ref'])
-#             out = resolved
-#         else:
-#             for k, v in out.items():
-#                 out[k] = resolve_schema_references(v, resolver=resolver)
-#     elif isinstance(out, (list, tuple)):
-#         for i in range(len(out)):
-#             out[i] = resolve_schema_references(out[i])
-#     return out
+def resolve_schema_references(schema, resolver=None):
+    r"""Resolve references within a schema.
+
+    Args:
+        schema (dict): Schema with references to resolve.
+        top_level (dict, optional): Reference to the top level schema.
+
+    Returns:
+        dict: Schema with references replaced with internal references.
+
+    """
+    if resolver is None:
+        if 'definitions' not in schema:
+            return schema
+        out = copy.deepcopy(schema)
+        resolver = jsonschema.RefResolver.from_schema(out)
+    else:
+        out = schema
+    if isinstance(out, dict):
+        if (len(out) == 1) and ('$ref' in out):
+            scope, resolved = resolver.resolve(out['$ref'])
+            out = resolved
+        else:
+            for k, v in out.items():
+                out[k] = resolve_schema_references(v, resolver=resolver)
+    elif isinstance(out, (list, tuple)):
+        for i in range(len(out)):
+            out[i] = resolve_schema_references(out[i], resolver=resolver)
+    return out
 
 
 def compare_schema(schema1, schema2, root1=None, root2=None):
@@ -577,3 +577,17 @@ def compare_schema(schema1, schema2, root1=None, root2=None):
                 yield e
     except BaseException as e:
         yield e
+
+
+def generate_data(typedef):
+    r"""Generate mock data for the specified type.
+
+    Args:
+        typedef (dict): Type definition.
+
+    Returns:
+        object: Python object of the specified type.
+
+    """
+    type_cls = get_type_class(typedef['type'])
+    return type_cls.generate_data(typedef)

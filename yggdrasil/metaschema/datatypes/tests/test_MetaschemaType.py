@@ -99,6 +99,15 @@ class TestMetaschemaType(YggTestClassInfo):
                                      "%s vs. %s" % (type(x), type(y)))
             assert_equal(x, y)
 
+    def test_generate_data(self):
+        r"""Test generation of data."""
+        if self._cls == 'MetaschemaType':
+            return
+        if len(self._valid_encoded) > 0:
+            typedef = self._valid_encoded[0]
+            data = self.import_cls.generate_data(typedef)
+            self.import_cls.validate(data, raise_errors=True)
+
     def test_issubtype(self):
         r"""Test issubtype."""
         if self._cls == 'MetaschemaType':
