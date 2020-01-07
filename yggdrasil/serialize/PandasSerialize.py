@@ -29,8 +29,8 @@ class PandasSerialize(AsciiTableSerialize):
 
     def __init__(self, *args, **kwargs):
         self.write_header_once = False
-        if 'dont_write_header' in kwargs:
-            kwargs['no_header'] = kwargs.pop('dont_write_header')
+        self.dont_write_header = kwargs.pop('dont_write_header',
+                                            kwargs.get('no_header', False))
         return super(PandasSerialize, self).__init__(*args, **kwargs)
 
     @property
@@ -116,9 +116,9 @@ class PandasSerialize(AsciiTableSerialize):
                      # line_terminator=backwards.as_str(self.newline),
                      sep=backwards.as_str(self.delimiter),
                      mode='wb', encoding='utf8',
-                     header=(not self.no_header))
+                     header=(not self.dont_write_header))
         if self.write_header_once:
-            self.no_header = True
+            self.dont_write_header = True
         out = fd.getvalue()
         fd.close()
         # Required to change out \r\n for \n on windows
@@ -337,13 +337,13 @@ class PandasSerialize(AsciiTableSerialize):
     def enable_file_header(self):
         r"""Set serializer attributes to enable file headers to be included in
         the serializations."""
-        self.no_header = False
+        self.dont_write_header = False
         self.write_header_once = True
 
     def disable_file_header(self):
         r"""Set serializer attributes to disable file headers from being
         included in the serializations."""
-        self.no_header = True
+        self.dont_write_header = True
         self.write_header_once = True
         
     def serialize_file_header(self):
