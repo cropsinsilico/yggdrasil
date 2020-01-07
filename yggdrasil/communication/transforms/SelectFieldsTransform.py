@@ -222,4 +222,4 @@ class SelectFieldsTransform(TransformBase):
                                                    'formats': ['i4', 'i4', 'i4']})),
                              np.zeros(3, np.dtype('i4')))]},
                 {'kwargs': {'selected': ['a', 'b']},
-                 'in/out': [(None, TypeError)]}]
+                 'in/out': [(None, AssertionError)]}]

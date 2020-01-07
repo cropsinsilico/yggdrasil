@@ -118,9 +118,9 @@ definitions:
             type: string
           type: array
       required:
-      - commtype
-      - datatype
       - name
+      - datatype
+      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -591,9 +591,9 @@ definitions:
             is used.
           type: string
       required:
+      - name
       - filetype
       - working_dir
-      - name
       title: file_base
       type: object
     - anyOf:
@@ -1320,9 +1320,9 @@ definitions:
             is used.
           type: string
       required:
+      - name
       - language
       - args
-      - name
       - working_dir
       title: model_base
       type: object
@@ -2163,9 +2163,11 @@ definitions:
           type: string
         transformtype:
           enum:
+          - array
           - direct
           - function
           - map_fields
+          - pandas
           - select_fields
           - statement
       title: transform_base
@@ -2254,6 +2256,22 @@ definitions:
         required:
         - map
         title: MapFieldsTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['array'] subtype.
+        properties:
+          transformtype:
+            enum:
+            - array
+        title: ArrayTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['pandas'] subtype.
+        properties:
+          transformtype:
+            enum:
+            - pandas
+        title: PandasTransform
         type: object
     description: Schema for transform components.
     title: transform
