@@ -3,6 +3,7 @@ import glob
 import jsonschema
 import copy
 import importlib
+import numpy as np
 from collections import OrderedDict
 from yggdrasil.metaschema.encoder import decode_json
 from yggdrasil.metaschema.properties import get_metaschema_property
@@ -591,3 +592,37 @@ def generate_data(typedef):
     """
     type_cls = get_type_class(typedef['type'])
     return type_cls.generate_data(typedef)
+
+
+def type2numpy(typedef):
+    r"""Convert a type definition into a numpy dtype.
+
+    Args:
+        typedef (dict): Type definition.
+
+    Returns:
+        np.dtype: Numpy data type.
+
+    """
+    from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
+        definition2dtype)
+    out = None
+    if ((isinstance(typedef, dict) and ('type' in typedef)
+         and (typedef['type'] == 'array') and ('items' in typedef))):
+        if isinstance(typedef['items'], dict):
+            as_array = (typedef['items']['type'] in ['1darray', 'ndarray'])
+            if as_array:
+                out = definition2dtype(typedef['items'])
+        elif isinstance(typedef['items'], (list, tuple)):
+            as_array = True
+            dtype_list = []
+            field_names = []
+            for i, x in enumerate(typedef['items']):
+                if x['type'] != '1darray':
+                    as_array = False
+                    break
+                dtype_list.append(definition2dtype(x))
+                field_names.append(x.get('title', 'f%d' % i))
+            if as_array:
+                out = np.dtype(dict(names=field_names, formats=dtype_list))
+    return out
