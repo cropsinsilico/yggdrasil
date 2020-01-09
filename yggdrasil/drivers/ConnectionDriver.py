@@ -80,12 +80,14 @@ class ConnectionDriver(Driver):
         'inputs': {'type': 'array', 'minItems': 1,
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                        {'$ref': '#/definitions/file'}]},
+                   'default': [{}],
                    'description': ('One or more name(s) of model output(s) '
                                    'and/or new comm/file objects that the '
                                    'connection should receive messages from.')},
         'outputs': {'type': 'array', 'minItems': 1,
                     'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                         {'$ref': '#/definitions/file'}]},
+                    'default': [{}],
                     'description': ('One or more name(s) of model input(s) '
                                     'and/or new comm/file objects that the '
                                     'connection should send messages to.')},
@@ -94,7 +96,6 @@ class ConnectionDriver(Driver):
                            {'type': 'function'},
                            {'$ref': '#/definitions/transform'}]}},
         'onexit': {'type': 'string'}}
-    _schema_excluded_from_class_validation = ['inputs', 'outputs']
 
     @property
     def _is_input(self):
