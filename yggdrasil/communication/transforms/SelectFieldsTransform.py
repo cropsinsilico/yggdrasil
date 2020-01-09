@@ -32,7 +32,8 @@ class SelectFieldsTransform(TransformBase):
         """
         super(SelectFieldsTransform, self).set_original_datatype(datatype)
         if not self.original_order:
-            if datatype['type'] == 'array':
+            if (((datatype['type'] == 'array')
+                 and isinstance(datatype['items'], list))):
                 self.original_order = [x.get('title', 'f%d' % i) for i, x in
                                        enumerate(self.original_datatype['items'])]
             elif datatype['type'] == 'object':
@@ -161,7 +162,10 @@ class SelectFieldsTransform(TransformBase):
                                 'properties': {x: {'type': 'int'}
                                                for x in 'abc'}},
                                {'type': 'int'})]},
-                {'kwargs': {'selected': ['a', 'c']},
+                {'kwargs': {'selected': ['a', 'c'],
+                            'original_datatype': {
+                                'type': 'array',
+                                'items': {'type': 'int'}}},
                  'in/out': [([0, 1, 2], ValueError)]},
                 {'kwargs': {'selected': ['a', 'c'],
                             'original_datatype': {
@@ -221,5 +225,8 @@ class SelectFieldsTransform(TransformBase):
                  'in/out': [(np.zeros(3, np.dtype({'names': ['a', 'b', 'c'],
                                                    'formats': ['i4', 'i4', 'i4']})),
                              np.zeros(3, np.dtype('i4')))]},
-                {'kwargs': {'selected': ['a', 'b']},
-                 'in/out': [(None, AssertionError)]}]
+                {'kwargs': {'selected': ['a', 'b'],
+                            'original_datatype': {
+                                'type': 'array',
+                                'items': {'type': 'int'}}},
+                 'in/out': [(None, TypeError)]}]

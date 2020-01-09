@@ -3,7 +3,7 @@ import copy
 import pandas
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.metaschema.datatypes import type2numpy
-from yggdrasil.serialize import consolidate_array, pandas2numpy
+from yggdrasil.serialize import consolidate_array, pandas2numpy, numpy2pandas
 
 
 class ArrayTransform(TransformBase):
@@ -91,6 +91,9 @@ class ArrayTransform(TransformBase):
         y = [x[n] for n in dtype.names]
         return [{'kwargs': {'original_datatype': t},
                  'in/out': [(y, x)],
+                 'in/out_t': [(t, t)]},
+                {'kwargs': {'original_datatype': t},
+                 'in/out': [(numpy2pandas(x), x)],
                  'in/out_t': [(t, t)]},
                 {'kwargs': {},
                  'in/out': [([0, 1, 2], TypeError)]}]
