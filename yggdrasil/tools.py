@@ -5,6 +5,7 @@ import logging
 import pprint
 import os
 import sys
+import sysconfig
 import copy
 import shutil
 import inspect
@@ -95,6 +96,79 @@ def check_environ_bool(name, valid_values=['true', '1', True, 1]):
     return (os.environ.get(name, '').lower() in valid_values)
 
 
+def get_python_c_library(allow_failure=False, libtype=None):
+    r"""Determine the location of the Python C API library.
+
+    Args:
+        allow_failure (bool, optional): If True, the base name will be returned
+            if the file cannot be located. Defaults to False.
+        libtype (str, optional): Type of library that should be located.
+            Valid values include 'static' and 'shared'. Defaults to 'shared'
+            on Unix OSs and 'static' on Windows.
+
+    Returns:
+        str: Full path to the library.
+
+    Raises:
+        ValueError: If libtype is not 'static' or 'shared'.
+        RuntimeError: If the base name for the library cannot be determined.
+        RuntimeError: If the library cannot be located.
+
+    """
+    if libtype not in ['static', 'shared', None]:  # pragma: debug
+        raise ValueError("libtype must be 'shared' or 'static', "
+                         "'%s' not supported." % libtype)
+    paths = sysconfig.get_paths()
+    cvars = sysconfig.get_config_vars()
+    if platform._is_win:  # pragma: windows
+        if libtype is None:
+            libtype = 'static'
+        libtype2ext = {'shared': '.dll', 'static': '.lib'}
+        base = 'python%s%s' % (cvars['py_version_nodot'],
+                               libtype2ext[libtype])
+    else:
+        if libtype is None:
+            libtype = 'shared'
+        libtype2key = {'shared': 'LDLIBRARY', 'static': 'LIBRARY'}
+        base = cvars.get(libtype2key[libtype], None)
+        if platform._is_mac and base.endswith('/Python'):  # pragma: osx
+            base = 'libpython%s.dylib' % cvars['py_version_short']
+    if base is None:  # pragma: debug
+        raise RuntimeError(("Could not determine base name for the Python "
+                            "C API library.\n"
+                            "sysconfig.get_paths():\n%s\n"
+                            "sysconfig.get_config_vars():\n%s\n")
+                           % (pprint.pformat(paths),
+                              pprint.pformat(cvars)))
+    dir_try = []
+    if cvars['prefix']:
+        dir_try.append(cvars['prefix'])
+        if platform._is_win:  # pragma: windows
+            dir_try.append(os.path.join(cvars['prefix'], 'libs'))
+        else:
+            dir_try.append(os.path.join(cvars['prefix'], 'lib'))
+    if cvars.get('LIBDIR', None):
+        dir_try.append(cvars['LIBDIR'])
+    if cvars.get('LIBDEST', None):
+        dir_try.append(cvars['LIBDEST'])
+    for k in ['stdlib', 'purelib', 'platlib', 'platstdlib', 'data']:
+        dir_try.append(paths[k])
+    dir_try.append(os.path.join(paths['data'], 'lib'))
+    dir_try = set(dir_try)
+    for idir in dir_try:
+        x = os.path.join(idir, base)
+        if os.path.isfile(x):
+            return x
+    if allow_failure:  # pragma: debug
+        return base
+    raise RuntimeError(("Could not determine the location of the Python "
+                        "C API library: %s.\n"
+                        "sysconfig.get_paths():\n%s\n"
+                        "sysconfig.get_config_vars():\n%s\n")
+                       % (base, pprint.pformat(paths),
+                          pprint.pformat(cvars)))  # pragma: debug
+
+
 def get_conda_prefix():
     r"""Determine the conda path prefix for the current environment.
 
@@ -163,7 +237,10 @@ def ygg_atexit():  # pragma: debug
     check_threads()
     if not is_subprocess():
         check_sockets()
-    if backwards.PY34:
+    # Python 3.4 no longer supported if using pip 9.0.0, but this
+    # allows the code to work if somehow installed using an older
+    # version of pip
+    if backwards.PY34:  # pragma: no cover
         # Print empty line to ensure close
         print('', end='')
         sys.stdout.flush()
@@ -225,6 +302,53 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
     return out
 
 
+def remove_path(fpath, timer_class=None, timeout=None):
+    r"""Delete a single file.
+
+    Args:
+        fpath (str): Full path to a file or directory that should be
+            removed.
+        timer_class (YggClass, optional): Class that should be used to
+            generate a timer that is used to wait for file to be removed.
+            Defaults to None and a new class instance will be created.
+        timeout (float, optional): Time (in seconds) that should be
+            waited before raising an error that a file cannot be removed.
+            Defaults to None and will be set by the timer_class.
+
+    Raises:
+        RuntimeError: If the product cannot be removed.
+
+    """
+    if timer_class is None:
+        timer_class = YggClass()
+    if os.path.isdir(fpath):
+        T = timer_class.start_timeout(t=timeout)
+        while ((not T.is_out) and os.path.isdir(fpath)):
+            try:
+                shutil.rmtree(fpath)
+            except BaseException:  # pragma: debug
+                if os.path.isdir(fpath):
+                    timer_class.sleep()
+                if T.is_out:
+                    raise
+        timer_class.stop_timeout()
+        if os.path.isdir(fpath):  # pragma: debug
+            raise RuntimeError("Failed to remove directory: %s" % fpath)
+    elif os.path.isfile(fpath):
+        T = timer_class.start_timeout(t=timeout)
+        while ((not T.is_out) and os.path.isfile(fpath)):
+            try:
+                os.remove(fpath)
+            except BaseException:  # pragma: debug
+                if os.path.isfile(fpath):
+                    timer_class.sleep()
+                if T.is_out:
+                    raise
+        timer_class.stop_timeout()
+        if os.path.isfile(fpath):  # pragma: debug
+            raise RuntimeError("Failed to remove file: %s" % fpath)
+
+
 def get_supported_platforms():
     r"""Get a list of the platforms supported by yggdrasil.
 
@@ -253,6 +377,17 @@ def get_supported_lang():
     if 'r' in out:
         out[out.index('r')] = 'R'
     return list(set(out))
+
+
+def get_supported_type():
+    r"""Get a list of the data types that are supported by yggdrasil.
+
+    Returns:
+        list: The names of data types supported by yggdrasil.
+
+    """
+    from yggdrasil.metaschema.datatypes import get_registered_types
+    return list(get_registered_types().keys())
 
 
 def get_supported_comm():

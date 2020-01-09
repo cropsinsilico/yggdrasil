@@ -62,29 +62,34 @@ class CPPModelDriver(CModelDriver):
     # To prevent inheritance
     default_compiler = None
     default_linker = None
-    type_map = dict(
-        CModelDriver.type_map,
-        array='std::vector<void*>',
-        object='std::map<char*,void*>',
-        schema='MetaschemaType')
     function_param = dict(
         CModelDriver.function_param,
         input='YggInput {channel}(\"{channel_name}\", {channel_type});',
         output='YggOutput {channel}(\"{channel_name}\", {channel_type});',
+        recv_heap='{channel}.recvRealloc',
+        recv_stack='{channel}.recv',
         recv_function='{channel}.recvRealloc',
         send_function='{channel}.send',
         exec_prefix=('#include <iostream>\n'
                      '#include <exception>\n'),
+        print_generic='std::cout << {object} << std::endl << std::flush;',
         error='throw \"{error_msg}\";',
         try_begin='try {',
         try_error_type='const std::exception&',
         try_except='}} catch ({error_type} {error_var}) {{',
-        function_def_regex=(r'(?P<flag_type>.+?)\s*{function_name}\s*'
-                            r'\((?P<inputs>(?:[^)&])*?)'
-                            r'(?:,\s*(?P<outputs>(?:[^)])*?&(?:[^)])*?))?\)\s*\{{'),
-        outputs_def_regex=(r'\s*(?P<native_type>.+?)(\s+)?'
-                           r'(?P<ref>&)(?(1)(?:\s*)|(?:\s+))'
-                           r'(?P<name>.+?)\s*(?:,|$)(?:\n)?'))
+        function_def_regex=(
+            r'(?P<flag_type>.+?)\s*{function_name}\s*'
+            r'\((?P<inputs>(?:[^{{&])*?)'
+            r'(?:,\s*(?P<outputs>'
+            r'(?:\s*(?:[^\s])+(?:\s+)(?:\()?&(?:[^{{])+)+'
+            r'))?\)\s*\{{'
+            r'(?P<body>(?:.*?\n?)*?)'
+            r'(?:(?:return +(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
+            r'|(?:\}}))'),
+        outputs_def_regex=(
+            r'\s*(?P<native_type>(?:[^\s])+)(\s+)?'
+            r'(\()?(?P<ref>&)(?(1)(?:\s*)|(?:\s+))'
+            r'(?P<name>.+?)(?(2)(?:\)|(?:)))(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?'))
     include_arg_count = True
     include_channel_obj = False
     
@@ -161,44 +166,32 @@ class CPPModelDriver(CModelDriver):
             try_contents, except_contents, **kwargs)
 
     @classmethod
-    def input2output(cls, var):
-        r"""Perform conversion necessary to turn a variable extracted from a
-        function definition from an input to an output.
+    def output2input(cls, var, in_definition=True):
+        r"""Perform conversion necessary to turn an output variable
+        into an corresponding input that can be used to format a
+        function definition.
 
         Args:
             var (dict): Variable definition.
+            in_definition (bool, optional): If True, the returned
+                dictionary corresponds to an input variable in a
+                function definition. If False, the returned value
+                will correspond to an input to a function. Defaults to
+                True.
 
         Returns:
             dict: Updated variable definition.
 
         """
-        if var['name'].startswith('&'):
-            var['name'] = var['name'][1:]
-        elif var['native_type'].endswith('&'):
-            var['native_type'] = var['native_type'][:-1]
-        else:
-            return super(CPPModelDriver, cls).input2output(var)
-        return super(CModelDriver, cls).input2output(var)
-
-    @classmethod
-    def prepare_output_variables(cls, vars_list, in_inputs=False):
-        r"""Concatenate a set of output variables such that it can be passed as
-        a single string to the function_call parameter.
-
-        Args:
-            vars_list (list): List of variable names to concatenate as output
-                from a function call.
-            in_inputs (bool, optional): If True, the output variables should
-                be formated to be included as input variables. Defaults to
-                False.
-
-        Returns:
-            str: Concatentated variables list.
-
-        """
-        if in_inputs:
-            vars_list = copy.deepcopy(vars_list)
-            for y in vars_list:
-                if not y.get('ref', False):
-                    y['name'] = '&' + y['name']
-        return super(CModelDriver, cls).prepare_output_variables(vars_list)
+        out = super(CModelDriver, cls).output2input(var)
+        if isinstance(var, dict):
+            if in_definition:
+                out = dict(out, name='&' + out['name'])
+                if ((('shape' in out.get('datatype', {}))
+                     or ('length' in out.get('datatype', {})))):
+                    out['name'] = '(%s)' % out['name']
+            else:
+                if not (out.get('ref', False)
+                        or out.get('is_length_var', False)):
+                    out = dict(out, name='&' + out['name'])
+        return out

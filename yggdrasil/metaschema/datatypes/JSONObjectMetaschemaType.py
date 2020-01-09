@@ -53,7 +53,8 @@ class JSONObjectMetaschemaType(ContainerMetaschemaType):
             obj = numpy2dict(obj)
         elif isinstance(obj, (list, tuple)) and (key_order is not None):
             obj = list2dict(obj, names=key_order)
-        return obj
+        return super(JSONObjectMetaschemaType, cls).coerce_type(
+            obj, typedef=typedef, **kwargs)
 
     @classmethod
     def _iterate(cls, container):

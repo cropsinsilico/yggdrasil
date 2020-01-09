@@ -25,19 +25,7 @@ int main(int argc, char *argv[]) {
 
     // Print received message
     printf("Model A: (%d verts, %d faces)\n", p.nvert, p.nface);
-    int i, j;
-    printf("  Vertices:\n");
-    for (i = 0; i < p.nvert; i++) {
-      printf("   %f, %f, %f\n",
-	     p.vertices[i][0], p.vertices[i][1], p.vertices[i][2]);
-    }
-    printf("  Faces:\n");
-    for (i = 0; i < p.nface; i++) {
-      printf("   %d", p.faces[i][0]);
-      for (j = 1; j < p.nvert_in_face[i]; j++)
-	printf(", %d", p.faces[i][j]);
-      printf("\n");
-    }
+    display_ply_indent(p, "  ");
 
     // Send output to output channel
     // If there is an error, the flag will be negative

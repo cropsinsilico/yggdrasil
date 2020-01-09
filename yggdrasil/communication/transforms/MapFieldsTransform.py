@@ -37,7 +37,7 @@ class MapFieldsTransform(TransformBase):
         elif datatype.get('type', None) == 'object':
             datatype = copy.deepcopy(datatype)
             for kold, knew in self.map.items():
-                datatype['properties'][kold] = datatype['properties'].pop(knew)
+                datatype['properties'][knew] = datatype['properties'].pop(kold)
         return datatype
     
     def transform_field_names(self, field_names):
@@ -97,9 +97,25 @@ class MapFieldsTransform(TransformBase):
         """
         return [{'kwargs': {'map': {'a': 'aa', 'c': 'cc'}},
                  'in/out': [(dict(zip('abc', range(3))),
-                             {'aa': 0, 'b': 1, 'cc': 2})]},
+                             {'aa': 0, 'b': 1, 'cc': 2})],
+                 'in/out_t': [
+                     ({'type': 'object',
+                       'properties': {
+                           x: {'type': 'int'}
+                           for x in 'abc'}},
+                      {'type': 'object',
+                       'properties': {
+                           x: {'type': 'int'}
+                           for x in ['aa', 'b', 'cc']}})]},
                 {'kwargs': {'map': {'a': 'aa', 'c': 'cc'}},
-                 'in/out': [([0, 1, 2], [0, 1, 2])]},
+                 'in/out': [([0, 1, 2], [0, 1, 2])],
+                 'in/out_t': [
+                     ({'type': 'array',
+                       'items': [{'type': 'int', 'title': x}
+                                 for x in 'abc']},
+                      {'type': 'array',
+                       'items': [{'type': 'int', 'title': x}
+                                 for x in ['aa', 'b', 'cc']]})]},
                 {'kwargs': {'map': {'a': 'aa', 'c': 'cc'}},
                  'in/out': [(np.zeros(3, np.dtype({'names': ['a', 'b', 'c'],
                                                    'formats': ['i4', 'i4', 'i4']})),

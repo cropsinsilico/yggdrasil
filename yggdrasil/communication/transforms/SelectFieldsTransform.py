@@ -21,8 +21,7 @@ class SelectFieldsTransform(TransformBase):
                                        'items': {'type': 'string'}},
                           'original_order': {'type': 'array',
                                              'items': {'type': 'string'}},
-                          'single_as_scalar': {'type': 'boolean',
-                                               'default': False}}
+                          'single_as_scalar': {'type': 'boolean'}}
 
     def set_original_datatype(self, datatype):
         r"""Set datatype.
@@ -152,17 +151,88 @@ class SelectFieldsTransform(TransformBase):
                 keywords.
         
         """
-        return [{'kwargs': {'selected': ['a', 'c']},
-                 'in/out': [(dict(zip('abc', range(3))), {'a': 0, 'c': 2})]},
+        return [{'kwargs': {'selected': ['a', 'c'],
+                            'original_datatype': {
+                                'type': 'object',
+                                'properties': {x: {'type': 'int'}
+                                               for x in 'abc'}}},
+                 'in/out': [(dict(zip('abc', range(3))), {'a': 0, 'c': 2})],
+                 'in/out_t': [({'type': 'object',
+                                'properties': {x: {'type': 'int'}
+                                               for x in 'abc'}},
+                               {'type': 'object',
+                                'properties': {x: {'type': 'int'}
+                                               for x in 'ac'}})]},
+                {'kwargs': {'selected': ['a'],
+                            'single_as_scalar': True,
+                            'original_datatype': {
+                                'type': 'object',
+                                'properties': {x: {'type': 'int'}
+                                               for x in 'abc'}}},
+                 'in/out': [(dict(zip('abc', range(3))), 0)],
+                 'in/out_t': [({'type': 'object',
+                                'properties': {x: {'type': 'int'}
+                                               for x in 'abc'}},
+                               {'type': 'int'})]},
                 {'kwargs': {'selected': ['a', 'c']},
                  'in/out': [([0, 1, 2], ValueError)]},
                 {'kwargs': {'selected': ['a', 'c'],
-                            'original_order': ['a', 'b', 'c']},
-                 'in/out': [([0, 1, 2], [0, 2])]},
+                            'original_datatype': {
+                                'type': 'array',
+                                'items': [
+                                    {'type': 'int', 'title': x}
+                                    for x in 'abc']}},
+                 'in/out': [([0, 1, 2], [0, 2])],
+                 'in/out_t': [({'type': 'array',
+                                'items': [
+                                    {'type': 'int', 'title': x}
+                                    for x in 'abc']},
+                               {'type': 'array',
+                                'items': [
+                                    {'type': 'int', 'title': x}
+                                    for x in 'ac']})]},
+                {'kwargs': {'selected': ['a', 'c'],
+                            'original_order': ['a', 'b', 'c'],
+                            'original_datatype': {
+                                'type': 'array',
+                                'items': {'type': 'int'}}},
+                 'in/out': [([0, 1, 2], [0, 2])],
+                 'in/out_t': [({'type': 'array',
+                                'items': {'type': 'int'}},
+                               {'type': 'array',
+                                'items': {'type': 'int'}})]},
+                {'kwargs': {'selected': ['a'],
+                            'single_as_scalar': True,
+                            'original_datatype': {
+                                'type': 'array',
+                                'items': [
+                                    {'type': 'int', 'title': x}
+                                    for x in 'abc']}},
+                 'in/out': [([0, 1, 2], 0)],
+                 'in/out_t': [({'type': 'array',
+                                'items': [
+                                    {'type': 'int', 'title': x}
+                                    for x in 'abc']},
+                               {'type': 'int', 'title': 'a'})]},
+                {'kwargs': {'selected': ['a'],
+                            'single_as_scalar': True,
+                            'original_order': ['a', 'b', 'c'],
+                            'original_datatype': {
+                                'type': 'array',
+                                'items': {'type': 'int'}}},
+                 'in/out': [([0, 1, 2], 0)],
+                 'in/out_t': [({'type': 'array',
+                                'items': {'type': 'int'}},
+                               {'type': 'int'})]},
                 {'kwargs': {'selected': ['a', 'c']},
                  'in/out': [(np.zeros(3, np.dtype({'names': ['a', 'b', 'c'],
                                                    'formats': ['i4', 'i4', 'i4']})),
                              np.zeros(3, np.dtype({'names': ['a', 'c'],
                                                    'formats': ['i4', 'i4']})))]},
+                {'kwargs': {'selected': ['a'],
+                            'single_as_scalar': True},
+                 'in/out': [(np.zeros(3, np.dtype({'names': ['a', 'b', 'c'],
+                                                   'formats': ['i4', 'i4', 'i4']})),
+                             np.zeros(3, np.dtype('i4')))]},
                 {'kwargs': {'selected': ['a', 'b']},
-                 'in/out': [(None, TypeError)]}]
+                 'in/out': [(None, AssertionError)]}]

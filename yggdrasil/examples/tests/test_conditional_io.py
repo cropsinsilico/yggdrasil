@@ -10,11 +10,6 @@ class TestExampleConditionalIO(ExampleTstBase):
     example_name = 'conditional_io'
 
     @property
-    def input_files(self):
-        r"""list: Input files for the run."""
-        return [os.path.join(self.yamldir, 'Input', 'input.txt')]
-
-    @property
     def expected_output_files(self):
         r"""list: Examples of expected output for the run."""
         return [os.path.join(self.yamldir, 'Output', 'output.txt')]
@@ -40,6 +35,7 @@ class TestExampleConditionalIO(ExampleTstBase):
         msg = x.recv_array()[1]
         if msg is not None:
             msg = msg.sort_values(by=['InputMass']).reset_index(drop=True)
+        x.close()
         return msg
 
     def assert_equal_file_contents(self, a, b):

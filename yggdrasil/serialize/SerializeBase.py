@@ -5,9 +5,10 @@ import warnings
 from yggdrasil import backwards, tools, units, serialize
 from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.datatypes import (
-    guess_type_from_obj, get_type_from_def, get_type_class, compare_schema)
+    guess_type_from_obj, get_type_from_def, get_type_class, compare_schema,
+    type2numpy)
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-    definition2dtype, _flexible_types)
+    _flexible_types)
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
     OneDArrayMetaschemaType)
@@ -417,25 +418,7 @@ class SerializeBase(tools.YggClass):
     def numpy_dtype(self):
         r"""np.dtype: Corresponding structured data type. Will be None unless the
         type is an array of 1darrays."""
-        out = None
-        if (self.typedef['type'] == 'array') and ('items' in self.typedef):
-            if isinstance(self.typedef['items'], dict):
-                as_array = (self.typedef['items']['type'] in ['1darray', 'ndarray'])
-                if as_array:
-                    out = definition2dtype(self.typedef['items'])
-            elif isinstance(self.typedef['items'], (list, tuple)):
-                as_array = True
-                dtype_list = []
-                field_names = []
-                for i, x in enumerate(self.typedef['items']):
-                    if x['type'] != '1darray':
-                        as_array = False
-                        break
-                    dtype_list.append(definition2dtype(x))
-                    field_names.append(x.get('title', 'f%d' % i))
-                if as_array:
-                    out = np.dtype(dict(names=field_names, formats=dtype_list))
-        return out
+        return type2numpy(self.typedef)
 
     def initialize_from_message(self, msg, **metadata):
         r"""Initialize the serializer based on recieved message.

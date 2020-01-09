@@ -4,9 +4,26 @@
 Installation
 ############
 
+
+.. note::
+
+   **Windows Users**
+
+   If you will be running C/C++ models on a Windows operatoring system, you will first need to install Microsoft Visual Studio, regardless of the installation method you end up using. Visual Studio Community can be downloaded for free from `here <https://visualstudio.microsoft.com/vs/community/>`_. During installation, we recommend selecting the components below. If you forget to add something during the initial download, you can always modify the installation via the "Visual Studio Installer" program.
+
+    * "Desktop development with C++" - Workload under "Windows" section
+    * "MSVC v140 - VS 2015 C++ build tools (v14.00)" - Individual component under "Compilers, build tools, and runtimes" section.
+
+   If you *do not use conda* to install |yggdrasil|, you will also need to initialize the command line build tools in any prompt you will be calling |yggdrasil| from. This can be done by calling |yggdrasil| from a developer prompt, or by locating the ``vsvarsall.bat`` script that comes with Visual Studio. Information on the developer prompt and how to locate the ``vsvarsall.bat`` script can be found `here <https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019>`_. The script used must be the one associated with Visual Studio 2015 build tools, which can be installed from within Visual Studio 2019. On a 64bit Windows machine, the command to initialize these tools within a prompt will probably look something like this::
+
+     $ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+
+
 Conda Installation (recommended)
 --------------------------------
 
+Download and install Miniconda (or Anaconda) from 
+`here <https://www.anaconda.com/download/>`_. 
 There are conda distributions available for |yggdrasil| from 
 `conda-forge <https://github.com/conda-forge/yggdrasil-feedstock>`_. 
 You can install |yggdrasil| from conda-forge by calling::
@@ -16,6 +33,12 @@ You can install |yggdrasil| from conda-forge by calling::
 from your terminal prompt (or Anaconda prompt on Windows). This will 
 install |yggdrasil| and all of its dependencies in your active
 conda environment from the ``conda-forge`` channel.
+
+Although not required, we recommend permanently adding conda-forge to 
+the list of accepted channels by running the following command from 
+the terminal (or Anaconda Prompt on Windows).::
+
+  $ conda config --add channels conda-forge
 
 
 Development Installation
@@ -48,7 +71,7 @@ or by cloning the `Git <https://git-scm.com/>`_ repository on
 and then building the distribution.::
 
   $ cd yggdrasil
-  $ python setup.py install
+  $ pip install .
 
 If the ``--recurse-submodules`` option was not included when cloning the repo, 
 you will need to run the following from within the repository before calling
@@ -59,7 +82,7 @@ you will need to run the following from within the repository before calling
   $ git submodule update
 
 If you do not have admin privileges on the target machine, ``--user`` can be
-added to the end of either the ``pip`` or ``setup.py`` installation commands.
+added to the end of either of the ``pip`` installation commands.
 When using the ``--user`` flag, you may need to add the directory containing the 
 entry point scripts to your ``PATH`` environment variable in order to use 
 |yggdrasil| command line tools (e.g. ``yggrun``) without specifying 
@@ -93,8 +116,8 @@ User Defined rapidjson
 If you would like to use an existing installation of the
 `rapidjson <http://rapidjson.org/>`_ 
 header-only library, you can pass the flag
-``--rapidjson-include-dir=<user_defined_dir>`` to either the ``pip``
-or ``setup.py`` installation commands from above with the location of the
+``--rapidjson-include-dir=<user_defined_dir>`` to either of the ``pip``
+installation commands from above with the location of the
 existing rapidjson include directory.
 
 

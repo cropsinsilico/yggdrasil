@@ -54,9 +54,9 @@ int main(int argc, char *argv[]) {
   }
   printf("canopy: layout = %f, %f, %f\n",
 	 layout[0], layout[1], layout[2]);
-  ret = in_struct.recv(10, &npatch, &x1[0], &x1[1], &x1[2],
-  		       &x2[0], &x2[1], &x2[2],
-  		       &x3[0], &x3[1], &x3[2]);
+  ret = in_struct.recvRealloc(10, &npatch, &x1[0], &x1[1], &x1[2],
+			      &x2[0], &x2[1], &x2[2],
+			      &x3[0], &x3[1], &x3[2]);
   if (ret < 0) {
     printf("canopy: Error receiving structure\n");
     free(layout);

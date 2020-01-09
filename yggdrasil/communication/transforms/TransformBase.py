@@ -1,4 +1,5 @@
 from yggdrasil.components import ComponentBase
+from yggdrasil.metaschema.datatypes import encode_type, generate_data
 
 
 class TransformBase(ComponentBase):
@@ -60,7 +61,10 @@ class TransformBase(ComponentBase):
             dict: Transformed datatype.
 
         """
-        return datatype
+        try:
+            return encode_type(self(generate_data(datatype)))
+        except NotImplementedError:
+            return datatype
 
     def transform_field_names(self, field_names):
         r"""Determine the field names that will result from applying the
@@ -103,6 +107,8 @@ class TransformBase(ComponentBase):
             object: The transformed message.
 
         """
+        if not self.original_datatype:
+            self.set_original_datatype(encode_type(x))
         out = self.evaluate_transform(x, no_copy=no_copy)
         return out
 
@@ -116,4 +122,7 @@ class TransformBase(ComponentBase):
                 keywords.
         
         """
-        return [{'in/out': [(1, NotImplementedError)]}]
+        return [{'in/out': [(1, NotImplementedError)],
+                 'kwargs': {'initial_state': {'test': 1},
+                            'original_datatype': {
+                                'type': 'int'}}}]

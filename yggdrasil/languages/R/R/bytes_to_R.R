@@ -1,3 +1,10 @@
+ygg_bytes <- function(robj) {
+  if (is(robj, "character")) {
+    robj <- structure(robj, class="ygg_bytes")
+  }
+  return(robj)
+}
+
 bytes_to_R <- function(pyobj) {
   np <- reticulate::import('numpy', convert=FALSE)
   if (is(pyobj, "numpy.ndarray")) {
@@ -5,6 +12,6 @@ bytes_to_R <- function(pyobj) {
   } else {
     pyobj <- pyobj$decode('utf-8')
   }
-  out <- reticulate::py_to_r(pyobj)
+  out <- ygg_bytes(reticulate::py_to_r(pyobj))
   return(out)
 }

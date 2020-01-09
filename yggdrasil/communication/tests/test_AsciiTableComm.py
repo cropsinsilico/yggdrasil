@@ -4,6 +4,8 @@ from yggdrasil import backwards, units
 from yggdrasil.tests import assert_equal
 from yggdrasil.communication import AsciiTableComm
 from yggdrasil.communication.tests import test_AsciiFileComm as parent
+from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
+    data2dtype)
 
 
 def test_AsciiTableComm_nofmt():
@@ -46,11 +48,11 @@ class TestAsciiTableComm(parent.TestAsciiFileComm):
             field_units = self.testing_options.get('field_units', None)
             if field_units:
                 if isinstance(obj, dict):
-                    return {k: units.add_units(v, u) for (k, v), u
-                            in zip(obj.items(), field_units)}
+                    return {k: units.add_units(v, u, dtype=data2dtype(v))
+                            for (k, v), u in zip(obj.items(), field_units)}
                 elif isinstance(obj, (list, tuple)):
-                    return [units.add_units(x, u) for x, u
-                            in zip(obj, field_units)]
+                    return [units.add_units(x, u, dtype=data2dtype(x))
+                            for x, u in zip(obj, field_units)]
         return obj
 
     

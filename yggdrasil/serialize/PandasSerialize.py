@@ -12,15 +12,15 @@ class PandasSerialize(AsciiTableSerialize):
     r"""Class for serializing/deserializing Pandas data frames.
 
     Args:
-        dont_write_header (bool, optional): If True, headers will not be added
-            to serialized tables. Defaults to False.
+        no_header (bool, optional): If True, headers will not be read or
+            serialized from/to tables. Defaults to False.
 
     """
 
     _seritype = 'pandas'
     _schema_subtype_description = ('Serializes tables using the pandas package.')
-    _schema_properties = {'dont_write_header': {'type': 'boolean',
-                                                'default': False}}
+    _schema_properties = {'no_header': {'type': 'boolean',
+                                        'default': False}}
     _schema_excluded_from_inherit = ['as_array']
     default_read_meth = 'read'
     as_array = True
@@ -28,8 +28,9 @@ class PandasSerialize(AsciiTableSerialize):
     # has_header = False
 
     def __init__(self, *args, **kwargs):
-        # self.dont_write_header = False  # Set by schema
         self.write_header_once = False
+        self.dont_write_header = kwargs.pop('dont_write_header',
+                                            kwargs.get('no_header', False))
         return super(PandasSerialize, self).__init__(*args, **kwargs)
 
     @property
@@ -141,11 +142,15 @@ class PandasSerialize(AsciiTableSerialize):
         dtype = None
         if self.initialized:
             dtype = self.numpy_dtype
-        out = pandas.read_csv(fd,
-                              sep=backwards.as_str(self.delimiter),
-                              names=names,
-                              dtype=dtype,
-                              encoding='utf8')
+        kws = dict(sep=backwards.as_str(self.delimiter),
+                   names=names,
+                   dtype=dtype,
+                   encoding='utf8',
+                   skipinitialspace=True)
+        if self.no_header:
+            kws['header'] = None
+        out = pandas.read_csv(fd, **kws)
+        out = out.dropna(axis='columns', how='all')
         fd.close()
         if not backwards.PY2:
             # For Python 3 and higher, make sure strings are bytes
@@ -167,6 +172,9 @@ class PandasSerialize(AsciiTableSerialize):
         out = self.apply_field_names(out, self.get_field_names())
         if self.field_names is None:
             self.field_names = out.columns.tolist()
+            if all([isinstance(x, int) for x in self.field_names]):
+                self.field_names = ['f%d' % x for x in self.field_names]
+                out.columns = self.field_names
         if not self.initialized:
             typedef = {'type': 'array', 'items': []}
             np_out = serialize.pandas2numpy(out)
@@ -212,7 +220,9 @@ class PandasSerialize(AsciiTableSerialize):
                 conversion could not be completed.
 
         """
-        return serialize.pandas2list(obj)
+        if isinstance(obj, pandas.DataFrame):
+            return serialize.pandas2list(obj)
+        return obj
 
     @classmethod
     def object2dict(cls, obj, **kwargs):

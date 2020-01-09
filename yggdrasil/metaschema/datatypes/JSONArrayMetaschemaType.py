@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from yggdrasil.metaschema.datatypes import generate_data
 from yggdrasil.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
 
@@ -64,7 +65,34 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         return obj
 
     @classmethod
-    def coerce_type(cls, obj, typedef=None, key_order=None, **kwargs):
+    def encode_type(cls, obj, **kwargs):
+        r"""Encode an object's type definition.
+
+        Args:
+            obj (object): Object to encode.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            dict: Encoded type definition.
+
+        """
+        names = None
+        if isinstance(obj, pd.DataFrame):
+            names = obj.columns
+        elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
+            names = obj.dtype.names
+        out = super(JSONArrayMetaschemaType, cls).encode_type(obj, **kwargs)
+        if names is not None:
+            assert('items' in out)
+            assert(len(out['items']) == len(names))
+            for n, x in zip(names, out['items']):
+                x.setdefault('title', n)
+        return out
+        
+    @classmethod
+    def coerce_type(cls, obj, typedef=None, key_order=None,
+                    dont_wrap_single=False, **kwargs):
         r"""Coerce objects of specific types to match the data type.
 
         Args:
@@ -73,6 +101,9 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
                 coerced to. Defaults to None.
             key_order (list, optional): Order that keys from a dictionary should
                 be used to compose an array. Defaults to None.
+            dont_wrap_single (bool, optional): If True, single element
+                data types will not attempt to wrap input object in
+                additional list. Defaults to False.
             **kwargs: Additional keyword arguments are metadata entries that may
                 aid in coercing the type.
 
@@ -93,12 +124,17 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
                 obj = dict2list(obj, order=key_order)
             else:
                 obj = [obj]
-        elif isinstance(typedef, dict) and (len(typedef.get('items', [])) == 1):
+        elif ((isinstance(typedef, dict) and (not dont_wrap_single)
+               and (len(typedef.get('items', [])) == 1))):
             typedef_validated = kwargs.get('typedef_validated', False)
-            if cls.check_decoded([obj], typedef,
+            try_obj = cls.coerce_type([obj], typedef=typedef,
+                                      key_order=key_order,
+                                      dont_wrap_single=True, **kwargs)
+            if cls.check_decoded(try_obj, typedef,
                                  typedef_validated=typedef_validated):
-                obj = [obj]
-        return obj
+                obj = try_obj
+        return super(JSONArrayMetaschemaType, cls).coerce_type(
+            obj, typedef=typedef, **kwargs)
 
     @classmethod
     def _iterate(cls, container):
@@ -169,3 +205,23 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             return container
         return super(JSONArrayMetaschemaType, cls)._get_element(
             container, index, default)
+
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        if isinstance(typedef[cls._json_property], dict):
+            nitems = typedef.get('minItems', 1)
+            out = cls._container_type()
+            for i in range(nitems):
+                cls._assign(out, i, generate_data(typedef[cls._json_property]))
+        else:
+            out = super(JSONArrayMetaschemaType, cls)._generate_data(typedef)
+        return out

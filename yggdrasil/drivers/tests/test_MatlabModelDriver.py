@@ -1,7 +1,7 @@
 import os
 import unittest
 import logging
-from yggdrasil.tests import scripts, assert_raises
+from yggdrasil.tests import scripts, assert_raises, requires_language
 import yggdrasil.drivers.tests.test_InterpretedModelDriver as parent
 from yggdrasil import runner
 from yggdrasil.drivers import MatlabModelDriver
@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 _session_fname = os.path.join(os.getcwd(), 'nt_screen_session.txt')
 
 
+@requires_language('matlab', installed='any')
 def test_is_matlab_running():
     r"""Test if there is Matlab engine running."""
     MatlabModelDriver.is_matlab_running()
@@ -21,24 +22,22 @@ def test_is_matlab_running():
 
 @unittest.skipIf(MatlabModelDriver._matlab_engine_installed,
                  "Matlab installed.")
-def test_matlab_not_installed():  # pragma: no matlab
-    r"""Assert that errors are raised when Matlab is not installed."""
+def test_matlab_engine_not_installed():  # pragma: no matlab
+    r"""Assert that errors are raised when Matlab engine is not installed."""
     assert_raises(RuntimeError, MatlabModelDriver.start_matlab_engine)
     assert_raises(RuntimeError, MatlabModelDriver.stop_matlab_engine,
                   None, None, None, None)
     assert_raises(RuntimeError, MatlabModelDriver.MatlabProcess, None, None)
 
 
-@unittest.skipIf(not MatlabModelDriver.MatlabModelDriver.is_installed(),
-                 "Matlab not installed.")
+@requires_language('matlab')
 def test_matlab_runner():  # pragma: matlab
     r"""Use get_runner to start a Matlab run."""
     cr = runner.get_runner([ex_yamls['hello']['matlab']])
     cr.run()
 
 
-@unittest.skipIf(not MatlabModelDriver.MatlabModelDriver.is_installed(),
-                 "Matlab not installed.")
+@requires_language('matlab')
 def test_matlab_exit():  # pragma: matlab
     r"""Test error when model contains 'exit' call."""
     MatlabModelDriver.MatlabModelDriver('error', [scripts['matlab_error']])
@@ -47,8 +46,7 @@ def test_matlab_exit():  # pragma: matlab
     #                  [scripts['matlab_error']])
 
 
-@unittest.skipIf(not MatlabModelDriver.MatlabModelDriver.is_installed(),
-                 "Matlab not installed.")
+@requires_language('matlab')
 def test_locate_matlabroot():  # pragma: matlab
     r"""Test locate_matlabroot."""
     MatlabModelDriver.locate_matlabroot()

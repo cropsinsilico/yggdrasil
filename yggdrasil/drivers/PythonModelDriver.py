@@ -52,13 +52,14 @@ class PythonModelDriver(InterpretedModelDriver):
         'recv_function': '{channel}.recv',
         'send_function': '{channel}.send',
         'multiple_outputs': '[{outputs}]',
-        'define': '{variable} = {value}',
         'comment': '#',
         'true': 'True',
+        'false': 'False',
         'not': 'not',
         'and': 'and',
         'indent': 4 * ' ',
         'quote': '\"',
+        'print_generic': 'print({object})',
         'print': 'print(\"{message}\")',
         'fprintf': 'print(\"{message}\" % ({variables}))',
         'error': 'raise Exception("{error_msg}")',
@@ -76,11 +77,14 @@ class PythonModelDriver(InterpretedModelDriver):
         'exec_begin': 'def main():',
         'exec_suffix': ('if __name__ == "__main__":\n'
                         '    main()'),
-        'function_def_regex': (r'\n?( *)def +{function_name}'
-                               r' *\((?P<inputs>(?:.|\n)*?)\) *:'
-                               r'(?:(?:\1(?:    )+(?!return).*\n)|(?: *\n))*'
-                               r'(?:\1(?:    )+'
-                               r'return *(\()?(?P<outputs>.*?)(?(3)\)))?'),
+        'function_def_begin': 'def {function_name}({input_var}):',
+        'return': 'return {output_var}',
+        'function_def_regex': (
+            r'\n?( *)def +{function_name}'
+            r' *\((?P<inputs>(?:.|\n)*?)\)? *:'
+            r'(?P<body>(?:\1(?:    )+(?!return).*\n)|(?: *\n))*'
+            r'(?:\1(?:    )+'
+            r'return *(?P<outputs>.*)?)?'),
         'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)',
         'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
 
@@ -167,9 +171,7 @@ class PythonModelDriver(InterpretedModelDriver):
         """
         if key == 'import':
             fname = kwargs.get('filename', None)
-            if fname is None:
-                key = 'import_nofile'
-            else:
+            if fname is not None:
                 kwargs['filename'] = os.path.splitext(os.path.basename(fname))[0]
         kwargs['default'] = default
         return super(PythonModelDriver, cls).format_function_param(key, **kwargs)

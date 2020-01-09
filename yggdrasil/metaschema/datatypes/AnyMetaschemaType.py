@@ -46,7 +46,7 @@ class AnyMetaschemaType(MetaschemaType):
         """
         out = None
         if isinstance(typedef, dict):
-            out = typedef.get('temptype', None)
+            out = typedef.get('temptype', typedef)
         return out
         
     @classmethod
@@ -109,3 +109,16 @@ class AnyMetaschemaType(MetaschemaType):
 
         """
         return transform_type(obj, cls.get_temptype(typedef))
+
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        return 'hello'

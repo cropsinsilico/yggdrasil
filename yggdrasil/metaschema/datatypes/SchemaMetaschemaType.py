@@ -89,6 +89,7 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
     specificity = JSONObjectMetaschemaType.specificity + 1
     inherit_properties = ['extract_properties']
     _replaces_existing = False
+    example_data = {'type': 'boolean'}
 
     @classmethod
     def encode_data(cls, obj, typedef):
@@ -104,7 +105,7 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
 
         """
         # Schemas should already be in JSON serializable format
-        return obj
+        return cls.normalize(obj)
 
     @classmethod
     def decode_data(cls, obj, typedef):

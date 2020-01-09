@@ -1,18 +1,16 @@
 import os
 import re
 import pprint
-import unittest
 import tempfile
 from yggdrasil import platform
-from yggdrasil.tests import scripts, assert_raises, assert_equal
+from yggdrasil.tests import (
+    scripts, assert_raises, assert_equal, requires_language)
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
 from yggdrasil.drivers.CMakeModelDriver import (
     CMakeModelDriver, CMakeConfigure, CMakeBuilder)
 
 
-_driver_installed = CMakeModelDriver.is_installed()
-
-
+@requires_language('cmake', installed='any')
 def test_CMakeConfigure():
     r"""Test CMakeConfigure."""
     src = scripts['c'][0]
@@ -30,6 +28,7 @@ def test_CMakeConfigure():
     assert_equal(out_A, out_B)
 
 
+@requires_language('cmake', installed='any')
 def test_CMakeBuilder():
     r"""Test CMakeBuilder."""
     src = scripts['c'][0]
@@ -51,7 +50,7 @@ def test_CMakeBuilder():
     assert_equal(out_A, out_B)
 
 
-@unittest.skipIf(not _driver_installed, "C Library not installed")
+@requires_language('cmake')
 def test_create_include():
     r"""Test create_include."""
     target = 'target'
@@ -107,13 +106,13 @@ def test_create_include():
                   None, target, linker_flags=['/invalid'])
 
 
-@unittest.skipIf(_driver_installed, "C Library installed")
+@requires_language('cmake', installed=False)
 def test_CMakeModelDriver_no_C_library():  # pragma: windows
     r"""Test CMakeModelDriver error when C library not installed."""
     assert_raises(RuntimeError, CMakeModelDriver, 'test', scripts['cmake'])
 
 
-@unittest.skipIf(not _driver_installed, "C Library not installed")
+@requires_language('cmake')
 def test_CMakeModelDriver_error_cmake():
     r"""Test CMakeModelDriver error for invalid cmake args."""
     makedir, target = os.path.split(scripts['cmake'])
@@ -122,7 +121,7 @@ def test_CMakeModelDriver_error_cmake():
                   target_language='c')
 
 
-@unittest.skipIf(not _driver_installed, "C Library not installed")
+@requires_language('cmake')
 def test_CMakeModelDriver_error_notarget():
     r"""Test CMakeModelDriver error for invalid target."""
     makedir, target = os.path.split(scripts['cmake'])
@@ -130,7 +129,7 @@ def test_CMakeModelDriver_error_notarget():
                   sourcedir=makedir, target_language='c')
 
 
-@unittest.skipIf(not _driver_installed, "C Library not installed")
+@requires_language('cmake')
 def test_CMakeModelDriver_error_nofile():
     r"""Test CMakeModelDriver error for missing CMakeLists.txt."""
     assert_raises(RuntimeError, CMakeModelDriver, 'test', 'invalid',

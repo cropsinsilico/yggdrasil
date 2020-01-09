@@ -1,8 +1,7 @@
 |tag version| |PyPI version| |Travis Build Status| |Appveyor Build status| 
 |codecov| |PEP8| |license| |platform|
 
-The Crops in Silico (CiS) framework, yggdrasil, 
-yggdrasil, original create as a framework for the Crops in Silico (CiS) 
+yggdrasil, originally created as a framework for the Crops in Silico (CiS) 
 project, provides support for combining scientific models 
 written in different programming languages. To combine two models,
 modelers add simple communications interfaces to the model code and

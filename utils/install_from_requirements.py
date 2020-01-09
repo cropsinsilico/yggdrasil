@@ -1,6 +1,7 @@
 # https://www.python.org/dev/peps/pep-0508/
 from pip._vendor.packaging.requirements import Requirement, InvalidRequirement
 import os
+import sys
 import argparse
 import subprocess
 
@@ -28,6 +29,7 @@ def prune(fname_in, fname_out=None, excl_suffix=None):
         with open(ifname_in, 'r') as fd:
             old_lines = fd.readlines()
         for line in old_lines:
+            line = line.strip()
             if line.startswith('#'):
                 continue
             if excl_suffix and line.endswith(excl_suffix):
@@ -37,6 +39,8 @@ def prune(fname_in, fname_out=None, excl_suffix=None):
                 if req.marker and (not req.marker.evaluate()):
                     continue
                 new_lines.append(req.name + str(req.specifier))
+                print('prune', line, line.endswith(excl_suffix), req.name,
+                      excl_suffix, type(line), type(excl_suffix))
             except InvalidRequirement as e:
                 print(e)
                 continue
@@ -66,7 +70,16 @@ def locate_conda_exe(conda_env, name):
         conda_prefix = os.path.dirname(conda_prefix)
     else:
         conda_prefix = os.path.join(conda_prefix, 'envs')
-    out = os.path.join(conda_prefix, conda_env, 'bin', name)
+    if (sys.platform in ['win32', 'cygwin']):
+        if not name.endswith('.exe'):
+            name += '.exe'
+        if name.startswith('python'):
+            out = os.path.join(conda_prefix, conda_env, name)
+        else:
+            out = os.path.join(conda_prefix, conda_env,
+                               'Scripts', name)
+    else:
+        out = os.path.join(conda_prefix, conda_env, 'bin', name)
     assert(os.path.isfile(out))
     return out
 

@@ -43,10 +43,10 @@ def convert_R_unit_string(r_str):
     for x in re.finditer(regex, r_str):
         xdict = x.groupdict()
         if xdict['exp']:
-            out.append('{name}**{exp}'.format(**xdict))
+            out.append('({name}**{exp})'.format(**xdict))
         else:
             out.append(xdict['name'])
-    return ' '.join(out)
+    return '*'.join(out)
 
 
 def has_units(obj):

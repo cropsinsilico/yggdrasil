@@ -20,16 +20,21 @@ def test_find_compilation_tool():
 def test_get_compilation_tool():
     r"""Test get_compilation_tool for different name variations."""
     from yggdrasil.drivers.CModelDriver import CModelDriver
-    tooltype = 'compiler'
-    out = CModelDriver.get_tool('compiler').__class__
-    toolname = out.toolname.lower()
-    toolpath = os.path.join('somedir', toolname)
-    toolfile = toolpath + '.exe'
-    vals = [toolname.upper(), toolpath, toolfile, toolfile.upper()]
-    for v in vals:
-        assert_equal(CompiledModelDriver.get_compilation_tool(tooltype, v), out)
-    assert_raises(ValueError, CompiledModelDriver.get_compilation_tool,
-                  'compiler', 'invalid')
+    if CModelDriver.is_language_installed():
+        tooltype = 'compiler'
+        out = CModelDriver.get_tool('compiler').__class__
+        toolname = out.toolname.lower()
+        toolpath = os.path.join('somedir', toolname)
+        toolfile = toolpath + '.exe'
+        vals = [toolname.upper(), toolpath, toolfile, toolfile.upper()]
+        for v in vals:
+            assert_equal(CompiledModelDriver.get_compilation_tool(tooltype, v), out)
+        assert_raises(ValueError, CompiledModelDriver.get_compilation_tool,
+                      'compiler', 'invalid')
+    else:
+        assert_raises(NotImplementedError, CModelDriver.get_tool, 'compiler')
+    assert_equal(CompiledModelDriver.get_compilation_tool('compiler', 'invalid',
+                                                          default='invalid'), 'invalid')
 
 
 def test_CompilationToolBase():
@@ -159,10 +164,13 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
     
     def test_build(self):
         r"""Test building libraries as a shared/static library or object files."""
-        self.import_cls.compile_dependencies(libtype='shared', overwrite=True)
-        self.import_cls.compile_dependencies(libtype='object', overwrite=True)
-        self.import_cls.compile_dependencies(libtype='static', overwrite=True)
-        self.import_cls.compile_dependencies(libtype='shared', overwrite=False)
+        for libtype in ['shared', 'object', 'static']:
+            self.import_cls.compile_dependencies(
+                libtype=libtype, overwrite=True)
+            if libtype == 'shared':
+                self.import_cls.compile_dependencies(
+                    libtype=libtype, overwrite=False)
+            self.import_cls.cleanup_dependencies(libtype=libtype)
 
     def test_get_tool(self):
         r"""Test other methods of calling get_tool."""
@@ -313,7 +321,7 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
             old_tools[k] = getattr(self.instance, '%s_tool' % k, None)
         # Compile with each compiler
         for k, v in self.import_cls.get_available_tools('compiler').items():
-            if not v.is_installed():
+            if (not v.is_installed()) or getattr(v, 'is_build_tool', False):
                 continue
             setattr(self.instance, 'compiler_tool', v)
             setattr(self.instance, 'linker_tool', v.linker())

@@ -3,6 +3,7 @@ import sys
 import os
 import time
 import signal
+import traceback
 from pprint import pformat
 from itertools import chain
 import socket
@@ -523,3 +524,14 @@ def get_runner(models, **kwargs):
     # Run
     yggRunner = YggRunner(models, **kwargs)
     return yggRunner
+
+
+def run(*args, **kwargs):
+    yggRunner = get_runner(*args, **kwargs)
+    try:
+        yggRunner.run()
+        yggRunner.debug("runner returns, exiting")
+    except Exception as ex:  # pragma: debug
+        yggRunner.pprint("yggrun exception: %s" % type(ex))
+        print(traceback.format_exc())
+    print('')

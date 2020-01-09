@@ -10,7 +10,7 @@ fprintf("maxMsgCli(R): Hello message size %d.", msg_size)
 rpc <- YggInterface('YggRpcClient', "maxMsgSrv_maxMsgCli", "%s", "%s")
 
 # Create a max message
-output <- paste(sample(charset, msg_size, replace=TRUE), collapse='')
+output <- ygg_bytes(paste(sample(charset, msg_size, replace=TRUE), collapse=''))
 
 # Call RPC server
 c(ret, input) %<-% rpc$call(output)

@@ -227,6 +227,7 @@ int ygg_send_nolimit_eof(const yggOutput_t yggQ) {
  */
 static inline
 int ygg_recv_nolimit(yggInput_t yggQ, char **data, const size_t len){
+  UNUSED(len);
   int ret = -1;
   size_t len_used = 0; // Send 0 to indicate data can be realloced
   int nargs_used = commRecvRealloc(yggQ, data, &len_used);
@@ -747,7 +748,7 @@ comm_t* yggAsciiArrayInput(const char *name) {
  */
 static inline
 comm_t* yggPlyOutput(const char *name) {
-  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_ply());
+  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_ply(false));
   if ((out->valid) && (out->datatype->obj == NULL)) {
     out->valid = 0;
   }
@@ -809,7 +810,7 @@ comm_t* yggPlyInput(const char *name) {
  */
 static inline
 comm_t* yggObjOutput(const char *name) {
-  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_obj());
+  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_obj(false));
   if ((out->valid) && (out->datatype->obj == NULL)) {
     out->valid = 0;
   }
@@ -825,6 +826,248 @@ static inline
 comm_t* yggObjInput(const char *name) {
   return init_comm(name, "recv", _default_comm, NULL);
 };
+
+
+//==============================================================================
+/*!
+  Generic object I/O.
+
+  Handle I/O from/to a generic object.
+
+  Input Usage:
+      1. One-time: Create interface by providing a channel name.
+	    comm_t* fin = yggGenericInput("file_channel");  // channel
+      2. Prepare: Allocate generic structure.
+            generic_t p;
+      3. Receive each structure, terminating when receive returns -1 (EOF or channel
+         closed).
+	    int ret = 1;
+	    while (ret > 0) {
+	      ret = yggRecv(fin, &p);
+	      // Do something with the generic structure
+	    }
+
+  Output by Usage:
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t* fout = yggGenericOutput("file_channel");  // channel
+      2. Send structure to the file by providing entries. Formatting is handled by
+         the interface. If return value is not 0, the send was not succesful.
+            int ret;
+	    generic_t p;
+	    // Populate the structure
+	    ret = yggSend(fout, p);
+
+*/
+//==============================================================================
+
+/*!
+  @brief Constructor for generic output comm to an output channel.
+  @param[in] name constant character pointer to output channel name.
+  @returns comm_t* output structure.
+ */
+static inline
+comm_t* yggGenericOutput(const char *name) {
+  return init_comm(name, "send", _default_comm, create_dtype_empty(true));
+};
+
+/*!
+  @brief Constructor for generic input comm from an input channel.
+  @param[in] name constant character pointer to input channel name.
+  @returns comm_t* input structure.
+ */
+static inline
+comm_t* yggGenericInput(const char *name) {
+  return init_comm(name, "recv", _default_comm, create_dtype_empty(true));
+};
+
+  
+//==============================================================================
+/*!
+  Generic object I/O of any type.
+
+  Handle I/O from/to a generic object of any type.
+
+  Input Usage:
+      1. One-time: Create interface by providing a channel name.
+	    comm_t* fin = yggAnyInput("file_channel");  // channel
+      2. Prepare: Allocate generic structure.
+            generic_t p;
+      3. Receive each structure, terminating when receive returns -1 (EOF or channel
+         closed).
+	    int ret = 1;
+	    while (ret > 0) {
+	      ret = yggRecv(fin, &p);
+	      // Do something with the generic structure
+	    }
+
+  Output by Usage:
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t* fout = yggAnyOutput("file_channel");  // channel
+      2. Send structure to the file by providing entries. Formatting is handled by
+         the interface. If return value is not 0, the send was not succesful.
+            int ret;
+	    generic_t p;
+	    // Populate the structure
+	    ret = yggSend(fout, p);
+
+*/
+//==============================================================================
+
+/*!
+  @brief Constructor for generic output comm to an output channel.
+  @param[in] name constant character pointer to output channel name.
+  @returns comm_t* output structure.
+ */
+static inline
+comm_t* yggAnyOutput(const char *name) {
+  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_any(true));
+  if ((out->valid) && (out->datatype->obj == NULL)) {
+    out->valid = 0;
+  }
+  return out;
+};
+
+/*!
+  @brief Constructor for generic input comm from an input channel.
+  @param[in] name constant character pointer to input channel name.
+  @returns comm_t* input structure.
+ */
+static inline
+comm_t* yggAnyInput(const char *name) {
+  comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_any(true));
+  if ((out->valid) && (out->datatype->obj == NULL)) {
+    out->valid = 0;
+  }
+  return out;
+};
+
+  
+//==============================================================================
+/*!
+  JSON array IO
+
+  Handle I/O from/to a JSON array.
+
+  Input Usage:
+      1. One-time: Create interface by providing a channel name.
+	    comm_t* fin = yggJSONArrayInput("file_channel");  // channel
+      2. Prepare: Allocate vector structure.
+            json_array_t p;
+      3. Receive each structure, terminating when receive returns -1 (EOF or channel
+         closed).
+	    int ret = 1;
+	    while (ret > 0) {
+	      ret = yggRecv(fin, &p);
+	      // Do something with the vector structure
+	    }
+
+  Output by Usage:
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t* fout = yggJSONArrayOutput("file_channel");  // channel
+      2. Send structure to the file by providing entries. Formatting is handled by
+         the interface. If return value is not 0, the send was not succesful.
+            int ret;
+	    json_array_t p;
+	    // Populate the structure
+	    ret = yggSend(fout, p);
+
+*/
+//==============================================================================
+
+/*!
+  @brief Constructor for vector output comm to an output channel.
+  @param[in] name constant character pointer to output channel name.
+  @returns comm_t* output structure.
+ */
+static inline
+comm_t* yggJSONArrayOutput(const char *name) {
+  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_json_array(0, NULL, true));
+  if ((out->valid) && (out->datatype->obj == NULL)) {
+    out->valid = 0;
+  }
+  return out;
+};
+
+/*!
+  @brief Constructor for vector input comm from an input channel.
+  @param[in] name constant character pointer to input channel name.
+  @returns comm_t* input structure.
+ */
+static inline
+comm_t* yggJSONArrayInput(const char *name) {
+  comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_json_array(0, NULL, true));
+  if ((out->valid) && (out->datatype->obj == NULL)) {
+    out->valid = 0;
+  }
+  return out;
+};
+
+#define yggVectorOutput yggJSONArrayOutput
+#define yggVectorInput yggJSONArrayInput
+  
+
+//==============================================================================
+/*!
+  JSON object IO
+
+  Handle I/O from/to a JSON object.
+
+  Input Usage:
+      1. One-time: Create interface by providing a channel name.
+	    comm_t* fin = yggJSONObjectInput("file_channel");  // channel
+      2. Prepare: Allocate map structure.
+            json_object_t p;
+      3. Receive each structure, terminating when receive returns -1 (EOF or channel
+         closed).
+	    int ret = 1;
+	    while (ret > 0) {
+	      ret = yggRecv(fin, &p);
+	      // Do something with the map structure
+	    }
+
+  Output by Usage:
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t* fout = yggJSONObjectOutput("file_channel");  // channel
+      2. Send structure to the file by providing entries. Formatting is handled by
+         the interface. If return value is not 0, the send was not succesful.
+            int ret;
+	    json_object_t p;
+	    // Populate the structure
+	    ret = yggSend(fout, p);
+
+*/
+//==============================================================================
+
+/*!
+  @brief Constructor for map output comm to an output channel.
+  @param[in] name constant character pointer to output channel name.
+  @returns comm_t* output structure.
+ */
+static inline
+comm_t* yggJSONObjectOutput(const char *name) {
+  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_json_object(0, NULL, NULL, true));
+  if ((out->valid) && (out->datatype->obj == NULL)) {
+    out->valid = 0;
+  }
+  return out;
+};
+
+/*!
+  @brief Constructor for map input comm from an input channel.
+  @param[in] name constant character pointer to input channel name.
+  @returns comm_t* input structure.
+ */
+static inline
+comm_t* yggJSONObjectInput(const char *name) {
+  comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_json_object(0, NULL, NULL, true));
+  if ((out->valid) && (out->datatype->obj == NULL)) {
+    out->valid = 0;
+  }
+  return out;
+};
+
+#define yggMapOutput yggJSONObjectOutput
+#define yggMapInput yggJSONObjectInput
 
 
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */

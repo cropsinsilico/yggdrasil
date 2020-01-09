@@ -2,6 +2,7 @@ import os
 import copy
 import pprint
 import yaml
+import json
 from collections import OrderedDict
 from jsonschema.exceptions import ValidationError
 from yggdrasil import metaschema, backwards
@@ -124,6 +125,72 @@ def get_schema(fname=None):
     return out
 
 
+def convert_extended2base(s):
+    r"""Covert schema from the extended form to a strictly JSON form.
+
+    Args:
+        s (object): Object to updated.
+
+    Returns:
+        object: Updated JSON object.
+
+    """
+    # TODO: Automate this on classes
+    type_map = {'int': 'integer', 'uint': 'integer',
+                'float': 'number', 'complex': 'string',
+                'unicode': 'string', 'bytes': 'string',
+                'function': 'string', 'class': 'string',
+                'instance': 'string', '1darray': 'array',
+                'ndarray': 'array', 'obj': 'object',
+                'ply': 'object'}
+    if isinstance(s, (list, tuple)):
+        s = [convert_extended2base(x) for x in s]
+    elif isinstance(s, (dict, OrderedDict)):
+        if 'type' in s:
+            if isinstance(s['type'], str):
+                if s['type'] in ['schema']:
+                    s = {"$ref": "#/definitions/schema"}
+                elif s['type'] in type_map:
+                    s['type'] = type_map[s['type']]
+                    s.pop('class', None)
+                # Scalars not currently included in the schema
+                # elif s['type'] in ['scalar']:
+                #     s.pop("precision", None)
+                #     s.pop("units", None)
+                #     s['type'] = type_map[s.pop('subtype')]
+            elif isinstance(s['type'], list):
+                assert('schema' not in s['type'])
+                assert('scalar' not in s['type'])
+                s['type'] = [type_map.get(t, t) for t in s['type']]
+                if all([t == s['type'][0] for t in s['type']]):
+                    s['type'] = s['type'][0]
+        s = {k: convert_extended2base(v) for k, v in s.items()}
+    return s
+
+
+def get_json_schema(fname_dst=None):
+    r"""Return the yggdrasil schema as a strictly JSON schema without
+    any of the extended datatypes.
+
+    Args:
+        fname_dst (str, optional): Full path to file where the JSON
+            schema should be saved. Defaults to None and no file is
+            created.
+
+    Returns:
+        dict: Converted structure.
+
+    """
+    s = get_schema()
+    out = copy.deepcopy(s.schema)
+    out['definitions']['schema'] = copy.deepcopy(metaschema._metaschema)
+    out = convert_extended2base(out)
+    if fname_dst is not None:
+        with open(fname_dst, 'w') as fd:
+            json.dump(out, fd)
+    return out
+
+
 class ComponentSchema(object):
     r"""Schema information for one component.
 
@@ -179,7 +246,8 @@ class ComponentSchema(object):
                 return subtype
             except ValidationError:
                 pass
-        raise ValueError("Could not determine subtype for document: %s" % doc)
+        raise ValueError("Could not determine subtype "
+                         "for document: %s" % doc)  # pragma: debug
 
     def get_subtype_schema(self, subtype, unique=False, relaxed=False,
                            allow_instance=False):
@@ -233,8 +301,15 @@ class ComponentSchema(object):
         if relaxed:
             out['additionalProperties'] = True
         if allow_instance:
+            if subtype == 'base':
+                comp_cls = self.base_subtype_class
+            else:
+                from yggdrasil.components import import_component
+                comp_cls = import_component(
+                    self.schema_type, subtype=subtype,
+                    without_schema=True)
             out = {'oneOf': [out, {'type': 'instance',
-                                   'class': self.base_subtype_class}]}
+                                   'class': comp_cls}]}
         return out
 
     def get_schema(self, relaxed=False, allow_instance=False):
@@ -679,15 +754,17 @@ class SchemaRegistry(object):
             kwargs.setdefault('schema_registry', self)
         return metaschema.validate_instance(obj, self.schema, **kwargs)
 
-    def validate_component(self, comp_name, obj):
+    def validate_component(self, comp_name, obj, **kwargs):
         r"""Validate an object against a specific component.
 
         Args:
             comp_name (str): Name of the component to validate against.
             obj (object): Object to validate.
+            **kwargs: Additional keyword arguments are passed to
+                get_component_schema.
 
         """
-        comp_schema = self.get_component_schema(comp_name)
+        comp_schema = self.get_component_schema(comp_name, **kwargs)
         return metaschema.validate_instance(obj, comp_schema)
 
     def normalize(self, obj, backwards_compat=False, **kwargs):
@@ -986,14 +1063,6 @@ def standardize(instance, keys, is_singular=False, suffixes=None, altkeys=None):
                 instance[k][i] = {'name': instance[k][i]}
 
 
-def normalize_instance(normalizer, value, instance, schema):
-    r"""Creates an instance from the JSON document."""
-    from yggdrasil.components import create_component
-    if isinstance(instance, dict):
-        instance = create_component(schema['title'], **instance)
-    return instance
-
-
 def normalize_function_file(cond, working_dir):
     r"""Normalize functions which use relative paths.
 
@@ -1047,10 +1116,11 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
                     x['name'] = new_name
                 if not x.get('is_default', False):
                     x.setdefault('working_dir', instance['working_dir'])
-                x_filter = x.get('filter', None)
-                if isinstance(x_filter, dict) and ('function' in x_filter):
-                    x['filter']['function'] = normalize_function_file(
-                        x['filter']['function'], instance['working_dir'])
+                for k in ['filter', 'transform']:
+                    x_k = x.get(k, None)
+                    if isinstance(x_k, dict) and ('function' in x_k):
+                        x[k]['function'] = normalize_function_file(
+                            x[k]['function'], instance['working_dir'])
     return instance
 
 
@@ -1158,10 +1228,11 @@ def _normalize_connio_first(normalizer, value, instance, schema):
         if instance.get('working_dir', False):
             for io in ['inputs', 'outputs']:
                 for x in instance[io]:
-                    x_filter = x.get('filter', None)
-                    if isinstance(x_filter, dict) and ('function' in x_filter):
-                        x['filter']['function'] = normalize_function_file(
-                            x['filter']['function'], instance['working_dir'])
+                    for k in ['filter', 'transform']:
+                        x_k = x.get(k, None)
+                        if isinstance(x_k, dict) and ('function' in x_k):
+                            x[k]['function'] = normalize_function_file(
+                                x[k]['function'], instance['working_dir'])
         # Handle indexed inputs/outputs
         for io in ['inputs', 'outputs']:
             pruned = []

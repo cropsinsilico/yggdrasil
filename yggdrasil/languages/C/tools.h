@@ -15,10 +15,80 @@
 #include <time.h>
 
 
+#ifdef _WIN32
+#ifdef __cplusplus
+#include <complex>
+typedef std::complex<float> complex_float;
+typedef std::complex<double> complex_double;
+typedef std::complex<long double> complex_long_double;
+#ifndef creal
+#define creal(x) x.real()
+#define crealf(x) x.real()
+#define creall(x) x.real()
+#define cimag(x) x.imag()
+#define cimagf(x) x.imag()
+#define cimagl(x) x.imag()
+#endif
+#else
+#include <complex.h>
+typedef _Fcomplex complex_float;
+typedef _Dcomplex complex_double;
+typedef _Lcomplex complex_long_double;
+#endif
+#else // Unix
+#ifdef __cplusplus
+#include <complex>
+typedef std::complex<float> complex_float;
+typedef std::complex<double> complex_double;
+typedef std::complex<long double> complex_long_double;
+#ifndef creal
+#define creal(x) x.real()
+#define crealf(x) x.real()
+#define creall(x) x.real()
+#define cimag(x) x.imag()
+#define cimagf(x) x.imag()
+#define cimagl(x) x.imag()
+#endif
+#else
+#include <complex.h>
+typedef float _Complex complex_float;
+typedef double _Complex complex_double;
+typedef long double _Complex complex_long_double;
+#endif
+#endif
+#define print_complex(x) printf("%lf+%lfj\n", (double)creal(x), (double)cimag(x))
+
+
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
 #endif
 
+#ifdef _DEBUG
+#undef _DEBUG
+#include <Python.h>
+#include <numpy/arrayobject.h>
+#include <numpy/ndarrayobject.h>
+#include <numpy/npy_common.h>
+#define _DEBUG
+#else
+#include <Python.h>
+#include <numpy/arrayobject.h>
+#include <numpy/ndarrayobject.h>
+#include <numpy/npy_common.h>
+#endif
+  
+typedef struct complex_float_t {
+  float re;
+  float im;
+} complex_float_t;
+typedef struct complex_double_t {
+  double re;
+  double im;
+} complex_double_t;
+typedef struct complex_long_double_t {
+  long double re;
+  long double im;
+} complex_long_double_t;
 // Platform specific
 #ifdef _WIN32
 #include "regex/regex_win32.h"
@@ -40,6 +110,8 @@ extern "C" {
 #define ygg_getpid getpid
 #endif
 
+#define STRBUFF 100
+  
 /*! @brief Maximum message size. */
 #ifdef IPCDEF
 #define YGG_MSG_MAX 2048
@@ -52,6 +124,8 @@ extern "C" {
 #define YGG_MSG_BUF 2048
 /*! @brief Sleep time in micro-seconds */
 #define YGG_SLEEP_TIME 250000
+/*! @brief Size for buffers to contain names of Python objects. */
+#define PYTHON_NAME_SIZE 1000
 
 /*! @brief Define old style names for compatibility. */
 #define PSI_MSG_MAX YGG_MSG_MAX
@@ -75,6 +149,7 @@ static int _ygg_error_flag = 0;
 #define _GET_NTH_ARG(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, N, ...) N
 #define COUNT_VARARGS(...) _GET_NTH_ARG("ignored", ##__VA_ARGS__, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #endif
+#define UNUSED(arg) ((void)&(arg))
 
 /*!
   @brief Get an unsigned long seed from the least significant 32bits of a pointer.
@@ -95,7 +170,60 @@ unsigned long ptr2seed(void *ptr) {
 typedef struct va_list_t {
   va_list va;
 } va_list_t;
-    
+
+
+/*! @brief Structure used to wrap Python objects. */
+typedef struct python_t {
+  char name[PYTHON_NAME_SIZE];
+  void *args;
+  void *kwargs;
+  PyObject *obj;
+} python_t;
+
+
+/*!
+  @brief Initialize a structure to contain a Python object.
+  @returns python_t New Python object structure.
+ */
+static inline
+python_t init_python() {
+  python_t out;
+  out.name[0] = '\0';
+  out.args = NULL;
+  out.kwargs = NULL;
+  out.obj = NULL;
+  return out;
+};
+
+  
+/*!
+  @brief Initialize Numpy arrays if it is not initalized.
+  @returns int 0 if successful, other values indicate errors.
+ */
+static inline
+int init_numpy_API() {
+  if (PyArray_API == NULL) {
+    if (_import_array() < 0) {
+      return -2;
+    }
+  }
+  return 0;
+};
+
+
+/*!
+  @brief Initialize Python if it is not initialized.
+  @returns int 0 if successful, other values indicate errors.
+ */
+static inline
+int init_python_API() {
+  if (!(Py_IsInitialized())) {
+    Py_Initialize();
+    if (!(Py_IsInitialized()))
+      return -1;
+  }
+  return init_numpy_API();
+};
 
 
 //==============================================================================
@@ -213,6 +341,68 @@ void yggError(const char* fmt, ...) {
 #endif
 
 /*!
+  @brief Get the length (in bytes) of a character array containing 4 byte
+  unicode characters.
+  @param[in] strarg char* Pointer to character array.
+  @returns size_t Length of strarg in bytes.
+ */
+static inline
+size_t strlen4(char* strarg) {
+  if(!strarg)
+    return 0; //strarg is NULL pointer
+  char* str = strarg;
+  for(;*str;str+=4)
+    ; // empty body
+  return (str - strarg);
+}
+
+/*!
+  @brief Called snprintf and realloc buffer if the formatted string is
+  larger than the provided buffer.
+  @param[in] dst char** Pointer to buffer where formatted message
+  should be stored.
+  @param[in,out] max_len size_t* Pointer to maximum size of buffer
+  that will be modified when the buffer is reallocated.
+  @param[in,out] offset size_t* Pointer to offset in buffer where the
+  formatted message should be stored. This will be updated to the end
+  of the updated message.
+  @param[in] format_str const char* Format string that should be used.
+  @param[in] ... Additional arguments are passed to snprintf as
+  parameters for formatting.
+  @returns int -1 if there is an error, otherwise the number of new
+  characters written to the buffer.
+ */
+static inline
+int snprintf_realloc(char** dst, size_t* max_len, size_t* offset,
+		     const char* format_str, ...) {
+  va_list arglist;
+  va_start(arglist, format_str);
+  int fmt_len = 0;
+  while (1) {
+    va_list arglist_copy;
+    va_copy(arglist_copy, arglist);
+    fmt_len = vsnprintf(dst[0] + offset[0],
+			max_len[0] - offset[0],
+			format_str, arglist_copy);
+    if (fmt_len > (int)(max_len[0] - offset[0])) {
+      max_len[0] = max_len[0] + fmt_len + 1;
+      char* temp = (char*)realloc(dst[0], max_len[0]);
+      if (temp == NULL) {
+	ygglog_error("snprintf_realloc: Error reallocating buffer.");
+	fmt_len = -1;
+	break;
+      }
+      dst[0] = temp;
+    } else {
+      offset[0] = offset[0] + fmt_len;
+      break;
+    }
+  }
+  va_end(arglist);
+  return fmt_len;
+};
+
+/*!
   @brief Check if a character array matches a message and is non-zero length.
   @param[in] pattern constant character pointer to string that should be checked.
   @param[in] buf constant character pointer to string that should be checked.
@@ -261,6 +451,25 @@ int is_send(const char *buf) {
   return not_empty_match("send", buf);
 };
 
+  
+/*! @brief Method for skipping a number of bytes in the argument list.
+  @param[in] ap va_list_t* Structure containing variable argument list.
+  @param[in] nbytes size_t Number of bytes that should be skipped.
+ */
+static inline
+void va_list_t_skip(va_list_t *ap, size_t nbytes) {
+  if (nbytes == sizeof(void*)) {
+    va_arg(ap->va, void*);
+  } else if (nbytes == sizeof(size_t)) {
+    va_arg(ap->va, size_t);
+  } else {
+    printf("WARNING: Cannot get argument of size %zd.\n", nbytes);
+    va_arg(ap->va, void*);
+    // va_arg(ap->va, char[nbytes]);
+  }
+};
+
+  
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }
 #endif

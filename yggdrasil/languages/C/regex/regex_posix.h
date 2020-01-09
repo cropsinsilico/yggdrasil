@@ -131,7 +131,7 @@ int find_matches(const char *regex_text, const char *to_match,
   int nomatch = regexec(&r, to_match, n_sub_matches, m, 0);
   if (!(nomatch)) {
     // Count
-    while (n_match < n_sub_matches) {
+    while (n_match < (int)n_sub_matches) {
       if ((m[n_match].rm_so == -1) && (m[n_match].rm_eo == -1)) {
 	break;
       }

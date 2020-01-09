@@ -1,3 +1,4 @@
+import unittest
 import yggdrasil.drivers.tests.test_InterpretedModelDriver as parent
 
 
@@ -15,7 +16,11 @@ class TestLPyModelParam(parent.TestInterpretedModelParam):
 class TestLPyModelDriverNoInit(TestLPyModelParam,
                                parent.TestInterpretedModelDriverNoInit):
     r"""Test runner for LPyModelDriver class without initing the driver."""
-    pass
+    
+    def run_model_instance(self, **kwargs):
+        r"""Create a driver for a model and run it."""
+        # This method of running dosn't work with LPy which requires io
+        raise unittest.SkipTest("LPy requires I/O channels to run.")
 
 
 class TestLPyModelDriverNoStart(TestLPyModelParam,
