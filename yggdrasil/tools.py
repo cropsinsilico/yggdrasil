@@ -237,7 +237,10 @@ def ygg_atexit():  # pragma: debug
     check_threads()
     if not is_subprocess():
         check_sockets()
-    if backwards.PY34:
+    # Python 3.4 no longer supported if using pip 9.0.0, but this
+    # allows the code to work if somehow installed using an older
+    # version of pip
+    if backwards.PY34:  # pragma: no cover
         # Print empty line to ensure close
         print('', end='')
         sys.stdout.flush()

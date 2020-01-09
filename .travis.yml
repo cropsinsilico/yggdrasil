@@ -197,12 +197,8 @@ jobs:
       services:
         - rabbitmq
       script:
-        - yggtest --ci
-    - os: linux
-      python: 3.4
-      script:
         - yggconfig --remove-file
-        - yggtest --ci --long-running tests/test_backwards.py
+        - yggtest --ci
     - os: linux
       python: 3.6
       env: INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=1
