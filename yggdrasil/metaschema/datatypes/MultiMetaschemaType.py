@@ -288,7 +288,7 @@ class MultiMetaschemaType(MetaschemaType):
         for t in types:
             try:
                 return cls.type_classes[t].generate_data(
-                    {'type': t, **typedef})
+                    dict(typedef, type=t))
             except BaseException:
                 pass
         raise NotImplementedError  # pragma: debug
