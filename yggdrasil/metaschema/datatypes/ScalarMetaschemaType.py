@@ -311,7 +311,7 @@ class ScalarMetaschemaType(MetaschemaType):
         """
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
         if typedef['type'] == '1darray':
-            out = np.zeros(typedef['length'], dtype)
+            out = np.zeros(typedef.get('length', 2), dtype)
         elif typedef['type'] == 'ndarray':
             out = np.zeros(typedef['shape'], dtype)
         else:

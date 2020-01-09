@@ -4,7 +4,8 @@ import uuid
 import atexit
 import threading
 import logging
-from yggdrasil import backwards, tools, serialize
+import types
+from yggdrasil import backwards, tools
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
 from yggdrasil.components import import_component, create_component
@@ -281,6 +282,9 @@ class CommBase(tools.YggClass):
         filter (:class:.FilterBase, optional): Callable class that will be used to
             determine when messages should be sent/received. Defaults to None
             and is ignored.
+        transform (:class:.TransformBase, optional): Callable class that will be
+            used to transform messages that are sent/received. Defaults to None
+            and is ignored.
         is_default (bool, optional): If True, this comm was created to handle
             all input/output variables to/from a model. Defaults to False. This
             variable is used internally and should not be set explicitly in
@@ -520,33 +524,43 @@ class CommBase(tools.YggClass):
             self.debug('seri_kws = %s', str(seri_kws))
             self.serializer = seri_cls(**seri_kws)
         # Set send/recv converter based on the serializer
+        dir_conv = '%s_converter' % self.direction
         if getattr(self, 'transform', []):
-            new_attr = '%s_converter' % self.direction
-            assert(not getattr(self, new_attr, []))
-            setattr(self, new_attr, self.transform)
-        for k in ['recv_converter', 'send_converter']:
-            v = getattr(self, k, [])
-            if not v:
-                v = getattr(self.serializer, k, [])
-            if v:
-                if not isinstance(v, list):
-                    v = [v]
-                oldv = v
-                v = []
-                for iv in oldv:
+            assert(not getattr(self, dir_conv, []))
+            # setattr(self, dir_conv, self.transform)
+        elif getattr(self, dir_conv, []):
+            self.transform = getattr(self, dir_conv)
+        else:
+            self.transform = getattr(self.serializer, dir_conv, [])
+        if self.transform:
+            if not isinstance(self.transform, list):
+                self.transform = [self.transform]
+            for i, iv in enumerate(self.transform):
+                if isinstance(iv, str):
+                    cls_conv = getattr(self.language_driver, dir_conv + 's')
+                    if iv in cls_conv:
+                        iv = cls_conv[iv]
                     if isinstance(iv, str):
-                        cls_conv = getattr(self.language_driver, k + 's')
-                        iv = cls_conv.get(iv, None)
-                    elif isinstance(iv, dict):
-                        from yggdrasil.schema import get_schema
-                        transform_schema = get_schema().get('transform')
-                        transform_kws = dict(
-                            iv,
-                            subtype=transform_schema.identify_subtype(iv))
-                        iv = create_component('transform', **transform_kws)
-                    if iv is not None:
-                        v.append(iv)
-            setattr(self, k, v)
+                        try:
+                            iv = create_component('transform', subtype=iv)
+                        except ValueError:
+                            iv = None
+                elif isinstance(iv, dict):
+                    from yggdrasil.schema import get_schema
+                    transform_schema = get_schema().get('transform')
+                    transform_kws = dict(
+                        iv,
+                        subtype=transform_schema.identify_subtype(iv))
+                    iv = create_component('transform', **transform_kws)
+                elif ((isinstance(iv, (types.BuiltinFunctionType, types.FunctionType,
+                                       types.BuiltinMethodType, types.MethodType))
+                       or hasattr(iv, '__call__'))):
+                    iv = create_component('transform', subtype='function',
+                                          function=iv)
+                else:  # pragma: debug
+                    raise TypeError("Unsupported transform type: '%s'" % type(iv))
+                self.transform[i] = iv
+        self.transform = [x for x in self.transform if x]
         # Set filter
         if isinstance(self.filter, dict):
             from yggdrasil.schema import get_schema
@@ -1020,54 +1034,32 @@ class CommBase(tools.YggClass):
         out = (isinstance(msg, backwards.bytes_type) and (msg == self.eof_msg))
         return out
 
-    def apply_recv_converter(self, msg_in):
-        r"""Apply recv_converter.
+    def apply_transform(self, msg_in):
+        r"""Evaluate the transform to alter the emssage being sent/received.
 
         Args:
-            msg_in (object): Message to convert.
-        
-        Returns:
-            object: Converted message.
- 
-        """
-        if self.recv_converter:
-            self.debug("Applying converters to received message.")
-        msg_out = msg_in
-        for iconv in self.recv_converter:
-            if isinstance(iconv, str):
-                if iconv in ['array', 'pandas']:
-                    # These are referenced by string since they require the
-                    # serializer customized with information from the received
-                    # message(s) (e.g. column names).
-                    msg_out = self.serializer.consolidate_array(msg_out)
-                    if iconv == 'pandas':
-                        msg_out = serialize.numpy2pandas(msg_out)
-                else:  # pragma: debug
-                    raise RuntimeError("Unrecognized recv_converter string: '%s'" %
-                                       iconv)
-            else:
-                msg_out = iconv(msg_out)
-        return msg_out
+            msg_in (object): Message being transformed.
 
-    def apply_send_converter(self, msg_in):
-        r"""Apply send converter.
-
-        Args:
-            msg_in (object): Message to convert.
-        
         Returns:
-            object: Converted message.
- 
+            object: Transformed message.
+
         """
-        if self.send_converter:
-            self.debug("Applying converters to message being sent.")
+        if not self.transform:
+            return msg_in
+        self.debug("Applying transformations to message being %s."
+                   % self.direction)
+        # If receiving, update the expected datatypes to use information
+        # about the received datatype that was recorded by the serializer
+        if (self.direction == 'recv') and (not self.transform[0].original_datatype):
+            typedef = self.serializer.typedef
+            for iconv in self.transform:
+                if not iconv.original_datatype:
+                    iconv.set_original_datatype(typedef)
+                typedef = iconv.transformed_datatype
+        # Actual conversion
         msg_out = msg_in
-        for iconv in self.send_converter:
-            if isinstance(iconv, str):  # pragma: debug
-                raise RuntimeError("Unrecognized send_converter string: '%s'." %
-                                   iconv)
-            else:
-                msg_out = iconv(msg_out)
+        for iconv in self.transform:
+            msg_out = iconv(msg_out)
         return msg_out
 
     def evaluate_filter(self, *msg_in):
@@ -1093,7 +1085,7 @@ class CommBase(tools.YggClass):
     def empty_obj_recv(self):
         r"""obj: Empty message object."""
         emsg, _ = self.deserialize(self.empty_bytes_msg)
-        emsg = self.apply_recv_converter(emsg)
+        emsg = self.apply_transform(emsg)
         return emsg
 
     def is_empty_recv(self, msg):
@@ -1125,7 +1117,7 @@ class CommBase(tools.YggClass):
             bool: True if the object is empty, False otherwise.
 
         """
-        smsg = self.apply_send_converter(msg)
+        smsg = self.apply_transform(msg)
         emsg, _ = self.deserialize(self.empty_bytes_msg)
         try:
             out = (isinstance(smsg, type(emsg)) and (smsg == emsg))
@@ -1477,7 +1469,7 @@ class CommBase(tools.YggClass):
         else:
             flag = True
             # Covert object
-            msg_ = self.apply_send_converter(msg)
+            msg_ = self.apply_transform(msg)
             # Serialize
             add_sinfo = (self._send_serializer and (not self.is_file))
             if add_sinfo:
@@ -1709,7 +1701,7 @@ class CommBase(tools.YggClass):
             flag = self.on_recv_eof()
             msg = msg_
         elif not header.get('incomplete', False):
-            msg = self.apply_recv_converter(msg_)
+            msg = self.apply_transform(msg_)
         else:
             msg = msg_
         if not second_pass:

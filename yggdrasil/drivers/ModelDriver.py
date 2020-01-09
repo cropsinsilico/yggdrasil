@@ -1711,6 +1711,7 @@ class ModelDriver(Driver):
                 if not isinstance(v, list):
                     v = [v]
                 try_vals += v
+        try_vals = [x for x in try_vals if isinstance(x, str)]
         if try_vals:
             if len(try_vals) > 1:  # pragma: debug
                 raise NotImplementedError("Multiple transformations "

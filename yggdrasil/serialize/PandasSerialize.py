@@ -220,7 +220,9 @@ class PandasSerialize(AsciiTableSerialize):
                 conversion could not be completed.
 
         """
-        return serialize.pandas2list(obj)
+        if isinstance(obj, pandas.DataFrame):
+            return serialize.pandas2list(obj)
+        return obj
 
     @classmethod
     def object2dict(cls, obj, **kwargs):
