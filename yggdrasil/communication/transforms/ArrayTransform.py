@@ -1,8 +1,9 @@
 import numpy as np
 import copy
+import pandas
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.metaschema.datatypes import type2numpy
-from yggdrasil.serialize import consolidate_array
+from yggdrasil.serialize import consolidate_array, pandas2numpy
 
 
 class ArrayTransform(TransformBase):
@@ -50,7 +51,9 @@ class ArrayTransform(TransformBase):
         """
         out = x
         np_dtype = type2numpy(self.original_datatype)
-        if np_dtype and isinstance(x, (list, tuple, np.ndarray)):
+        if isinstance(x, pandas.DataFrame):
+            out = pandas2numpy(x)
+        elif np_dtype and isinstance(x, (list, tuple, np.ndarray)):
             out = consolidate_array(x, dtype=np_dtype)
         else:
             # warning?
