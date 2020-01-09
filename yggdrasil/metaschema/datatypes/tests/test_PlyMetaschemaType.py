@@ -159,8 +159,10 @@ class TestPlyDict(YggTestClassInfo):
             self.assert_equal(o1, o2)
 
     @unittest.skipIf(not LPyModelDriver.is_installed(), "LPy library not installed.")
-    def test_to_from_scene(self, _as_obj=False):  # pragma: lpy
+    def test_to_from_scene(self, _as_obj=False, data=None):  # pragma: lpy
         r"""Test conversion to/from PlantGL scene."""
+        if data is None:
+            data = self._simple_test
         o1 = self.instance
         cls = o1.__class__
         s = o1.to_scene(name='test')
@@ -168,7 +170,7 @@ class TestPlyDict(YggTestClassInfo):
         # Direct equivalence won't happen unless test is just for simple mesh
         # as faces with more than 3 vertices will be triangulated.
         cls = self.import_cls
-        o1 = cls(self._simple_test)
+        o1 = cls(data)
         s = o1.to_scene(name='test')
         o2 = cls.from_scene(s)
         # import pprint
@@ -198,22 +200,24 @@ class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
     _mod = 'PlyMetaschemaType'
     _cls = 'PlyMetaschemaType'
 
-    def __init__(self, *args, **kwargs):
-        super(TestPlyMetaschemaType, self).__init__(*args, **kwargs)
-        self._value = _test_value
-        self._fulldef = {'type': self.import_cls.name}
-        self._typedef = {'type': self.import_cls.name}
-        self._valid_encoded = [self._fulldef]
-        self._valid_decoded = [self._value,
-                               PlyMetaschemaType.PlyDict(**_test_value),
-                               {'vertices': [], 'faces': [],
-                                'alt_verts': copy.deepcopy(_test_value['vertices'])},
-                               _test_value_int64]
-        self._invalid_encoded = [{}]
-        self._invalid_decoded = [{'vertices': [{k: 0.0 for k in 'xyz'}],
-                                  'faces': [{'vertex_index': [0, 1, 2]}]}]
-        self._compatible_objects = [(self._value, self._value, None)]
-        self._encode_data_kwargs = {'comments': ['Test comment']}
+    @staticmethod
+    def after_class_creation(cls):
+        r"""Actions to be taken during class construction."""
+        parent.TestJSONObjectMetaschemaType.after_class_creation(cls)
+        cls._value = _test_value
+        cls._fulldef = {'type': cls.get_import_cls().name}
+        cls._typedef = {'type': cls._fulldef['type']}
+        cls._valid_encoded = [cls._fulldef]
+        cls._valid_decoded = [cls._value,
+                              PlyMetaschemaType.PlyDict(**_test_value),
+                              {'vertices': [], 'faces': [],
+                               'alt_verts': copy.deepcopy(_test_value['vertices'])},
+                              _test_value_int64]
+        cls._invalid_encoded = [{}]
+        cls._invalid_decoded = [{'vertices': [{k: 0.0 for k in 'xyz'}],
+                                 'faces': [{'vertex_index': [0, 1, 2]}]}]
+        cls._compatible_objects = [(cls._value, cls._value, None)]
+        cls._encode_data_kwargs = {'comments': ['Test comment']}
 
     def test_decode_data_errors(self):
         r"""Test errors in decode_data."""

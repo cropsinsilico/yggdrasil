@@ -48,10 +48,10 @@ int main(int argc,char *argv[]) {
   double light_intensity = 0.0;
   ret = 0;
   while (1) {
-    ret = yggRecv(StructInput, &npatch,
-		  &x1[0], &x1[1], &x1[2],
-		  &x2[0], &x2[1], &x2[2],
-		  &x3[0], &x3[1], &x3[2]);
+    ret = yggRecvRealloc(StructInput, &npatch,
+			 &x1[0], &x1[1], &x1[2],
+			 &x2[0], &x2[1], &x2[2],
+			 &x3[0], &x3[1], &x3[2]);
     if (ret < 0) {
       printf("light: End of input.\n");
       break;

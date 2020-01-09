@@ -7,13 +7,6 @@ from yggdrasil.communication.filters.StatementFilter import StatementFilter
 from yggdrasil.communication.filters.FunctionFilter import FunctionFilter
 
 
-def my_repr(x):
-    if backwards.PY2 and isinstance(x, dict):  # pragma: Python 2
-        return '{' + ', '.join('%r: %r' % i for i in sorted(x.iteritems())) + '}'
-    else:
-        return repr(x)
-
-
 def test_registry():
     r"""Test registry of comm."""
     comm_class = 'CommBase'
@@ -176,11 +169,6 @@ class TestCommBase(YggTestClassInfo):
         msg = self.instance.empty_obj_recv
         assert(self.instance.is_empty_recv(msg))
         assert(not self.instance.is_empty_recv(self.instance.eof_msg))
-        if self.recv_instance.recv_converter is None:
-            self.recv_instance.recv_converter = lambda x: x
-            msg = self.instance.empty_obj_recv
-            assert(self.instance.is_empty_recv(msg))
-            assert(not self.instance.is_empty_recv(self.instance.eof_msg))
             
     def test_error_name(self):
         r"""Test error on missing address."""
@@ -510,8 +498,10 @@ class TestCommBase(YggTestClassInfo):
             str: Filter statement.
 
         """
-        if direction == 'recv':
-            msg = self.map_sent2recv(msg)
+        # Uncomment this if statements are ever used on the
+        # receiving side during tests
+        # if direction == 'recv':
+        #     msg = self.map_sent2recv(msg)
         if isinstance(msg, backwards.string_types):
             statement = '%x% != ' + repr(msg)
         else:
@@ -533,7 +523,11 @@ class TestCommBase(YggTestClassInfo):
             msg = self.map_sent2recv(msg)
 
         def fcond(x):
-            return (my_repr(x) != my_repr(msg))
+            try:
+                self.assert_equal(x, msg)
+                return False
+            except AssertionError:
+                return True
         return FunctionFilter(function=fcond)
 
     def setup_filters(self):

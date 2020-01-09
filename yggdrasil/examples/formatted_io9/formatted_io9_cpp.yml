@@ -1,0 +1,30 @@
+models:
+  - name: cpp_modelA
+    language: cpp
+    args: ./src/formatted_io9_modelA.cpp
+    inputs:
+      - name: inputA
+        type: any
+    outputs:
+      - name: outputA
+        type: any
+
+  - name: cpp_modelB
+    language: cpp
+    args: ./src/formatted_io9_modelB.cpp
+    inputs:
+      - name: inputB
+        type: any
+    outputs:
+      - name: outputB
+        type: any
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: inputA
+    filetype: yaml
+  - input: outputB  # Connection between model B output and file
+    output: ./output.txt
+    filetype: yaml

@@ -298,6 +298,27 @@ class ScalarMetaschemaType(MetaschemaType):
                 obj = py_type(obj)
         return obj
 
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
+        if typedef['type'] == '1darray':
+            out = np.zeros(typedef.get('length', 2), dtype)
+        elif typedef['type'] == 'ndarray':
+            out = np.zeros(typedef['shape'], dtype)
+        else:
+            out = np.zeros(1, dtype)[0]
+        out = units.add_units(out, typedef.get('units', ''))
+        return out
+
 
 # Dynamically create explicity scalar classes for shorthand
 for t in ScalarMetaschemaProperties._valid_types.keys():
@@ -307,6 +328,7 @@ for t in ScalarMetaschemaProperties._valid_types.keys():
                 '        Precision X is preserved.\n\n') % short_doc
     kwargs = {'target_globals': globals(),
               '__doc__': long_doc,
+              '__module__': ScalarMetaschemaType.__module__,
               'python_types': ScalarMetaschemaProperties._python_scalars[t]}
     create_fixed_type_class(t, short_doc, ScalarMetaschemaType,
                             {'subtype': t}, **kwargs)

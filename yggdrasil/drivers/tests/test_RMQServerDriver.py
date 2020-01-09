@@ -1,4 +1,5 @@
 import unittest
+import flaky
 from yggdrasil.communication.RMQComm import RMQComm
 import yggdrasil.drivers.tests.test_ServerDriver as parent
 
@@ -7,6 +8,7 @@ _rmq_installed = RMQComm.is_installed(language='python')
 
 
 @unittest.skipIf(not _rmq_installed, "RMQ Server not running")
+@flaky.flaky
 class TestRMQServerParam(parent.TestServerParam):
     r"""Test parameters for RMQServerDriver class."""
 
@@ -18,6 +20,7 @@ class TestRMQServerParam(parent.TestServerParam):
 
     
 @unittest.skipIf(not _rmq_installed, "RMQ Server not running")
+@flaky.flaky
 class TestRMQServerDriverNoStart(TestRMQServerParam,
                                  parent.TestServerDriverNoStart):
     r"""Test class for RMQServerDriver class without start."""
@@ -25,6 +28,7 @@ class TestRMQServerDriverNoStart(TestRMQServerParam,
 
 
 @unittest.skipIf(not _rmq_installed, "RMQ Server not running")
+@flaky.flaky
 class TestRMQServerDriver(TestRMQServerParam, parent.TestServerDriver):
     r"""Test class for RMQServerDriver class."""
     pass

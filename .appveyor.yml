@@ -19,10 +19,20 @@ environment:
 
   global:
     PYTHON: "C:\\Miniconda3-x64"
+    APPVEYOR_SAVE_CACHE_ON_ERROR: true
+    NUMPY: numpy
+    MATPLOTLIB: matplotlib
+    MPLBACKEND: agg
+    JSONSCHEMA: jsonschema
     INSTALLZMQ: 1
     INSTALLRMQ: 0
-    APPVEYOR_SAVE_CACHE_ON_ERROR: true
-    YGG_RUN_EXAMPLES: 0
+    INSTALLAPY: 0
+    INSTALLLPY: 0
+    INSTALLR: 1
+    INSTALLC: 1
+    BUILDDOCS: 0
+    YGG_CONDA: 1
+    YGG_TEST_FLAGS:
 
   erlang_download_url: "http://erlang.org/download/otp_win64_20.2.exe"
   erlang_exe_path: "C:\\Users\\appveyor\\erlang.exe"
@@ -35,82 +45,78 @@ environment:
     - platform: x64
       PYTHON_VERSION: "2.7"
       INSTALLZMQ: 0
+      INSTALLC: 0
     - platform: x64
       PYTHON_VERSION: "2.7"
-      YGG_ENABLE_LONG_TESTS: 1
+      YGG_TEST_FLAGS: "--long-running"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_ENABLE_LONG_TESTS: 1
+      INSTALLZMQ: 0
+      YGG_TEST_FLAGS: "--long-running"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_RUN_EXAMPLES: 1
+      YGG_TEST_FLAGS: "--test-suite=examples"
+    - platform: x64
+      PYTHON_VERSION: "3.6"
+      YGG_TEST_FLAGS: "--test-suite=types --languages r c"
+    - platform: x64
+      PYTHON_VERSION: "3.6"
+      YGG_TEST_FLAGS: "--test-suite=types --languages matlab python cpp"
 
 install:
-  - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
-  - "if %MSVCVER% gtr 11 set /a MSVCVER = MSVCVER - 1"
-  - "SET VSINSTALLDIR=%ProgramFiles(x86)%\\Microsoft Visual Studio %MSVCVER%.0\\"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-  - "SET MPLBACKEND=agg"
-  - "SET ZMQINSTALLDIR=%APPVEYOR_BUILD_FOLDER%"
   - "git submodule update --init --recursive"
 
-  # Setup Visual C++ toolset
-  # TODO: Generic case. This is specific to 64bit VS 2015/2017 (14.0/16.0)
-  - if "%MSVCVER%" == "16" if /I "%PLATFORM%" == "x64" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-  - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 /debug
-  - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+  # Set CZMQ/ZMQ install paths for use in install-czmq-windows.bat
+  - "if %INSTALLZMQ% == 1 SET ZMQINSTALLDIR=%APPVEYOR_BUILD_FOLDER%"
+  - "if %INSTALLZMQ% == 1 SET CONFIGURATION=Debug"
+  - "if %INSTALLZMQ% == 1 SET ZEROMQ_LIBRARY_DIR=%ZMQINSTALLDIR%\\build_libzmq\\lib\\%CONFIGURATION%"
+  - "if %INSTALLZMQ% == 1 SET CZMQ_LIBRARY_DIR=%ZMQINSTALLDIR%\\build_czmq\\%CONFIGURATION%"
+  - "if %INSTALLZMQ% == 1 SET ZEROMQ_INCLUDE_DIR=%ZMQINSTALLDIR%\\build_libzmq\\include"
+  - "if %INSTALLZMQ% == 1 SET CZMQ_INCLUDE_DIR=%ZMQINSTALLDIR%\\czmq\\include"
+  - "if %INSTALLZMQ% == 1 SET PATH=%PATH%;%ZEROMQ_LIBRARY_DIR%;%CZMQ_LIBRARY_DIR%;%ZEROMQ_INCLUDE_DIR%;%CZMQ_INCLUDE_DIR%"
+  - "if %INSTALLZMQ% == 1 echo PATH = %PATH%"
 
-  # Create a conda environment
-  # - "conda update -q --yes conda"
-  - "conda create -q --yes -n test python=%PYTHON_VERSION%"
-  - "activate test"
-  - "conda install --yes -c conda-forge r-base"
-
-  # Download and install Rtools
-  - ps: (new-object net.webclient).DownloadFile(
-      "https://cran.rstudio.com/bin/windows/Rtools/Rtools35.exe",
-      "C:\projects\rtools.exe")
-  - C:\projects\rtools.exe /VERYSILENT /DIR=C:\Rtools
-  - set PATH=c:\Rtools\bin;%PATH%
-  # - set PATH=c:\Rtools\bin;c:\Rtools\gcc-4.6.3\bin;%PATH%
-
-  # Check that we have the expected version of Python
-  - "python --version"
-
-  # Upgrade pip and setuptools and wheel to get clean install
-  - "python -m pip install --upgrade pip"
-  - "python -m pip install --upgrade wheel"
-  - "python -m pip install --upgrade setuptools"
-
-  # Install ZeroMQ
-  - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
+  # Install R tools
+  - ps: If ($env:INSTALLR -eq 1) {
+      (new-object net.webclient).DownloadFile(
+        "https://cran.rstudio.com/bin/windows/Rtools/Rtools35.exe",
+        "C:\projects\rtools.exe")
+      }
+  - if "%INSTALLR%" == "1" C:\projects\rtools.exe /VERYSILENT /DIR=C:\Rtools
+  - if "%INSTALLR%" == "1" set PATH=c:\Rtools\bin;%PATH%
 
   # Install & start RabbitMQ
-  - "if %INSTALLRMQ% == 1 pip install \"pika<1.0\""
-  - ps: If ($INSTALLRMQ -eq 1) { $webclient=New-Object System.Net.WebClient }
+  - ps: If ($env:INSTALLRMQ -eq 1) { $webclient=New-Object System.Net.WebClient }
   - if "%INSTALLRMQ%" == "1" ECHO Downloading Erlang...
-  - ps: If ($INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:erlang_download_url", "$env:erlang_exe_path") }
+  - ps: If ($env:INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:erlang_download_url", "$env:erlang_exe_path") }
   - if "%INSTALLRMQ%" == "1" ECHO Starting Erlang...
   - if "%INSTALLRMQ%" == "1" start /B /WAIT %erlang_exe_path% /S /D=%erlang_home_dir%
   - if "%INSTALLRMQ%" == "1" set ERLANG_HOME=%erlang_home_dir%
   - if "%INSTALLRMQ%" == "1" ECHO Downloading RabbitMQ...
-  - ps: If ($INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:rabbitmq_installer_download_url", "$env:rabbitmq_installer_path") }
+  - ps: If ($env:INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:rabbitmq_installer_download_url", "$env:rabbitmq_installer_path") }
   - if "%INSTALLRMQ%" == "1" ECHO Installing and starting RabbitMQ with default config...
   - if "%INSTALLRMQ%" == "1" start /B /WAIT %rabbitmq_installer_path% /S
-  - ps: If ($INSTALLRMQ -eq 1) { (Get-Service -Name RabbitMQ).Status }
+  - ps: If ($env:INSTALLRMQ -eq 1) { (Get-Service -Name RabbitMQ).Status }
 
-  # Install testing dependencies
-  - "conda install --yes -c conda-forge numpy scipy"  # Installing via pip causes import error
-  - "pip install -r requirements_testing.txt"
+  # Setup environment
+  # Currently conda is used reguardless of the installation method as
+  # that is how python is installed by appveyor
+  - "python utils\\ci_setup.py pip env %PYTHON_VERSION%"
+  # - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda env %PYTHON_VERSION%"
+  # - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip env %PYTHON_VERSION%"
 
-  # Install yggdrasil allowing pip to resolve requirements
-  - "python setup.py sdist"
-  - "dir dist\\*.tar.gz"
-  - for %%a in ("dist\\*.tar.gz") do set YGGSDIST=%%a
-  - echo %YGGSDIST%
-  - "pip install --verbose %YGGSDIST%"
-  # - "pip install --verbose -e ."
-  - "python create_coveragerc.py"
+  # Activate environment (should be conda reguardless)
+  - "activate test-environment"
+  
+  # Setup Visual C++ toolset
+  - if "%INSTALLC%" == "1" call "ci\\install-compilers.bat"
+
+  # Build and install
+  - "python utils\\ci_setup.py pip deploy"
+  # - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda deploy"
+  # - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip deploy"
+  - "echo %PATH%"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
@@ -124,14 +130,8 @@ cache:
 # Not a .NET project
 build: false
 
-before_test:
-  - "ygginfo --verbose"
-  - "flake8 yggdrasil"
-
 test_script:
-  - "type .coveragerc"
-  - "if %YGG_RUN_EXAMPLES% == 0 yggtest -c setup.cfg --cov-config=.coveragerc"
-  - "if %YGG_RUN_EXAMPLES% == 1 yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples"
+  - "yggtest --ci %YGG_TEST_FLAGS%"
 
 after_test:
   - "codecov"

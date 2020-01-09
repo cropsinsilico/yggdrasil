@@ -2,7 +2,7 @@ import os
 import copy
 import unittest
 from yggdrasil import platform, tools
-from yggdrasil.tests import assert_raises, scripts
+from yggdrasil.tests import assert_raises, scripts, check_enabled_languages
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_product
 from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
@@ -89,6 +89,7 @@ class TestModelParam(parent.TestParam):
                 self.__class__._flag_tests_on_not_installed = True
             raise unittest.SkipTest("'%s' not installed."
                                     % self.import_cls.language)
+        check_enabled_languages(self.import_cls.language)
         super(TestModelParam, self).setup(*args, **kwargs)
 
 
@@ -158,18 +159,18 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         self.run_model_instance(with_valgrind=False, with_strace=True)
         
     # Tests for code generation
-    def run_generated_code(self, lines):
+    def run_generated_code(self, lines, **kwargs):
         r"""Write and run generated code."""
         if not self.import_cls.is_installed():
             return
         # Write code to a file
-        self.import_cls.run_code(lines)
+        self.import_cls.run_code(lines, **kwargs)
 
     def get_test_types(self):
         r"""Return the list of tuples mapping json type to expected native type."""
         if self.import_cls.type_map is None:
             return []
-        out = list(self.import_cls.type_map.items())
+        out = copy.deepcopy(list(self.import_cls.type_map.items()))
         if 'flag' not in self.import_cls.type_map:
             out.append(('flag', self.import_cls.type_map['boolean']))
         return out
@@ -199,6 +200,9 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             if not isinstance(a, dict):
                 self.assert_equal(
                     self.import_cls.get_native_type(datatype={'type': a}), b)
+                if a in ['float', 'int', 'uint']:
+                    self.assert_equal(self.import_cls.get_native_type(
+                        datatype={'type': 'scalar', 'subtype': a}), b)
                 
     def test_write_declaration(self):
         r"""Test write_declaration for all supported native types."""
@@ -207,7 +211,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             return
         test_vals = self.get_test_types()
         for a, b in test_vals:
-            self.import_cls.write_declaration('test', datatype=a)
+            self.import_cls.write_declaration({'name': 'test',
+                                               'datatype': a})
 
     def test_write_model_wrapper(self):
         r"""Test writing a model based on yaml parameters."""
@@ -263,6 +268,87 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         lines = [self.import_cls.function_param['error'].format(error_msg=error_msg)]
         assert_raises(RuntimeError, self.import_cls.run_code, lines)
 
+    def test_write_function_def(self, inputs=None, outputs=None,
+                                outputs_in_inputs=None, **kwargs):
+        r"""Test writing and running a function definition."""
+        if self.import_cls.function_param is None:
+            self.assert_raises(NotImplementedError,
+                               self.import_cls.write_function_def, None)
+        else:
+            if inputs is None:
+                inputs = [{'name': 'x', 'value': 1.0,
+                           'datatype': {'type': 'float',
+                                        'precision': 32,
+                                        'units': 'cm'}}]
+            if outputs is None:
+                outputs = [{'name': 'y',
+                            'datatype': {'type': 'float',
+                                         'precision': 32,
+                                         'units': 'cm'}}]
+            if outputs_in_inputs is None:
+                outputs_in_inputs = self.import_cls.outputs_in_inputs
+            flag_var = {'name': 'flag',
+                        'datatype': 'flag',
+                        'value': self.import_cls.function_param['true']}
+            function_contents = []
+            if len(inputs) == len(outputs):
+                for i, o in zip(inputs, outputs):
+                    function_contents += self.import_cls.write_assign_to_output(
+                        o['name'], i['name'],
+                        outputs_in_inputs=outputs_in_inputs)
+                    function_contents += self.import_cls.write_print_output_var(
+                        o['name'], in_inputs=outputs_in_inputs)
+            output_var = self.import_cls.prepare_output_variables(
+                outputs, in_inputs=self.import_cls.outputs_in_inputs,
+                in_definition=True)
+            definition = self.import_cls.write_function_def(
+                'test_function', inputs=inputs, output_var=output_var,
+                function_contents=function_contents,
+                flag_var=flag_var, outputs_in_inputs=outputs_in_inputs,
+                print_inputs=True, print_outputs=True, **kwargs)
+            # Add second definition to test ability to locate specific
+            # function in the presence of others
+            definition.append('')
+            definition += self.import_cls.write_function_def(
+                'test_function_decoy', inputs=inputs,
+                outputs=outputs, flag_var=flag_var,
+                function_contents=function_contents,
+                outputs_in_inputs=outputs_in_inputs,
+                skip_interface=True)
+            parsed = self.import_cls.parse_function_definition(
+                None, 'test_function', contents='\n'.join(definition),
+                outputs_in_inputs=outputs_in_inputs,
+                expected_outputs=outputs)
+            self.assert_equal(len(parsed.get('inputs', [])), len(inputs))
+            self.assert_equal(len(parsed.get('outputs', [])), len(outputs))
+            if inputs:
+                for xp, x0 in zip(parsed['inputs'], inputs):
+                    assert(xp['name'] == x0['name'])
+                    x0.update(xp)
+            if outputs:
+                for xp, x0 in zip(parsed['outputs'], outputs):
+                    assert(xp['name'] == x0['name'])
+                    x0.update(xp)
+            # Lines required to set up the function call
+            lines = []
+            if 'declare' in self.import_cls.function_param:
+                for x in inputs + outputs:
+                    lines += self.import_cls.write_declaration(x)
+                if outputs_in_inputs:
+                    lines += self.import_cls.write_declaration(flag_var)
+            for x in inputs:
+                lines.append(self.import_cls.format_function_param(
+                    'assign', **x))
+            if outputs_in_inputs:
+                lines.append(self.import_cls.format_function_param(
+                    'assign', **flag_var))
+            lines += self.import_cls.write_function_call(
+                'test_function', flag_var=flag_var,
+                inputs=inputs, outputs=outputs,
+                outputs_in_inputs=outputs_in_inputs)
+            self.run_generated_code(lines,
+                                    function_definitions=definition)
+            
     def test_write_if_block(self):
         r"""Test writing an if block."""
         if self.import_cls.function_param is None:
@@ -273,10 +359,18 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             if 'declare' in self.import_cls.function_param:
                 lines.append(self.import_cls.function_param['declare'].format(
                     type_name='int', variable='x'))
-            cond = self.import_cls.function_param['true']
-            block_contents = self.import_cls.function_param['assign'].format(
-                name='x', value='1')
-            lines += self.import_cls.write_if_block(cond, block_contents)
+            cond = [self.import_cls.function_param['true'],
+                    self.import_cls.function_param['false']]
+            block_contents = [
+                self.import_cls.function_param['assign'].format(
+                    name='x', value='1'),
+                self.import_cls.function_param['assign'].format(
+                    name='x', value='2')]
+            else_contents = self.import_cls.function_param['assign'].format(
+                name='x', value='-1')
+            lines += self.import_cls.write_if_block(
+                cond, block_contents,
+                else_block_contents=else_contents)
             self.run_generated_code(lines)
 
     def test_write_for_loop(self):
@@ -322,6 +416,10 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             lines += self.import_cls.write_try_except(try_contents,
                                                       except_contents, **kwargs)
             self.run_generated_code(lines)
+
+    def test_cleanup_dependencies(self):
+        r"""Test cleanup_dependencies method."""
+        self.import_cls.cleanup_dependencies()
     
 
 class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):

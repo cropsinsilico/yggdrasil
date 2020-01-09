@@ -35,3 +35,11 @@ class TestTransformBase(YggTestClass):
                     self.assert_raises(msg_out, inst, msg_in)
                 else:
                     self.assert_equal(inst(msg_in), msg_out)
+
+    def test_transform_type(self):
+        r"""Test transform_type."""
+        for x in self.get_options():
+            inst = self.import_cls(**x.get('kwargs', {}))
+            for typ_in, typ_out in x.get('in/out_t', []):
+                self.assert_equal(inst.transform_datatype(typ_in),
+                                  typ_out)

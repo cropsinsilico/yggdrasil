@@ -1,25 +1,23 @@
 import os
-import unittest
-from yggdrasil.tests import scripts, assert_raises, assert_equal
+from yggdrasil.tests import (
+    scripts, assert_raises, assert_equal, requires_language)
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
 from yggdrasil.drivers.MakeModelDriver import MakeModelDriver, MakeCompiler
 
 
-_driver_installed = MakeModelDriver.is_installed()
-
-
+@requires_language('make', installed='any')
 def test_MakeCompiler():
     r"""Test MakeCompiler class."""
     assert_equal(MakeCompiler.get_output_file(None, target='clean'), 'clean')
 
 
-@unittest.skipIf(_driver_installed, "C Library installed")
+@requires_language('make', installed=False)
 def test_MakeModelDriver_no_C_library():  # pragma: windows
     r"""Test MakeModelDriver error when C library not installed."""
     assert_raises(RuntimeError, MakeModelDriver, 'test', scripts['make'])
 
 
-@unittest.skipIf(not _driver_installed, "C Library not installed")
+@requires_language('make')
 def test_MakeModelDriver_error_notarget():
     r"""Test MakeModelDriver error for invalid target."""
     makedir, target = os.path.split(scripts['make'])
@@ -27,7 +25,7 @@ def test_MakeModelDriver_error_notarget():
                   makedir=makedir)
 
 
-@unittest.skipIf(not _driver_installed, "C Library not installed")
+@requires_language('make')
 def test_MakeModelDriver_error_nofile():
     r"""Test MakeModelDriver error for missing Makefile."""
     makedir, target = os.path.split(scripts['make'])

@@ -14,7 +14,8 @@ class TestOneDArrayMetaschemaType(parent.TestScalarMetaschemaType):
         self._valid_encoded[0]['length'] = len(self._array)
         self._valid_decoded.append(np.array([], self._array.dtype))
 
-    def assert_result_equal(self, x, y):
+    @classmethod
+    def assert_result_equal(cls, x, y):
         r"""Assert that serialized/deserialized objects equal."""
         np.testing.assert_array_equal(x, y)
         
@@ -29,6 +30,7 @@ class TestNDArrayMetaschemaType(parent.TestScalarMetaschemaType):
         super(TestNDArrayMetaschemaType, self).__init__(*args, **kwargs)
         self._valid_encoded[0]['shape'] = list(self._array.shape)
 
-    def assert_result_equal(self, x, y):
+    @classmethod
+    def assert_result_equal(cls, x, y):
         r"""Assert that serialized/deserialized objects equal."""
         np.testing.assert_array_equal(x, y)

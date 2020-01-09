@@ -3,7 +3,7 @@ from yggdrasil.serialize import _default_delimiter
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-    definition2dtype)
+    definition2dtype, data2dtype)
 
 
 class AsciiTableSerialize(DefaultSerialize):
@@ -150,7 +150,8 @@ class AsciiTableSerialize(DefaultSerialize):
             out = list(serialize.process_message(msg, self.format_str))
         field_units = self.get_field_units()
         if field_units is not None:
-            out = [units.add_units(x, u) for x, u in zip(out, field_units)]
+            out = [units.add_units(x, u, dtype=data2dtype(x))
+                   for x, u in zip(out, field_units)]
         return out
 
     @classmethod

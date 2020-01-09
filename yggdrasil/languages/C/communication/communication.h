@@ -114,7 +114,13 @@ void clean_comms(void) {
   // #if defined(_WIN32) && defined(ZMQINSTALLED)
   zsys_shutdown();
 #endif
+  if (Py_IsInitialized()) {
+    Py_Finalize();
+  }
   ygglog_debug("atexit done");
+  if (_ygg_error_flag != 0) {
+    _exit(_ygg_error_flag);
+  }
   /* printf(""); */
 };
 
@@ -268,7 +274,7 @@ comm_t* init_comm(const char *name, const char *direction,
   _set_abort_behavior(0,_WRITE_ABORT_MSG);
 #endif
   if ((datatype == NULL) && (strcmp(direction, "send") == 0)) {
-    datatype = create_dtype_scalar("bytes", 0, "");
+    datatype = create_dtype_scalar("bytes", 0, "", false);
   }
   comm_t *ret = init_comm_base(name, direction, t, datatype);
   if (ret == NULL) {
@@ -316,7 +322,7 @@ comm_t* init_comm_format(const char *name, const char *direction,
       datatype = NULL;
     }
   } else {
-    datatype = create_dtype_format(format_str, as_array);
+    datatype = create_dtype_format(format_str, as_array, false);
   }
   comm_t* out = init_comm(name, direction, t, datatype);
   if ((format_str != NULL) && (datatype == NULL)) {
@@ -964,6 +970,10 @@ int vcommSend(const comm_t *x, size_t nargs, va_list_t ap) {
   if (x->type == CLIENT_COMM) {
     comm_t *handle = (comm_t*)(x->handle);
     datatype = handle->datatype;
+  }
+  // Update datatype if not yet set and object being sent includes type
+  if (update_dtype_from_generic_ap(datatype, nargs, ap) < 0) {
+    return -1;
   }
   size_t nargs_orig = nargs;
   ret = serialize_dtype(datatype, &buf, &buf_siz, 1, &nargs, ap);

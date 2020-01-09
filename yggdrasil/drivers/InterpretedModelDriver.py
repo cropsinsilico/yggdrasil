@@ -54,11 +54,6 @@ class InterpretedModelDriver(ModelDriver):
             threads at exit (e.g. when using a Matlab engine).
         decode_format (function: Function decoding format string created in this
             language. If None, no additional actions are taken.
-        python2language (function): Function preparing Python objects for
-            transfer to this language. If None, no additional actions are taken.
-        language2python (function): Function preparing objects native to this
-            language for transfer to Python. If None, no additional actions are
-            taken.
         recv_converters (dict): Mapping between the names of message types (e.g.
             'array', 'pandas') and functions that should be used to prepare such
             objects for return when they are received.
@@ -81,8 +76,6 @@ class InterpretedModelDriver(ModelDriver):
     comm_atexit = None
     comm_linger = False
     decode_format = None
-    python2language = None
-    language2python = None
     recv_converters = {'pandas': 'pandas'}
     send_converters = {'pandas': serialize.pandas2list}
 
@@ -275,3 +268,35 @@ class InterpretedModelDriver(ModelDriver):
                      "to InterpretedModelDriver in place of this "
                      "warning message.") % self.language)
         return out
+
+    # Methods for handling type conversions
+    @classmethod
+    def python2language(cls, pyobj):
+        r"""Prepare a python object for transformation in target
+        language.
+
+        Args:
+            pyobj (object): Python object.
+
+        Returns:
+            object: Python object in a form that is friendly to the
+                target language.
+
+        """
+        return pyobj
+
+    @classmethod
+    def language2python(cls, pyobj):
+        r"""Prepare an object from the target language for receipt
+        in Python.
+
+        Args:
+            pyobj (object): Python object transformed from the target
+                language.
+
+        Returns:
+            object: Python object in a form that conforms with the
+                expected Python type.
+
+        """
+        return pyobj

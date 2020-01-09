@@ -1,36 +1,46 @@
+import six
 import numpy as np
 import copy
 import pprint
 import jsonschema
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError, YGG_MSG_HEAD
-from yggdrasil.tests import YggTestClassInfo
+from yggdrasil.tests import YggTestClassInfo, assert_equal
 
 
+class TstMetaschemaTypeMeta(type):
+    r"""Meta class for setting up test information."""
+
+    def __new__(meta, name, bases, class_dict):
+        attr = dict(_explicit=False,
+                    _empty_msg=b'',
+                    _typedef={},
+                    _invalid_validate=[None],
+                    _valid_encoded=[],
+                    _invalid_encoded=[{}],
+                    _valid_decoded=['nothing'],
+                    _invalid_decoded=[],
+                    _compatible_objects=[],
+                    _encode_type_kwargs={},
+                    _encode_data_kwargs={},
+                    _valid_normalize=[(None, None)])
+        attr.update(class_dict)
+        cls = type.__new__(meta, name, bases, attr)
+        cls.after_class_creation(cls)
+        return cls
+    
+
+@six.add_metaclass(TstMetaschemaTypeMeta)
 class TestMetaschemaType(YggTestClassInfo):
     r"""Test class for MetaschemaType class."""
 
+    _mod_base = 'yggdrasil.metaschema.datatypes'
     _mod = 'MetaschemaType'
     _cls = 'MetaschemaType'
-    _explicit = False
 
-    def __init__(self, *args, **kwargs):
-        super(TestMetaschemaType, self).__init__(*args, **kwargs)
-        self._empty_msg = b''
-        self._typedef = {}
-        self._invalid_validate = [None]
-        self._valid_encoded = []
-        self._invalid_encoded = [{}]
-        self._valid_decoded = ['nothing']
-        self._invalid_decoded = []
-        self._compatible_objects = []
-        self._encode_type_kwargs = {}
-        self._encode_data_kwargs = {}
-        self._valid_normalize = [(None, None)]
-
-    @property
-    def mod(self):
-        r"""str: Absolute name of module containing class to be tested."""
-        return 'yggdrasil.metaschema.datatypes.%s' % self._mod
+    @staticmethod
+    def after_class_creation(cls):
+        r"""Actions to be taken during class construction."""
+        pass
 
     @property
     def typedef(self):
@@ -44,7 +54,8 @@ class TestMetaschemaType(YggTestClassInfo):
         r"""dict: Keyword arguments for creating a class instance."""
         return self._typedef
 
-    def assert_result_equal(self, x, y):
+    @classmethod
+    def assert_result_equal(cls, x, y):
         r"""Assert that serialized/deserialized objects equal."""
         if isinstance(x, dict):
             if not isinstance(y, dict):  # pragma: debug
@@ -56,7 +67,7 @@ class TestMetaschemaType(YggTestClassInfo):
                     print('y')
                     pprint.pprint(y)
                     raise AssertionError("Key '%s' not in second dictionary." % k)
-                self.assert_result_equal(x[k], y[k])
+                cls.assert_result_equal(x[k], y[k])
             for k in y.keys():
                 if k not in x:  # pragma: debug
                     print('x')
@@ -75,7 +86,7 @@ class TestMetaschemaType(YggTestClassInfo):
                 raise AssertionError("Sizes do not match. %d vs. %d"
                                      % (len(x), len(y)))
             for ix, iy in zip(x, y):
-                self.assert_result_equal(ix, iy)
+                cls.assert_result_equal(ix, iy)
         elif isinstance(x, np.ndarray):
             np.testing.assert_array_equal(x, y)
         else:
@@ -86,7 +97,28 @@ class TestMetaschemaType(YggTestClassInfo):
                 pprint.pprint(y)
                 raise AssertionError("Compared objects are different types. "
                                      "%s vs. %s" % (type(x), type(y)))
-            self.assert_equal(x, y)
+            assert_equal(x, y)
+
+    def test_generate_data(self):
+        r"""Test generation of data."""
+        if self._cls == 'MetaschemaType':
+            return
+        if len(self._valid_encoded) > 0:
+            typedef = self._valid_encoded[0]
+            data = self.import_cls.generate_data(typedef)
+            self.import_cls.validate(data, raise_errors=True)
+
+    def test_issubtype(self):
+        r"""Test issubtype."""
+        if self._cls == 'MetaschemaType':
+            return
+        assert(self.import_cls.issubtype(self.typedef['type']))
+        if self.import_cls.name == 'any':
+            assert(self.import_cls.issubtype('invalid'))
+        else:
+            assert(not self.import_cls.issubtype('invalid'))
+        if not isinstance(self.typedef['type'], (list, tuple)):
+            assert(self.import_cls.issubtype([self.typedef['type']]))
 
     def test_validate(self):
         r"""Test validation."""

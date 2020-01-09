@@ -53,9 +53,15 @@ class TestConnectionParam(parent.TestParam):
     def is_output(self):
         r"""bool: True if the connection is for output."""
         return (self.ocomm_name != self.comm_name)
-        
+    
+    def map_sent2recv(self, obj):
+        r"""Convert a sent object into a received one."""
+        return obj
+
     def assert_msg_equal(self, x, y):
         r"""Assert that two messages are equivalent."""
+        if not self.send_comm.is_eof(y):
+            y = self.map_sent2recv(y)
         self.assert_equal(x, y)
 
     def assert_msg_lists_equal(self, x, y):
@@ -392,11 +398,6 @@ class TestConnectionDriverFork(TestConnectionDriver):
         return out
 
 
-def direct_translate(msg):
-    r"""Test translator that just returns passed message."""
-    return msg
-
-
 invalid_translate = True
 
 
@@ -407,10 +408,25 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionDriverTranslate, self).inst_kwargs
-        out['translator'] = direct_translate
+        out['translator'] = {'transformtype': 'select_fields',
+                             'selected': ['a'],
+                             'single_as_scalar': True}
         out['onexit'] = 'printStatus'
         return out
 
+    @property
+    def test_msg(self):
+        r"""str: Test message that should be used for any send/recv tests."""
+        return {'a': int(1), 'b': float(2)}
+
+    def test_send_recv_nolimit(self):
+        r"""Test sending/receiving large message."""
+        pass
+    
+    def map_sent2recv(self, obj):
+        r"""Convert a sent object into a received one."""
+        return obj['a']
+    
 
 def test_ConnectionDriverOnexit_errors():
     r"""Test that errors are raised for invalid onexit."""

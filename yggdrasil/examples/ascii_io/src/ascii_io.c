@@ -1,11 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <complex.h>
-#ifdef _WIN32
-typedef _Dcomplex complex_double;
-#else
-typedef double _Complex complex_double;
-#endif
 // Include interface methods
 #include "YggInterface.h"
 
@@ -45,9 +39,9 @@ int main(int argc,char *argv[]){
       printf("File: %s", line);
       ret = yggSend(FileOutput, line, line_size);
       if (ret < 0) {
-	printf("ascii_io(C): ERROR SENDING LINE\n");
-	error_code = -1;
-	break;
+  	printf("ascii_io(C): ERROR SENDING LINE\n");
+  	error_code = -1;
+  	break;
       }
     } else {
       // If the receive was not succesful, send the end-of-file message to
@@ -76,12 +70,12 @@ int main(int argc,char *argv[]){
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
       printf("Table: %.5s, %ld, %3.1f, %g%+gj\n",
-	     name, number, value, creal(comp), cimag(comp));
+  	     name, number, value, creal(comp), cimag(comp));
       ret = yggSend(TableOutput, name, name_siz, number, value, comp);
       if (ret < 0) {
-	printf("ascii_io(C): ERROR SENDING ROW\n");
-	error_code = -1;
-	break;
+  	printf("ascii_io(C): ERROR SENDING ROW\n");
+  	error_code = -1;
+  	break;
       }
     } else {
       // If the receive was not succesful, send the end-of-file message to
@@ -101,7 +95,7 @@ int main(int argc,char *argv[]){
   complex_double *comp_arr = NULL;
   ret = 0;
   while (ret >= 0) {
-    ret = yggRecv(ArrayInput, &nrows, &name_arr, &number_arr, &value_arr, &comp_arr);
+    ret = yggRecvRealloc(ArrayInput, &nrows, &name_arr, &number_arr, &value_arr, &comp_arr);
     if (ret >= 0) {
       printf("Array: (%lu rows)\n", nrows);
       // Print each line in the array

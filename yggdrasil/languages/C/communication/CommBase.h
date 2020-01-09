@@ -79,10 +79,12 @@ int free_comm_base(comm_t *x) {
     x->used = NULL;
   }
   if (x->datatype != NULL) {
-    destroy_dtype(x->datatype);
+    destroy_dtype(&(x->datatype));
     x->datatype = NULL;
   }
   x->valid = 0;
+  x->name[0] = '\0';
+  x->index_in_register = -1;
   return 0;
 };
 
@@ -143,7 +145,7 @@ comm_t* new_comm_base(char *address, const char *direction,
   } else {
     strncpy(ret->direction, direction, COMM_DIR_SIZE);
   }
-  ret->datatype = init_dtype(datatype);
+  ret->datatype = complete_dtype(datatype, false);
   if (ret->datatype == NULL) {
     ygglog_error("new_comm_base: Could not initialize data type.");
     free_comm_base(ret);

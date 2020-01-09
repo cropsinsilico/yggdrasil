@@ -2,13 +2,14 @@ import six
 import copy
 import uuid
 import pprint
+import importlib
 import jsonschema
 from yggdrasil import backwards, tools
 from yggdrasil.metaschema import (get_metaschema, get_validator, encoder,
                                   validate_instance)
 from yggdrasil.metaschema.datatypes import (
     MetaschemaTypeError, MetaschemaTypeMeta, compare_schema, YGG_MSG_HEAD,
-    get_type_class, conversions)
+    get_type_class, conversions, is_default_typedef)
 from yggdrasil.metaschema.properties import get_metaschema_property
 
 
@@ -179,12 +180,14 @@ class MetaschemaType(object):
         r"""Determine if this type is a subclass of the provided type.
 
         Args:
-            t (str): Type name to check against.
+            t (str, list): Type name or list of type names to check against.
 
         Returns:
             bool: True if this type is a subtype of the specified type t.
 
         """
+        if isinstance(t, list):
+            return (cls.name in t)
         return (cls.name == t)
 
     @classmethod
@@ -335,7 +338,7 @@ class MetaschemaType(object):
         if typename1 and typename0 and (typename1 != typename0):
             raise MetaschemaTypeError(
                 "Cannot update typedef for type '%s' to be '%s'."
-                % (typename0, typename1))
+                % (typename0, typename1))  # pragma: debug
         # Copy over valid properties
         all_keys = [k for k in kwargs.keys()]
         # req_keys = self.definition_schema().get('required', [])
@@ -609,7 +612,7 @@ class MetaschemaType(object):
         conv_func = None
         if isinstance(metadata, dict):
             metatype = metadata.get('type', None)
-            if (metatype not in [None, 'bytes']) and (typedef == {'type': 'bytes'}):
+            if (metatype not in [None, 'bytes']) and is_default_typedef(typedef):
                 new_cls = get_type_class(metatype)
                 return new_cls.decode(metadata, data, dont_check=dont_check)
             if metatype != cls.name:
@@ -714,7 +717,7 @@ class MetaschemaType(object):
             if metadata is None:
                 metadata = dict(size=len(msg))
                 if (((len(msg) > 0) and (msg != tools.YGG_MSG_EOF)
-                     and (self._typedef != {'type': 'bytes'})
+                     and (not is_default_typedef(self._typedef))
                      and (not dont_decode))):
                     raise ValueError("Header marker not in message.")
         # Set flags based on data
@@ -734,3 +737,66 @@ class MetaschemaType(object):
             obj = self.decode(metadata, data, self._typedef,
                               typedef_validated=True, dont_check=dont_check)
         return obj, metadata
+
+    # TESTING METHODS
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        raise NotImplementedError  # pragma: debug
+    
+    @classmethod
+    def generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        cls.validate_definition(typedef)
+        typedef = cls.normalize_definition(typedef)
+        if hasattr(cls, 'example_data'):
+            return cls.example_data
+        return cls._generate_data(typedef)
+    
+    @classmethod
+    def import_test_class(cls):
+        r"""Import the test class for this class.
+
+        Returns:
+            class: Test class for this class.
+
+        """
+        tmod = importlib.import_module(cls.get_test_module())
+        tcls = cls.get_test_class()
+        return getattr(tmod, tcls)
+    
+    @classmethod
+    def get_test_class(cls):
+        r"""Determine the test class for the class.
+
+        Returns:
+            str: Name of the test class for this class.
+
+        """
+        return 'Test%s' % cls.__name__
+    
+    @classmethod
+    def get_test_module(cls):
+        r"""Determine the test module for the class.
+
+        Returns:
+            str: Full Python "path" to module containing the test class.
+
+        """
+        return '%s.tests.test_%s' % tuple(cls.__module__.rsplit('.', 1))

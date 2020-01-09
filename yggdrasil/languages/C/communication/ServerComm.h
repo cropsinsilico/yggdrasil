@@ -38,7 +38,7 @@ int init_server_comm(comm_t *comm) {
     return init_default_comm(comm);
   }
   // Called to initialize/create server comm
-  dtype_t *dtype_in = create_dtype_format(comm->direction, 0);
+  dtype_t *dtype_in = create_dtype_format(comm->direction, 0, false);
   if (dtype_in == NULL) {
     ygglog_error("init_server_comm: Failed to create dtype_in.");
     return -1;

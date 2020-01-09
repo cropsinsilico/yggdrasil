@@ -600,10 +600,10 @@ class FileComm(CommBase.CommBase):
                 the read messages as bytes.
 
         """
+        flag = True
         try:
             self.read_header()
             prev_pos = self.fd.tell()
-            flag = True
             if self.read_meth == 'read':
                 out = self.fd.read()
             elif self.read_meth == 'readline':

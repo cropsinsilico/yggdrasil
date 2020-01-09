@@ -54,55 +54,73 @@ definitions:
           type: array
         filter:
           $ref: '#/definitions/filter'
-          description: Callable class that will be used to determine when messages
-            should be sent/received. Defaults to None and is ignored.
         is_default:
           default: false
-          description: If True, this comm was created to handle all input/output variables
-            to/from a model. Defaults to False. This variable is used internally and
-            should not be set explicitly in the YAML.
           type: boolean
+        length_map:
+          additionalProperties:
+            type: string
+          description: Map from pointer variable names to
+          type: object
         name:
           description: Name used for component in log messages.
           type: string
+        outside_loop:
+          default: false
+          type: boolean
         recv_converter:
-          description: Converter that should be used on received objects. Defaults
-            to None.
-          oneOf:
+          anyOf:
           - $ref: '#/definitions/transform'
           - type:
             - function
             - string
           - items:
-              oneOf:
+              anyOf:
               - $ref: '#/definitions/transform'
               - type:
                 - function
                 - string
             type: array
+          description: Converter that should be used on received objects. Defaults
+            to None.
         send_converter:
-          description: Converter that should be used on sent objects. Defaults to
-            None.
-          oneOf:
+          anyOf:
           - $ref: '#/definitions/transform'
           - type:
             - function
             - string
           - items:
-              oneOf:
+              anyOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
+          description: Converter that should be used on sent objects. Defaults to
+            None.
+        transform:
+          anyOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              anyOf:
               - $ref: '#/definitions/transform'
               - type:
                 - function
                 - string
             type: array
         vars:
+          description: Names of variables to be sent/received by this comm. Defaults
+            to [].
           items:
             type: string
           type: array
       required:
-      - commtype
-      - datatype
       - name
+      - datatype
+      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -227,8 +245,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -395,11 +413,6 @@ definitions:
           description: Delimiter that should be used to separate name/value pairs
             in the map. Defaults to \t.
           type: string
-        dont_write_header:
-          default: false
-          description: If True, headers will not be added to serialized tables. Defaults
-            to False.
-          type: boolean
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -440,8 +453,6 @@ definitions:
           type: string
         filter:
           $ref: '#/definitions/filter'
-          description: Callable class that will be used to determine when messages
-            should be sent/received. Defaults to None and is ignored.
         format_str:
           description: If provided, this string will be used to format messages from
             a list of arguments and parse messages to get a list of arguments in C
@@ -462,9 +473,6 @@ definitions:
           - int
         is_default:
           default: false
-          description: If True, this comm was created to handle all input/output variables
-            to/from a model. Defaults to False. This variable is used internally and
-            should not be set explicitly in the YAML.
           type: boolean
         is_series:
           default: false
@@ -473,6 +481,11 @@ definitions:
             each output will be to a new file in the series. The addressed is assumed
             to contain a format for the index of the file. Defaults to False.
           type: boolean
+        length_map:
+          additionalProperties:
+            type: string
+          description: Map from pointer variable names to
+          type: object
         name:
           description: Name used for component in log messages.
           type: string
@@ -482,6 +495,14 @@ definitions:
             '
           description: One or more characters indicating a newline. Defaults to '\n'.
           type: string
+        no_header:
+          default: false
+          description: If True, headers will not be read or serialized from/to tables.
+            Defaults to False.
+          type: boolean
+        outside_loop:
+          default: false
+          type: boolean
         read_meth:
           default: read
           description: Method that should be used to read data from the file. Defaults
@@ -491,35 +512,35 @@ definitions:
           - readline
           type: string
         recv_converter:
+          anyOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              anyOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
           description: Converter that should be used on received objects. Defaults
             to None.
-          oneOf:
+        send_converter:
+          anyOf:
           - $ref: '#/definitions/transform'
           - type:
             - function
             - string
           - items:
-              oneOf:
+              anyOf:
               - $ref: '#/definitions/transform'
               - type:
                 - function
                 - string
             type: array
-        send_converter:
           description: Converter that should be used on sent objects. Defaults to
             None.
-          oneOf:
-          - $ref: '#/definitions/transform'
-          - type:
-            - function
-            - string
-          - items:
-              oneOf:
-              - $ref: '#/definitions/transform'
-              - type:
-                - function
-                - string
-            type: array
         serializer:
           default:
             seritype: direct
@@ -535,12 +556,27 @@ definitions:
           description: If True, the serialization of dictionaries will be in key sorted
             order. Defaults to True.
           type: boolean
+        transform:
+          anyOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              anyOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
         use_astropy:
           default: false
           description: If True, the astropy package will be used to serialize/deserialize
             table. Defaults to False.
           type: boolean
         vars:
+          description: Names of variables to be sent/received by this comm. Defaults
+            to [].
           items:
             type: string
           type: array
@@ -555,9 +591,9 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - name
       - filetype
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -770,11 +806,6 @@ definitions:
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
-          dont_write_header:
-            default: false
-            description: If True, headers will not be added to serialized tables.
-              Defaults to False.
-            type: boolean
           filetype:
             default: binary
             description: The file is a Pandas frame output as a table.
@@ -794,6 +825,11 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
+          no_header:
+            default: false
+            description: If True, headers will not be read or serialized from/to tables.
+              Defaults to False.
+            type: boolean
           use_astropy:
             default: false
             description: If True, the astropy package will be used to serialize/deserialize
@@ -1182,6 +1218,12 @@ definitions:
           items:
             $ref: '#/definitions/comm'
           type: array
+        outputs_in_inputs:
+          description: If True, outputs from wrapped model functions are passed by
+            pointer as inputs for modification and the return value will be a flag.
+            If False, outputs are limited to return values. Defaults to the value
+            of the class attribute outputs_in_inputs.
+          type: boolean
         overwrite:
           default: true
           description: If True, any existing model products (compilation products,
@@ -1278,62 +1320,13 @@ definitions:
             is used.
           type: string
       required:
-      - language
-      - working_dir
       - name
+      - language
       - args
+      - working_dir
       title: model_base
       type: object
     - anyOf:
-      - additionalProperties: true
-        description: Schema for model component ['c'] subtype.
-        properties:
-          compiler:
-            description: Command or path to executable that should be used to compile
-              the model. If not provided, the compiler will be determined based on
-              configuration options for the language (if present) and the registered
-              compilers that are available on the current operating system.
-            type: string
-          compiler_flags:
-            default: []
-            description: Flags that should be passed to the compiler during compilation.
-              If nto provided, the compiler flags will be determined based on configuration
-              options for the language (if present), the compiler defaults, and the
-              default_compiler_flags class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in C.
-            enum:
-            - c
-            type: string
-          linker:
-            description: Command or path to executable that should be used to link
-              the model. If not provided, the linker will be determined based on configuration
-              options for the language (if present) and the registered linkers that
-              are available on the current operating system
-            type: string
-          linker_flags:
-            default: []
-            description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
-              options for the language (if present), the linker defaults, and the
-              default_linker_flags class attribute.
-            items:
-              type: string
-            type: array
-          source_files:
-            default: []
-            description: Source files that should be compiled into an executable.
-              Defaults to an empty list and the driver will search for a source file
-              based on the model executable (the first model argument).
-            items:
-              type: string
-            type: array
-        title: CModelDriver
-        type: object
       - additionalProperties: true
         description: Schema for model component ['make'] subtype.
         properties:
@@ -1523,6 +1516,55 @@ definitions:
               in Matlab using symunit. Defaults to False.
             type: boolean
         title: MatlabModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['c'] subtype.
+        properties:
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in C.
+            enum:
+            - c
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+        title: CModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['c++', 'cpp'] subtype.
@@ -1725,11 +1767,6 @@ definitions:
           description: Character(s) that should be used to separate columns. Defaults
             to '\t'.
           type: string
-        dont_write_header:
-          default: false
-          description: If True, headers will not be added to serialized tables. Defaults
-            to False.
-          type: boolean
         encoded_datatype:
           description: JSON schema describing the type that serialized objects should
             conform to. Defaults to the class attribute default_encoded_datatype.
@@ -1782,6 +1819,11 @@ definitions:
             '
           description: One or more characters indicating a newline. Defaults to '\n'.
           type: string
+        no_header:
+          default: false
+          description: If True, headers will not be read or serialized from/to tables.
+            Defaults to False.
+          type: boolean
         seritype:
           default: default
           description: Serializer type.
@@ -1878,11 +1920,6 @@ definitions:
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
-          dont_write_header:
-            default: false
-            description: If True, headers will not be added to serialized tables.
-              Defaults to False.
-            type: boolean
           field_names:
             description: The names of fields in the format string. If not provided,
               names are set based on the order of the fields in the format string.
@@ -1901,6 +1938,11 @@ definitions:
               in C printf/scanf style. Defaults to None and messages are assumed to
               already be bytes.
             type: string
+          no_header:
+            default: false
+            description: If True, headers will not be read or serialized from/to tables.
+              Defaults to False.
+            type: boolean
           seritype:
             default: default
             description: Serializes tables using the pandas package.
@@ -2108,7 +2150,6 @@ definitions:
             type: string
           type: array
         single_as_scalar:
-          default: false
           description: If True and only a single field is selected, the transformed
             messages will be scalars rather than arrays with single elements. Defaults
             to False.
@@ -2122,9 +2163,11 @@ definitions:
           type: string
         transformtype:
           enum:
+          - array
           - direct
           - function
           - map_fields
+          - pandas
           - select_fields
           - statement
       title: transform_base
@@ -2145,7 +2188,6 @@ definitions:
               type: string
             type: array
           single_as_scalar:
-            default: false
             description: If True and only a single field is selected, the transformed
               messages will be scalars rather than arrays with single elements. Defaults
               to False.
@@ -2214,6 +2256,22 @@ definitions:
         required:
         - map
         title: MapFieldsTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['array'] subtype.
+        properties:
+          transformtype:
+            enum:
+            - array
+        title: ArrayTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['pandas'] subtype.
+        properties:
+          transformtype:
+            enum:
+            - pandas
+        title: PandasTransform
         type: object
     description: Schema for transform components.
     title: transform

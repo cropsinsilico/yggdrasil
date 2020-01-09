@@ -35,11 +35,16 @@ env:
     INSTALLLPY=0
     INSTALLR=1
     BUILDDOCS=0
+    YGG_RUN_ALL_TESTS=1
     YGG_RUN_EXAMPLES=0
+    YGG_RUN_TYPES_EXAMPLES=0
+    YGG_RUN_TIME_TESTS=0
     YGG_ENABLE_LONG_TESTS=0
+    YGG_TYPES_LANGUAGES=
+    YGG_TEST_FLAGS=
   matrix:
-    - YGG_ENABLE_LONG_TESTS=1
-    - YGG_RUN_EXAMPLES=1
+    - YGG_TEST_FLAGS="--long-running"
+    - YGG_TEST_FLAGS="--test-suite=examples"
     - YGG_CONDA=yes
 
 before_install:
@@ -48,6 +53,9 @@ before_install:
     if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
        export PATH=/usr/lib/ccache:$PATH
     fi
+    # if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+    #    export PATH=/usr/local/opt/ccache/libexec:$PATH
+    # fi
 
     if [[ -n "$TRAVIS_PYTHON_VERSION" ]]; then
       if [[ -n "$YGG_CONDA" ]]; then
@@ -59,18 +67,7 @@ before_install:
     echo "YGG_CONDA = $YGG_CONDA"
     echo "YGG_PYTHON = $YGG_PYTHON"
 
-    # Install from source in virtual env
-    if [[ -n "$YGG_PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then
-      echo Installing Python using virtualenv...;
-      if [[ "$TRAVIS_OS_NAME" == "osx" && "${YGG_PYTHON:0:1}" == "3" ]]; then
-         brew install python3;
-      fi
-      pip install --upgrade pip virtualenv
-      virtualenv -p python$YGG_PYTHON venv
-      source venv/bin/activate
-    fi
-
-    # Install from conda in conda env
+    # Install miniconda
     if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
       echo Installing Python using conda...;
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi
@@ -81,27 +78,19 @@ before_install:
       bash miniconda.sh -b -p $HOME/miniconda
       export PATH="$HOME/miniconda/bin:$PATH"
       hash -r
-      conda config --set always_yes yes --set changeps1 no
-      conda config --set channel_priority strict
-      conda config --add channels conda-forge
-      conda update -q conda
-      if [[ -n "$YGG_CONDA" ]]; then
-        conda create -q -n test-environment python=$YGG_CONDA
-      else
-        conda create -q -n test-environment python=$YGG_PYTHON
-      fi
-      source activate test-environment
-      conda install -q conda-build conda-verify
-      pip uninstall -y numpy
-      pip uninstall -y matplotlib
-      conda info -a
-      
+
+      # Download and point to older SDK on OSX
+      echo "TRAVIS_OS_NAME = ${TRAVIS_OS_NAME}"
       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+        conda info -a
         # Install older Mac SDK so that conda llvm (7) can be used
         # https://github.com/conda-forge/mpi-feedstock/issues/4
         export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-10.9}
         export CONDA_BUILD_SYSROOT="$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk"
         export SDKROOT=${CONDA_BUILD_SYSROOT}
+        echo "MACOSX_DEPLOYMENT_TARGET = ${MACOSX_DEPLOYMENT_TARGET}"
+        echo "CONDA_BUILD_SYSROOT = ${CONDA_BUILD_SYSROOT}"
+        echo "SDKROOT = ${SDKROOT}"
 
         if [[ ! -d ${CONDA_BUILD_SYSROOT} || "$OSX_FORCE_SDK_DOWNLOAD" == "1" ]]; then
           echo "Downloading ${MACOSX_DEPLOYMENT_TARGET} sdk to ${CONDA_BUILD_SYSROOT}"
@@ -114,49 +103,6 @@ before_install:
           printf "CONDA_BUILD_SYSROOT:\n  - ${CONDA_BUILD_SYSROOT}  # [osx]\n" > ~/conda_build_config.yaml
         fi
       fi
-
-    fi
-    
-    # Install r-base from conda, apt, or homebrew
-    if [[ $INSTALLR == '1' ]]; then
-      if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
-        if [[ $INSTALLLPY == '1' ]]; then
-          conda install r-base
-        fi
-      elif [[ -n "$YGG_PYTHON" ]]; then
-        export YGG_USE_SUDO_FOR_R=1
-        if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-          sudo apt-get install r-base
-        elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-          brew install r
-        fi
-      fi
-    fi
-
-    # Install AstroPy
-    if [[ $INSTALLAPY == '1' ]]; then
-       echo Installing AstroPy...;
-       if [[ -n "$YGG_PYTHON" ]]; then
-         pip install astropy
-       elif [[ -n "$YGG_CONDA" ]]; then
-         conda install astropy
-       fi
-    fi
-
-    # Install LPy
-    if [[ $INSTALLLPY == '1' ]]; then
-       echo Installing LPy...;
-       sh ci/install-lpy-linux.sh
-    fi
-
-    # Install ZeroMQ
-    if [[ $INSTALLZMQ == '1' && -n "$YGG_PYTHON" ]]; then
-       echo Installing ZeroMQ...;
-       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-          sh ci/install-czmq-osx.sh
-       else
-          sh ci/install-czmq-linux.sh
-       fi
     fi
 
     # Install RabbitMQ & Start a server
@@ -175,68 +121,42 @@ before_install:
        fi
        echo Checking rabbitmq status...;
        sudo rabbitmqctl status
+    fi
 
-       echo Installing Pika...;
-       if [[ -n "$YGG_PYTHON" ]]; then
-         pip install "pika<1.0.0b1"
-       elif [[ -n "$YGG_CONDA" ]]; then
-         conda install "pika<1.0.0b1"
-       fi
+    # Setup environment
+    if [[ -n "$YGG_CONDA" ]]; then
+      python utils/ci_setup.py conda env $YGG_CONDA
+    else
+      python utils/ci_setup.py pip env $YGG_PYTHON
+    fi
+
+    # Activate environment
+    if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
+      source activate test-environment
+    fi
+    if [[ -n "$YGG_PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then
+      source venv/bin/activate
     fi
 
 install:
   - |
     # setup environment
-    ccache -s
-    # Upgrade pip and setuptools and wheel to get clean install
-    pip install --upgrade pip
-    pip install --upgrade wheel
-    pip install --upgrade setuptools
-    # Install yggdrasil
-    if [[ -n "$YGG_PYTHON" ]]; then
-      # May need to uninstall conda version of numpy and matplotlib on LPy test
-      pip install $NUMPY
-      pip install $MATPLOTLIB
-      pip install $JSONSCHEMA
-      pip install -r requirements_testing.txt
-      if [[ $BUILDDOCS == '1' ]]; then
-        pip install -r requirements_documentation.txt
+    if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+      ccache -s
+    fi
+
+    # Build and install
+    if [[ -n "$YGG_CONDA" ]]; then
+      python utils/ci_setup.py conda deploy
+    else
+      if [[ $INSTALLR == '1' ]]; then
+        export YGG_USE_SUDO_FOR_R=1
       fi
-      # Install from source dist
-      python setup.py sdist
-      pip install --verbose dist/*.tar.gz
-      # Install from source
-      # pip install --verbose -e .
-      pip list
-    elif [[ -n "$YGG_CONDA" ]]; then
-      conda install $NUMPY $MATPLOTLIB $JSONSCHEMA
-      python utils/install_from_requirements.py conda requirements_testing.txt
-      if [[ $BUILDDOCS == '1' ]]; then
-        python utils/install_from_requirements.py conda requirements_documentation.txt
-      fi
-      conda build recipe/meta.yaml --python $YGG_CONDA
-      # --use-local not working in
-      #  - conda 4.7.5, conda-build 3.17.8, Python 2.7, 3.6, or 3.7
-      conda --version
-      conda index ${CONDA_PREFIX}/conda-bld
-      conda install -c file:/${CONDA_PREFIX}/conda-bld yggdrasil
-      # if [[ "$YGG_CONDA" == "3.7" ]]; then
-      #   # conda install -c local yggdrasil
-      #   conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
-      # else
-      #   conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
-      # fi
-      conda list
+      python utils/ci_setup.py pip deploy
     fi
 
 script:
-  - sh ci/pretest_script.sh || travis_terminate 1;
-  - |
-    if [[ $YGG_RUN_EXAMPLES == '1' ]]; then
-      yggtest -c setup.cfg --cov-config=.coveragerc examples --with-examples
-    else
-      yggtest -c setup.cfg --cov-config=.coveragerc
-    fi
+  - yggtest --ci $YGG_TEST_FLAGS
 
 
 after_success:
@@ -245,15 +165,29 @@ after_success:
     codecov
 
 
+stages:
+  - warm-up
+  - test
+  - test-with-cache
+  - deploy
+
+
 jobs:
   fast_finish: true
-  allow_failures:
-    - os: linux
-      python: 3.8-dev
-      dist: xenial
-      sudo: true
   include:
 
+    # # Warm-up cache
+    # - stage: warm-up
+    #   os: osx
+    #   python: 2.7
+    #   language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+    #   cache:
+    #     pip: false
+    #     directories:
+    #       - $HOME/Library/Caches/pip
+    #       - $HOME/Library/Caches/Homebrew
+    #   env: YGG_PYTHON=2.7
+    #   script: true
     # Tests
     - stage: test
       os: linux
@@ -262,46 +196,62 @@ jobs:
       env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 JSONSCHEMA=jsonschema==2.6.0 INSTALLZMQ=0 INSTALLRMQ=1 INSTALLLPY=1 INSTALLR=0
       services:
         - rabbitmq
-    - os: linux
-      python: 3.4
-      env: YGG_ENABLE_LONG_TESTS=1
       script:
-        - sh ci/pretest_script.sh || travis_terminate 1;
         - yggconfig --remove-file
-        - yggtest -c setup.cfg --cov-config=.coveragerc tests/test_backwards.py
+        - yggtest --ci
     - os: linux
       python: 3.6
-      env: INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=1 YGG_SKIP_COMPONENT_VALIDATION=0
+      env: INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=1
+      script:
+        - yggtest --ci --validate-components
     # Python >=3.7 requires special dist
     - os: linux
       python: 3.6
-      env: YGG_DEFAULT_COMM=ZMQComm YGG_ENABLE_LONG_TESTS=1 YGG_TEST_PRODUCTION_RUNS=1
+      env: YGG_DEFAULT_COMM=ZMQComm
       dist: xenial
       sudo: true
+      script:
+        - yggtest --ci --test-suite=timing
     - os: linux
-      python: 3.8-dev
+      python: 3.6
+      script:
+        - yggtest --ci --test-suite=types --languages r c
+    - os: linux
+      python: 3.6
+      script:
+        - yggtest --ci --test-suite=types --languages matlab python cpp
+    - os: linux
+      env: YGG_ENABLE_LONG_TESTS=1 YGG_DEFAULT_COMM=ZMQComm
+      python: 3.8
       dist: xenial
       sudo: true
+      script:
+        - yggtest --ci
 
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
     - os: osx
       python: 2.7
-      env: YGG_PYTHON=2.7 YGG_ENABLE_LONG_TESTS=1
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
         pip: false
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
+          - $HOME/R/Library
+      env: YGG_PYTHON=2.7 R_LIBS_USER=$HOME/R/Library
+      script:
+        - yggtest --ci --test-suite=timing  # --long-running
     - os: osx
       python: 3.7
-      env: YGG_CONDA=3.7 INSTALLRMQ=1 YGG_ENABLE_LONG_TESTS=1
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
         pip: false
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
+      env: YGG_CONDA=3.7 INSTALLRMQ=1
+      script:
+        - yggtest --ci --long-running
     - name: "Build docs"
       python: 3.6
       env: BUILDDOCS=1
@@ -316,6 +266,21 @@ jobs:
             - *native_deps_apt
             - doxygen
           update: true
+
+    # # Mac test after cache
+    # - stage: test-with-cache
+    #   os: osx
+    #   python: 2.7
+    #   language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+    #   cache:
+    #     pip: false
+    #     directories:
+    #       - $HOME/Library/Caches/pip
+    #       - $HOME/Library/Caches/Homebrew
+    #       - $HOME/R/Library
+    #   env: YGG_PYTHON=2.7 R_LIBS_USER=$HOME/R/Library
+    #   script:
+    #     - yggtest --ci --test-suite=timing  # --long-running
 
     # Docs
     - stage: deploy

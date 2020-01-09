@@ -17,6 +17,7 @@ Welcome to yggdrasil's documentation!
    server_client_io
    autowrap
    conditional_io
+   transformed_io
    yaml
    config
    units

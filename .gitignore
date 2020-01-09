@@ -9,6 +9,7 @@ yggdrasil/tests/scripts/Makefile
 *.so
 *.dll
 *.dylib
+yggdrasil/languages/C/stdint.h
 
 # Intermediate docs
 docs/build
@@ -19,6 +20,9 @@ docs/source/yggdrasil*.rst
 docs/source/modules.rst
 docs/source/examples/*.rst
 docs/source/tables
+
+# Dev setup
+requirements_pruned.txt
 
 # Profiling
 prof
