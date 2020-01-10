@@ -17,6 +17,33 @@ _test_registry = {}
 _default_comm = tools.get_default_comm()
 
 
+def iter_pattern_match(a, b):
+    r"""Determine if two sets of iteration parameters match, allowing
+    for wild cards.
+
+    Args:
+        a (tuple): Iteration parameters.
+        b (tuple): Iteration parameters.
+
+    Returns:
+        bool: True if the parameters match, False otherwise.
+
+    """
+    assert(not isinstance(a, list))
+    if isinstance(b, list):
+        matches = [iter_pattern_match(a, ib) for ib in b]
+        return any(matches)
+    matches = []
+    for ia, ib in zip(a, b):
+        if not ((ia == ib) or (ia == '*') or (ib == '*')
+                or (isinstance(ia, tuple) and (ib in ia))
+                or (isinstance(ib, tuple) and (ia in ib))
+                or (isinstance(ia, set) and (ib not in ia))
+                or (isinstance(ib, set) and (ia not in ib))):
+            return False
+    return True
+
+
 def make_iter_test(is_flaky=False, **kwargs):
     def itest(self):
         if is_flaky:
@@ -33,29 +60,35 @@ class ExampleMeta(ComponentMeta):
         iter_lists = []
         iter_keys = []
         test_name_fmt = 'test'
+        iter_skip = dct.get('iter_skip', [])
         iter_flaky = dct.get('iter_flaky', [])
         iter_over = dct.get('iter_over', ['language'])
+        iter_aliases = {'lang': 'language',
+                        'type': 'datatype',
+                        'types': 'datatype'}
+        iter_over = [iter_aliases.get(x, x) for x in iter_over]
         for x in iter_over:
             test_name_fmt += '_%s'
-            if x in ['language', 'lang']:
-                iter_lists.append(tools.get_supported_lang()
-                                  + ['all', 'all_nomatlab'])
-                iter_keys.append('language')
-            elif x in ['comm']:
-                iter_lists.append(tools.get_supported_comm())
-                iter_keys.append('comm')
-            elif x in ['type', 'types']:
-                iter_lists.append(tools.get_supported_type())
-                iter_keys.append('datatype')
+            x_iter_list = dct.get('iter_list_%s' % x, None)
+            for ibase in bases:
+                if x_iter_list is not None:
+                    break
+                x_iter_list = getattr(ibase, 'iter_list_%s' % x, None)
+            if x_iter_list is not None:
+                iter_lists.append(x_iter_list)
+                iter_keys.append(x)
             else:  # pragma: debug
                 raise ValueError("Unsupported iter dimension: %s" % x)
         if dct.get('example_name', None) is not None:
             for x in itertools.product(*iter_lists):
+                if iter_pattern_match(x, iter_skip):
+                    continue
                 itest_name = backwards.as_str(test_name_fmt % x)
                 if itest_name not in dct:
-                    itest_func = make_iter_test(is_flaky=(x in iter_flaky),
-                                                **{k: v for k, v in
-                                                   zip(iter_keys, x)})
+                    itest_func = make_iter_test(
+                        is_flaky=iter_pattern_match(x, iter_flaky),
+                        **{k: v for k, v in
+                           zip(iter_keys, x)})
                     itest_func.__name__ = itest_name
                     dct[itest_name] = itest_func
         out = super(ExampleMeta, cls).__new__(cls, name, bases, dct)
@@ -75,15 +108,29 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     expects_error = False
     env = {}
     iter_over = ['language']
+    iter_skip = []
     iter_flaky = []
+    iter_list_language = tools.get_supported_lang() + ['all', 'all_nomatlab']
+    iter_list_comm = tools.get_supported_comm()
+    iter_list_datatype = tools.get_supported_type()
 
     def __init__(self, *args, **kwargs):
         tools.YggClass.__init__(self, self.example_name)
-        self.language = None
+        self.iter_param = {}
         self.uuid = str(uuid.uuid4())
         self.runner = None
         # self.debug_flag = True
         super(ExampleTstBase, self).__init__(*args, **kwargs)
+
+    @property
+    def language(self):
+        r"""str: Language of the currect test."""
+        return self.iter_param.get('language', None)
+
+    @property
+    def comm(self):
+        r"""str: Comm used by the current test."""
+        return self.iter_param.get('comm', _default_comm)
 
     @property
     def description_prefix(self):
@@ -239,26 +286,49 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                 if os.path.isfile(fout):
                     tools.remove_path(fout, timer_class=timer_class, timeout=5)
 
-    def run_iteration(self, language=None, datatype=None, comm=None):
+    def setup_iteration(self, **kwargs):
+        r"""Perform setup associated with an iteration."""
+        for k, v in kwargs.items():
+            k_setup = getattr(self, 'setup_iteration_%s' % k, None)
+            if k_setup is not None:
+                v = k_setup(v)
+            self.iter_param[k] = v
+
+    def teardown_iteration(self, **kwargs):
+        r"""Perform teardown associated with an iteration."""
+        for k, v in kwargs.items():
+            k_teardown = getattr(self, 'teardown_iteration_%s' % k, None)
+            if k_teardown is not None:
+                k_teardown(v)
+            del self.iter_param[k]
+        assert(not self.iter_param)
+        self.iter_param = {}
+
+    def setup_iteration_language(self, language=None):
+        r"""Perform setup associated with a language iteration."""
+        if language is not None:
+            check_enabled_languages(language)
+        return language
+
+    def setup_iteration_comm(self, comm=None):
+        r"""Perform setup associated with a comm iteration."""
+        assert(comm is not None)
+        if not tools.is_comm_installed(comm):
+            raise unittest.SkipTest("%s library not installed."
+                                    % comm)
+        self.set_default_comm(default_comm=comm)
+        return comm
+
+    def teardown_iteration_comm(self, comm=None):
+        r"""Peform teardown associated with a comm iteration."""
+        self.reset_default_comm()
+
+    def run_iteration(self, **kwargs):
         r"""Run a test for the specified parameters."""
         if not tools.check_environ_bool('YGG_ENABLE_EXAMPLE_TESTS'):
             raise unittest.SkipTest("Example tests not enabled.")
-        if comm and (not tools.is_comm_installed(comm)):
-            raise unittest.SkipTest("%s library not installed."
-                                    % comm)
-        if language is not None:
-            check_enabled_languages(language)
-        self.language = language
-        self.datatype = datatype
-        if comm is None:
-            self.comm = _default_comm
-        else:
-            self.comm = comm
-        self.set_default_comm(default_comm=comm)
+        self.setup_iteration(**kwargs)
         try:
-            self.run_example()
+            getattr(self, kwargs.get('method', 'run_example'))()
         finally:
-            self.language = None
-            self.datatype = None
-            self.comm = None
-            self.reset_default_comm()
+            self.teardown_iteration(**kwargs)
