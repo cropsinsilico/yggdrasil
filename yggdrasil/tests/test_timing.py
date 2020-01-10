@@ -41,10 +41,10 @@ def test_get_source():
 
 def test_platform_error():
     r"""Test error when test cannot be performed."""
-    if platform._is_mac:
-        test_platform = 'Linux'
-    else:
-        test_platform = 'MacOS'
+    test_platform_map = {'MacOS': 'Linux',
+                         'Linux': 'Windows',
+                         'Windows': 'MacOS'}
+    test_platform = test_platform_map[platform._platform]
     x = timing.TimedRun(_test_lang, _test_lang, platform=test_platform)
     assert_raises(RuntimeError, x.can_run, raise_error=True)
 

@@ -43,9 +43,8 @@ env:
     YGG_TYPES_LANGUAGES=
     YGG_TEST_FLAGS="--test-suite=examples"
   matrix:
-    # - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running" INSTALLLPY=1
+    - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running" INSTALLLPY=1
     # - YGG_TEST_FLAGS="--test-suite=examples"
-    # - YGG_CONDA=yes
     - YGG_CONDA= 
 
 before_install:
@@ -176,57 +175,41 @@ stages:
 jobs:
   fast_finish: true
   include:
-    # # Tests
-    # - stage: test
-    #   os: linux
-    #   env: YGG_TEST_FLAGS="--test-suite=examples --test-suite=timing"
-    #   python: 3.8
-    #   dist: xenial
-    #   sudo: true
-    # - stage: test
-    #   os: linux
-    #   env: YGG_TEST_FLAGS="--test-suite=examples" INSTALLZMQ=0 INSTALLR=0 INSTALLRMQ=1 INSTALLAPY=1
-    #   python: 3.5
-    # - os: linux
-    #   python: 3.6
-    #   env: YGG_TEST_FLAGS="--test-suite=types --languages r c" YGG_DEFAULT_COMM=ZMQComm
-    # - os: linux
-    #   python: 3.6
-    #   env: YGG_TEST_FLAGS="--test-suite=types --languages matlab python cpp"
-    # # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
-    # - os: osx
-    #   python: 2.7
-    #   language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-    #   cache:
-    #     pip: false
-    #     directories:
-    #       - $HOME/Library/Caches/pip
-    #       - $HOME/Library/Caches/Homebrew
-    #       - $HOME/R/Library
-    #   env: YGG_PYTHON=2.7 R_LIBS_USER=$HOME/R/Library YGG_TEST_FLAGS="--test-suite=timing"
-    #   script:
-    #     - yggconfig --remove-file
-    #     - yggtest --ci $YGG_TEST_FLAGS
-    # - os: osx
-    #   python: 3.7
-    #   language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-    #   cache:
-    #     pip: false
-    #     directories:
-    #       - $HOME/Library/Caches/pip
-    #       - $HOME/Library/Caches/Homebrew
-    #   env: YGG_CONDA=3.7 INSTALLRMQ=1 YGG_TEST_FLAGS="--long-running"
-    #   script:
-    #     - yggtest --ci $YGG_TEST_FLAGS
-    - os: osx
+    # Tests
+    - stage: test
+      os: linux
+      env: YGG_TEST_FLAGS="--test-suite=types --languages r c"
       python: 3.7
+      dist: xenial
+      sudo: true
+    - os: linux
+      env: YGG_TEST_FLAGS="--test-suite=types --languages matlab python cpp"
+      python: 3.7
+      dist: xenial
+      sudo: true
+    - os: osx
+      python: 2.7
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
         pip: false
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
-      env: YGG_CONDA=3.7 YGG_TEST_FLAGS="--test-suite=examples"
+          - $HOME/R/Library
+      env: YGG_PYTHON=2.7 R_LIBS_USER=$HOME/R/Library YGG_TEST_FLAGS="--test-suite=examples" INSTALLRMQ=1
+    - os: osx
+      python: 3.8
+      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+      cache:
+        pip: false
+        directories:
+          - $HOME/Library/Caches/pip
+          - $HOME/Library/Caches/Homebrew
+      env: YGG_CONDA=3.8 YGG_TEST_FLAGS="--test-suite=examples"
+      script:
+        - yggconfig --remove-file
+        - yggtest --ci $YGG_TEST_FLAGS
+      
     - name: "Build docs"
       python: 3.6
       env: BUILDDOCS=1

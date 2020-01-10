@@ -56,15 +56,16 @@ environment:
     #   test_script:
     #     - "yggtest --ci %YGG_TEST_FLAGS%"
     # 	- "yggtest --ci --long-running"
-    # - platform: x64
-    #   PYTHON_VERSION: "3.6"
-    #   YGG_TEST_FLAGS: "--test-suite=types --languages r c"
-    # - platform: x64
-    #   PYTHON_VERSION: "3.6"
-    #   YGG_TEST_FLAGS: "--test-suite=types --languages matlab python cpp"
+    - platform: x64
+      PYTHON_VERSION: "2.7"
+      YGG_TEST_FLAGS: "--test-suite=examples"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=examples"
+      YGG_TEST_FLAGS: "--test-suite=types"
+      INSTALLC: 0  # Acts to exclude c and cpp
+    - platform: x64
+      PYTHON_VERSION: "3.6"
+      YGG_TEST_FLAGS: "--test-suite=types --languages c cpp"
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
