@@ -187,9 +187,9 @@ class PandasSerialize(AsciiTableSerialize):
         out = self.apply_field_names(out, self.get_field_names())
         if (self.field_names is None) and (not self.no_header):
             self.field_names = out.columns.tolist()
-            if all([isinstance(x, int) for x in self.field_names]):
-                self.field_names = ['f%d' % x for x in self.field_names]
-                out.columns = self.field_names
+            # if all([isinstance(x, int) for x in self.field_names]):
+            #     self.field_names = ['f%d' % x for x in self.field_names]
+            #     out.columns = self.field_names
         if not self.initialized:
             typedef = {'type': 'array', 'items': []}
             np_out = serialize.pandas2numpy(out)

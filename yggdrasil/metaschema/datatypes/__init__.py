@@ -484,8 +484,6 @@ def resolve_schema_references(schema, resolver=None):
 
     """
     if resolver is None:
-        if 'definitions' not in schema:
-            return schema
         out = copy.deepcopy(schema)
         resolver = jsonschema.RefResolver.from_schema(out)
     else:
