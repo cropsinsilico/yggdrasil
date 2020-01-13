@@ -4,6 +4,8 @@ import pandas
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.metaschema.datatypes import type2numpy
 from yggdrasil.serialize import consolidate_array, pandas2numpy, numpy2pandas
+from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
+    _valid_types, _flexible_types)
 
 
 class ArrayTransform(TransformBase):
@@ -21,7 +23,32 @@ class ArrayTransform(TransformBase):
 
         """
         assert(datatype.get('type', None) in ['array'])
-        # TODO: Check for others?
+        if (((isinstance(datatype['items'], dict)
+              and (datatype['items']['type'] in ['1darray', 'ndarray']))
+             or (isinstance(datatype['items'], list)
+                 and all([(x['type'] in ['1darray', 'ndarray'])
+                          for x in datatype['items']])))):
+            pass
+        elif (isinstance(datatype['items'], list)
+              and all([(x['type'] == 'array') for x in datatype['items']])):
+            if len(datatype['items']) > 1:
+                base_types = datatype['items'][0]['items']
+                assert(isinstance(base_types, list))
+                for i in range(len(base_types)):
+                    assert(base_types[i].get('subtype', base_types[i]['type'])
+                           in _valid_types)
+                for x in datatype['items'][1:]:
+                    assert(isinstance(x['items'], list))
+                    assert(len(x['items']) == len(base_types))
+                    for ix, ibase in zip(x['items'], base_types):
+                        itype = ix.get('subtype', ix['type'])
+                        assert(itype == ibase.get('subtype', ibase['type']))
+                        assert(ix.get('title', '') == ibase.get('title', ''))
+                        if itype not in _flexible_types:
+                            assert(ix.get('precision', 0)
+                                   == ibase.get('precision', 0))
+        else:
+            raise ValueError("Invalid datatypes: %s" % datatype)
         
     def transform_datatype(self, datatype):
         r"""Determine the datatype that will result from applying the transform
@@ -34,6 +61,21 @@ class ArrayTransform(TransformBase):
             dict: Transformed datatype.
 
         """
+        if ((isinstance(datatype['items'], list)
+             and all([(x['type'] == 'array') for x in datatype['items']])
+             and (len(datatype['items']) > 1))):
+            out = copy.deepcopy(datatype)
+            out['items'] = [dict(x, type='1darray',
+                                 subtype=x.get('subtype', x['type']))
+                            for x in datatype['items'][0]['items']]
+            for i, x in enumerate(out['items']):
+                if x['subtype'] in _flexible_types:
+                    x['precision'] = max(
+                        [y['items'][i].get('precision', 0)
+                         for y in datatype['items']])
+                    if x['precision'] == 0:
+                        x.pop('precision')
+            return out
         return datatype
     
     def evaluate_transform(self, x, no_copy=False):
@@ -50,11 +92,14 @@ class ArrayTransform(TransformBase):
 
         """
         out = x
-        np_dtype = type2numpy(self.original_datatype)
+        np_dtype = type2numpy(self.transformed_datatype)
         if isinstance(x, pandas.DataFrame):
             out = pandas2numpy(x)
         elif np_dtype and isinstance(x, (list, tuple, np.ndarray)):
-            out = consolidate_array(x, dtype=np_dtype)
+            if len(x) == 0:
+                out = np.zeros(0, np_dtype)
+            else:
+                out = consolidate_array(x, dtype=np_dtype)
         else:
             # warning?
             raise TypeError(("Cannot consolidate object of type %s "

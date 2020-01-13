@@ -540,11 +540,11 @@ class CommBase(tools.YggClass):
                     cls_conv = getattr(self.language_driver, dir_conv + 's')
                     if iv in cls_conv:
                         iv = cls_conv[iv]
-                    if isinstance(iv, str):
-                        try:
-                            iv = create_component('transform', subtype=iv)
-                        except ValueError:
-                            iv = None
+                if isinstance(iv, str):
+                    try:
+                        iv = create_component('transform', subtype=iv)
+                    except ValueError:
+                        iv = None
                 elif isinstance(iv, dict):
                     from yggdrasil.schema import get_schema
                     transform_schema = get_schema().get('transform')
@@ -1044,13 +1044,14 @@ class CommBase(tools.YggClass):
             object: Transformed message.
 
         """
-        if not self.transform:
+        if not (self.transform and self.serializer.initialized):
             return msg_in
         self.debug("Applying transformations to message being %s."
                    % self.direction)
         # If receiving, update the expected datatypes to use information
         # about the received datatype that was recorded by the serializer
-        if (self.direction == 'recv') and (not self.transform[0].original_datatype):
+        if (((self.direction == 'recv')
+             and (not self.transform[0].original_datatype))):
             typedef = self.serializer.typedef
             for iconv in self.transform:
                 if not iconv.original_datatype:

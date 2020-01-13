@@ -65,14 +65,12 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'interface': 'library(yggdrasil)',
         'input': '{channel} <- YggInterface(\"YggInput\", \"{channel_name}\")',
         'output': '{channel} <- YggInterface(\"YggOutput\", \"{channel_name}\")',
+        'python_interface': ('{channel} <- YggInterface(\"{python_interface}\", '
+                             '\"{channel_name}\")'),
         'table_input': ('{channel} <- YggInterface(\"YggAsciiTableInput\", '
                         '\"{channel_name}\")'),
         'table_output': ('{channel} <- YggInterface(\"YggAsciiTableOutput\", '
                          '\"{channel_name}\", \"{format_str}\")'),
-        'pandas_input': ('{channel} <- YggInterface(\"YggPandasInput\", '
-                         '\"{channel_name}\")'),
-        'pandas_output': ('{channel} <- YggInterface(\"YggPandasOutput\", '
-                          '\"{channel_name}\")'),
         'recv_function': '{channel}$recv',
         'send_function': '{channel}$send',
         'multiple_outputs': 'c({outputs})',

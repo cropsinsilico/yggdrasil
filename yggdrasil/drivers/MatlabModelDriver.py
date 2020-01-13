@@ -461,6 +461,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'len': 'length({variable})',
         'index': '{variable}{{{index}}}',
         'first_index': 1,
+        'python_interface': ('{channel} = YggInterface(\'{python_interface}\', '
+                             '\'{channel_name}\');'),
         'input': '{channel} = YggInterface(\'YggInput\', \'{channel_name}\');',
         'output': '{channel} = YggInterface(\'YggOutput\', \'{channel_name}\');',
         'recv_function': '{channel}.recv',

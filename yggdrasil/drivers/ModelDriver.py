@@ -291,6 +291,12 @@ class ModelDriver(Driver):
     include_channel_obj = False
     is_typed = False
     brackets = None
+    python_interface = {'table_input': 'YggAsciiTableInput',
+                        'table_output': 'YggAsciiTableOutput',
+                        'array_input': 'YggArrayInput',
+                        'array_outputs': 'YggArrayOutput',
+                        'pandas_input': 'YggPandasInput',
+                        'pandas_output': 'YggPandasOutput'}
 
     _library_cache = {}
 
@@ -1723,6 +1729,10 @@ class ModelDriver(Driver):
             try_key = '%s_%s' % (try_vals[-1], key)
             if try_key in cls.function_param:
                 key = try_key
+            elif ((('python_interface' in cls.function_param)
+                   and (try_key in cls.python_interface))):
+                kwargs['python_interface'] = cls.python_interface[try_key]
+                key = 'python_interface'
         out = [cls.format_function_param(key, **kwargs)]
         return out
 
