@@ -1044,7 +1044,8 @@ class CommBase(tools.YggClass):
             object: Transformed message.
 
         """
-        if not (self.transform and self.serializer.initialized):
+        if ((((self.direction == 'recv') and (not self.serializer.initialized))
+             or (not self.transform))):
             return msg_in
         self.debug("Applying transformations to message being %s."
                    % self.direction)
