@@ -121,9 +121,11 @@ def deploy_package_on_ci(method):
         # Check that we have the expected version of Python
         "python --version",
         # Upgrade pip and setuptools and wheel to get clean install
-        "pip install --upgrade pip",
         "pip install --upgrade wheel"
     ]
+    if not _is_win:
+        cmds += ["pip install --upgrade pip"]
+    cmds += ["pip install --upgrade wheel"]
     if PY2:  # Python 2
         cmds.append("pip install setuptools==43.0.0")
     else:
