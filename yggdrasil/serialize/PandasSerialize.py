@@ -6,6 +6,7 @@ from yggdrasil import backwards, platform, serialize, units
 from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
     OneDArrayMetaschemaType)
 from yggdrasil.serialize.AsciiTableSerialize import AsciiTableSerialize
+from yggdrasil.communication.transforms.PandasTransform import PandasTransform
 
 
 class PandasSerialize(AsciiTableSerialize):
@@ -204,28 +205,13 @@ class PandasSerialize(AsciiTableSerialize):
             self.update_serializer(extract=True, **typedef)
         return out
 
-    def send_converter(self, obj):
-        r"""Performs conversion from a limited set of objects to a Pandas data
-        frame for sending to a file via PandasFileComm. Currently supports
-        converting from structured numpy arrays, lists/tuples of numpy arrays,
-        and dictionaries.
-
-        Args:
-            obj (object): Object to convert.
-
-        Returns:
-            pandas.DataFrame: Converted data frame (or unmodified input if
-                conversion could not be completed.
-
-        """
-        if isinstance(obj, (list, tuple)):
-            names = self.get_field_names()
-            obj = serialize.list2pandas(obj, names=names)
-        elif isinstance(obj, np.ndarray):
-            obj = serialize.numpy2pandas(obj)
-        elif isinstance(obj, dict):
-            obj = serialize.dict2pandas(obj)
-        return obj
+    @property
+    def send_converter(self):
+        kws = {}
+        field_names = self.get_field_names()
+        if field_names is not None:
+            kws['field_names'] = field_names
+        return PandasTransform(**kws)
 
     def recv_converter(self, obj):
         r"""Performs conversion to a limited set of objects from a Pandas data

@@ -1,3 +1,4 @@
+import pandas
 import numpy as np
 from yggdrasil.communication.transforms.ArrayTransform import ArrayTransform
 from yggdrasil.serialize import numpy2pandas
@@ -20,8 +21,13 @@ class PandasTransform(ArrayTransform):
             object: The transformed message.
 
         """
-        out = super(PandasTransform, self).evaluate_transform(x, no_copy=no_copy)
-        return numpy2pandas(out)
+        if isinstance(x, pandas.DataFrame):
+            out = x
+        else:
+            out = super(PandasTransform, self).evaluate_transform(
+                x, no_copy=no_copy)
+            out = numpy2pandas(out)
+        return out
     
     @classmethod
     def get_testing_options(cls):
@@ -53,5 +59,10 @@ class PandasTransform(ArrayTransform):
         return [{'kwargs': {'original_datatype': t},
                  'in/out': [(y, x)],
                  'in/out_t': [(t, t)]},
+                {'kwargs': {'original_datatype': t},
+                 'in/out': [(x, x)],
+                 'in/out_t': [(t, t)]},
+                {'kwargs': {'original_datatype': t},
+                 'in/out': [(None, TypeError)]},
                 {'kwargs': {},
-                 'in/out': [([0, 1, 2], TypeError)]}]
+                 'in/out': [([0, 1, 2], ValueError)]}]

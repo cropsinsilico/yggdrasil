@@ -15,6 +15,7 @@ from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
+from yggdrasil.communication.transforms.TransformBase import TransformBase
 
 
 logger = logging.getLogger(__name__)
@@ -552,6 +553,8 @@ class CommBase(tools.YggClass):
                         iv,
                         subtype=transform_schema.identify_subtype(iv))
                     iv = create_component('transform', **transform_kws)
+                elif isinstance(iv, TransformBase):
+                    pass
                 elif ((isinstance(iv, (types.BuiltinFunctionType, types.FunctionType,
                                        types.BuiltinMethodType, types.MethodType))
                        or hasattr(iv, '__call__'))):
@@ -1044,14 +1047,14 @@ class CommBase(tools.YggClass):
             object: Transformed message.
 
         """
-        if ((((self.direction == 'recv') and (not self.serializer.initialized))
-             or (not self.transform))):
+        if not self.transform:
             return msg_in
         self.debug("Applying transformations to message being %s."
                    % self.direction)
         # If receiving, update the expected datatypes to use information
         # about the received datatype that was recorded by the serializer
         if (((self.direction == 'recv')
+             and self.serializer.initialized
              and (not self.transform[0].original_datatype))):
             typedef = self.serializer.typedef
             for iconv in self.transform:
@@ -1061,7 +1064,10 @@ class CommBase(tools.YggClass):
         # Actual conversion
         msg_out = msg_in
         for iconv in self.transform:
-            msg_out = iconv(msg_out)
+            msg_out = iconv(
+                msg_out,
+                no_init=((self.direction == 'recv')
+                         and (not self.serializer.initialized)))
         return msg_out
 
     def evaluate_filter(self, *msg_in):

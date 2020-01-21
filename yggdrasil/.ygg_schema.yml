@@ -119,8 +119,8 @@ definitions:
           type: array
       required:
       - name
-      - datatype
       - commtype
+      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -592,8 +592,8 @@ definitions:
           type: string
       required:
       - name
-      - filetype
       - working_dir
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1320,10 +1320,10 @@ definitions:
             is used.
           type: string
       required:
-      - name
-      - language
       - args
+      - name
       - working_dir
+      - language
       title: model_base
       type: object
     - anyOf:
@@ -2118,6 +2118,10 @@ definitions:
         - args
       description: Base schema for all subtypes of transform components.
       properties:
+        field_names:
+          items:
+            type: string
+          type: array
         function:
           description: The handle for a callable Python object (e.g. function) that
             should be used to transform messages or a string of the form "<function
@@ -2173,6 +2177,30 @@ definitions:
       title: transform_base
       type: object
     - anyOf:
+      - additionalProperties: true
+        description: Schema for transform component ['array'] subtype.
+        properties:
+          field_names:
+            items:
+              type: string
+            type: array
+          transformtype:
+            enum:
+            - array
+        title: ArrayTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['pandas'] subtype.
+        properties:
+          field_names:
+            items:
+              type: string
+            type: array
+          transformtype:
+            enum:
+            - pandas
+        title: PandasTransform
+        type: object
       - additionalProperties: true
         description: Schema for transform component ['select_fields'] subtype.
         properties:
@@ -2256,22 +2284,6 @@ definitions:
         required:
         - map
         title: MapFieldsTransform
-        type: object
-      - additionalProperties: true
-        description: Schema for transform component ['array'] subtype.
-        properties:
-          transformtype:
-            enum:
-            - array
-        title: ArrayTransform
-        type: object
-      - additionalProperties: true
-        description: Schema for transform component ['pandas'] subtype.
-        properties:
-          transformtype:
-            enum:
-            - pandas
-        title: PandasTransform
         type: object
     description: Schema for transform components.
     title: transform
