@@ -28,6 +28,9 @@ R2python <- function(robj, not_bytes=FALSE) {
     out <- call_python_method(np, 'float64',
       reticulate::r_to_py(robj))
     # }
+  } else if (is(robj, "ygg_float32")) {
+    out <- call_python_method(np, 'float32',
+      reticulate::r_to_py(robj))
   } else if (is(robj, "numeric")) {
     out <- call_python_method(np, 'float64',
       reticulate::r_to_py(robj))
