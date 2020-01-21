@@ -815,6 +815,10 @@ class ModelDriver(Driver):
                                   % cls.language)
 
     @classmethod
+    def is_disabled(cls):
+        return (ygg_cfg.get(cls.language, 'disable', 'false').lower() == 'true')
+
+    @classmethod
     def is_configured(cls):
         r"""Determine if the appropriate configuration has been performed (e.g.
         installation of supporting libraries etc.)
