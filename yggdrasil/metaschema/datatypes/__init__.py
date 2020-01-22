@@ -616,7 +616,7 @@ def type2numpy(typedef):
             dtype_list = []
             field_names = []
             for i, x in enumerate(typedef['items']):
-                if x['type'] != '1darray':
+                if x['type'] not in ['1darray', 'ndarray']:
                     as_array = False
                     break
                 dtype_list.append(definition2dtype(x))
