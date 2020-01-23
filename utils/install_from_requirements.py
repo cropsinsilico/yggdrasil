@@ -80,7 +80,12 @@ def locate_conda_exe(conda_env, name):
                                'Scripts', name)
     else:
         out = os.path.join(conda_prefix, conda_env, 'bin', name)
-    assert(os.path.isfile(out))
+    try:
+        assert(os.path.isfile(out))
+    except AssertionError:
+        out = os.path.expanduser(os.path.join('~', '.conda', 'envs', name))
+        if not os.path.isfile(out):
+            raise
     return out
 
 
