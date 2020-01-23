@@ -116,7 +116,8 @@ setup(
                             'yggtime_paper=yggdrasil.command_line:yggtime_paper',
                             'yggvalidate=yggdrasil.command_line:validate_yaml',
                             'ygginstall=yggdrasil.command_line:ygginstall',
-                            'yggclean=yggdrasil.command_line:yggclean'],
+                            'yggclean=yggdrasil.command_line:yggclean',
+                            'yggmodelform=yggdrasil.command_line:yggmodelform'],
     },
     license="BSD",
 )

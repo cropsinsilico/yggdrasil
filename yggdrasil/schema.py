@@ -164,7 +164,10 @@ def convert_extended2base(s):
                 s['type'] = [type_map.get(t, t) for t in s['type']]
                 if all([t == s['type'][0] for t in s['type']]):
                     s['type'] = s['type'][0]
+        opt = copy.deepcopy(s.get('options', None))
         s = {k: convert_extended2base(v) for k, v in s.items()}
+        if opt is not None:
+            s['options'] = opt
     return s
 
 
@@ -304,8 +307,16 @@ class ComponentSchema(object):
                 out['additionalProperties'] = False
                 for x in self._storage.values():
                     for k, v in x['properties'].items():
-                        if (k != self.subtype_key) and (k not in out['properties']):
-                            out['properties'][k] = copy.deepcopy(v)
+                        if (k != self.subtype_key):
+                            if (k not in out['properties']):
+                                out['properties'][k] = copy.deepcopy(v)
+                                if for_form:
+                                    out['properties'][k]['options'] = {
+                                        'dependencies': {self.subtype_key: []}}
+                            if for_form and ('options' in out['properties'][k]):
+                                out['properties'][k]['options']['dependencies'][
+                                    self.subtype_key] += (
+                                        x['properties'][self.subtype_key]['enum'])
         else:
             if subtype not in self._storage:
                 s2c = self.subtype2class
@@ -762,24 +773,41 @@ class SchemaRegistry(object):
     @property
     def model_form_schema(self):
         r"""dict: Schema for generating a model YAML form."""
+        from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
+            _valid_types)
         out = self.get_schema(for_form=True)
-        out['definitions']['schema'] = copy.deepcopy(metaschema._metaschema)
-        for k in ['allOf', 'anyOf', 'oneOf', 'definitions', 'dependencies',
-                  'additionalProperties', 'additionalItems']:
-            out['definitions']['schema']['properties'].pop(k, None)
-        for k in ['positiveIntegerDefault0', 'schemaArray']:
-            out['definitions']['schema']['definitions'].pop(k, None)
-        out['definitions'].update(out['definitions']['schema'].pop('definitions'))
-        out['definitions']['schema']['properties']['class'].pop('anyOf', None)
-        out['definitions']['schema']['properties']['class'].update({"type": "string"})
-        out['definitions']['schema']['properties']['items'] = {
-            "$ref": "#/definitions/schema"}
+        scalar_types = list(_valid_types.keys())
+        meta = copy.deepcopy(metaschema._metaschema)
+        meta_prop = {
+            'subtype': ['1darray', 'ndarray'],
+            'units': ['1darray', 'ndarray'] + scalar_types,
+            'precision': ['1darray', 'ndarray'] + scalar_types,
+            'length': ['1darray'],
+            'shape': ['ndarray']}
+        out['definitions']['simpleTypes'] = meta['definitions']['simpleTypes']
+        out['definitions']['simpleTypes'].update(type='string',
+                                                 default='bytes')
+        out['definitions']['simpleTypes']['enum'].remove('scalar')
+        out['definitions']['schema'] = {'type': 'object',
+                                        'required': ['type'],
+                                        'properties': {}}
         out['definitions']['schema']['properties']['type'] = {
-            "$ref": "#/definitions/simpleTypes"}
+            '$ref': '#/definitions/simpleTypes'}
+        for k, types in meta_prop.items():
+            out['definitions']['schema']['properties'][k] = meta['properties'][k]
+            if types:
+                out['definitions']['schema']['properties'][k]['options'] = {
+                    'dependencies': {'type': types}}
         for k in out['definitions'].keys():
+            if k in ['schema', 'simpleTypes']:
+                continue
+            out['definitions'][k].pop('title', None)
             if ((('required' in out['definitions'][k])
                  and ('working_dir' in out['definitions'][k]['required']))):
                 out['definitions'][k]['required'].remove('working_dir')
+            for p, v in list(out['definitions'][k]['properties'].items()):
+                if v.get('description', '').startswith('[DEPRECATED]'):
+                    out['definitions'][k]['properties'].pop(p)
         for x in ['comm', 'file']:
             for k in ['send_converter', 'recv_converter']:
                 out['definitions'][x]['properties'][k].pop('oneOf', None)
@@ -790,12 +818,39 @@ class SchemaRegistry(object):
                 out['definitions'][x]['properties'][k].pop('oneOf', None)
                 out['definitions'][x]['properties'][k].update(
                     {"$ref": "#/definitions/serializer"})
+        prop_required = {
+            'model': ['inputs', 'outputs']}
+        prop_remove = {
+            'comm': ['is_default', 'length_map', 'serializer'],
+            'file': ['is_default', 'length_map',
+                     'wait_for_creation', 'working_dir',
+                     'read_meth', 'in_temp',
+                     'serializer', 'datatype'],
+            'model': ['client_of', 'is_server', 'preserve_cache',
+                      'products', 'source_products', 'working_dir',
+                      'overwrite', 'skip_interpreter']}
+        prop_order = {
+            'model': ['name', 'language', 'args', 'inputs', 'outputs']
+        }
+        for k, rlist in prop_remove.items():
+            for p in rlist:
+                out['definitions'][k]['properties'].pop(p, None)
+        for k, rlist in prop_required.items():
+            if 'required' not in out['definitions'][k]:
+                out['definitions'][k]['required'] = []
+            for p in rlist:
+                if p not in out['definitions'][k]['required']:
+                    out['definitions'][k]['required'].append(p)
+        for k, rlist in prop_order.items():
+            for i, p in enumerate(rlist):
+                out['definitions'][k]['properties'][p]['propertyOrder'] = i
         out.update(out['definitions'].pop('model'))
         out['definitions'].pop('connection')
         out.update(
             title='Model YAML Schema',
             description='Schema for yggdrasil model YAML input files.')
-        out['definitions']['comm']['default_file'] = {'$ref': '#/definitions/file'}
+        out['definitions']['comm']['properties']['default_file'] = {
+            '$ref': '#/definitions/file'}
         out = convert_extended2base(out)
         return out
 
