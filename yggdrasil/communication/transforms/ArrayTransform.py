@@ -15,6 +15,24 @@ class ArrayTransform(TransformBase):
     _schema_properties = {'field_names': {'type': 'array',
                                           'items': {'type': 'string'}}}
 
+    def set_original_datatype(self, datatype):
+        r"""Set datatype.
+
+        Args:
+            datatype (dict): Datatype.
+
+        """
+        super(ArrayTransform, self).set_original_datatype(datatype)
+        if not self.field_names:
+            self.field_names = self.original_datatype.get('field_names', None)
+        if not self.field_names:
+            if (((datatype['type'] == 'array')
+                 and isinstance(datatype['items'], list))):
+                self.field_names = [x.get('title', 'f%d' % i) for i, x in
+                                    enumerate(self.original_datatype['items'])]
+            elif datatype['type'] == 'object':
+                self.field_names = list(datatype['properties'].keys())
+
     @classmethod
     def get_summary(cls, x, subtype=False):
         r"""Get subset of information summarizing an array element
