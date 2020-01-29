@@ -48,9 +48,8 @@ class ScalarMetaschemaType(MetaschemaType):
                         cls.fixed_properties['subtype']]]
             else:
                 type_list = ScalarMetaschemaProperties._valid_numpy_types
-            for k in type_list:
-                if dtype.name.startswith(k):
-                    return True
+            if dtype.name.startswith(tuple(type_list)):
+                return True
             else:
                 if raise_errors:
                     raise ValueError(("dtype %s dosn't corresponding with any "

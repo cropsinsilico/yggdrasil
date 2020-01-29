@@ -15,13 +15,17 @@ class PandasSerialize(AsciiTableSerialize):
     Args:
         no_header (bool, optional): If True, headers will not be read or
             serialized from/to tables. Defaults to False.
+        str_as_bytes (bool, optional): If True, strings in columns are
+            read as bytes. Defaults to False.
 
     """
 
     _seritype = 'pandas'
     _schema_subtype_description = ('Serializes tables using the pandas package.')
     _schema_properties = {'no_header': {'type': 'boolean',
-                                        'default': False}}
+                                        'default': False},
+                          'str_as_bytes': {'type': 'boolean',
+                                           'default': False}}
     _schema_excluded_from_inherit = ['as_array']
     default_read_meth = 'read'
     as_array = True
@@ -37,7 +41,7 @@ class PandasSerialize(AsciiTableSerialize):
     @property
     def empty_msg(self):
         r"""obj: Object indicating empty message."""
-        return pandas.DataFrame(columns=self.get_field_names())
+        return pandas.DataFrame(np.zeros(0, self.numpy_dtype))
 
     def get_field_names(self, *args, **kwargs):
         r"""Get the field names for an array of fields.
@@ -157,7 +161,13 @@ class PandasSerialize(AsciiTableSerialize):
         names = None
         dtype = None
         if self.initialized:
-            dtype = self.numpy_dtype
+            np_dtype = self.numpy_dtype
+            dtype = {}
+            for n in np_dtype.names:
+                if np_dtype[n].char == 'U':
+                    dtype[n] = object
+                else:
+                    dtype[n] = np_dtype[n]
         kws = dict(sep=backwards.as_str(self.delimiter),
                    names=names,
                    dtype=dtype,
@@ -168,7 +178,7 @@ class PandasSerialize(AsciiTableSerialize):
         out = pandas.read_csv(fd, **kws)
         out = out.dropna(axis='columns', how='all')
         fd.close()
-        if not backwards.PY2:
+        if self.str_as_bytes and (not backwards.PY2):
             # For Python 3 and higher, make sure strings are bytes
             for c, d in zip(out.columns, out.dtypes):
                 if (d == object) and isinstance(out[c][0], backwards.unicode_type):
@@ -212,23 +222,6 @@ class PandasSerialize(AsciiTableSerialize):
         if field_names is not None:
             kws['field_names'] = field_names
         return PandasTransform(**kws)
-
-    def recv_converter(self, obj):
-        r"""Performs conversion to a limited set of objects from a Pandas data
-        frame for receiving from a file via PandasFileComm. Currently supports
-        converting to lists/tuples of numpy arrays.
-
-        Args:
-            obj (pandas.DataFrame): Data frame to convert.
-
-        Returns:
-            list: pandas.DataFrame: Converted data frame (or unmodified input if
-                conversion could not be completed.
-
-        """
-        if isinstance(obj, pandas.DataFrame):
-            return serialize.pandas2list(obj)
-        return obj
 
     @classmethod
     def object2dict(cls, obj, **kwargs):
@@ -309,14 +302,16 @@ class PandasSerialize(AsciiTableSerialize):
             dict: Dictionary of variables to use for testing.
 
         """
+        kwargs.setdefault('table_string_type', 'string')
         field_names = None
         out = super(PandasSerialize, cls).get_testing_options(array_columns=True,
                                                               **kwargs)
+        if kwargs['table_string_type'] == 'bytes':
+            out['kwargs']['str_as_bytes'] = True
         for k in ['as_array']:  # , 'format_str']:
             if k in out['kwargs']:
                 del out['kwargs'][k]
         out['extra_kwargs'] = {}
-        out['empty'] = pandas.DataFrame()
         if no_names:
             for x in [out['kwargs'], out]:
                 if 'field_names' in x:
@@ -354,6 +349,7 @@ class PandasSerialize(AsciiTableSerialize):
             out['objects'] = [serialize.list2pandas(x, names=field_names)
                               for x in out['objects']]
         out['kwargs'].update(out['typedef'])
+        out['empty'] = pandas.DataFrame(np.zeros(0, out['dtype']))
         return out
 
     def enable_file_header(self):

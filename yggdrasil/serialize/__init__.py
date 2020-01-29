@@ -1277,17 +1277,19 @@ def pandas2numpy(frame, index=False):
     """
     if not isinstance(frame, pandas.DataFrame):
         raise TypeError("frame must be a pandas data frame, not %s." % type(frame))
-    if frame.empty:
-        return np.array([])
     arr = frame.to_records(index=index)
     # Covert object type to string
     old_dtype = arr.dtype
     new_dtype = dict(names=old_dtype.names, formats=[])
     for i in range(len(old_dtype)):
-        if old_dtype[i] == object:
+        if (old_dtype[i] == object) and (len(arr[old_dtype.names[i]]) > 0):
+            if isinstance(arr[old_dtype.names[i]][0], backwards.bytes_type):
+                char_str = 'S'
+            else:
+                char_str = 'U'
             try:
                 max_len = len(max(arr[old_dtype.names[i]], key=len))
-                new_dtype['formats'].append(np.dtype("S%s" % max_len))
+                new_dtype['formats'].append(np.dtype("%s%s" % (char_str, max_len)))
             except TypeError:
                 new_dtype['formats'].append(old_dtype[i])
         else:
@@ -1330,8 +1332,6 @@ def pandas2dict(frame):
     """
     if not isinstance(frame, pandas.DataFrame):
         raise TypeError("frame must be a pandas data frame, not %s." % type(frame))
-    if frame.empty:
-        return {}
     return numpy2dict(pandas2numpy(frame))
 
 
@@ -1362,8 +1362,6 @@ def pandas2list(frame):
     """
     if isinstance(frame, list):
         return frame
-    if frame.empty:
-        return []
     return numpy2list(pandas2numpy(frame))
 
 

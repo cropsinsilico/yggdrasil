@@ -119,8 +119,8 @@ definitions:
           type: array
       required:
       - name
-      - commtype
       - datatype
+      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -556,6 +556,11 @@ definitions:
           description: If True, the serialization of dictionaries will be in key sorted
             order. Defaults to True.
           type: boolean
+        str_as_bytes:
+          default: false
+          description: If True, strings in columns are read as bytes. Defaults to
+            False.
+          type: boolean
         transform:
           anyOf:
           - $ref: '#/definitions/transform'
@@ -591,8 +596,8 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - working_dir
+      - name
       - filetype
       title: file_base
       type: object
@@ -829,6 +834,11 @@ definitions:
             default: false
             description: If True, headers will not be read or serialized from/to tables.
               Defaults to False.
+            type: boolean
+          str_as_bytes:
+            default: false
+            description: If True, strings in columns are read as bytes. Defaults to
+              False.
             type: boolean
           use_astropy:
             default: false
@@ -1320,10 +1330,10 @@ definitions:
             is used.
           type: string
       required:
-      - args
-      - name
-      - working_dir
       - language
+      - working_dir
+      - name
+      - args
       title: model_base
       type: object
     - anyOf:
@@ -1846,6 +1856,11 @@ definitions:
           description: If True, the serialization of dictionaries will be in key sorted
             order. Defaults to True.
           type: boolean
+        str_as_bytes:
+          default: false
+          description: If True, strings in columns are read as bytes. Defaults to
+            False.
+          type: boolean
         use_astropy:
           default: false
           description: If True, the astropy package will be used to serialize/deserialize
@@ -1949,6 +1964,11 @@ definitions:
             enum:
             - pandas
             type: string
+          str_as_bytes:
+            default: false
+            description: If True, strings in columns are read as bytes. Defaults to
+              False.
+            type: boolean
           use_astropy:
             default: false
             description: If True, the astropy package will be used to serialize/deserialize

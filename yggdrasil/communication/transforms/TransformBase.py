@@ -62,7 +62,15 @@ class TransformBase(ComponentBase):
 
         """
         try:
-            return encode_type(self(generate_data(datatype)))
+            out = encode_type(self(generate_data(datatype)))
+            if (((out['type'] == 'array') and (datatype['type'] == 'array')
+                 and isinstance(out['items'], list)
+                 and isinstance(datatype['items'], list)
+                 and (len(out['items']) == len(datatype['items'])))):
+                for x, y in zip(out['items'], datatype['items']):
+                    if 'title' in y:
+                        x.setdefault('title', y['title'])
+            return out
         except NotImplementedError:
             return datatype
 

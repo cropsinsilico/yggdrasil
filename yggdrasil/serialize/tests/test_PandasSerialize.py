@@ -26,3 +26,9 @@ class TestPandasSerializeNoHeader(TestPandasSerialize):
     r"""Test class for PandasSerialize class when no header specified."""
 
     testing_option_kws = {'no_header': True}
+
+    
+class TestPandasSerializeBytes(TestPandasSerialize):
+    r"""Test class for PandasSerialize class when strings are bytes."""
+
+    testing_option_kws = {'table_string_type': 'bytes'}

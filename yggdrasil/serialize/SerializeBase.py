@@ -171,7 +171,7 @@ class SerializeBase(tools.YggClass):
 
     @classmethod
     def get_testing_options(cls, table_example=False, array_columns=False,
-                            include_oldkws=False):
+                            include_oldkws=False, table_string_type='bytes'):
         r"""Method to return a dictionary of testing options for this class.
 
         Arguments:
@@ -185,6 +185,8 @@ class SerializeBase(tools.YggClass):
             include_oldkws (bool, optional): If True, old-style keywords will be
                 added to the returned options. This will only have an effect if
                 table_example is True. Defaults to False.
+            table_string_type (str, optional): Type that should be used
+                for the string column in the table. Defaults to 'bytes'.
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
@@ -209,13 +211,26 @@ class SerializeBase(tools.YggClass):
         if array_columns:
             table_example = True
         if table_example:
-            rows = [(b'one', np.int32(1), 1.0),
-                    (b'two', np.int32(2), 2.0),
-                    (b'three', np.int32(3), 3.0)]
+            assert(table_string_type in ['bytes', 'unicode', 'string'])
+            if table_string_type == 'string':
+                if backwards.PY2:
+                    table_string_type = 'bytes'
+                else:
+                    table_string_type = 'unicode'
+            if table_string_type == 'bytes':
+                np_dtype_str = 'S'
+                rows = [(b'one', np.int32(1), 1.0),
+                        (b'two', np.int32(2), 2.0),
+                        (b'three', np.int32(3), 3.0)]
+            else:
+                np_dtype_str = 'U'
+                rows = [('one', np.int32(1), 1.0),
+                        ('two', np.int32(2), 2.0),
+                        ('three', np.int32(3), 3.0)]
             out = {'kwargs': {}, 'empty': [], 'dtype': None,
                    'extra_kwargs': {},
                    'typedef': {'type': 'array',
-                               'items': [{'type': 'bytes',
+                               'items': [{'type': table_string_type,
                                           'units': 'n/a', 'title': 'name'},
                                          {'type': 'int', 'precision': 32,
                                           'units': 'umol', 'title': 'count'},
@@ -243,7 +258,7 @@ class SerializeBase(tools.YggClass):
                 out['kwargs']['as_array'] = True
                 dtype = np.dtype(
                     {'names': out['field_names'],
-                     'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
+                     'formats': ['%s5' % np_dtype_str, 'i4', 'f8']})
                 out['dtype'] = dtype
                 arr = np.array(rows, dtype=dtype)
                 lst = [units.add_units(arr[n], u) for n, u
@@ -254,6 +269,8 @@ class SerializeBase(tools.YggClass):
                     x['type'] = '1darray'
                     if x['title'] == 'name':
                         x['precision'] = 40
+                        if x['subtype'] == 'unicode':
+                            x['precision'] *= 4
         else:
             out = {'kwargs': {}, 'empty': b'', 'dtype': None,
                    'typedef': cls.default_datatype,
