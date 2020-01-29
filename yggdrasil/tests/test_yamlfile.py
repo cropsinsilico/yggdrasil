@@ -60,6 +60,7 @@ class YamlTestBase(YggTestClass):
     r"""Test base for yamlfile."""
     _contents = tuple()
     _include = tuple()
+    _use_json = False
 
     def __init__(self, *args, **kwargs):
         super(YamlTestBase, self).__init__(*args, **kwargs)
@@ -114,10 +115,14 @@ class YamlTestBase(YggTestClass):
 
     def get_fname(self, idx=0, suffix=''):
         r"""Path to temporary file."""
+        if self._use_json:
+            ext = '.json'
+        else:
+            ext = '.yml'
         return os.path.join(tempfile.gettempdir(),
-                            '%s_%s_%d%s.yml' % (
+                            '%s_%s_%d%s%s' % (
                                 tempfile.gettempprefix(), self.uuid,
-                                idx, suffix))
+                                idx, suffix, ext))
 
     def create_instance(self):
         r"""Disabled: Create a new instance of the class."""
@@ -150,6 +155,15 @@ class YamlTestBaseError(YamlTestBase):
             return
         assert_raises(self._error, yamlfile.parse_yaml, self.files)
 
+
+class TestJSONModelOnly(YamlTestBase):
+    r"""Test parsing of different numbers/styles of models from JSON."""
+    _use_json = True
+    _contents = (['{"models":',
+                  '   [{"name": "modelA",',
+                  '     "driver": "GCCModelDriver",',
+                  '     "args": "./src/modelA.c"}]}'],)
+        
 
 class TestYamlModelOnly(YamlTestBase):
     r"""Test parsing of different numbers/styles of models."""

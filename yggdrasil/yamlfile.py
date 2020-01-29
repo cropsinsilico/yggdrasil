@@ -3,6 +3,7 @@ import copy
 import pprint
 import pystache
 import yaml
+import json
 import git
 import sys
 
@@ -81,7 +82,10 @@ def load_yaml(fname):
     yamlparsed = fd.read()
     yamlparsed = pystache.render(
         backwards.StringIO(yamlparsed).getvalue(), dict(os.environ))
-    yamlparsed = yaml.safe_load(yamlparsed)
+    if fname.endswith('.json'):
+        yamlparsed = json.loads(yamlparsed)
+    else:
+        yamlparsed = yaml.safe_load(yamlparsed)
     if not isinstance(yamlparsed, dict):  # pragma: debug
         raise ValueError("Loaded yaml is not a dictionary.")
     yamlparsed['working_dir'] = os.path.dirname(fname)
