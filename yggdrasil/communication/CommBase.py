@@ -1063,11 +1063,10 @@ class CommBase(tools.YggClass):
                 typedef = iconv.transformed_datatype
         # Actual conversion
         msg_out = msg_in
+        no_init = ((self.direction == 'recv')
+                   and (not self.serializer.initialized))
         for iconv in self.transform:
-            msg_out = iconv(
-                msg_out,
-                no_init=((self.direction == 'recv')
-                         and (not self.serializer.initialized)))
+            msg_out = iconv(msg_out, no_init=no_init)
         return msg_out
 
     def evaluate_filter(self, *msg_in):

@@ -107,6 +107,16 @@ def prep_yaml(files):
     if not isinstance(files, list):
         files = [files]
     yamls = [load_yaml(f) for f in files]
+    # Load files pointed to
+    for y in yamls:
+        if 'include' in y:
+            new_files = y.pop('include')
+            if not isinstance(new_files, list):
+                new_files = [new_files]
+            for f in new_files:
+                if not os.path.isabs(f):
+                    f = os.path.join(y['working_dir'], f)
+                yamls.append(load_yaml(f))
     # Standardize format of models and connections to be lists and
     # add working_dir to each
     comp_keys = ['models', 'connections']
