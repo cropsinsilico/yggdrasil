@@ -198,8 +198,8 @@ class PandasSerialize(AsciiTableSerialize):
         out = pandas.read_csv(fd, **kws)
         out = out.dropna(axis='columns', how='all')
         fd.close()
-        if self.str_as_bytes and (not backwards.PY2):
-            # For Python 3 and higher, make sure strings are bytes
+        if self.str_as_bytes:
+            # Make sure strings are bytes
             for c, d in zip(out.columns, out.dtypes):
                 if (d == object) and isinstance(out[c][0], backwards.unicode_type):
                     out[c] = out[c].apply(lambda s: s.encode('utf-8'))
