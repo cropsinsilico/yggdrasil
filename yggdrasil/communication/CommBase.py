@@ -212,7 +212,7 @@ class CommBase(tools.YggClass):
             to 'send'.
         is_interface (bool, optional): Set to True if this comm is a Python
             interface binding. Defaults to False.
-        langauge (str, optional): Programming language of the calling model.
+        language (str, optional): Programming language of the calling model.
             Defaults to 'python'.
         partner_language (str, optional): Programming language of this comm's
             partner comm. Defaults to 'python'.
@@ -440,6 +440,10 @@ class CommBase(tools.YggClass):
             language = 'python'
         self.language = language
         self.partner_language = partner_language
+        self.partner_language_driver = None
+        if partner_language:
+            self.partner_language_driver = import_component(
+                'model', self.partner_language)
         self.language_driver = import_component('model', self.language)
         self.is_client = is_client
         self.is_server = is_server

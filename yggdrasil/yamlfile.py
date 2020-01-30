@@ -261,7 +261,8 @@ def parse_model(yml, existing):
 
     """
     _lang2driver = get_schema()['model'].subtype2class
-    yml['driver'] = _lang2driver[yml.pop('language')]
+    language = yml.pop('language')
+    yml['driver'] = _lang2driver[language]
     # Add server driver
     if yml.get('is_server', False):
         srv = {'name': '%s:%s' % (yml['name'], yml['name']),
@@ -289,6 +290,7 @@ def parse_model(yml, existing):
     for io in ['inputs', 'outputs']:
         for x in yml[io]:
             x['model_driver'] = [yml['name']]
+            x['partner_language'] = language
             existing = parse_component(x, io[:-1], existing=existing)
     return existing
 
