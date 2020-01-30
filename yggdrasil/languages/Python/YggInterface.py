@@ -268,6 +268,40 @@ def YggAsciiArrayOutput(name, fmt, **kwargs):
     return YggAsciiTableOutput(name, fmt, **kwargs)
 
 
+# Specialized classes for receiving consolidated arrays
+def YggArrayInput(name, **kwargs):
+    r"""Get class for handling table-like formatted input as arrays.
+
+    Args:
+        name (str): The name of the input message queue that input should be
+            received from.
+        **kwargs: Additional keyword arguments are passed to YggInput.
+
+    Returns:
+        DefaultComm: Communication object.
+        
+    """
+    kwargs.update(recv_converter='array')
+    return YggInput(name, **kwargs)
+
+
+def YggArrayOutput(name, fmt, **kwargs):
+    r"""Get class for handling table-like formatted output as arrays.
+
+    Args:
+        name (str): The name of the message queue where output should be sent.
+        fmt (str): A C style format string specifying how each 'row' of output
+            should be formated. This should include the newline character.
+        **kwargs: Additional keyword arguments are passed to YggOutput.
+
+    Returns:
+        DefaultComm: Communication object.
+        
+    """
+    kwargs.update(send_converter='array')
+    return YggOutput(name, **kwargs)
+
+
 # Pickle io (for backwards compatibility)
 def YggPickleInput(name, **kwargs):
     r"""Get class for handling pickled input.

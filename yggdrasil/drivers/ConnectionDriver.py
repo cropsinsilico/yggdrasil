@@ -530,6 +530,9 @@ class ConnectionDriver(Driver):
         r"""Update the serializer for the output comm based on input."""
         sinfo = self.icomm.serializer.typedef
         sinfo.update(self.icomm.serializer.serializer_info)
+        for t in self.icomm.transform:
+            t.set_original_datatype(sinfo)
+            sinfo = t.transformed_datatype
         sinfo.pop('seritype', None)
         self.debug('Before update:\n'
                    + '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n'
@@ -542,6 +545,9 @@ class ConnectionDriver(Driver):
             if isinstance_component(t, 'transform'):
                 t.set_original_datatype(sinfo)
                 sinfo = t.transformed_datatype
+        for t in self.ocomm.transform:
+            t.set_original_datatype(sinfo)
+            sinfo = t.transformed_datatype
         self.ocomm.serializer.initialize_serializer(sinfo)
         self.ocomm.serializer.update_serializer(skip_type=True,
                                                 **self.icomm._last_header)

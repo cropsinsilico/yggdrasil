@@ -392,7 +392,7 @@ class YggRunner(YggClass):
                         running.remove(drv)
                         self.info("%s finished exiting.", drv['name'])
                 else:
-                    self.info('%s still running', drv['name'])
+                    self.debug('%s still running', drv['name'])
             dead = []
             for drv in self.all_drivers:
                 d = drv['instance']

@@ -55,7 +55,7 @@ def register_example(example_dir):
         lang_avail += ['all', 'all_nomatlab', 'c', 'python']
     elif example_base == 'fakeplant':
         lang_avail += ['all', 'all_nomatlab', 'c', 'cpp', 'matlab', 'python']
-    elif example_base == 'types':
+    elif example_base in ['types', 'transforms']:
         lang_avail += tools.get_supported_lang()
         for k in ['cmake', 'make', 'lpy', 'executable']:
             lang_avail.remove(k)
@@ -137,8 +137,8 @@ def register_example(example_dir):
             elif lang == 'matlab':
                 yml_names = ['growth.yml', 'growth_files.yml']
                 src_names = ['growth.m']
-        elif example_base == 'types':
-            yml_names = ['types.yml']
+        elif example_base in ['types', 'transforms']:
+            yml_names = ['%s.yml' % example_base]
             src_names = ['src.py', 'dst.py']
         else:
             src_is_abs = True

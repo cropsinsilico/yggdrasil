@@ -2,6 +2,7 @@ import os
 import copy
 import pprint
 import yaml
+from yggdrasil import tools
 from yggdrasil.components import import_component
 from yggdrasil.languages import get_language_ext
 from yggdrasil.metaschema.datatypes import get_type_class
@@ -11,18 +12,38 @@ from yggdrasil.examples.tests import ExampleTstBase
 from yggdrasil.metaschema.datatypes import encode_type
 
 
+_all_lang = tools.get_supported_lang()
+_typed_lang = tuple([x for x in _all_lang if
+                     import_component('model', x).is_typed])
+
+
 @long_running
 class TestExampleTypes(ExampleTstBase):
     r"""Test the Types example."""
 
     example_name = 'types'
-    iter_over = ['language', 'type']
-    iter_flaky = [('c', 'instance'), ('cpp', 'instance')]
+    iter_over = ['language', 'type', 'method']
+    iter_skip = [(set(_typed_lang), '*', 'run_example_generic'),
+                 (set(_typed_lang), '*', 'run_example_pointers'),
+                 (set(['c']), '*', 'run_example_c_nolengths'),
+                 (set(['c']), '*', 'run_example_c_prefixes'),
+                 ('c', set(['string', 'bytes', 'unicode']), 'run_example_c_nolengths'),
+                 ('c', set(['1darray', 'ndarray']), 'run_example_c_prefixes'),
+                 ('*', set(['array']), 'run_example_split_array')]
+    iter_flaky = [('c', 'instance', '*'), ('cpp', 'instance', '*')]
+    iter_list_language = _all_lang
+    iter_list_method = ['run_example', 'run_example_generic',
+                        'run_example_pointers', 'run_example_c_nolengths',
+                        'run_example_c_prefixes', 'run_example_split_array']
 
     def __init__(self, *args, **kwargs):
-        self.datatype = None
         self._output_files = None
         super(TestExampleTypes, self).__init__(*args, **kwargs)
+
+    @property
+    def datatype(self):
+        r"""str: Name of datatype being used by the current iteration."""
+        return self.iter_param.get('datatype', None)
 
     @property
     def output_files(self):
@@ -245,46 +266,44 @@ class TestExampleTypes(ExampleTstBase):
     def check_results(self):
         r"""This should be overridden with checks for the result."""
         pass
-    
-    def run_example(self):
+
+    def run_example(self, **kwargs):
         r"""This runs an example in the correct language."""
         if self.yaml is not None:
             self._output_files = [self.setup_model(self.language,
-                                                   self.datatype)]
+                                                   self.datatype,
+                                                   **kwargs)]
         super(TestExampleTypes, self).run_example()
+        
+    def run_example_generic(self):
+        r"""Version of the example using generic type."""
         drv = import_component('model', self.language)
         if drv.is_typed:
-            # Version using generic type
-            self._output_files = [self.setup_model(self.language,
-                                                   self.datatype,
-                                                   using_generics=True)]
-            super(TestExampleTypes, self).run_example()
-            # Version using pointers
-            self._output_files = [self.setup_model(self.language,
-                                                   self.datatype,
-                                                   using_pointers=True)]
-            super(TestExampleTypes, self).run_example()
-            # C Specific tests
-            if self.language == 'c':
-                if self.datatype in ['string', 'bytes', 'unicode']:
-                    # Version using pointers & no lengths
-                    self._output_files = [
-                        self.setup_model(self.language,
-                                         self.datatype,
-                                         using_pointers=True,
-                                         dont_add_lengths=True)]
-                    super(TestExampleTypes, self).run_example()
-                elif self.datatype in ['1darray', 'ndarray']:
-                    # Version using pointers & prefixes
-                    self._output_files = [
-                        self.setup_model(self.language,
-                                         self.datatype,
-                                         using_pointers=True,
-                                         length_prefix=True)]
-                    super(TestExampleTypes, self).run_example()
-        # Version splitting array
+            self.run_example(using_generics=True)
+
+    def run_example_pointers(self):
+        r"""Version of the example using pointers."""
+        drv = import_component('model', self.language)
+        if drv.is_typed:
+            self.run_example(using_pointers=True)
+    
+    def run_example_c_nolengths(self):
+        r"""Version of the example in C using pointers & no lengths."""
+        drv = import_component('model', self.language)
+        if ((drv.is_typed and (self.language == 'c')
+             and (self.datatype in ['string', 'bytes', 'unicode']))):
+            self.run_example(using_pointers=True,
+                             dont_add_lengths=True)
+    
+    def run_example_c_prefixes(self):
+        r"""Version of the example in C using pointers & prefixes."""
+        drv = import_component('model', self.language)
+        if ((drv.is_typed and (self.language == 'c')
+             and (self.datatype in ['1darray', 'ndarray']))):
+            self.run_example(using_pointers=True,
+                             length_prefix=True)
+
+    def run_example_split_array(self):
+        r"""Version of the example where array is split."""
         if self.datatype == 'array':
-            self._output_files = [self.setup_model(self.language,
-                                                   self.datatype,
-                                                   split_array=True)]
-            super(TestExampleTypes, self).run_example()
+            self.run_example(split_array=True)

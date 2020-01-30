@@ -9,7 +9,7 @@ from yggdrasil.serialize.tests import test_DefaultSerialize as parent
 def test_serialize_nofmt():
     r"""Test error on serialization without a format."""
     inst = AsciiTableSerialize.AsciiTableSerialize()
-    inst._initialized = True
+    inst.initialized = True
     test_msg = np.zeros((5, 5))
     assert_raises(RuntimeError, inst.serialize, test_msg)
 

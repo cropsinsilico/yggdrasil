@@ -369,6 +369,16 @@ def combine_flds(arrs, dtype=None):
     if dtype is None:
         names = ['f%d' % i for i in range(nflds)]
         dtype = np.dtype([(n, a.dtype) for n, a in zip(names, arrs)])
+    else:
+        formats = [dtype[i].str for i in range(len(dtype))]
+        update_dtype = False
+        for i in range(len(dtype)):
+            if not dtype[i].str.endswith('S0'):
+                continue
+            formats[i] = 'S%d' % max([len(x) for x in arrs[i]])
+            update_dtype = True
+        if update_dtype:
+            dtype = np.dtype({'names': dtype.names, 'formats': formats})
     # Check number of fields and array shapes
     if len(dtype) != nflds:
         raise ValueError("dtype has %d fields, but %d arrays were provided." %
@@ -435,7 +445,17 @@ def combine_eles(arrs, dtype=None):
             if len(a) != nflds:
                 raise ValueError("Element %d has %d values, but " % (i, len(a))
                                  + "%d fields are expected." % nflds)
+    
     # Get data type
+    def get_max_len(i):
+        max_len = 0
+        for iele in arrs:
+            if isinstance(iele, (np.ndarray, np.void)):
+                n = iele.dtype.names[i]
+                max_len = max(max_len, len(iele[n]))
+            else:
+                max_len = max(max_len, len(iele[i]))
+        return max_len
     if dtype is None:
         if isinstance(arrs[0], (np.ndarray, np.void)):
             dtype = arrs[0].dtype
@@ -450,18 +470,23 @@ def combine_eles(arrs, dtype=None):
             for i, a in enumerate(arrs[0]):
                 dtype_str = np.dtype(type(a)).str
                 if 'S' in dtype_str:
-                    max_len = 0
-                    for iele in arrs:
-                        if isinstance(iele, (np.ndarray, np.void)):
-                            n = iele.dtype.names[i]
-                            max_len = max(max_len, len(iele[n]))
-                        else:
-                            max_len = max(max_len, len(iele[i]))
+                    max_len = get_max_len(i)
                     dtype_str = 'S%d' % max_len
                 dtype_list.append(np.dtype(dtype_str))
             if names is None:
                 names = ['f%d' % i for i in range(nflds)]
             dtype = np.dtype({'names': names, 'formats': dtype_list})
+    else:
+        formats = [dtype[i].str for i in range(len(dtype))]
+        update_dtype = False
+        for i in range(len(dtype)):
+            if not dtype[i].str.endswith('S0'):
+                continue
+            max_len = get_max_len(i)
+            formats[i] = 'S%d' % max_len
+            update_dtype = True
+        if update_dtype:
+            dtype = np.dtype({'names': dtype.names, 'formats': formats})
     # Combine rows
     out = np.empty(neles, dtype=dtype)
     for i, a in enumerate(arrs):
@@ -647,6 +672,8 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
     if not _use_astropy:
         use_astropy = False
     dtype = cformat2nptype(fmt_str)
+    if len(dtype) == 0:
+        dtype = np.dtype([('f0', dtype)])
     info = format2table(fmt_str)
     comment = info.get('comment', None)
     if comment is not None:
@@ -1252,17 +1279,19 @@ def pandas2numpy(frame, index=False):
     """
     if not isinstance(frame, pandas.DataFrame):
         raise TypeError("frame must be a pandas data frame, not %s." % type(frame))
-    if frame.empty:
-        return np.array([])
     arr = frame.to_records(index=index)
     # Covert object type to string
     old_dtype = arr.dtype
     new_dtype = dict(names=old_dtype.names, formats=[])
     for i in range(len(old_dtype)):
-        if old_dtype[i] == object:
+        if (old_dtype[i] == object) and (len(arr[old_dtype.names[i]]) > 0):
+            if isinstance(arr[old_dtype.names[i]][0], backwards.bytes_type):
+                char_str = 'S'
+            else:
+                char_str = 'U'
             try:
                 max_len = len(max(arr[old_dtype.names[i]], key=len))
-                new_dtype['formats'].append(np.dtype("S%s" % max_len))
+                new_dtype['formats'].append(np.dtype("%s%s" % (char_str, max_len)))
             except TypeError:
                 new_dtype['formats'].append(old_dtype[i])
         else:
@@ -1305,8 +1334,6 @@ def pandas2dict(frame):
     """
     if not isinstance(frame, pandas.DataFrame):
         raise TypeError("frame must be a pandas data frame, not %s." % type(frame))
-    if frame.empty:
-        return {}
     return numpy2dict(pandas2numpy(frame))
 
 
@@ -1335,8 +1362,8 @@ def pandas2list(frame):
         list: List with contents from the input frame.
 
     """
-    if frame.empty:
-        return []
+    if isinstance(frame, list):
+        return frame
     return numpy2list(pandas2numpy(frame))
 
 

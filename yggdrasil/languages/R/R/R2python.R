@@ -25,11 +25,14 @@ R2python <- function(robj, not_bytes=FALSE) {
       reticulate::r_to_py(float::dbl(robj)))
   } else if (is(robj, "double")) {
     # if (length(attributes(robj)) != 0) {
-    out <- call_python_method(np, 'float32',
+    out <- call_python_method(np, 'float64',
       reticulate::r_to_py(robj))
     # }
-  } else if (is(robj, "numeric")) {
+  } else if (is(robj, "ygg_float32")) {
     out <- call_python_method(np, 'float32',
+      reticulate::r_to_py(robj))
+  } else if (is(robj, "numeric")) {
+    out <- call_python_method(np, 'float64',
       reticulate::r_to_py(robj))
   } else if (is(robj, "raw") || is(robj, "ygg_bytes")) {
     ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)

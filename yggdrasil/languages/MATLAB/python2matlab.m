@@ -102,10 +102,16 @@ function x_ml = python2matlab(x_py)
     elseif ndim > 2
       disp('Conversion of numpy arrays with ndim > 2 uses nested cell arrays.');
     end;
-    % if ~is_struct
-    if ismember(char_code, ['f', 'i'])
+    if (is_struct)
+      x_ml = cell2table(x_ml, 'VariableNames', ...
+			matlab.lang.makeValidName(python2matlab(x_py.dtype.names)));
+    elseif ismember(char_code, ['f', 'i'])
       if isa(x_ml, 'cell')
         x_ml = cell2mat(x_ml);
+      end;
+    elseif ismember(char_code, ['S'])
+      if isa(x_ml, 'cell')
+        x_ml = string(x_ml);
       end;
     end;
   elseif (isa(x_py, 'numeric') || isa(x_py, 'logical'))

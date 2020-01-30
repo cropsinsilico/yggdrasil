@@ -556,6 +556,11 @@ definitions:
           description: If True, the serialization of dictionaries will be in key sorted
             order. Defaults to True.
           type: boolean
+        str_as_bytes:
+          default: false
+          description: If True, strings in columns are read as bytes. Defaults to
+            False.
+          type: boolean
         transform:
           anyOf:
           - $ref: '#/definitions/transform'
@@ -591,9 +596,9 @@ definitions:
             is used.
           type: string
       required:
+      - working_dir
       - name
       - filetype
-      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -829,6 +834,11 @@ definitions:
             default: false
             description: If True, headers will not be read or serialized from/to tables.
               Defaults to False.
+            type: boolean
+          str_as_bytes:
+            default: false
+            description: If True, strings in columns are read as bytes. Defaults to
+              False.
             type: boolean
           use_astropy:
             default: false
@@ -1320,10 +1330,10 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - language
-      - args
       - working_dir
+      - name
+      - args
       title: model_base
       type: object
     - anyOf:
@@ -1846,6 +1856,11 @@ definitions:
           description: If True, the serialization of dictionaries will be in key sorted
             order. Defaults to True.
           type: boolean
+        str_as_bytes:
+          default: false
+          description: If True, strings in columns are read as bytes. Defaults to
+            False.
+          type: boolean
         use_astropy:
           default: false
           description: If True, the astropy package will be used to serialize/deserialize
@@ -1949,6 +1964,11 @@ definitions:
             enum:
             - pandas
             type: string
+          str_as_bytes:
+            default: false
+            description: If True, strings in columns are read as bytes. Defaults to
+              False.
+            type: boolean
           use_astropy:
             default: false
             description: If True, the astropy package will be used to serialize/deserialize
@@ -2118,6 +2138,10 @@ definitions:
         - args
       description: Base schema for all subtypes of transform components.
       properties:
+        field_names:
+          items:
+            type: string
+          type: array
         function:
           description: The handle for a callable Python object (e.g. function) that
             should be used to transform messages or a string of the form "<function
@@ -2173,6 +2197,30 @@ definitions:
       title: transform_base
       type: object
     - anyOf:
+      - additionalProperties: true
+        description: Schema for transform component ['array'] subtype.
+        properties:
+          field_names:
+            items:
+              type: string
+            type: array
+          transformtype:
+            enum:
+            - array
+        title: ArrayTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['pandas'] subtype.
+        properties:
+          field_names:
+            items:
+              type: string
+            type: array
+          transformtype:
+            enum:
+            - pandas
+        title: PandasTransform
+        type: object
       - additionalProperties: true
         description: Schema for transform component ['select_fields'] subtype.
         properties:
@@ -2256,22 +2304,6 @@ definitions:
         required:
         - map
         title: MapFieldsTransform
-        type: object
-      - additionalProperties: true
-        description: Schema for transform component ['array'] subtype.
-        properties:
-          transformtype:
-            enum:
-            - array
-        title: ArrayTransform
-        type: object
-      - additionalProperties: true
-        description: Schema for transform component ['pandas'] subtype.
-        properties:
-          transformtype:
-            enum:
-            - pandas
-        title: PandasTransform
         type: object
     description: Schema for transform components.
     title: transform

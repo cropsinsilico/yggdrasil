@@ -3,6 +3,7 @@ import copy
 import pprint
 import pystache
 import yaml
+import json
 import git
 import sys
 
@@ -81,7 +82,10 @@ def load_yaml(fname):
     yamlparsed = fd.read()
     yamlparsed = pystache.render(
         backwards.StringIO(yamlparsed).getvalue(), dict(os.environ))
-    yamlparsed = yaml.safe_load(yamlparsed)
+    if fname.endswith('.json'):
+        yamlparsed = json.loads(yamlparsed)
+    else:
+        yamlparsed = yaml.safe_load(yamlparsed)
     if not isinstance(yamlparsed, dict):  # pragma: debug
         raise ValueError("Loaded yaml is not a dictionary.")
     yamlparsed['working_dir'] = os.path.dirname(fname)
@@ -107,6 +111,16 @@ def prep_yaml(files):
     if not isinstance(files, list):
         files = [files]
     yamls = [load_yaml(f) for f in files]
+    # Load files pointed to
+    for y in yamls:
+        if 'include' in y:
+            new_files = y.pop('include')
+            if not isinstance(new_files, list):
+                new_files = [new_files]
+            for f in new_files:
+                if not os.path.isabs(f):
+                    f = os.path.join(y['working_dir'], f)
+                yamls.append(load_yaml(f))
     # Standardize format of models and connections to be lists and
     # add working_dir to each
     comp_keys = ['models', 'connections']
@@ -247,7 +261,8 @@ def parse_model(yml, existing):
 
     """
     _lang2driver = get_schema()['model'].subtype2class
-    yml['driver'] = _lang2driver[yml.pop('language')]
+    language = yml.pop('language')
+    yml['driver'] = _lang2driver[language]
     # Add server driver
     if yml.get('is_server', False):
         srv = {'name': '%s:%s' % (yml['name'], yml['name']),
@@ -275,6 +290,7 @@ def parse_model(yml, existing):
     for io in ['inputs', 'outputs']:
         for x in yml[io]:
             x['model_driver'] = [yml['name']]
+            x['partner_language'] = language
             existing = parse_component(x, io[:-1], existing=existing)
     return existing
 

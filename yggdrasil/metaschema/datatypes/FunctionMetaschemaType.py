@@ -22,6 +22,6 @@ class FunctionMetaschemaType(ClassMetaschemaType):
             object: Python object of the specified type.
 
         """
-        def example_func(x):
+        def example_func(x):  # pragma: debug
             return x
         return example_func

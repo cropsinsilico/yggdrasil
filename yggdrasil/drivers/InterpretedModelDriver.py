@@ -1,5 +1,5 @@
 import os
-from yggdrasil import tools, serialize
+from yggdrasil import tools
 from yggdrasil.config import ygg_cfg, locate_file
 from yggdrasil.drivers.ModelDriver import ModelDriver
 
@@ -76,8 +76,8 @@ class InterpretedModelDriver(ModelDriver):
     comm_atexit = None
     comm_linger = False
     decode_format = None
-    recv_converters = {'pandas': 'pandas'}
-    send_converters = {'pandas': serialize.pandas2list}
+    recv_converters = {}
+    send_converters = {}
 
     def __init__(self, name, args, **kwargs):
         super(InterpretedModelDriver, self).__init__(name, args, **kwargs)

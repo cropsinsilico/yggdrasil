@@ -1,3 +1,4 @@
+import pprint
 from yggdrasil.tests import YggTestClass
 
 
@@ -30,16 +31,36 @@ class TestTransformBase(YggTestClass):
         r"""Test transform."""
         for x in self.get_options():
             inst = self.import_cls(**x.get('kwargs', {}))
-            for msg_in, msg_out in x.get('in/out', []):
-                if isinstance(msg_out, type(BaseException)):
-                    self.assert_raises(msg_out, inst, msg_in)
+            for msg_in, msg_exp in x.get('in/out', []):
+                if isinstance(msg_exp, type(BaseException)):
+                    self.assert_raises(msg_exp, inst, msg_in)
                 else:
-                    self.assert_equal(inst(msg_in), msg_out)
+                    msg_out = inst(msg_in)
+                    try:
+                        self.assert_equal(msg_out, msg_exp)
+                    except BaseException:  # pragma: debug
+                        for t, x in zip(['in', 'expected', 'out'],
+                                        [msg_in, msg_exp, msg_out]):
+                            print('%s:' % t)
+                            pprint.pprint(x)
+                        raise
 
     def test_transform_type(self):
         r"""Test transform_type."""
         for x in self.get_options():
             inst = self.import_cls(**x.get('kwargs', {}))
-            for typ_in, typ_out in x.get('in/out_t', []):
-                self.assert_equal(inst.transform_datatype(typ_in),
-                                  typ_out)
+            for typ_in, typ_exp in x.get('in/out_t', []):
+                if isinstance(typ_exp, type(BaseException)):
+                    self.assert_raises(typ_exp, inst.validate_datatype,
+                                       typ_in)
+                else:
+                    inst.validate_datatype(typ_in)
+                    typ_out = inst.transform_datatype(typ_in)
+                    try:
+                        self.assert_equal(typ_out, typ_exp)
+                    except BaseException:  # pragma: debug
+                        for t, x in zip(['in', 'expected', 'out'],
+                                        [typ_in, typ_exp, typ_out]):
+                            print('%s:' % t)
+                            pprint.pprint(x)
+                        raise

@@ -5,6 +5,7 @@ import atexit
 import threading
 import logging
 import types
+import pandas
 from yggdrasil import backwards, tools
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
@@ -15,6 +16,7 @@ from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
+from yggdrasil.communication.transforms.TransformBase import TransformBase
 
 
 logger = logging.getLogger(__name__)
@@ -210,7 +212,7 @@ class CommBase(tools.YggClass):
             to 'send'.
         is_interface (bool, optional): Set to True if this comm is a Python
             interface binding. Defaults to False.
-        langauge (str, optional): Programming language of the calling model.
+        language (str, optional): Programming language of the calling model.
             Defaults to 'python'.
         partner_language (str, optional): Programming language of this comm's
             partner comm. Defaults to 'python'.
@@ -438,6 +440,10 @@ class CommBase(tools.YggClass):
             language = 'python'
         self.language = language
         self.partner_language = partner_language
+        self.partner_language_driver = None
+        if partner_language:
+            self.partner_language_driver = import_component(
+                'model', self.partner_language)
         self.language_driver = import_component('model', self.language)
         self.is_client = is_client
         self.is_server = is_server
@@ -540,11 +546,11 @@ class CommBase(tools.YggClass):
                     cls_conv = getattr(self.language_driver, dir_conv + 's')
                     if iv in cls_conv:
                         iv = cls_conv[iv]
-                    if isinstance(iv, str):
-                        try:
-                            iv = create_component('transform', subtype=iv)
-                        except ValueError:
-                            iv = None
+                if isinstance(iv, str):
+                    try:
+                        iv = create_component('transform', subtype=iv)
+                    except ValueError:
+                        iv = None
                 elif isinstance(iv, dict):
                     from yggdrasil.schema import get_schema
                     transform_schema = get_schema().get('transform')
@@ -552,6 +558,8 @@ class CommBase(tools.YggClass):
                         iv,
                         subtype=transform_schema.identify_subtype(iv))
                     iv = create_component('transform', **transform_kws)
+                elif isinstance(iv, TransformBase):
+                    pass
                 elif ((isinstance(iv, (types.BuiltinFunctionType, types.FunctionType,
                                        types.BuiltinMethodType, types.MethodType))
                        or hasattr(iv, '__call__'))):
@@ -1050,7 +1058,9 @@ class CommBase(tools.YggClass):
                    % self.direction)
         # If receiving, update the expected datatypes to use information
         # about the received datatype that was recorded by the serializer
-        if (self.direction == 'recv') and (not self.transform[0].original_datatype):
+        if (((self.direction == 'recv')
+             and self.serializer.initialized
+             and (not self.transform[0].original_datatype))):
             typedef = self.serializer.typedef
             for iconv in self.transform:
                 if not iconv.original_datatype:
@@ -1058,8 +1068,10 @@ class CommBase(tools.YggClass):
                 typedef = iconv.transformed_datatype
         # Actual conversion
         msg_out = msg_in
+        no_init = ((self.direction == 'recv')
+                   and (not self.serializer.initialized))
         for iconv in self.transform:
-            msg_out = iconv(msg_out)
+            msg_out = iconv(msg_out, no_init=no_init)
         return msg_out
 
     def evaluate_filter(self, *msg_in):
@@ -1103,6 +1115,8 @@ class CommBase(tools.YggClass):
         emsg = self.empty_obj_recv
         try:
             out = (isinstance(msg, type(emsg)) and (msg == emsg))
+            if isinstance(out, pandas.DataFrame):
+                out = True
         except BaseException:  # pragma: debug
             out = False
         return out

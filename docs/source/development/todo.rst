@@ -80,4 +80,3 @@ Testing
 * Test outside of conda on windows?
 * Update base test class for comm and connection drivers to use comm installation bool for generating unittest skip errors
 * testing for R native functions
-* Split test_examples runs into separate tests to allow more efficient treatment of flaky datatypes (instance in C/C++).

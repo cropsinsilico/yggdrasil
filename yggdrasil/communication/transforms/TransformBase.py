@@ -1,3 +1,4 @@
+from yggdrasil import backwards
 from yggdrasil.components import ComponentBase
 from yggdrasil.metaschema.datatypes import encode_type, generate_data
 
@@ -24,6 +25,7 @@ class TransformBase(ComponentBase):
         super(TransformBase, self).__init__(*args, **kwargs)
         if self.initial_state:
             self._state = self.initial_state
+        self.transformed_datatype = None
         if self.original_datatype:
             self.set_original_datatype(self.original_datatype)
 
@@ -62,7 +64,15 @@ class TransformBase(ComponentBase):
 
         """
         try:
-            return encode_type(self(generate_data(datatype)))
+            out = encode_type(self(generate_data(datatype)))
+            if (((out['type'] == 'array') and (datatype['type'] == 'array')
+                 and isinstance(out['items'], list)
+                 and isinstance(datatype['items'], list)
+                 and (len(out['items']) == len(datatype['items'])))):
+                for x, y in zip(out['items'], datatype['items']):
+                    if 'title' in y:
+                        x.setdefault('title', y['title'])
+            return out
         except NotImplementedError:
             return datatype
 
@@ -81,7 +91,7 @@ class TransformBase(ComponentBase):
         """
         raise NotImplementedError
 
-    def __call__(self, x, no_copy=False):
+    def __call__(self, x, no_copy=False, no_init=False):
         r"""Call transform on the provided message.
 
         Args:
@@ -89,13 +99,17 @@ class TransformBase(ComponentBase):
             no_copy (bool, optional): If True, the transformation occurs in
                 place. Otherwise a copy is created and transformed. Defaults
                 to False.
+            no_init (bool, optional): If True, the datatype is not initialized
+                if it is not already set. Defaults to False.
 
         Returns:
             object: The transformed message.
 
         """
-        if not self.original_datatype:
+        if (not self.original_datatype) and (not no_init):
             self.set_original_datatype(encode_type(x))
+        if isinstance(x, backwards.bytes_type) and (len(x) == 0) and no_init:
+            return b''
         out = self.evaluate_transform(x, no_copy=no_copy)
         return out
 

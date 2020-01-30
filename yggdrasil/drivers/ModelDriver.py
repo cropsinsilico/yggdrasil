@@ -291,6 +291,12 @@ class ModelDriver(Driver):
     include_channel_obj = False
     is_typed = False
     brackets = None
+    python_interface = {'table_input': 'YggAsciiTableInput',
+                        'table_output': 'YggAsciiTableOutput',
+                        'array_input': 'YggArrayInput',
+                        'array_outputs': 'YggArrayOutput',
+                        'pandas_input': 'YggPandasInput',
+                        'pandas_output': 'YggPandasOutput'}
 
     _library_cache = {}
 
@@ -1705,25 +1711,28 @@ class ModelDriver(Driver):
         dir_map = {'input': 'recv', 'output': 'send'}
         try_keys = [dir_map[key] + '_converter', 'transform']
         try_vals = []
+        if all([bool(kwargs.get(k, False)) for k in try_keys]):  # pragma: debug
+            # TODO: Handling merger of the transforms in yaml or
+            # remove the *_converter options entirely
+            raise RuntimeError(("Transforms are specified in multiple "
+                                "locations for this input: %s")
+                               % str(try_keys))
         for k in try_keys:
             if k in kwargs:
                 v = kwargs[k]
                 if not isinstance(v, list):
                     v = [v]
                 try_vals += v
-        try_vals = [x for x in try_vals if isinstance(x, str)]
-        if try_vals:
-            if len(try_vals) > 1:  # pragma: debug
-                raise NotImplementedError("Multiple transformations "
-                                          "not supported for model "
-                                          "input/output channels.")
-            if not isinstance(try_vals[0], str):  # pragma: debug
-                raise NotImplementedError(("Transformations of the "
-                                           "type '%s' not supported "
-                                           "for model input/output "
-                                           "channels.")
-                                          % type(try_vals[0]))
-            key = '%s_%s' % (try_vals[0], key)
+        # This last transform is used because the others are assumed
+        # to be applied by the connection driver
+        if try_vals and isinstance(try_vals[-1], str):
+            try_key = '%s_%s' % (try_vals[-1], key)
+            if try_key in cls.function_param:
+                key = try_key
+            elif ((('python_interface' in cls.function_param)
+                   and (try_key in cls.python_interface))):
+                kwargs['python_interface'] = cls.python_interface[try_key]
+                key = 'python_interface'
         out = [cls.format_function_param(key, **kwargs)]
         return out
 

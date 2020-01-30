@@ -86,15 +86,12 @@ function x_py = matlab2python(x_ml)
       x_py = x_ml;
     end;
   elseif isvector(x_ml);
-    if isa(x_ml, 'string');
-      x_py = py.str(x_ml);
-    elseif isa(x_ml, 'string');
-      try
-	x_py = py.str(x_ml);
-      catch
-	x_py = py.unicode(x_ml);
+    if (isa(x_ml, 'string') || isa(x_ml, 'double'));
+      x_py = py.list();  
+      for i = 1:length(x_ml)
+	x_py.append(matlab2python(x_ml(i)));
       end
-      x_py = x_py.encode('utf-8');
+      x_py = py.numpy.array(x_py);
     elseif isa(x_ml, 'char');
       try
         x_py = py.str(x_ml);
@@ -135,6 +132,17 @@ function x_py = matlab2python(x_ml)
       else
 	x_py = matlab2python(reduce_dim(x_ml));
       end;
+    elseif isa(x_ml, 'table')
+      arr_dict = py.dict();
+      order = py.list();
+      names = x_ml.Properties.VariableNames;
+      for i = 1:length(names)
+	iname = names{i};
+        iarr = matlab2python(x_ml{:, iname});
+        arr_dict{py.str(iname)} = iarr;
+        order.append(py.str(iname));
+      end
+      x_py = py.yggdrasil.serialize.dict2numpy(arr_dict, order);
     else
       data_size = int16(size(x_ml));
       transpose = x_ml';
