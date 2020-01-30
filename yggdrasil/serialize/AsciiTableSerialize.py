@@ -66,9 +66,20 @@ class AsciiTableSerialize(DefaultSerialize):
             for k in _metaschema['properties'].keys():
                 if k in kwargs:
                     old_typedef[k] = kwargs.pop(k)
-            new_typedef = {'type': 'array', 'items': [old_typedef]}
+            if old_typedef['type'] == 'object':
+                names = self.get_field_names()
+                if not names:
+                    names = list(old_typedef['properties'].keys())
+                assert(len(old_typedef['properties']) == len(names))
+                new_typedef = {'type': 'array', 'items': []}
+                for n in names:
+                    new_typedef['items'].append(dict(
+                        old_typedef['properties'][n], title=n))
+            else:
+                new_typedef = {'type': 'array', 'items': [old_typedef]}
             kwargs.update(new_typedef)
         out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
+        self.initialized = (self.typedef != self.default_datatype)
         self.update_format_str()
         self.update_field_names()
         self.update_field_units()

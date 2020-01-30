@@ -672,6 +672,8 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
     if not _use_astropy:
         use_astropy = False
     dtype = cformat2nptype(fmt_str)
+    if len(dtype) == 0:
+        dtype = np.dtype([('f0', dtype)])
     info = format2table(fmt_str)
     comment = info.get('comment', None)
     if comment is not None:

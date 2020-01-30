@@ -5,6 +5,7 @@ import atexit
 import threading
 import logging
 import types
+import pandas
 from yggdrasil import backwards, tools
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
@@ -1110,6 +1111,8 @@ class CommBase(tools.YggClass):
         emsg = self.empty_obj_recv
         try:
             out = (isinstance(msg, type(emsg)) and (msg == emsg))
+            if isinstance(out, pandas.DataFrame):
+                out = True
         except BaseException:  # pragma: debug
             out = False
         return out

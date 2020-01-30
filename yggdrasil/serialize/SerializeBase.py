@@ -539,6 +539,19 @@ class SerializeBase(tools.YggClass):
             if isinstance(v, backwards.string_types):
                 setattr(self, k, backwards.as_bytes(v))
 
+    def cformat2nptype(self, *args, **kwargs):
+        r"""Method to convert c format string to numpy data type.
+
+        Args:
+            *args: Arguments are passed to serialize.cformat2nptype.
+            **kwargs: Keyword arguments are passed to serialize.cformat2nptype.
+
+        Returns:
+            np.dtype: Corresponding numpy data type.
+
+        """
+        return serialize.cformat2nptype(*args, **kwargs)
+
     def update_typedef_from_oldstyle(self, typedef):
         r"""Update a given typedef using an old, table-style serialization spec.
         Existing typedef values are not overwritten and warnings are raised if the
@@ -576,7 +589,7 @@ class SerializeBase(tools.YggClass):
                                                  getattr(self, 'as_array', False))
                 typedef.update(type='array', items=[])
                 for i, fmt in enumerate(fmts):
-                    nptype = serialize.cformat2nptype(fmt)
+                    nptype = self.cformat2nptype(fmt)
                     itype = OneDArrayMetaschemaType.encode_type(np.ones(1, nptype))
                     itype = OneDArrayMetaschemaType.extract_typedef(itype)
                     if (fmt == '%s') and ('precision' in itype):

@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import unittest
 from yggdrasil import backwards, units
 from yggdrasil.tests import assert_equal
@@ -60,3 +61,31 @@ class TestAsciiTableComm_AsArray(TestAsciiTableComm):
     r"""Test for AsciiTableComm communication class."""
 
     testing_option_kws = {'array_columns': True}
+
+
+class TestAsciiTableComm_single(TestAsciiTableComm):
+    r"""Test for AsciiTableComm communication class with field names sent."""
+
+    def get_options(self):
+        r"""Get testing options."""
+        nele = 5
+        dtype = np.dtype(dict(formats=['float'], names=['f0']))
+        arr1 = np.zeros((nele, ), dtype)
+        arr2 = np.ones((nele, ), dtype)
+        out = {'kwargs': {'as_array': True, 'field_names': ['f0']},
+               'contents': (
+                   b'# f0\n# %g\n'
+                   + nele * b'0\n' + nele * b'1\n'),
+               'send': [[arr1['f0']], [arr2['f0']]],
+               'recv': [[np.hstack([arr1, arr2])['f0']]],
+               'recv_partial': [[[arr1['f0']]], [[arr2['f0']]]],
+               'dict': {'f0': arr1['f0']},
+               'objects': [[arr1['f0']], [arr2['f0']]]}
+        out['msg'] = out['send'][0]
+        out['msg_array'] = arr1
+        return out
+
+    def test_send_dict_default(self):
+        r"""Test automated conversion of dictionary to pandas data frame."""
+        self.do_send_recv(msg_send=self.testing_options['dict'],
+                          msg_recv=self.testing_options['msg'])

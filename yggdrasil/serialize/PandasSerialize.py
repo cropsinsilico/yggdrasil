@@ -3,8 +3,8 @@ import copy
 import numpy as np
 import warnings
 from yggdrasil import backwards, platform, serialize, units
-from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
-    OneDArrayMetaschemaType)
+from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
+    JSONArrayMetaschemaType)
 from yggdrasil.serialize.AsciiTableSerialize import AsciiTableSerialize
 from yggdrasil.communication.transforms.PandasTransform import PandasTransform
 
@@ -106,6 +106,22 @@ class PandasSerialize(AsciiTableSerialize):
             frame = frame[field_names]
         return frame
 
+    def cformat2nptype(self, *args, **kwargs):
+        r"""Method to convert c format string to numpy data type.
+
+        Args:
+            *args: Arguments are passed to serialize.cformat2nptype.
+            **kwargs: Keyword arguments are passed to serialize.cformat2nptype.
+
+        Returns:
+            np.dtype: Corresponding numpy data type.
+
+        """
+        out = super(PandasSerialize, self).cformat2nptype(*args, **kwargs)
+        if (not backwards.PY2) and (out.char == 'S') and (not self.str_as_bytes):
+            out = np.dtype('U%d' % out.itemsize)
+        return out
+    
     def func_serialize(self, args):
         r"""Serialize a message.
 
@@ -131,6 +147,10 @@ class PandasSerialize(AsciiTableSerialize):
         if (self.field_names is None) and (not self.no_header):
             self.field_names = self.get_field_names()
         args_ = self.apply_field_names(args_, self.field_names)
+        cols = args_.columns.tolist()
+        if cols == list(range(len(cols))):
+            args_ = self.apply_field_names(args_, ['f%d' % i for i in
+                                                   range(len(cols))])
         args_.to_csv(fd, index=False,
                      # Not in pandas <0.24
                      # line_terminator=backwards.as_str(self.newline),
@@ -198,20 +218,14 @@ class PandasSerialize(AsciiTableSerialize):
         out = self.apply_field_names(out, self.get_field_names())
         if (self.field_names is None) and (not self.no_header):
             self.field_names = out.columns.tolist()
-            # if all([isinstance(x, int) for x in self.field_names]):
-            #     self.field_names = ['f%d' % x for x in self.field_names]
-            #     out.columns = self.field_names
+            if self.field_names == list(range(len(self.field_names))):
+                self.field_names = ['f%d' % x for x in self.field_names]
+                out.columns = self.field_names
         if not self.initialized:
-            typedef = {'type': 'array', 'items': []}
-            np_out = serialize.pandas2numpy(out)
+            typedef = JSONArrayMetaschemaType.encode_type(out)
             if self.no_header:
-                for n in np_out.dtype.names:
-                    typedef['items'].append(OneDArrayMetaschemaType.encode_type(
-                        np_out[n]))
-            else:
-                for n in self.get_field_names():
-                    typedef['items'].append(OneDArrayMetaschemaType.encode_type(
-                        np_out[n], title=n))
+                for x in typedef['items']:
+                    x.pop('title', None)
             self.update_serializer(extract=True, **typedef)
         return out
 
@@ -279,11 +293,33 @@ class PandasSerialize(AsciiTableSerialize):
         if len(objects) == 0:
             return []
         if isinstance(objects[0], pandas.DataFrame):
+            field_names = objects[0].columns.tolist()
+            for i in range(1, len(objects)):
+                objects[i] = cls.apply_field_names(objects[i],
+                                                   field_names)
             return [pandas.concat(objects, ignore_index=True)]
         out = super(PandasSerialize, cls).concatenate(objects, as_array=True,
                                                       **kwargs)
         return out
     
+    def consolidate_array(self, out):
+        r"""Consolidate message into a structure numpy array if possible.
+
+        Args:
+            out (list, tuple, np.ndarray): Object to consolidate into a
+                structured numpy array.
+
+        Returns:
+            np.ndarray: Structured numpy array containing consolidated message.
+
+        Raises:
+            ValueError: If the array cannot be consolidated.
+
+        """
+        if isinstance(out, pandas.DataFrame):
+            out = serialize.pandas2numpy(out)
+        return super(PandasSerialize, self).consolidate_array(out)
+        
     @classmethod
     def get_testing_options(cls, not_as_frames=False, no_names=False,
                             no_header=False, **kwargs):
