@@ -11,6 +11,7 @@ import importlib
 from ._version import get_versions
 _test_package_name = None
 _test_package = None
+logging.basicConfig()
 logger = logging.getLogger(__name__)
 order = ['pytest', 'nose']
 try:

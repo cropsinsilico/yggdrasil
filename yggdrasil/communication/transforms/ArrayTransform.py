@@ -439,7 +439,8 @@ class ArrayTransform(TransformBase):
                                {'type': 'array',
                                 'items': [dict(i, title=n) for n, i in
                                           zip(dtype.names, t['items'])]})]},
-                {'in/out': [(x.tolist(), x)],
+                {'kwargs': {'original_datatype': t_arr},
+                 'in/out': [(x.tolist(), x)],
                  'in/out_t': [(t_arr, t)]},
                 {'kwargs': {'original_datatype': t},
                  'in/out': [(None, TypeError)]},
