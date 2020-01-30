@@ -1,6 +1,7 @@
 import numpy as np
 import copy
 import pandas
+from yggdrasil import backwards
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.metaschema.datatypes import type2numpy
 from yggdrasil.serialize import (
@@ -34,6 +35,10 @@ class ArrayTransform(TransformBase):
                                     enumerate(self.original_datatype['items'])]
             elif datatype['type'] == 'object':
                 self.field_names = list(datatype['properties'].keys())
+                if backwards.PY2:  # pragma: Python 2
+                    # Required because dictionaries are not ordered on
+                    # Python 2
+                    self.field_names = sorted(self.field_names)
 
     @classmethod
     def get_summary(cls, x, subtype=False):
