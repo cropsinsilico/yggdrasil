@@ -84,6 +84,9 @@ def load_yaml(fname):
         backwards.StringIO(yamlparsed).getvalue(), dict(os.environ))
     if fname.endswith('.json'):
         yamlparsed = json.loads(yamlparsed)
+        if backwards.PY2:  # pragma: Python 2
+            yamlparsed = backwards.as_str(yamlparsed, recurse=True,
+                                          allow_pass=True)
     else:
         yamlparsed = yaml.safe_load(yamlparsed)
     if not isinstance(yamlparsed, dict):  # pragma: debug
