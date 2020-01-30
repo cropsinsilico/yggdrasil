@@ -27,7 +27,9 @@ class ArrayTransform(TransformBase):
             self.field_names = self.original_datatype.get('field_names', None)
         if not self.field_names:
             if (((datatype['type'] == 'array')
-                 and isinstance(datatype['items'], list))):
+                 and isinstance(datatype['items'], list)
+                 and all([('title' in x) for x in
+                          self.original_datatype['items']]))):
                 self.field_names = [x.get('title', 'f%d' % i) for i, x in
                                     enumerate(self.original_datatype['items'])]
             elif datatype['type'] == 'object':
@@ -414,8 +416,8 @@ class ArrayTransform(TransformBase):
                               ({'type': 'null'}, AssertionError),
                               (t['items'][0], t['items'][0]),
                               ({'type': 'array',
-                                'items': [dict(x, length=i)
-                                          for i, x in enumerate(t['items'])]},
+                                'items': [dict(v, length=i)
+                                          for i, v in enumerate(t['items'])]},
                                AssertionError),
                               (t_arr_err, AssertionError)]},
                 {'in/out': [(x, x)]},

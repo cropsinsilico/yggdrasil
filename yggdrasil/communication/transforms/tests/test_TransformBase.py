@@ -39,7 +39,9 @@ class TestTransformBase(YggTestClass):
                     try:
                         self.assert_equal(msg_out, msg_exp)
                     except BaseException:  # pragma: debug
-                        for x in [msg_in, msg_exp, msg_out]:
+                        for t, x in zip(['in', 'expected', 'out'],
+                                        [msg_in, msg_exp, msg_out]):
+                            print('%s:' % t)
                             pprint.pprint(x)
                         raise
 
@@ -57,6 +59,8 @@ class TestTransformBase(YggTestClass):
                     try:
                         self.assert_equal(typ_out, typ_exp)
                     except BaseException:  # pragma: debug
-                        for x in [typ_in, typ_exp, typ_out]:
+                        for t, x in zip(['in', 'expected', 'out'],
+                                        [typ_in, typ_exp, typ_out]):
+                            print('%s:' % t)
                             pprint.pprint(x)
                         raise
