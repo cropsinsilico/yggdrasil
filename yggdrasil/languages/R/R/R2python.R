@@ -45,7 +45,18 @@ R2python <- function(robj, not_bytes=FALSE) {
     ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
     out <- ygg_back$as_str(reticulate::r_to_py(robj))
   } else if (is(robj, "data.frame")) {
+    ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
     out <- reticulate::r_to_py(robj)
+    columns <- reticulate::py_get_attr(out, 'columns')
+    if (is.element("is_bytes", names(attributes(robj)))) {
+      for (i in names(attr(robj, "is_bytes"))) {
+        name = call_python_method(columns, '__getitem__',
+	  R2python(as.integer(as.integer(i) - 1)))
+        new_col = call_python_method(call_python_method(out, '__getitem__', name),
+         'apply', ygg_back$as_bytes)
+        call_python_method(out, '__setitem__', name, new_col)
+      }
+    }
   } else if (is.na(robj)) {
     out <- reticulate::r_to_py(NULL)
   } else {

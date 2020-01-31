@@ -219,10 +219,6 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             for n in pyobj.columns:
                 if pyobj[n].dtype == np.dtype('int64'):
                     pyobj[n] = pyobj[n].astype('int32')
-                elif ((not backwards.PY2)
-                      and (pyobj[n].dtype == np.dtype('object'))
-                      and isinstance(pyobj[n][0], backwards.bytes_type)):
-                    pyobj[n] = pyobj[n].apply(backwards.as_str)
         return pyobj
     
     @classmethod
