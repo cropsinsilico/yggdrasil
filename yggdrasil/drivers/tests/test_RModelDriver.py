@@ -30,10 +30,8 @@ class TestRModelDriverNoInit(TestRModelParam,
                      (OrderedDict([(np.string_('hello'), np.string_('hello'))]),
                       OrderedDict([('hello', 'hello')]))]
         test_vars.append((
-            pd.DataFrame.from_dict({'a': np.zeros(5, dtype='int64'),
-                                    'b': np.ones(5, dtype=bytes)}),
-            pd.DataFrame.from_dict({'a': np.zeros(5, dtype='int32'),
-                                    'b': np.ones(5, dtype=str)})))
+            pd.DataFrame.from_dict({'a': np.zeros(5, dtype='int64')}),
+            pd.DataFrame.from_dict({'a': np.zeros(5, dtype='int32')})))
         for a, b in test_vars:
             self.assert_equal(self.import_cls.python2language(a), b)
 
