@@ -64,3 +64,7 @@ class TestTransformBase(YggTestClass):
                             print('%s:' % t)
                             pprint.pprint(x)
                         raise
+
+    def test_transform_empty(self):
+        r"""Test transform of empty bytes message."""
+        self.assert_equal(self.instance(b'', no_init=True), b'')
