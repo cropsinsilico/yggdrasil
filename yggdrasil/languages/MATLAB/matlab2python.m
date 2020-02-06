@@ -110,6 +110,36 @@ function x_py = matlab2python(x_ml)
 	end;
       end;
       x_py = py.list(x_ml);
+    elseif isa(x_ml, 'single');
+      if isreal(x_ml)
+        x_py = py.numpy.array(x_ml, 'float32');
+      else
+        x_py = py.numpy.array(x_ml, 'complex64');
+      end
+    elseif isa(x_ml, 'double');
+      if isreal(x_ml)
+        x_py = py.numpy.array(x_ml, 'float64');
+      else
+        x_py = py.numpy.array(x_ml, 'complex128');
+      end;
+    elseif isa(x_ml, 'float');
+      if isreal(x_ml)
+        x_py = py.numpy.array(x_ml, 'float');
+      else
+        x_py = py.numpy.array(x_ml, 'complex');
+      end
+    elseif isa(x_ml, 'uint8');
+      x_py = py.numpy.array(x_ml, 'uint8');
+    elseif isa(x_ml, 'uint32');
+      x_py = py.numpy.array(x_ml, 'uint32');
+    elseif isa(x_ml, 'uint64');
+      x_py = py.numpy.array(x_ml, 'uint64');
+    elseif isa(x_ml, 'int32');
+      x_py = py.numpy.array(x_ml, 'int32');
+    elseif isa(x_ml, 'int64');
+      x_py = py.numpy.array(x_ml, 'int64');
+    elseif isa(x_ml, 'integer');
+      x_py = py.numpy.array(x_ml, 'int');
     else
       x_py = py.numpy.array(x_ml);
     end;

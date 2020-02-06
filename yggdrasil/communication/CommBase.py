@@ -5,7 +5,7 @@ import atexit
 import threading
 import logging
 import types
-import pandas
+from yggdrasil.tests import assert_equal
 from yggdrasil import backwards, tools
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
@@ -544,8 +544,7 @@ class CommBase(tools.YggClass):
             for i, iv in enumerate(self.transform):
                 if isinstance(iv, str):
                     cls_conv = getattr(self.language_driver, dir_conv + 's')
-                    if iv in cls_conv:
-                        iv = cls_conv[iv]
+                    iv = cls_conv.get(iv, iv)
                 if isinstance(iv, str):
                     try:
                         iv = create_component('transform', subtype=iv)
@@ -562,7 +561,7 @@ class CommBase(tools.YggClass):
                     pass
                 elif ((isinstance(iv, (types.BuiltinFunctionType, types.FunctionType,
                                        types.BuiltinMethodType, types.MethodType))
-                       or hasattr(iv, '__call__'))):
+                       or hasattr(iv, '__call__'))):  # pragma: matlab
                     iv = create_component('transform', subtype='function',
                                           function=iv)
                 else:  # pragma: debug
@@ -1100,6 +1099,23 @@ class CommBase(tools.YggClass):
         emsg = self.apply_transform(emsg)
         return emsg
 
+    def is_empty(self, msg, emsg):
+        r"""Check that a message matches an empty message object.
+
+        Args:
+            msg (object): Message object.
+            emsg (object): Empty message object.
+
+        Returns:
+            bool: True if the object is empty, False otherwise.
+
+        """
+        try:
+            assert_equal(msg, emsg)
+        except AssertionError:
+            return False
+        return True
+
     def is_empty_recv(self, msg):
         r"""Check if a received message object is empty.
 
@@ -1110,16 +1126,10 @@ class CommBase(tools.YggClass):
             bool: True if the object is empty, False otherwise.
 
         """
+        
         if self.is_eof(msg):
             return False
-        emsg = self.empty_obj_recv
-        try:
-            out = (isinstance(msg, type(emsg)) and (msg == emsg))
-            if isinstance(out, pandas.DataFrame):
-                out = True
-        except BaseException:  # pragma: debug
-            out = False
-        return out
+        return self.is_empty(msg, self.empty_obj_recv)
     
     def is_empty_send(self, msg):
         r"""Check if a message object being sent is empty.
@@ -1133,11 +1143,7 @@ class CommBase(tools.YggClass):
         """
         smsg = self.apply_transform(msg)
         emsg, _ = self.deserialize(self.empty_bytes_msg)
-        try:
-            out = (isinstance(smsg, type(emsg)) and (smsg == emsg))
-        except BaseException:  # pragma: debug
-            out = False
-        return out
+        return self.is_empty(smsg, emsg)
         
     def chunk_message(self, msg):
         r"""Yield chunks of message of size maxMsgSize

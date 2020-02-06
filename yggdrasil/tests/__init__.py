@@ -14,6 +14,7 @@ import psutil
 import copy
 import pprint
 import types
+from pandas.testing import assert_frame_equal
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil import tools, backwards, platform, units
 from yggdrasil.communication import cleanup_comms
@@ -201,6 +202,10 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
                 return
             elif (self.has_func(first) or self.has_func(second)):
                 self.assertEqualNested(first, second, msg=msg)
+                return
+            elif (isinstance(first, pd.DataFrame)
+                  or isinstance(second, pd.DataFrame)):
+                assert_frame_equal(first, second)
                 return
         try:
             super(WrappedTestCase, self).assertEqual(first, second, msg=msg)

@@ -20,7 +20,9 @@ connections:
     output:
       name: {{TEST_LANGUAGE}}_model:input
       transform: {{TEST_TRANSFORM}}
-  - input: {{TEST_LANGUAGE}}_model:output
+  - input:
+      name: {{TEST_LANGUAGE}}_model:output
+      transform: {{TEST_TRANSFORM}}
     output:
       name: destination:input
       transform: {{TEST_TRANSFORM}}

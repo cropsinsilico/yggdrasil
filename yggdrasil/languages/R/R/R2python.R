@@ -37,23 +37,30 @@ R2python <- function(robj, not_bytes=FALSE) {
   } else if (is(robj, "raw") || is(robj, "ygg_bytes")) {
     ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
     if (not_bytes) {
-      out <- ygg_back$as_str(reticulate::r_to_py(robj))
+      out <- ygg_back$as_str(reticulate::r_to_py(robj),
+        recurse=R2python(TRUE))
     } else {
-      out <- ygg_back$as_bytes(reticulate::r_to_py(robj))
+      out <- ygg_back$as_bytes(reticulate::r_to_py(robj),
+        recurse=R2python(TRUE))
     }
   } else if (is(robj, "character")) {
     ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
-    out <- ygg_back$as_str(reticulate::r_to_py(robj))
+    out <- ygg_back$as_str(reticulate::r_to_py(robj),
+      recurse=R2python(TRUE))
   } else if (is(robj, "data.frame")) {
     ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
     out <- reticulate::r_to_py(robj)
     columns <- reticulate::py_get_attr(out, 'columns')
-    if (is.element("is_bytes", names(attributes(robj)))) {
-      for (i in names(attr(robj, "is_bytes"))) {
+    if (is.element("ygg_types", names(attributes(robj)))) {
+      for (i in names(attr(robj, "ygg_types"))) {
         name = call_python_method(columns, '__getitem__',
-	  R2python(as.integer(as.integer(i) - 1)))
-        new_col = call_python_method(call_python_method(out, '__getitem__', name),
-         'apply', ygg_back$as_bytes)
+          R2python(as.integer(as.integer(i) - 1)))
+        new_col = call_python_method(out, '__getitem__', name)
+        if (attr(robj, "ygg_types")[[i]] == "bytes") {
+          new_col = call_python_method(new_col, 'apply', ygg_back$as_bytes)
+	} else if (attr(robj, "ygg_types")[[i]] == "float32") {
+          new_col = call_python_method(new_col, 'apply', np$float32)
+	}
         call_python_method(out, '__setitem__', name, new_col)
       }
     }

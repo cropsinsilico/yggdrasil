@@ -104,7 +104,7 @@ function x_ml = python2matlab(x_py)
     end;
     if (is_struct)
       x_ml = cell2table(x_ml, 'VariableNames', ...
-			matlab.lang.makeValidName(python2matlab(x_py.dtype.names)));
+			matlab.lang.makeValidName(string(python2matlab(x_py.dtype.names))));
     elseif ismember(char_code, ['f', 'i'])
       if isa(x_ml, 'cell')
         x_ml = cell2mat(x_ml);

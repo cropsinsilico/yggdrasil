@@ -47,7 +47,7 @@ python2R <- function(pyobj) {
   } else if (is(pyobj, "pandas.core.frame.DataFrame")) {
     ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
     out <- reticulate::py_to_r(pyobj)
-    is_bytes <- list()
+    ygg_types <- list()
     ncol_data = ncol(out)
     columns <- reticulate::py_get_attr(pyobj, 'columns')
     for (i in 1:ncol_data) {
@@ -56,12 +56,15 @@ python2R <- function(pyobj) {
       icol <- call_python_method(pyobj, '__getitem__', icol_name)
       iele <- call_python_method(icol, '__getitem__', R2python(as.integer(0)))
       if (is(iele, "python.builtin.bytes") && (pyv != 2)) {
-        is_bytes[[as.character(i)]] <- TRUE
+        ygg_types[[as.character(i)]] <- "bytes"
 	icol <- call_python_method(icol, 'apply', ygg_back$as_str)
+      } else if (is(iele, "numpy.float32")) {
+        ygg_types[[as.character(i)]] <- "float32"
+	icol <- call_python_method(icol, 'apply', np$float32)
       }
       out[, i] <- python2R(reticulate::py_get_attr(icol, 'values'))
     }
-    attr(out, "is_bytes") <- is_bytes
+    attr(out, "ygg_types") <- ygg_types
   # TODO: There dosn't seem to be variable integer precision in R
   } else if (is(pyobj, "numpy.ndarray")) {
     type_len <- reticulate::py_len(pyobj$dtype)
