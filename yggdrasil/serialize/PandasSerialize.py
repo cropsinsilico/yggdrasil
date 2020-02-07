@@ -387,6 +387,8 @@ class PandasSerialize(AsciiTableSerialize):
             out['objects'] = [serialize.list2pandas(x) for x in out['objects']]
             out['dtype'] = np.dtype(','.join([x[1] for x in out['dtype'].descr]))
         else:
+            if field_names is None:
+                field_names = ['f0', 'f1', 'f2']
             out['objects'] = [serialize.list2pandas(x, names=field_names)
                               for x in out['objects']]
         out['kwargs'].update(out['typedef'])

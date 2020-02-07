@@ -24,9 +24,9 @@ class TestPandasFileComm_single(TestPandasFileComm):
         dtype = np.dtype(dict(formats=['float'], names=['f0']))
         arr1 = np.zeros((nele, ), dtype)
         arr2 = np.ones((nele, ), dtype)
-        pd1 = pandas.DataFrame(arr1['f0'])
-        pd2 = pandas.DataFrame(arr2['f0'])
-        pdcat = pandas.DataFrame(np.hstack([arr1, arr2])['f0'])
+        pd1 = pandas.DataFrame(arr1)
+        pd2 = pandas.DataFrame(arr2)
+        pdcat = pandas.DataFrame(np.hstack([arr1, arr2]))
         out = {'kwargs': {},
                'contents': (b'f0\n' + nele * b'0.0\n' + nele * b'1.0\n'),
                'send': [pd1, pd2],
