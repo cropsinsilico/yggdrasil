@@ -639,7 +639,8 @@ def safe_eval(statement, **kwargs):
                                 'sum', 'tuple', 'type'],
                    'numpy': ['array', 'int8', 'int16', 'int32', 'int64',
                              'uint8', 'uint16', 'uint32', 'uint64',
-                             'float16', 'float32', 'float64']}
+                             'float16', 'float32', 'float64'],
+                   'yggdrasil.units': ['get_data', 'add_units']}
     _no_eval_class = {}
     if units._use_unyt:
         _safe_lists['unyt.array'] = ['unyt_quantity', 'unyt_array']

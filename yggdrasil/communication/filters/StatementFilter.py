@@ -52,7 +52,10 @@ class StatementFilter(FilterBase):
         out = [{'kwargs': {'statement': '%x% != 2'},
                 'pass': [1, 3], 'fail': [2]},
                {'kwargs': {'statement': '%x% != array([0, 0, 0])'},
-                'pass': [np.ones(3, int)], 'fail': [np.zeros(3, int)]}]
+                'pass': [np.ones(3, int)], 'fail': [np.zeros(3, int)]},
+               {'kwargs': {'statement': '%x% != add_units(1, "cm")'},
+                'pass': [units.add_units(2, 'cm')],
+                'fail': [units.add_units(1, 'cm')]}]
         if units._use_unyt:
             out.append({'kwargs': {'statement': '%x% != '
                                    + repr(units.add_units(1, 'cm'))},

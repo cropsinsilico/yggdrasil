@@ -78,7 +78,11 @@ function x_py = matlab2python(x_ml)
       [x_ml_data, x_ml_unit] = separateUnits(x_ml);
       x_py_data = matlab2python(double(subs(x_ml_data)));
       x_py_unit = matlab2python(symunit2str(x_ml_unit));
-      x_py = py.yggdrasil.units.add_units(x_py_data, x_py_unit);
+      if (x_ml_unit == 1)
+        x_py = x_py_data;
+      else
+        x_py = py.yggdrasil.units.add_units(x_py_data, x_py_unit);
+      end
     else;
       disp('Could not convert scalar matlab type to python type');
       disp(x_ml);

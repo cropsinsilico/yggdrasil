@@ -73,9 +73,9 @@ function x_ml = python2matlab(x_py)
 	x_ml{i, j} = python2matlab(x_ml{i, j});
       end;
     end;
-  elseif (isa(x_py, 'py.unyt.array.unyt_quantity') || isa(x_py, 'py.unyt.array.unyt_array'))
+  elseif (isa(x_py, 'py.unyt.array.unyt_quantity') || isa(x_py, 'py.unyt.array.unyt_array') || isa(x_py, 'py.pint.quantity.Quantity'))
     sym_env = getenv('YGG_MATLAB_SYMUNIT');
-    if ((length(sym_env) > 0) && (lower(sym_env) == 'true'))
+    if ((length(sym_env) > 0) && strcmp(lower(sym_env), 'true'))
       x_ml_data = python2matlab(py.yggdrasil.units.get_data(x_py));
       x_ml_unit = python2matlab(py.yggdrasil.units.get_units(x_py));
       x_ml = x_ml_data * str2symunit(x_ml_unit);
