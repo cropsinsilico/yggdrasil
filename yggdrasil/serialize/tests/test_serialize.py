@@ -534,14 +534,14 @@ def test_numpy2dict():
     dtype = np.dtype([(n, f) for n, f in zip(names, dtypes)])
     arr_mix = np.zeros(nele, dtype)
     arr_mix['name'][0] = 'hello'
-    test_arrs = [arr_mix]
+    test_arrs = [arr_mix, np.zeros(0, dtype)]
     for ans in test_arrs:
         d = serialize.numpy2dict(ans)
         # Sorted
         res = serialize.dict2numpy(d)
         np.testing.assert_array_equal(ans, res)
         # Provided
-        res = serialize.dict2numpy(d, order=names)
+        res = serialize.dict2numpy(d, order=ans.dtype.names)
         np.testing.assert_array_equal(ans, res)
 
 

@@ -1365,8 +1365,6 @@ def pandas2list(frame):
         list: List with contents from the input frame.
 
     """
-    if isinstance(frame, list):
-        return frame
     return numpy2list(pandas2numpy(frame))
 
 
