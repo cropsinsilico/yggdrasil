@@ -31,16 +31,20 @@ class TestAsciiTableSerialize(parent.TestDefaultSerialize):
     
     def test_field_specs(self):
         r"""Test field specifiers."""
+        if not self.instance.initialized:
+            self.instance.serialize(self.testing_options['objects'][0],
+                                    no_metadata=True)
         super(TestAsciiTableSerialize, self).test_field_specs()
         # Specific to this class
-        self.assert_equal(self.instance.format_str,
-                          backwards.as_bytes(
-                              self.testing_options['kwargs']['format_str']))
-        field_names = self.testing_options['kwargs'].get('field_names', None)
+        if 'format_str' in self.testing_options:
+            self.assert_equal(self.instance.format_str,
+                              backwards.as_bytes(
+                                  self.testing_options['format_str']))
+        field_names = self.testing_options.get('field_names', None)
         if field_names is not None:
             field_names = [backwards.as_str(x) for x in field_names]
         self.assert_equal(self.instance.field_names, field_names)
-        field_units = self.testing_options['kwargs'].get('field_units', None)
+        field_units = self.testing_options.get('field_units', None)
         if field_units is not None:
             field_units = [backwards.as_str(x) for x in field_units]
         self.assert_equal(self.instance.field_units, field_units)
@@ -74,3 +78,29 @@ class TestAsciiTableSerialize_asarray(TestAsciiTableSerialize):
     r"""Test class for AsciiTableSerialize class with as_array."""
 
     testing_option_kws = {'array_columns': True}
+
+
+class TestAsciiTableSerialize_object(TestAsciiTableSerialize):
+    r"""Test class for AsciiTableSerialize class with object."""
+
+    testing_option_kws = {}
+
+    def get_options(self):
+        r"""Get testing options."""
+        out = super(TestAsciiTableSerialize_object, self).get_options()
+        out['kwargs'] = {'field_units': out['kwargs']['field_units']}
+        out['format_str'] = '%s\t%d\t%g\n'
+        out['field_names'] = ['%s_%s' % (k, x) for k, x
+                              in zip('abc', out['field_names'])]
+        out['objects'] = [{k: ix for k, ix in zip(out['field_names'], x)}
+                          for x in out['objects']]
+        for x, k2 in zip(out['typedef']['items'], out['field_names']):
+            out['contents'].replace(x['title'], k2)
+            x['title'] = k2
+        return out
+
+    def map_sent2recv(self, obj):
+        r"""Convert a sent object into a received one."""
+        out = super(TestAsciiTableSerialize_object, self).map_sent2recv(obj)
+        return self.instance.datatype.coerce_type(
+            out, typedef=self.instance.typedef)

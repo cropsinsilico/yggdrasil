@@ -126,6 +126,11 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         elif isinstance(obj, dict):
             if (key_order is not None) or (len(obj) == 1):
                 obj = dict2list(obj, order=key_order)
+            elif (isinstance(typedef, dict)
+                  and isinstance(typedef.get('items', None), list)
+                  and all([('title' in x) for x in typedef['items']])):
+                key_order = [x['title'] for x in typedef['items']]
+                obj = dict2list(obj, order=key_order)
             else:
                 obj = [obj]
         elif ((isinstance(typedef, dict) and (not dont_wrap_single)

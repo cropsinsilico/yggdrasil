@@ -147,10 +147,11 @@ class PandasSerialize(AsciiTableSerialize):
         if (self.field_names is None) and (not self.no_header):
             self.field_names = self.get_field_names()
         args_ = self.apply_field_names(args_, self.field_names)
-        cols = args_.columns.tolist()
-        if cols == list(range(len(cols))):
-            args_ = self.apply_field_names(args_, ['f%d' % i for i in
-                                                   range(len(cols))])
+        if not self.no_header:
+            cols = args_.columns.tolist()
+            if cols == list(range(len(cols))):
+                args_ = self.apply_field_names(args_, ['f%d' % i for i in
+                                                       range(len(cols))])
         args_.to_csv(fd, index=False,
                      # Not in pandas <0.24
                      # line_terminator=backwards.as_str(self.newline),
@@ -183,7 +184,11 @@ class PandasSerialize(AsciiTableSerialize):
         if self.initialized:
             np_dtype = self.numpy_dtype
             dtype = {}
-            for n in np_dtype.names:
+            if self.no_header:
+                dtype_names = range(len(np_dtype.names))
+            else:
+                dtype_names = np_dtype.names
+            for n in dtype_names:
                 if np_dtype[n].char == 'U':
                     dtype[n] = object
                 else:
