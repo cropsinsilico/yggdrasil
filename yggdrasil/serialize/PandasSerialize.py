@@ -223,14 +223,8 @@ class PandasSerialize(AsciiTableSerialize):
         out = self.apply_field_names(out, self.get_field_names())
         if (self.field_names is None) and (not self.no_header):
             self.field_names = out.columns.tolist()
-            if self.field_names == list(range(len(self.field_names))):
-                self.field_names = ['f%d' % x for x in self.field_names]
-                out.columns = self.field_names
         if not self.initialized:
             typedef = JSONArrayMetaschemaType.encode_type(out)
-            if self.no_header:
-                for x in typedef['items']:
-                    x.pop('title', None)
             self.update_serializer(extract=True, **typedef)
         return out
 
@@ -257,8 +251,6 @@ class PandasSerialize(AsciiTableSerialize):
         """
         if isinstance(obj, pandas.DataFrame):
             return serialize.pandas2dict(obj)
-        if kwargs.get('field_names', None) is None:
-            kwargs['field_names'] = ['f%d' % i for i in range(len(obj))]
         return super(PandasSerialize, cls).object2dict(obj, as_array=True,
                                                        **kwargs)
 
@@ -277,8 +269,6 @@ class PandasSerialize(AsciiTableSerialize):
         """
         if isinstance(obj, pandas.DataFrame):
             return serialize.pandas2numpy(obj)
-        if kwargs.get('field_names', None) is None:
-            kwargs['field_names'] = ['f%d' % i for i in range(len(obj))]
         return super(PandasSerialize, cls).object2array(obj, as_array=True,
                                                         **kwargs)
 
