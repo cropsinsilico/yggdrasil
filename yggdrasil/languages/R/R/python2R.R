@@ -78,21 +78,30 @@ python2R <- function(pyobj) {
       }
     } else {
       dtype <- reticulate::py_to_r(pyobj$dtype$name)
+      ygg_type <- ""
       if (substring(dtype, 1, nchar("uint")) == "uint") {
         out <- uint_to_R(pyobj)
+	ygg_type <- "uint"
       } else if (dtype == "int32") {
         out <- int32_to_R(pyobj)
+	# ygg_type <- "int32"
       } else if (dtype == "int64") {
         out <- int64_to_R(pyobj)
+	# ygg_type <- "int64"
       } else if (dtype == "float32") {
         out <- float32_to_R(pyobj)
+	ygg_type <- "float32"
       } else if (substring(dtype, 1, nchar("bytes")) == "bytes") {
         out <- bytes_to_R(pyobj)
+	ygg_type <- "bytes"
       } else {
         out <- reticulate::py_to_r(pyobj)
       }
       if (length(dim(out)) == 1) {
         out <- as.vector(out)
+	if (nchar(ygg_type) > 0) {
+          attr(out, "ygg_type") <- ygg_type
+	}
       }
     }
   } else if (is(pyobj, "python.builtin.NoneType")) {

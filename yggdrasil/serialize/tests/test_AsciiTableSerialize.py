@@ -95,7 +95,8 @@ class TestAsciiTableSerialize_object(TestAsciiTableSerialize):
         out['objects'] = [{k: ix for k, ix in zip(out['field_names'], x)}
                           for x in out['objects']]
         for x, k2 in zip(out['typedef']['items'], out['field_names']):
-            out['contents'].replace(x['title'], k2)
+            out['contents'].replace(backwards.as_bytes(x['title']),
+                                    backwards.as_bytes(k2))
             x['title'] = k2
         return out
 

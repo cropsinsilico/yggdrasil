@@ -39,7 +39,10 @@ def convert_R_unit_string(r_str):
 
     """
     out = []
-    regex = r'(?P<name>[A-Za-z]+)(?P<exp>-?[0-9]*)(?: |$)'
+    regex_mu = ''
+    if not backwards.PY2:
+        regex_mu = b'\xc2\xb5'.decode('utf-8')
+    regex = r'(?P<name>[A-Za-z%s]+)(?P<exp>-?[0-9]*)(?: |$)' % regex_mu
     for x in re.finditer(regex, r_str):
         xdict = x.groupdict()
         if xdict['exp']:
