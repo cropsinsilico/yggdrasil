@@ -608,7 +608,6 @@ def safe_eval(statement, **kwargs):
                              'float16', 'float32', 'float64'],
                    'yggdrasil.units': ['get_data', 'add_units'],
                    'unyt.array': ['unyt_quantity', 'unyt_array']}
-    _no_eval_class = {}
     for mod_name, func_list in _safe_lists.items():
         mod = importlib.import_module(mod_name)
         for func in func_list:

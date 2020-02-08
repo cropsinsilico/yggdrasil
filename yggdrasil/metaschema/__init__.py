@@ -7,7 +7,7 @@ from yggdrasil.metaschema.encoder import encode_json, decode_json
 from yggdrasil.metaschema.properties import (
     get_registered_properties, import_all_properties)
 from yggdrasil.metaschema.datatypes import (
-    get_registered_types, import_all_types, _jsonschema_ver_maj)
+    get_registered_types, import_all_types)
 
 
 _metaschema_fbase = '.ygg_metaschema.json'
@@ -51,11 +51,6 @@ def create_metaschema(overwrite=False):
         raise RuntimeError("Metaschema file already exists.")
     out = copy.deepcopy(_base_validator.META_SCHEMA)
     out['title'] = "Ygg meta-schema for data type schemas"
-    # Lower versions have a differing draft4
-    if _jsonschema_ver_maj < 3:
-        for x in ['minItems', 'uniqueItems']:
-            if x in out['properties']['enum']:
-                del out['properties']['enum'][x]
     # TODO: Replace schema with a link to the metaschema in the documentation
     # del out['$schema']
     # Add properties
@@ -121,25 +116,15 @@ def get_validator(overwrite=False, normalizers=None, **kwargs):
                 assert(k not in all_validators)
             all_validators[k] = v.wrapped_validate
         # Get set of datatypes
-        # TODO: This will need to be changed if back-ported in jsonschema
-        if _jsonschema_ver_maj < 3:
-            all_datatypes = copy.deepcopy(_base_validator.DEFAULT_TYPES)
-            for k, v in get_registered_types().items():
-                if (not v._replaces_existing):
-                    # Error raised on registration
-                    assert(k not in all_datatypes)
-                all_datatypes[k] = v.python_types
-            kwargs['default_types'] = all_datatypes
-        else:
-            type_checker = copy.deepcopy(_base_validator.TYPE_CHECKER)
-            new_type_checkers = {}
-            for k, v in get_registered_types().items():
-                if (not v._replaces_existing):
-                    # Error raised on registration
-                    assert(k not in type_checker._type_checkers)
-                new_type_checkers[k] = v.jsonschema_type_checker
-            kwargs['type_checker'] = type_checker.redefine_many(
-                new_type_checkers)
+        type_checker = copy.deepcopy(_base_validator.TYPE_CHECKER)
+        new_type_checkers = {}
+        for k, v in get_registered_types().items():
+            if (not v._replaces_existing):
+                # Error raised on registration
+                assert(k not in type_checker._type_checkers)
+            new_type_checkers[k] = v.jsonschema_type_checker
+        kwargs['type_checker'] = type_checker.redefine_many(
+            new_type_checkers)
         # Get set of normalizers
         if normalizers is None:
             normalizers = {}

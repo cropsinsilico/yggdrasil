@@ -5,7 +5,7 @@ pandas
 pyperf
 psutil
 pystache
-python-rapidjson
+python-rapidjson>=3
 pyyaml
 pyzmq
 scipy
