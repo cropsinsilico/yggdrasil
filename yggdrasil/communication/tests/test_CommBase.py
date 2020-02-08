@@ -250,7 +250,10 @@ class TestCommBase(YggTestClassInfo):
         recv_kwargs = self.instance.get_work_comm_kwargs
         recv_kwargs['work_comm_name'] = 'test_worker_%s' % header_recv['id']
         recv_kwargs['new_comm_class'] = wc_send.comm_class
-        os.environ[recv_kwargs['work_comm_name']] = wc_send.opp_address
+        if isinstance(wc_send.opp_address, str):
+            os.environ[recv_kwargs['work_comm_name']] = wc_send.opp_address
+        else:
+            recv_kwargs['address'] = wc_send.opp_address
         wc_recv = self.instance.create_work_comm(**recv_kwargs)
         # wc_recv = self.instance.get_work_comm(header_recv)
         if self.comm in ['CommBase', 'AsyncComm']:
