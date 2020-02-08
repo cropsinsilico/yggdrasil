@@ -366,7 +366,8 @@ class SerializeBase(tools.YggClass):
         """
         if getattr(self, 'field_names', None) is not None:
             out = self.field_names
-        elif self.typedef['type'] != 'array':
+        elif ((self.typedef['type'] != 'array')
+              or ('items' not in self.typedef)):
             out = None
         elif isinstance(self.typedef['items'], dict):  # pragma: debug
             raise Exception("Variable number of items not yet supported.")

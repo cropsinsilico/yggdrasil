@@ -48,10 +48,12 @@ class FilterBase(ComponentBase):
         try:
             out = self.evaluate_filter(x)
         except ValueError:
-            if backwards.PY2 and units.has_units(x):
+            # This check is required because pint does not allow
+            # comparison between values with and without units
+            if backwards.PY2 and units.has_units(x):  # pragma: Python 2
                 out = self.evaluate_filter(units.get_data(x))
-            else:
-                raise  # pragma: debug
+            else:  # pragma: debug
+                raise
         if isinstance(out, np.ndarray):
             assert(out.dtype == bool)
             out = bool(out.all())

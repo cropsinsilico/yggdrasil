@@ -57,6 +57,7 @@ class AsciiTableSerialize(DefaultSerialize):
     _attr_conv = DefaultSerialize._attr_conv + ['format_str', 'delimiter']
     has_header = True
     default_read_meth = 'readline'  # because default for as_array is False
+    default_datatype = {'type': 'array'}
 
     def update_serializer(self, *args, **kwargs):
         # Transform scalar into array for table
@@ -70,6 +71,8 @@ class AsciiTableSerialize(DefaultSerialize):
                 names = self.get_field_names()
                 if not names:
                     names = list(old_typedef['properties'].keys())
+                    if backwards.PY2:  # pragma: Python 2
+                        names = sorted(names)
                 assert(len(old_typedef['properties']) == len(names))
                 new_typedef = {'type': 'array', 'items': []}
                 for n in names:

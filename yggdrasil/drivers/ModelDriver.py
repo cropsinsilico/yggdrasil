@@ -1727,12 +1727,14 @@ class ModelDriver(Driver):
         # to be applied by the connection driver
         if try_vals and isinstance(try_vals[-1], str):
             try_key = '%s_%s' % (try_vals[-1], key)
-            if try_key in cls.function_param:
-                key = try_key
-            elif ((('python_interface' in cls.function_param)
-                   and (try_key in cls.python_interface))):
+            if ((('python_interface' in cls.function_param)
+                 and (try_key in cls.python_interface))):
                 kwargs['python_interface'] = cls.python_interface[try_key]
-                key = 'python_interface'
+                if ((('format_str' in kwargs)
+                     and ('python_interface_format' in cls.function_param))):
+                    key = 'python_interface_format'
+                else:
+                    key = 'python_interface'
         out = [cls.format_function_param(key, **kwargs)]
         return out
 

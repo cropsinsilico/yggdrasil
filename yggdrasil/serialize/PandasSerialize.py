@@ -147,10 +147,11 @@ class PandasSerialize(AsciiTableSerialize):
         if (self.field_names is None) and (not self.no_header):
             self.field_names = self.get_field_names()
         args_ = self.apply_field_names(args_, self.field_names)
-        cols = args_.columns.tolist()
-        if cols == list(range(len(cols))):
-            args_ = self.apply_field_names(args_, ['f%d' % i for i in
-                                                   range(len(cols))])
+        if not self.no_header:
+            cols = args_.columns.tolist()
+            if cols == list(range(len(cols))):
+                args_ = self.apply_field_names(args_, ['f%d' % i for i in
+                                                       range(len(cols))])
         args_.to_csv(fd, index=False,
                      # Not in pandas <0.24
                      # line_terminator=backwards.as_str(self.newline),
@@ -183,7 +184,11 @@ class PandasSerialize(AsciiTableSerialize):
         if self.initialized:
             np_dtype = self.numpy_dtype
             dtype = {}
-            for n in np_dtype.names:
+            if self.no_header:
+                dtype_names = range(len(np_dtype.names))
+            else:
+                dtype_names = np_dtype.names
+            for n in dtype_names:
                 if np_dtype[n].char == 'U':
                     dtype[n] = object
                 else:
@@ -198,8 +203,8 @@ class PandasSerialize(AsciiTableSerialize):
         out = pandas.read_csv(fd, **kws)
         out = out.dropna(axis='columns', how='all')
         fd.close()
-        if self.str_as_bytes and (not backwards.PY2):
-            # For Python 3 and higher, make sure strings are bytes
+        if self.str_as_bytes:
+            # Make sure strings are bytes
             for c, d in zip(out.columns, out.dtypes):
                 if (d == object) and isinstance(out[c][0], backwards.unicode_type):
                     out[c] = out[c].apply(lambda s: s.encode('utf-8'))
@@ -218,14 +223,8 @@ class PandasSerialize(AsciiTableSerialize):
         out = self.apply_field_names(out, self.get_field_names())
         if (self.field_names is None) and (not self.no_header):
             self.field_names = out.columns.tolist()
-            if self.field_names == list(range(len(self.field_names))):
-                self.field_names = ['f%d' % x for x in self.field_names]
-                out.columns = self.field_names
         if not self.initialized:
             typedef = JSONArrayMetaschemaType.encode_type(out)
-            if self.no_header:
-                for x in typedef['items']:
-                    x.pop('title', None)
             self.update_serializer(extract=True, **typedef)
         return out
 
@@ -252,8 +251,6 @@ class PandasSerialize(AsciiTableSerialize):
         """
         if isinstance(obj, pandas.DataFrame):
             return serialize.pandas2dict(obj)
-        if kwargs.get('field_names', None) is None:
-            kwargs['field_names'] = ['f%d' % i for i in range(len(obj))]
         return super(PandasSerialize, cls).object2dict(obj, as_array=True,
                                                        **kwargs)
 
@@ -272,8 +269,6 @@ class PandasSerialize(AsciiTableSerialize):
         """
         if isinstance(obj, pandas.DataFrame):
             return serialize.pandas2numpy(obj)
-        if kwargs.get('field_names', None) is None:
-            kwargs['field_names'] = ['f%d' % i for i in range(len(obj))]
         return super(PandasSerialize, cls).object2array(obj, as_array=True,
                                                         **kwargs)
 
@@ -382,6 +377,8 @@ class PandasSerialize(AsciiTableSerialize):
             out['objects'] = [serialize.list2pandas(x) for x in out['objects']]
             out['dtype'] = np.dtype(','.join([x[1] for x in out['dtype'].descr]))
         else:
+            if field_names is None:
+                field_names = ['f0', 'f1', 'f2']
             out['objects'] = [serialize.list2pandas(x, names=field_names)
                               for x in out['objects']]
         out['kwargs'].update(out['typedef'])

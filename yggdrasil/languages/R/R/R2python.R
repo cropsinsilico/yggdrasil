@@ -5,7 +5,22 @@ R2python <- function(robj, not_bytes=FALSE) {
   ver <- reticulate::py_get_attr(sys, 'version_info')
   pyv <- reticulate::py_to_r(reticulate::py_get_attr(ver, 'major'))
   np <- reticulate::import('numpy', convert=FALSE)
-  if (is(robj, "list")) {
+  ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
+  if (is.element("ygg_type", names(attributes(robj)))) {
+    if (attr(robj, "ygg_type") == "bytes") {
+      out <- ygg_back$as_bytes(reticulate::r_to_py(robj),
+        recurse=reticulate::r_to_py(TRUE))
+    } else if (attr(robj, "ygg_type") == "float32") {
+      out <- call_python_method(np, 'float32',
+        reticulate::r_to_py(robj))
+    } else if (attr(robj, "ygg_type") == "uint") {
+      out <- call_python_method(np, 'uint',
+        reticulate::r_to_py(robj))
+    } else {
+      print(attr(robj, "ygg_type"))
+      stop("Unsupported ygg_type.")
+    }
+  } else if (is(robj, "list")) {
     robj <- lapply(robj, R2python, not_bytes=not_bytes)
     out <- reticulate::r_to_py(robj)
   } else if (is(robj, "units")) {
@@ -35,17 +50,32 @@ R2python <- function(robj, not_bytes=FALSE) {
     out <- call_python_method(np, 'float64',
       reticulate::r_to_py(robj))
   } else if (is(robj, "raw") || is(robj, "ygg_bytes")) {
-    ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
     if (not_bytes) {
-      out <- ygg_back$as_str(reticulate::r_to_py(robj))
+      out <- ygg_back$as_str(reticulate::r_to_py(robj),
+        recurse=reticulate::r_to_py(TRUE))
     } else {
-      out <- ygg_back$as_bytes(reticulate::r_to_py(robj))
+      out <- ygg_back$as_bytes(reticulate::r_to_py(robj),
+        recurse=reticulate::r_to_py(TRUE))
     }
   } else if (is(robj, "character")) {
-    ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
-    out <- ygg_back$as_str(reticulate::r_to_py(robj))
+    out <- ygg_back$as_str(reticulate::r_to_py(robj),
+      recurse=R2python(TRUE))
   } else if (is(robj, "data.frame")) {
     out <- reticulate::r_to_py(robj)
+    columns <- reticulate::py_get_attr(out, 'columns')
+    if (is.element("ygg_types", names(attributes(robj)))) {
+      for (i in names(attr(robj, "ygg_types"))) {
+        name = call_python_method(columns, '__getitem__',
+          R2python(as.integer(as.integer(i) - 1)))
+        new_col = call_python_method(out, '__getitem__', name)
+        if (attr(robj, "ygg_types")[[i]] == "bytes") {
+          new_col = call_python_method(new_col, 'apply', ygg_back$as_bytes)
+	} else if (attr(robj, "ygg_types")[[i]] == "float32") {
+          new_col = call_python_method(new_col, 'apply', np$float32)
+	}
+        call_python_method(out, '__setitem__', name, new_col)
+      }
+    }
   } else if (is.na(robj)) {
     out <- reticulate::r_to_py(NULL)
   } else {

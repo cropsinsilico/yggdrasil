@@ -45,16 +45,26 @@ python2R <- function(pyobj) {
   } else if (is(pyobj, "python.builtin.bytes")) {
     out <- bytes_to_R(pyobj)
   } else if (is(pyobj, "pandas.core.frame.DataFrame")) {
+    ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
     out <- reticulate::py_to_r(pyobj)
+    ygg_types <- list()
     ncol_data = ncol(out)
     columns <- reticulate::py_get_attr(pyobj, 'columns')
     for (i in 1:ncol_data) {
       icol_name <- call_python_method(columns, '__getitem__',
         R2python(as.integer(i - 1)))
-      icol <- reticulate::py_get_attr(call_python_method(pyobj, '__getitem__',
-        icol_name), 'values')
-      out[, i] <- python2R(icol)
+      icol <- call_python_method(pyobj, '__getitem__', icol_name)
+      iele <- call_python_method(icol, '__getitem__', R2python(as.integer(0)))
+      if (is(iele, "python.builtin.bytes") && (pyv != 2)) {
+        ygg_types[[as.character(i)]] <- "bytes"
+	icol <- call_python_method(icol, 'apply', ygg_back$as_str)
+      } else if (is(iele, "numpy.float32")) {
+        ygg_types[[as.character(i)]] <- "float32"
+	icol <- call_python_method(icol, 'apply', np$float32)
+      }
+      out[, i] <- python2R(reticulate::py_get_attr(icol, 'values'))
     }
+    attr(out, "ygg_types") <- ygg_types
   # TODO: There dosn't seem to be variable integer precision in R
   } else if (is(pyobj, "numpy.ndarray")) {
     type_len <- reticulate::py_len(pyobj$dtype)
@@ -68,21 +78,30 @@ python2R <- function(pyobj) {
       }
     } else {
       dtype <- reticulate::py_to_r(pyobj$dtype$name)
+      ygg_type <- ""
       if (substring(dtype, 1, nchar("uint")) == "uint") {
         out <- uint_to_R(pyobj)
+	ygg_type <- "uint"
       } else if (dtype == "int32") {
         out <- int32_to_R(pyobj)
+	# ygg_type <- "int32"
       } else if (dtype == "int64") {
         out <- int64_to_R(pyobj)
+	# ygg_type <- "int64"
       } else if (dtype == "float32") {
         out <- float32_to_R(pyobj)
+	ygg_type <- "float32"
       } else if (substring(dtype, 1, nchar("bytes")) == "bytes") {
         out <- bytes_to_R(pyobj)
+	ygg_type <- "bytes"
       } else {
         out <- reticulate::py_to_r(pyobj)
       }
       if (length(dim(out)) == 1) {
         out <- as.vector(out)
+	if (nchar(ygg_type) > 0) {
+          attr(out, "ygg_type") <- ygg_type
+	}
       }
     }
   } else if (is(pyobj, "python.builtin.NoneType")) {

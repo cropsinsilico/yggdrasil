@@ -78,7 +78,11 @@ function x_py = matlab2python(x_ml)
       [x_ml_data, x_ml_unit] = separateUnits(x_ml);
       x_py_data = matlab2python(double(subs(x_ml_data)));
       x_py_unit = matlab2python(symunit2str(x_ml_unit));
-      x_py = py.yggdrasil.units.add_units(x_py_data, x_py_unit);
+      if (x_ml_unit == 1)
+        x_py = x_py_data;
+      else
+        x_py = py.yggdrasil.units.add_units(x_py_data, x_py_unit);
+      end
     else;
       disp('Could not convert scalar matlab type to python type');
       disp(x_ml);
@@ -110,6 +114,36 @@ function x_py = matlab2python(x_ml)
 	end;
       end;
       x_py = py.list(x_ml);
+    elseif isa(x_ml, 'single');
+      if isreal(x_ml)
+        x_py = py.numpy.array(x_ml, 'float32');
+      else
+        x_py = py.numpy.array(x_ml, 'complex64');
+      end
+    elseif isa(x_ml, 'double');
+      if isreal(x_ml)
+        x_py = py.numpy.array(x_ml, 'float64');
+      else
+        x_py = py.numpy.array(x_ml, 'complex128');
+      end;
+    elseif isa(x_ml, 'float');
+      if isreal(x_ml)
+        x_py = py.numpy.array(x_ml, 'float');
+      else
+        x_py = py.numpy.array(x_ml, 'complex');
+      end
+    elseif isa(x_ml, 'uint8');
+      x_py = py.numpy.array(x_ml, 'uint8');
+    elseif isa(x_ml, 'uint32');
+      x_py = py.numpy.array(x_ml, 'uint32');
+    elseif isa(x_ml, 'uint64');
+      x_py = py.numpy.array(x_ml, 'uint64');
+    elseif isa(x_ml, 'int32');
+      x_py = py.numpy.array(x_ml, 'int32');
+    elseif isa(x_ml, 'int64');
+      x_py = py.numpy.array(x_ml, 'int64');
+    elseif isa(x_ml, 'integer');
+      x_py = py.numpy.array(x_ml, 'int');
     else
       x_py = py.numpy.array(x_ml);
     end;

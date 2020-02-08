@@ -1,6 +1,7 @@
 import numpy as np
 import copy
 import pandas
+from yggdrasil import backwards
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.metaschema.datatypes import type2numpy
 from yggdrasil.serialize import (
@@ -34,6 +35,10 @@ class ArrayTransform(TransformBase):
                                     enumerate(self.original_datatype['items'])]
             elif datatype['type'] == 'object':
                 self.field_names = list(datatype['properties'].keys())
+                if backwards.PY2:  # pragma: Python 2
+                    # Required because dictionaries are not ordered on
+                    # Python 2
+                    self.field_names = sorted(self.field_names)
 
     @classmethod
     def get_summary(cls, x, subtype=False):
@@ -160,6 +165,10 @@ class ArrayTransform(TransformBase):
         elif items[0]['type'] == 'object':
             if order is None:
                 order = list(items[0]['properties'].keys())
+                if backwards.PY2:  # pragma: Python 2
+                    # Required because dictionaries are not ordered on
+                    # Python 2
+                    order = sorted(order)
             base_types = [items[0]['properties'][k] for k in order]
         elif items[0]['type'] in ['1darray', 'ndarray']:
             cls.check_element(items)
@@ -214,6 +223,10 @@ class ArrayTransform(TransformBase):
             order = self.field_names
             if order is None:
                 order = list(datatype['properties'].keys())
+                if backwards.PY2:  # pragma: Python 2
+                    # Required because dictionaries are not ordered on
+                    # Python 2
+                    order = sorted(order)
             self.check_array_items([datatype['properties'][k]
                                     for k in order])
         else:
@@ -245,6 +258,10 @@ class ArrayTransform(TransformBase):
         elif items[0]['type'] == 'object':
             if order is None:
                 order = list(items[0]['properties'].keys())
+                if backwards.PY2:  # pragma: Python 2
+                    # Required because dictionaries are not ordered on
+                    # Python 2
+                    order = sorted(order)
             items = [dict(x, items=[dict(x['properties'][k], title=k)
                                     for k in order])
                      for x in items]
@@ -290,6 +307,10 @@ class ArrayTransform(TransformBase):
             order = self.field_names
             if order is None:
                 order = list(out['properties'].keys())
+                if backwards.PY2:  # pragma: Python 2
+                    # Required because dictionaries are not ordered on
+                    # Python 2
+                    order = sorted(order)
             out['type'] = 'array'
             out['items'] = self.transform_array_items(
                 [dict(out['properties'][k], title=k)
@@ -428,7 +449,8 @@ class ArrayTransform(TransformBase):
                 {'kwargs': {'original_datatype': t},
                  'in/out': [(numpy2pandas(x), x)],
                  'in/out_t': [(t, t)]},
-                {'in/out': [(x.tolist(), x)],
+                {'kwargs': {'original_datatype': t_arr},
+                 'in/out': [(x.tolist(), x)],
                  'in/out_t': [(t_arr, t),
                               ({'type': 'array',
                                 'items': t_arr['items'][0]}, t)]},

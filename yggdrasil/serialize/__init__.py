@@ -1349,7 +1349,10 @@ def list2pandas(l, names=None):
         pandas.DataFrame: Pandas data frame with contents from the input list.
 
     """
-    return numpy2pandas(list2numpy(l, names=names))
+    out = numpy2pandas(list2numpy(l, names=names))
+    if names is None:
+        out.columns = pandas.RangeIndex(len(l))
+    return out
 
 
 def pandas2list(frame):
@@ -1362,8 +1365,6 @@ def pandas2list(frame):
         list: List with contents from the input frame.
 
     """
-    if isinstance(frame, list):
-        return frame
     return numpy2list(pandas2numpy(frame))
 
 

@@ -5,7 +5,7 @@ import atexit
 import threading
 import logging
 import types
-import pandas
+from yggdrasil.tests import assert_equal
 from yggdrasil import backwards, tools
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
@@ -395,6 +395,7 @@ class CommBase(tools.YggClass):
     is_file = False
     _maxMsgSize = 0
     address_description = None
+    no_serialization = False
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
                  is_interface=None, language=None, partner_language='python',
@@ -544,8 +545,7 @@ class CommBase(tools.YggClass):
             for i, iv in enumerate(self.transform):
                 if isinstance(iv, str):
                     cls_conv = getattr(self.language_driver, dir_conv + 's')
-                    if iv in cls_conv:
-                        iv = cls_conv[iv]
+                    iv = cls_conv.get(iv, iv)
                 if isinstance(iv, str):
                     try:
                         iv = create_component('transform', subtype=iv)
@@ -562,7 +562,7 @@ class CommBase(tools.YggClass):
                     pass
                 elif ((isinstance(iv, (types.BuiltinFunctionType, types.FunctionType,
                                        types.BuiltinMethodType, types.MethodType))
-                       or hasattr(iv, '__call__'))):
+                       or hasattr(iv, '__call__'))):  # pragma: matlab
                     iv = create_component('transform', subtype='function',
                                           function=iv)
                 else:  # pragma: debug
@@ -703,7 +703,8 @@ class CommBase(tools.YggClass):
                     out = True
                     break
         else:
-            if comm_class in ['CommBase', 'AsyncComm', 'ForkComm', 'ErrorClass']:
+            if comm_class in ['CommBase', 'AsyncComm', 'ForkComm',
+                              'ErrorClass']:
                 out = (language in lang_list)
             else:
                 # Check driver
@@ -1100,6 +1101,23 @@ class CommBase(tools.YggClass):
         emsg = self.apply_transform(emsg)
         return emsg
 
+    def is_empty(self, msg, emsg):
+        r"""Check that a message matches an empty message object.
+
+        Args:
+            msg (object): Message object.
+            emsg (object): Empty message object.
+
+        Returns:
+            bool: True if the object is empty, False otherwise.
+
+        """
+        try:
+            assert_equal(msg, emsg)
+        except AssertionError:
+            return False
+        return True
+
     def is_empty_recv(self, msg):
         r"""Check if a received message object is empty.
 
@@ -1110,16 +1128,10 @@ class CommBase(tools.YggClass):
             bool: True if the object is empty, False otherwise.
 
         """
+        
         if self.is_eof(msg):
             return False
-        emsg = self.empty_obj_recv
-        try:
-            out = (isinstance(msg, type(emsg)) and (msg == emsg))
-            if isinstance(out, pandas.DataFrame):
-                out = True
-        except BaseException:  # pragma: debug
-            out = False
-        return out
+        return self.is_empty(msg, self.empty_obj_recv)
     
     def is_empty_send(self, msg):
         r"""Check if a message object being sent is empty.
@@ -1133,11 +1145,7 @@ class CommBase(tools.YggClass):
         """
         smsg = self.apply_transform(msg)
         emsg, _ = self.deserialize(self.empty_bytes_msg)
-        try:
-            out = (isinstance(smsg, type(emsg)) and (smsg == emsg))
-        except BaseException:  # pragma: debug
-            out = False
-        return out
+        return self.is_empty(smsg, emsg)
         
     def chunk_message(self, msg):
         r"""Yield chunks of message of size maxMsgSize
@@ -1478,7 +1486,7 @@ class CommBase(tools.YggClass):
             return False, self.empty_bytes_msg, work_comm
         if len(msg) == 1:
             msg = msg[0]
-        if isinstance(msg, backwards.bytes_type) and (msg == self.eof_msg):
+        if self.is_eof(msg):
             flag, msg_s = self.on_send_eof()
         else:
             flag = True
@@ -1490,8 +1498,12 @@ class CommBase(tools.YggClass):
                 self.debug('Sending sinfo: %s', self.serializer.serializer_info)
             msg_s = self.serialize(msg_, header_kwargs=header_kwargs,
                                    add_serializer_info=add_sinfo)
+            if self.no_serialization:
+                msg_len = 1
+            else:
+                msg_len = len(msg_s)
             # Create work comm if message too large to be sent all at once
-            if (len(msg_s) > self.maxMsgSize) and (self.maxMsgSize != 0):
+            if (msg_len > self.maxMsgSize) and (self.maxMsgSize != 0):
                 if header_kwargs is None:
                     header_kwargs = dict()
                 work_comm = self.create_work_comm()
@@ -1571,7 +1583,10 @@ class CommBase(tools.YggClass):
         flag, msg_s, header = self.on_send(msg, header_kwargs=header_kwargs)
         if not flag:
             return flag
-        msg_len = len(msg_s)
+        if self.no_serialization:
+            msg_len = 1
+        else:
+            msg_len = len(msg_s)
         # Sent first part of message which includes the header describing the
         # work comm
         self.special_debug('Sending %d bytes', msg_len)
@@ -1620,7 +1635,7 @@ class CommBase(tools.YggClass):
             if self.is_closed:
                 return (False, self.empty_bytes_msg)
             out = self._recv(*args, **kwargs)
-        if out[0] and out[1]:
+        if out[0] and (not self.is_empty(out[1], self.empty_bytes_msg)):
             self._n_recv += 1
             self._last_recv = backwards.clock_time()
         return out
@@ -1792,8 +1807,12 @@ class CommBase(tools.YggClass):
                 return flag, s_msg
             # Parse complete message
             flag, msg, header2 = self.on_recv(s_msg, second_pass=True)
-        if flag and len(s_msg) > 0:
-            self.debug('%d bytes received', len(s_msg))
+        if isinstance(s_msg, backwards.bytes_type):
+            msg_len = len(s_msg)
+        else:
+            msg_len = 1
+        if flag and (msg_len > 0):
+            self.debug('%d bytes received', msg_len)
         return flag, msg
         
     def recv_nolimit(self, *args, **kwargs):

@@ -84,6 +84,9 @@ def load_yaml(fname):
         backwards.StringIO(yamlparsed).getvalue(), dict(os.environ))
     if fname.endswith('.json'):
         yamlparsed = json.loads(yamlparsed)
+        if backwards.PY2:  # pragma: Python 2
+            yamlparsed = backwards.as_str(yamlparsed, recurse=True,
+                                          allow_pass=True)
     else:
         yamlparsed = yaml.safe_load(yamlparsed)
     if not isinstance(yamlparsed, dict):  # pragma: debug
@@ -369,7 +372,8 @@ def parse_connection(yml, existing):
         # Add single non-file intermediate output comm if there are any non-file
         # outputs and an output comm for each file output
         if (sum(is_file['outputs']) < len(is_file['outputs'])):
-            xo['ocomm_kws']['comm'].append({'name': args, 'no_suffix': True})
+            xo['ocomm_kws']['comm'].append({'name': args, 'no_suffix': True,
+                                            'comm': 'buffer'})
         for i, y in enumerate(yml['outputs']):
             if is_file['outputs'][i]:
                 xo['ocomm_kws']['comm'].append(y)
@@ -392,7 +396,8 @@ def parse_connection(yml, existing):
         # Add single non-file intermediate input comm if there are any non-file
         # inputs and an input comm for each file input
         if (sum(is_file['inputs']) < len(is_file['inputs'])):
-            xi['icomm_kws']['comm'].append({'name': args, 'no_suffix': True})
+            xi['icomm_kws']['comm'].append({'name': args, 'no_suffix': True,
+                                            'comm': 'buffer'})
         for i, y in enumerate(yml['inputs']):
             if is_file['inputs'][i]:
                 xi['icomm_kws']['comm'].append(y)

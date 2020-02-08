@@ -22,7 +22,7 @@ class TestExampleTransforms(ExampleTstBase):
     example_name = 'transforms'
     iter_over = ['language', 'transform']
     iter_list_language = _untyped_lang
-    iter_list_transform = ['array', 'pandas']
+    iter_list_transform = ['table', 'array', 'pandas']
 
     def __init__(self, *args, **kwargs):
         self._output_files = None
@@ -68,7 +68,11 @@ class TestExampleTransforms(ExampleTstBase):
                 to the received message.
 
         """
-        t = create_component('transform', subtype=transform)
+        try:
+            t = create_component('transform', subtype=transform)
+        except ValueError:
+            def t(x):
+                return x
         x_sent = t(cls.get_test_data())
         print('RECEIVED:')
         pprint.pprint(x_recv)
