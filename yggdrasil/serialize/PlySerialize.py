@@ -57,8 +57,7 @@ class PlySerialize(SerializeBase):
             obj: Deserialized message.
 
         """
-        return PlyDict(self.datatype.decode_data(msg.decode("utf-8"),
-                                                 self.typedef))
+        return PlyDict(self.datatype.decode_data(msg, self.typedef))
 
     @classmethod
     def concatenate(cls, objects, **kwargs):

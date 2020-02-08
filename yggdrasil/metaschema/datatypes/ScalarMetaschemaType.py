@@ -1,7 +1,8 @@
 import numpy as np
 import copy
 import warnings
-from yggdrasil import units, backwards
+import base64
+from yggdrasil import units
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.FixedMetaschemaType import (
     create_fixed_type_class)
@@ -90,15 +91,15 @@ class ScalarMetaschemaType(MetaschemaType):
         """
         if cls.is_fixed and ('subtype' in cls.fixed_properties):
             if (cls.fixed_properties['subtype'] == 'bytes'):
-                if isinstance(obj, backwards.string_types):
-                    obj = backwards.as_bytes(obj)
-                else:
-                    obj = backwards.as_bytes(str(obj))
+                if isinstance(obj, str):
+                    obj = obj.encode("utf-8")
+                elif not isinstance(obj, bytes):
+                    obj = str(obj).encode("utf-8")
             elif (cls.fixed_properties['subtype'] == 'unicode'):
-                if isinstance(obj, backwards.string_types):
-                    obj = backwards.as_unicode(obj)
+                if isinstance(obj, bytes):
+                    obj = obj.decode("utf-8")
                 else:
-                    obj = backwards.as_unicode(str(obj))
+                    obj = str(obj)
             else:
                 dtype = ScalarMetaschemaProperties._python_scalars[
                     cls.fixed_properties['subtype']][0]
@@ -122,8 +123,7 @@ class ScalarMetaschemaType(MetaschemaType):
 
         """
         arr = cls.to_array(obj)
-        bytes = arr.tobytes()
-        out = backwards.base64_encode(bytes).decode('ascii')
+        out = base64.encodebytes(arr.tobytes()).decode('ascii')
         return out
 
     @classmethod
@@ -156,7 +156,10 @@ class ScalarMetaschemaType(MetaschemaType):
         elif subtype in ['complex']:
             return str(complex(arr[0]))
         elif subtype in ['bytes', 'unicode']:
-            return str(backwards.as_str(arr[0]))
+            out = arr[0]
+            if isinstance(out, bytes):
+                out = out.decode("utf-8")
+            return out
         else:  # pragma: debug
             warnings.warn(("No method for handling readable serialization of "
                            + "subtype '%s', falling back to default.") % subtype)
@@ -175,7 +178,7 @@ class ScalarMetaschemaType(MetaschemaType):
             object: Decoded object.
 
         """
-        bytes = backwards.base64_decode(obj.encode('ascii'))
+        bytes = base64.decodebytes(obj.encode('ascii'))
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
         arr = np.frombuffer(bytes, dtype=dtype)
         # arr = np.fromstring(bytes, dtype=dtype)

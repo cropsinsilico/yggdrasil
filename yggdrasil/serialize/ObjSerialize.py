@@ -33,8 +33,7 @@ class ObjSerialize(PlySerialize):
             obj: Deserialized message.
 
         """
-        return ObjDict(self.datatype.decode_data(msg.decode("utf-8"),
-                                                 self.typedef))
+        return ObjDict(self.datatype.decode_data(msg, self.typedef))
 
     @classmethod
     def get_testing_options(cls):

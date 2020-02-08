@@ -1,7 +1,7 @@
 import os
 import sys
 import importlib
-from yggdrasil import backwards, platform
+from yggdrasil import platform
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
@@ -10,7 +10,7 @@ class ClassMetaschemaType(MetaschemaType):
 
     name = 'class'
     description = 'Type for Python classes.'
-    python_types = backwards.class_types
+    python_types = (type, )
     encoded_type = 'string'
     cross_language_support = False
 
@@ -25,9 +25,12 @@ class ClassMetaschemaType(MetaschemaType):
             object: Normalized object.
 
         """
-        if isinstance(obj, backwards.string_types):
+        if isinstance(obj, (str, bytes)):
             try:
-                obj = cls.decode_data(backwards.as_str(obj), {'type': cls.name})
+                obj_str = obj
+                if isinstance(obj_str, bytes):
+                    obj_str = obj_str.decode("utf-8")
+                obj = cls.decode_data(obj_str, {'type': cls.name})
             except (ValueError, AttributeError):
                 pass
         return obj
@@ -63,7 +66,7 @@ class ClassMetaschemaType(MetaschemaType):
             object: Decoded object.
 
         """
-        if not isinstance(obj, backwards.string_types):
+        if not isinstance(obj, (str, bytes)):
             return obj
         pkg_mod = obj.split(':')
         if (len(pkg_mod) == 3) and platform._is_win:  # pragma: windows

@@ -4,7 +4,7 @@ import uuid
 import pprint
 import importlib
 import jsonschema
-from yggdrasil import backwards, tools
+from yggdrasil import tools
 from yggdrasil.metaschema import (get_metaschema, get_validator, encoder,
                                   validate_instance)
 from yggdrasil.metaschema.datatypes import (
@@ -652,7 +652,7 @@ class MetaschemaType(object):
             bytes, str: Serialized message.
 
         """
-        if ((isinstance(obj, backwards.bytes_type)
+        if ((isinstance(obj, bytes)
              and ((obj == tools.YGG_MSG_EOF) or kwargs.get('raw', False)
                   or dont_encode))):
             metadata = kwargs
@@ -701,7 +701,7 @@ class MetaschemaType(object):
             ValueError: If msg does not contain the header separator.
 
         """
-        if not isinstance(msg, backwards.bytes_type):
+        if not isinstance(msg, bytes):
             raise TypeError("Message to be deserialized is not bytes type.")
         # Check for header
         if YGG_MSG_HEAD in msg:
