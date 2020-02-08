@@ -390,6 +390,8 @@ def scanf(format, s=None, collapseWhitespace=True):
     if isinstance(s, bytes):
         as_bytes = True
         s = s.decode("utf-8")
+    if isinstance(format, bytes):
+        format = format.decode("utf-8")
 
     # print(s, format)
 
@@ -400,7 +402,13 @@ def scanf(format, s=None, collapseWhitespace=True):
         groups = found.groups()
         out = tuple([casts[i](groups[i]) for i in range(len(groups))])
         if as_bytes:
-            out = tuple([x.encode("utf-8") for x in out])
+            out_bytes = []
+            for x in out:
+                if isinstance(x, str):
+                    out_bytes.append(x.encode("utf-8"))
+                else:
+                    out_bytes.append(x)
+            out = tuple(out_bytes)
         return out
 
 

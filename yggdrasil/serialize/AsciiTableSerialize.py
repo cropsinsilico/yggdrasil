@@ -139,7 +139,9 @@ class AsciiTableSerialize(DefaultSerialize):
                                            use_astropy=self.use_astropy)
         else:
             out = serialize.format_message(args, self.format_str)
-        return out.encode("utf-8")
+        if isinstance(out, str):
+            out = out.encode("utf-8")
+        return out
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.

@@ -152,8 +152,8 @@ class PandasSerialize(AsciiTableSerialize):
                                                        range(len(cols))])
         args_.to_csv(fd, index=False,
                      # Not in pandas <0.24
-                     # line_terminator=self.newline,
-                     sep=self.delimiter,
+                     # line_terminator=self.newline.decode("utf-8"),
+                     sep=self.delimiter.decode("utf-8"),
                      mode='wb', encoding='utf8',
                      header=(not self.dont_write_header))
         if self.write_header_once:
@@ -161,8 +161,9 @@ class PandasSerialize(AsciiTableSerialize):
         out = fd.getvalue()
         fd.close()
         # Required to change out \r\n for \n on windows
-        out = out.replace(platform._newline_str, self.newline)
-        return out.encode("utf-8")
+        out = out.encode("utf-8")
+        out = out.replace(platform._newline, self.newline)
+        return out
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -189,7 +190,7 @@ class PandasSerialize(AsciiTableSerialize):
                     dtype[n] = object
                 else:
                     dtype[n] = np_dtype[n]
-        kws = dict(sep=self.delimiter,
+        kws = dict(sep=self.delimiter.decode("utf-8"),
                    names=names,
                    dtype=dtype,
                    encoding='utf8',

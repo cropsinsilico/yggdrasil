@@ -635,7 +635,7 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
             object: Coerced object.
 
         """
-        if isinstance(obj['material'], bytes):
+        if isinstance(obj, dict) and isinstance(obj.get('material', None), bytes):
             obj['material'] = obj['material'].decode("utf-8")
         return super(ObjMetaschemaType, cls).coerce_type(obj, typedef=typedef,
                                                          **kwargs)

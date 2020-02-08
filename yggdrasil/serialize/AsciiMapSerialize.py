@@ -37,6 +37,7 @@ class AsciiMapSerialize(SerializeBase):
         """
         out = ''
         order = sorted([k for k in args.keys()])
+        newline_str = self.newline.decode("utf-8")
         for k in order:
             v = args[k]
             if not isinstance(k, (str, bytes)):
@@ -49,7 +50,7 @@ class AsciiMapSerialize(SerializeBase):
             if isinstance(v, bytes):
                 v = v.decode("utf-8")
             out += json.dumps(v, cls=JSONReadableEncoder)
-            out += self.newline
+            out += newline_str
         return out.encode("utf-8")
 
     def func_deserialize(self, msg):
@@ -63,7 +64,7 @@ class AsciiMapSerialize(SerializeBase):
 
         """
         out = dict()
-        lines = msg.decode("utf-8").split(self.newline)
+        lines = [l.decode("utf-8") for l in msg.split(self.newline)]
         for l in lines:
             kv = [x for x in l.split(self.delimiter) if x]
             if len(kv) <= 1:

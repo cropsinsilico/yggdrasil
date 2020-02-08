@@ -249,8 +249,10 @@ class SerializeBase(tools.YggClass):
                 out['kwargs'].update({'format_str': '%5s\t%d\t%f\n',
                                       'field_names': ['name', 'count', 'size'],
                                       'field_units': ['n/a', 'umol', 'cm']})
-                out['extra_kwargs'].update(
-                    {'format_str': out['kwargs']['format_str'].encode("utf-8")})
+                out['extra_kwargs']['format_str'] = out['kwargs']['format_str']
+                if 'format_str' in cls._attr_conv:
+                    out['extra_kwargs']['format_str'] = (
+                        out['extra_kwargs']['format_str'].encode("utf-8"))
             if array_columns:
                 out['kwargs']['as_array'] = True
                 dtype = np.dtype(
@@ -365,7 +367,7 @@ class SerializeBase(tools.YggClass):
 
         """
         if getattr(self, 'field_names', None) is not None:
-            out = self.field_names
+            out = copy.deepcopy(self.field_names)
         elif ((self.typedef['type'] != 'array')
               or ('items' not in self.typedef)):
             out = None
@@ -404,7 +406,7 @@ class SerializeBase(tools.YggClass):
         if self.typedef['type'] != 'array':
             return None
         if getattr(self, 'field_units', None) is not None:
-            out = self.field_units
+            out = copy.deepcopy(self.field_units)
         elif isinstance(self.typedef['items'], dict):  # pragma: debug
             raise Exception("Variable number of items not yet supported.")
         elif isinstance(self.typedef['items'], list):

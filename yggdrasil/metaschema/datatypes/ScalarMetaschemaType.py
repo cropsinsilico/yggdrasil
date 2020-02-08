@@ -159,6 +159,8 @@ class ScalarMetaschemaType(MetaschemaType):
             out = arr[0]
             if isinstance(out, bytes):
                 out = out.decode("utf-8")
+            else:
+                out = str(out)
             return out
         else:  # pragma: debug
             warnings.warn(("No method for handling readable serialization of "
