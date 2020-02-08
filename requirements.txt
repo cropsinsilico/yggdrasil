@@ -1,11 +1,11 @@
-jsonschema
+jsonschema>=3
 matplotlib
 numpy>=1.13.0
 pandas
 pyperf
 psutil
 pystache
-python-rapidjson>=3
+python-rapidjson
 pyyaml
 pyzmq
 scipy
