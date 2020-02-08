@@ -1603,7 +1603,7 @@ class CommBase(tools.YggClass):
                 self.special_debug("Sending message header failed.")
         if flag:
             self.debug('Sent %d bytes', msg_len)
-        else:
+        else:  # pragma: debug
             self.special_debug('Failed to send %d bytes', msg_len)
         return flag
 
