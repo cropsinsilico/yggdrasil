@@ -1,6 +1,5 @@
 import os
 import uuid
-from yggdrasil import backwards
 from yggdrasil.tests import YggTestClassInfo, assert_equal
 from yggdrasil.communication import new_comm, get_comm, CommBase
 from yggdrasil.communication.filters.StatementFilter import StatementFilter
@@ -105,7 +104,7 @@ class TestCommBase(YggTestClassInfo):
     def msg_long(self):
         r"""str: Small test message for sending."""
         out = self.test_msg
-        if isinstance(out, backwards.bytes_type):
+        if isinstance(out, bytes):
             out += (self.maxMsgSize * b'0')
         return out
             
@@ -505,7 +504,7 @@ class TestCommBase(YggTestClassInfo):
         # receiving side during tests
         # if direction == 'recv':
         #     msg = self.map_sent2recv(msg)
-        if isinstance(msg, backwards.string_types):
+        if isinstance(msg, (str, bytes)):
             statement = '%x% != ' + repr(msg)
         else:
             statement = 'repr(%x%) != r"""' + repr(msg) + '"""'

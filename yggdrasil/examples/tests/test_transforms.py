@@ -2,7 +2,7 @@ import os
 import copy
 import pprint
 import numpy as np
-from yggdrasil import tools, units, backwards
+from yggdrasil import tools, units
 from yggdrasil.tests import assert_equal
 from yggdrasil.components import import_component, create_component
 from yggdrasil.languages import get_language_ext
@@ -45,7 +45,7 @@ class TestExampleTransforms(ExampleTstBase):
         field_units = ['n/a', 'umol', 'cm']
         dtype = np.dtype(
             {'names': field_names,
-             'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
+             'formats': ['S5', 'i4', 'f8']})
         rows = [(b'one', np.int32(1), 1.0),
                 (b'two', np.int32(2), 2.0),
                 (b'three', np.int32(3), 3.0)]

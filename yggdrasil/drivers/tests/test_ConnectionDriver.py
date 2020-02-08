@@ -1,5 +1,5 @@
 import unittest
-from yggdrasil import tools, backwards, platform
+from yggdrasil import tools, platform
 from yggdrasil.tests import MagicTestError, assert_raises
 from yggdrasil.schema import get_schema
 from yggdrasil.components import import_component
@@ -173,7 +173,7 @@ class TestConnectionParam(parent.TestParam):
     def msg_long(self):
         r"""str: Small test message for sending."""
         msg_short = self.test_msg
-        if isinstance(msg_short, backwards.bytes_type):
+        if isinstance(msg_short, bytes):
             out = msg_short + (self.maxMsgSize * b'0')
         else:  # pragma: debug
             out = msg_short

@@ -1,4 +1,4 @@
-from yggdrasil import backwards, tools
+from yggdrasil import tools
 from yggdrasil.communication.DefaultComm import DefaultComm
 
 
@@ -45,7 +45,7 @@ def YggInit(_type, args=None):
     elif _type.startswith('CIS'):
         _type = _type.replace('CIS', 'YGG', 1)
     cls = eval(_type)
-    if isinstance(cls, (int, backwards.bytes_type, backwards.unicode_type)):
+    if isinstance(cls, (int, bytes, str)):
         obj = cls
     else:
         obj = cls(*args)

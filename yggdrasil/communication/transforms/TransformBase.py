@@ -1,4 +1,3 @@
-from yggdrasil import backwards
 from yggdrasil.components import ComponentBase
 from yggdrasil.metaschema.datatypes import encode_type, generate_data
 
@@ -108,7 +107,7 @@ class TransformBase(ComponentBase):
         """
         if (not self.original_datatype) and (not no_init):
             self.set_original_datatype(encode_type(x))
-        if isinstance(x, backwards.bytes_type) and (len(x) == 0) and no_init:
+        if isinstance(x, bytes) and (len(x) == 0) and no_init:
             return b''
         out = self.evaluate_transform(x, no_copy=no_copy)
         return out
