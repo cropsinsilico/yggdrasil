@@ -595,7 +595,6 @@ def safe_eval(statement, **kwargs):
         object: Result of the eval.
 
     """
-    from yggdrasil import units
     safe_dict = {}
     _safe_lists = {'math': ['acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
                             'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor', 'fmod',
@@ -607,13 +606,9 @@ def safe_eval(statement, **kwargs):
                    'numpy': ['array', 'int8', 'int16', 'int32', 'int64',
                              'uint8', 'uint16', 'uint32', 'uint64',
                              'float16', 'float32', 'float64'],
-                   'yggdrasil.units': ['get_data', 'add_units']}
+                   'yggdrasil.units': ['get_data', 'add_units'],
+                   'unyt.array': ['unyt_quantity', 'unyt_array']}
     _no_eval_class = {}
-    if units._use_unyt:
-        _safe_lists['unyt.array'] = ['unyt_quantity', 'unyt_array']
-    else:
-        safe_dict['Quantity'] = units._unit_quantity
-        _no_eval_class['Quantity'] = 'Quantity'
     for mod_name, func_list in _safe_lists.items():
         mod = importlib.import_module(mod_name)
         for func in func_list:
