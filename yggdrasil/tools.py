@@ -16,7 +16,6 @@ import uuid as uuid_gen
 import subprocess
 import importlib
 from yggdrasil import platform
-from yggdrasil import backwards
 from yggdrasil.components import import_component, ComponentBase
 
 
@@ -240,7 +239,7 @@ def ygg_atexit():  # pragma: debug
     # Python 3.4 no longer supported if using pip 9.0.0, but this
     # allows the code to work if somehow installed using an older
     # version of pip
-    if backwards.PY34:  # pragma: no cover
+    if sys.version_info[0:2] == (3, 4):  # pragma: no cover
         # Print empty line to ensure close
         print('', end='')
         sys.stdout.flush()
@@ -263,22 +262,7 @@ def which(program):
         out = which(program + '.exe')
         if out is not None:
             return out
-    if backwards.PY2:  # pragma: Python 2
-        def is_exe(fpath):
-            return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-
-        fpath, fname = os.path.split(program)
-        if fpath:
-            if is_exe(program):
-                return program
-        else:
-            for path in os.environ["PATH"].split(os.pathsep):
-                exe_file = os.path.join(path, program)
-                if is_exe(exe_file):
-                    return exe_file
-        return None
-    else:  # pragma: Python 3
-        return shutil.which(program)
+    return shutil.which(program)
 
 
 def locate_path(fname, basedir=os.path.abspath(os.sep)):
@@ -596,24 +580,7 @@ def sleep(interval):
         interval (float): Time in seconds that process should sleep.
 
     """
-    if platform._is_win and backwards.PY2:  # pragma: windows
-        while True:
-            try:
-                t = time.time()
-                time.sleep(interval)
-            except IOError as e:  # pragma: debug
-                import errno
-                if e.errno != errno.EINTR:
-                    raise
-            # except InterruptedError:  # pragma: debug
-            #     import errno
-            #     print(e.errno)
-            #     print(e)
-            interval -= time.time() - t
-            if interval <= 0:
-                break
-    else:
-        time.sleep(interval)
+    time.sleep(interval)
 
 
 def safe_eval(statement, **kwargs):
@@ -648,14 +615,9 @@ def safe_eval(statement, **kwargs):
         safe_dict['Quantity'] = units._unit_quantity
         _no_eval_class['Quantity'] = 'Quantity'
     for mod_name, func_list in _safe_lists.items():
-        if (mod_name == 'builtins') and backwards.PY2:  # pragma: Python 2
-            mod = __builtins__
-            for func in func_list:
-                safe_dict[func] = mod[func]
-        else:
-            mod = importlib.import_module(mod_name)
-            for func in func_list:
-                safe_dict[func] = getattr(mod, func)
+        mod = importlib.import_module(mod_name)
+        for func in func_list:
+            safe_dict[func] = getattr(mod, func)
     safe_dict.update(kwargs)
     # The following replaces <Class Name(a, b)> style reprs with calls to classes
     # identified in self._no_eval_class
@@ -790,15 +752,18 @@ def print_encoded(msg, *args, **kwargs):
 
     """
     try:
-        print(backwards.as_unicode(msg), *args, **kwargs)
+        orig_msg = msg
+        if isinstance(msg, bytes):
+            msg = msg.decode('utf-8')
+        print(msg, *args, **kwargs)
     except (UnicodeEncodeError, UnicodeDecodeError):  # pragma: debug
         logger.debug("sys.stdout.encoding = %s, cannot print unicode",
                      sys.stdout.encoding)
         kwargs.pop('end', None)
         try:
-            print(msg, *args, **kwargs)
+            print(orig_msg, *args, **kwargs)
         except UnicodeEncodeError:  # pragma: debug
-            print(backwards.as_bytes(msg), *args, **kwargs)
+            print(msg.encode('utf-8'), *args, **kwargs)
 
 
 class TimeOut(object):
@@ -821,13 +786,13 @@ class TimeOut(object):
 
     def __init__(self, max_time, key=None):
         self.max_time = max_time
-        self.start_time = backwards.clock_time()
+        self.start_time = time.perf_counter()
         self.key = key
 
     @property
     def elapsed(self):
         r"""float: Total time that has elapsed since the start."""
-        return backwards.clock_time() - self.start_time
+        return time.perf_counter() - self.start_time
     
     @property
     def is_out(self):

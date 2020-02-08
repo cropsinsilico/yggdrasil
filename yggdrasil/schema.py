@@ -5,7 +5,7 @@ import yaml
 import json
 from collections import OrderedDict
 from jsonschema.exceptions import ValidationError
-from yggdrasil import metaschema, backwards
+from yggdrasil import metaschema
 
 
 _schema_fname = os.path.abspath(os.path.join(
@@ -36,7 +36,6 @@ def ordered_load(stream, object_pairs_hook=SchemaDict, **kwargs):
     """
     kwargs['sorted_dict_type'] = object_pairs_hook
     out = metaschema.encoder.decode_yaml(stream, **kwargs)
-    out = backwards.as_str(out, recurse=True, allow_pass=True)
     return out
 
 

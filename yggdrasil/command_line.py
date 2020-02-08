@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 def ygginfo():
     r"""Print information about yggdrasil installation."""
-    from yggdrasil import __version__, tools, config, backwards, platform
+    from yggdrasil import __version__, tools, config, platform
     from yggdrasil.components import import_component
     lang_list = tools.get_installed_lang()
     prefix = '    '
@@ -78,8 +78,8 @@ def ygginfo():
         if args.verbose:
             # Conda info
             if os.environ.get('CONDA_PREFIX', ''):
-                out = backwards.as_str(subprocess.check_output(
-                    ['conda', 'info'])).strip()
+                out = subprocess.check_output(
+                    ['conda', 'info']).decode('utf-8').strip()
                 curr_prefix += prefix
                 vardict.append((curr_prefix + 'Conda Info:', "\n%s%s"
                                 % (curr_prefix + prefix,
@@ -102,8 +102,8 @@ def ygginfo():
                 vardict.append((curr_prefix + "R C Compiler:", ""))
                 curr_prefix += prefix
                 for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS']:
-                    out = backwards.as_str(subprocess.check_output(
-                        [interp, 'CMD', 'config', x])).strip()
+                    out = subprocess.check_output(
+                        [interp, 'CMD', 'config', x]).decode("utf-8").strip()
                     vardict.append((curr_prefix + x, "%s"
                                     % ("\n" + curr_prefix + prefix).join(
                                         out.splitlines(False))))

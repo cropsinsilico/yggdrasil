@@ -9,7 +9,7 @@ from itertools import chain
 import socket
 from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment
-from yggdrasil import platform, backwards, yamlfile
+from yggdrasil import platform, yamlfile
 from yggdrasil.drivers import create_driver
 
 
@@ -96,7 +96,7 @@ class YggRunner(YggClass):
     def signal_handler(self, sig, frame):
         r"""Terminate all drivers on interrrupt."""
         self.debug("Interrupt with signal %d", sig)
-        now = backwards.clock_time()
+        now = time.perf_counter()
         elapsed = now - self.interrupt_time
         self.debug('Elapsed time since last interrupt: %d s', elapsed)
         self.interrupt_time = now

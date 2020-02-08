@@ -13,7 +13,7 @@ import shutil
 import logging
 import warnings
 import subprocess
-from yggdrasil.backwards import configparser
+import configparser
 from yggdrasil import platform, tools
 conda_prefix = os.environ.get('CONDA_PREFIX', '')
 config_file = '.yggdrasil.cfg'

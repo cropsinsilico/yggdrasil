@@ -6,8 +6,7 @@ import yaml
 import json
 import git
 import sys
-
-from yggdrasil import backwards
+import io as sio
 from yggdrasil.schema import standardize, get_schema
 
 if sys.version_info > (3, 0):
@@ -81,12 +80,9 @@ def load_yaml(fname):
     # Mustache replace vars
     yamlparsed = fd.read()
     yamlparsed = pystache.render(
-        backwards.StringIO(yamlparsed).getvalue(), dict(os.environ))
+        sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
     if fname.endswith('.json'):
         yamlparsed = json.loads(yamlparsed)
-        if backwards.PY2:  # pragma: Python 2
-            yamlparsed = backwards.as_str(yamlparsed, recurse=True,
-                                          allow_pass=True)
     else:
         yamlparsed = yaml.safe_load(yamlparsed)
     if not isinstance(yamlparsed, dict):  # pragma: debug
