@@ -21,7 +21,6 @@ os:
 
 python:
   - 3.6
-  - 2.7
 
 env:
   global:
@@ -189,7 +188,7 @@ jobs:
       dist: xenial
       sudo: true
     - os: osx
-      python: 2.7
+      python: 3.6
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
         pip: false
@@ -197,7 +196,7 @@ jobs:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
           - $HOME/R/Library
-      env: YGG_PYTHON=2.7 R_LIBS_USER=$HOME/R/Library YGG_TEST_FLAGS="--test-suite=types --language=c" INSTALLRMQ=1
+      env: YGG_PYTHON=3.6 R_LIBS_USER=$HOME/R/Library YGG_TEST_FLAGS="--test-suite=types --language=c" INSTALLRMQ=1
     - os: osx
       python: 3.8
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
