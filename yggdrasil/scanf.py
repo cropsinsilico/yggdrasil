@@ -386,6 +386,11 @@ def scanf(format, s=None, collapseWhitespace=True):
     if hasattr(s, "readline"):
         s = s.readline()
 
+    as_bytes = False
+    if isinstance(s, bytes):
+        as_bytes = True
+        s = s.decode("utf-8")
+
     # print(s, format)
 
     format_re, casts = scanf_compile(format, collapseWhitespace)
@@ -393,7 +398,10 @@ def scanf(format, s=None, collapseWhitespace=True):
     found = format_re.search(s)
     if found:
         groups = found.groups()
-        return tuple([casts[i](groups[i]) for i in range(len(groups))])
+        out = tuple([casts[i](groups[i]) for i in range(len(groups))])
+        if as_bytes:
+            out = tuple([x.encode("utf-8") for x in out])
+        return out
 
 
 def extractdata(pattern, text=None, filepath=None):

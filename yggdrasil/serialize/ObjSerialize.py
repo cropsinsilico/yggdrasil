@@ -1,4 +1,3 @@
-from yggdrasil import backwards
 from yggdrasil.serialize.PlySerialize import PlySerialize
 from yggdrasil.metaschema.datatypes.ObjMetaschemaType import ObjDict
 
@@ -19,22 +18,22 @@ class ObjSerialize(PlySerialize):
                 serialized.
 
         Returns:
-            bytes, str: Serialized message.
+            bytes: Serialized message.
 
         """
-        return backwards.as_bytes(self.datatype.encode_data(args, self.typedef))
+        return self.datatype.encode_data(args, self.typedef).encode("utf-8")
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
 
         Args:
-            msg: Message to be deserialized.
+            msg (bytes): Message to be deserialized.
 
         Returns:
             obj: Deserialized message.
 
         """
-        return ObjDict(self.datatype.decode_data(backwards.as_str(msg),
+        return ObjDict(self.datatype.decode_data(msg.decode("utf-8"),
                                                  self.typedef))
 
     @classmethod

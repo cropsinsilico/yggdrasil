@@ -1,6 +1,5 @@
 import re
 import numpy as np
-import logging
 import unyt
 _ureg_unyt = unyt.UnitRegistry()
 _unit_quantity = unyt.array.unyt_quantity

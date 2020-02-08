@@ -17,3 +17,4 @@ else:
         _platform = 'MacOS'
     elif _is_linux:
         _platform = 'Linux'
+_newline_str = _newline.decode("utf-8")

@@ -2,7 +2,8 @@ import pandas
 import copy
 import numpy as np
 import warnings
-from yggdrasil import backwards, platform, serialize, units
+import io as sio
+from yggdrasil import platform, serialize, units
 from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
 from yggdrasil.serialize.AsciiTableSerialize import AsciiTableSerialize
@@ -118,7 +119,7 @@ class PandasSerialize(AsciiTableSerialize):
 
         """
         out = super(PandasSerialize, self).cformat2nptype(*args, **kwargs)
-        if (not backwards.PY2) and (out.char == 'S') and (not self.str_as_bytes):
+        if (out.char == 'S') and (not self.str_as_bytes):
             out = np.dtype('U%d' % out.itemsize)
         return out
     
@@ -135,15 +136,12 @@ class PandasSerialize(AsciiTableSerialize):
         if not isinstance(args, pandas.DataFrame):
             raise TypeError(("Pandas DataFrame required. Invalid type "
                              + "of '%s' provided.") % type(args))
-        fd = backwards.StringIO()
-        if backwards.PY2:  # pragma: Python 2
-            args_ = args
-        else:  # pragma: Python 3
-            # For Python 3 and higher, bytes need to be encoded
-            args_ = copy.deepcopy(args)
-            for c in args.columns:
-                if isinstance(args_[c][0], backwards.bytes_type):
-                    args_[c] = args_[c].apply(lambda s: s.decode('utf-8'))
+        fd = sio.StringIO()
+        # For Python 3 and higher, bytes need to be encoded
+        args_ = copy.deepcopy(args)
+        for c in args.columns:
+            if isinstance(args_[c][0], bytes):
+                args_[c] = args_[c].apply(lambda s: s.decode('utf-8'))
         if (self.field_names is None) and (not self.no_header):
             self.field_names = self.get_field_names()
         args_ = self.apply_field_names(args_, self.field_names)
@@ -154,8 +152,8 @@ class PandasSerialize(AsciiTableSerialize):
                                                        range(len(cols))])
         args_.to_csv(fd, index=False,
                      # Not in pandas <0.24
-                     # line_terminator=backwards.as_str(self.newline),
-                     sep=backwards.as_str(self.delimiter),
+                     # line_terminator=self.newline,
+                     sep=self.delimiter,
                      mode='wb', encoding='utf8',
                      header=(not self.dont_write_header))
         if self.write_header_once:
@@ -163,10 +161,8 @@ class PandasSerialize(AsciiTableSerialize):
         out = fd.getvalue()
         fd.close()
         # Required to change out \r\n for \n on windows
-        out = out.replace(
-            backwards.match_stype(out, platform._newline),
-            backwards.match_stype(out, self.newline))
-        return backwards.as_bytes(out)
+        out = out.replace(platform._newline_str, self.newline)
+        return out.encode("utf-8")
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -178,7 +174,7 @@ class PandasSerialize(AsciiTableSerialize):
             obj: Deserialized Python object.
 
         """
-        fd = backwards.BytesIO(msg)
+        fd = sio.BytesIO(msg)
         names = None
         dtype = None
         if self.initialized:
@@ -193,7 +189,7 @@ class PandasSerialize(AsciiTableSerialize):
                     dtype[n] = object
                 else:
                     dtype[n] = np_dtype[n]
-        kws = dict(sep=backwards.as_str(self.delimiter),
+        kws = dict(sep=self.delimiter,
                    names=names,
                    dtype=dtype,
                    encoding='utf8',
@@ -206,7 +202,7 @@ class PandasSerialize(AsciiTableSerialize):
         if self.str_as_bytes:
             # Make sure strings are bytes
             for c, d in zip(out.columns, out.dtypes):
-                if (d == object) and isinstance(out[c][0], backwards.unicode_type):
+                if (d == object) and isinstance(out[c][0], str):
                     out[c] = out[c].apply(lambda s: s.encode('utf-8'))
         # On windows, long != longlong and longlong requires special cformat
         # For now, long will be used to preserve the use of %ld to match long
@@ -358,8 +354,7 @@ class PandasSerialize(AsciiTableSerialize):
                 x.pop('title', None)
         else:
             if 'field_names' in out['kwargs']:
-                field_names = [backwards.as_str(x) for
-                               x in out['kwargs']['field_names']]
+                field_names = out['kwargs']['field_names']
             header_line = b'name\tcount\tsize\n'
         out['contents'] = (header_line
                            + b'one\t1\t1.0\n'

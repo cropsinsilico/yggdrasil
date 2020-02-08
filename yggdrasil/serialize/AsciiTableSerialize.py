@@ -1,5 +1,5 @@
-from yggdrasil import backwards, units, serialize
-from yggdrasil.serialize import _default_delimiter
+from yggdrasil import units, serialize
+from yggdrasil.serialize import _default_delimiter_str
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
@@ -52,7 +52,7 @@ class AsciiTableSerialize(DefaultSerialize):
         'field_units': {'type': 'array', 'items': {'type': 'string'}},
         'as_array': {'type': 'boolean', 'default': False},
         'delimiter': {'type': 'string',
-                      'default': backwards.as_str(_default_delimiter)},
+                      'default': _default_delimiter_str},
         'use_astropy': {'type': 'boolean', 'default': False}}
     _attr_conv = DefaultSerialize._attr_conv + ['format_str', 'delimiter']
     has_header = True
@@ -71,8 +71,6 @@ class AsciiTableSerialize(DefaultSerialize):
                 names = self.get_field_names()
                 if not names:
                     names = list(old_typedef['properties'].keys())
-                    if backwards.PY2:  # pragma: Python 2
-                        names = sorted(names)
                 assert(len(old_typedef['properties']) == len(names))
                 new_typedef = {'type': 'array', 'items': []}
                 for n in names:
@@ -141,7 +139,7 @@ class AsciiTableSerialize(DefaultSerialize):
                                            use_astropy=self.use_astropy)
         else:
             out = serialize.format_message(args, self.format_str)
-        return backwards.as_bytes(out)
+        return out.encode("utf-8")
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.

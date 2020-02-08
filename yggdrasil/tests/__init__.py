@@ -5,7 +5,6 @@ import uuid
 import difflib
 import importlib
 import contextlib
-import warnings
 import unittest
 import numpy as np
 import pandas as pd
@@ -16,7 +15,7 @@ import pprint
 import types
 from pandas.testing import assert_frame_equal
 from yggdrasil.config import ygg_cfg, cfg_logging
-from yggdrasil import tools, backwards, platform, units
+from yggdrasil import tools, platform, units
 from yggdrasil.communication import cleanup_comms
 from yggdrasil.components import import_component
 
@@ -365,34 +364,7 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
         self.assertTrue(testBool, msg=msg_k)
 
 
-if backwards.PY2:  # pragma: Python 2
-    # Dummy TestCase instance, so we can initialize an instance
-    # and access the assert instance methods
-    class DummyTestCase(WrappedTestCase):  # pragma: no cover
-        def __init__(self):
-            super(DummyTestCase, self).__init__('_dummy')
-
-        def _dummy(self):
-            pass
-
-    # A metaclass that makes __getattr__ static
-    class AssertsAccessorType(type):  # pragma: no cover
-        dummy = DummyTestCase()
-
-        def __getattr__(cls, key):
-            return getattr(AssertsAccessor.dummy, key)
-
-    # The actual accessor, a static class, that redirect the asserts
-    class AssertsAccessor(object):  # pragma: no cover
-        __metaclass__ = AssertsAccessorType
-        
-    ut = AssertsAccessor
-        
-else:  # pragma: Python 3
-
-    ut = WrappedTestCase()
-
-
+ut = WrappedTestCase()
 long_running = unittest.skipIf(not enable_long_tests, "Long tests not enabled.")
 extra_example = unittest.skipIf(skip_extra_examples, "Extra examples not enabled.")
 
@@ -440,26 +412,7 @@ def assert_warns(warning, *args, **kwargs):
         AssertionError: If the correct warning is not caught.
 
     """
-    if backwards.PY2:  # pragma: Python 2
-        if args and args[0] is None:  # pragma: debug
-            warnings.warn("callable is None",
-                          DeprecationWarning, 3)
-            args = ()
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            try:
-                if not args:
-                    yield w
-                else:  # pragma: debug
-                    callable_obj = args[0]
-                    args = args[1:]
-                    callable_obj(*args, **kwargs)
-            finally:
-                assert(len(w) >= 1)
-                for iw in w:
-                    assert(issubclass(iw.category, warning))
-    else:  # pragma: Python 3
-        yield ut.assertWarns(warning, *args, **kwargs)
+    yield ut.assertWarns(warning, *args, **kwargs)
 
 
 def assert_equal(x, y):
@@ -785,7 +738,7 @@ class YggTestBase(unittest.TestCase):
 
         """
         result = None
-        if isinstance(fsize, backwards.string_types):
+        if isinstance(fsize, (bytes, str)):
             result = fsize
             fsize = len(result)
         Tout = self.start_timeout(2)
@@ -994,14 +947,12 @@ class IOInfo(object):
     r"""Simple class for useful IO attributes."""
 
     def __init__(self):
-        self.field_names = ['name', 'count', 'size']
-        self.field_units = ['n/a', 'umol', 'cm']
+        self.field_names = [b'name', b'count', b'size']
+        self.field_units = [b'n/a', b'umol', b'cm']
         self.nfields = len(self.field_names)
         self.comment = b'# '
         self.delimiter = b'\t'
         self.newline = b'\n'
-        self.field_names = [backwards.as_bytes(x) for x in self.field_names]
-        self.field_units = [backwards.as_bytes(x) for x in self.field_units]
 
 
 class YggTestClassInfo(YggTestClass, IOInfo):

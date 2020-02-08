@@ -1,9 +1,9 @@
 import tempfile
 import os
 import yaml
+import io as sio
 from jsonschema.exceptions import ValidationError
 from yggdrasil import yamlfile
-from yggdrasil.backwards import StringIO
 from yggdrasil.tests import YggTestClass, assert_raises, assert_equal
 _yaml_env = 'TEST_YAML_FILE'
 
@@ -35,7 +35,7 @@ def test_load_yaml():
             out = yamlfile.load_yaml(fd)
             assert_equal(out, dict_read)
         # Open stream
-        out = yamlfile.load_yaml(StringIO(contents))
+        out = yamlfile.load_yaml(sio.StringIO(contents))
         assert_equal(out, dict_read)
     finally:
         # Remove file

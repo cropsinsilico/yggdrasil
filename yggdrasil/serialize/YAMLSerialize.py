@@ -1,4 +1,3 @@
-from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import encode_yaml, decode_yaml
 from yggdrasil.serialize.JSONSerialize import JSONSerialize
 
@@ -38,8 +37,6 @@ class YAMLSerialize(JSONSerialize):
             bytes, str: Serialized message.
 
         """
-        # Convert bytes to str because JSON cannot serialize bytes by default
-        args = backwards.as_str(args, recurse=True, allow_pass=True)
         return encode_yaml(args, indent=self.indent, encoding=self.encoding,
                            default_flow_style=self.default_flow_style)
 
@@ -53,10 +50,7 @@ class YAMLSerialize(JSONSerialize):
             obj: Deserialized Python object.
 
         """
-        out = decode_yaml(msg)
-        if backwards.PY2:  # pragma: Python 2
-            out = backwards.as_str(out, recurse=True, allow_pass=True)
-        return out
+        return decode_yaml(msg)
 
     @classmethod
     def get_testing_options(cls, **kwargs):

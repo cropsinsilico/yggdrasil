@@ -2,7 +2,7 @@ import copy
 import pprint
 import numpy as np
 import warnings
-from yggdrasil import backwards, tools, units, serialize
+from yggdrasil import tools, units, serialize
 from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.datatypes import (
     guess_type_from_obj, get_type_from_def, get_type_class, compare_schema,
@@ -59,9 +59,9 @@ class SerializeBase(tools.YggClass):
                      'default': 'default',
                      'description': ('Serializer type.')},
         'newline': {'type': 'string',
-                    'default': backwards.as_str(serialize._default_newline)},
+                    'default': serialize._default_newline_str},
         'comment': {'type': 'string',
-                    'default': backwards.as_str(serialize._default_comment)},
+                    'default': serialize._default_comment_str},
         'datatype': {'type': 'schema'}}
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
     _attr_conv = ['newline', 'comment']
@@ -213,10 +213,7 @@ class SerializeBase(tools.YggClass):
         if table_example:
             assert(table_string_type in ['bytes', 'unicode', 'string'])
             if table_string_type == 'string':
-                if backwards.PY2:
-                    table_string_type = 'bytes'
-                else:
-                    table_string_type = 'unicode'
+                table_string_type = 'unicode'
             if table_string_type == 'bytes':
                 np_dtype_str = 'S'
                 rows = [(b'one', np.int32(1), 1.0),
@@ -253,7 +250,7 @@ class SerializeBase(tools.YggClass):
                                       'field_names': ['name', 'count', 'size'],
                                       'field_units': ['n/a', 'umol', 'cm']})
                 out['extra_kwargs'].update(
-                    {'format_str': backwards.as_str(out['kwargs']['format_str'])})
+                    {'format_str': out['kwargs']['format_str'].encode("utf-8")})
             if array_columns:
                 out['kwargs']['as_array'] = True
                 dtype = np.dtype(
@@ -308,8 +305,8 @@ class SerializeBase(tools.YggClass):
             if v is not None:
                 out[k] = copy.deepcopy(v)
         for k in self._attr_conv:
-            if (k in out) and isinstance(out[k], backwards.string_types):
-                out[k] = backwards.as_str(out[k])
+            if (k in out) and isinstance(out[k], bytes):
+                out[k] = out[k].decode("utf-8")
         return out
         
     @property
@@ -324,12 +321,15 @@ class SerializeBase(tools.YggClass):
                 out[k] = copy.deepcopy(v)
         for k in out.keys():
             v = out[k]
-            if isinstance(v, backwards.string_types):
-                out[k] = backwards.as_str(v)
+            if isinstance(v, bytes):
+                out[k] = v.decode("utf-8")
             elif isinstance(v, (list, tuple)):
                 out[k] = []
                 for x in v:
-                    out[k].append(backwards.as_str(x, allow_pass=True))
+                    if isinstance(x, bytes):
+                        out[k].append(x.decode("utf-8"))
+                    else:
+                        out[k].append(x)
             else:
                 out[k] = v
         return out
@@ -382,10 +382,11 @@ class SerializeBase(tools.YggClass):
             if not any_names:
                 out = None
         if (out is not None):
-            if as_bytes:
-                out = [backwards.as_bytes(x) for x in out]
-            else:
-                out = [backwards.as_str(x) for x in out]
+            for i in range(len(out)):
+                if as_bytes and isinstance(out[i], str):
+                    out[i] = out[i].encode("utf-8")
+                elif (not as_bytes) and isinstance(out[i], bytes):
+                    out[i] = out[i].decode("utf-8")
         return out
 
     def get_field_units(self, as_bytes=False):
@@ -417,10 +418,11 @@ class SerializeBase(tools.YggClass):
             if not any_units:
                 out = None
         if (out is not None):
-            if as_bytes:
-                out = [backwards.as_bytes(x) for x in out]
-            else:
-                out = [backwards.as_str(x) for x in out]
+            for i in range(len(out)):
+                if as_bytes and isinstance(out[i], str):
+                    out[i] = out[i].encode("utf-8")
+                elif (not as_bytes) and isinstance(out[i], bytes):
+                    out[i] = out[i].decode("utf-8")
         return out
 
     @property
@@ -537,8 +539,10 @@ class SerializeBase(tools.YggClass):
         # Enfore that strings used with messages are in bytes
         for k in self._attr_conv:
             v = getattr(self, k, None)
-            if isinstance(v, backwards.string_types):
-                setattr(self, k, backwards.as_bytes(v))
+            if isinstance(v, bytes):
+                setattr(self, k, v)
+            elif isinstance(v, str):
+                setattr(self, k, v.encode("utf-8"))
 
     def cformat2nptype(self, *args, **kwargs):
         r"""Method to convert c format string to numpy data type.
@@ -576,7 +580,8 @@ class SerializeBase(tools.YggClass):
                 continue
             # Key specific changes to type
             if k == 'format_str':
-                v = backwards.as_str(v)
+                if isinstance(v, bytes):
+                    v = v.decode("utf-8")
                 fmts = serialize.extract_formats(v)
                 if 'type' in typedef:
                     if (typedef.get('type', None) == 'array'):
@@ -609,7 +614,9 @@ class SerializeBase(tools.YggClass):
                 # Can only be used in conjunction with format_str
                 pass
             elif k in ['field_names', 'field_units']:
-                v = [backwards.as_str(x) for x in v]
+                for i in range(len(v)):
+                    if isinstance(v[i], bytes):
+                        v[i] = v[i].decode("utf-8")
                 if k == 'field_names':
                     tk = 'title'
                 else:
@@ -691,7 +698,7 @@ class SerializeBase(tools.YggClass):
         """
         if header_kwargs is None:
             header_kwargs = {}
-        if isinstance(args, backwards.bytes_type) and (args == tools.YGG_MSG_EOF):
+        if isinstance(args, bytes) and (args == tools.YGG_MSG_EOF):
             header_kwargs['raw'] = True
         self.initialize_from_message(args, **header_kwargs)
         metadata = {'no_metadata': no_metadata}
@@ -709,10 +716,10 @@ class SerializeBase(tools.YggClass):
             else:
                 data = self.func_serialize(args)
                 if (self.encoded_typedef['type'] == 'bytes'):
-                    if not isinstance(data, backwards.bytes_type):
+                    if not isinstance(data, bytes):
                         raise TypeError(("Serialization function returned object "
                                          + "of type '%s', not required '%s' type.")
-                                        % (type(data), backwards.bytes_type))
+                                        % (type(data), bytes))
                     metadata['dont_encode'] = True
                     if not no_metadata:
                         metadata['metadata'] = self.datatype.encode_type(
