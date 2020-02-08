@@ -1,5 +1,4 @@
 import importlib
-from yggdrasil import backwards
 import json as stdjson
 import yaml
 json = stdjson
@@ -148,7 +147,7 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     """
     if (indent is None) and (fd is not None):
         indent = '\t'
-    if backwards.PY2 or _use_rapidjson:  # pragma: Python 2
+    if _use_rapidjson:
         # Character indents not allowed in Python 2 json
         indent = indent_char2int(indent)
     kwargs['indent'] = indent
@@ -161,7 +160,7 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     else:
         kwargs.setdefault('cls', JSONEncoder)
     if fd is None:
-        return backwards.as_bytes(json.dumps(obj, **kwargs))
+        return json.dumps(obj, **kwargs).encode("utf-8")
     else:
         return json.dump(obj, fd, **kwargs)
 
@@ -177,9 +176,10 @@ def decode_json(msg, **kwargs):
         object: Deserialized Python object.
 
     """
-    if isinstance(msg, backwards.string_types):
-        # Should this be unicode?
-        msg_decode = backwards.as_str(msg)
+    if isinstance(msg, (str, bytes)):
+        msg_decode = msg
+        if isinstance(msg, bytes):
+            msg_decode = msg.decode("utf-8")
         func_decode = json.loads
     else:
         msg_decode = msg
@@ -268,5 +268,4 @@ def decode_yaml(msg, sorted_dict_type=None, **kwargs):
         construct_scalar)
     kwargs['Loader'] = OrderedLoader
     out = yaml.load(msg, **kwargs)
-    # out = backwards.as_str(out, recurse=True, allow_pass=True)
     return out

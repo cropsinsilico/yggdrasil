@@ -6,7 +6,8 @@ import os
 import psutil
 import warnings
 import weakref
-from yggdrasil import backwards, tools, platform, serialize
+import io as sio
+from yggdrasil import tools, platform, serialize
 from yggdrasil.languages import get_language_dir
 from yggdrasil.config import ygg_cfg
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
@@ -163,7 +164,7 @@ def connect_matlab_engine(matlab_session, first_connect=False):  # pragma: matla
     """
     matlab_engine = matlab.engine.connect_matlab(matlab_session)
     matlab_engine.eval('clear classes;', nargout=0)
-    err = backwards.StringIO()
+    err = sio.StringIO()
     try:
         matlab_engine.eval("YggInterface('YGG_MSG_MAX');", nargout=0,
                            stderr=err)
@@ -171,12 +172,6 @@ def connect_matlab_engine(matlab_session, first_connect=False):  # pragma: matla
         for x in MatlabModelDriver.paths_to_add:
             matlab_engine.addpath(x, nargout=0)
     matlab_engine.eval("os = py.importlib.import_module('os');", nargout=0)
-    if not first_connect:
-        if backwards.PY2:
-            matlab_engine.eval("py.reload(os);", nargout=0)
-        else:
-            # matlab_engine.eval("py.importlib.reload(os);", nargout=0)
-            pass
     return matlab_engine
 
 
@@ -273,8 +268,8 @@ class MatlabProcess(tools.YggClass):  # pragma: matlab
             raise RuntimeError("Matlab engine is not installed.")
         if kwargs is None:
             kwargs = {}
-        self.stdout = backwards.sio.StringIO()
-        self.stderr = backwards.sio.StringIO()
+        self.stdout = sio.StringIO()
+        self.stderr = sio.StringIO()
         self._stdout_line = None
         self._stderr_line = None
         self.target = target
@@ -779,7 +774,6 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         cmd = ("fprintf('" + mtl_id + "%s" + mtl_id + "R%s" + mtl_id + "'"
                + ",matlabroot,version('-release'));")
         mtl_proc = cls.run_executable([cmd])
-        mtl_id = backwards.match_stype(mtl_proc, mtl_id)
         if mtl_id not in mtl_proc:  # pragma: debug
             raise RuntimeError(("Could not locate ID string (%s) in "
                                 "output (%s).") % (mtl_id, mtl_proc))
@@ -787,8 +781,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         if len(parts) < 3:  # pragma: debug
             raise RuntimeError(("Could not get matlabroot/version from "
                                 "output (%s).") % (mtl_proc))
-        matlabroot = backwards.as_str(parts[-3])
-        release = backwards.as_str(parts[-2])
+        matlabroot = parts[-3]
+        release = parts[-2]
         return matlabroot, release
 
     def start_matlab_engine(self):
@@ -963,4 +957,12 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
             str: Decoded format string.
 
         """
-        return backwards.decode_escape(format_str)
+        as_str = False
+        format_str_bytes = format_str
+        if isinstance(format_str, str):
+            as_str = True
+            format_str_bytes = format_str.encode("utf-8")
+        out = format_str_bytes.decode('unicode-escape')
+        if not as_str:
+            out = out.encode("utf-8")
+        return out

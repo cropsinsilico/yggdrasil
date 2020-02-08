@@ -3,7 +3,6 @@ import copy
 import pprint
 import jsonschema
 import yggdrasil
-from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import encode_json, decode_json
 from yggdrasil.metaschema.properties import (
     get_registered_properties, import_all_properties)
@@ -70,10 +69,6 @@ def create_metaschema(overwrite=False):
             out['definitions']['simpleTypes']['enum'].append(k)
         for p in v.properties:
             assert(p in out['properties'])
-    # Convert to unicode if python 2
-    if backwards.PY2:  # pragma: Python 2
-        out = backwards.as_unicode(out, recurse=True, convert_types=(str,),
-                                   allow_pass=True)
     # Print
     print('Created metaschema')
     pprint.pprint(out)

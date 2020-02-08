@@ -3,7 +3,6 @@ import os
 import copy
 import numpy as np
 import threading
-from yggdrasil import backwards
 from yggdrasil.communication import new_comm
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.components import (
@@ -710,7 +709,7 @@ class ConnectionDriver(Driver):
             return
         self.nrecv += 1
         self.state = 'received'
-        if isinstance(msg, backwards.bytes_type):
+        if isinstance(msg, bytes):
             self.debug('Received message that is %d bytes from %s.',
                        len(msg), self.icomm.address)
         elif isinstance(msg, np.ndarray):

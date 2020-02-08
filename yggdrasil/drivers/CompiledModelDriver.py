@@ -6,7 +6,7 @@ import logging
 import warnings
 import subprocess
 from collections import OrderedDict
-from yggdrasil import platform, backwards, tools, scanf
+from yggdrasil import platform, tools, scanf
 from yggdrasil.config import ygg_cfg, locate_file
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
 from yggdrasil.components import import_component
@@ -834,7 +834,7 @@ class CompilationToolBase(object):
                                  additional_args=additional_args,
                                  suffix=suffix, **kwargs)
         # Add additional arguments
-        if isinstance(args, backwards.string_types):
+        if isinstance(args, (str, bytes)):
             args = [args]
         assert(isinstance(args, list))
         if additional_args is not None:
@@ -881,7 +881,7 @@ class CompilationToolBase(object):
             logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
-            output = backwards.as_str(output)
+            output = output.decode("utf-8")
             if (proc.returncode != 0) and (not allow_error):
                 raise RuntimeError("Command '%s' failed with code %d:\n%s."
                                    % (' '.join(cmd), proc.returncode, output))

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import logging
 from collections import OrderedDict
-from yggdrasil import serialize, backwards, platform
+from yggdrasil import serialize, platform
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
 from yggdrasil.drivers.CModelDriver import CModelDriver
@@ -212,7 +212,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             return {cls.python2language(k): cls.python2language(v)
                     for k, v in pyobj.items()}
         elif isinstance(pyobj, np.string_):
-            return backwards.as_str(pyobj)
+            return pyobj.decode("utf-8")
         elif isinstance(pyobj, pd.DataFrame):
             # R dosn't have int64 and will cast 64bit ints as floats if passed
             # without casting them to int32 first

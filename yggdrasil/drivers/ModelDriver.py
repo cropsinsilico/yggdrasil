@@ -10,7 +10,7 @@ import uuid
 import tempfile
 from collections import OrderedDict
 from pprint import pformat
-from yggdrasil import platform, tools, backwards, languages
+from yggdrasil import platform, tools, languages
 from yggdrasil.config import ygg_cfg, locate_file, update_language_config
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
@@ -486,19 +486,19 @@ class ModelDriver(Driver):
                 Defaults to None and is set to the working_dir.
 
         """
-        if isinstance(args, backwards.string_types):
+        if isinstance(args, (str, bytes)):
             args = args.split()
+        for i in range(len(args)):
+            if isinstance(args[i], bytes):
+                args[i] = args[i].decode("utf-8")
+            else:
+                args[i] = str(args[i])
         assert(isinstance(args, list))
         if default_model_dir is None:
             default_model_dir = self.working_dir
-        self.raw_model_file = backwards.as_str(args[0])
+        self.raw_model_file = args[0]
         self.model_file = self.raw_model_file
-        self.model_args = []
-        for a in args[1:]:
-            try:
-                self.model_args.append(backwards.as_str(a))
-            except TypeError:
-                self.model_args.append(str(a))
+        self.model_args = args[1:]
         if (self.language != 'executable') and (not os.path.isabs(self.model_file)):
             model_file = os.path.normpath(os.path.join(default_model_dir,
                                                        self.model_file))
@@ -614,7 +614,7 @@ class ModelDriver(Driver):
                 logger.error(out)
                 raise RuntimeError("Command '%s' failed with code %d."
                                    % (' '.join(cmd), proc.returncode))
-            out = backwards.as_str(out)
+            out = out.decode("utf-8")
             logger.debug('%s\n%s' % (' '.join(cmd), out))
             return out
         except (subprocess.CalledProcessError, OSError) as e:  # pragma: debug
