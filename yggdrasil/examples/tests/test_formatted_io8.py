@@ -1,5 +1,4 @@
 import os
-from yggdrasil.metaschema.encoder import _use_rapidjson
 from yggdrasil.examples.tests import ExampleTstBase
 
 
@@ -11,10 +10,7 @@ class TestExampleFIO8(ExampleTstBase):
     @property
     def input_files(self):
         r"""Input file."""
-        if _use_rapidjson:   # pragma: Python 3
-            out = [os.path.join(self.yamldir, 'Input', 'input_rj.txt')]
-        else:   # pragma: no cover
-            out = [os.path.join(self.yamldir, 'Input', 'input.txt')]
+        out = [os.path.join(self.yamldir, 'Input', 'input_rj.txt')]
         return out
 
     @property

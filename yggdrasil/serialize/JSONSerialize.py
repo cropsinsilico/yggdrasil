@@ -1,5 +1,5 @@
 from yggdrasil.metaschema.encoder import (
-    indent_char2int, encode_json, decode_json, _use_rapidjson,
+    indent_char2int, encode_json, decode_json,
     JSONReadableEncoder)
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
@@ -108,7 +108,6 @@ class JSONSerialize(SerializeBase):
         #                    b'\n\t\t"c": {\n\t\t\t"z": "hello"\n\t\t},'
         #                    b'\n\t\t"d": "new field"\n\t},'
         #                    b'\n\t2,\n\t2.0\n]')
-        if _use_rapidjson:
-            tab_rep = indent_char2int('\t') * b' '
-            out['contents'] = out['contents'].replace(b'\t', tab_rep)
+        tab_rep = indent_char2int('\t') * b' '
+        out['contents'] = out['contents'].replace(b'\t', tab_rep)
         return out

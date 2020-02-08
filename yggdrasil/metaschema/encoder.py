@@ -1,17 +1,9 @@
 import importlib
 import json as stdjson
 import yaml
-json = stdjson
-_json_encoder = stdjson.JSONEncoder
-_json_decoder = stdjson.JSONDecoder
-_use_rapidjson = True
-if _use_rapidjson:
-    try:  # pragma: Python 3
-        import rapidjson as json
-        _json_encoder = json.Encoder
-        _json_decoder = json.Decoder
-    except ImportError:  # pragma: Python 2
-        _use_rapidjson = False
+import rapidjson as json
+_json_encoder = json.Encoder
+_json_decoder = json.Decoder
 
 
 def indent_char2int(indent):
@@ -62,10 +54,7 @@ class JSONReadableEncoder(stdjson.JSONEncoder):
         try:
             return encode_data_readable(o)
         except MetaschemaTypeError:
-            if _use_rapidjson:
-                raise TypeError("Cannot encode %s" % o)
-            else:
-                return _json_encoder.default(self, o)
+            raise TypeError("Cannot encode %s" % o)
 
 
 class JSONEncoder(_json_encoder):
@@ -78,20 +67,11 @@ class JSONEncoder(_json_encoder):
         try:
             return encode_data(o)
         except MetaschemaTypeError:
-            if _use_rapidjson:
-                raise TypeError("Cannot encode %s" % o)
-            else:
-                return _json_encoder.default(self, o)
+            raise TypeError("Cannot encode %s" % o)
     
 
 class JSONDecoder(_json_decoder):
     r"""Decoder class for Ygg messages."""
-
-    def __init__(self, *args, **kwargs):
-        super(JSONDecoder, self).__init__(*args, **kwargs)
-        if not _use_rapidjson:
-            from json.scanner import py_make_scanner
-            self.scan_once = py_make_scanner(self)
 
     def string(self, s):
         r"""Try to parse string with class."""
@@ -147,18 +127,14 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     """
     if (indent is None) and (fd is not None):
         indent = '\t'
-    if _use_rapidjson:
-        # Character indents not allowed in Python 2 json
-        indent = indent_char2int(indent)
+    # Character indents not allowed in Python 2 json
+    indent = indent_char2int(indent)
     kwargs['indent'] = indent
     kwargs['sort_keys'] = sort_keys
-    if _use_rapidjson:
-        if 'cls' in kwargs:
-            kwargs.setdefault('default', kwargs.pop('cls')().default)
-        else:
-            kwargs.setdefault('default', JSONEncoder().default)
+    if 'cls' in kwargs:
+        kwargs.setdefault('default', kwargs.pop('cls')().default)
     else:
-        kwargs.setdefault('cls', JSONEncoder)
+        kwargs.setdefault('default', JSONEncoder().default)
     if fd is None:
         return json.dumps(obj, **kwargs).encode("utf-8")
     else:
@@ -184,10 +160,7 @@ def decode_json(msg, **kwargs):
     else:
         msg_decode = msg
         func_decode = json.load
-    if _use_rapidjson:
-        func_decode = JSONDecoder()
-    else:
-        kwargs.setdefault('cls', JSONDecoder)
+    func_decode = JSONDecoder()
     return func_decode(msg_decode, **kwargs)
 
 
