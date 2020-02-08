@@ -19,6 +19,7 @@ _fmt_char = b'%'
 _default_comment = b'# '
 _default_delimiter = b'\t'
 _default_newline = b'\n'
+_fmt_char_str = _fmt_char.decode("utf-8")
 _default_comment_str = _default_comment.decode("utf-8")
 _default_delimiter_str = _default_delimiter.decode("utf-8")
 _default_newline_str = _default_newline.decode("utf-8")

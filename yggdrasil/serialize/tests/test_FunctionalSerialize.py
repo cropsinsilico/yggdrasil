@@ -1,6 +1,5 @@
 import numpy as np
 import unittest
-from yggdrasil import backwards
 from yggdrasil.serialize import DefaultSerialize
 from yggdrasil.serialize.tests import test_SerializeBase as parent
 
@@ -31,13 +30,13 @@ class TestFunctionalSerialize(parent.TestSerializeBase):
         
     def _func_serialize(self, args):  # pragma: no cover
         r"""Method that serializes using repr."""
-        return backwards.as_bytes(repr(args))
+        return repr(args).encode("utf-8")
 
     def _func_deserialize(self, args):  # pragma: no cover
         r"""Method that deserializes using eval."""
         if len(args) == 0:
             return self.testing_options['empty']
-        x = eval(backwards.as_str(args))
+        x = eval(args.decode("utf-8"))
         return x
 
     def test_serialize_sinfo(self):
@@ -55,13 +54,13 @@ class FakeSerializer(DefaultSerialize.DefaultSerialize):
 
     def func_serialize(self, args):  # pragma: no cover
         r"""Method that serializes using repr."""
-        return backwards.as_bytes(repr(args))
+        return repr(args).encode("utf-8")
 
     def func_deserialize(self, args):  # pragma: no cover
         r"""Method that deserializes using eval."""
         if len(args) == 0:
             return []
-        x = eval(backwards.as_str(args))
+        x = eval(args.decode("utf-8"))
         return x
 
 
