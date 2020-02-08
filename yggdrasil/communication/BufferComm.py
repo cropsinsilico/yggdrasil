@@ -1,4 +1,5 @@
 import threading
+from yggdrasil import backwards
 from yggdrasil.communication import CommBase
 
 
@@ -148,4 +149,9 @@ class BufferComm(CommBase.CommBase):
     def purge(self):
         r"""Purge all messages from the comm."""
         super(BufferComm, self).purge()
-        self.address.clear()
+        if backwards.PY2:  # pragma: Python 2
+            with self.address.lock:
+                while self.address:
+                    self.address.pop()
+        else:
+            self.address.clear()
