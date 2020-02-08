@@ -61,7 +61,7 @@ class BufferComm(CommBase.CommBase):
         if not isinstance(self.address, LockedBuffer):
             if self.address == 'address':
                 self.address = LockedBuffer()
-            else:
+            else:  # pragma: debug
                 raise ValueError("Invalid address for a buffer: %s"
                                  % self.address)
         
@@ -130,9 +130,9 @@ class BufferComm(CommBase.CommBase):
                 and the message received.
 
         """
-        if timeout is None:
+        if timeout is None:  # pragma: no cover
             timeout = self.recv_timeout
-        if self.direction == 'send':
+        if self.direction == 'send':  # pragma: debug
             self.error("Sending buffer comm cannot receive.")
             return (False, self.empty_bytes_msg)
         # Sleep until there is a message
