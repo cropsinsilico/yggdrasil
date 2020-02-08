@@ -5,8 +5,9 @@ import atexit
 import threading
 import logging
 import types
+import time
 from yggdrasil.tests import assert_equal
-from yggdrasil import backwards, tools
+from yggdrasil import tools
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
 from yggdrasil.components import import_component, create_component
@@ -626,7 +627,7 @@ class CommBase(tools.YggClass):
         msg_array = seri_cls.object2array(out['msg'], **out['kwargs'])
         if msg_array is not None:
             out['msg_array'] = msg_array
-        if isinstance(out['msg'], backwards.bytes_type):
+        if isinstance(out['msg'], bytes):
             out['msg_long'] = out['msg'] + (cls._maxMsgSize * b'0')
         else:
             out['msg_long'] = out['msg']
@@ -1040,7 +1041,7 @@ class CommBase(tools.YggClass):
             bool: True if the message indicates an EOF, False otherwise.
 
         """
-        out = (isinstance(msg, backwards.bytes_type) and (msg == self.eof_msg))
+        out = (isinstance(msg, bytes) and (msg == self.eof_msg))
         return out
 
     def apply_transform(self, msg_in):
@@ -1377,7 +1378,7 @@ class CommBase(tools.YggClass):
                 out = self._send(*args, **kwargs)
         if out:
             self._n_sent += 1
-            self._last_send = backwards.clock_time()
+            self._last_send = time.perf_counter()
         return out
     
     def _send_1st(self, *args, **kwargs):
@@ -1637,7 +1638,7 @@ class CommBase(tools.YggClass):
             out = self._recv(*args, **kwargs)
         if out[0] and (not self.is_empty(out[1], self.empty_bytes_msg)):
             self._n_recv += 1
-            self._last_recv = backwards.clock_time()
+            self._last_recv = time.perf_counter()
         return out
 
     def _recv(self, *args, **kwargs):
@@ -1807,7 +1808,7 @@ class CommBase(tools.YggClass):
                 return flag, s_msg
             # Parse complete message
             flag, msg, header2 = self.on_recv(s_msg, second_pass=True)
-        if isinstance(s_msg, backwards.bytes_type):
+        if isinstance(s_msg, bytes):
             msg_len = len(s_msg)
         else:
             msg_len = 1
