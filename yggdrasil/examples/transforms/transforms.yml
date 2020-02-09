@@ -8,7 +8,7 @@ models:
     language: {{TEST_LANGUAGE}}
     args: ./src/model{{TEST_LANGUAGE_EXT}}
     function: model
-    {{TEST_MODEL_IO}}
+    {{{TEST_MODEL_IO}}}
 
   - name: destination
     language: python

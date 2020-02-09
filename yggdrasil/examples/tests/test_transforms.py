@@ -134,7 +134,7 @@ class TestExampleTransforms(ExampleTstBase):
                 'outputs:\n'
                 + '      - name: '
                 + language + '_model:output\n'
-                + '        format_str: \'%s\\t%d\\t%f\\n\'')
+                + '        format_str: "%s\\t%d\\t%f\\n"')
         return modelfile
 
     def check_results(self):
