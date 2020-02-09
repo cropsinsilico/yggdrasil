@@ -54,7 +54,7 @@ def call_script(lines):
     finally:
         if os.path.isfile(fname):
             os.remove(fname)
-            
+
 
 def setup_package_on_ci(method, python):
     r"""Setup a test environment on a CI resource.
@@ -89,10 +89,15 @@ def setup_package_on_ci(method, python):
             setup_package_on_ci('conda', python)
         elif _is_osx:
             cmds.append("echo Installing Python using virtualenv...")
+            pip_cmd = 'pip'
             if sys.version_info[0] != major:
-                cmds.append('brew install python%d' % major)
+                pip_cmd = 'pip%d' % major
+                try:
+                    call_script(['python%d --version' % major])
+                except BaseException:
+                    cmds.append('brew install python%d' % major)
             cmds += [
-                "pip install --upgrade pip virtualenv",
+                "%s install --upgrade pip virtualenv" % pip_cmd,
                 "virtualenv -p python%s venv" % python
             ]
     else:  # pragma: debug
