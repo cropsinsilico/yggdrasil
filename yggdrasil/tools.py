@@ -44,6 +44,78 @@ except AttributeError:
         raise RuntimeError("Could not located MainThread")
 
 
+def apply_recurse(x, func, **kwargs):
+    r"""Apply a function recursively to all elements of x if it is
+    a list, tuple, or dictionary.
+
+    Args:
+        x (list, tuple, dict): Object to apply function to.
+        func (function): Function to apply to elements of x.
+        **kwargs: Additional keyword arguments are passed to each
+            function call.
+
+    Returns:
+        object: Version of input, but after applying func.
+
+    """
+    if isinstance(x, (list, tuple)):
+        out = [func(ix, **kwargs) for ix in x]
+        if isinstance(x, tuple):
+            out = tuple(out)
+    elif isinstance(x, dict):
+        out = {k: func(v, **kwargs) for k, v in x.items()}
+    else:  # pragma: debug
+        raise TypeError("Recursion not supported for type '%s'"
+                        % type(x))
+    return out
+
+
+def bytes2str(x, recurse=False):
+    r"""Convert bytes type to string type.
+
+    Args:
+        x (bytes): String.
+        recurse (bool, optional): If True and x is a list, tuple, or
+            dict, the coversion will recurse. Defaults to False.
+
+    Returns:
+        str: Decoded string version of x.
+
+    """
+    if isinstance(x, str):
+        out = x
+    elif isinstance(x, bytes):
+        out = x.decode("utf-8")
+    elif isinstance(x, (list, tuple, dict)) and recurse:
+        out = apply_recurse(x, bytes2str, recurse=True)
+    else:  # pragma: debug
+        raise TypeError("Cannot convert type '%s' to str." % type(x))
+    return out
+
+
+def str2bytes(x, recurse=False):
+    r"""Convert string type to bytes type.
+
+    Args:
+        x (str): String.
+        recurse (bool, optional): If True and x is a list, tuple, or
+            dict, the coversion will recurse. Defaults to False.
+
+    Returns:
+        bytes: Encoded bytes version of x.
+
+    """
+    if isinstance(x, bytes):
+        out = x
+    elif isinstance(x, str):
+        out = x.encode("utf-8")
+    elif isinstance(x, (list, tuple, dict)) and recurse:
+        out = apply_recurse(x, str2bytes, recurse=True)
+    else:  # pragma: debug
+        raise TypeError("Cannot convert type '%s' to bytes." % type(x))
+    return out
+
+
 def check_threads():  # pragma: debug
     r"""Check for threads that are still running."""
     global _thread_registry

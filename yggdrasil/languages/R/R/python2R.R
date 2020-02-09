@@ -40,12 +40,10 @@ python2R <- function(pyobj) {
     out <- int32_to_R(pyobj)
   } else if (is(pyobj, "numpy.int64")) {
     out <- int64_to_R(pyobj)
-  } else if (is(pyobj, "python.builtin.str") && (pyv == 2)) {
-    out <- reticulate::py_to_r(pyobj)
   } else if (is(pyobj, "python.builtin.bytes")) {
     out <- bytes_to_R(pyobj)
   } else if (is(pyobj, "pandas.core.frame.DataFrame")) {
-    ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
+    ygg_tool <- reticulate::import('yggdrasil.tools', convert=FALSE)
     out <- reticulate::py_to_r(pyobj)
     ygg_types <- list()
     ncol_data = ncol(out)
@@ -55,9 +53,9 @@ python2R <- function(pyobj) {
         R2python(as.integer(i - 1)))
       icol <- call_python_method(pyobj, '__getitem__', icol_name)
       iele <- call_python_method(icol, '__getitem__', R2python(as.integer(0)))
-      if (is(iele, "python.builtin.bytes") && (pyv != 2)) {
+      if (is(iele, "python.builtin.bytes")) {
         ygg_types[[as.character(i)]] <- "bytes"
-	icol <- call_python_method(icol, 'apply', ygg_back$as_str)
+	icol <- call_python_method(icol, 'apply', ygg_tool$bytes2str)
       } else if (is(iele, "numpy.float32")) {
         ygg_types[[as.character(i)]] <- "float32"
 	icol <- call_python_method(icol, 'apply', np$float32)

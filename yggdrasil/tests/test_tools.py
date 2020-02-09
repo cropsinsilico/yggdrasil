@@ -4,6 +4,30 @@ from yggdrasil import tools, platform
 from yggdrasil.tests import YggTestClass, assert_equal
 
 
+def test_bytes2str():
+    r"""Test bytes2str."""
+    vals = [(b'hello', 'hello'),
+            ('hello', 'hello'),
+            ((b'a', b'b'), ('a', 'b')),
+            ({'a': b'a', 'b': b'b'}, {'a': 'a', 'b': 'b'}),
+            ([b'a', b'b'], ['a', 'b']),
+            ([b'a', [b'b', b'c']], ['a', ['b', 'c']])]
+    for x, exp in vals:
+        assert_equal(tools.bytes2str(x, recurse=True), exp)
+
+
+def test_str2bytes():
+    r"""Test str2bytes."""
+    vals = [('hello', b'hello'),
+            (b'hello', b'hello'),
+            (('a', 'b'), (b'a', b'b')),
+            ({'a': 'a', 'b': 'b'}, {'a': b'a', 'b': b'b'}),
+            (['a', 'b'], [b'a', b'b']),
+            (['a', ['b', 'c']], [b'a', [b'b', b'c']])]
+    for x, exp in vals:
+        assert_equal(tools.str2bytes(x, recurse=True), exp)
+
+
 def test_get_conda_prefix():
     r"""Test get_conda_prefix."""
     tools.get_conda_prefix()

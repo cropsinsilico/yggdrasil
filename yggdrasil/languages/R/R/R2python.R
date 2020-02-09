@@ -5,10 +5,10 @@ R2python <- function(robj, not_bytes=FALSE) {
   ver <- reticulate::py_get_attr(sys, 'version_info')
   pyv <- reticulate::py_to_r(reticulate::py_get_attr(ver, 'major'))
   np <- reticulate::import('numpy', convert=FALSE)
-  ygg_back <- reticulate::import('yggdrasil.backwards', convert=FALSE)
+  ygg_tool <- reticulate::import('yggdrasil.tools', convert=FALSE)
   if (is.element("ygg_type", names(attributes(robj)))) {
     if (attr(robj, "ygg_type") == "bytes") {
-      out <- ygg_back$as_bytes(reticulate::r_to_py(robj),
+      out <- ygg_tool$str2bytes(reticulate::r_to_py(robj),
         recurse=reticulate::r_to_py(TRUE))
     } else if (attr(robj, "ygg_type") == "float32") {
       out <- call_python_method(np, 'float32',
@@ -51,14 +51,14 @@ R2python <- function(robj, not_bytes=FALSE) {
       reticulate::r_to_py(robj))
   } else if (is(robj, "raw") || is(robj, "ygg_bytes")) {
     if (not_bytes) {
-      out <- ygg_back$as_str(reticulate::r_to_py(robj),
+      out <- ygg_tool$bytes2str(reticulate::r_to_py(robj),
         recurse=reticulate::r_to_py(TRUE))
     } else {
-      out <- ygg_back$as_bytes(reticulate::r_to_py(robj),
+      out <- ygg_tool$str2bytes(reticulate::r_to_py(robj),
         recurse=reticulate::r_to_py(TRUE))
     }
   } else if (is(robj, "character")) {
-    out <- ygg_back$as_str(reticulate::r_to_py(robj),
+    out <- ygg_tool$bytes2str(reticulate::r_to_py(robj),
       recurse=R2python(TRUE))
   } else if (is(robj, "data.frame")) {
     out <- reticulate::r_to_py(robj)
@@ -69,7 +69,7 @@ R2python <- function(robj, not_bytes=FALSE) {
           R2python(as.integer(as.integer(i) - 1)))
         new_col = call_python_method(out, '__getitem__', name)
         if (attr(robj, "ygg_types")[[i]] == "bytes") {
-          new_col = call_python_method(new_col, 'apply', ygg_back$as_bytes)
+          new_col = call_python_method(new_col, 'apply', ygg_tool$str2bytes)
 	} else if (attr(robj, "ygg_types")[[i]] == "float32") {
           new_col = call_python_method(new_col, 'apply', np$float32)
 	}
