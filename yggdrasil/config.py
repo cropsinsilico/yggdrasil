@@ -259,7 +259,8 @@ def find_all(name, path):
         out = ''
     if not out.isspace():
         result = sorted(out.splitlines())
-    result = [os.path.normcase(os.path.normpath(m.decode('utf-8'))) for m in result]
+    result = [os.path.normcase(os.path.normpath(tools.bytes2str(m)))
+              for m in result]
     return result
 
 

@@ -1,4 +1,4 @@
-from yggdrasil import units, serialize
+from yggdrasil import units, serialize, tools
 from yggdrasil.serialize import _default_delimiter_str
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.metaschema import get_metaschema
@@ -139,9 +139,7 @@ class AsciiTableSerialize(DefaultSerialize):
                                            use_astropy=self.use_astropy)
         else:
             out = serialize.format_message(args, self.format_str)
-        if isinstance(out, str):
-            out = out.encode("utf-8")
-        return out
+        return tools.str2bytes(out)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.

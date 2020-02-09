@@ -78,8 +78,8 @@ def ygginfo():
         if args.verbose:
             # Conda info
             if os.environ.get('CONDA_PREFIX', ''):
-                out = subprocess.check_output(
-                    ['conda', 'info']).decode('utf-8').strip()
+                out = tools.bytes2str(subprocess.check_output(
+                    ['conda', 'info'])).strip()
                 curr_prefix += prefix
                 vardict.append((curr_prefix + 'Conda Info:', "\n%s%s"
                                 % (curr_prefix + prefix,
@@ -102,8 +102,8 @@ def ygginfo():
                 vardict.append((curr_prefix + "R C Compiler:", ""))
                 curr_prefix += prefix
                 for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS']:
-                    out = subprocess.check_output(
-                        [interp, 'CMD', 'config', x]).decode("utf-8").strip()
+                    out = tools.bytes2str(subprocess.check_output(
+                        [interp, 'CMD', 'config', x])).strip()
                     vardict.append((curr_prefix + x, "%s"
                                     % ("\n" + curr_prefix + prefix).join(
                                         out.splitlines(False))))

@@ -2,6 +2,7 @@ import importlib
 import json as stdjson
 import yaml
 import rapidjson as json
+from yggdrasil import tools
 _json_encoder = json.Encoder
 _json_decoder = json.Decoder
 
@@ -136,7 +137,7 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     else:
         kwargs.setdefault('default', JSONEncoder().default)
     if fd is None:
-        return json.dumps(obj, **kwargs).encode("utf-8")
+        return tools.str2bytes(json.dumps(obj, **kwargs))
     else:
         return json.dump(obj, fd, **kwargs)
 
@@ -153,9 +154,7 @@ def decode_json(msg, **kwargs):
 
     """
     if isinstance(msg, (str, bytes)):
-        msg_decode = msg
-        if isinstance(msg, bytes):
-            msg_decode = msg.decode("utf-8")
+        msg_decode = tools.bytes2str(msg)
         func_decode = json.loads
     else:
         msg_decode = msg

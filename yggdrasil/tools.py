@@ -82,10 +82,10 @@ def bytes2str(x, recurse=False):
         str: Decoded string version of x.
 
     """
-    if isinstance(x, str):
-        out = x
-    elif isinstance(x, bytes):
+    if isinstance(x, bytes):
         out = x.decode("utf-8")
+    elif isinstance(x, str):
+        out = str(x)
     elif isinstance(x, (list, tuple, dict)) and recurse:
         out = apply_recurse(x, bytes2str, recurse=True)
     else:  # pragma: debug
@@ -105,10 +105,10 @@ def str2bytes(x, recurse=False):
         bytes: Encoded bytes version of x.
 
     """
-    if isinstance(x, bytes):
-        out = x
-    elif isinstance(x, str):
+    if isinstance(x, str):
         out = x.encode("utf-8")
+    elif isinstance(x, bytes):
+        out = bytes(x)
     elif isinstance(x, (list, tuple, dict)) and recurse:
         out = apply_recurse(x, str2bytes, recurse=True)
     else:  # pragma: debug
@@ -354,7 +354,7 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
         return False
     if out.isspace():  # pragma: debug
         return False
-    out = out.decode('utf-8').splitlines()
+    out = bytes2str(out).splitlines()
     return out
 
 
@@ -818,18 +818,15 @@ def print_encoded(msg, *args, **kwargs):
 
     """
     try:
-        orig_msg = msg
-        if isinstance(msg, bytes):
-            msg = msg.decode('utf-8')
-        print(msg, *args, **kwargs)
+        print(bytes2str(msg), *args, **kwargs)
     except (UnicodeEncodeError, UnicodeDecodeError):  # pragma: debug
         logger.debug("sys.stdout.encoding = %s, cannot print unicode",
                      sys.stdout.encoding)
         kwargs.pop('end', None)
         try:
-            print(orig_msg, *args, **kwargs)
+            print(msg, *args, **kwargs)
         except UnicodeEncodeError:  # pragma: debug
-            print(msg.encode('utf-8'), *args, **kwargs)
+            print(str2bytes(msg), *args, **kwargs)
 
 
 class TimeOut(object):

@@ -1,6 +1,7 @@
 import re
 import numpy as np
 import unyt
+from yggdrasil import tools
 _ureg_unyt = unyt.UnitRegistry()
 _unit_quantity = unyt.array.unyt_quantity
 _unit_array = unyt.array.unyt_array
@@ -18,7 +19,7 @@ def convert_R_unit_string(r_str):
 
     """
     out = []
-    regex_mu = b'\xc2\xb5'.decode('utf-8')
+    regex_mu = tools.bytes2str(b'\xc2\xb5')
     regex = r'(?P<name>[A-Za-z%s]+)(?P<exp>-?[0-9]*)(?: |$)' % regex_mu
     for x in re.finditer(regex, r_str):
         xdict = x.groupdict()
@@ -95,8 +96,7 @@ def add_units(arr, unit_str, dtype=None):
         unyt.unyt_array: Array with units.
 
     """
-    if isinstance(unit_str, bytes):
-        unit_str = unit_str.decode("utf-8")
+    unit_str = tools.bytes2str(unit_str)
     if is_null_unit(unit_str):
         return arr
     if has_units(arr):
@@ -182,8 +182,7 @@ def is_unit(ustr):
         bool: True if the string is a valid unit. False otherwise.
 
     """
-    if isinstance(ustr, bytes):
-        ustr = ustr.decode("utf-8")
+    ustr = tools.bytes2str(ustr)
     if is_null_unit(ustr):
         return True
     try:

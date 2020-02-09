@@ -1,3 +1,4 @@
+from yggdrasil import tools
 from yggdrasil.serialize import format_message
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
@@ -23,9 +24,7 @@ class DirectSerialize(SerializeBase):
         if (((self.extra_kwargs.get('format_str', None) is not None)
              and isinstance(args, list))):
             args = format_message(args, self.extra_kwargs['format_str'])
-        if isinstance(args, str):
-            args = args.encode("utf-8")
-        return args
+        return tools.str2bytes(args)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.

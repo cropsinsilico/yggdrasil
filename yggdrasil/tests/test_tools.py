@@ -86,7 +86,7 @@ def test_popen_nobuffer():
         args = ['pwd']
     p = tools.popen_nobuffer(args)
     out, err = p.communicate()
-    res = out.decode('utf-8').splitlines()[0]
+    res = tools.bytes2str(out).splitlines()[0]
     assert_equal(res, ans)
     # Test w/ shell
     if platform._is_win:  # pragma: windows
@@ -95,7 +95,7 @@ def test_popen_nobuffer():
         args = 'pwd'
     p = tools.popen_nobuffer(args, shell=True)
     out, err = p.communicate()
-    res = out.decode('utf-8').splitlines()[0]
+    res = tools.bytes2str(out).splitlines()[0]
     assert_equal(res, ans)
 
 

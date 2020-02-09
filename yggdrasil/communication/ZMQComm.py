@@ -394,14 +394,10 @@ class ZMQComm(AsyncComm.AsyncComm):
         self.socket_action = socket_action
         self.socket = self.context.socket(self.socket_type)
         self.socket.setsockopt(zmq.LINGER, 0)
-        self.topic_filter = topic_filter
-        if isinstance(self.topic_filter, str):
-            self.topic_filter = self.topic_filter.encode("utf-8")
+        self.topic_filter = tools.str2bytes(topic_filter)
         if dealer_identity is None:
             dealer_identity = str(uuid.uuid4())
-        self.dealer_identity = dealer_identity
-        if isinstance(self.dealer_identity, str):
-            self.dealer_identity = self.dealer_identity.encode("utf-8")
+        self.dealer_identity = tools.str2bytes(dealer_identity)
         self._openned = False
         self._bound = False
         self._connected = False
@@ -648,8 +644,7 @@ class ZMQComm(AsyncComm.AsyncComm):
 
     def set_reply_socket_recv(self, address):
         r"""Set the recv reply socket if the address dosn't exist."""
-        if isinstance(address, bytes):
-            address = address.decode("utf-8")
+        address = tools.bytes2str(address)
         if address not in self.reply_socket_recv:
             s = self.context.socket(zmq.REQ)
             s.setsockopt(zmq.LINGER, 0)
@@ -997,10 +992,8 @@ class ZMQComm(AsyncComm.AsyncComm):
             return False
         if identity is None:
             identity = self.dealer_identity
-        if isinstance(topic, str):
-            topic = topic.encode("utf-8")
-        if isinstance(identity, str):
-            identity = identity.encode("utf-8")
+        topic = tools.str2bytes(topic)
+        identity = tools.str2bytes(identity)
         if self.socket_type_name == 'PUB':
             total_msg = topic + _flag_zmq_filter + msg
         else:

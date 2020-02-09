@@ -3,7 +3,7 @@ import copy
 import numpy as np
 import pandas
 import io as sio
-from yggdrasil import platform, units, scanf
+from yggdrasil import platform, units, scanf, tools
 try:
     from astropy.io import ascii as apy_ascii
     from astropy.table import Table as apy_Table
@@ -161,8 +161,7 @@ def cformat2nptype(cfmt, names=None):
         raise TypeError("Input must be a string, bytes string, or list, not %s" %
                         type(cfmt))
     if isinstance(cfmt, (str, bytes)):
-        if isinstance(cfmt, bytes):
-            cfmt = cfmt.decode("utf-8")
+        cfmt = tools.bytes2str(cfmt)
         fmt_list = extract_formats(cfmt)
         if len(fmt_list) == 0:
             raise ValueError("Could not locate any format codes in the "
@@ -179,13 +178,7 @@ def cformat2nptype(cfmt, names=None):
         elif len(names) != nfmt:
             raise ValueError("Number of names does not match the number of fields.")
         else:
-            new_names = []
-            for n in names:
-                if isinstance(n, str):
-                    new_names.append(n)
-                else:
-                    new_names.append(n.decode("utf-8"))
-            names = new_names
+            names = tools.bytes2str(names, recurse=True)
         out = np.dtype(dict(names=names, formats=dtype_list))
         # out = np.dtype([(n, d) for n, d in zip(names, dtype_list)])
         return out
@@ -644,12 +637,7 @@ def table2format(fmts=[], delimiter=None, newline=None, comment=None):
         comment = _default_comment
     if isinstance(fmts, np.dtype):
         fmts = nptype2cformat(fmts)
-    bytes_fmts = []
-    for f in fmts:
-        if isinstance(f, str):
-            bytes_fmts.append(f.encode("utf-8"))
-        else:
-            bytes_fmts.append(f)
+    bytes_fmts = tools.str2bytes(fmts, recurse=True)
     fmt_str = comment + delimiter.join(bytes_fmts) + newline
     return fmt_str
 
@@ -682,18 +670,13 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
     if use_astropy:
         fd = sio.StringIO()
         table = apy_Table(arr1)
-        delimiter = info['delimiter']
-        if not isinstance(delimiter, str):
-            delimiter = delimiter.decode("utf-8")
+        delimiter = tools.bytes2str(info['delimiter'])
         apy_ascii.write(table, fd, delimiter=delimiter,
                         format='no_header')
-        out = fd.getvalue()
-        if not isinstance(out, bytes):
-            out = out.encode("utf-8")
+        out = tools.str2bytes(fd.getvalue())
     else:
         fd = sio.BytesIO()
-        if not isinstance(fmt_str, bytes):
-            fmt_str = fmt_str.encode("utf-8")
+        fmt_str = tools.str2bytes(fmt_str)
         for ele in arr1:
             line = format_message(ele.tolist(), fmt_str)
             fd.write(line)
@@ -742,23 +725,13 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         names = dtype.names
     fd = sio.BytesIO(msg)
     if names is not None:
-        new_names = []
-        for n in names:
-            if isinstance(n, str):
-                new_names.append(n)
-            else:
-                new_names.append(n.decode("utf-8"))
-        names = new_names
+        names = tools.bytes2str(names, recurse=True)
     np_kws = dict()
     if info.get('delimiter', None) is not None:
         np_kws['delimiter'] = info['delimiter']
     if info.get('comment', None) is not None:
         np_kws['comments'] = info['comment']
-    for k, v in np_kws.items():
-        if isinstance(v, str):
-            np_kws[k] = v
-        else:
-            np_kws[k] = v.decode("utf-8")
+    np_kws = tools.bytes2str(np_kws, recurse=True)
     if use_astropy:
         if 'comments' in np_kws:
             np_kws['comment'] = np_kws.pop('comments')
@@ -976,12 +949,7 @@ def format_header(format_str=None, dtype=None,
     for x in [field_names, field_units, fmts]:
         if (x is not None) and (len(max(x, key=len)) > 0):
             assert(len(x) == nfld)
-            x_bytes = []
-            for ix in x:
-                if isinstance(ix, bytes):
-                    x_bytes.append(ix)
-                else:
-                    x_bytes.append(ix.encode("utf-8"))
+            x_bytes = tools.str2bytes(x, recurse=True)
             out.append(comment + delimiter.join(x_bytes))
     out = newline.join(out) + newline
     return out
@@ -1059,9 +1027,8 @@ def discover_header(fd, serializer, newline=_default_newline,
         # Determine maximum size of string field
         while str_fmt in header['format_str']:
             field_formats = extract_formats(header['format_str'])
-            ifld = header['field_names'][field_formats.index(str_fmt)]
-            if not isinstance(ifld, str):
-                ifld = ifld.decode("utf-8")
+            ifld = tools.bytes2str(
+                header['field_names'][field_formats.index(str_fmt)])
             max_len = len(max(arr[ifld], key=len))
             new_str_fmt = b'%%%ds' % max_len
             header['format_str'] = header['format_str'].replace(

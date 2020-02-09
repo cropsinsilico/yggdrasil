@@ -274,8 +274,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
 
     def on_message(self, ch, method, props, body):
         r"""Buffer received messages."""
-        if isinstance(body, str):
-            body = body.encode("utf-8")
+        body = tools.str2bytes(body)
         if self.direction == 'send':  # pragma: debug
             raise Exception("Send comm received a message.")
         with self.rmq_lock:

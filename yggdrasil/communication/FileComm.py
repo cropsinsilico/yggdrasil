@@ -1,7 +1,7 @@
 import os
 import copy
 import tempfile
-from yggdrasil import platform
+from yggdrasil import platform, tools
 from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.communication import CommBase
 
@@ -165,8 +165,9 @@ class FileComm(CommBase.CommBase):
         if read_meth == 'readline':
             out['recv_partial'] = [[x] for x in out['recv']]
             if cls._default_serializer == 'direct':
-                comment = (cls._schema_properties['comment']['default']
-                           + 'Comment\n').encode("utf-8")
+                comment = tools.str2bytes(
+                    cls._schema_properties['comment']['default']
+                    + 'Comment\n')
                 out['send'].append(comment)
                 out['contents'] += comment
                 out['recv_partial'].append([])

@@ -251,8 +251,8 @@ class SerializeBase(tools.YggClass):
                                       'field_units': ['n/a', 'umol', 'cm']})
                 out['extra_kwargs']['format_str'] = out['kwargs']['format_str']
                 if 'format_str' in cls._attr_conv:
-                    out['extra_kwargs']['format_str'] = (
-                        out['extra_kwargs']['format_str'].encode("utf-8"))
+                    out['extra_kwargs']['format_str'] = tools.str2bytes(
+                        out['extra_kwargs']['format_str'])
             if array_columns:
                 out['kwargs']['as_array'] = True
                 dtype = np.dtype(
@@ -307,8 +307,8 @@ class SerializeBase(tools.YggClass):
             if v is not None:
                 out[k] = copy.deepcopy(v)
         for k in self._attr_conv:
-            if (k in out) and isinstance(out[k], bytes):
-                out[k] = out[k].decode("utf-8")
+            if k in out:
+                out[k] = tools.bytes2str(out[k])
         return out
         
     @property
@@ -323,15 +323,8 @@ class SerializeBase(tools.YggClass):
                 out[k] = copy.deepcopy(v)
         for k in out.keys():
             v = out[k]
-            if isinstance(v, bytes):
-                out[k] = v.decode("utf-8")
-            elif isinstance(v, (list, tuple)):
-                out[k] = []
-                for x in v:
-                    if isinstance(x, bytes):
-                        out[k].append(x.decode("utf-8"))
-                    else:
-                        out[k].append(x)
+            if isinstance(v, (bytes, list, tuple)):
+                out[k] = tools.bytes2str(v, recurse=True)
             else:
                 out[k] = v
         return out
@@ -384,11 +377,10 @@ class SerializeBase(tools.YggClass):
             if not any_names:
                 out = None
         if (out is not None):
-            for i in range(len(out)):
-                if as_bytes and isinstance(out[i], str):
-                    out[i] = out[i].encode("utf-8")
-                elif (not as_bytes) and isinstance(out[i], bytes):
-                    out[i] = out[i].decode("utf-8")
+            if as_bytes:
+                out = tools.str2bytes(out, recurse=True)
+            else:
+                out = tools.bytes2str(out, recurse=True)
         return out
 
     def get_field_units(self, as_bytes=False):
@@ -420,11 +412,10 @@ class SerializeBase(tools.YggClass):
             if not any_units:
                 out = None
         if (out is not None):
-            for i in range(len(out)):
-                if as_bytes and isinstance(out[i], str):
-                    out[i] = out[i].encode("utf-8")
-                elif (not as_bytes) and isinstance(out[i], bytes):
-                    out[i] = out[i].decode("utf-8")
+            if as_bytes:
+                out = tools.str2bytes(out, recurse=True)
+            else:
+                out = tools.bytes2str(out, recurse=True)
         return out
 
     @property
@@ -541,10 +532,8 @@ class SerializeBase(tools.YggClass):
         # Enfore that strings used with messages are in bytes
         for k in self._attr_conv:
             v = getattr(self, k, None)
-            if isinstance(v, bytes):
-                setattr(self, k, v)
-            elif isinstance(v, str):
-                setattr(self, k, v.encode("utf-8"))
+            if isinstance(v, (str, bytes)):
+                setattr(self, k, tools.str2bytes(v))
 
     def cformat2nptype(self, *args, **kwargs):
         r"""Method to convert c format string to numpy data type.
@@ -582,8 +571,7 @@ class SerializeBase(tools.YggClass):
                 continue
             # Key specific changes to type
             if k == 'format_str':
-                if isinstance(v, bytes):
-                    v = v.decode("utf-8")
+                v = tools.bytes2str(v)
                 fmts = serialize.extract_formats(v)
                 if 'type' in typedef:
                     if (typedef.get('type', None) == 'array'):
@@ -616,9 +604,7 @@ class SerializeBase(tools.YggClass):
                 # Can only be used in conjunction with format_str
                 pass
             elif k in ['field_names', 'field_units']:
-                for i in range(len(v)):
-                    if isinstance(v[i], bytes):
-                        v[i] = v[i].decode("utf-8")
+                v = tools.bytes2str(v, recurse=True)
                 if k == 'field_names':
                     tk = 'title'
                 else:

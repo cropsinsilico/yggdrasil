@@ -1,7 +1,7 @@
 import os
 import sys
 import importlib
-from yggdrasil import platform
+from yggdrasil import platform, tools
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
@@ -27,9 +27,7 @@ class ClassMetaschemaType(MetaschemaType):
         """
         if isinstance(obj, (str, bytes)):
             try:
-                obj_str = obj
-                if isinstance(obj_str, bytes):
-                    obj_str = obj_str.decode("utf-8")
+                obj_str = tools.bytes2str(obj)
                 obj = cls.decode_data(obj_str, {'type': cls.name})
             except (ValueError, AttributeError):
                 pass

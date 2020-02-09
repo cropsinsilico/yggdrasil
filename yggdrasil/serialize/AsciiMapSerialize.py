@@ -1,4 +1,5 @@
 import json
+from yggdrasil import tools
 from yggdrasil.serialize import _default_delimiter_str
 from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.metaschema.encoder import JSONReadableEncoder
@@ -37,21 +38,16 @@ class AsciiMapSerialize(SerializeBase):
         """
         out = ''
         order = sorted([k for k in args.keys()])
-        newline_str = self.newline.decode("utf-8")
+        newline_str = tools.bytes2str(self.newline)
         for k in order:
             v = args[k]
             if not isinstance(k, (str, bytes)):
                 raise ValueError("Serialization of non-string keys not supported.")
-            if isinstance(k, str):
-                out += k
-            else:
-                out += k.decode("utf-8")
+            out += tools.bytes2str(k)
             out += self.delimiter
-            if isinstance(v, bytes):
-                v = v.decode("utf-8")
             out += json.dumps(v, cls=JSONReadableEncoder)
             out += newline_str
-        return out.encode("utf-8")
+        return tools.str2bytes(out)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -64,7 +60,7 @@ class AsciiMapSerialize(SerializeBase):
 
         """
         out = dict()
-        lines = [l.decode("utf-8") for l in msg.split(self.newline)]
+        lines = tools.bytes2str(msg.split(self.newline), recurse=True)
         for l in lines:
             kv = [x for x in l.split(self.delimiter) if x]
             if len(kv) <= 1:

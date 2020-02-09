@@ -2,6 +2,7 @@ import os
 import copy
 import warnings
 import numpy as np
+from yggdrasil import tools
 from yggdrasil.metaschema.encoder import encode_json, decode_json
 from yggdrasil.metaschema.datatypes import _schema_dir
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
@@ -790,8 +791,7 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
             object: Decoded object.
 
         """
-        if isinstance(msg, bytes):
-            msg = msg.decode("utf-8")
+        msg = tools.bytes2str(msg)
         lines = msg.splitlines()
         metadata = {'comments': [], 'element_order': [], 'property_order': {}}
         if lines[0] != 'ply':
