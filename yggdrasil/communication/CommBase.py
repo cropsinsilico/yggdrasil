@@ -372,6 +372,7 @@ class CommBase(tools.YggClass):
                           'length_map': {
                               'type': 'object',
                               'additionalProperties': {'type': 'string'}},
+                          'format_str': {'type': 'string'},
                           'field_names': {'type': 'array',
                                           'items': {'type': 'string'}},
                           'field_units': {'type': 'array',

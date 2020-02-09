@@ -199,6 +199,7 @@ jobs:
       script:
         - yggconfig --remove-file
         - yggtest --ci
+        - yggtest --ci --test-suite=types --languages c python
     - os: linux
       python: 3.6
       env: INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=1

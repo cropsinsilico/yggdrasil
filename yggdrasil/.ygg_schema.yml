@@ -55,6 +55,10 @@ definitions:
           type: array
         filter:
           $ref: '#/definitions/filter'
+        format_str:
+          description: String that should be used to format/parse messages. Default
+            to None.
+          type: string
         is_default:
           default: false
           type: boolean
@@ -466,10 +470,8 @@ definitions:
         filter:
           $ref: '#/definitions/filter'
         format_str:
-          description: If provided, this string will be used to format messages from
-            a list of arguments and parse messages to get a list of arguments in C
-            printf/scanf style. Defaults to None and messages are assumed to already
-            be bytes.
+          description: String that should be used to format/parse messages. Default
+            to None.
           type: string
         in_temp:
           default: false
@@ -608,9 +610,9 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - filetype
       - name
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -731,12 +733,6 @@ definitions:
             enum:
             - table
             type: string
-          format_str:
-            description: If provided, this string will be used to format messages
-              from a list of arguments and parse messages to get a list of arguments
-              in C printf/scanf style. Defaults to None and messages are assumed to
-              already be bytes.
-            type: string
           newline:
             default: '
 
@@ -828,12 +824,6 @@ definitions:
             description: The file is a Pandas frame output as a table.
             enum:
             - pandas
-            type: string
-          format_str:
-            description: If provided, this string will be used to format messages
-              from a list of arguments and parse messages to get a list of arguments
-              in C printf/scanf style. Defaults to None and messages are assumed to
-              already be bytes.
             type: string
           newline:
             default: '
@@ -1342,10 +1332,10 @@ definitions:
             is used.
           type: string
       required:
-      - args
       - working_dir
-      - language
+      - args
       - name
+      - language
       title: model_base
       type: object
     - anyOf:
@@ -2210,30 +2200,6 @@ definitions:
       type: object
     - anyOf:
       - additionalProperties: true
-        description: Schema for transform component ['array'] subtype.
-        properties:
-          field_names:
-            items:
-              type: string
-            type: array
-          transformtype:
-            enum:
-            - array
-        title: ArrayTransform
-        type: object
-      - additionalProperties: true
-        description: Schema for transform component ['pandas'] subtype.
-        properties:
-          field_names:
-            items:
-              type: string
-            type: array
-          transformtype:
-            enum:
-            - pandas
-        title: PandasTransform
-        type: object
-      - additionalProperties: true
         description: Schema for transform component ['select_fields'] subtype.
         properties:
           original_order:
@@ -2316,6 +2282,30 @@ definitions:
         required:
         - map
         title: MapFieldsTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['array'] subtype.
+        properties:
+          field_names:
+            items:
+              type: string
+            type: array
+          transformtype:
+            enum:
+            - array
+        title: ArrayTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['pandas'] subtype.
+        properties:
+          field_names:
+            items:
+              type: string
+            type: array
+          transformtype:
+            enum:
+            - pandas
+        title: PandasTransform
         type: object
     description: Schema for transform components.
     title: transform
