@@ -389,7 +389,8 @@ class CommBase(tools.YggClass):
                                    {'type': ['function', 'string']}]}}]},
                           'is_default': {'type': 'boolean', 'default': False},
                           'outside_loop': {'type': 'boolean',
-                                           'default': False}}
+                                           'default': False},
+                          'default_file': {'$ref': '#/definitions/file'}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
@@ -398,6 +399,7 @@ class CommBase(tools.YggClass):
     _maxMsgSize = 0
     address_description = None
     no_serialization = False
+    _model_schema_prop = ['is_default', 'outside_loop', 'default_file']
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
                  is_interface=None, language=None, partner_language='python',

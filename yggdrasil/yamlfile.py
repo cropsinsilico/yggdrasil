@@ -169,12 +169,19 @@ def parse_yaml(files):
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
     # Make sure that I/O channels initialized
+    opp_map = {'input': 'output', 'output': 'input'}
     for io in ['input', 'output']:
         remove = []
-        for k, v in existing[io].items():
+        for k in list(existing[io].keys()):
+            v = existing[io][k]
             if 'driver' not in v:
                 if v.get('is_default', False):
                     remove.append(k)
+                elif 'default_file' in v:
+                    new_conn = {io + 's': [v['default_file']],
+                                opp_map[io] + 's': [v]}
+                    existing = parse_component(new_conn, 'connection',
+                                               existing=existing)
                 else:
                     raise RuntimeError("No driver established for %s channel %s" % (
                         io, k))

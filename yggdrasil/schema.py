@@ -1115,6 +1115,9 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
                     x['name'] = new_name
                 if not x.get('is_default', False):
                     x.setdefault('working_dir', instance['working_dir'])
+                if 'default_file' in x:
+                    x['default_file'].setdefault('working_dir',
+                                                 instance['working_dir'])
                 for k in ['filter', 'transform']:
                     x_k = x.get(k, None)
                     if isinstance(x_k, dict) and ('function' in x_k):

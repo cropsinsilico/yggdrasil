@@ -36,6 +36,8 @@ definitions:
             object. Defaults to {''type'': ''bytes''}. Additional information on specifying
             datatypes can be found :ref:`here <datatypes_rst>`.'
           type: schema
+        default_file:
+          $ref: '#/definitions/file'
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -123,9 +125,9 @@ definitions:
             type: string
           type: array
       required:
+      - name
       - commtype
       - datatype
-      - name
       title: comm_base
       type: object
     - anyOf:
@@ -485,9 +487,6 @@ definitions:
           type:
           - string
           - int
-        is_default:
-          default: false
-          type: boolean
         is_series:
           default: false
           description: If True, input/output will be done to a series of files. If
@@ -513,9 +512,6 @@ definitions:
           default: false
           description: If True, headers will not be read or serialized from/to tables.
             Defaults to False.
-          type: boolean
-        outside_loop:
-          default: false
           type: boolean
         read_meth:
           default: read
@@ -610,9 +606,9 @@ definitions:
             is used.
           type: string
       required:
-      - filetype
       - name
       - working_dir
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1332,10 +1328,10 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
-      - args
-      - name
       - language
+      - name
+      - args
+      - working_dir
       title: model_base
       type: object
     - anyOf:
@@ -2200,6 +2196,30 @@ definitions:
       type: object
     - anyOf:
       - additionalProperties: true
+        description: Schema for transform component ['array'] subtype.
+        properties:
+          field_names:
+            items:
+              type: string
+            type: array
+          transformtype:
+            enum:
+            - array
+        title: ArrayTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['pandas'] subtype.
+        properties:
+          field_names:
+            items:
+              type: string
+            type: array
+          transformtype:
+            enum:
+            - pandas
+        title: PandasTransform
+        type: object
+      - additionalProperties: true
         description: Schema for transform component ['select_fields'] subtype.
         properties:
           original_order:
@@ -2282,30 +2302,6 @@ definitions:
         required:
         - map
         title: MapFieldsTransform
-        type: object
-      - additionalProperties: true
-        description: Schema for transform component ['array'] subtype.
-        properties:
-          field_names:
-            items:
-              type: string
-            type: array
-          transformtype:
-            enum:
-            - array
-        title: ArrayTransform
-        type: object
-      - additionalProperties: true
-        description: Schema for transform component ['pandas'] subtype.
-        properties:
-          field_names:
-            items:
-              type: string
-            type: array
-          transformtype:
-            enum:
-            - pandas
-        title: PandasTransform
         type: object
     description: Schema for transform components.
     title: transform

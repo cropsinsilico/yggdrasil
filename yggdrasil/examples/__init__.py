@@ -126,7 +126,7 @@ def register_example(example_dir):
                     yml_names.append('growth.yml')
                     src_names.append('growth.m')
             elif lang == 'python':
-                yml_names = ['photosynthesis.yml', 'photosynthesis_files.yml']
+                yml_names = ['photosynthesis.yml']
                 src_names = ['photosynthesis.py']
             elif lang == 'c':
                 yml_names = ['light.yml', 'light_files.yml']
