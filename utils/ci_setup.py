@@ -98,7 +98,7 @@ def setup_package_on_ci(method, python):
                     cmds.append('brew install python%d' % major)
             cmds += [
                 "%s install --upgrade pip virtualenv" % pip_cmd,
-                "virtualenv -p python%s venv" % python
+                "virtualenv -p python%d venv" % major
             ]
     else:  # pragma: debug
         raise ValueError("Method must be 'conda' or 'pip', not '%s'"
