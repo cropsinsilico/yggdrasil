@@ -1733,6 +1733,8 @@ class ModelDriver(Driver):
                 if ((('format_str' in kwargs)
                      and ('python_interface_format' in cls.function_param))):
                     key = 'python_interface_format'
+                    kwargs['format_str'] = kwargs['format_str'].encode(
+                        "unicode_escape").decode('utf-8')
                 else:
                     key = 'python_interface'
         out = [cls.format_function_param(key, **kwargs)]

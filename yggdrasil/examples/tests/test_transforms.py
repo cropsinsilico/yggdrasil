@@ -96,7 +96,9 @@ class TestExampleTransforms(ExampleTstBase):
                 driver.
 
         Returns:
-            str: Full path to the file that was written.
+            tuple(str, dict): Full path to the file that was written
+                and the environment variables that should be set before
+                running the integration.
 
         """
         if language_ext is None:
@@ -126,16 +128,17 @@ class TestExampleTransforms(ExampleTstBase):
             print(modelfile)
             print('\n'.join(lines))
             fd.write('\n'.join(lines))
-        os.environ['TEST_LANGUAGE'] = language
-        os.environ['TEST_LANGUAGE_EXT'] = language_ext
-        os.environ['TEST_TRANSFORM'] = transform
+        env = {}
+        env['TEST_LANGUAGE'] = language
+        env['TEST_LANGUAGE_EXT'] = language_ext
+        env['TEST_TRANSFORM'] = transform
         if transform == 'table':
-            os.environ['TEST_MODEL_IO'] = (
+            env['TEST_MODEL_IO'] = (
                 'outputs:\n'
                 + '      - name: '
                 + language + '_model:output\n'
                 + '        format_str: "%s\\t%d\\t%f\\n"')
-        return modelfile
+        return modelfile, env
 
     def check_results(self):
         r"""This should be overridden with checks for the result."""
@@ -143,8 +146,18 @@ class TestExampleTransforms(ExampleTstBase):
 
     def run_example(self, **kwargs):
         r"""This runs an example in the correct language."""
+        self.oldenv_yaml = {}
         if self.yaml is not None:
-            self._output_files = [self.setup_model(self.language,
-                                                   self.iter_param['transform'],
-                                                   **kwargs)]
+            modelfile, env = self.setup_model(self.language,
+                                              self.iter_param['transform'],
+                                              **kwargs)
+            self._output_files = [modelfile]
+            for k, v in env.items():
+                self.oldenv_yaml[k] = os.environ.get(k, None)
+                os.environ[k] = v
         super(TestExampleTransforms, self).run_example()
+        for k, v in self.oldenv_yaml.items():
+            if v is None:
+                del os.environ[k]
+            else:
+                os.environ[k] = v
