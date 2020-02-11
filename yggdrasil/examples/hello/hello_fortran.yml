@@ -1,0 +1,23 @@
+---
+
+model:
+  name: hello_fortran
+  language: fortran
+  args: ./src/hello.f90  # compile the Fortran code with necessary libraries
+
+  inputs:
+    - inFile
+    - helloQueueIn
+  outputs:
+    - helloQueueOut
+    - outFile
+
+connections:
+  - input: ./Input/input.txt
+    output: inFile
+  - input: helloQueueOut
+    output: helloQueueIn
+    onexit: printStatus
+  - input: outFile
+    output: output_hello.txt
+    in_temp: True

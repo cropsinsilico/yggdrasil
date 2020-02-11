@@ -54,6 +54,7 @@ tmp/
 # Compiled things - not managed
 *.pyc
 *.o
+*.mod
 
 # Tooling things - not managed
 *.vscode

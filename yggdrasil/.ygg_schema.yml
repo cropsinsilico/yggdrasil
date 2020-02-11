@@ -606,9 +606,9 @@ definitions:
             is used.
           type: string
       required:
+      - filetype
       - name
       - working_dir
-      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1185,6 +1185,7 @@ definitions:
           - cmake
           - cpp
           - executable
+          - fortran
           - lpy
           - make
           - matlab
@@ -1328,10 +1329,10 @@ definitions:
             is used.
           type: string
       required:
-      - language
       - name
-      - args
       - working_dir
+      - args
+      - language
       title: model_base
       type: object
     - anyOf:
@@ -1727,6 +1728,55 @@ definitions:
               and will be set based on the source files provided.
             type: string
         title: CMakeModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['fortran'] subtype.
+        properties:
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in Fortran.
+            enum:
+            - fortran
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+        title: FortranModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['executable'] subtype.
