@@ -1314,8 +1314,6 @@ def _normalize_connio_elements_file(normalizer, value, instance, schema):
         if iodict is not None:
             if (((instance['name'] not in iodict[opp_map[io]])
                  and ('filetype' not in instance))):
-                import pprint
-                pprint.pprint(iodict)
                 instance['filetype'] = schema['properties']['filetype']['default']
     return instance
 
