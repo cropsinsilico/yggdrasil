@@ -136,10 +136,6 @@ class InterpretedModelDriver(ModelDriver):
 
         """
         out = getattr(cls, 'interpreter', getattr(cls, 'default_interpreter'))
-        # out = None
-        # if cls.language is not None:
-        #     out = ygg_cfg.get(cls.language, 'interpreter',
-        #                       getattr(cls, '_interpreter', cls.language))
         if out is None:
             raise NotImplementedError("Interpreter not set for language '%s'."
                                       % cls.language)

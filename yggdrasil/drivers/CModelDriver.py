@@ -211,7 +211,7 @@ class MSVCCompiler(CCompilerBase):
 class ARArchiver(ArchiverBase):
     r"""Archiver class for ar tool."""
     toolname = 'ar'
-    languages = ['c', 'c++']
+    languages = ['c', 'c++', 'fortran']
     default_executable_env = 'AR'
     default_flags_env = None
     static_library_flag = 'rcs'
@@ -279,6 +279,7 @@ class CModelDriver(CompiledModelDriver):
                    'language': 'c'}}
     internal_libraries = {
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
+                'language': 'c',
                 'linker_language': 'c++',  # Some dependencies are C++
                 'internal_dependencies': ['regex', 'datatypes'],
                 'external_dependencies': ['rapidjson',

@@ -1,4 +1,4 @@
-MODULE ygg
+MODULE fygg
   USE ISO_C_BINDING
   IMPLICIT none
 
@@ -118,4 +118,4 @@ CONTAINS
   
   ! FUNCTION yggSend(ygg_q, args) RESULT (flag) BIND (C, name="
   
-END MODULE ygg
+END MODULE fygg

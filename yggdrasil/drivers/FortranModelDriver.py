@@ -1,9 +1,17 @@
 import os
+import copy
+from collections import OrderedDict
+from yggdrasil import platform, tools
 from yggdrasil.languages import get_language_dir
 from yggdrasil.drivers import CModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (
     CompilerBase, CompiledModelDriver)
 
+
+_top_lang_dir = get_language_dir('fortran')
+_incl_interface = _top_lang_dir
+_c_internal_libs = copy.deepcopy(CModelDriver.CModelDriver.internal_libraries)
+    
 
 class FortranCompilerBase(CompilerBase):
     r"""Base class for Fortran compilers."""
@@ -16,36 +24,70 @@ class FortranCompilerBase(CompilerBase):
     search_path_env = []
     default_linker = None
     default_executable = None
-    
+    product_exts = ['mod']
+
+    @classmethod
+    def get_flags(cls, **kwargs):
+        r"""Get a list of flags for the tool.
+
+        Args:
+            **kwargs: Keyword arguments are passed to the parent class's
+                method.
+
+        Returns:
+            list: Flags for the tool.
+
+        """
+        kwargs.setdefault('module-dir', _top_lang_dir)
+        kwargs.setdefault('module-search-path', _top_lang_dir)
+        return super(FortranCompilerBase, cls).get_flags(**kwargs)
+        
+    @classmethod
+    def append_product(cls, products, src, new, new_dir=None,
+                       dont_append_src=False):
+        r"""Append a product to the specified list along with additional values
+        indicated by cls.product_exts.
+
+        Args:
+            products (list): List of of existing products that new product
+                should be appended to.
+            src (list): Input arguments to compilation call that was used to
+                generate the output file (usually one or more source files).
+            new (str): New product that should be appended to the list.
+            new_dir (str, optional): Directory that should be used as base when
+                adding files listed in cls.product_files. Defaults to
+                os.path.dirname(new).
+            dont_append_src (bool, optional): If True and src is in the list of
+                products, it will be removed. Defaults to False.
+
+        """
+        super(FortranCompilerBase, cls).append_product(
+            products, src, new, new_dir=new_dir,
+            dont_append_src=dont_append_src)
+        if os.path.basename(new).startswith('YggInterface_f90'):
+            products.append(os.path.join(_top_lang_dir,
+                                         'fygg.mod'))
+
 
 class GFortranCompiler(FortranCompilerBase):
-    r"""Interface class for G++ compiler/linker."""
+    r"""Interface class for gfortran compiler/linker."""
     toolname = 'gfortran'
     platforms = ['MacOS', 'Linux', 'Windows']
     default_archiver = 'ar'
-
-    @classmethod
-    def set_env(cls, **kwargs):
-        r"""Set environment variables required for compilation.
-
-        Args:
-            **kwargs: Keyword arguments are passed to the parent
-                class's method.
-
-        Returns:
-            dict: Environment variables for the model process.
-
-        """
-        out = super(GFortranCompiler, cls).set_env(**kwargs)
-        conda_prefix = cls.get_conda_prefix()
-        if conda_prefix:
-            out.setdefault('DYLD_FALLBACK_LIBRARY_PATH', conda_prefix)
-        return out
+    flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
+                               + [('module-dir', '-J%s'),
+                                  ('module-search-path', '-I%s')])
 
 
-_top_lang_dir = get_language_dir('fortran')
-_incl_interface = _top_lang_dir
-    
+# class IFortCompiler(FortranCompilerBase):
+#     r"""Interface class for ifort compiler/linker."""
+#     toolname = 'ifort'
+#     platforms = ['MacOS', 'Linux', 'Windows']
+#     default_archiver = 'ar'
+#     flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
+#                                + [('module-dir', '-module'),
+#                                   ('module-search-path', '-module')])
+
 
 class FortranModelDriver(CompiledModelDriver):
     r"""Class for running Fortran models."""
@@ -54,17 +96,23 @@ class FortranModelDriver(CompiledModelDriver):
     language = 'fortran'
     language_ext = ['.f77', '.f90', '.f', '.h']
     base_languages = ['c']
-    interface_library = 'ygg'
+    interface_library = 'fygg'
     # To prevent inheritance
     default_compiler = 'gfortran'
     default_linker = None
-    internal_libraries = {
-        'ygg': {'source': os.path.join(_incl_interface,
-                                       'YggInterface.f90'),
-                'internal_dependencies': ['ygg_c'],
-                'libtype': 'static'},
-        'ygg_c': {'source': 'ygg', 'language': 'c',
-                  'libtype': 'object'}}
+    external_libraries = CModelDriver.CModelDriver.external_libraries
+    internal_libraries = dict(
+        _c_internal_libs,
+        fygg={'source': os.path.join(_incl_interface,
+                                     'YggInterface.f90'),
+              'libtype': 'static',
+              'internal_dependencies': (
+                  _c_internal_libs['ygg']['internal_dependencies']
+                  + ['ygg']),
+              'external_dependencies': (
+                  _c_internal_libs['ygg']['external_dependencies']),
+              'include_dirs': (
+                  _c_internal_libs['ygg']['include_dirs'])})
     type_map = {
         'int': 'integer(kind = X)',
         'float': 'real',
@@ -128,6 +176,15 @@ class FortranModelDriver(CompiledModelDriver):
     include_channel_obj = True
     is_typed = True
     
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        cls.internal_libraries['ygg']['libtype'] = 'object'
+        CompiledModelDriver.before_registration(cls)
+        
     def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
@@ -141,4 +198,8 @@ class FortranModelDriver(CompiledModelDriver):
         """
         out = super(FortranModelDriver, self).set_env(**kwargs)
         out = CModelDriver.CModelDriver.update_ld_library_path(out)
+        conda_prefix = tools.get_conda_prefix()
+        if conda_prefix and platform._is_mac:
+            out.setdefault('DYLD_FALLBACK_LIBRARY_PATH',
+                           os.path.join(conda_prefix, 'lib'))
         return out
