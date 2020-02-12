@@ -1,5 +1,5 @@
 PROGRAM hello
-  USE ygg
+  USE fygg
   USE ISO_C_BINDING
   IMPLICIT none
 
@@ -25,7 +25,8 @@ PROGRAM hello
      CALL EXIT(-1)
   END IF
   bufsiz = ret
-  PRINT *, "hello(Fortran): Received", bufsiz, "bytes from file:", buf
+  PRINT *, "hello(Fortran): Received", bufsiz, &
+       "bytes from file:" ! , buf
 
   ! Send output to the output queue
   ret = ygg_send(outq, buf, bufsiz)
@@ -42,7 +43,8 @@ PROGRAM hello
      CALL EXIT(-1)
   END IF
   bufsiz = ret
-  PRINT *, "hello(Fortran): Received", bufsiz, "bytes from queue:", buf
+  PRINT *, "hello(Fortran): Received", bufsiz, &
+       "bytes from queue:"  !, buf
 
   ! Send output to a local file
   ret = ygg_send(outf, buf, bufsiz)

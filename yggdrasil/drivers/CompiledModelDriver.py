@@ -407,7 +407,7 @@ class CompilationToolBase(object):
             key = key['key']
         # Loop over list
         if isinstance(value, list):
-            for i, v in enumerate(value):
+            for i, v in enumerate(set(value)):
                 cls.append_flags(out, key, v, **kwargs)
             return
         # Unpack keyword arguments
@@ -423,6 +423,18 @@ class CompilationToolBase(object):
                 if scanf.scanf(key, o):
                     raise ValueError("Flag for key %s already exists: '%s'"
                                      % (key, o))
+        # Check for exact matches
+        idx = 0
+        nnew = len(new_flags)
+        nout = len(out)
+        while idx < nout:
+            if new_flags[0] not in out[idx:]:
+                break
+            ibeg = idx + out[idx:].index(new_flags[0])
+            iend = ibeg + nnew
+            if (iend < nout) and (out[ibeg:iend] == new_flags):
+                return
+            idx = iend
         # Determine location where flags should be added & add them
         if position is None:
             if prepend:
@@ -878,7 +890,7 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
-            logger.debug('Command: "%s"' % ' '.join(cmd))
+            logger.info('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = output.decode("utf-8")
@@ -1357,10 +1369,10 @@ class LinkerBase(CompilationToolBase):
             # TODO: Dynamic library by default on windows?
             # cls.shared_library_flag = '-dynamiclib'
             cls.library_ext = '.dylib'
-            cls.flag_options['library_rpath'] = '-rpath'
+            # cls.flag_options['library_rpath'] = '-rpath'
         else:
             cls.library_ext = '.so'
-            cls.flag_options['library_rpath'] = '-Wl,-rpath'
+            # cls.flag_options['library_rpath'] = '-Wl,-rpath'
 
     @classmethod
     def libpath2libname(cls, libpath):
@@ -1498,7 +1510,7 @@ class LinkerBase(CompilationToolBase):
                     dest_flags.append(x)
             else:
                 x_d, x_f = os.path.split(x)
-                if x_d not in library_dirs:
+                if x_d and (x_d not in library_dirs):
                     library_dirs.append(x_d)
                 x_l = cls.libpath2libname(x_f)
                 if x_l not in library_libs:
@@ -2247,7 +2259,7 @@ class CompiledModelDriver(ModelDriver):
         elif dep in cls.external_libraries:
             dep_lang = cls.external_libraries[dep].get('language', cls.language)
             out = ygg_cfg.get(dep_lang, '%s_include' % dep, None)
-            if os.path.isfile(out):
+            if (out is not None) and os.path.isfile(out):
                 out = os.path.dirname(out)
         elif os.path.isfile(dep):
             out = os.path.dirname(dep)

@@ -40,7 +40,11 @@ class FortranCompilerBase(CompilerBase):
         """
         kwargs.setdefault('module-dir', _top_lang_dir)
         kwargs.setdefault('module-search-path', _top_lang_dir)
-        return super(FortranCompilerBase, cls).get_flags(**kwargs)
+        out = super(FortranCompilerBase, cls).get_flags(**kwargs)
+        for x in ['-O', '-O2', '-O3', 'Os', 'Ofast']:
+            if x in out:
+                out.remove(x)
+        return out
         
     @classmethod
     def append_product(cls, products, src, new, new_dir=None,
@@ -100,7 +104,11 @@ class FortranModelDriver(CompiledModelDriver):
     # To prevent inheritance
     default_compiler = 'gfortran'
     default_linker = None
-    external_libraries = CModelDriver.CModelDriver.external_libraries
+    supported_comm_options = dict(
+        CModelDriver.CModelDriver.supported_comm_options)
+    external_libraries = dict(
+        CModelDriver.CModelDriver.external_libraries,
+        **{'c++': {}})
     internal_libraries = dict(
         _c_internal_libs,
         fygg={'source': os.path.join(_incl_interface,
@@ -108,11 +116,19 @@ class FortranModelDriver(CompiledModelDriver):
               'libtype': 'static',
               'internal_dependencies': (
                   _c_internal_libs['ygg']['internal_dependencies']
-                  + ['ygg']),
+                  + ['ygg', 'c_wrappers']),
               'external_dependencies': (
                   _c_internal_libs['ygg']['external_dependencies']),
               'include_dirs': (
-                  _c_internal_libs['ygg']['include_dirs'])})
+                  _c_internal_libs['ygg']['include_dirs'])},
+        c_wrappers={'source': os.path.join(_incl_interface,
+                                           'c_wrappers.c'),
+                    'language': 'c',
+                    'libtype': 'object',
+                    'internal_dependencies': ['ygg'],
+                    'external_dependencies': (
+                        _c_internal_libs['ygg']['external_dependencies']),
+                    'include_dirs': [_incl_interface]})
     type_map = {
         'int': 'integer(kind = X)',
         'float': 'real',
@@ -182,7 +198,7 @@ class FortranModelDriver(CompiledModelDriver):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
-        cls.internal_libraries['ygg']['libtype'] = 'object'
+        # cls.internal_libraries['ygg']['libtype'] = 'object'
         CompiledModelDriver.before_registration(cls)
         
     def set_env(self, **kwargs):
@@ -203,3 +219,18 @@ class FortranModelDriver(CompiledModelDriver):
             out.setdefault('DYLD_FALLBACK_LIBRARY_PATH',
                            os.path.join(conda_prefix, 'lib'))
         return out
+
+    def compile_model(self, **kwargs):
+        r"""Compile model executable(s).
+
+        Args:
+            **kwargs: Keyword arguments are passed to the parent class's
+            method.
+
+        Returns:
+            str: Compiled model file path.
+
+        """
+        kwargs.setdefault('libraries', [])
+        kwargs['libraries'].append('c++')
+        return super(FortranModelDriver, self).compile_model(**kwargs)

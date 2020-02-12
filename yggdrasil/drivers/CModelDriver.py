@@ -8,7 +8,7 @@ import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, tools
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase, ArchiverBase)
+    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase)
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     _valid_types)
 from yggdrasil.languages import get_language_dir
@@ -133,6 +133,12 @@ class GCCCompiler(CCompilerBase):
     toolname = 'gcc'
     platforms = ['MacOS', 'Linux', 'Windows']
     default_archiver = 'ar'
+    linker_attributes = dict(
+        CCompilerBase.linker_attributes,
+        flag_options=OrderedDict(
+            list(LinkerBase.flag_options.items())
+            + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
+            + [('library_rpath', '-Wl,-rpath')]))
 
 
 class ClangCompiler(CCompilerBase):
@@ -146,6 +152,12 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
+    linker_attributes = dict(
+        CCompilerBase.linker_attributes,
+        flag_options=OrderedDict(
+            list(LinkerBase.flag_options.items())
+            + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
+            + [('library_rpath', '-rpath')]))
 
 
 class MSVCCompiler(CCompilerBase):
