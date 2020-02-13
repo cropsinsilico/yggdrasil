@@ -1005,7 +1005,7 @@ int vcommSend(const comm_t *x, size_t nargs, va_list_t ap) {
 */
 static
 int ncommSend(const comm_t *x, size_t nargs, ...) {
-  va_list_t ap;
+  va_list_t ap = init_va_list();
   va_start(ap.va, nargs);
   ygglog_debug("ncommSend: nargs = %d", nargs);
   int ret = vcommSend(x, nargs, ap);
@@ -1090,7 +1090,7 @@ int vcommRecv(comm_t *x, const int allow_realloc, size_t nargs, va_list_t ap) {
  */
 static
 int ncommRecv(comm_t *x, const int allow_realloc, size_t nargs, ...) {
-  va_list_t ap;
+  va_list_t ap = init_va_list();
   va_start(ap.va, nargs);
   ygglog_debug("ncommRecv: nargs = %d", nargs);
   int ret = vcommRecv(x, allow_realloc, nargs, ap);

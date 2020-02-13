@@ -513,15 +513,27 @@ public:
 	switch (precision_) {
 	case 8:
 	case 16: {
-	  va_arg(ap.va, int);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(int));
+	  } else {
+	    va_arg(ap.va, int);
+	  }
 	  break;
 	}
 	case 32: {
-	  va_arg(ap.va, int32_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(int32_t));
+	  } else {
+	    va_arg(ap.va, int32_t);
+	  }
 	  break;
 	}
 	case 64: {
-	  va_arg(ap.va, int64_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(int64_t));
+	  } else {
+	    va_arg(ap.va, int64_t);
+	  }
 	  break;
 	}
 	}
@@ -532,15 +544,27 @@ public:
 	switch (precision_) {
 	case 8:
 	case 16: {
-	  va_arg(ap.va, unsigned int);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(unsigned int));
+	  } else {
+	    va_arg(ap.va, unsigned int);
+	  }
 	  break;
 	}
 	case 32: {
-	  va_arg(ap.va, uint32_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(uint32_t));
+	  } else {
+	    va_arg(ap.va, uint32_t);
+	  }
 	  break;
 	}
 	case 64: {
-	  va_arg(ap.va, uint64_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(uint64_t));
+	  } else {
+	    va_arg(ap.va, uint64_t);
+	  }
 	  break;
 	}
 	}
@@ -549,22 +573,46 @@ public:
       }
       case T_FLOAT: {
 	if (sizeof(float) == bytes_precision) {
-	  va_arg(ap.va, double);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(double));
+	  } else {
+	    va_arg(ap.va, double);
+	  }
 	} else if (sizeof(double) == bytes_precision) {
-	  va_arg(ap.va, double);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(double));
+	  } else {
+	    va_arg(ap.va, double);
+	  }
 	} else if (sizeof(long double) == bytes_precision) {
-	  va_arg(ap.va, long double);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(long double));
+	  } else {
+	    va_arg(ap.va, long double);
+	  }
 	}
 	out = out + 1;
 	break;
       }
       case T_COMPLEX: {
 	if (sizeof(float) == (bytes_precision / 2)) {
-	  va_arg(ap.va, complex_float_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(complex_float_t));
+	  } else {
+	    va_arg(ap.va, complex_float_t);
+	  }
 	} else if (sizeof(double) == (bytes_precision / 2)) {
-	  va_arg(ap.va, complex_double_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(complex_double_t));
+	  } else {
+	    va_arg(ap.va, complex_double_t);
+	  }
 	} else if (sizeof(long double) == (bytes_precision / 2)) {
-	  va_arg(ap.va, complex_long_double_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(complex_long_double_t));
+	  } else {
+	    va_arg(ap.va, complex_long_double_t);
+	  }
 	}
 	out = out + 1;
 	break;
@@ -572,13 +620,23 @@ public:
       case T_BYTES:
       case T_UNICODE: {
 	if (_variable_precision) {
-	  char* arg0 = va_arg(ap.va, char*);
-	  UNUSED(arg0); // Parameter extract to get next
-	  const size_t arg0_siz = va_arg(ap.va, size_t);
-	  set_precision(8 * arg0_siz);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(char*));
+	    const size_t arg0_siz = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
+	    set_precision(8 * arg0_siz);
+	  } else {
+	    va_arg(ap.va, char*);
+	    const size_t arg0_siz = va_arg(ap.va, size_t);
+	    set_precision(8 * arg0_siz);
+	  }
 	} else {
-	  va_arg(ap.va, char*);
-	  va_arg(ap.va, size_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(char*));
+	    va_list_t_skip(&ap, sizeof(size_t));
+	  } else {
+	    va_arg(ap.va, char*);
+	    va_arg(ap.va, size_t);
+	  }
 	}
 	out = out + 2;
 	break;
@@ -870,7 +928,12 @@ public:
     switch (type_code()) {
     case T_1DARRAY:
     case T_NDARRAY: {
-      unsigned char* arg0 = va_arg(ap.va, unsigned char*);
+      unsigned char* arg0;
+      if (ap.using_ptrs) {
+	arg0 = (unsigned char*)get_va_list_ptr_cpp(&ap);
+      } else {
+	arg0 = va_arg(ap.va, unsigned char*);
+      }
       if (nelements() == 0) {
 	ygglog_error("ScalarMetaschemaType::encode_data: Array types require the number of elements be non-zero.");
 	return false;
@@ -883,22 +946,42 @@ public:
       case T_INT: {
 	switch (precision_) {
 	case 8: {
-	  int8_t arg0 = (int8_t)va_arg(ap.va, int);
+	  int8_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((int8_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = (int8_t)va_arg(ap.va, int);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
 	case 16: {
-	  int16_t arg0 = (int16_t)va_arg(ap.va, int);
+	  int16_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((int16_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = (int16_t)va_arg(ap.va, int);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
 	case 32: {
-	  int32_t arg0 = va_arg(ap.va, int32_t);
+	  int32_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((int32_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, int32_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
 	case 64: {
-	  int64_t arg0 = va_arg(ap.va, int64_t);
+	  int64_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((int64_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, int64_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
@@ -913,22 +996,42 @@ public:
       case T_UINT: {
 	switch (precision_) {
 	case 8: {
-	  uint8_t arg0 = (uint8_t)va_arg(ap.va, unsigned int);
+	  uint8_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((uint8_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = (uint8_t)va_arg(ap.va, unsigned int);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
 	case 16: {
-	  uint16_t arg0 = (uint16_t)va_arg(ap.va, unsigned int);
+	  uint16_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((uint16_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = (uint16_t)va_arg(ap.va, unsigned int);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
 	case 32: {
-	  uint32_t arg0 = va_arg(ap.va, uint32_t);
+	  uint32_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((uint32_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, uint32_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
 	case 64: {
-	  uint64_t arg0 = va_arg(ap.va, uint64_t);
+	  uint64_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((uint64_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, uint64_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
@@ -942,13 +1045,28 @@ public:
       }
       case T_FLOAT: {
 	if (sizeof(float) == bytes_precision) {
-	  float arg0 = (float)va_arg(ap.va, double);
+	  float arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((float*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = (float)va_arg(ap.va, double);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(double) == bytes_precision) {
-	  double arg0 = va_arg(ap.va, double);
+	  double arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((double*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, double);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(long double) == bytes_precision) {
-	  long double arg0 = va_arg(ap.va, long double);
+	  long double arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((long double*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, long double);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	} else {
 	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported float precision '%lu'.",
@@ -959,13 +1077,28 @@ public:
       }
       case T_COMPLEX: {
 	if (sizeof(float) == (bytes_precision / 2)) {
-    complex_float_t arg0 = (complex_float_t)va_arg(ap.va, complex_float_t);
+	  complex_float_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((complex_float_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = (complex_float_t)va_arg(ap.va, complex_float_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(double) == (bytes_precision / 2)) {
-	  complex_double_t arg0 = va_arg(ap.va, complex_double_t);
+	  complex_double_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((complex_double_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, complex_double_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(long double) == (bytes_precision / 2)) {
-	  complex_long_double_t arg0 = va_arg(ap.va, complex_long_double_t);
+	  complex_long_double_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((complex_long_double_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, complex_long_double_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	} else {
 	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported complex precision '%lu'.",
@@ -976,8 +1109,16 @@ public:
       }
       case T_BYTES:
       case T_UNICODE: {
-	char* arg0 = va_arg(ap.va, char*);
-	const size_t arg0_siz = va_arg(ap.va, size_t);
+	char* arg0;
+	size_t arg0_siz_x;
+	if (ap.using_ptrs) {
+	  arg0 = (char*)get_va_list_ptr_cpp(&ap);
+	  arg0_siz_x = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
+	} else {
+	  arg0 = va_arg(ap.va, char*);
+	  arg0_siz_x = va_arg(ap.va, size_t);
+	}
+	const size_t arg0_siz = arg0_siz_x;
 	int allow_realloc = (int)_variable_precision;
 	(*nargs)--;
 	size_t arg_siz = bytes_precision + 1;
@@ -1186,17 +1327,31 @@ public:
     char *arg;
     char **p;
     if (allow_realloc) {
-      p = va_arg(ap.va, char**);
+      if (ap.using_ptrs) {
+	p = (char**)get_va_list_ptr_cpp(&ap);
+      } else {
+	p = va_arg(ap.va, char**);
+      }
       arg = *p;
     } else {
-      arg = va_arg(ap.va, char*);
+      if (ap.using_ptrs) {
+	arg = (char*)get_va_list_ptr_cpp(&ap);
+      } else {
+	arg = va_arg(ap.va, char*);
+      }
       p = &arg;
     }
     (*nargs)--;
     bool skip_terminal;
     if ((type_code() == T_SCALAR) &&
 	((subtype_code_ == T_BYTES) || (subtype_code_ == T_UNICODE))) {
-      size_t * const arg_siz = va_arg(ap.va, size_t*);
+      size_t * arg_siz_x;
+      if (ap.using_ptrs) {
+	arg_siz_x = (size_t*)get_va_list_ptr_cpp(&ap);
+      } else {
+	arg_siz_x = va_arg(ap.va, size_t*);
+      }
+      size_t * const arg_siz = arg_siz_x;
       (*nargs)--;
       skip_terminal = false;
       int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
@@ -1637,14 +1792,18 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     if (use_generic())
       return out;
     if ((_variable_length) && (*nargs >= 2)) {
-      unsigned char* temp = va_arg(ap.va, unsigned char*);
-      UNUSED(temp); // Parameter extract to get next
-      size_t new_length = va_arg(ap.va, size_t);
+      size_t new_length;
+      va_list_t_skip(&ap, sizeof(unsigned char*));
+      if (ap.using_ptrs) {
+	new_length = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
+      } else {
+	new_length = va_arg(ap.va, size_t);
+      }
       skip_after_.push_back(sizeof(size_t));
       set_length(new_length);
       out = out + 2;
     } else {
-      va_arg(ap.va, unsigned char*);
+      va_list_t_skip(&ap, sizeof(unsigned char*));
       out = out + 1;
     }
     return out;
@@ -1661,10 +1820,14 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     if (use_generic())
       return out;
     if ((_variable_length) && (*nargs >= 2)) {
-      unsigned char** temp = va_arg(ap.va, unsigned char**);
-      UNUSED(temp); // Parameter extracted to get next
-      size_t * const new_length = va_arg(ap.va, size_t*);
-      new_length[0] = length_;
+      va_list_t_skip(&ap, sizeof(unsigned char**));
+      if (ap.using_ptrs) {
+	size_t * const new_length = (size_t* const)get_va_list_ptr_cpp(&ap);
+	new_length[0] = length_;
+      } else {
+	size_t * const new_length = va_arg(ap.va, size_t*);
+	new_length[0] = length_;
+      }
       skip_after_.push_back(sizeof(size_t*));
       out = out + 2;
     }
@@ -1882,17 +2045,23 @@ size_t NDArrayMetaschemaType::update_from_serialization_args(size_t *nargs, va_l
   if (use_generic())
     return out;
   if ((_variable_shape) && (*nargs >= 3)) {
-    unsigned char* temp = va_arg(ap.va, unsigned char*);
-    UNUSED(temp); // Parameter extracted to get next
-    size_t new_ndim = va_arg(ap.va, size_t);
+    size_t new_ndim;
+    size_t* new_shape_ptr;
+    va_list_t_skip(&ap, sizeof(unsigned char*));
+    if (ap.using_ptrs) {
+      new_ndim = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
+      new_shape_ptr = ((size_t**)get_va_list_ptr_cpp(&ap))[0];
+    } else {
+      new_ndim = va_arg(ap.va, size_t);
+      new_shape_ptr = va_arg(ap.va, size_t*);
+    }
     skip_after_.push_back(sizeof(size_t));
-    size_t* new_shape_ptr = va_arg(ap.va, size_t*);
     skip_after_.push_back(sizeof(size_t*));
     std::vector<size_t> new_shape(new_shape_ptr, new_shape_ptr + new_ndim);
     set_shape(new_shape);
     out = out + 3;
   } else {
-    va_arg(ap.va, unsigned char*);
+    va_list_t_skip(&ap, sizeof(unsigned char*));
     out = out + 1;
   }
   return out;
@@ -1902,13 +2071,19 @@ size_t NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va
   if (use_generic())
     return out;
   if ((_variable_shape) && (*nargs >= 3)) {
-    unsigned char** temp = va_arg(ap.va, unsigned char**);
-    UNUSED(temp); // Parameter extracted to get next
-    size_t * const new_ndim = va_arg(ap.va, size_t*);
+    va_list_t_skip(&ap, sizeof(unsigned char**));
+    size_t** new_shape;
+    if (ap.using_ptrs) {
+      size_t * const new_ndim = (size_t* const)get_va_list_ptr_cpp(&ap);
+      new_ndim[0] = ndim();
+      new_shape = (size_t**)get_va_list_ptr_cpp(&ap);
+    } else {
+      size_t * const new_ndim = va_arg(ap.va, size_t*);
+      new_ndim[0] = ndim();
+      new_shape = va_arg(ap.va, size_t**);
+    }
     skip_after_.push_back(sizeof(size_t*));
-    size_t** new_shape = va_arg(ap.va, size_t**);
     skip_after_.push_back(sizeof(size_t**));
-    new_ndim[0] = ndim();
     size_t* new_shape_temp = (size_t*)realloc(new_shape[0], ndim()*sizeof(size_t));
     if (new_shape_temp == NULL) {
       ygglog_throw_error("NDArrayMetaschemaType::decode_data: Failed to realloc memory for the provided shape array.");

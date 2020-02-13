@@ -291,20 +291,37 @@ public:
       switch (type_code_) {
       case T_BOOLEAN:
       case T_INTEGER: {
-	va_arg(ap.va, int);
+	if (ap.using_ptrs) {
+	  get_va_list_ptr_cpp(&ap);
+	} else {
+	  va_arg(ap.va, int);
+	}
 	return 1;
       }
       case T_NULL: {
-	va_arg(ap.va, void*);
+	if (ap.using_ptrs) {
+	  get_va_list_ptr_cpp(&ap);
+	} else {
+	  va_arg(ap.va, void*);
+	}
 	return 1;
       }
       case T_NUMBER: {
-	va_arg(ap.va, double);
+	if (ap.using_ptrs) {
+	  get_va_list_ptr_cpp(&ap);
+	} else {
+	  va_arg(ap.va, double);
+	}
 	return 1;
       }
       case T_STRING: {
-	va_arg(ap.va, char*);
-	va_arg(ap.va, size_t);
+	if (ap.using_ptrs) {
+	  get_va_list_ptr_cpp(&ap);
+	  get_va_list_ptr_cpp(&ap);
+	} else {
+	  va_arg(ap.va, char*);
+	  va_arg(ap.va, size_t);
+	}
 	return 2;
       }
       }
@@ -646,7 +663,12 @@ public:
 			 nargs_exp(), *nargs);
     switch (type_code_) {
     case T_BOOLEAN: {
-      int arg = va_arg(ap.va, int);
+      int arg;
+      if (ap.using_ptrs) {
+	arg = ((int*)get_va_list_ptr_cpp(&ap))[0];
+      } else {
+	arg = va_arg(ap.va, int);
+      }
       (*nargs)--;
       if (arg == 0)
 	writer->Bool(false);
@@ -655,26 +677,47 @@ public:
       return true;
     }
     case T_INTEGER: {
-      int arg = va_arg(ap.va, int);
+      int arg;
+      if (ap.using_ptrs) {
+	arg = ((int*)get_va_list_ptr_cpp(&ap))[0];
+      } else {
+	arg = va_arg(ap.va, int);
+      }
       (*nargs)--;
       writer->Int(arg);
       return true;
     }
     case T_NULL: {
-      va_arg(ap.va, void*);
+      if (ap.using_ptrs) {
+	get_va_list_ptr_cpp(&ap);
+      } else {
+	va_arg(ap.va, void*);
+      }
       (*nargs)--;
       writer->Null();
       return true;
     }
     case T_NUMBER: {
-      double arg = va_arg(ap.va, double);
+      double arg;
+      if (ap.using_ptrs) {
+	arg = ((double*)get_va_list_ptr_cpp(&ap))[0];
+      } else {
+	arg = va_arg(ap.va, double);
+      }
       (*nargs)--;
       writer->Double(arg);
       return true;
     }
     case T_STRING: {
-      char* arg = va_arg(ap.va, char*);
-      size_t arg_siz = va_arg(ap.va, size_t);
+      char* arg;
+      size_t arg_siz;
+      if (ap.using_ptrs) {
+	arg = (char*)get_va_list_ptr_cpp(&ap);
+	arg_siz = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
+      } else {
+	arg = va_arg(ap.va, char*);
+	arg_siz = va_arg(ap.va, size_t);
+      }
       (*nargs)--;
       (*nargs)--;
       writer->String(arg, (rapidjson::SizeType)arg_siz);
@@ -695,7 +738,7 @@ public:
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, ...) const {
-    va_list_t ap_s;
+    va_list_t ap_s = init_va_list();
     va_start(ap_s.va, nargs);
     bool out = encode_data(writer, nargs, ap_s);
     va_end(ap_s.va);
@@ -743,7 +786,7 @@ public:
    */
   bool encode_data_wrap(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 			size_t *nargs, ...) const {
-    va_list_t ap_s;
+    va_list_t ap_s = init_va_list();
     va_start(ap_s.va, nargs);
     bool out = encode_data_wrap(writer, nargs, ap_s);
     va_end(ap_s.va);
@@ -869,8 +912,7 @@ public:
       return serialize(buf, buf_siz, allow_realloc,
 		       (YggGeneric*)(gen_arg.obj));
     }
-    va_list_t ap_copy;
-    va_copy(ap_copy.va, ap.va);
+    va_list_t ap_copy = copy_va_list(ap);
     update_from_serialization_args(nargs, ap_copy);
     if (nargs_exp() != *nargs) {
       ygglog_throw_error("MetaschemaType::serialize: %d arguments expected, but %d provided.",
@@ -948,13 +990,21 @@ public:
       bool *arg;
       bool **p;
       if (allow_realloc) {
-	p = va_arg(ap.va, bool**);
+	if (ap.using_ptrs) {
+	  p = (bool**)get_va_list_ptr_cpp(&ap);
+	} else {
+	  p = va_arg(ap.va, bool**);
+	}
 	arg = (bool*)realloc(*p, sizeof(bool));
 	if (arg == NULL)
 	  ygglog_throw_error("MetaschemaType::decode_data: could not realloc bool pointer.");
 	*p = arg;
       } else {
-	arg = va_arg(ap.va, bool*);
+	if (ap.using_ptrs) {
+	  arg = (bool*)get_va_list_ptr_cpp(&ap);
+	} else {
+	  arg = va_arg(ap.va, bool*);
+	}
       }
       (*nargs)--;
       arg[0] = data.GetBool();
@@ -966,13 +1016,21 @@ public:
       int *arg;
       int **p;
       if (allow_realloc) {
-	p = va_arg(ap.va, int**);
+	if (ap.using_ptrs) {
+	  p = (int**)get_va_list_ptr_cpp(&ap);
+	} else {
+	  p = va_arg(ap.va, int**);
+	}
 	arg = (int*)realloc(*p, sizeof(int));
 	if (arg == NULL)
 	  ygglog_throw_error("MetaschemaType::decode_data: could not realloc int pointer.");
 	*p = arg;
       } else {
-	arg = va_arg(ap.va, int*);
+	if (ap.using_ptrs) {
+	  arg = (int*)get_va_list_ptr_cpp(&ap);
+	} else {
+	  arg = va_arg(ap.va, int*);
+	}
       }
       (*nargs)--;
       arg[0] = data.GetInt();
@@ -984,13 +1042,21 @@ public:
       void **arg;
       void ***p;
       if (allow_realloc) {
-	p = va_arg(ap.va, void***);
+	if (ap.using_ptrs) {
+	  p = (void***)get_va_list_ptr_cpp(&ap);
+	} else {
+	  p = va_arg(ap.va, void***);
+	}
 	arg = (void**)realloc(*p, sizeof(void*));
 	if (arg == NULL)
 	  ygglog_throw_error("MetaschemaType::decode_data: could not realloc void* pointer.");
 	*p = arg;
       } else {
-	arg = va_arg(ap.va, void**);
+	if (ap.using_ptrs) {
+	  arg = (void**)get_va_list_ptr_cpp(&ap);
+	} else {
+	  arg = va_arg(ap.va, void**);
+	}
       }
       (*nargs)--;
       arg[0] = NULL;
@@ -1002,13 +1068,21 @@ public:
       double *arg;
       double **p;
       if (allow_realloc) {
-	p = va_arg(ap.va, double**);
+	if (ap.using_ptrs) {
+	  p = (double**)get_va_list_ptr_cpp(&ap);
+	} else {
+	  p = va_arg(ap.va, double**);
+	}
 	arg = (double*)realloc(*p, sizeof(double));
 	if (arg == NULL)
 	  ygglog_throw_error("MetaschemaType::decode_data: could not realloc double pointer.");
 	*p = arg;
       } else {
-	arg = va_arg(ap.va, double*);
+	if (ap.using_ptrs) {
+	  arg = (double*)get_va_list_ptr_cpp(&ap);
+	} else {
+	  arg = va_arg(ap.va, double*);
+	}
       }
       (*nargs)--;
       arg[0] = data.GetDouble();
@@ -1020,13 +1094,26 @@ public:
       char *arg;
       char **p;
       if (allow_realloc) {
-	p = va_arg(ap.va, char**);
+	if (ap.using_ptrs) {
+	  p = (char**)get_va_list_ptr_cpp(&ap);
+	} else {
+	  p = va_arg(ap.va, char**);
+	}
 	arg = *p;
       } else {
-	arg = va_arg(ap.va, char*);
+	if (ap.using_ptrs) {
+	  arg = (char*)get_va_list_ptr_cpp(&ap);
+	} else {
+	  arg = va_arg(ap.va, char*);
+	}
 	p = &arg;
       }
-      size_t *arg_siz = va_arg(ap.va, size_t*);
+      size_t *arg_siz;
+      if (ap.using_ptrs) {
+	arg_siz = (size_t*)get_va_list_ptr_cpp(&ap);
+      } else {
+	arg_siz = va_arg(ap.va, size_t*);
+      }
       (*nargs)--;
       (*nargs)--;
       int ret = copy_to_buffer(data.GetString(), data.GetStringLength(),
@@ -1055,7 +1142,7 @@ public:
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, ...) const {
-    va_list_t ap_s;
+    va_list_t ap_s = init_va_list();
     va_start(ap_s.va, nargs);
     bool out = decode_data(data, allow_realloc, nargs, ap_s);
     va_end(ap_s.va);
@@ -1080,7 +1167,7 @@ public:
     bool out;
     size_t i;
     for (i = 0; i < skip_before_.size(); i++) {
-      va_arg(ap.va, void*);
+      va_list_t_skip(&ap, sizeof(void*));
       (*nargs)--;
     }
     if (use_generic()) {
@@ -1090,7 +1177,7 @@ public:
       out = decode_data(data, allow_realloc, nargs, ap);
     }
     for (i = 0; i < skip_after_.size(); i++) {
-      va_arg(ap.va, void*);
+      va_list_t_skip(&ap, sizeof(void*));
       (*nargs)--;
     }
     return out;
@@ -1110,7 +1197,7 @@ public:
    */
   bool decode_data_wrap(rapidjson::Value &data, const int allow_realloc,
 			size_t *nargs, ...) const {
-    va_list_t ap_s;
+    va_list_t ap_s = init_va_list();
     va_start(ap_s.va, nargs);
     bool out = decode_data_wrap(data, allow_realloc, nargs, ap_s);
     va_end(ap_s.va);
@@ -1157,8 +1244,7 @@ public:
       return deserialize(buf, buf_siz, (YggGeneric*)(gen_arg->obj));
     }
     const size_t nargs_orig = *nargs;
-    va_list_t ap_copy;
-    va_copy(ap_copy.va, ap.va);
+    va_list_t ap_copy = copy_va_list(ap);
     update_from_deserialization_args(nargs, ap_copy);
     if (nargs_exp() != *nargs) {
       ygglog_throw_error("MetaschemaType::deserialize: %d arguments expected, but only %d provided.",

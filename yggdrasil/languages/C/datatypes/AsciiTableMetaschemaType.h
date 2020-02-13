@@ -219,6 +219,9 @@ public:
       ygglog_throw_error("AsciiTableMetaschemaType::serialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
     }
+    if (ap.using_ptrs) {
+      ygglog_throw_error("AsciiTableMetaschemaType::serialize: Pointer representation of variable argument list not yet supported.");
+    }
     *nargs = *nargs - nargs_exp();
     // Assumes null termination
     int ret;
@@ -315,6 +318,9 @@ public:
     if (nargs_exp() != *nargs) {
       ygglog_throw_error("AsciiTableMetaschemaType::deserialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
+    }
+    if (ap.using_ptrs) {
+      ygglog_throw_error("AsciiTableMetaschemaType::deserialize: Pointer representation of variable argument list not yet supported.");
     }
     const size_t nargs_orig = *nargs;
     *nargs = *nargs - nargs_exp();

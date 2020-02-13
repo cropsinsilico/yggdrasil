@@ -542,18 +542,25 @@ extern "C" {
     generic_t out;
     if (nargs != 1)
       return out;
-    va_list ap_copy;
-    va_copy(ap_copy, ap.va);
-    out = va_arg(ap_copy, generic_t);
+    va_list_t ap_copy = copy_va_list(ap);
+    if (ap.using_ptrs) {
+      CSafe(out = ((generic_t*)get_va_list_ptr_cpp(&ap_copy))[0])
+    } else {
+      out = va_arg(ap_copy.va, generic_t);
+    }
     return out;
   }
 
   generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap) {
     if (nargs != 1)
       return NULL;
-    va_list ap_copy;
-    va_copy(ap_copy, ap.va);
-    generic_t *out = va_arg(ap_copy, generic_t*);
+    generic_t *out;
+    va_list_t ap_copy = copy_va_list(ap);
+    if (ap.using_ptrs) {
+      CSafe(out = (generic_t*)get_va_list_ptr_cpp(&ap_copy))
+    } else {
+      out = va_arg(ap_copy.va, generic_t*);
+    }
     if ((out != NULL) || (is_generic_init(*out))) {
       return out;
     } else {
@@ -568,7 +575,11 @@ extern "C" {
       return out;
     }
     (*nargs)--;
-    out = va_arg(ap->va, generic_t);
+    if (ap->using_ptrs) {
+      CSafe(out = ((generic_t*)get_va_list_ptr_cpp(ap))[0])
+    } else {
+      out = va_arg(ap->va, generic_t);
+    }
     return out;
   }
 
@@ -578,7 +589,12 @@ extern "C" {
       return NULL;
     }
     (*nargs)--;
-    generic_t *out = va_arg(ap->va, generic_t*);
+    generic_t *out;
+    if (ap->using_ptrs) {
+      CSafe(out = (generic_t*)get_va_list_ptr_cpp(ap))
+    } else {
+      out = va_arg(ap->va, generic_t*);
+    }
     if (out == NULL) {
       ygglog_error("pop_generic_va_ptr: Object is NULL.");
       return NULL;

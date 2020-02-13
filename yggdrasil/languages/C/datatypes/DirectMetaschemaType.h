@@ -127,8 +127,15 @@ public:
     }
     *nargs = *nargs - nargs_exp();
     // Assumes null termination
-    char *msg = va_arg(ap.va, char*);
-    size_t msg_siz = va_arg(ap.va, size_t);
+    char *msg;
+    size_t msg_siz;
+    if (ap.using_ptrs) {
+      msg = ((char*)get_va_list_ptr_cpp(&ap));
+      msg_siz = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
+    } else {
+      msg = va_arg(ap.va, char*);
+      msg_siz = va_arg(ap.va, size_t);
+    }
     if (*nargs != 0) {
       ygglog_error("DirectMetaschemaType::serialize: %d arguments were not used.", *nargs);
       return -1;
@@ -226,13 +233,24 @@ public:
     // Assumes reallocation is allowed
     char **msg;
     char *msg_base;
-    if (allow_realloc) {
-      msg = va_arg(ap.va, char**);
+    size_t *msg_siz;
+    if (ap.using_ptrs) {
+      if (allow_realloc) {
+	msg = (char**)get_va_list_ptr_cpp(&ap);
+      } else {
+	msg_base = (char*)get_va_list_ptr_cpp(&ap);
+	msg = &msg_base;
+      }
+      msg_siz = (size_t*)get_va_list_ptr_cpp(&ap);
     } else {
-      msg_base = va_arg(ap.va, char*);
-      msg = &msg_base;
+      if (allow_realloc) {
+	msg = va_arg(ap.va, char**);
+      } else {
+	msg_base = va_arg(ap.va, char*);
+	msg = &msg_base;
+      }
+      msg_siz = va_arg(ap.va, size_t*);
     }
-    size_t *msg_siz = va_arg(ap.va, size_t*);
     // Copy message from buffer
     if (copy_to_buffer(buf, buf_siz, msg, *msg_siz, allow_realloc) < 0) {
       return -1;

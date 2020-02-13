@@ -110,7 +110,11 @@ public:
     size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
     if (use_generic())
       return out;
-    va_arg(ap.va, dtype_t*);
+    if (ap.using_ptrs) {
+      va_list_t_skip(&ap, sizeof(dtype_t*));
+    } else {
+      va_arg(ap.va, dtype_t*);
+    }
     out++;
     return out;
   }
@@ -168,7 +172,12 @@ public:
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) const override {
-    dtype_t* arg = va_arg(ap.va, dtype_t*);
+    dtype_t* arg;
+    if (ap.using_ptrs) {
+      arg = (dtype_t*)get_va_list_ptr_cpp(&ap);
+    } else {
+      arg = va_arg(ap.va, dtype_t*);
+    }
     MetaschemaType* obj = (MetaschemaType*)(arg->obj);
     (*nargs)--;
     return obj->encode_type(writer);
@@ -204,7 +213,11 @@ public:
     dtype_t *arg;
     dtype_t **p;
     if (allow_realloc) {
-      p = va_arg(ap.va, dtype_t**);
+      if (ap.using_ptrs) {
+	p = (dtype_t**)get_va_list_ptr_cpp(&ap);
+      } else {
+	p = va_arg(ap.va, dtype_t**);
+      }
       bool new_obj = false;
       if (p[0] == NULL)
 	new_obj = true;
@@ -220,7 +233,11 @@ public:
       p[0] = temp;
       arg = *p;
     } else {
-      arg = va_arg(ap.va, dtype_t*);
+      if (ap.using_ptrs) {
+	arg = (dtype_t*)get_va_list_ptr_cpp(&ap);
+      } else {
+	arg = va_arg(ap.va, dtype_t*);
+      }
       p = &arg;
     }
     (*nargs)--;

@@ -117,7 +117,11 @@ public:
     size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
     if (use_generic())
       return out;
-    va_arg(ap.va, ply_t);
+    if (ap.using_ptrs) {
+      va_list_t_skip(&ap, 0);
+    } else {
+      va_arg(ap.va, ply_t);
+    }
     out++;
     return out;
   }
@@ -422,7 +426,12 @@ public:
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) const override {
     // Get argument
-    ply_t p = va_arg(ap.va, ply_t);
+    ply_t p;
+    if (ap.using_ptrs) {
+      p = ((ply_t*)get_va_list_ptr_cpp(&ap))[0];
+    } else {
+      p = va_arg(ap.va, ply_t);
+    }
     (*nargs)--;
     // Allocate buffer
     size_t buf_size = 1000;
@@ -628,14 +637,22 @@ public:
     ply_t *p;
     ply_t **pp;
     if (allow_realloc) {
-      pp = va_arg(ap.va, ply_t**);
+      if (ap.using_ptrs) {
+	pp = (ply_t**)get_va_list_ptr_cpp(&ap);
+      } else {
+	pp = va_arg(ap.va, ply_t**);
+      }
       p = (ply_t*)realloc(*pp, sizeof(ply_t));
       if (p == NULL)
 	ygglog_throw_error("PlyMetaschemaType::decode_data: could not realloc pointer.");
       *pp = p;
       *p = init_ply();
     } else {
-      p = va_arg(ap.va, ply_t*);
+      if (ap.using_ptrs) {
+	p = (ply_t*)get_va_list_ptr_cpp(&ap);
+      } else {
+	p = va_arg(ap.va, ply_t*);
+      }
     }
     (*nargs)--;
     // Process buffer

@@ -400,8 +400,7 @@ public:
       iout = it->second->update_from_deserialization_args(&new_nargs, ap);
       if (iout == 0) {
 	for (iout = 0; iout < it->second->nargs_exp(); iout++) {
-	  // Can use void* here since all variables will be pointers
-	  va_arg(ap.va, void*);
+	  va_list_t_skip(&ap, sizeof(void*));
 	}
       }
       out = out + iout;

@@ -460,8 +460,7 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
   rret = 0;
 
   // Create copy for receiving
-  va_list_t op;
-  va_copy(op.va, ap.va);
+  va_list_t op = copy_va_list(ap);
   
   // pack the args and call
   comm_t *send_comm = (comm_t*)(rpc->handle);
@@ -481,8 +480,6 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
   nargs = nargs - sret;
 
   // unpack the messages into the remaining variable arguments
-  // va_list_t op;
-  // va_copy(op.va, ap.va);
   rret = vcommRecv(rpc, allow_realloc, nargs, op);
   va_end(op.va);
   
@@ -512,7 +509,7 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
 static inline
 int nrpcCallBase(yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
   int ret;
-  va_list_t ap;
+  va_list_t ap = init_va_list();
   va_start(ap.va, nargs);
   ret = vrpcCallBase(rpc, allow_realloc, nargs, ap);
   va_end(ap.va);

@@ -169,6 +169,10 @@ unsigned long ptr2seed(void *ptr) {
 */
 typedef struct va_list_t {
   va_list va;
+  int using_ptrs;
+  void **ptrs;
+  int nptrs;
+  int iptr;
 } va_list_t;
 
 
@@ -452,20 +456,103 @@ int is_send(const char *buf) {
 };
 
   
+/*!
+  @brief Initialize a variable argument list from an existing va_list.
+  @returns va_list_t New variable argument list structure.
+ */
+static inline
+va_list_t init_va_list() {
+  va_list_t out;
+  out.using_ptrs = 0;
+  out.ptrs = NULL;
+  out.nptrs = 0;
+  out.iptr = 0;
+  return out;
+};
+
+
+/*! Initialize a variable argument list from an array of pointers.
+  @param[in] nptrs int Number of pointers.
+  @param[in] ptrs void** Array of pointers. 
+  @returns va_list_t New variable argument list structure.
+*/
+static inline
+va_list_t init_va_ptrs(const int nptrs, void** ptrs) {
+  va_list_t out;
+  out.using_ptrs = 1;
+  out.ptrs = ptrs;
+  out.nptrs = nptrs;
+  out.iptr = 0;
+  return out;
+};
+
+
+/*! Copy a variable argument list.
+  @param[in] va_list_t Variable argument list structure to copy.
+  @returns va_list_t New variable argument list structure.
+*/
+static inline
+va_list_t copy_va_list(va_list_t ap) {
+  va_list_t out;
+  if (ap.using_ptrs) {
+    out = init_va_ptrs(ap.nptrs, ap.ptrs);
+    out.iptr = ap.iptr;
+  } else {
+    out = init_va_list();
+    va_copy(out.va, ap.va);
+  }
+  return out;
+};
+
+
+/*! Get a pointer from the variable argument list, advancing the
+  position.
+  @param[in] ap va_list_t Variable argument list.
+  @returns void* Pointer.
+*/
+static inline
+void* get_va_list_ptr(va_list_t *ap) {
+  void *out = NULL;
+  if (ap->using_ptrs) {
+    if (ap->ptrs == NULL) {
+      ygglog_error("get_va_list_ptr: Pointers is NULL.");
+    } else if (ap->iptr >= ap->nptrs) {
+      ygglog_error("get_va_list_ptr: Current index %d exceeds total number of pointers %d.",
+		   ap->iptr, ap->nptrs);
+    } else {
+      out = ap->ptrs[ap->iptr];
+      ap->iptr++;
+      if (out == NULL) {
+	ygglog_error("get_va_list_ptr: Argument is NULL.");
+      }
+    }
+  } else {
+    ygglog_error("get_va_list_ptr: Variable argument list is not stored in pointers.");
+  }
+  return out;
+};
+
+  
 /*! @brief Method for skipping a number of bytes in the argument list.
   @param[in] ap va_list_t* Structure containing variable argument list.
   @param[in] nbytes size_t Number of bytes that should be skipped.
  */
 static inline
 void va_list_t_skip(va_list_t *ap, size_t nbytes) {
-  if (nbytes == sizeof(void*)) {
-    va_arg(ap->va, void*);
-  } else if (nbytes == sizeof(size_t)) {
-    va_arg(ap->va, size_t);
+  if (ap->using_ptrs) {
+    ap->iptr++;
   } else {
-    printf("WARNING: Cannot get argument of size %zd.\n", nbytes);
-    va_arg(ap->va, void*);
-    // va_arg(ap->va, char[nbytes]);
+    if (nbytes == sizeof(void*)) {
+      va_arg(ap->va, void*);
+    } else if (nbytes == sizeof(size_t)) {
+      va_arg(ap->va, size_t);
+    } else if (nbytes == sizeof(char*)) {
+      va_arg(ap->va, char*);
+    } else {
+      printf("WARNING: Cannot get argument of size %zd.\n", nbytes);
+      va_arg(ap->va, void*);
+      // va_arg(ap->va, char[nbytes]);
+    }
   }
 };
 

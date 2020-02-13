@@ -176,7 +176,11 @@ public:
     size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
     if (use_generic())
       return out;
-    va_arg(ap.va, python_t);
+    if (ap.using_ptrs) {
+      va_list_t_skip(&ap, 0);
+    } else {
+      va_arg(ap.va, python_t);
+    }
     out++;
     return out;
   }
@@ -270,7 +274,12 @@ public:
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) const override {
     size_t bytes_precision = PYTHON_NAME_SIZE;
-    python_t arg0 = va_arg(ap.va, python_t);
+    python_t arg0;
+    if (ap.using_ptrs) {
+      arg0 = ((python_t*)get_va_list_ptr_cpp(&ap))[0];
+    } else {
+      arg0 = va_arg(ap.va, python_t);
+    }
     if (strlen(arg0.name) < bytes_precision) {
       bytes_precision = strlen(arg0.name);
     }
@@ -329,7 +338,11 @@ public:
     python_t *arg;
     python_t **p;
     if (allow_realloc) {
-      p = va_arg(ap.va, python_t**);
+      if (ap.using_ptrs) {
+	p = (python_t**)get_va_list_ptr_cpp(&ap);
+      } else {
+	p = va_arg(ap.va, python_t**);
+      }
       python_t *temp = (python_t *)realloc(p[0], sizeof(python_t));
       if (temp == NULL) {
 	ygglog_throw_error("PyObjMetaschemaType::decode_data: Failed to realloc variable.");
@@ -337,7 +350,11 @@ public:
       p[0] = temp;
       arg = *p;
     } else {
-      arg = va_arg(ap.va, python_t*);
+      if (ap.using_ptrs) {
+	arg = (python_t*)get_va_list_ptr_cpp(&ap);
+      } else {
+	arg = va_arg(ap.va, python_t*);
+      }
       p = &arg;
     }
     (*nargs)--;

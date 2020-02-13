@@ -32,6 +32,17 @@ void ygglog_throw_error(const char* fmt, ...) {
   throw std::exception();
 };
 
+
+static inline
+void* get_va_list_ptr_cpp(va_list_t *ap) {
+  void *out = get_va_list_ptr(ap);
+  if (out == NULL) {
+    ygglog_throw_error("get_va_list_ptr_cpp: Error getting variable argument from pointer variable argument list.");
+  }
+  return out;
+};
+
+
 /*!
   @brief Count the number of times a regular expression is matched in a string.
   @param[in] regex_text constant character pointer to string that should be
