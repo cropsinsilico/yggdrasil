@@ -1,0 +1,28 @@
+models:
+  - name: fortran_modelA
+    language: fortran
+    args: ./src/gs_lesson4b_modelA.f90
+
+    inputs:
+      - name: inputA
+        driver: FileInputDriver
+        args: ./Input/input.txt
+
+    outputs:
+      - name: outputA
+        driver: OutputDriver  # Output to another channel
+        args: A_to_B  # Connection to inputB
+
+  - name: fortran_modelB
+    language: fortran
+    args: ./src/gs_lesson4b_modelB.f90
+
+    inputs:
+      - name: inputB
+        driver: InputDriver  # Input from another channel
+        args: A_to_B  # Conneciton to inputA
+
+    outputs:
+      - name: outputB
+        driver: FileOutputDriver
+        args: ./output.txt

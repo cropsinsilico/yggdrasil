@@ -1,0 +1,14 @@
+models:
+  - name: fortran_model
+    language: fortran  # Runs the fortran script using default Fortran
+    args: ./src/gs_lesson3.f90
+    inputs:
+      - input
+    outputs:
+      - output
+
+connections:
+  - input_file: ./Input/input.txt
+    output: input
+  - input: output
+    output: ./output.txt
