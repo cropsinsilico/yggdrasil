@@ -72,8 +72,8 @@ CONTAINS
     ! c_data = C_LOC(data(1))
     c_data_len = data_len
     c_flag = ygg_recv_c(c_ygg_q, c_data, c_data_len)
-    data = c_data
     flag = c_flag
+    data = c_data(:flag)
   END FUNCTION ygg_recv
   
   ! FUNCTION yggSend(ygg_q, args) RESULT (flag) BIND (C, name="
