@@ -36,7 +36,7 @@
      END FUNCTION ygg_input_fmt_c
   
      FUNCTION ygg_output_c(name) RESULT(channel) &
-          BIND(C, name="yggOutput")
+          BIND(C, name="ygg_output_f")
        USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_CHAR
        IMPLICIT NONE
        CHARACTER(KIND=C_CHAR), dimension(*), INTENT(IN) :: name
@@ -44,7 +44,7 @@
      END FUNCTION ygg_output_c
   
      FUNCTION ygg_input_c(name) RESULT(channel) &
-          BIND(C, name="ygg_input_ff")
+          BIND(C, name="ygg_input_f")
        USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_CHAR
        IMPLICIT NONE
        CHARACTER(KIND=C_CHAR), dimension(*), INTENT(IN) :: name
@@ -52,7 +52,7 @@
      END FUNCTION ygg_input_c
   
      FUNCTION ygg_send_c(ygg_q, data, data_len) RESULT (flag) &
-          BIND(C, name="ygg_send")
+          BIND(C, name="ygg_send_f")
        USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_CHAR, &
             C_INT
        IMPLICIT NONE
@@ -65,7 +65,7 @@
   
      ! This might need to be a subroutine
      FUNCTION ygg_recv_c(ygg_q, data, data_len) RESULT (flag) &
-          BIND(C, name="ygg_recv")
+          BIND(C, name="ygg_recv_f")
        USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_CHAR, &
             C_INT
        IMPLICIT NONE

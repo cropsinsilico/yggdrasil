@@ -1,12 +1,10 @@
 PROGRAM hello
   USE fygg
-  USE ISO_C_BINDING
-  IMPLICIT none
 
   integer :: BSIZE = 512 ! the max
   integer :: ret = 0
   integer :: bufsiz
-  character(len = 512) :: buf
+  character(len = 512) :: buf = ""
   TYPE(yggcomm) :: inf, outf, inq, outq
 
   PRINT *, "Hello from Fortran"
@@ -25,8 +23,8 @@ PROGRAM hello
      CALL EXIT(-1)
   END IF
   bufsiz = ret
-  PRINT *, "hello(Fortran): Received", bufsiz, &
-       "bytes from file:" ! , buf
+  PRINT *, "hello(Fortran): Received ", bufsiz, &
+       "bytes from file: ", buf
 
   ! Send output to the output queue
   ret = ygg_send(outq, buf, bufsiz)
@@ -43,8 +41,8 @@ PROGRAM hello
      CALL EXIT(-1)
   END IF
   bufsiz = ret
-  PRINT *, "hello(Fortran): Received", bufsiz, &
-       "bytes from queue:"  !, buf
+  PRINT *, "hello(Fortran): Received ", bufsiz, &
+       "bytes from queue: ", buf
 
   ! Send output to a local file
   ret = ygg_send(outf, buf, bufsiz)
