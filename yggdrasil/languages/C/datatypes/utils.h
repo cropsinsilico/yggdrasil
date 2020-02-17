@@ -33,11 +33,31 @@ void ygglog_throw_error(const char* fmt, ...) {
 };
 
 
+/*! C++ wrapper to get a pointer from the variable argument list and
+  advancing the position.
+  @param[in] ap va_list_t Variable argument list.
+  @returns void* Pointer.
+*/
 static inline
 void* get_va_list_ptr_cpp(va_list_t *ap) {
   void *out = get_va_list_ptr(ap);
   if (out == NULL) {
     ygglog_throw_error("get_va_list_ptr_cpp: Error getting variable argument from pointer variable argument list.");
+  }
+  return out;
+};
+
+
+/*! C++ wrapper to get a pointer to a pointer from the variable
+  argument list and advancing the position.
+  @param[in] ap va_list_t Variable argument list.
+  @returns void* Pointer.
+*/
+static inline
+void** get_va_list_ptr_ref_cpp(va_list_t *ap) {
+  void **out = get_va_list_ptr_ref(ap);
+  if (out == NULL) {
+    ygglog_throw_error("get_va_list_ptr_ref_cpp: Error getting variable argument from pointer variable argument list.");
   }
   return out;
 };

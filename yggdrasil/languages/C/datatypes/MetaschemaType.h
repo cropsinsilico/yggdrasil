@@ -991,7 +991,7 @@ public:
       bool **p;
       if (allow_realloc) {
 	if (ap.using_ptrs) {
-	  p = (bool**)get_va_list_ptr_cpp(&ap);
+	  p = (bool**)get_va_list_ptr_ref_cpp(&ap);
 	} else {
 	  p = va_arg(ap.va, bool**);
 	}
@@ -1017,7 +1017,7 @@ public:
       int **p;
       if (allow_realloc) {
 	if (ap.using_ptrs) {
-	  p = (int**)get_va_list_ptr_cpp(&ap);
+	  p = (int**)get_va_list_ptr_ref_cpp(&ap);
 	} else {
 	  p = va_arg(ap.va, int**);
 	}
@@ -1043,7 +1043,7 @@ public:
       void ***p;
       if (allow_realloc) {
 	if (ap.using_ptrs) {
-	  p = (void***)get_va_list_ptr_cpp(&ap);
+	  p = (void***)get_va_list_ptr_ref_cpp(&ap);
 	} else {
 	  p = va_arg(ap.va, void***);
 	}
@@ -1069,7 +1069,7 @@ public:
       double **p;
       if (allow_realloc) {
 	if (ap.using_ptrs) {
-	  p = (double**)get_va_list_ptr_cpp(&ap);
+	  p = (double**)get_va_list_ptr_ref_cpp(&ap);
 	} else {
 	  p = va_arg(ap.va, double**);
 	}
@@ -1095,7 +1095,7 @@ public:
       char **p;
       if (allow_realloc) {
 	if (ap.using_ptrs) {
-	  p = (char**)get_va_list_ptr_cpp(&ap);
+	  p = (char**)get_va_list_ptr_ref_cpp(&ap);
 	} else {
 	  p = va_arg(ap.va, char**);
 	}

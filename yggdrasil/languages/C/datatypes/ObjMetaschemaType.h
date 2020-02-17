@@ -1486,7 +1486,7 @@ public:
     obj_t **pp;
     if (allow_realloc) {
       if (ap.using_ptrs) {
-	pp = (obj_t**)get_va_list_ptr_cpp(&ap);
+	pp = (obj_t**)get_va_list_ptr_ref_cpp(&ap);
       } else {
 	pp = va_arg(ap.va, obj_t**);
       }

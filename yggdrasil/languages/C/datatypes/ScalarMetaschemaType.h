@@ -1328,7 +1328,7 @@ public:
     char **p;
     if (allow_realloc) {
       if (ap.using_ptrs) {
-	p = (char**)get_va_list_ptr_cpp(&ap);
+	p = (char**)get_va_list_ptr_ref_cpp(&ap);
       } else {
 	p = va_arg(ap.va, char**);
       }
@@ -1347,9 +1347,9 @@ public:
 	((subtype_code_ == T_BYTES) || (subtype_code_ == T_UNICODE))) {
       size_t * arg_siz_x;
       if (ap.using_ptrs) {
-	arg_siz_x = (size_t*)get_va_list_ptr_cpp(&ap);
+      	arg_siz_x = (size_t*)get_va_list_ptr_cpp(&ap);
       } else {
-	arg_siz_x = va_arg(ap.va, size_t*);
+      	arg_siz_x = va_arg(ap.va, size_t*);
       }
       size_t * const arg_siz = arg_siz_x;
       (*nargs)--;
@@ -2050,7 +2050,7 @@ size_t NDArrayMetaschemaType::update_from_serialization_args(size_t *nargs, va_l
     va_list_t_skip(&ap, sizeof(unsigned char*));
     if (ap.using_ptrs) {
       new_ndim = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
-      new_shape_ptr = ((size_t**)get_va_list_ptr_cpp(&ap))[0];
+      new_shape_ptr = (size_t*)get_va_list_ptr_cpp(&ap);
     } else {
       new_ndim = va_arg(ap.va, size_t);
       new_shape_ptr = va_arg(ap.va, size_t*);
@@ -2076,7 +2076,7 @@ size_t NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va
     if (ap.using_ptrs) {
       size_t * const new_ndim = (size_t* const)get_va_list_ptr_cpp(&ap);
       new_ndim[0] = ndim();
-      new_shape = (size_t**)get_va_list_ptr_cpp(&ap);
+      new_shape = (size_t**)get_va_list_ptr_ref_cpp(&ap);
     } else {
       size_t * const new_ndim = va_arg(ap.va, size_t*);
       new_ndim[0] = ndim();

@@ -638,7 +638,7 @@ public:
     ply_t **pp;
     if (allow_realloc) {
       if (ap.using_ptrs) {
-	pp = (ply_t**)get_va_list_ptr_cpp(&ap);
+	pp = (ply_t**)get_va_list_ptr_ref_cpp(&ap);
       } else {
 	pp = va_arg(ap.va, ply_t**);
       }

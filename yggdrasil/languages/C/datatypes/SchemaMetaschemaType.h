@@ -214,7 +214,7 @@ public:
     dtype_t **p;
     if (allow_realloc) {
       if (ap.using_ptrs) {
-	p = (dtype_t**)get_va_list_ptr_cpp(&ap);
+	p = (dtype_t**)get_va_list_ptr_ref_cpp(&ap);
       } else {
 	p = va_arg(ap.va, dtype_t**);
       }

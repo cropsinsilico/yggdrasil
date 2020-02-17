@@ -554,7 +554,7 @@ public:
     python_t **p;
     if (allow_realloc) {
       if (ap.using_ptrs) {
-	p = (python_t**)get_va_list_ptr_cpp(&ap);
+	p = (python_t**)get_va_list_ptr_ref_cpp(&ap);
       } else {
 	p = va_arg(ap.va, python_t**);
       }

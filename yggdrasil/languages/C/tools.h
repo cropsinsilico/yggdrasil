@@ -533,6 +533,34 @@ void* get_va_list_ptr(va_list_t *ap) {
 };
 
   
+/*! Get a pointer to a pointer from the variable argument list and
+  advancing the position.
+  @param[in] ap va_list_t Variable argument list.
+  @returns void* Pointer.
+*/
+static inline
+void** get_va_list_ptr_ref(va_list_t *ap) {
+  void **out = NULL;
+  if (ap->using_ptrs) {
+    if (ap->ptrs == NULL) {
+      ygglog_error("get_va_list_ptr_ref: Pointers is NULL.");
+    } else if (ap->iptr >= ap->nptrs) {
+      ygglog_error("get_va_list_ptr_ref: Current index %d exceeds total number of pointers %d.",
+		   ap->iptr, ap->nptrs);
+    } else {
+      out = ap->ptrs + ap->iptr;
+      ap->iptr++;
+      if (out == NULL) {
+	ygglog_error("get_va_list_ptr_ref: Argument is NULL.");
+      }
+    }
+  } else {
+    ygglog_error("get_va_list_ptr_ref: Variable argument list is not stored in pointers.");
+  }
+  return out;
+};
+
+  
 /*! @brief Method for skipping a number of bytes in the argument list.
   @param[in] ap va_list_t* Structure containing variable argument list.
   @param[in] nbytes size_t Number of bytes that should be skipped.
