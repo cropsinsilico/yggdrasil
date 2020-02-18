@@ -9,6 +9,7 @@ module fygg
   interface yggarg_realloc
      module procedure yggarg_realloc_scalar
      ! module procedure yggarg_realloc_array
+     ! module procedure yggarg_char_realloc
   end interface yggarg_realloc
   type :: yggptr
      type(c_ptr) :: ptr
@@ -31,7 +32,7 @@ module fygg
      type(c_ptr) :: comm
   end type yggcomm
 
-  public :: yggarg, yggcomm, yggptr
+  public :: yggarg, yggarg_realloc, yggcomm, yggptr
 
   INCLUDE "YggInterface_cdef.f90"
 
@@ -70,9 +71,7 @@ contains
        print *, "precision ", precision
     end if
     if (x%alloc) then
-       print *, "allocated missing logic"
        if ((array_len.gt.x%len).or.(precision.gt.x%prec)) then
-          print *, array_len, x%len
           if (x%array) then
              select type(item=>x%item_array)
              type is (integer)
@@ -237,24 +236,20 @@ contains
     y%alloc = .true.
   end function yggarg_realloc_scalar
   ! function yggarg_char_realloc(x) result(y)
-  !   character(len=:), allocatable, target :: x
+  !   character(len=*), allocatable, target :: x
   !   type(yggptr) :: y
   !   y%type = "character"
   !   if (.not.(allocated(x))) then
   !      allocate(character(len=1) :: x)
   !   end if
-  !   y%data_character_full => x
-  !   ! if (allocated(x)) then
+  !   y%item => x
   !   allocate(y%data_character_unit(len(x)))
   !   y%data_character_unit = transfer(x, y%data_character_unit)
   !   y%data_character_unit(len_trim(x) + 1) = c_null_char
   !   y%ptr = c_loc(y%data_character_unit(1))
-  !   y%len = len(x)
-  !   ! else
-  !   !    y%ptr = c_null_ptr
-  !   !    y%len = 0
-  !   ! end if
-  !   y%array = .true.
+  !   y%len = 1
+  !   y%prec = len(x)
+  !   y%array = .false.
   !   y%alloc = .true.
   ! end function yggarg_char_realloc
   
@@ -470,12 +465,9 @@ contains
     c_ygg_q = ygg_q%comm
     call pre_recv(args, c_args)
     c_nargs = size(args)
-    print *, "before call"
     c_flag = ygg_recv_var_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
-    print *, "after call"
     flag = c_flag
     call post_recv(args, c_args, flag)
-    print *, "after post"
   end function ygg_recv_var
   
   function ygg_recv_var_realloc(ygg_q, args) result (flag)

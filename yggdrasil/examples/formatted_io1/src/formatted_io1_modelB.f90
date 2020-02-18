@@ -7,6 +7,8 @@ program main
   integer :: flag = 1
   type(yggcomm) :: in_channel, out_channel
   character(len=100), target :: msg = "hello"
+  ! character(len=:), allocatable, target :: msg
+  ! allocate(character(len=100) :: msg)
   integer(kind=c_size_t), target :: msg_siz = 100
 
   ! Initialize input/output channels
@@ -19,7 +21,7 @@ program main
      ! Receive input from input channel
      ! If there is an error, the flag will be negative
      ! Otherwise, it is the number of variables filled
-     flag = ygg_recv_var_realloc(in_channel, &
+     flag = ygg_recv_var(in_channel, &
           [yggarg(msg), yggarg(msg_siz)])
      if (flag.lt.0) then
         print *, "Model B: No more input."
