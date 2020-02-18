@@ -173,6 +173,7 @@ typedef struct va_list_t {
   void **ptrs;
   int nptrs;
   int iptr;
+  int for_fortran;
 } va_list_t;
 
 
@@ -467,6 +468,7 @@ va_list_t init_va_list() {
   out.ptrs = NULL;
   out.nptrs = 0;
   out.iptr = 0;
+  out.for_fortran = 0;
   return out;
 };
 
@@ -483,6 +485,7 @@ va_list_t init_va_ptrs(const int nptrs, void** ptrs) {
   out.ptrs = ptrs;
   out.nptrs = nptrs;
   out.iptr = 0;
+  out.for_fortran = 0;
   return out;
 };
 
@@ -501,6 +504,7 @@ va_list_t copy_va_list(va_list_t ap) {
     out = init_va_list();
     va_copy(out.va, ap.va);
   }
+  out.for_fortran = ap.for_fortran;
   return out;
 };
 

@@ -1393,6 +1393,28 @@ public:
 	return false;
       }
     }
+    if (ap.for_fortran) {
+      if (ap.using_ptrs) {
+	if ((type_code() != T_SCALAR) &&
+	    ((subtype_code_ == T_BYTES) || (subtype_code_ == T_UNICODE))) {
+	  ap.nptrs++;
+	  size_t * const arg_siz = (size_t* const)get_va_list_ptr_cpp(&ap);
+	  arg_siz[0] = (size_t)precision();
+	  
+	}
+	if (type_code() == T_1DARRAY) {
+	  ap.nptrs++;
+	  size_t * const arg_siz = (size_t* const)get_va_list_ptr_cpp(&ap);
+	  arg_siz[0] = (size_t)nelements();
+	}
+      } else {
+	ygglog_error("ScalarMetaschemaType::decode_data: for_fortran not supported when not using pointers to pass variable arguments.");
+	// size_t * const arg_siz = va_arg(ap.va, size_t*);
+	// arg_siz[0] = (size_t)ret;
+	free(decoded_bytes);
+	return false;
+      }
+    }
     free(decoded_bytes);
     return true;
   }

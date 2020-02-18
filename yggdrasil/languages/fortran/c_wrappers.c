@@ -31,6 +31,7 @@ int ygg_recv_var_f(void *yggQ, int nargs, void *args) {
     return -1;
   }
   va_list_t ap = init_va_ptrs(nargs, (void**)args);
+  ap.for_fortran = 1;
   return vcommRecv((comm_t*)yggQ, 0, nargs, ap);
 }
 
@@ -40,5 +41,6 @@ int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
     return -1;
   }
   va_list_t ap = init_va_ptrs(nargs, (void**)args);
+  ap.for_fortran = 1;
   return vcommRecv((comm_t*)yggQ, 1, nargs, ap);
 }
