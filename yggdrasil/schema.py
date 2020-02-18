@@ -818,8 +818,11 @@ class SchemaRegistry(object):
                 out['definitions'][x]['properties'][k].pop('oneOf', None)
                 out['definitions'][x]['properties'][k].update(
                     {"$ref": "#/definitions/serializer"})
+        prop_add = {
+            'model': {'repository_url': {'type': 'string'},
+                      'contact_email': {'type': 'string'}}}
         prop_required = {
-            'model': ['inputs', 'outputs']}
+            'model': ['inputs', 'outputs', 'repository_url']}
         prop_remove = {
             'comm': ['is_default', 'length_map', 'serializer'],
             'file': ['is_default', 'length_map',
@@ -844,6 +847,8 @@ class SchemaRegistry(object):
         for k, rlist in prop_order.items():
             for i, p in enumerate(rlist):
                 out['definitions'][k]['properties'][p]['propertyOrder'] = i
+        for k, adict in prop_add.items():
+            out['definitions'][k]['properties'].update(adict)
         out.update(out['definitions'].pop('model'))
         out['definitions'].pop('connection')
         out.update(
