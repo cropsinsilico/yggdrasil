@@ -5,6 +5,7 @@ import copy
 import logging
 import subprocess
 import argparse
+import pprint
 
 
 logger = logging.getLogger(__name__)
@@ -370,6 +371,21 @@ def ygginstall():
     else:
         for x in args.language:
             install_languages.install_language(x, args=args)
+
+
+def yggmodelform():
+    r"""Save/print a JSON schema that can be used for generating a
+    form for composing a model specification files."""
+    from yggdrasil.schema import get_model_form_schema
+    parser = argparse.ArgumentParser(
+        description=('Save/print the JSON schema for generating the '
+                     'model specification form.'))
+    parser.add_argument('--file',
+                        help='Path to file where the schema should be saved.')
+    args = parser.parse_args()
+    out = get_model_form_schema(fname_dst=args.file)
+    if not args.file:
+        pprint.pprint(out)
 
 
 if __name__ == '__main__':
