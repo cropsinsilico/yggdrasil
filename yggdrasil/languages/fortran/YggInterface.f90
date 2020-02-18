@@ -2,6 +2,8 @@ module fygg
   use iso_c_binding
   implicit none
 
+  integer, parameter :: LINE_SIZE_MAX = 2048
+
   interface yggarg
      module procedure yggarg_scalar
      module procedure yggarg_array
@@ -32,7 +34,8 @@ module fygg
      type(c_ptr) :: comm
   end type yggcomm
 
-  public :: yggarg, yggarg_realloc, yggcomm, yggptr
+  public :: yggarg, yggarg_realloc, yggcomm, yggptr, &
+       LINE_SIZE_MAX
 
   INCLUDE "YggInterface_cdef.f90"
 
@@ -326,6 +329,66 @@ contains
     c_name = trim(name)//c_null_char
     channel%comm = ygg_input_c(c_name)
   end function ygg_input
+  
+  function ygg_ascii_file_output(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_ascii_file_output_c(c_name)
+  end function ygg_ascii_file_output
+  
+  function ygg_ascii_file_input(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_ascii_file_input_c(c_name)
+  end function ygg_ascii_file_input
+  
+  function ygg_ascii_table_output(name, format_str) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=*), intent(in) :: format_str
+    character(len=len_trim(name)+1) :: c_name
+    character(len=len_trim(format_str)+1) :: c_format_str
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    c_format_str = trim(format_str)//c_null_char
+    channel%comm = ygg_ascii_table_output_c(c_name, c_format_str)
+  end function ygg_ascii_table_output
+  
+  function ygg_ascii_table_input(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_ascii_table_input_c(c_name)
+  end function ygg_ascii_table_input
+  
+  function ygg_ascii_array_output(name, format_str) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=*), intent(in) :: format_str
+    character(len=len_trim(name)+1) :: c_name
+    character(len=len_trim(format_str)+1) :: c_format_str
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    c_format_str = trim(format_str)//c_null_char
+    channel%comm = ygg_ascii_array_output_c(c_name, c_format_str)
+  end function ygg_ascii_array_output
+  
+  function ygg_ascii_array_input(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_ascii_array_input_c(c_name)
+  end function ygg_ascii_array_input
   
   function ygg_send(ygg_q, data, data_len) result (flag)
     implicit none

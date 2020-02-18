@@ -9,6 +9,12 @@ extern "C" {
 
 void* ygg_output_f(const char *name);
 void* ygg_input_f(const char *name);
+void* yggAsciiFileOutput_f(const char *name);
+void* yggAsciiFileInput_f(const char *name);
+void* yggAsciiTableOutput_f(const char *name, const char *format_str);
+void* yggAsciiTableInput_f(const char *name);
+void* yggAsciiArrayOutput_f(const char *name, const char *format_str);
+void* yggAsciiArrayInput_f(const char *name);
 int ygg_send_f(const void *yggQ, const char *data, const size_t len);
 int ygg_recv_f(void *yggQ, char *data, const size_t len);
 int ygg_send_var_f(const void *yggQ, int nargs, void *args);

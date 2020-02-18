@@ -51,6 +51,56 @@
        type(c_ptr) :: channel
      end function ygg_input_c
   
+     function ygg_ascii_file_output_c(name) result(channel) &
+          bind(c, name="yggAsciiFileOutput_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       type(c_ptr) :: channel
+     end function ygg_ascii_file_output_c
+  
+     function ygg_ascii_file_input_c(name) result(channel) &
+          bind(c, name="yggAsciiFileInput_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       type(c_ptr) :: channel
+     end function ygg_ascii_file_input_c
+  
+     function ygg_ascii_table_output_c(name, format_str) &
+          result(channel) bind(c, name="yggAsciiTableOutput_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       character(kind=c_char), dimension(*), intent(in) :: format_str
+       type(c_ptr) :: channel
+     end function ygg_ascii_table_output_c
+  
+     function ygg_ascii_table_input_c(name) result(channel) &
+          bind(c, name="yggAsciiTableInput_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       type(c_ptr) :: channel
+     end function ygg_ascii_table_input_c
+  
+     function ygg_ascii_array_output_c(name, format_str) &
+          result(channel) bind(c, name="yggAsciiArrayOutput_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       character(kind=c_char), dimension(*), intent(in) :: format_str
+       type(c_ptr) :: channel
+     end function ygg_ascii_array_output_c
+  
+     function ygg_ascii_array_input_c(name) result(channel) &
+          bind(c, name="yggAsciiArrayInput_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       type(c_ptr) :: channel
+     end function ygg_ascii_array_input_c
+  
      function ygg_send_c(ygg_q, data, data_len) result (flag) &
           bind(c, name="ygg_send_f")
        use, intrinsic :: iso_c_binding, only: c_ptr, c_char, &
