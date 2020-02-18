@@ -1305,10 +1305,14 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
                     x['name'] = new_name
                 if not x.get('is_default', False):
                     x.setdefault('working_dir', instance['working_dir'])
-                x_filter = x.get('filter', None)
-                if isinstance(x_filter, dict) and ('function' in x_filter):
-                    x['filter']['function'] = normalize_function_file(
-                        x['filter']['function'], instance['working_dir'])
+                if 'default_file' in x:
+                    x['default_file'].setdefault('working_dir',
+                                                 instance['working_dir'])
+                for k in ['filter', 'transform']:
+                    x_k = x.get(k, None)
+                    if isinstance(x_k, dict) and ('function' in x_k):
+                        x[k]['function'] = normalize_function_file(
+                            x[k]['function'], instance['working_dir'])
     return instance
 
 
@@ -1416,10 +1420,11 @@ def _normalize_connio_first(normalizer, value, instance, schema):
         if instance.get('working_dir', False):
             for io in ['inputs', 'outputs']:
                 for x in instance[io]:
-                    x_filter = x.get('filter', None)
-                    if isinstance(x_filter, dict) and ('function' in x_filter):
-                        x['filter']['function'] = normalize_function_file(
-                            x['filter']['function'], instance['working_dir'])
+                    for k in ['filter', 'transform']:
+                        x_k = x.get(k, None)
+                        if isinstance(x_k, dict) and ('function' in x_k):
+                            x[k]['function'] = normalize_function_file(
+                                x[k]['function'], instance['working_dir'])
         # Handle indexed inputs/outputs
         for io in ['inputs', 'outputs']:
             pruned = []
