@@ -187,6 +187,11 @@ jobs:
       python: 3.7
       dist: xenial
       sudo: true
+    - os: linux
+      env: YGG_TEST_FLAGS="--test-suite=timing"
+      python: 3.7
+      dist: xenial
+      sudo: true
     - os: osx
       python: 3.6
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
