@@ -44,7 +44,10 @@ environment:
   matrix:
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=examples"
+      YGG_TEST_FLAGS: "--test-suite=examples_part1 serialize"
+    - platform: x64
+      PYTHON_VERSION: "3.6"
+      YGG_TEST_FLAGS: "--test-suite=examples_part2 communication"
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_TEST_FLAGS: "--test-suite=types"
