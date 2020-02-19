@@ -1395,17 +1395,21 @@ public:
     }
     if (ap.for_fortran) {
       if (ap.using_ptrs) {
-	if ((type_code() != T_SCALAR) &&
-	    ((subtype_code_ == T_BYTES) || (subtype_code_ == T_UNICODE))) {
-	  ap.nptrs++;
-	  size_t * const arg_siz = (size_t* const)get_va_list_ptr_cpp(&ap);
-	  arg_siz[0] = (size_t)precision();
+	// if ((type_code() != T_SCALAR) &&
+	//     ((subtype_code_ == T_BYTES) || (subtype_code_ == T_UNICODE))) {
+	//   ap.nptrs++;
+	//   size_t * const arg_siz = (size_t* const)get_va_list_ptr_cpp(&ap);
+	//   arg_siz[0] = (size_t)precision();
 	  
-	}
+	// }
 	if (type_code() == T_1DARRAY) {
 	  ap.nptrs++;
 	  size_t * const arg_siz = (size_t* const)get_va_list_ptr_cpp(&ap);
-	  arg_siz[0] = (size_t)nelements();
+	  if ((subtype_code_ == T_BYTES) || (subtype_code_ == T_UNICODE)) {
+	    arg_siz[0] = (size_t)(precision() * nelements());
+	  } else {
+	    arg_siz[0] = (size_t)nelements();
+	  }
 	}
       } else {
 	ygglog_error("ScalarMetaschemaType::decode_data: for_fortran not supported when not using pointers to pass variable arguments.");
