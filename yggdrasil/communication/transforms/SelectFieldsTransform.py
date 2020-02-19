@@ -1,6 +1,7 @@
 import numpy as np
 import pandas
 import copy
+from yggdrasil import serialize
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 
 
@@ -87,6 +88,11 @@ class SelectFieldsTransform(TransformBase):
                     datatype['items'][i]['title'] = k
                 if 'field_names' in datatype:
                     datatype['field_names'] = copy.deepcopy(self.selected)
+                if 'format_str' in datatype:
+                    info = serialize.format2table(datatype['format_str'])
+                    info['fmts'] = [info['fmts'][order.index(k)]
+                                    for k in self.selected]
+                    datatype['format_str'] = serialize.table2format(**info)
         elif (((datatype.get('type', None) == 'array')
                and isinstance(datatype.get('items', None), dict)
                and self.as_single)):

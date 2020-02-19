@@ -638,7 +638,9 @@ def table2format(fmts=[], delimiter=None, newline=None, comment=None):
     if isinstance(fmts, np.dtype):
         fmts = nptype2cformat(fmts)
     bytes_fmts = tools.str2bytes(fmts, recurse=True)
-    fmt_str = comment + delimiter.join(bytes_fmts) + newline
+    fmt_str = (tools.str2bytes(comment)
+               + tools.str2bytes(delimiter).join(bytes_fmts)
+               + tools.str2bytes(newline))
     return fmt_str
 
 
