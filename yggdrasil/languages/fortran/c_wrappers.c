@@ -1,5 +1,11 @@
 #include "c_wrappers.h"
 
+void ygg_c_free(void *x) {
+  if (x != NULL) {
+    free(x);
+  }
+}
+
 void* ygg_output_f(const char *name) {
   return (void*)yggOutput(name);
 }

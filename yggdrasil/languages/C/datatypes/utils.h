@@ -36,13 +36,28 @@ void ygglog_throw_error(const char* fmt, ...) {
 /*! C++ wrapper to get a pointer from the variable argument list and
   advancing the position.
   @param[in] ap va_list_t Variable argument list.
+  @param[in] allow_null int If 0, an error will be raised if the
+  selected pointer is null, otherwise the null pointer will be returned.
   @returns void* Pointer.
 */
 static inline
-void* get_va_list_ptr_cpp(va_list_t *ap) {
-  void *out = get_va_list_ptr(ap);
-  if (out == NULL) {
-    ygglog_throw_error("get_va_list_ptr_cpp: Error getting variable argument from pointer variable argument list.");
+void* get_va_list_ptr_cpp(va_list_t *ap, int allow_null = 0) {
+  void *out = NULL;
+  if (ap->using_ptrs) {
+    if (ap->ptrs == NULL) {
+      ygglog_throw_error("get_va_list_ptr: Pointers is NULL.");
+    } else if (ap->iptr >= ap->nptrs) {
+      ygglog_throw_error("get_va_list_ptr: Current index %d exceeds total number of pointers %d.",
+		   ap->iptr, ap->nptrs);
+    } else {
+      out = ap->ptrs[ap->iptr];
+      ap->iptr++;
+      if ((out == NULL) && (allow_null == 0)) {
+	ygglog_throw_error("get_va_list_ptr: Argument is NULL.");
+      }
+    }
+  } else {
+    ygglog_throw_error("get_va_list_ptr: Variable argument list is not stored in pointers.");
   }
   return out;
 };
@@ -51,13 +66,28 @@ void* get_va_list_ptr_cpp(va_list_t *ap) {
 /*! C++ wrapper to get a pointer to a pointer from the variable
   argument list and advancing the position.
   @param[in] ap va_list_t Variable argument list.
+  @param[in] allow_null int If 0, an error will be raised if the
+  selected pointer is null, otherwise the null pointer will be returned.
   @returns void* Pointer.
 */
 static inline
-void** get_va_list_ptr_ref_cpp(va_list_t *ap) {
-  void **out = get_va_list_ptr_ref(ap);
-  if (out == NULL) {
-    ygglog_throw_error("get_va_list_ptr_ref_cpp: Error getting variable argument from pointer variable argument list.");
+void** get_va_list_ptr_ref_cpp(va_list_t *ap, int allow_null = 0) {
+  void **out = NULL;
+  if (ap->using_ptrs) {
+    if (ap->ptrs == NULL) {
+      ygglog_throw_error("get_va_list_ptr_ref: Pointers is NULL.");
+    } else if (ap->iptr >= ap->nptrs) {
+      ygglog_throw_error("get_va_list_ptr_ref: Current index %d exceeds total number of pointers %d.",
+		   ap->iptr, ap->nptrs);
+    } else {
+      out = ap->ptrs + ap->iptr;
+      ap->iptr++;
+      if ((out == NULL) && (allow_null == 0)) {
+	ygglog_throw_error("get_va_list_ptr_ref: Argument is NULL.");
+      }
+    }
+  } else {
+    ygglog_throw_error("get_va_list_ptr_ref: Variable argument list is not stored in pointers.");
   }
   return out;
 };

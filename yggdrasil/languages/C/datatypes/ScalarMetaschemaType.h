@@ -1328,7 +1328,7 @@ public:
     char **p;
     if (allow_realloc) {
       if (ap.using_ptrs) {
-	p = (char**)get_va_list_ptr_ref_cpp(&ap);
+	p = (char**)get_va_list_ptr_ref_cpp(&ap, 1);
       } else {
 	p = va_arg(ap.va, char**);
       }
@@ -1383,7 +1383,6 @@ public:
 	  return false;
 	}
       }
-      // ygglog_info("arg_siz = %ld", *arg_siz);
       int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
 			       p, *arg_siz, allow_realloc, skip_terminal);
       if (ret < 0) {
@@ -1395,26 +1394,18 @@ public:
     }
     if (ap.for_fortran) {
       if (ap.using_ptrs) {
-	// if ((type_code() != T_SCALAR) &&
-	//     ((subtype_code_ == T_BYTES) || (subtype_code_ == T_UNICODE))) {
-	//   ap.nptrs++;
-	//   size_t * const arg_siz = (size_t* const)get_va_list_ptr_cpp(&ap);
-	//   arg_siz[0] = (size_t)precision();
-	  
-	// }
 	if (type_code() == T_1DARRAY) {
 	  ap.nptrs++;
 	  size_t * const arg_siz = (size_t* const)get_va_list_ptr_cpp(&ap);
+	  arg_siz[0] = (size_t)nelements();
 	  if ((subtype_code_ == T_BYTES) || (subtype_code_ == T_UNICODE)) {
-	    arg_siz[0] = (size_t)(precision() * nelements());
-	  } else {
-	    arg_siz[0] = (size_t)nelements();
+	    ap.nptrs++;
+	    size_t * arg_prec = (size_t*)get_va_list_ptr_cpp(&ap);
+	    arg_prec[0] = (size_t)precision();
 	  }
 	}
       } else {
 	ygglog_error("ScalarMetaschemaType::decode_data: for_fortran not supported when not using pointers to pass variable arguments.");
-	// size_t * const arg_siz = va_arg(ap.va, size_t*);
-	// arg_siz[0] = (size_t)ret;
 	free(decoded_bytes);
 	return false;
       }

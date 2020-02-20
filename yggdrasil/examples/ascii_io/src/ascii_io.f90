@@ -7,19 +7,19 @@ program main
   type(yggcomm) :: file_input, file_output, &
        table_input, table_output, array_input, array_output
   integer(kind=c_size_t), target :: line_size = LINE_SIZE_MAX
-  character(len=1), dimension(:), pointer :: line
+  type(yggchar_r) :: line  ! Wrapped to be reallocatable
   character(len=BSIZE), target :: name
   integer(kind=c_size_t), target :: name_siz = BSIZE
-  integer :: number  ! TODO: Needs to be equivalent to C long
-  real :: value  ! TODO: Needs to be equivalent to C double
-  complex :: comp  ! TODO: Needs to be equivalent to C complex_double
+  integer :: number
+  real(kind=8) :: value
+  complex(kind=8) :: comp
   integer(kind=c_size_t), target :: nrows
-  character(len=1), dimension(:), pointer :: name_arr
-  ! TODO: Check that these types are equivalent
+  type(yggchar_r), dimension(:), pointer :: name_arr
   integer, dimension(:), pointer :: number_arr
-  real, dimension(:), pointer :: value_arr
-  complex, dimension(:), pointer :: comp_arr
+  real(kind=8), dimension(:), pointer :: value_arr
+  complex(kind=8), dimension(:), pointer :: comp_arr
   integer(kind=c_size_t) :: i
+  ! nullify(line, name_arr, number_arr, value_arr, comp_arr)
 
   ! Input & output to an ASCII file line by line
   file_input = ygg_ascii_file_input("inputF_file")
@@ -39,14 +39,14 @@ program main
   ! allocate(character(len=LINE_SIZE_MAX) :: line)
   ret = 0
   do while (ret.ge.0)
-     line_size = LINE_SIZE_MAX  ! Reset to size of buffer
+     line_size = 0  ! Reset to size of buffer
 
      ! Receive a single line
      ret = ygg_recv_var_realloc(file_input, &
           [yggarg_realloc(line), yggarg(line_size)])
      if (ret.ge.0) then
         ! If the receive was succesful, send the line to output
-        print *, "File: ", line
+        print *, "File: ", line%x
         ret = ygg_send_var(file_output, &
              [yggarg(line), yggarg(line_size)])
         if (ret.lt.0) then
@@ -60,9 +60,9 @@ program main
         print *, "End of file input (F)"
      end if
   end do
-  if (associated(line)) then
-     deallocate(line)
-  end if
+  ! if (associated(line)) then
+  !    deallocate(line)
+  ! end if
 
   ! Read rows from ASCII table until end of file is reached.
   ! As each row is received, it is then sent to the output ASCII table
@@ -79,7 +79,7 @@ program main
      if (ret.ge.0) then
         ! If the receive was succesful, send the values to output. Formatting
         ! is taken care of on the output driver side.
-        print *, "Table: ", name, number, value, comp
+        print *, "Table: ", trim(name), number, value, comp
         ret = ygg_send_var(table_output, &
              [yggarg(name), yggarg(name_siz), yggarg(number), &
              yggarg(value), yggarg(comp)])
@@ -110,7 +110,7 @@ program main
         print *, "Array: (", nrows, " rows)"
         ! Print each line in the array
         do i = 1, nrows
-           print *, name_arr(i), number_arr(i), value_arr(i), &
+           print *, name_arr(i)%x, number_arr(i), value_arr(i), &
                 comp_arr(i)
         end do
         ! Send the columns in the array to output. Formatting is handled on the
@@ -129,10 +129,10 @@ program main
   end do
   
   ! Free dynamically allocated columns
-  if (associated(name_arr)) deallocate(name_arr)
-  if (associated(number_arr)) deallocate(number_arr)
-  if (associated(value_arr)) deallocate(value_arr)
-  if (associated(comp_arr)) deallocate(comp_arr)
+  ! if (associated(name_arr)) deallocate(name_arr)
+  ! if (associated(number_arr)) deallocate(number_arr)
+  ! if (associated(value_arr)) deallocate(value_arr)
+  ! if (associated(comp_arr)) deallocate(comp_arr)
 
   call exit(error_code)
 

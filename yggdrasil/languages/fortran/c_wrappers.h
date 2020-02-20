@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+void ygg_c_free(void *x);
 void* ygg_output_f(const char *name);
 void* ygg_input_f(const char *name);
 void* yggAsciiFileOutput_f(const char *name);
