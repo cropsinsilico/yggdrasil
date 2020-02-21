@@ -10,14 +10,14 @@ program main
   type(yggchar_r) :: line  ! Wrapped to be reallocatable
   character(len=BSIZE), target :: name
   integer(kind=c_size_t), target :: name_siz = BSIZE
-  integer :: number
+  integer(kind=8) :: number
   real(kind=8) :: value
   complex(kind=8) :: comp
   integer(kind=c_size_t), target :: nrows
-  type(character_1d), pointer :: name_arr
-  type(integer_1d), pointer :: number_arr
-  type(real8_1d), pointer :: value_arr
-  type(complex8_1d), pointer :: comp_arr
+  type(character_1d), target :: name_arr
+  type(integer8_1d), target :: number_arr
+  type(real8_1d), target :: value_arr
+  type(complex8_1d), target :: comp_arr
   ! type(yggchar_r), dimension(:), pointer :: name_arr
   ! integer, dimension(:), pointer :: number_arr
   ! real(kind=8), dimension(:), pointer :: value_arr

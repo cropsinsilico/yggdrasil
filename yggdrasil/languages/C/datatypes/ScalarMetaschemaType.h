@@ -1401,7 +1401,7 @@ public:
 	  if ((subtype_code_ == T_BYTES) || (subtype_code_ == T_UNICODE)) {
 	    ap.nptrs++;
 	    size_t * arg_prec = (size_t*)get_va_list_ptr_cpp(&ap);
-	    arg_prec[0] = (size_t)precision();
+	    arg_prec[0] = (size_t)(precision()/8);
 	  }
 	}
       } else {

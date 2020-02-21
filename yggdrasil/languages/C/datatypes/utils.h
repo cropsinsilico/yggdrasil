@@ -82,7 +82,7 @@ void** get_va_list_ptr_ref_cpp(va_list_t *ap, int allow_null = 0) {
     } else {
       out = ap->ptrs + ap->iptr;
       ap->iptr++;
-      if ((out == NULL) && (allow_null == 0)) {
+      if (((out == NULL) || (*out == NULL)) && (allow_null == 0)) {
 	ygglog_throw_error("get_va_list_ptr_ref: Argument is NULL.");
       }
     }

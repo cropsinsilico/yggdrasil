@@ -11,20 +11,6 @@ module fygg
   end interface yggarg
   interface yggarg_realloc
      module procedure yggarg_realloc_scalar
-     module procedure yggarg_realloc_array_integer2
-     module procedure yggarg_realloc_array_integer4
-     module procedure yggarg_realloc_array_integer8
-     module procedure yggarg_realloc_array_real4
-     module procedure yggarg_realloc_array_real8
-     module procedure yggarg_realloc_array_real16
-     module procedure yggarg_realloc_array_complex4
-     module procedure yggarg_realloc_array_complex8
-     module procedure yggarg_realloc_array_complex16
-     module procedure yggarg_realloc_array_logical1
-     module procedure yggarg_realloc_array_logical2
-     module procedure yggarg_realloc_array_logical4
-     module procedure yggarg_realloc_array_logical8
-     module procedure yggarg_realloc_array_character
   end interface yggarg_realloc
   type :: yggcomm
      type(c_ptr) :: comm
@@ -35,6 +21,9 @@ module fygg
   type :: yggarr_r
      class(*), dimension(:), allocatable :: x
   end type yggarr_r
+  type :: c_long_1d
+     integer(kind=c_long), dimension(:), allocatable :: x
+  end type c_long_1d
   type :: integer_1d
      integer, dimension(:), allocatable :: x
   end type integer_1d
@@ -144,16 +133,15 @@ module fygg
      type(yggchar_r), dimension(:, :), allocatable :: x
   end type character_2d
   type :: yggptr
-     type(c_ptr) :: ptr = c_null_ptr
-     class(*), pointer :: item => null()
-     class(*), dimension(:), pointer :: item_array => null()
-     class(*), allocatable :: item_alloc
      character(len=15) :: type = "none"
-     character, dimension(:), pointer :: data_character_unit => null()
      logical :: array = .false.
      logical :: alloc = .false.
      integer :: len = 0
      integer :: prec = 0
+     type(c_ptr) :: ptr = c_null_ptr
+     class(*), pointer :: item => null()
+     class(*), dimension(:), pointer :: item_array => null()
+     character, dimension(:), pointer :: data_character_unit => null()
      integer(kind=c_size_t), pointer :: len_c => null()
      type(c_ptr) :: len_ptr = c_null_ptr
      integer(kind=c_size_t), pointer :: prec_c => null()
@@ -294,18 +282,10 @@ contains
              deallocate(xarr_character_realloc)
              allocate(xarr_character_realloc(array_len))
           end if
-          if (precision.gt.x%prec) then
+          if ((array_len.gt.x%len).or.(precision.gt.x%prec)) then
              do i = 1, array_len
-                print *, i
                 x_character_realloc => xarr_character_realloc(i)
-                ! if (i.eq.1) then
-                !    if (allocated(x_character_realloc%x)) deallocate(x_character_realloc%x)
-                !    allocate(x_character_realloc%x(precision*array_len))
-                ! else
-                if (allocated(x_character_realloc%x)) print *, "allocated"
-                ! if (allocated(x_character_realloc%x)) deallocate(x_character_realloc%x)
                 allocate(x_character_realloc%x(precision))
-                ! end if
                 nullify(x_character_realloc)
              end do
           end if
@@ -326,6 +306,125 @@ contains
        end select
     end if
   end subroutine yggptr_c2f_alloc_character
+  subroutine yggarg_c2f_alloc_1darray(x, array_len, precision)
+    implicit none
+    type(yggptr) :: x
+    integer(kind=c_size_t), pointer :: array_len
+    integer(kind=c_size_t), pointer :: precision
+    type(yggchar_r), pointer :: x_character_realloc
+    type(yggchar_r), dimension(:), pointer :: xarr_character_realloc
+    integer :: i
+    type(c_long_1d), pointer :: x_c_long_1d
+    type(integer_1d), pointer :: x_integer_1d
+    type(integer2_1d), pointer :: x_integer2_1d
+    type(integer4_1d), pointer :: x_integer4_1d
+    type(integer8_1d), pointer :: x_integer8_1d
+    type(real_1d), pointer :: x_real_1d
+    type(real4_1d), pointer :: x_real4_1d
+    type(real8_1d), pointer :: x_real8_1d
+    type(real16_1d), pointer :: x_real16_1d
+    type(complex_1d), pointer :: x_complex_1d
+    type(complex4_1d), pointer :: x_complex4_1d
+    type(complex8_1d), pointer :: x_complex8_1d
+    type(complex16_1d), pointer :: x_complex16_1d
+    type(logical_1d), pointer :: x_logical_1d
+    type(logical1_1d), pointer :: x_logical1_1d
+    type(logical2_1d), pointer :: x_logical2_1d
+    type(logical4_1d), pointer :: x_logical4_1d
+    type(logical8_1d), pointer :: x_logical8_1d
+    type(character_1d), pointer :: x_character_1d
+    select type(item=>x%item)
+    type is (c_long_1d)
+       x_c_long_1d => item
+       if (allocated(x_c_long_1d%x)) deallocate(x_c_long_1d%x)
+       allocate(x_c_long_1d%x(array_len))
+    type is (integer_1d)
+       x_integer_1d => item
+       if (allocated(x_integer_1d%x)) deallocate(x_integer_1d%x)
+       allocate(x_integer_1d%x(array_len))
+    type is (integer2_1d)
+       x_integer2_1d => item
+       if (allocated(x_integer2_1d%x)) deallocate(x_integer2_1d%x)
+       allocate(x_integer2_1d%x(array_len))
+    type is (integer4_1d)
+       x_integer4_1d => item
+       if (allocated(x_integer4_1d%x)) deallocate(x_integer4_1d%x)
+       allocate(x_integer4_1d%x(array_len))
+    type is (integer8_1d)
+       x_integer8_1d => item
+       if (allocated(x_integer8_1d%x)) deallocate(x_integer8_1d%x)
+       allocate(x_integer8_1d%x(array_len))
+    type is (real_1d)
+       x_real_1d => item
+       if (allocated(x_real_1d%x)) deallocate(x_real_1d%x)
+       allocate(x_real_1d%x(array_len))
+    type is (real4_1d)
+       x_real4_1d => item
+       if (allocated(x_real4_1d%x)) deallocate(x_real4_1d%x)
+       allocate(x_real4_1d%x(array_len))
+    type is (real8_1d)
+       x_real8_1d => item
+       if (allocated(x_real8_1d%x)) deallocate(x_real8_1d%x)
+       allocate(x_real8_1d%x(array_len))
+    type is (real16_1d)
+       x_real16_1d => item
+       if (allocated(x_real16_1d%x)) deallocate(x_real16_1d%x)
+       allocate(x_real16_1d%x(array_len))
+    type is (complex_1d)
+       x_complex_1d => item
+       if (allocated(x_complex_1d%x)) deallocate(x_complex_1d%x)
+       allocate(x_complex_1d%x(array_len))
+    type is (complex4_1d)
+       x_complex4_1d => item
+       if (allocated(x_complex4_1d%x)) deallocate(x_complex4_1d%x)
+       allocate(x_complex4_1d%x(array_len))
+    type is (complex8_1d)
+       x_complex8_1d => item
+       if (allocated(x_complex8_1d%x)) deallocate(x_complex8_1d%x)
+       allocate(x_complex8_1d%x(array_len))
+    type is (complex16_1d)
+       x_complex16_1d => item
+       if (allocated(x_complex16_1d%x)) deallocate(x_complex16_1d%x)
+       allocate(x_complex16_1d%x(array_len))
+    type is (logical_1d)
+       x_logical_1d => item
+       if (allocated(x_logical_1d%x)) deallocate(x_logical_1d%x)
+       allocate(x_logical_1d%x(array_len))
+    type is (logical1_1d)
+       x_logical1_1d => item
+       if (allocated(x_logical1_1d%x)) deallocate(x_logical1_1d%x)
+       allocate(x_logical1_1d%x(array_len))
+    type is (logical2_1d)
+       x_logical2_1d => item
+       if (allocated(x_logical2_1d%x)) deallocate(x_logical2_1d%x)
+       allocate(x_logical2_1d%x(array_len))
+    type is (logical4_1d)
+       x_logical4_1d => item
+       if (allocated(x_logical4_1d%x)) deallocate(x_logical4_1d%x)
+       allocate(x_logical4_1d%x(array_len))
+    type is (logical8_1d)
+       x_logical8_1d => item
+       if (allocated(x_logical8_1d%x)) deallocate(x_logical8_1d%x)
+       allocate(x_logical8_1d%x(array_len))
+    type is (character_1d)
+       x_character_1d => item
+       if (array_len.gt.x%len) then
+          if (allocated(x_character_1d%x)) then
+             deallocate(x_character_1d%x)
+          end if
+          allocate(x_character_1d%x(array_len))
+       end if
+       if ((array_len.gt.x%len).or.(precision.gt.x%prec)) then
+          do i = 1, array_len
+             x_character_realloc => x_character_1d%x(i)
+             allocate(x_character_realloc%x(precision))
+             nullify(x_character_realloc)
+          end do
+       end if
+    class default
+       stop 'yggarg_c2f_alloc_1darray: Unexpected type.'
+    end select
+  end subroutine yggarg_c2f_alloc_1darray
   
   subroutine yggptr_c2f_array_transfer_integer(x)
     implicit none
@@ -424,9 +523,9 @@ contains
     integer :: i, j
     select type(item=>x%item_array)
     type is (yggchar_r)
-       ! xarr_character_realloc => item
-       ! x_character_realloc => xarr_character_realloc(1)
-       ! xarr_character0 => x_character_realloc%x
+       xarr_character_realloc => item
+       x_character_realloc => xarr_character_realloc(1)
+       xarr_character0 => x_character_realloc%x
        ! print *, "before pointer (mult) "
        ! call c_f_pointer(x%ptr, xarr_character0, [x%prec*x%len])
        ! print *, "after  pointer (mult) "
@@ -454,6 +553,151 @@ contains
        stop 'yggptr_c2f_array_transfer_character: Unexpected type.'
     end select
   end subroutine yggptr_c2f_array_transfer_character
+  subroutine yggptr_c2f_array_transfer_1darray(x)
+    implicit none
+    type(yggptr) :: x
+    integer(kind=c_size_t), pointer :: array_len
+    integer(kind=c_size_t), pointer :: precision
+    type(yggchar_r), pointer :: x_character_realloc
+    type(yggchar_r), dimension(:), pointer :: xarr_character_realloc
+    character, dimension(:), pointer :: xarr_character, xarr_character0
+    integer :: i, j
+    type(c_long_1d), pointer :: x_c_long_1d
+    type(integer_1d), pointer :: x_integer_1d
+    type(integer2_1d), pointer :: x_integer2_1d
+    type(integer4_1d), pointer :: x_integer4_1d
+    type(integer8_1d), pointer :: x_integer8_1d
+    type(real_1d), pointer :: x_real_1d
+    type(real4_1d), pointer :: x_real4_1d
+    type(real8_1d), pointer :: x_real8_1d
+    type(real16_1d), pointer :: x_real16_1d
+    type(complex_1d), pointer :: x_complex_1d
+    type(complex4_1d), pointer :: x_complex4_1d
+    type(complex8_1d), pointer :: x_complex8_1d
+    type(complex16_1d), pointer :: x_complex16_1d
+    type(logical_1d), pointer :: x_logical_1d
+    type(logical1_1d), pointer :: x_logical1_1d
+    type(logical2_1d), pointer :: x_logical2_1d
+    type(logical4_1d), pointer :: x_logical4_1d
+    type(logical8_1d), pointer :: x_logical8_1d
+    type(character_1d), pointer :: x_character_1d
+    integer, dimension(:), pointer :: ptr_c_long
+    integer, dimension(:), pointer :: ptr_integer
+    integer(kind=2), dimension(:), pointer :: ptr_integer2
+    integer(kind=4), dimension(:), pointer :: ptr_integer4
+    integer(kind=8), dimension(:), pointer :: ptr_integer8
+    real, dimension(:), pointer :: ptr_real
+    real(kind=4), dimension(:), pointer :: ptr_real4
+    real(kind=8), dimension(:), pointer :: ptr_real8
+    real(kind=16), dimension(:), pointer :: ptr_real16
+    complex, dimension(:), pointer :: ptr_complex
+    complex(kind=4), dimension(:), pointer :: ptr_complex4
+    complex(kind=8), dimension(:), pointer :: ptr_complex8
+    complex(kind=16), dimension(:), pointer :: ptr_complex16
+    logical, dimension(:), pointer :: ptr_logical
+    logical(kind=1), dimension(:), pointer :: ptr_logical1
+    logical(kind=2), dimension(:), pointer :: ptr_logical2
+    logical(kind=4), dimension(:), pointer :: ptr_logical4
+    logical(kind=8), dimension(:), pointer :: ptr_logical8
+    select type(item=>x%item)
+    type is (c_long_1d)
+       x_c_long_1d => item
+       call c_f_pointer(x%ptr, ptr_c_long, [x%len])
+       x_c_long_1d%x = ptr_c_long
+    type is (integer_1d)
+       x_integer_1d => item
+       call c_f_pointer(x%ptr, ptr_integer, [x%len])
+       x_integer_1d%x = ptr_integer
+    type is (integer2_1d)
+       x_integer2_1d => item
+       call c_f_pointer(x%ptr, ptr_integer2, [x%len])
+       x_integer2_1d%x = ptr_integer2
+    type is (integer4_1d)
+       x_integer4_1d => item
+       call c_f_pointer(x%ptr, ptr_integer4, [x%len])
+       x_integer4_1d%x = ptr_integer4
+    type is (integer8_1d)
+       x_integer8_1d => item
+       call c_f_pointer(x%ptr, ptr_integer8, [x%len])
+       x_integer8_1d%x = ptr_integer8
+    type is (real_1d)
+       x_real_1d => item
+       call c_f_pointer(x%ptr, ptr_real, [x%len])
+       x_real_1d%x = ptr_real
+    type is (real4_1d)
+       x_real4_1d => item
+       call c_f_pointer(x%ptr, ptr_real4, [x%len])
+       x_real4_1d%x = ptr_real4
+    type is (real8_1d)
+       x_real8_1d => item
+       call c_f_pointer(x%ptr, ptr_real8, [x%len])
+       x_real8_1d%x = ptr_real8
+    type is (real16_1d)
+       x_real16_1d => item
+       call c_f_pointer(x%ptr, ptr_real16, [x%len])
+       x_real16_1d%x = ptr_real16
+    type is (complex_1d)
+       x_complex_1d => item
+       call c_f_pointer(x%ptr, ptr_complex, [x%len])
+       x_complex_1d%x = ptr_complex
+    type is (complex4_1d)
+       x_complex4_1d => item
+       call c_f_pointer(x%ptr, ptr_complex4, [x%len])
+       x_complex4_1d%x = ptr_complex4
+    type is (complex8_1d)
+       x_complex8_1d => item
+       call c_f_pointer(x%ptr, ptr_complex8, [x%len])
+       x_complex8_1d%x = ptr_complex8
+    type is (complex16_1d)
+       x_complex16_1d => item
+       call c_f_pointer(x%ptr, ptr_complex16, [x%len])
+       x_complex16_1d%x = ptr_complex16
+    type is (logical_1d)
+       x_logical_1d => item
+       call c_f_pointer(x%ptr, ptr_logical, [x%len])
+       x_logical_1d%x = ptr_logical
+    type is (logical1_1d)
+       x_logical1_1d => item
+       call c_f_pointer(x%ptr, ptr_logical1, [x%len])
+       x_logical1_1d%x = ptr_logical1
+    type is (logical2_1d)
+       x_logical2_1d => item
+       call c_f_pointer(x%ptr, ptr_logical2, [x%len])
+       x_logical2_1d%x = ptr_logical2
+    type is (logical4_1d)
+       x_logical4_1d => item
+       call c_f_pointer(x%ptr, ptr_logical4, [x%len])
+       x_logical4_1d%x = ptr_logical4
+    type is (logical8_1d)
+       x_logical8_1d => item
+       call c_f_pointer(x%ptr, ptr_logical8, [x%len])
+       x_logical8_1d%x = ptr_logical8
+    type is (character_1d)
+       x_character_1d => item
+       x_character_realloc => x_character_1d%x(1)
+       xarr_character0 => x_character_realloc%x
+       ! allocate(x%data_character_unit(x%prec*x%len))
+       print *, "before pointer (mult) ", x%len, x%prec
+       print *, "pointer = ", x%ptr
+       call c_f_pointer(x%ptr, x%data_character_unit, [x%prec*x%len])
+       print *, "after  pointer (mult) ", x%data_character_unit
+       do i = 1, x%len
+          ! x_character_realloc => x_character_1d%x(i)
+          ! xarr_character => x_character_realloc%x
+          ! xarr_character(1:x%prec) = x%data_character_unit( &
+          !      (1+(i-1)*x%prec):(i*x%prec))
+          x_character_1d%x(i)%x = x%data_character_unit( &
+               (1+(i-1)*x%prec):(i*x%prec))
+          print *, "after  pointer (mult) ", i, &
+               size(x_character_1d%x(i)%x),&
+               size(x%data_character_unit((1+(i-1)*x%prec):(i*x%prec))), &
+               x_character_1d%x(i)%x
+       end do
+       deallocate(x%data_character_unit)
+    class default
+       stop 'yggarg_c2f_array_transfer_1darray: Unexpected type.'
+    end select
+  end subroutine yggptr_c2f_array_transfer_1darray
   
   subroutine yggptr_c2f_scalar_transfer_integer(x)
     implicit none
@@ -629,6 +873,44 @@ contains
              call yggptr_c2f_array_alloc_logical(x, array_len)
           type is (yggchar_r)
              call yggptr_c2f_alloc_character(x, array_len, precision)
+          type is (c_long_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (integer_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (integer2_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (integer4_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (integer8_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (real_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (real4_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (real8_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (real16_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (complex_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (complex4_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (complex8_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (complex16_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (logical_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (logical1_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (logical2_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (logical4_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (logical8_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
+          type is (character_1d)
+             call yggarg_c2f_alloc_1darray(x, array_len, precision)
           class default
              print *, x%type
              stop 'yggptr_c2f (realloc) Unexpected type.'
@@ -650,41 +932,87 @@ contains
        end if
     end if
     if (x%array) then
-       select type(item=>x%item_array)
-       type is (integer(kind=2))
-          call yggptr_c2f_array_transfer_integer(x)
-       type is (integer(kind=4))
-          call yggptr_c2f_array_transfer_integer(x)
-       type is (integer(kind=8))
-          call yggptr_c2f_array_transfer_integer(x)
-       type is (real(kind=4))
-          call yggptr_c2f_array_transfer_real(x)
-       type is (real(kind=8))
-          call yggptr_c2f_array_transfer_real(x)
-       type is (real(kind=16))
-          call yggptr_c2f_array_transfer_real(x)
-       type is (complex(kind=4))
-          call yggptr_c2f_array_transfer_complex(x)
-       type is (complex(kind=8))
-          call yggptr_c2f_array_transfer_complex(x)
-       type is (complex(kind=16))
-          call yggptr_c2f_array_transfer_complex(x)
-       type is (logical(kind=1))
-          call yggptr_c2f_array_transfer_logical(x)
-       type is (logical(kind=2))
-          call yggptr_c2f_array_transfer_logical(x)
-       type is (logical(kind=4))
-          call yggptr_c2f_array_transfer_logical(x)
-       type is (logical(kind=8))
-          call yggptr_c2f_array_transfer_logical(x)
-       type is (yggchar_r)
-          call yggptr_c2f_array_transfer_character(x)
-       type is (character(*))
-          call yggptr_c2f_array_transfer_character(x)
-       class default
-          print *, x%type
-          stop 'yggptr_c2f (array transfer): Unexpected type.'
-       end select
+       if (x%alloc) then
+          select type(item=>x%item)
+          type is (c_long_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (integer_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (integer2_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (integer4_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (integer8_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (real_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (real4_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (real8_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (real16_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (complex_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (complex4_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (complex8_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (complex16_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (logical_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (logical1_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (logical2_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (logical4_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (logical8_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          type is (character_1d)
+             call yggptr_c2f_array_transfer_1darray(x)
+          class default
+             print *, x%type
+             stop 'yggptr_c2f (realloc array transfer): Unexpected type.'
+          end select
+       else
+          select type(item=>x%item_array)
+          type is (integer(kind=2))
+             call yggptr_c2f_array_transfer_integer(x)
+          type is (integer(kind=4))
+             call yggptr_c2f_array_transfer_integer(x)
+          type is (integer(kind=8))
+             call yggptr_c2f_array_transfer_integer(x)
+          type is (real(kind=4))
+             call yggptr_c2f_array_transfer_real(x)
+          type is (real(kind=8))
+             call yggptr_c2f_array_transfer_real(x)
+          type is (real(kind=16))
+             call yggptr_c2f_array_transfer_real(x)
+          type is (complex(kind=4))
+             call yggptr_c2f_array_transfer_complex(x)
+          type is (complex(kind=8))
+             call yggptr_c2f_array_transfer_complex(x)
+          type is (complex(kind=16))
+             call yggptr_c2f_array_transfer_complex(x)
+          type is (logical(kind=1))
+             call yggptr_c2f_array_transfer_logical(x)
+          type is (logical(kind=2))
+             call yggptr_c2f_array_transfer_logical(x)
+          type is (logical(kind=4))
+             call yggptr_c2f_array_transfer_logical(x)
+          type is (logical(kind=8))
+             call yggptr_c2f_array_transfer_logical(x)
+          type is (yggchar_r)
+             call yggptr_c2f_array_transfer_character(x)
+          type is (character(*))
+             call yggptr_c2f_array_transfer_character(x)
+          class default
+             print *, x%type
+             stop 'yggptr_c2f (array transfer): Unexpected type.'
+          end select
+       end if
     else
        select type(item=>x%item)
        type is (integer(kind=2))
@@ -846,6 +1174,7 @@ contains
        else
           y%ptr = c_null_ptr
        end if
+       y%alloc = .true.
     class default
        stop 'yggarg_scalar_character: Unexpected type.'
     end select
@@ -889,6 +1218,8 @@ contains
        call yggarg_scalar_character(y)
     type is (yggchar_r)
        call yggarg_scalar_character(y)
+    type is (c_long_1d)
+       call yggarg_realloc_1darray(y)
     type is (integer_1d)
        call yggarg_realloc_1darray(y)
     type is (integer2_1d)
@@ -942,6 +1273,7 @@ contains
   ! Array versions
   subroutine yggarg_realloc_1darray(y)
     type(yggptr) :: y
+    type(c_long_1d), pointer :: x_c_long_1d
     type(integer_1d), pointer :: x_integer_1d
     type(integer2_1d), pointer :: x_integer2_1d
     type(integer4_1d), pointer :: x_integer4_1d
@@ -967,6 +1299,13 @@ contains
     y%prec = 1
     y%ptr = c_null_ptr
     select type(x=>y%item)
+    type is (c_long_1d)
+       y%type = "c_long"
+       x_c_long_1d => x
+       if (allocated(x_c_long_1d%x)) then
+          y%ptr = c_loc(x_c_long_1d%x(1))
+          y%len = size(x_c_long_1d%x)
+       end if
     type is (integer_1d)
        y%type = "integer"
        x_integer_1d => x
@@ -1093,32 +1432,30 @@ contains
        print *, "yggarg_realloc_1darray: character, allocated? ", &
             allocated(x_character_1d%x)
        if (allocated(x_character_1d%x)) then
-          ! y%ptr = c_loc(x_character_1d%x(1))
           y%len = size(x_character_1d%x)
           if (allocated(x_character_1d%x(1)%x)) then
              y%prec = size(x_character_1d%x(1)%x)
              allocate(y%data_character_unit(y%len * y%prec))
              do i = 1, size(x_character_1d%x)
-                print *, "i = ", i
                 ilength = 0
-                do j = 1, ilength
+                do j = 1, y%prec
                    if (len_trim(x_character_1d%x(i)%x(j)) > 0) ilength = j
                 end do
+                print *, i, ilength
                 do j = 1, ilength
-                   print *, "j = ", j
                    y%data_character_unit(((i-1)*y%prec) + j) = x_character_1d%x(i)%x(j)
                 end do
-                if (ilength.lt.size(x_character_1d%x(i)%x)) then
+                if (ilength.lt.y%prec) then
                    y%data_character_unit(((i-1)*y%prec) + ilength + 1) = c_null_char
                 end if
-                do j = (ilength + 2), size(x_character_1d%x(i)%x)
-                   print *, "j = ", j
+                do j = (ilength + 2), y%prec
                    y%data_character_unit(((i-1)*y%prec) + j) = ' '
                 end do
              end do
              y%ptr = c_loc(y%data_character_unit(1))
           end if
       end if
+      print *, "initial ptr = ", y%ptr
     class default
        stop 'yggarg_scalar: Unexpected type.'
     end select
@@ -1305,135 +1642,6 @@ contains
     end select
   end function yggarg_array
   
-  function yggarg_realloc_array_integer2(x) result (y)
-    integer(kind=2), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_integer2
-  function yggarg_realloc_array_integer4(x) result (y)
-    integer(kind=4), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_integer4
-  function yggarg_realloc_array_integer8(x) result (y)
-    integer(kind=8), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_integer8
-  function yggarg_realloc_array_real4(x) result (y)
-    real(kind=4), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_real4
-  function yggarg_realloc_array_real8(x) result (y)
-    real(kind=8), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_real8
-  function yggarg_realloc_array_real16(x) result (y)
-    real(kind=16), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_real16
-  function yggarg_realloc_array_complex4(x) result (y)
-    complex(kind=4), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_complex4
-  function yggarg_realloc_array_complex8(x) result (y)
-    complex(kind=8), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_complex8
-  function yggarg_realloc_array_complex16(x) result (y)
-    complex(kind=16), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_complex16
-  function yggarg_realloc_array_logical1(x) result (y)
-    logical(kind=1), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_logical1
-  function yggarg_realloc_array_logical2(x) result (y)
-    logical(kind=2), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_logical2
-  function yggarg_realloc_array_logical4(x) result (y)
-    logical(kind=4), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_logical4
-  function yggarg_realloc_array_logical8(x) result (y)
-    logical(kind=8), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-  end function yggarg_realloc_array_logical8
-  function yggarg_realloc_array_character(x) result (y)
-    type(yggchar_r), dimension(:), pointer :: x
-    type(yggptr) :: y
-    if (associated(x)) print *, "Warning: Pointer associated (or not nullified), memory leak possible."
-    nullify(x)
-    allocate(x(1))
-    y = yggarg(x)
-    y%alloc = .true.
-    y%ptr = c_null_ptr
-    y%prec = 1
-  end function yggarg_realloc_array_character
-
   ! Utilities
   subroutine fix_format_str(x)
     implicit none
@@ -1607,7 +1815,7 @@ contains
        args(i)%prec_c = 1
        if (((args(i)%type.eq."character").or. &
             args(i)%array).and. &
-            (i.ge.size(args)).or. &
+            (i.ge.size(args)).or.(args(i+1)%array).or. &
             (args(i+1)%type.ne."size_t")) then
           nargs = nargs + 1
           if ((args(i)%type.eq."character").and.args(i)%array) then
@@ -1621,7 +1829,8 @@ contains
        c_args(j) = args(i)%ptr
        j = j + 1
        if ((args(i)%type.eq."character").and.(.not.args(i)%array)) then
-          if ((i.lt.size(args)).and.(args(i+1)%type.eq."size_t")) then
+          if ((i.lt.size(args)).and.(.not.args(i+1)%array).and. &
+               (args(i+1)%type.eq."size_t")) then
              print *, "Assigned next argument's pointer"
              args(i)%prec_ptr = args(i+1)%ptr
           else
@@ -1631,7 +1840,8 @@ contains
              j = j + 1
           end if
        else if ((args(i)%type.eq."character").or.args(i)%array) then
-          if ((i.lt.size(args)).and.(args(i+1)%type.eq."size_t")) then
+          if ((i.lt.size(args)).and.(.not.args(i+1)%array).and. &
+               (args(i+1)%type.eq."size_t")) then
              args(i)%len_ptr = args(i+1)%ptr
           else
              args(i)%len_c = args(i)%len
@@ -1657,6 +1867,8 @@ contains
     if (flag.ge.0) then
        j = 1
        do i = 1, size(args)
+          print *, "post_recv: ", args(i)%type, args(i)%array, &
+               i, j, c_args(j)
           args(i)%ptr = c_args(j)
           flag = yggptr_c2f(args(i))
           if (flag.lt.0) then
@@ -1666,20 +1878,23 @@ contains
           end if
           j = j + 1
           if (((args(i)%type.eq."character").or.args(i)%array).and. &
-               (i.ge.size(args)).or. &
-               (args(i+1)%type.ne."size_t")) then
+               ((i.ge.size(args)).or.(args(i+1)%array).or. &
+               (args(i+1)%type.ne."size_t"))) then
+             print *, "Added 1 for length"
              j = j + 1
              if ((args(i)%type.eq."character").and.args(i)%array) then
                 j = j + 1
+                print *, "Added 1 for precision"
              end if
           end if
-          deallocate(args(i)%len_c)
-          deallocate(args(i)%prec_c)
+          ! deallocate(args(i)%len_c)
+          ! deallocate(args(i)%prec_c)
        end do
     end if
     if (allocated(c_args)) then
        deallocate(c_args)
     end if
+    print *, "after post_recv"
   end subroutine post_recv
   
   function ygg_recv_var(ygg_q, args) result (flag)
