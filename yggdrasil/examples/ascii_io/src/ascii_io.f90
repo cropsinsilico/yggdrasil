@@ -14,10 +14,14 @@ program main
   real(kind=8) :: value
   complex(kind=8) :: comp
   integer(kind=c_size_t), target :: nrows
-  type(yggchar_r), dimension(:), pointer :: name_arr
-  integer, dimension(:), pointer :: number_arr
-  real(kind=8), dimension(:), pointer :: value_arr
-  complex(kind=8), dimension(:), pointer :: comp_arr
+  type(character_1d), pointer :: name_arr
+  type(integer_1d), pointer :: number_arr
+  type(real8_1d), pointer :: value_arr
+  type(complex8_1d), pointer :: comp_arr
+  ! type(yggchar_r), dimension(:), pointer :: name_arr
+  ! integer, dimension(:), pointer :: number_arr
+  ! real(kind=8), dimension(:), pointer :: value_arr
+  ! complex(kind=8), dimension(:), pointer :: comp_arr
   integer(kind=c_size_t) :: i
   ! nullify(line, name_arr, number_arr, value_arr, comp_arr)
 
@@ -110,8 +114,8 @@ program main
         print *, "Array: (", nrows, " rows)"
         ! Print each line in the array
         do i = 1, nrows
-           print *, name_arr(i)%x, number_arr(i), value_arr(i), &
-                comp_arr(i)
+           print *, name_arr%x(i)%x, number_arr%x(i), value_arr%x(i), &
+                comp_arr%x(i)
         end do
         ! Send the columns in the array to output. Formatting is handled on the
         ! output driver side.
