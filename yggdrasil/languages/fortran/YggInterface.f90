@@ -15,9 +15,6 @@ module fygg
   type :: yggchar_r
      character, dimension(:), pointer :: x => null()
   end type yggchar_r
-  type :: yggarr_r
-     class(*), dimension(:), pointer :: x => null()
-  end type yggarr_r
   type :: c_long_1d
      integer(kind=c_long), dimension(:), pointer :: x => null()
   end type c_long_1d
@@ -152,7 +149,7 @@ module fygg
      type(yggptr), dimension(:), pointer :: vals
   end type yggptr_map
 
-  public :: yggarg, yggchar_r, yggarr_r, yggcomm, &
+  public :: yggarg, yggchar_r, yggcomm, &
        yggptr, yggptr_arr, yggptr_map, &
        integer_1d, real_1d, complex_1d, logical_1d, character_1d, &
        LINE_SIZE_MAX
@@ -996,8 +993,8 @@ contains
                 j = j + 1
              end if
           end if
-          ! deallocate(args(i)%len_c)
-          ! deallocate(args(i)%prec_c)
+          deallocate(args(i)%len_c)
+          deallocate(args(i)%prec_c)
        end do
     end if
     if (allocated(c_args)) then
