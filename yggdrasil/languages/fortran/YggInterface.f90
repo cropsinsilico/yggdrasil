@@ -157,7 +157,7 @@ module fygg
        integer_1d, real_1d, complex_1d, logical_1d, character_1d, &
        LINE_SIZE_MAX
 
-  INCLUDE "YggInterface_cdef.f90"
+  include "YggInterface_cdef.f90"
 
 contains
 
@@ -452,7 +452,8 @@ contains
        call c_f_pointer(x%ptr, x_integer4, [x%len])
     type is (integer(kind=8))
        x_integer8 => item
-       call c_f_pointer(x%ptr, x_integer8, [x%len])
+       print *, "INTEGER", x_integer8
+       ! call c_f_pointer(x%ptr, x_integer8, [x%len])
     class default
        print *, x%type
        stop 'yggptr_c2f_scalar_transfer_integer: Unexpected type.'
@@ -535,11 +536,14 @@ contains
     select type(item=>x%item)
     type is (yggchar_r)
        x_character_realloc => item
-       xarr_character => x_character_realloc%x
+       ! xarr_character => x_character_realloc%x
        print *, "before pointer (sing)"
        call c_f_pointer(x%ptr, xarr_character, [x%prec])
        print *, "after pointer (sing)", xarr_character
        x_character_realloc%x = xarr_character
+       do i = (x%prec + 1), size(x_character_realloc%x)
+          x_character_realloc%x(i) = ' '
+       end do
     type is (character(*))
        x_character => item
        do i = 1, x%prec
@@ -1471,8 +1475,8 @@ contains
        if ((args(i)%type.eq."character").and.(.not.args(i)%array)) then
           if ((i.lt.size(args)).and.(.not.args(i+1)%array).and. &
                (args(i+1)%type.eq."size_t")) then
-             print *, "Assigned next argument's pointer"
              args(i)%prec_ptr = args(i+1)%ptr
+             print *, "Assigned next argument's pointer", args(i)%prec_ptr
           else
              args(i)%prec_c = args(i)%prec
              args(i)%prec_ptr = c_loc(args(i)%prec_c)

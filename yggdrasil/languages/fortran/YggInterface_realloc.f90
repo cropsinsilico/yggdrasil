@@ -42,46 +42,46 @@ function yggptr_realloc(x, array_len, precision, realloc) result(flag)
         type is (yggchar_r)
            call yggptr_realloc_character(x, array_len, precision)
         type is (c_long_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_integer(x, array_len, precision)
         type is (integer_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_integer(x, array_len, precision)
         type is (integer2_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_integer(x, array_len, precision)
         type is (integer4_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_integer(x, array_len, precision)
         type is (integer8_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_integer(x, array_len, precision)
         type is (real_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_real(x, array_len, precision)
         type is (real4_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_real(x, array_len, precision)
         type is (real8_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_real(x, array_len, precision)
         type is (real16_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_real(x, array_len, precision)
         type is (complex_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_complex(x, array_len, precision)
         type is (complex4_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_complex(x, array_len, precision)
         type is (complex8_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_complex(x, array_len, precision)
         type is (complex16_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_complex(x, array_len, precision)
         type is (logical_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_logical(x, array_len, precision)
         type is (logical1_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_logical(x, array_len, precision)
         type is (logical2_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_logical(x, array_len, precision)
         type is (logical4_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_logical(x, array_len, precision)
         type is (logical8_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_logical(x, array_len, precision)
         type is (character_1d)
-           call yggptr_realloc_1darray(x, array_len, precision)
+           call yggptr_realloc_1darray_character(x, array_len, precision)
         class default
            print *, x%type
-           stop 'yggptr_c2f (realloc) Unexpected type.'
+           stop 'yggptr_realloc: Unexpected type.'
         end select
         if (array_len.gt.x%len) x%len = array_len
         if (precision.gt.x%prec) x%prec = precision
@@ -108,6 +108,9 @@ subroutine yggptr_realloc_integer(x, array_len)
   integer(kind=2), dimension(:), pointer :: xarr_integer2
   integer(kind=4), dimension(:), pointer :: xarr_integer4
   integer(kind=8), dimension(:), pointer :: xarr_integer8
+  if (.not.x%array) then
+     stop 'yggptr_realloc_integer: Only arrays can be reallocated.'
+  end if
   select type(item=>x%item_array)
   type is (integer(kind=2))
      xarr_integer2 => item
@@ -132,6 +135,9 @@ subroutine yggptr_realloc_real(x, array_len)
   real(kind=4), dimension(:), pointer :: xarr_real4
   real(kind=8), dimension(:), pointer :: xarr_real8
   real(kind=16), dimension(:), pointer :: xarr_real16
+  if (.not.x%array) then
+     stop 'yggptr_realloc_real: Only arrays can be reallocated.'
+  end if
   select type(item=>x%item_array)
   type is (real(kind=4))
      xarr_real4 => item
@@ -156,6 +162,9 @@ subroutine yggptr_realloc_complex(x, array_len)
   complex(kind=4), dimension(:), pointer :: xarr_complex4
   complex(kind=8), dimension(:), pointer :: xarr_complex8
   complex(kind=16), dimension(:), pointer :: xarr_complex16
+  if (.not.x%array) then
+     stop 'yggptr_realloc_complex: Only arrays can be reallocated.'
+  end if
   select type(item=>x%item_array)
   type is (complex(kind=4))
      xarr_complex4 => item
@@ -181,6 +190,9 @@ subroutine yggptr_realloc_logical(x, array_len)
   logical(kind=2), dimension(:), pointer :: xarr_logical2
   logical(kind=4), dimension(:), pointer :: xarr_logical4
   logical(kind=8), dimension(:), pointer :: xarr_logical8
+  if (.not.x%array) then
+     stop 'yggptr_realloc_logical: Only arrays can be reallocated.'
+  end if
   select type(item=>x%item_array)
   type is (logical(kind=1))
      xarr_logical1 => item
@@ -242,33 +254,17 @@ subroutine yggptr_realloc_character(x, array_len, precision)
      end select
   end if
 end subroutine yggptr_realloc_character
-subroutine yggptr_realloc_1darray(x, array_len, precision)
+
+subroutine yggptr_realloc_1darray_integer(x, array_len, precision)
   implicit none
   type(yggptr) :: x
   integer(kind=c_size_t), pointer :: array_len
   integer(kind=c_size_t), pointer :: precision
-  type(yggchar_r), pointer :: x_character_realloc
-  type(yggchar_r), dimension(:), pointer :: xarr_character_realloc
-  integer(kind=8) :: i
   type(c_long_1d), pointer :: x_c_long_1d
   type(integer_1d), pointer :: x_integer_1d
   type(integer2_1d), pointer :: x_integer2_1d
   type(integer4_1d), pointer :: x_integer4_1d
   type(integer8_1d), pointer :: x_integer8_1d
-  type(real_1d), pointer :: x_real_1d
-  type(real4_1d), pointer :: x_real4_1d
-  type(real8_1d), pointer :: x_real8_1d
-  type(real16_1d), pointer :: x_real16_1d
-  type(complex_1d), pointer :: x_complex_1d
-  type(complex4_1d), pointer :: x_complex4_1d
-  type(complex8_1d), pointer :: x_complex8_1d
-  type(complex16_1d), pointer :: x_complex16_1d
-  type(logical_1d), pointer :: x_logical_1d
-  type(logical1_1d), pointer :: x_logical1_1d
-  type(logical2_1d), pointer :: x_logical2_1d
-  type(logical4_1d), pointer :: x_logical4_1d
-  type(logical8_1d), pointer :: x_logical8_1d
-  type(character_1d), pointer :: x_character_1d
   select type(item=>x%item)
   type is (c_long_1d)
      x_c_long_1d => item
@@ -290,6 +286,20 @@ subroutine yggptr_realloc_1darray(x, array_len, precision)
      x_integer8_1d => item
      if (allocated(x_integer8_1d%x)) deallocate(x_integer8_1d%x)
      allocate(x_integer8_1d%x(array_len))
+  class default
+     stop 'yggptr_realloc_1darray_integer: Unexpected type.'
+  end select
+end subroutine yggptr_realloc_1darray_integer
+subroutine yggptr_realloc_1darray_real(x, array_len, precision)
+  implicit none
+  type(yggptr) :: x
+  integer(kind=c_size_t), pointer :: array_len
+  integer(kind=c_size_t), pointer :: precision
+  type(real_1d), pointer :: x_real_1d
+  type(real4_1d), pointer :: x_real4_1d
+  type(real8_1d), pointer :: x_real8_1d
+  type(real16_1d), pointer :: x_real16_1d
+  select type(item=>x%item)
   type is (real_1d)
      x_real_1d => item
      if (allocated(x_real_1d%x)) deallocate(x_real_1d%x)
@@ -306,6 +316,20 @@ subroutine yggptr_realloc_1darray(x, array_len, precision)
      x_real16_1d => item
      if (allocated(x_real16_1d%x)) deallocate(x_real16_1d%x)
      allocate(x_real16_1d%x(array_len))
+  class default
+     stop 'yggptr_realloc_1darray_real: Unexpected type.'
+  end select
+end subroutine yggptr_realloc_1darray_real
+subroutine yggptr_realloc_1darray_complex(x, array_len, precision)
+  implicit none
+  type(yggptr) :: x
+  integer(kind=c_size_t), pointer :: array_len
+  integer(kind=c_size_t), pointer :: precision
+  type(complex_1d), pointer :: x_complex_1d
+  type(complex4_1d), pointer :: x_complex4_1d
+  type(complex8_1d), pointer :: x_complex8_1d
+  type(complex16_1d), pointer :: x_complex16_1d
+  select type(item=>x%item)
   type is (complex_1d)
      x_complex_1d => item
      if (allocated(x_complex_1d%x)) deallocate(x_complex_1d%x)
@@ -322,6 +346,21 @@ subroutine yggptr_realloc_1darray(x, array_len, precision)
      x_complex16_1d => item
      if (allocated(x_complex16_1d%x)) deallocate(x_complex16_1d%x)
      allocate(x_complex16_1d%x(array_len))
+  class default
+     stop 'yggptr_realloc_1darray_complex: Unexpected type.'
+  end select
+end subroutine yggptr_realloc_1darray_complex
+subroutine yggptr_realloc_1darray_logical(x, array_len, precision)
+  implicit none
+  type(yggptr) :: x
+  integer(kind=c_size_t), pointer :: array_len
+  integer(kind=c_size_t), pointer :: precision
+  type(logical_1d), pointer :: x_logical_1d
+  type(logical1_1d), pointer :: x_logical1_1d
+  type(logical2_1d), pointer :: x_logical2_1d
+  type(logical4_1d), pointer :: x_logical4_1d
+  type(logical8_1d), pointer :: x_logical8_1d
+  select type(item=>x%item)
   type is (logical_1d)
      x_logical_1d => item
      if (allocated(x_logical_1d%x)) deallocate(x_logical_1d%x)
@@ -342,6 +381,20 @@ subroutine yggptr_realloc_1darray(x, array_len, precision)
      x_logical8_1d => item
      if (allocated(x_logical8_1d%x)) deallocate(x_logical8_1d%x)
      allocate(x_logical8_1d%x(array_len))
+  class default
+     stop 'yggptr_realloc_1darray_logical: Unexpected type.'
+  end select
+end subroutine yggptr_realloc_1darray_logical
+subroutine yggptr_realloc_1darray_character(x, array_len, precision)
+  implicit none
+  type(yggptr) :: x
+  integer(kind=c_size_t), pointer :: array_len
+  integer(kind=c_size_t), pointer :: precision
+  type(yggchar_r), pointer :: x_character_realloc
+  type(yggchar_r), dimension(:), pointer :: xarr_character_realloc
+  type(character_1d), pointer :: x_character_1d
+  integer(kind=8) :: i
+  select type(item=>x%item)
   type is (character_1d)
      x_character_1d => item
      if (array_len.gt.x%len) then
@@ -358,6 +411,6 @@ subroutine yggptr_realloc_1darray(x, array_len, precision)
         end do
      end if
   class default
-     stop 'yggptr_realloc_1darray: Unexpected type.'
+     stop 'yggptr_realloc_1darray_character: Unexpected type.'
   end select
-end subroutine yggptr_realloc_1darray
+end subroutine yggptr_realloc_1darray_character
