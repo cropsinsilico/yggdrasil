@@ -15,32 +15,6 @@ function yggptr_realloc(x, array_len, precision, realloc) result(flag)
              x%len, array_len, x%prec, precision
         call ygglog_debug(log_msg)
         select type(item=>x%item)
-        ! type is (integer(kind=2))
-        !    call yggptr_realloc_integer(x, array_len)
-        ! type is (integer(kind=4))
-        !    call yggptr_realloc_integer(x, array_len)
-        ! type is (integer(kind=8))
-        !    call yggptr_realloc_integer(x, array_len)
-        ! type is (real(kind=4))
-        !    call yggptr_realloc_real(x, array_len)
-        ! type is (real(kind=8))
-        !    call yggptr_realloc_real(x, array_len)
-        ! type is (real(kind=16))
-        !    call yggptr_realloc_real(x, array_len)
-        ! type is (complex(kind=4))
-        !    call yggptr_realloc_complex(x, array_len)
-        ! type is (complex(kind=8))
-        !    call yggptr_realloc_complex(x, array_len)
-        ! type is (complex(kind=16))
-        !    call yggptr_realloc_complex(x, array_len)
-        ! type is (logical(kind=1))
-        !    call yggptr_realloc_logical(x, array_len)
-        ! type is (logical(kind=2))
-        !    call yggptr_realloc_logical(x, array_len)
-        ! type is (logical(kind=4))
-        !    call yggptr_realloc_logical(x, array_len)
-        ! type is (logical(kind=8))
-        !    call yggptr_realloc_logical(x, array_len)
         type is (yggchar_r)
            call yggptr_realloc_character(x, array_len, precision)
         type is (c_long_1d)
@@ -108,120 +82,6 @@ function yggptr_realloc(x, array_len, precision, realloc) result(flag)
   end if
 end function yggptr_realloc
 
-subroutine yggptr_realloc_integer(x, array_len)
-  implicit none
-  type(yggptr) :: x
-  integer(kind=c_size_t), pointer :: array_len
-  integer(kind=2), dimension(:), pointer :: xarr_integer2
-  integer(kind=4), dimension(:), pointer :: xarr_integer4
-  integer(kind=8), dimension(:), pointer :: xarr_integer8
-  if (.not.x%array) then
-     stop 'yggptr_realloc_integer: Only arrays can be reallocated.'
-  end if
-  select type(item=>x%item_array)
-  type is (integer(kind=2))
-     xarr_integer2 => item
-     deallocate(xarr_integer2);
-     allocate(xarr_integer2(array_len))
-  type is (integer(kind=4))
-     xarr_integer4 => item
-     deallocate(xarr_integer4);
-     allocate(xarr_integer4(array_len))
-  type is (integer(kind=8))
-     xarr_integer8 => item
-     deallocate(xarr_integer8);
-     allocate(xarr_integer8(array_len))
-  class default
-     stop 'yggptr_realloc_integer: Unexpected type.'
-  end select
-end subroutine yggptr_realloc_integer
-subroutine yggptr_realloc_real(x, array_len)
-  implicit none
-  type(yggptr) :: x
-  integer(kind=c_size_t), pointer :: array_len
-  real(kind=4), dimension(:), pointer :: xarr_real4
-  real(kind=8), dimension(:), pointer :: xarr_real8
-  real(kind=16), dimension(:), pointer :: xarr_real16
-  if (.not.x%array) then
-     stop 'yggptr_realloc_real: Only arrays can be reallocated.'
-  end if
-  select type(item=>x%item_array)
-  type is (real(kind=4))
-     xarr_real4 => item
-     deallocate(xarr_real4);
-     allocate(xarr_real4(array_len))
-  type is (real(kind=8))
-     xarr_real8 => item
-     deallocate(xarr_real8);
-     allocate(xarr_real8(array_len))
-  type is (real(kind=16))
-     xarr_real16 => item
-     deallocate(xarr_real16);
-     allocate(xarr_real16(array_len))
-  class default
-     stop 'yggptr_realloc_real: Unexpected type.'
-  end select
-end subroutine yggptr_realloc_real
-subroutine yggptr_realloc_complex(x, array_len)
-  implicit none
-  type(yggptr) :: x
-  integer(kind=c_size_t), pointer :: array_len
-  complex(kind=4), dimension(:), pointer :: xarr_complex4
-  complex(kind=8), dimension(:), pointer :: xarr_complex8
-  complex(kind=16), dimension(:), pointer :: xarr_complex16
-  if (.not.x%array) then
-     stop 'yggptr_realloc_complex: Only arrays can be reallocated.'
-  end if
-  select type(item=>x%item_array)
-  type is (complex(kind=4))
-     xarr_complex4 => item
-     deallocate(xarr_complex4);
-     allocate(xarr_complex4(array_len))
-  type is (complex(kind=8))
-     xarr_complex8 => item
-     deallocate(xarr_complex8);
-     allocate(xarr_complex8(array_len))
-  type is (complex(kind=16))
-     xarr_complex16 => item
-     deallocate(xarr_complex16);
-     allocate(xarr_complex16(array_len))
-  class default
-     stop 'yggptr_realloc_complex: Unexpected type.'
-  end select
-end subroutine yggptr_realloc_complex
-subroutine yggptr_realloc_logical(x, array_len)
-  implicit none
-  type(yggptr) :: x
-  integer(kind=c_size_t), pointer :: array_len
-  logical(kind=1), dimension(:), pointer :: xarr_logical1
-  logical(kind=2), dimension(:), pointer :: xarr_logical2
-  logical(kind=4), dimension(:), pointer :: xarr_logical4
-  logical(kind=8), dimension(:), pointer :: xarr_logical8
-  if (.not.x%array) then
-     stop 'yggptr_realloc_logical: Only arrays can be reallocated.'
-  end if
-  select type(item=>x%item_array)
-  type is (logical(kind=1))
-     xarr_logical1 => item
-     deallocate(xarr_logical1);
-     allocate(xarr_logical1(array_len))
-  type is (logical(kind=2))
-     xarr_logical2 => item
-     deallocate(xarr_logical2);
-     allocate(xarr_logical2(array_len))
-  type is (logical(kind=4))
-     xarr_logical4 => item
-     deallocate(xarr_logical4);
-     allocate(xarr_logical4(array_len))
-  type is (logical(kind=8))
-     xarr_logical8 => item
-     deallocate(xarr_logical8);
-     allocate(xarr_logical8(array_len))
-  class default
-     stop 'yggptr_realloc_logical: Unexpected type.'
-  end select
-end subroutine yggptr_realloc_logical
-
 
 subroutine yggptr_realloc_character(x, array_len, precision)
   implicit none
@@ -233,23 +93,6 @@ subroutine yggptr_realloc_character(x, array_len, precision)
   integer(kind=8) :: i
   if (x%array) then
      stop 'yggptr_realloc_character (array): Unexpected type.'
-     ! select type(item=>x%item_array)
-     ! type is (yggchar_r)
-     !    xarr_character_realloc => item
-     !    if (array_len.gt.x%len) then
-     !       deallocate(xarr_character_realloc)
-     !       allocate(xarr_character_realloc(array_len))
-     !    end if
-     !    if ((array_len.gt.x%len).or.(precision.gt.x%prec)) then
-     !       do i = 1, array_len
-     !          x_character_realloc => xarr_character_realloc(i)
-     !          allocate(x_character_realloc%x(precision))
-     !          nullify(x_character_realloc)
-     !       end do
-     !    end if
-     ! class default
-     !    stop 'yggptr_realloc_character (array): Unexpected type.'
-     ! end select
   else
      select type(item=>x%item)
      type is (yggchar_r)

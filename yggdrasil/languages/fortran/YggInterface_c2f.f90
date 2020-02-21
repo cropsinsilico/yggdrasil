@@ -75,31 +75,18 @@ function yggptr_c2f(x, realloc) result(flag)
      else
         select type(item=>x%item_array)
         type is (integer(kind=2))
-           call yggptr_c2f_array_integer(x)
         type is (integer(kind=4))
-           call yggptr_c2f_array_integer(x)
         type is (integer(kind=8))
-           call yggptr_c2f_array_integer(x)
         type is (real(kind=4))
-           call yggptr_c2f_array_real(x)
         type is (real(kind=8))
-           call yggptr_c2f_array_real(x)
         type is (real(kind=16))
-           call yggptr_c2f_array_real(x)
         type is (complex(kind=4))
-           call yggptr_c2f_array_complex(x)
         type is (complex(kind=8))
-           call yggptr_c2f_array_complex(x)
         type is (complex(kind=16))
-           call yggptr_c2f_array_complex(x)
         type is (logical(kind=1))
-           call yggptr_c2f_array_logical(x)
         type is (logical(kind=2))
-           call yggptr_c2f_array_logical(x)
         type is (logical(kind=4))
-           call yggptr_c2f_array_logical(x)
         type is (logical(kind=8))
-           call yggptr_c2f_array_logical(x)
         type is (yggchar_r)
            call yggptr_c2f_array_character(x)
         type is (character(*))
@@ -113,31 +100,18 @@ function yggptr_c2f(x, realloc) result(flag)
   else
      select type(item=>x%item)
      type is (integer(kind=2))
-        call yggptr_c2f_scalar_integer(x)
      type is (integer(kind=4))
-        call yggptr_c2f_scalar_integer(x)
      type is (integer(kind=8))
-        call yggptr_c2f_scalar_integer(x)
      type is (real(kind=4))
-        call yggptr_c2f_scalar_real(x)
      type is (real(kind=8))
-        call yggptr_c2f_scalar_real(x)
      type is (real(kind=16))
-        call yggptr_c2f_scalar_real(x)
      type is (complex(kind=4))
-        call yggptr_c2f_scalar_complex(x)
      type is (complex(kind=8))
-        call yggptr_c2f_scalar_complex(x)
      type is (complex(kind=16))
-        call yggptr_c2f_scalar_complex(x)
      type is (logical(kind=1))
-        call yggptr_c2f_scalar_logical(x)
      type is (logical(kind=2))
-        call yggptr_c2f_scalar_logical(x)
      type is (logical(kind=4))
-        call yggptr_c2f_scalar_logical(x)
      type is (logical(kind=8))
-        call yggptr_c2f_scalar_logical(x)
      type is (yggchar_r)
         call yggptr_c2f_scalar_character(x)
      type is (character(*))
@@ -158,94 +132,6 @@ function yggptr_c2f(x, realloc) result(flag)
 end function yggptr_c2f
 
 
-subroutine yggptr_c2f_scalar_integer(x)
-  implicit none
-  type(yggptr) :: x
-  ! integer(kind=2), pointer :: x_integer2
-  ! integer(kind=4), pointer :: x_integer4
-  ! integer(kind=8), pointer :: x_integer8
-  ! select type(item=>x%item)
-  ! type is (integer(kind=2))
-  !    x_integer2 => item
-  !    call c_f_pointer(x%ptr, x_integer2, [x%len])
-  ! type is (integer(kind=4))
-  !    x_integer4 => item
-  !    call c_f_pointer(x%ptr, x_integer4, [x%len])
-  ! type is (integer(kind=8))
-  !    x_integer8 => item
-  !    ! call c_f_pointer(x%ptr, x_integer8, [x%len])
-  ! class default
-  !    call ygglog_error("yggptr_c2f_scalar_integer: Unexpected type.")
-  !    stop "ERROR"
-  ! end select
-end subroutine yggptr_c2f_scalar_integer
-subroutine yggptr_c2f_scalar_real(x)
-  implicit none
-  type(yggptr) :: x
-  ! real(kind=4), pointer :: x_real4
-  ! real(kind=8), pointer :: x_real8
-  ! real(kind=16), pointer :: x_real16
-  ! select type(item=>x%item)
-  ! type is (real(kind=4))
-  !    x_real4 => item
-  !    call c_f_pointer(x%ptr, x_real4, [x%len])
-  ! type is (real(kind=8))
-  !    x_real8 => item
-  !    call c_f_pointer(x%ptr, x_real8, [x%len])
-  ! type is (real(kind=16))
-  !    x_real16 => item
-  !    call c_f_pointer(x%ptr, x_real16, [x%len])
-  ! class default
-  !    call ygglog_error("yggptr_c2f_scalar_real: Unexpected type.")
-  !    stop "ERROR"
-  ! end select
-end subroutine yggptr_c2f_scalar_real
-subroutine yggptr_c2f_scalar_complex(x)
-  implicit none
-  type(yggptr) :: x
-  ! complex(kind=4), pointer :: x_complex4
-  ! complex(kind=8), pointer :: x_complex8
-  ! complex(kind=16), pointer :: x_complex16
-  ! select type(item=>x%item)
-  ! type is (complex(kind=4))
-  !    x_complex4 => item
-  !    call c_f_pointer(x%ptr, x_complex4, [x%len])
-  ! type is (complex(kind=8))
-  !    x_complex8 => item
-  !    call c_f_pointer(x%ptr, x_complex8, [x%len])
-  ! type is (complex(kind=16))
-  !    x_complex16 => item
-  !    call c_f_pointer(x%ptr, x_complex16, [x%len])
-  ! class default
-  !    call ygglog_error("yggptr_c2f_scalar_complex: Unexpected type.")
-  !    stop "ERROR"
-  ! end select
-end subroutine yggptr_c2f_scalar_complex
-subroutine yggptr_c2f_scalar_logical(x)
-  implicit none
-  type(yggptr) :: x
-  ! logical(kind=1), pointer :: x_logical1
-  ! logical(kind=2), pointer :: x_logical2
-  ! logical(kind=4), pointer :: x_logical4
-  ! logical(kind=8), pointer :: x_logical8
-  ! select type(item=>x%item)
-  ! type is (logical(kind=1))
-  !    x_logical1 => item
-  !    call c_f_pointer(x%ptr, x_logical1, [x%len])
-  ! type is (logical(kind=2))
-  !    x_logical2 => item
-  !    call c_f_pointer(x%ptr, x_logical2, [x%len])
-  ! type is (logical(kind=4))
-  !    x_logical4 => item
-  !    call c_f_pointer(x%ptr, x_logical4, [x%len])
-  ! type is (logical(kind=8))
-  !    x_logical8 => item
-  !    call c_f_pointer(x%ptr, x_logical8, [x%len])
-  ! class default
-  !    call ygglog_error("yggptr_c2f_scalar_logical: Unexpected type.")
-  !    stop "ERROR"
-  ! end select
-end subroutine yggptr_c2f_scalar_logical
 subroutine yggptr_c2f_scalar_character(x)
   implicit none
   type(yggptr) :: x
@@ -277,94 +163,6 @@ subroutine yggptr_c2f_scalar_character(x)
 end subroutine yggptr_c2f_scalar_character
 
 
-subroutine yggptr_c2f_array_integer(x)
-  implicit none
-  type(yggptr) :: x
-  ! integer(kind=2), dimension(:), pointer :: xarr_integer2
-  ! integer(kind=4), dimension(:), pointer :: xarr_integer4
-  ! integer(kind=8), dimension(:), pointer :: xarr_integer8
-  ! select type(item=>x%item_array)
-  ! type is (integer(kind=2))
-  !    xarr_integer2 => item
-  !    call c_f_pointer(x%ptr, xarr_integer2, [x%len])
-  ! type is (integer(kind=4))
-  !    xarr_integer4 => item
-  !    call c_f_pointer(x%ptr, xarr_integer4, [x%len])
-  ! type is (integer(kind=8))
-  !    xarr_integer8 => item
-  !    call c_f_pointer(x%ptr, xarr_integer8, [x%len])
-  ! class default
-  !    call ygglog_error("yggptr_c2f_array_integer: Unexpected type.")
-  !    stop "ERROR"
-  ! end select
-end subroutine yggptr_c2f_array_integer
-subroutine yggptr_c2f_array_real(x)
-  implicit none
-  type(yggptr) :: x
-  ! real(kind=4), dimension(:), pointer :: xarr_real4
-  ! real(kind=8), dimension(:), pointer :: xarr_real8
-  ! real(kind=16), dimension(:), pointer :: xarr_real16
-  ! select type(item=>x%item_array)
-  ! type is (real(kind=4))
-  !    xarr_real4 => item
-  !    call c_f_pointer(x%ptr, xarr_real4, [x%len])
-  ! type is (real(kind=8))
-  !    xarr_real8 => item
-  !    call c_f_pointer(x%ptr, xarr_real8, [x%len])
-  ! type is (real(kind=16))
-  !    xarr_real16 => item
-  !    call c_f_pointer(x%ptr, xarr_real16, [x%len])
-  ! class default
-  !    call ygglog_error("yggptr_c2f_array_real: Unexpected type.")
-  !    stop "ERROR"
-  ! end select
-end subroutine yggptr_c2f_array_real
-subroutine yggptr_c2f_array_complex(x)
-  implicit none
-  type(yggptr) :: x
-  ! complex(kind=4), dimension(:), pointer :: xarr_complex4
-  ! complex(kind=8), dimension(:), pointer :: xarr_complex8
-  ! complex(kind=16), dimension(:), pointer :: xarr_complex16
-  ! select type(item=>x%item_array)
-  ! type is (complex(kind=4))
-  !    xarr_complex4 => item
-  !    call c_f_pointer(x%ptr, xarr_complex4, [x%len])
-  ! type is (complex(kind=8))
-  !    xarr_complex8 => item
-  !    call c_f_pointer(x%ptr, xarr_complex8, [x%len])
-  ! type is (complex(kind=16))
-  !    xarr_complex16 => item
-  !    call c_f_pointer(x%ptr, xarr_complex16, [x%len])
-  ! class default
-  !    call ygglog_error("yggptr_c2f_array_complex: Unexpected type.")
-  !    stop "ERROR"
-  ! end select
-end subroutine yggptr_c2f_array_complex
-subroutine yggptr_c2f_array_logical(x)
-  implicit none
-  type(yggptr) :: x
-  ! logical(kind=1), dimension(:), pointer :: xarr_logical1
-  ! logical(kind=2), dimension(:), pointer :: xarr_logical2
-  ! logical(kind=4), dimension(:), pointer :: xarr_logical4
-  ! logical(kind=8), dimension(:), pointer :: xarr_logical8
-  ! select type(item=>x%item_array)
-  ! type is (logical(kind=1))
-  !    xarr_logical1 => item
-  !    call c_f_pointer(x%ptr, xarr_logical1, [x%len])
-  ! type is (logical(kind=2))
-  !    xarr_logical2 => item
-  !    call c_f_pointer(x%ptr, xarr_logical2, [x%len])
-  ! type is (logical(kind=4))
-  !    xarr_logical4 => item
-  !    call c_f_pointer(x%ptr, xarr_logical4, [x%len])
-  ! type is (logical(kind=8))
-  !    xarr_logical8 => item
-  !    call c_f_pointer(x%ptr, xarr_logical8, [x%len])
-  ! class default
-  !    call ygglog_error("yggptr_c2f_array_logical: Unexpected type.")
-  !    stop "ERROR"
-  ! end select
-end subroutine yggptr_c2f_array_logical
 subroutine yggptr_c2f_array_character(x)
   implicit none
   type(yggptr) :: x
@@ -373,21 +171,6 @@ subroutine yggptr_c2f_array_character(x)
   character, dimension(:), pointer :: xarr_character, xarr_character0
   integer(kind=8) :: i, j
   select type(item=>x%item_array)
-  ! type is (yggchar_r)
-  !    xarr_character_realloc => item
-  !    x_character_realloc => xarr_character_realloc(1)
-  !    xarr_character0 => x_character_realloc%x
-  !    ! print *, "before pointer (mult) "
-  !    ! call c_f_pointer(x%ptr, xarr_character0, [x%prec*x%len])
-  !    ! print *, "after  pointer (mult) "
-  !    ! do i = 2, x%len
-  !    !    x_character_realloc => xarr_character_realloc(i)
-  !    !    xarr_character => x_character_realloc%x
-  !    !    print *, "before pointer (mult) ", i
-  !    !    xarr_character(1:x%prec) = xarr_character0( &
-  !    !         (1+(i-1)*x%prec):(i*x%prec))
-  !    !    print *, "after  pointer (mult) ", i
-  !    ! end do
   type is (character(*))
      xarr_character => item
      do i = 1, x%len
