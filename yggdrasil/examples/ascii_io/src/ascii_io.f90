@@ -78,7 +78,7 @@ program main
         ret = ygg_send_var(table_output, &
              [yggarg(name), yggarg(name_siz), yggarg(number), &
              yggarg(value), yggarg(comp)])
-        if (reg.lt.0) then
+        if (ret.lt.0) then
            print *, "ascii_io(F): ERROR SENDING ROW"
            error_code = -1
            exit
