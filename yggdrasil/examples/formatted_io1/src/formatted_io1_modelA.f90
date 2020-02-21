@@ -3,13 +3,10 @@ program main
   use fygg
 
   ! Declare resulting variables and create buffer for received message
-  integer, parameter :: mybufsiz = 1000
   integer :: flag = 1
   type(yggcomm) :: in_channel, out_channel
-  character(len=100), target :: msg = "hello"
-  ! character(len=:), allocatable, target :: msg
-  ! allocate(character(len=100) :: msg)
-  integer(kind=c_size_t), target :: msg_siz = 100
+  type(yggchar_r) :: msg  ! Structure wrapping reallocatable string
+  integer(kind=c_size_t), target :: msg_siz = 0
 
   ! initialize input/output channels
   in_channel = ygg_input("inputA")
@@ -21,7 +18,7 @@ program main
      ! Receive input from input channel
      ! If there is an error, the flag will be negative
      ! Otherwise, it is the number of variables filled
-     flag = ygg_recv_var(in_channel, &
+     flag = ygg_recv_var_realloc(in_channel, &
           [yggarg(msg), yggarg(msg_siz)])
      if (flag.lt.0) then
         print *, "Model A: No more input."
@@ -29,7 +26,7 @@ program main
      end if
 
      ! Print received message
-     print *, "Model A: ", msg
+     print *, "Model A: ", msg%x
 
      ! Send output to output channel
      ! If there is an error, the flag will be negative

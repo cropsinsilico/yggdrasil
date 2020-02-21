@@ -136,8 +136,8 @@ module fygg
      character(len=15) :: type = "none"
      logical :: array = .false.
      logical :: alloc = .false.
-     integer :: len = 0
-     integer :: prec = 0
+     integer(kind=8) :: len = 0
+     integer(kind=8) :: prec = 0
      type(c_ptr) :: ptr = c_null_ptr
      class(*), pointer :: item => null()
      class(*), dimension(:), pointer :: item_array => null()
@@ -273,7 +273,7 @@ contains
     integer(kind=c_size_t), pointer :: precision
     type(yggchar_r), pointer :: x_character_realloc
     type(yggchar_r), dimension(:), pointer :: xarr_character_realloc
-    integer :: i
+    integer(kind=8) :: i
     if (x%array) then
        select type(item=>x%item_array)
        type is (yggchar_r)
@@ -313,7 +313,7 @@ contains
     integer(kind=c_size_t), pointer :: precision
     type(yggchar_r), pointer :: x_character_realloc
     type(yggchar_r), dimension(:), pointer :: xarr_character_realloc
-    integer :: i
+    integer(kind=8) :: i
     type(c_long_1d), pointer :: x_c_long_1d
     type(integer_1d), pointer :: x_integer_1d
     type(integer2_1d), pointer :: x_integer2_1d
@@ -520,7 +520,7 @@ contains
     type(yggchar_r), pointer :: x_character_realloc
     type(yggchar_r), dimension(:), pointer :: xarr_character_realloc
     character, dimension(:), pointer :: xarr_character, xarr_character0
-    integer :: i, j
+    integer(kind=8) :: i, j
     select type(item=>x%item_array)
     type is (yggchar_r)
        xarr_character_realloc => item
@@ -561,7 +561,7 @@ contains
     type(yggchar_r), pointer :: x_character_realloc
     type(yggchar_r), dimension(:), pointer :: xarr_character_realloc
     character, dimension(:), pointer :: xarr_character, xarr_character0
-    integer :: i, j
+    integer(kind=8) :: i, j
     type(c_long_1d), pointer :: x_c_long_1d
     type(integer_1d), pointer :: x_integer_1d
     type(integer2_1d), pointer :: x_integer2_1d
@@ -793,7 +793,7 @@ contains
     character(len=:), pointer :: x_character
     character, dimension(:), pointer :: xarr_character
     type(yggchar_r), pointer :: x_character_realloc
-    integer :: i
+    integer(kind=8) :: i
     select type(item=>x%item)
     type is (yggchar_r)
        x_character_realloc => item
@@ -817,9 +817,10 @@ contains
     end select
   end subroutine yggptr_c2f_scalar_transfer_character
   
-  function yggptr_c2f(x) result(flag)
+  function yggptr_c2f(x, realloc) result(flag)
     implicit none
     type(yggptr) :: x
+    logical :: realloc
     integer(kind=c_size_t), pointer :: array_len
     integer(kind=c_size_t), pointer :: precision
     integer(kind=8) :: i, j
@@ -840,8 +841,10 @@ contains
        call c_f_pointer(x%prec_ptr, precision)
        print *, "precision ", precision
     end if
-    if (x%alloc) then
-       print *, "begen realloc ", x%type, x%len, x%prec
+    if (realloc.and.x%alloc) then
+       print *, "begen realloc ", x%type, &
+            " size: ", x%len, array_len, &
+            " prec: ", x%prec, precision
        if ((x%array.and.(array_len.gt.x%len)).or. &
             ((x%type.eq."character").and.(precision.gt.x%prec))) then
           select type(item=>x%item)
@@ -1166,11 +1169,11 @@ contains
        y%prec = len(x_character)
     type is (yggchar_r)
        x_character_realloc => x
-       print *, "character len", len(x_character_realloc%x), &
+       print *, "character len", size(x_character_realloc%x), &
             allocated(x_character_realloc%x)
        if (allocated(x_character_realloc%x)) then
           y%ptr = c_loc(x_character_realloc%x(1))
-          y%len = size(x_character_realloc%x)
+          y%prec = size(x_character_realloc%x)
        else
           y%ptr = c_null_ptr
        end if
@@ -1292,7 +1295,7 @@ contains
     type(logical4_1d), pointer :: x_logical4_1d
     type(logical8_1d), pointer :: x_logical8_1d
     type(character_1d), pointer :: x_character_1d
-    integer :: i, j, ilength
+    integer(kind=8) :: i, j, ilength
     y%array = .true.
     y%alloc = .true.
     y%len = 1
@@ -1457,7 +1460,7 @@ contains
       end if
       print *, "initial ptr = ", y%ptr
     class default
-       stop 'yggarg_scalar: Unexpected type.'
+       stop 'yggarg_realloc_1darray: Unexpected type.'
     end select
     print *, "yggarg_realloc_1darray: finished init ", y%type
   end subroutine yggarg_realloc_1darray
@@ -1859,18 +1862,19 @@ contains
     end do
   end subroutine pre_recv
 
-  subroutine post_recv(args, c_args, flag)
+  subroutine post_recv(args, c_args, flag, realloc)
     implicit none
     type(yggptr) :: args(:)
     type(c_ptr), allocatable, target :: c_args(:)
     integer :: flag, i, j
+    logical :: realloc
     if (flag.ge.0) then
        j = 1
        do i = 1, size(args)
           print *, "post_recv: ", args(i)%type, args(i)%array, &
                i, j, c_args(j)
           args(i)%ptr = c_args(j)
-          flag = yggptr_c2f(args(i))
+          flag = yggptr_c2f(args(i), realloc)
           if (flag.lt.0) then
              print *, "Error recovering fortran pointer for ", i, &
                   "th variable."
@@ -1911,7 +1915,7 @@ contains
     c_nargs = size(args)
     c_flag = ygg_recv_var_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
     flag = c_flag
-    call post_recv(args, c_args, flag)
+    call post_recv(args, c_args, flag, .false.)
   end function ygg_recv_var
   
   function ygg_recv_var_realloc(ygg_q, args) result (flag)
@@ -1927,10 +1931,15 @@ contains
     c_ygg_q = ygg_q%comm
     flag = 0
     do i = 1, size(args)
-       if ((args(i)%array.or.(args(i)%type.eq."character")) &
-            .and.(.not.(args(i)%alloc))) then
-          print *, "Array provided as element ", i, " is not allocatable."
-          flag = -1
+       if (args(i)%array.or.(args(i)%type.eq."character")) then
+          if (.not.(args(i)%alloc)) then
+             print *, "Array provided as element ", i, " is not allocatable."
+             flag = -1
+          else
+             ! TODO: Find a way to nullify pointer so that memory
+             ! is "surrendered" to C when it is reallocated C side
+             args(i)%ptr = c_null_ptr
+          end if
        end if
     end do
     if (flag.ge.0) then
@@ -1942,7 +1951,7 @@ contains
        flag = c_flag
     end if
     print *, "post_recv ygg_recv_var_realloc"
-    call post_recv(args, c_args, flag)
+    call post_recv(args, c_args, flag, .true.)
     print *, "end ygg_recv_var_realloc"
   end function ygg_recv_var_realloc
   

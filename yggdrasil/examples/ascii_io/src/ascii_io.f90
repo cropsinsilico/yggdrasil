@@ -18,12 +18,7 @@ program main
   type(integer8_1d), target :: number_arr
   type(real8_1d), target :: value_arr
   type(complex8_1d), target :: comp_arr
-  ! type(yggchar_r), dimension(:), pointer :: name_arr
-  ! integer, dimension(:), pointer :: number_arr
-  ! real(kind=8), dimension(:), pointer :: value_arr
-  ! complex(kind=8), dimension(:), pointer :: comp_arr
   integer(kind=c_size_t) :: i
-  ! nullify(line, name_arr, number_arr, value_arr, comp_arr)
 
   ! Input & output to an ASCII file line by line
   file_input = ygg_ascii_file_input("inputF_file")
@@ -40,14 +35,13 @@ program main
   ! Read lines from ASCII text file until end of file is reached.
   ! As each line is received, it is then sent to the output ASCII file.
   print *, "ascii_io(F): Receiving/sending ASCII file."
-  ! allocate(character(len=LINE_SIZE_MAX) :: line)
   ret = 0
   do while (ret.ge.0)
-     line_size = 0  ! Reset to size of buffer
+     line_size = size(line%x)  ! Reset to size of buffer
 
      ! Receive a single line
      ret = ygg_recv_var_realloc(file_input, &
-          [yggarg_realloc(line), yggarg(line_size)])
+          [yggarg(line), yggarg(line_size)])
      if (ret.ge.0) then
         ! If the receive was succesful, send the line to output
         print *, "File: ", line%x
@@ -64,9 +58,6 @@ program main
         print *, "End of file input (F)"
      end if
   end do
-  ! if (associated(line)) then
-  !    deallocate(line)
-  ! end if
 
   ! Read rows from ASCII table until end of file is reached.
   ! As each row is received, it is then sent to the output ASCII table
@@ -104,12 +95,10 @@ program main
   ! columns.
   print *, "Receiving/sending ASCII table as array."
   ret = 0
-  ! allocate(character(len=BSIZE) :: name_arr(1))
   do while (ret.ge.0)
-     ret = ygg_recv_var_realloc(array_input, &
-          [yggarg(nrows), yggarg_realloc(name_arr), &
-          yggarg_realloc(number_arr), yggarg_realloc(value_arr), &
-          yggarg_realloc(comp_arr)])
+     ret = ygg_recv_var_realloc(array_input, [yggarg(nrows), &
+          yggarg(name_arr), yggarg(number_arr), &
+          yggarg(value_arr), yggarg(comp_arr)])
      if (ret.ge.0) then
         print *, "Array: (", nrows, " rows)"
         ! Print each line in the array
@@ -119,8 +108,8 @@ program main
         end do
         ! Send the columns in the array to output. Formatting is handled on the
         ! output driver side.
-        ret = ygg_send_var(array_output, &
-             [yggarg(nrows), yggarg(name_arr), yggarg(number_arr), &
+        ret = ygg_send_var(array_output, [yggarg(nrows), &
+             yggarg(name_arr), yggarg(number_arr), &
              yggarg(value_arr), yggarg(comp_arr)])
         if (ret.lt.0) then
            print *, "ascii_io(F): ERROR SENDING ARRAY"
@@ -132,12 +121,6 @@ program main
      end if
   end do
   
-  ! Free dynamically allocated columns
-  ! if (associated(name_arr)) deallocate(name_arr)
-  ! if (associated(number_arr)) deallocate(number_arr)
-  ! if (associated(value_arr)) deallocate(value_arr)
-  ! if (associated(comp_arr)) deallocate(comp_arr)
-
   call exit(error_code)
 
 end program main
