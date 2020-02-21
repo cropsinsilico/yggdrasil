@@ -13,121 +13,121 @@ module fygg
      type(c_ptr) :: comm
   end type yggcomm
   type :: yggchar_r
-     character, dimension(:), allocatable :: x
+     character, dimension(:), pointer :: x => null()
   end type yggchar_r
   type :: yggarr_r
-     class(*), dimension(:), allocatable :: x
+     class(*), dimension(:), pointer :: x => null()
   end type yggarr_r
   type :: c_long_1d
-     integer(kind=c_long), dimension(:), allocatable :: x
+     integer(kind=c_long), dimension(:), pointer :: x => null()
   end type c_long_1d
   type :: integer_1d
-     integer, dimension(:), allocatable :: x
+     integer, dimension(:), pointer :: x => null()
   end type integer_1d
   type :: integer2_1d
-     integer(kind=2), dimension(:), allocatable :: x
+     integer(kind=2), dimension(:), pointer :: x => null()
   end type integer2_1d
   type :: integer4_1d
-     integer(kind=4), dimension(:), allocatable :: x
+     integer(kind=4), dimension(:), pointer :: x => null()
   end type integer4_1d
   type :: integer8_1d
-     integer(kind=8), dimension(:), allocatable :: x
+     integer(kind=8), dimension(:), pointer :: x => null()
   end type integer8_1d
   type :: real_1d
-     real, dimension(:), allocatable :: x
+     real, dimension(:), pointer :: x => null()
   end type real_1d
   type :: real4_1d
-     real(kind=4), dimension(:), allocatable :: x
+     real(kind=4), dimension(:), pointer :: x => null()
   end type real4_1d
   type :: real8_1d
-     real(kind=8), dimension(:), allocatable :: x
+     real(kind=8), dimension(:), pointer :: x => null()
   end type real8_1d
   type :: real16_1d
-     real(kind=16), dimension(:), allocatable :: x
+     real(kind=16), dimension(:), pointer :: x => null()
   end type real16_1d
   type :: complex_1d
-     complex, dimension(:), allocatable :: x
+     complex, dimension(:), pointer :: x => null()
   end type complex_1d
   type :: complex4_1d
-     complex(kind=4), dimension(:), allocatable :: x
+     complex(kind=4), dimension(:), pointer :: x => null()
   end type complex4_1d
   type :: complex8_1d
-     complex(kind=8), dimension(:), allocatable :: x
+     complex(kind=8), dimension(:), pointer :: x => null()
   end type complex8_1d
   type :: complex16_1d
-     complex(kind=16), dimension(:), allocatable :: x
+     complex(kind=16), dimension(:), pointer :: x => null()
   end type complex16_1d
   type :: logical_1d
-     logical, dimension(:), allocatable :: x
+     logical, dimension(:), pointer :: x => null()
   end type logical_1d
   type :: logical1_1d
-     logical(kind=1), dimension(:), allocatable :: x
+     logical(kind=1), dimension(:), pointer :: x => null()
   end type logical1_1d
   type :: logical2_1d
-     logical(kind=2), dimension(:), allocatable :: x
+     logical(kind=2), dimension(:), pointer :: x => null()
   end type logical2_1d
   type :: logical4_1d
-     logical(kind=4), dimension(:), allocatable :: x
+     logical(kind=4), dimension(:), pointer :: x => null()
   end type logical4_1d
   type :: logical8_1d
-     logical(kind=8), dimension(:), allocatable :: x
+     logical(kind=8), dimension(:), pointer :: x => null()
   end type logical8_1d
   type :: character_1d
-     type(yggchar_r), dimension(:), allocatable :: x
+     type(yggchar_r), dimension(:), pointer :: x => null()
   end type character_1d
   type :: integer_2d
-     integer, dimension(:, :), allocatable :: x
+     integer, dimension(:, :), pointer :: x => null()
   end type integer_2d
   type :: integer2_2d
-     integer(kind=2), dimension(:, :), allocatable :: x
+     integer(kind=2), dimension(:, :), pointer :: x => null()
   end type integer2_2d
   type :: integer4_2d
-     integer(kind=4), dimension(:, :), allocatable :: x
+     integer(kind=4), dimension(:, :), pointer :: x => null()
   end type integer4_2d
   type :: integer8_2d
-     integer(kind=8), dimension(:, :), allocatable :: x
+     integer(kind=8), dimension(:, :), pointer :: x => null()
   end type integer8_2d
   type :: real_2d
-     real, dimension(:, :), allocatable :: x
+     real, dimension(:, :), pointer :: x => null()
   end type real_2d
   type :: real4_2d
-     real(kind=4), dimension(:, :), allocatable :: x
+     real(kind=4), dimension(:, :), pointer :: x => null()
   end type real4_2d
   type :: real8_2d
-     real(kind=8), dimension(:, :), allocatable :: x
+     real(kind=8), dimension(:, :), pointer :: x => null()
   end type real8_2d
   type :: real16_2d
-     real(kind=16), dimension(:, :), allocatable :: x
+     real(kind=16), dimension(:, :), pointer :: x => null()
   end type real16_2d
   type :: complex_2d
-     complex, dimension(:, :), allocatable :: x
+     complex, dimension(:, :), pointer :: x => null()
   end type complex_2d
   type :: complex4_2d
-     complex(kind=4), dimension(:, :), allocatable :: x
+     complex(kind=4), dimension(:, :), pointer :: x => null()
   end type complex4_2d
   type :: complex8_2d
-     complex(kind=8), dimension(:, :), allocatable :: x
+     complex(kind=8), dimension(:, :), pointer :: x => null()
   end type complex8_2d
   type :: complex16_2d
-     complex(kind=16), dimension(:, :), allocatable :: x
+     complex(kind=16), dimension(:, :), pointer :: x => null()
   end type complex16_2d
   type :: logical_2d
-     logical, dimension(:, :), allocatable :: x
+     logical, dimension(:, :), pointer :: x => null()
   end type logical_2d
   type :: logical1_2d
-     logical(kind=1), dimension(:, :), allocatable :: x
+     logical(kind=1), dimension(:, :), pointer :: x => null()
   end type logical1_2d
   type :: logical2_2d
-     logical(kind=2), dimension(:, :), allocatable :: x
+     logical(kind=2), dimension(:, :), pointer :: x => null()
   end type logical2_2d
   type :: logical4_2d
-     logical(kind=4), dimension(:, :), allocatable :: x
+     logical(kind=4), dimension(:, :), pointer :: x => null()
   end type logical4_2d
   type :: logical8_2d
-     logical(kind=8), dimension(:, :), allocatable :: x
+     logical(kind=8), dimension(:, :), pointer :: x => null()
   end type logical8_2d
   type :: character_2d
-     type(yggchar_r), dimension(:, :), allocatable :: x
+     type(yggchar_r), dimension(:, :), pointer :: x => null()
   end type character_2d
   type :: yggptr
      character(len=15) :: type = "none"
@@ -145,11 +145,11 @@ module fygg
      type(c_ptr) :: prec_ptr = c_null_ptr
   end type yggptr
   type :: yggptr_arr
-     type(yggptr), dimension(:), allocatable :: vals
+     type(yggptr), dimension(:), pointer :: vals
   end type yggptr_arr
   type :: yggptr_map
-     character(len=20), dimension(:), allocatable :: keys
-     type(yggptr), dimension(:), allocatable :: vals
+     character(len=20), dimension(:), pointer :: keys
+     type(yggptr), dimension(:), pointer :: vals
   end type yggptr_map
 
   public :: yggarg, yggchar_r, yggarr_r, yggcomm, &
@@ -271,7 +271,7 @@ contains
        y%prec = len(x_character)
     type is (yggchar_r)
        x_character_realloc => x
-       if (allocated(x_character_realloc%x)) then
+       if (associated(x_character_realloc%x)) then
           y%ptr = c_loc(x_character_realloc%x(1))
           y%prec = size(x_character_realloc%x)
        else
@@ -397,135 +397,135 @@ contains
     type is (c_long_1d)
        y%type = "c_long"
        x_c_long_1d => x
-       if (allocated(x_c_long_1d%x)) then
+       if (associated(x_c_long_1d%x)) then
           y%ptr = c_loc(x_c_long_1d%x(1))
           y%len = size(x_c_long_1d%x)
        end if
     type is (integer_1d)
        y%type = "integer"
        x_integer_1d => x
-       if (allocated(x_integer_1d%x)) then
+       if (associated(x_integer_1d%x)) then
           y%ptr = c_loc(x_integer_1d%x(1))
           y%len = size(x_integer_1d%x)
        end if
     type is (integer2_1d)
        y%type = "integer"
        x_integer2_1d => x
-       if (allocated(x_integer2_1d%x)) then
+       if (associated(x_integer2_1d%x)) then
           y%ptr = c_loc(x_integer2_1d%x(1))
           y%len = size(x_integer2_1d%x)
        end if
     type is (integer4_1d)
        y%type = "integer"
        x_integer4_1d => x
-       if (allocated(x_integer4_1d%x)) then
+       if (associated(x_integer4_1d%x)) then
           y%ptr = c_loc(x_integer4_1d%x(1))
           y%len = size(x_integer4_1d%x)
        end if
     type is (integer8_1d)
        y%type = "integer"
        x_integer8_1d => x
-       if (allocated(x_integer8_1d%x)) then
+       if (associated(x_integer8_1d%x)) then
           y%ptr = c_loc(x_integer8_1d%x(1))
           y%len = size(x_integer8_1d%x)
        end if
     type is (real_1d)
        y%type = "real"
        x_real_1d => x
-       if (allocated(x_real_1d%x)) then
+       if (associated(x_real_1d%x)) then
           y%ptr = c_loc(x_real_1d%x(1))
           y%len = size(x_real_1d%x)
        end if
     type is (real4_1d)
        y%type = "real"
        x_real4_1d => x
-       if (allocated(x_real4_1d%x)) then
+       if (associated(x_real4_1d%x)) then
           y%ptr = c_loc(x_real4_1d%x(1))
           y%len = size(x_real4_1d%x)
        end if
     type is (real8_1d)
        y%type = "real"
        x_real8_1d => x
-       if (allocated(x_real8_1d%x)) then
+       if (associated(x_real8_1d%x)) then
           y%ptr = c_loc(x_real8_1d%x(1))
           y%len = size(x_real8_1d%x)
        end if
     type is (real16_1d)
        y%type = "real"
        x_real16_1d => x
-       if (allocated(x_real16_1d%x)) then
+       if (associated(x_real16_1d%x)) then
           y%ptr = c_loc(x_real16_1d%x(1))
           y%len = size(x_real16_1d%x)
        end if
     type is (complex_1d)
        y%type = "complex"
        x_complex_1d => x
-       if (allocated(x_complex_1d%x)) then
+       if (associated(x_complex_1d%x)) then
           y%ptr = c_loc(x_complex_1d%x(1))
           y%len = size(x_complex_1d%x)
        end if
     type is (complex4_1d)
        y%type = "complex"
        x_complex4_1d => x
-       if (allocated(x_complex4_1d%x)) then
+       if (associated(x_complex4_1d%x)) then
           y%ptr = c_loc(x_complex4_1d%x(1))
           y%len = size(x_complex4_1d%x)
        end if
     type is (complex8_1d)
        y%type = "complex"
        x_complex8_1d => x
-       if (allocated(x_complex8_1d%x)) then
+       if (associated(x_complex8_1d%x)) then
           y%ptr = c_loc(x_complex8_1d%x(1))
           y%len = size(x_complex8_1d%x)
        end if
     type is (complex16_1d)
        y%type = "complex"
        x_complex16_1d => x
-       if (allocated(x_complex16_1d%x)) then
+       if (associated(x_complex16_1d%x)) then
           y%ptr = c_loc(x_complex16_1d%x(1))
           y%len = size(x_complex16_1d%x)
        end if
     type is (logical_1d)
        y%type = "logical"
        x_logical_1d => x
-       if (allocated(x_logical_1d%x)) then
+       if (associated(x_logical_1d%x)) then
           y%ptr = c_loc(x_logical_1d%x(1))
           y%len = size(x_logical_1d%x)
        end if
     type is (logical1_1d)
        y%type = "logical"
        x_logical1_1d => x
-       if (allocated(x_logical1_1d%x)) then
+       if (associated(x_logical1_1d%x)) then
           y%ptr = c_loc(x_logical1_1d%x(1))
           y%len = size(x_logical1_1d%x)
        end if
     type is (logical2_1d)
        y%type = "logical"
        x_logical2_1d => x
-       if (allocated(x_logical2_1d%x)) then
+       if (associated(x_logical2_1d%x)) then
           y%ptr = c_loc(x_logical2_1d%x(1))
           y%len = size(x_logical2_1d%x)
        end if
     type is (logical4_1d)
        y%type = "logical"
        x_logical4_1d => x
-       if (allocated(x_logical4_1d%x)) then
+       if (associated(x_logical4_1d%x)) then
           y%ptr = c_loc(x_logical4_1d%x(1))
           y%len = size(x_logical4_1d%x)
        end if
     type is (logical8_1d)
        y%type = "logical"
        x_logical8_1d => x
-       if (allocated(x_logical8_1d%x)) then
+       if (associated(x_logical8_1d%x)) then
           y%ptr = c_loc(x_logical8_1d%x(1))
           y%len = size(x_logical8_1d%x)
        end if
     type is (character_1d)
        y%type = "character"
        x_character_1d => x
-       if (allocated(x_character_1d%x)) then
+       if (associated(x_character_1d%x)) then
           y%len = size(x_character_1d%x)
-          if (allocated(x_character_1d%x(1)%x)) then
+          if (associated(x_character_1d%x(1)%x)) then
              y%prec = size(x_character_1d%x(1)%x)
              allocate(y%data_character_unit(y%len * y%prec))
              do i = 1, size(x_character_1d%x)
@@ -647,7 +647,7 @@ contains
     select type(x=>y%item_array)
     type is (yggchar_r)
        x_character_realloc => x
-       if ((allocated(x_character_realloc(1)%x)).and. &
+       if ((associated(x_character_realloc(1)%x)).and. &
             (size(x_character_realloc(1)%x).ge.1)) then
           ! y%ptr = c_loc(x_character_realloc(1)%x(1))
           y%prec = size(x_character_realloc(1)%x)
@@ -1036,15 +1036,10 @@ contains
     c_ygg_q = ygg_q%comm
     flag = 0
     do i = 1, size(args)
-       if (args(i)%array.or.(args(i)%type.eq."character")) then
-          if (.not.(args(i)%alloc)) then
-             call ygglog_error("Provided array/string is not allocatable.")
-             flag = -1
-          else
-             ! TODO: Find a way to nullify pointer so that memory
-             ! is "surrendered" to C when it is reallocated C side
-             args(i)%ptr = c_null_ptr
-          end if
+       if ((args(i)%array.or.(args(i)%type.eq."character")).and. &
+            (.not.(args(i)%alloc))) then
+          call ygglog_error("Provided array/string is not allocatable.")
+          flag = -1
        end if
     end do
     if (flag.ge.0) then

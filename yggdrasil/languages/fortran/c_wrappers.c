@@ -63,7 +63,7 @@ int ygg_send_var_f(const void *yggQ, int nargs, void *args) {
     return -1;
   }
   va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  return vcommSend((const comm_t*)yggQ, nargs, ap);
+  return vcommSend((const comm_t*)yggQ, (size_t)nargs, ap);
 }
 
 int ygg_recv_var_f(void *yggQ, int nargs, void *args) {
@@ -73,7 +73,7 @@ int ygg_recv_var_f(void *yggQ, int nargs, void *args) {
   }
   va_list_t ap = init_va_ptrs(nargs, (void**)args);
   ap.for_fortran = 1;
-  return vcommRecv((comm_t*)yggQ, 0, nargs, ap);
+  return vcommRecv((comm_t*)yggQ, 0, (size_t)nargs, ap);
 }
 
 int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
@@ -83,5 +83,5 @@ int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
   }
   va_list_t ap = init_va_ptrs(nargs, (void**)args);
   ap.for_fortran = 1;
-  return vcommRecv((comm_t*)yggQ, 1, nargs, ap);
+  return vcommRecv((comm_t*)yggQ, 1, (size_t)nargs, ap);
 }
