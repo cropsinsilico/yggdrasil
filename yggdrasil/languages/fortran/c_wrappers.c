@@ -6,6 +6,17 @@ void ygg_c_free(void *x) {
   }
 }
 
+void ygg_log_info_f(const char* fmt) {
+  ygglog_info(fmt);
+}
+void ygg_log_debug_f(const char* fmt) {
+  ygglog_debug(fmt);
+  /* yggInfo(fmt); */
+}
+void ygg_log_error_f(const char* fmt) {
+  ygglog_error(fmt);
+}
+
 void* ygg_output_f(const char *name) {
   return (void*)yggOutput(name);
 }

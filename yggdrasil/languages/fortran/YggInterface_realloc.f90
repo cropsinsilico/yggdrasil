@@ -5,13 +5,15 @@ function yggptr_realloc(x, array_len, precision, realloc) result(flag)
   integer(kind=c_size_t), pointer :: precision
   logical :: realloc
   integer :: flag
+  character(len=500) :: log_msg
   flag = 0
   if ((x%array.and.(array_len.gt.x%len)).or. &
        ((x%type.eq."character").and.(precision.gt.x%prec))) then
      if (realloc.and.x%alloc) then
-        print *, "begen realloc ", x%type, &
-             " size: ", x%len, array_len, &
-             " prec: ", x%prec, precision
+        write(log_msg, '("yggptr_realloc: begin realloc. &
+             &size: ",i7,i7," precision: ",i7,i7)'), &
+             x%len, array_len, x%prec, precision
+        call ygglog_debug(log_msg)
         select type(item=>x%item)
         type is (integer(kind=2))
            call yggptr_realloc_integer(x, array_len)
@@ -80,21 +82,26 @@ function yggptr_realloc(x, array_len, precision, realloc) result(flag)
         type is (character_1d)
            call yggptr_realloc_1darray_character(x, array_len, precision)
         class default
-           print *, x%type
-           stop 'yggptr_realloc: Unexpected type.'
+           write(log_msg, '("yggptr_realloc: Unexpected type: ",A)'), x%type
+           call ygglog_error(log_msg)
+           stop "ERROR"
         end select
         if (array_len.gt.x%len) x%len = array_len
         if (precision.gt.x%prec) x%prec = precision
-        print *, "done alloc"
+        call ygglog_debug("yggptr_realloc: done alloc")
      else
         flag = -1
         if (x%array.and.(array_len.gt.x%len)) then
-           print *, "Destination array has ", x%len, &
-                " elements, but ", array_len, " elements are expected."
+           write(log_msg, '("yggptr_realloc: Destination array has ", &
+                &i7," elements, but ",i7," elements are expected.")'), &
+                x%len, array_len
+           call ygglog_error(log_msg)
         end if
         if ((x%type.eq."character").and.(precision.gt.x%prec)) then
-           print *, "Destination string has ", x%prec, &
-                "elements, but ", precision, " elements are expected."
+           write(log_msg, '("yggptr_realloc: Destination string has ", &
+                &i7," elements, but ",i7," elements are expected.")'), &
+                x%prec, precision
+           call ygglog_error(log_msg)
         end if
         stop "ERROR"
      end if
@@ -238,7 +245,6 @@ subroutine yggptr_realloc_character(x, array_len, precision)
            end do
         end if
      class default
-        print *, x%type
         stop 'yggptr_realloc_character (array): Unexpected type.'
      end select
   else
@@ -247,9 +253,7 @@ subroutine yggptr_realloc_character(x, array_len, precision)
         x_character_realloc => item
         if (allocated(x_character_realloc%x)) deallocate(x_character_realloc%x)
         allocate(x_character_realloc%x(precision))
-        print *, "realloc string ", size(x_character_realloc%x)
      class default
-        print *, x%type
         stop 'yggptr_realloc_character (scalar): Unexpected type.'
      end select
   end if

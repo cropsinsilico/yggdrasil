@@ -181,8 +181,8 @@ contains
        xarr_integer8 => item
        call c_f_pointer(x%ptr, xarr_integer8, [x%len])
     class default
-       print *, x%type
-       stop 'yggptr_c2f_array_transfer_integer: Unexpected type.'
+       call ygglog_error("yggptr_c2f_array_transfer_integer: Unexpected type.")
+       stop "ERROR"
     end select
   end subroutine yggptr_c2f_array_transfer_integer
   subroutine yggptr_c2f_array_transfer_real(x)
@@ -202,8 +202,8 @@ contains
        xarr_real16 => item
        call c_f_pointer(x%ptr, xarr_real16, [x%len])
     class default
-       print *, x%type
-       stop 'yggptr_c2f_array_transfer_real: Unexpected type.'
+       call ygglog_error("yggptr_c2f_array_transfer_real: Unexpected type.")
+       stop "ERROR"
     end select
   end subroutine yggptr_c2f_array_transfer_real
   subroutine yggptr_c2f_array_transfer_complex(x)
@@ -223,8 +223,8 @@ contains
        xarr_complex16 => item
        call c_f_pointer(x%ptr, xarr_complex16, [x%len])
     class default
-       print *, x%type
-       stop 'yggptr_c2f_array_transfer_complex: Unexpected type.'
+       call ygglog_error("yggptr_c2f_array_transfer_complex: Unexpected type.")
+       stop "ERROR"
     end select
   end subroutine yggptr_c2f_array_transfer_complex
   subroutine yggptr_c2f_array_transfer_logical(x)
@@ -248,8 +248,8 @@ contains
        xarr_logical8 => item
        call c_f_pointer(x%ptr, xarr_logical8, [x%len])
     class default
-       print *, x%type
-       stop 'yggptr_c2f_array_transfer_logical: Unexpected type.'
+       call ygglog_error("yggptr_c2f_array_transfer_logical: Unexpected type.")
+       stop "ERROR"
     end select
   end subroutine yggptr_c2f_array_transfer_logical
   subroutine yggptr_c2f_array_transfer_character(x)
@@ -287,8 +287,8 @@ contains
        end do
        deallocate(x%data_character_unit)
     class default
-       print *, x%type
-       stop 'yggptr_c2f_array_transfer_character: Unexpected type.'
+       call ygglog_error("yggptr_c2f_array_transfer_character: Unexpected type.")
+       stop "ERROR"
     end select
   end subroutine yggptr_c2f_array_transfer_character
   subroutine yggptr_c2f_array_transfer_1darray(x)
@@ -415,10 +415,7 @@ contains
        x_character_realloc => x_character_1d%x(1)
        xarr_character0 => x_character_realloc%x
        ! allocate(x%data_character_unit(x%prec*x%len))
-       print *, "before pointer (mult) ", x%len, x%prec
-       print *, "pointer = ", x%ptr
        call c_f_pointer(x%ptr, x%data_character_unit, [x%prec*x%len])
-       print *, "after  pointer (mult) ", x%data_character_unit
        do i = 1, x%len
           ! x_character_realloc => x_character_1d%x(i)
           ! xarr_character => x_character_realloc%x
@@ -426,14 +423,11 @@ contains
           !      (1+(i-1)*x%prec):(i*x%prec))
           x_character_1d%x(i)%x = x%data_character_unit( &
                (1+(i-1)*x%prec):(i*x%prec))
-          print *, "after  pointer (mult) ", i, &
-               size(x_character_1d%x(i)%x),&
-               size(x%data_character_unit((1+(i-1)*x%prec):(i*x%prec))), &
-               x_character_1d%x(i)%x
        end do
        deallocate(x%data_character_unit)
     class default
-       stop 'yggarg_c2f_array_transfer_1darray: Unexpected type.'
+       call ygglog_error("yggarg_c2f_array_transfer_1darray: Unexpected type.")
+       stop "ERROR"
     end select
   end subroutine yggptr_c2f_array_transfer_1darray
   
@@ -452,11 +446,10 @@ contains
        call c_f_pointer(x%ptr, x_integer4, [x%len])
     type is (integer(kind=8))
        x_integer8 => item
-       print *, "INTEGER", x_integer8
        ! call c_f_pointer(x%ptr, x_integer8, [x%len])
     class default
-       print *, x%type
-       stop 'yggptr_c2f_scalar_transfer_integer: Unexpected type.'
+       call ygglog_error("yggptr_c2f_scalar_transfer_integer: Unexpected type.")
+       stop "ERROR"
     end select
   end subroutine yggptr_c2f_scalar_transfer_integer
   subroutine yggptr_c2f_scalar_transfer_real(x)
@@ -476,8 +469,8 @@ contains
        x_real16 => item
        call c_f_pointer(x%ptr, x_real16, [x%len])
     class default
-       print *, x%type
-       stop 'yggptr_c2f_scalar_transfer_real: Unexpected type.'
+       call ygglog_error("yggptr_c2f_scalar_transfer_real: Unexpected type.")
+       stop "ERROR"
     end select
   end subroutine yggptr_c2f_scalar_transfer_real
   subroutine yggptr_c2f_scalar_transfer_complex(x)
@@ -497,8 +490,8 @@ contains
        x_complex16 => item
        call c_f_pointer(x%ptr, x_complex16, [x%len])
     class default
-       print *, x%type
-       stop 'yggptr_c2f_scalar_transfer_complex: Unexpected type.'
+       call ygglog_error("yggptr_c2f_scalar_transfer_complex: Unexpected type.")
+       stop "ERROR"
     end select
   end subroutine yggptr_c2f_scalar_transfer_complex
   subroutine yggptr_c2f_scalar_transfer_logical(x)
@@ -522,8 +515,8 @@ contains
        x_logical8 => item
        call c_f_pointer(x%ptr, x_logical8, [x%len])
     class default
-       print *, x%type
-       stop 'yggptr_c2f_scalar_transfer_logical: Unexpected type.'
+       call ygglog_error("yggptr_c2f_scalar_transfer_logical: Unexpected type.")
+       stop "ERROR"
     end select
   end subroutine yggptr_c2f_scalar_transfer_logical
   subroutine yggptr_c2f_scalar_transfer_character(x)
@@ -536,10 +529,7 @@ contains
     select type(item=>x%item)
     type is (yggchar_r)
        x_character_realloc => item
-       ! xarr_character => x_character_realloc%x
-       print *, "before pointer (sing)"
        call c_f_pointer(x%ptr, xarr_character, [x%prec])
-       print *, "after pointer (sing)", xarr_character
        x_character_realloc%x = xarr_character
        do i = (x%prec + 1), size(x_character_realloc%x)
           x_character_realloc%x(i) = ' '
@@ -554,8 +544,8 @@ contains
        end do
        deallocate(x%data_character_unit)
     class default
-       print *, x%type
-       stop 'yggptr_c2f_scalar_transfer_character: Unexpected type.'
+       call ygglog_error("yggptr_c2f_scalar_transfer_character: Unexpected type.")
+       stop "ERROR"
     end select
   end subroutine yggptr_c2f_scalar_transfer_character
   
@@ -567,8 +557,9 @@ contains
     integer(kind=c_size_t), pointer :: precision
     integer(kind=8) :: i, j
     integer :: flag
+    character(len=500) :: log_msg
     flag = 0
-    print *, "begin yggptr_c2f"
+    call ygglog_debug("yggptr_c2f: begin")
     allocate(array_len)
     allocate(precision)
     array_len = 1
@@ -576,12 +567,14 @@ contains
     if (x%array) then
        deallocate(array_len)
        call c_f_pointer(x%len_ptr, array_len)
-       print *, "array_len ", array_len
+       write(log_msg, '("array_len = ",i7)'), array_len
+       call ygglog_debug(log_msg)
     end if
     if (x%type.eq."character") then
        deallocate(precision)
        call c_f_pointer(x%prec_ptr, precision)
-       print *, "precision ", precision
+       write(log_msg, '("precision = ",i7)'), precision
+       call ygglog_debug(log_msg)
     end if
     flag = yggptr_realloc(x, array_len, precision, realloc)
     if (x%array) then
@@ -626,8 +619,9 @@ contains
           type is (character_1d)
              call yggptr_c2f_array_transfer_1darray(x)
           class default
-             print *, x%type
-             stop 'yggptr_c2f (realloc array transfer): Unexpected type.'
+             write(log_msg, '("yggptr_c2f (realloc array transfer): Unexpected type: ",A)'), x%type
+             call ygglog_error(log_msg)
+             stop "ERROR"
           end select
        else
           select type(item=>x%item_array)
@@ -662,8 +656,9 @@ contains
           type is (character(*))
              call yggptr_c2f_array_transfer_character(x)
           class default
-             print *, x%type
-             stop 'yggptr_c2f (array transfer): Unexpected type.'
+             write(log_msg, '("yggptr_c2f (realloc transfer): Unexpected type: ",A)'), x%type
+             call ygglog_error(log_msg)
+             stop "ERROR"
           end select
        end if
     else
@@ -699,8 +694,9 @@ contains
        type is (character(*))
           call yggptr_c2f_scalar_transfer_character(x)
        class default
-          print *, x%type
-          stop 'yggptr_c2f (scalar transfer): Unexpected type.'
+          write(log_msg, '("yggptr_c2f (scalar transfer): Unexpected type: ",A)'), x%type
+          call ygglog_error(log_msg)
+          stop "ERROR"
        end select
     end if
     if (.not.x%array) then
@@ -709,7 +705,7 @@ contains
     if (.not.(x%type.eq."character")) then
        deallocate(precision)
     end if
-    print *, "end yggptr_c2f"
+    call ygglog_debug("yggptr_c2f: end")
   end function yggptr_c2f
   
   ! Scalar versions
@@ -819,8 +815,6 @@ contains
        y%prec = len(x_character)
     type is (yggchar_r)
        x_character_realloc => x
-       print *, "character len", size(x_character_realloc%x), &
-            allocated(x_character_realloc%x)
        if (allocated(x_character_realloc%x)) then
           y%ptr = c_loc(x_character_realloc%x(1))
           y%prec = size(x_character_realloc%x)
@@ -937,6 +931,7 @@ contains
     type(logical8_1d), pointer :: x_logical8_1d
     type(character_1d), pointer :: x_character_1d
     integer(kind=8) :: i, j, ilength
+    call ygglog_debug("yggarg_realloc_1darray: begin")
     y%array = .true.
     y%alloc = .true.
     y%len = 1
@@ -1071,10 +1066,7 @@ contains
        end if
     type is (character_1d)
        y%type = "character"
-       print *, "yggarg_realloc_1darray: character"
        x_character_1d => x
-       print *, "yggarg_realloc_1darray: character, allocated? ", &
-            allocated(x_character_1d%x)
        if (allocated(x_character_1d%x)) then
           y%len = size(x_character_1d%x)
           if (allocated(x_character_1d%x(1)%x)) then
@@ -1085,7 +1077,6 @@ contains
                 do j = 1, y%prec
                    if (len_trim(x_character_1d%x(i)%x(j)) > 0) ilength = j
                 end do
-                print *, i, ilength
                 do j = 1, ilength
                    y%data_character_unit(((i-1)*y%prec) + j) = x_character_1d%x(i)%x(j)
                 end do
@@ -1098,12 +1089,12 @@ contains
              end do
              y%ptr = c_loc(y%data_character_unit(1))
           end if
-      end if
-      print *, "initial ptr = ", y%ptr
+       end if
     class default
-       stop 'yggarg_realloc_1darray: Unexpected type.'
+       call ygglog_error("yggarg_realloc_1darray: Unexpected type.")
+       stop "ERROR"
     end select
-    print *, "yggarg_realloc_1darray: finished init ", y%type
+    call ygglog_debug("yggarg_realloc_1darray: end")
   end subroutine yggarg_realloc_1darray
     
   subroutine yggarg_array_integer(y)
@@ -1309,6 +1300,31 @@ contains
   end subroutine fix_format_str
 
   ! YggInterface
+  subroutine ygglog_info(fmt)
+    implicit none
+    character(len=*), intent(in) :: fmt
+    character(len=len_trim(fmt)+1) :: c_fmt
+    type(yggcomm) :: channel
+    c_fmt = trim(fmt)//c_null_char
+    call ygglog_info_c(c_fmt)
+  end subroutine ygglog_info
+  subroutine ygglog_debug(fmt)
+    implicit none
+    character(len=*), intent(in) :: fmt
+    character(len=len_trim(fmt)+1) :: c_fmt
+    type(yggcomm) :: channel
+    c_fmt = trim(fmt)//c_null_char
+    call ygglog_debug_c(c_fmt)
+  end subroutine ygglog_debug
+  subroutine ygglog_error(fmt)
+    implicit none
+    character(len=*), intent(in) :: fmt
+    character(len=len_trim(fmt)+1) :: c_fmt
+    type(yggcomm) :: channel
+    c_fmt = trim(fmt)//c_null_char
+    call ygglog_error_c(c_fmt)
+  end subroutine ygglog_error
+  
   function ygg_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1435,13 +1451,10 @@ contains
     integer(kind=c_int) :: c_flag
     c_ygg_q = ygg_q%comm
     c_nargs = size(args)
-    print *, "before pointers"
     do i = 1, size(args)
        c_args(i) = args(i)%ptr
     end do
-    print *, "before send"
     c_flag = ygg_send_var_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
-    print *, "after send"
     flag = c_flag
   end function ygg_send_var
 
@@ -1476,7 +1489,6 @@ contains
           if ((i.lt.size(args)).and.(.not.args(i+1)%array).and. &
                (args(i+1)%type.eq."size_t")) then
              args(i)%prec_ptr = args(i+1)%ptr
-             print *, "Assigned next argument's pointer", args(i)%prec_ptr
           else
              args(i)%prec_c = args(i)%prec
              args(i)%prec_ptr = c_loc(args(i)%prec_c)
@@ -1509,27 +1521,23 @@ contains
     type(c_ptr), allocatable, target :: c_args(:)
     integer :: flag, i, j
     logical :: realloc
+    call ygglog_debug("post_recv: begin")
     if (flag.ge.0) then
        j = 1
        do i = 1, size(args)
-          print *, "post_recv: ", args(i)%type, args(i)%array, &
-               i, j, c_args(j)
           args(i)%ptr = c_args(j)
           flag = yggptr_c2f(args(i), realloc)
           if (flag.lt.0) then
-             print *, "Error recovering fortran pointer for ", i, &
-                  "th variable."
+             call ygglog_error("Error recovering fortran pointer for variable.")
              exit
           end if
           j = j + 1
           if (((args(i)%type.eq."character").or.args(i)%array).and. &
                ((i.ge.size(args)).or.(args(i+1)%array).or. &
                (args(i+1)%type.ne."size_t"))) then
-             print *, "Added 1 for length"
              j = j + 1
              if ((args(i)%type.eq."character").and.args(i)%array) then
                 j = j + 1
-                print *, "Added 1 for precision"
              end if
           end if
           ! deallocate(args(i)%len_c)
@@ -1539,7 +1547,7 @@ contains
     if (allocated(c_args)) then
        deallocate(c_args)
     end if
-    print *, "after post_recv"
+    call ygglog_debug("post_recv: end")
   end subroutine post_recv
   
   function ygg_recv_var(ygg_q, args) result (flag)
@@ -1568,13 +1576,13 @@ contains
     integer :: c_nargs
     integer :: flag, i
     integer(kind=c_int) :: c_flag
-    print *, "begin ygg_recv_var_realloc"
+    call ygglog_debug("ygg_recv_var_realloc: begin")
     c_ygg_q = ygg_q%comm
     flag = 0
     do i = 1, size(args)
        if (args(i)%array.or.(args(i)%type.eq."character")) then
           if (.not.(args(i)%alloc)) then
-             print *, "Array provided as element ", i, " is not allocatable."
+             call ygglog_error("Provided array/string is not allocatable.")
              flag = -1
           else
              ! TODO: Find a way to nullify pointer so that memory
@@ -1584,16 +1592,13 @@ contains
        end if
     end do
     if (flag.ge.0) then
-       print *, "pre_recv ygg_recv_var_realloc"
        call pre_recv(args, c_args)
        c_nargs = size(args)
-       print *, "call ygg_recv_var_realloc"
        c_flag = ygg_recv_var_realloc_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
        flag = c_flag
     end if
-    print *, "post_recv ygg_recv_var_realloc"
     call post_recv(args, c_args, flag, .true.)
-    print *, "end ygg_recv_var_realloc"
+    call ygglog_debug("ygg_recv_var_realloc: end")
   end function ygg_recv_var_realloc
   
 end module fygg

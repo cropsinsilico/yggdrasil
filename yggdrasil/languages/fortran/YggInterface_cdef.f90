@@ -34,6 +34,28 @@
      !   character(kind=c_char), intent(in) :: fmt_string(*)
      !   type(c_ptr) :: channel
      ! end function ygg_input_fmt_c
+
+     subroutine c_free(x) bind(c, name="ygg_c_free")
+       use, intrinsic :: iso_c_binding, only: c_ptr
+       implicit none
+       type(c_ptr) :: x
+     end subroutine c_free
+
+     subroutine ygglog_info_c(fmt) bind(c, name="ygg_log_info_f")
+       use, intrinsic :: iso_c_binding, only: c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: fmt
+     end subroutine ygglog_info_c
+     subroutine ygglog_debug_c(fmt) bind(c, name="ygg_log_debug_f")
+       use, intrinsic :: iso_c_binding, only: c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: fmt
+     end subroutine ygglog_debug_c
+     subroutine ygglog_error_c(fmt) bind(c, name="ygg_log_error_f")
+       use, intrinsic :: iso_c_binding, only: c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: fmt
+     end subroutine ygglog_error_c
   
      function ygg_output_c(name) result(channel) &
           bind(c, name="ygg_output_f")
