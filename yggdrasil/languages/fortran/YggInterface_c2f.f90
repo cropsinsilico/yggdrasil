@@ -30,43 +30,43 @@ function yggptr_c2f(x, realloc) result(flag)
      if (x%alloc) then
         select type(item=>x%item)
         type is (c_long_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_integer(x)
         type is (integer_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_integer(x)
         type is (integer2_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_integer(x)
         type is (integer4_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_integer(x)
         type is (integer8_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_integer(x)
         type is (real_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_real(x)
         type is (real4_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_real(x)
         type is (real8_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_real(x)
         type is (real16_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_real(x)
         type is (complex_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_complex(x)
         type is (complex4_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_complex(x)
         type is (complex8_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_complex(x)
         type is (complex16_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_complex(x)
         type is (logical_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_logical(x)
         type is (logical1_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_logical(x)
         type is (logical2_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_logical(x)
         type is (logical4_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_logical(x)
         type is (logical8_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_logical(x)
         type is (character_1d)
-           call yggptr_c2f_array_transfer_1darray(x)
+           call yggptr_c2f_1darray_character(x)
         class default
            write(log_msg, '("yggptr_c2f (realloc array transfer): Unexpected type: ",A)'), x%type
            call ygglog_error(log_msg)
@@ -75,35 +75,35 @@ function yggptr_c2f(x, realloc) result(flag)
      else
         select type(item=>x%item_array)
         type is (integer(kind=2))
-           call yggptr_c2f_array_transfer_integer(x)
+           call yggptr_c2f_array_integer(x)
         type is (integer(kind=4))
-           call yggptr_c2f_array_transfer_integer(x)
+           call yggptr_c2f_array_integer(x)
         type is (integer(kind=8))
-           call yggptr_c2f_array_transfer_integer(x)
+           call yggptr_c2f_array_integer(x)
         type is (real(kind=4))
-           call yggptr_c2f_array_transfer_real(x)
+           call yggptr_c2f_array_real(x)
         type is (real(kind=8))
-           call yggptr_c2f_array_transfer_real(x)
+           call yggptr_c2f_array_real(x)
         type is (real(kind=16))
-           call yggptr_c2f_array_transfer_real(x)
+           call yggptr_c2f_array_real(x)
         type is (complex(kind=4))
-           call yggptr_c2f_array_transfer_complex(x)
+           call yggptr_c2f_array_complex(x)
         type is (complex(kind=8))
-           call yggptr_c2f_array_transfer_complex(x)
+           call yggptr_c2f_array_complex(x)
         type is (complex(kind=16))
-           call yggptr_c2f_array_transfer_complex(x)
+           call yggptr_c2f_array_complex(x)
         type is (logical(kind=1))
-           call yggptr_c2f_array_transfer_logical(x)
+           call yggptr_c2f_array_logical(x)
         type is (logical(kind=2))
-           call yggptr_c2f_array_transfer_logical(x)
+           call yggptr_c2f_array_logical(x)
         type is (logical(kind=4))
-           call yggptr_c2f_array_transfer_logical(x)
+           call yggptr_c2f_array_logical(x)
         type is (logical(kind=8))
-           call yggptr_c2f_array_transfer_logical(x)
+           call yggptr_c2f_array_logical(x)
         type is (yggchar_r)
-           call yggptr_c2f_array_transfer_character(x)
+           call yggptr_c2f_array_character(x)
         type is (character(*))
-           call yggptr_c2f_array_transfer_character(x)
+           call yggptr_c2f_array_character(x)
         class default
            write(log_msg, '("yggptr_c2f (realloc transfer): Unexpected type: ",A)'), x%type
            call ygglog_error(log_msg)
@@ -113,35 +113,35 @@ function yggptr_c2f(x, realloc) result(flag)
   else
      select type(item=>x%item)
      type is (integer(kind=2))
-        call yggptr_c2f_scalar_transfer_integer(x)
+        call yggptr_c2f_scalar_integer(x)
      type is (integer(kind=4))
-        call yggptr_c2f_scalar_transfer_integer(x)
+        call yggptr_c2f_scalar_integer(x)
      type is (integer(kind=8))
-        call yggptr_c2f_scalar_transfer_integer(x)
+        call yggptr_c2f_scalar_integer(x)
      type is (real(kind=4))
-        call yggptr_c2f_scalar_transfer_real(x)
+        call yggptr_c2f_scalar_real(x)
      type is (real(kind=8))
-        call yggptr_c2f_scalar_transfer_real(x)
+        call yggptr_c2f_scalar_real(x)
      type is (real(kind=16))
-        call yggptr_c2f_scalar_transfer_real(x)
+        call yggptr_c2f_scalar_real(x)
      type is (complex(kind=4))
-        call yggptr_c2f_scalar_transfer_complex(x)
+        call yggptr_c2f_scalar_complex(x)
      type is (complex(kind=8))
-        call yggptr_c2f_scalar_transfer_complex(x)
+        call yggptr_c2f_scalar_complex(x)
      type is (complex(kind=16))
-        call yggptr_c2f_scalar_transfer_complex(x)
+        call yggptr_c2f_scalar_complex(x)
      type is (logical(kind=1))
-        call yggptr_c2f_scalar_transfer_logical(x)
+        call yggptr_c2f_scalar_logical(x)
      type is (logical(kind=2))
-        call yggptr_c2f_scalar_transfer_logical(x)
+        call yggptr_c2f_scalar_logical(x)
      type is (logical(kind=4))
-        call yggptr_c2f_scalar_transfer_logical(x)
+        call yggptr_c2f_scalar_logical(x)
      type is (logical(kind=8))
-        call yggptr_c2f_scalar_transfer_logical(x)
+        call yggptr_c2f_scalar_logical(x)
      type is (yggchar_r)
-        call yggptr_c2f_scalar_transfer_character(x)
+        call yggptr_c2f_scalar_character(x)
      type is (character(*))
-        call yggptr_c2f_scalar_transfer_character(x)
+        call yggptr_c2f_scalar_character(x)
      class default
         write(log_msg, '("yggptr_c2f (scalar transfer): Unexpected type: ",A)'), x%type
         call ygglog_error(log_msg)
@@ -158,7 +158,7 @@ function yggptr_c2f(x, realloc) result(flag)
 end function yggptr_c2f
 
 
-subroutine yggptr_c2f_scalar_transfer_integer(x)
+subroutine yggptr_c2f_scalar_integer(x)
   implicit none
   type(yggptr) :: x
   integer(kind=2), pointer :: x_integer2
@@ -175,11 +175,11 @@ subroutine yggptr_c2f_scalar_transfer_integer(x)
      x_integer8 => item
      ! call c_f_pointer(x%ptr, x_integer8, [x%len])
   class default
-     call ygglog_error("yggptr_c2f_scalar_transfer_integer: Unexpected type.")
+     call ygglog_error("yggptr_c2f_scalar_integer: Unexpected type.")
      stop "ERROR"
   end select
-end subroutine yggptr_c2f_scalar_transfer_integer
-subroutine yggptr_c2f_scalar_transfer_real(x)
+end subroutine yggptr_c2f_scalar_integer
+subroutine yggptr_c2f_scalar_real(x)
   implicit none
   type(yggptr) :: x
   real(kind=4), pointer :: x_real4
@@ -196,11 +196,11 @@ subroutine yggptr_c2f_scalar_transfer_real(x)
      x_real16 => item
      call c_f_pointer(x%ptr, x_real16, [x%len])
   class default
-     call ygglog_error("yggptr_c2f_scalar_transfer_real: Unexpected type.")
+     call ygglog_error("yggptr_c2f_scalar_real: Unexpected type.")
      stop "ERROR"
   end select
-end subroutine yggptr_c2f_scalar_transfer_real
-subroutine yggptr_c2f_scalar_transfer_complex(x)
+end subroutine yggptr_c2f_scalar_real
+subroutine yggptr_c2f_scalar_complex(x)
   implicit none
   type(yggptr) :: x
   complex(kind=4), pointer :: x_complex4
@@ -217,11 +217,11 @@ subroutine yggptr_c2f_scalar_transfer_complex(x)
      x_complex16 => item
      call c_f_pointer(x%ptr, x_complex16, [x%len])
   class default
-     call ygglog_error("yggptr_c2f_scalar_transfer_complex: Unexpected type.")
+     call ygglog_error("yggptr_c2f_scalar_complex: Unexpected type.")
      stop "ERROR"
   end select
-end subroutine yggptr_c2f_scalar_transfer_complex
-subroutine yggptr_c2f_scalar_transfer_logical(x)
+end subroutine yggptr_c2f_scalar_complex
+subroutine yggptr_c2f_scalar_logical(x)
   implicit none
   type(yggptr) :: x
   logical(kind=1), pointer :: x_logical1
@@ -242,11 +242,11 @@ subroutine yggptr_c2f_scalar_transfer_logical(x)
      x_logical8 => item
      call c_f_pointer(x%ptr, x_logical8, [x%len])
   class default
-     call ygglog_error("yggptr_c2f_scalar_transfer_logical: Unexpected type.")
+     call ygglog_error("yggptr_c2f_scalar_logical: Unexpected type.")
      stop "ERROR"
   end select
-end subroutine yggptr_c2f_scalar_transfer_logical
-subroutine yggptr_c2f_scalar_transfer_character(x)
+end subroutine yggptr_c2f_scalar_logical
+subroutine yggptr_c2f_scalar_character(x)
   implicit none
   type(yggptr) :: x
   character(len=:), pointer :: x_character
@@ -271,13 +271,13 @@ subroutine yggptr_c2f_scalar_transfer_character(x)
      end do
      deallocate(x%data_character_unit)
   class default
-     call ygglog_error("yggptr_c2f_scalar_transfer_character: Unexpected type.")
+     call ygglog_error("yggptr_c2f_scalar_character: Unexpected type.")
      stop "ERROR"
   end select
-end subroutine yggptr_c2f_scalar_transfer_character
+end subroutine yggptr_c2f_scalar_character
 
 
-subroutine yggptr_c2f_array_transfer_integer(x)
+subroutine yggptr_c2f_array_integer(x)
   implicit none
   type(yggptr) :: x
   integer(kind=2), dimension(:), pointer :: xarr_integer2
@@ -294,11 +294,11 @@ subroutine yggptr_c2f_array_transfer_integer(x)
      xarr_integer8 => item
      call c_f_pointer(x%ptr, xarr_integer8, [x%len])
   class default
-     call ygglog_error("yggptr_c2f_array_transfer_integer: Unexpected type.")
+     call ygglog_error("yggptr_c2f_array_integer: Unexpected type.")
      stop "ERROR"
   end select
-end subroutine yggptr_c2f_array_transfer_integer
-subroutine yggptr_c2f_array_transfer_real(x)
+end subroutine yggptr_c2f_array_integer
+subroutine yggptr_c2f_array_real(x)
   implicit none
   type(yggptr) :: x
   real(kind=4), dimension(:), pointer :: xarr_real4
@@ -315,11 +315,11 @@ subroutine yggptr_c2f_array_transfer_real(x)
      xarr_real16 => item
      call c_f_pointer(x%ptr, xarr_real16, [x%len])
   class default
-     call ygglog_error("yggptr_c2f_array_transfer_real: Unexpected type.")
+     call ygglog_error("yggptr_c2f_array_real: Unexpected type.")
      stop "ERROR"
   end select
-end subroutine yggptr_c2f_array_transfer_real
-subroutine yggptr_c2f_array_transfer_complex(x)
+end subroutine yggptr_c2f_array_real
+subroutine yggptr_c2f_array_complex(x)
   implicit none
   type(yggptr) :: x
   complex(kind=4), dimension(:), pointer :: xarr_complex4
@@ -336,11 +336,11 @@ subroutine yggptr_c2f_array_transfer_complex(x)
      xarr_complex16 => item
      call c_f_pointer(x%ptr, xarr_complex16, [x%len])
   class default
-     call ygglog_error("yggptr_c2f_array_transfer_complex: Unexpected type.")
+     call ygglog_error("yggptr_c2f_array_complex: Unexpected type.")
      stop "ERROR"
   end select
-end subroutine yggptr_c2f_array_transfer_complex
-subroutine yggptr_c2f_array_transfer_logical(x)
+end subroutine yggptr_c2f_array_complex
+subroutine yggptr_c2f_array_logical(x)
   implicit none
   type(yggptr) :: x
   logical(kind=1), dimension(:), pointer :: xarr_logical1
@@ -361,11 +361,11 @@ subroutine yggptr_c2f_array_transfer_logical(x)
      xarr_logical8 => item
      call c_f_pointer(x%ptr, xarr_logical8, [x%len])
   class default
-     call ygglog_error("yggptr_c2f_array_transfer_logical: Unexpected type.")
+     call ygglog_error("yggptr_c2f_array_logical: Unexpected type.")
      stop "ERROR"
   end select
-end subroutine yggptr_c2f_array_transfer_logical
-subroutine yggptr_c2f_array_transfer_character(x)
+end subroutine yggptr_c2f_array_logical
+subroutine yggptr_c2f_array_character(x)
   implicit none
   type(yggptr) :: x
   type(yggchar_r), pointer :: x_character_realloc
@@ -400,56 +400,25 @@ subroutine yggptr_c2f_array_transfer_character(x)
      end do
      deallocate(x%data_character_unit)
   class default
-     call ygglog_error("yggptr_c2f_array_transfer_character: Unexpected type.")
+     call ygglog_error("yggptr_c2f_array_character: Unexpected type.")
      stop "ERROR"
   end select
-end subroutine yggptr_c2f_array_transfer_character
-subroutine yggptr_c2f_array_transfer_1darray(x)
+end subroutine yggptr_c2f_array_character
+
+
+subroutine yggptr_c2f_1darray_integer(x)
   implicit none
   type(yggptr) :: x
-  integer(kind=c_size_t), pointer :: array_len
-  integer(kind=c_size_t), pointer :: precision
-  type(yggchar_r), pointer :: x_character_realloc
-  type(yggchar_r), dimension(:), pointer :: xarr_character_realloc
-  character, dimension(:), pointer :: xarr_character, xarr_character0
-  integer(kind=8) :: i, j
   type(c_long_1d), pointer :: x_c_long_1d
   type(integer_1d), pointer :: x_integer_1d
   type(integer2_1d), pointer :: x_integer2_1d
   type(integer4_1d), pointer :: x_integer4_1d
   type(integer8_1d), pointer :: x_integer8_1d
-  type(real_1d), pointer :: x_real_1d
-  type(real4_1d), pointer :: x_real4_1d
-  type(real8_1d), pointer :: x_real8_1d
-  type(real16_1d), pointer :: x_real16_1d
-  type(complex_1d), pointer :: x_complex_1d
-  type(complex4_1d), pointer :: x_complex4_1d
-  type(complex8_1d), pointer :: x_complex8_1d
-  type(complex16_1d), pointer :: x_complex16_1d
-  type(logical_1d), pointer :: x_logical_1d
-  type(logical1_1d), pointer :: x_logical1_1d
-  type(logical2_1d), pointer :: x_logical2_1d
-  type(logical4_1d), pointer :: x_logical4_1d
-  type(logical8_1d), pointer :: x_logical8_1d
-  type(character_1d), pointer :: x_character_1d
   integer, dimension(:), pointer :: ptr_c_long
   integer, dimension(:), pointer :: ptr_integer
   integer(kind=2), dimension(:), pointer :: ptr_integer2
   integer(kind=4), dimension(:), pointer :: ptr_integer4
   integer(kind=8), dimension(:), pointer :: ptr_integer8
-  real, dimension(:), pointer :: ptr_real
-  real(kind=4), dimension(:), pointer :: ptr_real4
-  real(kind=8), dimension(:), pointer :: ptr_real8
-  real(kind=16), dimension(:), pointer :: ptr_real16
-  complex, dimension(:), pointer :: ptr_complex
-  complex(kind=4), dimension(:), pointer :: ptr_complex4
-  complex(kind=8), dimension(:), pointer :: ptr_complex8
-  complex(kind=16), dimension(:), pointer :: ptr_complex16
-  logical, dimension(:), pointer :: ptr_logical
-  logical(kind=1), dimension(:), pointer :: ptr_logical1
-  logical(kind=2), dimension(:), pointer :: ptr_logical2
-  logical(kind=4), dimension(:), pointer :: ptr_logical4
-  logical(kind=8), dimension(:), pointer :: ptr_logical8
   select type(item=>x%item)
   type is (c_long_1d)
      x_c_long_1d => item
@@ -471,6 +440,23 @@ subroutine yggptr_c2f_array_transfer_1darray(x)
      x_integer8_1d => item
      call c_f_pointer(x%ptr, ptr_integer8, [x%len])
      x_integer8_1d%x = ptr_integer8
+  class default
+     call ygglog_error("yggptr_c2f_1darray_integer: Unexpected type.")
+     stop "ERROR"
+  end select
+end subroutine yggptr_c2f_1darray_integer
+subroutine yggptr_c2f_1darray_real(x)
+  implicit none
+  type(yggptr) :: x
+  type(real_1d), pointer :: x_real_1d
+  type(real4_1d), pointer :: x_real4_1d
+  type(real8_1d), pointer :: x_real8_1d
+  type(real16_1d), pointer :: x_real16_1d
+  real, dimension(:), pointer :: ptr_real
+  real(kind=4), dimension(:), pointer :: ptr_real4
+  real(kind=8), dimension(:), pointer :: ptr_real8
+  real(kind=16), dimension(:), pointer :: ptr_real16
+  select type(item=>x%item)
   type is (real_1d)
      x_real_1d => item
      call c_f_pointer(x%ptr, ptr_real, [x%len])
@@ -487,6 +473,23 @@ subroutine yggptr_c2f_array_transfer_1darray(x)
      x_real16_1d => item
      call c_f_pointer(x%ptr, ptr_real16, [x%len])
      x_real16_1d%x = ptr_real16
+  class default
+     call ygglog_error("yggptr_c2f_1darray_real: Unexpected type.")
+     stop "ERROR"
+  end select
+end subroutine yggptr_c2f_1darray_real
+subroutine yggptr_c2f_1darray_complex(x)
+  implicit none
+  type(yggptr) :: x
+  type(complex_1d), pointer :: x_complex_1d
+  type(complex4_1d), pointer :: x_complex4_1d
+  type(complex8_1d), pointer :: x_complex8_1d
+  type(complex16_1d), pointer :: x_complex16_1d
+  complex, dimension(:), pointer :: ptr_complex
+  complex(kind=4), dimension(:), pointer :: ptr_complex4
+  complex(kind=8), dimension(:), pointer :: ptr_complex8
+  complex(kind=16), dimension(:), pointer :: ptr_complex16
+  select type(item=>x%item)
   type is (complex_1d)
      x_complex_1d => item
      call c_f_pointer(x%ptr, ptr_complex, [x%len])
@@ -503,6 +506,25 @@ subroutine yggptr_c2f_array_transfer_1darray(x)
      x_complex16_1d => item
      call c_f_pointer(x%ptr, ptr_complex16, [x%len])
      x_complex16_1d%x = ptr_complex16
+  class default
+     call ygglog_error("yggptr_c2f_1darray_complex: Unexpected type.")
+     stop "ERROR"
+  end select
+end subroutine yggptr_c2f_1darray_complex
+subroutine yggptr_c2f_1darray_logical(x)
+  implicit none
+  type(yggptr) :: x
+  type(logical_1d), pointer :: x_logical_1d
+  type(logical1_1d), pointer :: x_logical1_1d
+  type(logical2_1d), pointer :: x_logical2_1d
+  type(logical4_1d), pointer :: x_logical4_1d
+  type(logical8_1d), pointer :: x_logical8_1d
+  logical, dimension(:), pointer :: ptr_logical
+  logical(kind=1), dimension(:), pointer :: ptr_logical1
+  logical(kind=2), dimension(:), pointer :: ptr_logical2
+  logical(kind=4), dimension(:), pointer :: ptr_logical4
+  logical(kind=8), dimension(:), pointer :: ptr_logical8
+  select type(item=>x%item)
   type is (logical_1d)
      x_logical_1d => item
      call c_f_pointer(x%ptr, ptr_logical, [x%len])
@@ -523,6 +545,22 @@ subroutine yggptr_c2f_array_transfer_1darray(x)
      x_logical8_1d => item
      call c_f_pointer(x%ptr, ptr_logical8, [x%len])
      x_logical8_1d%x = ptr_logical8
+  class default
+     call ygglog_error("yggptr_c2f_1darray_logical: Unexpected type.")
+     stop "ERROR"
+  end select
+end subroutine yggptr_c2f_1darray_logical
+subroutine yggptr_c2f_1darray_character(x)
+  implicit none
+  type(yggptr) :: x
+  integer(kind=c_size_t), pointer :: array_len
+  integer(kind=c_size_t), pointer :: precision
+  type(yggchar_r), pointer :: x_character_realloc
+  type(yggchar_r), dimension(:), pointer :: xarr_character_realloc
+  character, dimension(:), pointer :: xarr_character, xarr_character0
+  integer(kind=8) :: i, j
+  type(character_1d), pointer :: x_character_1d
+  select type(item=>x%item)
   type is (character_1d)
      x_character_1d => item
      x_character_realloc => x_character_1d%x(1)
@@ -539,7 +577,7 @@ subroutine yggptr_c2f_array_transfer_1darray(x)
      end do
      deallocate(x%data_character_unit)
   class default
-     call ygglog_error("yggarg_c2f_array_transfer_1darray: Unexpected type.")
+     call ygglog_error("yggptr_c2f_1darray_character: Unexpected type.")
      stop "ERROR"
   end select
-end subroutine yggptr_c2f_array_transfer_1darray
+end subroutine yggptr_c2f_1darray_character
