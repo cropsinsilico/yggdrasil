@@ -117,9 +117,13 @@ function yggptr_c2f(x, realloc) result(flag)
      type is (character(*))
         call yggptr_c2f_scalar_character(x)
      class default
-        write(log_msg, '("yggptr_c2f (scalar transfer): Unexpected type: ",A)'), x%type
-        call ygglog_error(log_msg)
-        stop "ERROR"
+        if ((x%type.eq."ply").or.(x%type.eq."obj")) then
+           ! Use pointer
+        else
+           write(log_msg, '("yggptr_c2f (scalar transfer): Unexpected type: ",A)'), x%type
+           call ygglog_error(log_msg)
+           stop "ERROR"
+        end if
      end select
   end if
   if (.not.x%array) then

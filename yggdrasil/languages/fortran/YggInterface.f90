@@ -6,9 +6,70 @@ module fygg
   integer, parameter :: LINE_SIZE_MAX = 2048
 
   interface yggarg
-     module procedure yggarg_scalar
-     module procedure yggarg_array
+     module procedure yggarg_scalar_integer2
+     module procedure yggarg_scalar_integer4
+     module procedure yggarg_scalar_integer8
+     module procedure yggarg_scalar_real4
+     module procedure yggarg_scalar_real8
+     module procedure yggarg_scalar_real16
+     module procedure yggarg_scalar_complex4
+     module procedure yggarg_scalar_complex8
+     module procedure yggarg_scalar_complex16
+     module procedure yggarg_scalar_logical1
+     module procedure yggarg_scalar_logical2
+     module procedure yggarg_scalar_logical4
+     module procedure yggarg_scalar_logical8
+     module procedure yggarg_scalar_character
+     module procedure yggarg_scalar_yggchar_r
+     module procedure yggarg_scalar_ply
+     module procedure yggarg_scalar_obj
+     module procedure yggarg_realloc_1darray_c_long
+     module procedure yggarg_realloc_1darray_integer
+     module procedure yggarg_realloc_1darray_integer2
+     module procedure yggarg_realloc_1darray_integer4
+     module procedure yggarg_realloc_1darray_integer8
+     module procedure yggarg_realloc_1darray_real
+     module procedure yggarg_realloc_1darray_real4
+     module procedure yggarg_realloc_1darray_real8
+     module procedure yggarg_realloc_1darray_real16
+     module procedure yggarg_realloc_1darray_complex
+     module procedure yggarg_realloc_1darray_complex4
+     module procedure yggarg_realloc_1darray_complex8
+     module procedure yggarg_realloc_1darray_complex16
+     module procedure yggarg_realloc_1darray_logical
+     module procedure yggarg_realloc_1darray_logical1
+     module procedure yggarg_realloc_1darray_logical2
+     module procedure yggarg_realloc_1darray_logical4
+     module procedure yggarg_realloc_1darray_logical8
+     module procedure yggarg_realloc_1darray_character
+     module procedure yggarg_1darray_integer2
+     module procedure yggarg_1darray_integer4
+     module procedure yggarg_1darray_integer8
+     module procedure yggarg_1darray_real4
+     module procedure yggarg_1darray_real8
+     module procedure yggarg_1darray_real16
+     module procedure yggarg_1darray_complex4
+     module procedure yggarg_1darray_complex8
+     module procedure yggarg_1darray_complex16
+     module procedure yggarg_1darray_logical1
+     module procedure yggarg_1darray_logical2
+     module procedure yggarg_1darray_logical4
+     module procedure yggarg_1darray_logical8
+     module procedure yggarg_1darray_character
+     module procedure yggarg_1darray_yggchar_r
   end interface yggarg
+  interface ygg_send_var
+     module procedure ygg_send_var_sing
+     module procedure ygg_send_var_mult
+  end interface ygg_send_var
+  interface ygg_recv_var
+     module procedure ygg_recv_var_sing
+     module procedure ygg_recv_var_mult
+  end interface ygg_recv_var
+  interface ygg_recv_var_realloc
+     module procedure ygg_recv_var_realloc_sing
+     module procedure ygg_recv_var_realloc_mult
+  end interface ygg_recv_var_realloc
   type :: yggcomm
      type(c_ptr) :: comm
   end type yggcomm
@@ -142,15 +203,65 @@ module fygg
      type(c_ptr) :: prec_ptr = c_null_ptr
   end type yggptr
   type :: yggptr_arr
-     type(yggptr), dimension(:), pointer :: vals
+     type(yggptr), dimension(:), pointer :: vals => null()
   end type yggptr_arr
   type :: yggptr_map
-     character(len=20), dimension(:), pointer :: keys
-     type(yggptr), dimension(:), pointer :: vals
+     character(len=20), dimension(:), pointer :: keys => null()
+     type(yggptr), dimension(:), pointer :: vals => null()
   end type yggptr_map
+  type, bind(c) :: yggply
+     character(kind=c_char), dimension(100) :: material
+     integer(kind=c_int) :: nvert
+     integer(kind=c_int) :: nface
+     integer(kind=c_int) :: nedge
+     type(c_ptr) :: c_vertices
+     type(c_ptr) :: c_faces
+     type(c_ptr) :: c_edges
+     type(c_ptr) :: c_vertex_colors
+     type(c_ptr) :: c_edge_colors
+     type(c_ptr) :: c_nvert_in_face
+  end type yggply
+  type, bind(c) :: yggobj
+     character(kind=c_char), dimension(100) :: material
+     integer(kind=c_int) :: nvert
+     integer(kind=c_int) :: ntexc
+     integer(kind=c_int) :: nnorm
+     integer(kind=c_int) :: nparam
+     integer(kind=c_int) :: npoint
+     integer(kind=c_int) :: nline
+     integer(kind=c_int) :: nface
+     integer(kind=c_int) :: ncurve
+     integer(kind=c_int) :: ncurve2
+     integer(kind=c_int) :: nsurf
+     type(c_ptr) :: c_vertices
+     type(c_ptr) :: c_vertex_colors
+     type(c_ptr) :: c_texcoords
+     type(c_ptr) :: c_normals
+     type(c_ptr) :: c_params
+     type(c_ptr) :: c_points
+     type(c_ptr) :: c_nvert_in_point
+     type(c_ptr) :: c_lines
+     type(c_ptr) :: c_nvert_in_line
+     type(c_ptr) :: c_line_texcoords
+     type(c_ptr) :: c_faces
+     type(c_ptr) :: c_nvert_in_face
+     type(c_ptr) :: c_face_texcoords
+     type(c_ptr) :: c_face_normals
+     type(c_ptr) :: c_curves
+     type(c_ptr) :: c_curve_params
+     type(c_ptr) :: c_nvert_in_curve
+     type(c_ptr) :: c_curves2
+     type(c_ptr) :: c_nparam_in_curve2
+     type(c_ptr) :: c_surfaces
+     type(c_ptr) :: c_nvert_in_surface
+     type(c_ptr) :: c_surface_params_u
+     type(c_ptr) :: c_surface_params_v
+     type(c_ptr) :: c_surface_texcoords
+     type(c_ptr) :: c_surface_normals
+  end type yggobj
 
   public :: yggarg, yggchar_r, yggcomm, &
-       yggptr, yggptr_arr, yggptr_map, &
+       yggptr, yggptr_arr, yggptr_map, yggply, yggobj, &
        integer_1d, real_1d, complex_1d, logical_1d, character_1d, &
        LINE_SIZE_MAX
 
@@ -160,575 +271,7 @@ contains
 
   include "YggInterface_realloc.f90"
   include "YggInterface_c2f.f90"
-  
-  ! Scalar versions
-  subroutine yggarg_scalar_integer(y)
-    type(yggptr) :: y
-    integer(kind=2), pointer :: x_integer2
-    integer(kind=4), pointer :: x_integer4
-    integer(kind=8), pointer :: x_integer8
-    y%type = "integer"
-    select type(x=>y%item)
-    type is (integer(kind=2))
-       x_integer2 => x
-       y%ptr = c_loc(x_integer2)
-    type is (integer(kind=4))
-       x_integer4 => x
-       y%ptr = c_loc(x_integer4)
-    type is (integer(kind=8))
-       y%type = "size_t"
-       x_integer8 => x
-       y%ptr = c_loc(x_integer8)
-    class default
-       stop 'yggarg_scalar_integer: Unexpected type.'
-    end select
-  end subroutine yggarg_scalar_integer
-  subroutine yggarg_scalar_real(y)
-    type(yggptr) :: y
-    real(kind=4), pointer :: x_real4
-    real(kind=8), pointer :: x_real8
-    real(kind=16), pointer :: x_real16
-    y%type = "real"
-    select type(x=>y%item)
-    type is (real(kind=4))
-       x_real4 => x
-       y%ptr = c_loc(x_real4)
-    type is (real(kind=8))
-       x_real8 => x
-       y%ptr = c_loc(x_real8)
-    type is (real(kind=16))
-       x_real16 => x
-       y%ptr = c_loc(x_real16)
-    class default
-       stop 'yggarg_scalar_real: Unexpected type.'
-    end select
-  end subroutine yggarg_scalar_real
-  subroutine yggarg_scalar_complex(y)
-    type(yggptr) :: y
-    complex, pointer :: x_complex
-    complex(kind=4), pointer :: x_complex4
-    complex(kind=8), pointer :: x_complex8
-    complex(kind=16), pointer :: x_complex16
-    y%type = "complex"
-    select type(x=>y%item)
-    type is (complex(kind=4))
-       x_complex4 => x
-       y%ptr = c_loc(x_complex4)
-    type is (complex(kind=8))
-       x_complex8 => x
-       y%ptr = c_loc(x_complex8)
-    type is (complex(kind=16))
-       x_complex16 => x
-       y%ptr = c_loc(x_complex16)
-    class default
-       stop 'yggarg_scalar_complex: Unexpected type.'
-    end select
-  end subroutine yggarg_scalar_complex
-  subroutine yggarg_scalar_logical(y)
-    type(yggptr) :: y
-    logical(kind=1), pointer :: x_logical1
-    logical(kind=2), pointer :: x_logical2
-    logical(kind=4), pointer :: x_logical4
-    logical(kind=8), pointer :: x_logical8
-    y%type = "logical"
-    select type(x=>y%item)
-    type is (logical(kind=1))
-       x_logical1 => x
-       y%ptr = c_loc(x_logical1)
-    type is (logical(kind=2))
-       x_logical2 => x
-       y%ptr = c_loc(x_logical2)
-    type is (logical(kind=4))
-       x_logical4 => x
-       y%ptr = c_loc(x_logical4)
-    type is (logical(kind=8))
-       x_logical8 => x
-       y%ptr = c_loc(x_logical8)
-    class default
-       stop 'yggarg_scalar_logical: Unexpected type.'
-    end select
-  end subroutine yggarg_scalar_logical
-  subroutine yggarg_scalar_character(y)
-    type(yggptr) :: y
-    character(len=:), pointer :: x_character
-    type(yggchar_r), pointer :: x_character_realloc
-    integer :: i
-    y%type = "character"
-    select type(x=>y%item)
-    type is (character(*))
-       x_character => x
-       allocate(y%data_character_unit(len(x_character)))
-       do i = 1, len(x_character)
-          y%data_character_unit(i) = x_character(i:i)
-       end do
-       if (len_trim(x_character).lt.len(x_character)) then
-          y%data_character_unit(len_trim(x_character) + 1) = c_null_char
-       end if
-       y%ptr = c_loc(y%data_character_unit(1))
-       y%prec = len(x_character)
-    type is (yggchar_r)
-       x_character_realloc => x
-       if (associated(x_character_realloc%x)) then
-          y%ptr = c_loc(x_character_realloc%x(1))
-          y%prec = size(x_character_realloc%x)
-       else
-          y%ptr = c_null_ptr
-       end if
-       y%alloc = .true.
-    class default
-       stop 'yggarg_scalar_character: Unexpected type.'
-    end select
-  end subroutine yggarg_scalar_character
-  function yggarg_scalar(x) result(y)
-    class(*), target :: x
-    type(yggptr) :: y
-    y%item => x
-    y%array = .false.
-    y%alloc = .false.
-    y%len = 1
-    y%prec = 1
-    select type(x)
-    type is (integer(kind=2))
-       call yggarg_scalar_integer(y)
-    type is (integer(kind=4))
-       call yggarg_scalar_integer(y)
-    type is (integer(kind=8))
-       call yggarg_scalar_integer(y)
-    type is (real(kind=4))
-       call yggarg_scalar_real(y)
-    type is (real(kind=8))
-       call yggarg_scalar_real(y)
-    type is (real(kind=16))
-       call yggarg_scalar_real(y)
-    type is (complex(kind=4))
-       call yggarg_scalar_complex(y)
-    type is (complex(kind=8))
-       call yggarg_scalar_complex(y)
-    type is (complex(kind=16))
-       call yggarg_scalar_complex(y)
-    type is (logical(kind=1))
-       call yggarg_scalar_logical(y)
-    type is (logical(kind=2))
-       call yggarg_scalar_logical(y)
-    type is (logical(kind=4))
-       call yggarg_scalar_logical(y)
-    type is (logical(kind=8))
-       call yggarg_scalar_logical(y)
-    type is (character(*))
-       call yggarg_scalar_character(y)
-    type is (yggchar_r)
-       call yggarg_scalar_character(y)
-    type is (c_long_1d)
-       call yggarg_realloc_1darray(y)
-    type is (integer_1d)
-       call yggarg_realloc_1darray(y)
-    type is (integer2_1d)
-       call yggarg_realloc_1darray(y)
-    type is (integer4_1d)
-       call yggarg_realloc_1darray(y)
-    type is (integer8_1d)
-       call yggarg_realloc_1darray(y)
-    type is (real_1d)
-       call yggarg_realloc_1darray(y)
-    type is (real4_1d)
-       call yggarg_realloc_1darray(y)
-    type is (real8_1d)
-       call yggarg_realloc_1darray(y)
-    type is (real16_1d)
-       call yggarg_realloc_1darray(y)
-    type is (complex_1d)
-       call yggarg_realloc_1darray(y)
-    type is (complex4_1d)
-       call yggarg_realloc_1darray(y)
-    type is (complex8_1d)
-       call yggarg_realloc_1darray(y)
-    type is (complex16_1d)
-       call yggarg_realloc_1darray(y)
-    type is (logical_1d)
-       call yggarg_realloc_1darray(y)
-    type is (logical1_1d)
-       call yggarg_realloc_1darray(y)
-    type is (logical2_1d)
-       call yggarg_realloc_1darray(y)
-    type is (logical4_1d)
-       call yggarg_realloc_1darray(y)
-    type is (logical8_1d)
-       call yggarg_realloc_1darray(y)
-    type is (character_1d)
-       call yggarg_realloc_1darray(y)
-    class default
-       stop 'yggarg_scalar: Unexpected type.'
-    end select
-  end function yggarg_scalar
-  
-  ! Array versions
-  subroutine yggarg_realloc_1darray(y)
-    type(yggptr) :: y
-    type(c_long_1d), pointer :: x_c_long_1d
-    type(integer_1d), pointer :: x_integer_1d
-    type(integer2_1d), pointer :: x_integer2_1d
-    type(integer4_1d), pointer :: x_integer4_1d
-    type(integer8_1d), pointer :: x_integer8_1d
-    type(real_1d), pointer :: x_real_1d
-    type(real4_1d), pointer :: x_real4_1d
-    type(real8_1d), pointer :: x_real8_1d
-    type(real16_1d), pointer :: x_real16_1d
-    type(complex_1d), pointer :: x_complex_1d
-    type(complex4_1d), pointer :: x_complex4_1d
-    type(complex8_1d), pointer :: x_complex8_1d
-    type(complex16_1d), pointer :: x_complex16_1d
-    type(logical_1d), pointer :: x_logical_1d
-    type(logical1_1d), pointer :: x_logical1_1d
-    type(logical2_1d), pointer :: x_logical2_1d
-    type(logical4_1d), pointer :: x_logical4_1d
-    type(logical8_1d), pointer :: x_logical8_1d
-    type(character_1d), pointer :: x_character_1d
-    integer(kind=8) :: i, j, ilength
-    call ygglog_debug("yggarg_realloc_1darray: begin")
-    y%array = .true.
-    y%alloc = .true.
-    y%len = 1
-    y%prec = 1
-    y%ptr = c_null_ptr
-    select type(x=>y%item)
-    type is (c_long_1d)
-       y%type = "c_long"
-       x_c_long_1d => x
-       if (associated(x_c_long_1d%x)) then
-          y%ptr = c_loc(x_c_long_1d%x(1))
-          y%len = size(x_c_long_1d%x)
-       end if
-    type is (integer_1d)
-       y%type = "integer"
-       x_integer_1d => x
-       if (associated(x_integer_1d%x)) then
-          y%ptr = c_loc(x_integer_1d%x(1))
-          y%len = size(x_integer_1d%x)
-       end if
-    type is (integer2_1d)
-       y%type = "integer"
-       x_integer2_1d => x
-       if (associated(x_integer2_1d%x)) then
-          y%ptr = c_loc(x_integer2_1d%x(1))
-          y%len = size(x_integer2_1d%x)
-       end if
-    type is (integer4_1d)
-       y%type = "integer"
-       x_integer4_1d => x
-       if (associated(x_integer4_1d%x)) then
-          y%ptr = c_loc(x_integer4_1d%x(1))
-          y%len = size(x_integer4_1d%x)
-       end if
-    type is (integer8_1d)
-       y%type = "integer"
-       x_integer8_1d => x
-       if (associated(x_integer8_1d%x)) then
-          y%ptr = c_loc(x_integer8_1d%x(1))
-          y%len = size(x_integer8_1d%x)
-       end if
-    type is (real_1d)
-       y%type = "real"
-       x_real_1d => x
-       if (associated(x_real_1d%x)) then
-          y%ptr = c_loc(x_real_1d%x(1))
-          y%len = size(x_real_1d%x)
-       end if
-    type is (real4_1d)
-       y%type = "real"
-       x_real4_1d => x
-       if (associated(x_real4_1d%x)) then
-          y%ptr = c_loc(x_real4_1d%x(1))
-          y%len = size(x_real4_1d%x)
-       end if
-    type is (real8_1d)
-       y%type = "real"
-       x_real8_1d => x
-       if (associated(x_real8_1d%x)) then
-          y%ptr = c_loc(x_real8_1d%x(1))
-          y%len = size(x_real8_1d%x)
-       end if
-    type is (real16_1d)
-       y%type = "real"
-       x_real16_1d => x
-       if (associated(x_real16_1d%x)) then
-          y%ptr = c_loc(x_real16_1d%x(1))
-          y%len = size(x_real16_1d%x)
-       end if
-    type is (complex_1d)
-       y%type = "complex"
-       x_complex_1d => x
-       if (associated(x_complex_1d%x)) then
-          y%ptr = c_loc(x_complex_1d%x(1))
-          y%len = size(x_complex_1d%x)
-       end if
-    type is (complex4_1d)
-       y%type = "complex"
-       x_complex4_1d => x
-       if (associated(x_complex4_1d%x)) then
-          y%ptr = c_loc(x_complex4_1d%x(1))
-          y%len = size(x_complex4_1d%x)
-       end if
-    type is (complex8_1d)
-       y%type = "complex"
-       x_complex8_1d => x
-       if (associated(x_complex8_1d%x)) then
-          y%ptr = c_loc(x_complex8_1d%x(1))
-          y%len = size(x_complex8_1d%x)
-       end if
-    type is (complex16_1d)
-       y%type = "complex"
-       x_complex16_1d => x
-       if (associated(x_complex16_1d%x)) then
-          y%ptr = c_loc(x_complex16_1d%x(1))
-          y%len = size(x_complex16_1d%x)
-       end if
-    type is (logical_1d)
-       y%type = "logical"
-       x_logical_1d => x
-       if (associated(x_logical_1d%x)) then
-          y%ptr = c_loc(x_logical_1d%x(1))
-          y%len = size(x_logical_1d%x)
-       end if
-    type is (logical1_1d)
-       y%type = "logical"
-       x_logical1_1d => x
-       if (associated(x_logical1_1d%x)) then
-          y%ptr = c_loc(x_logical1_1d%x(1))
-          y%len = size(x_logical1_1d%x)
-       end if
-    type is (logical2_1d)
-       y%type = "logical"
-       x_logical2_1d => x
-       if (associated(x_logical2_1d%x)) then
-          y%ptr = c_loc(x_logical2_1d%x(1))
-          y%len = size(x_logical2_1d%x)
-       end if
-    type is (logical4_1d)
-       y%type = "logical"
-       x_logical4_1d => x
-       if (associated(x_logical4_1d%x)) then
-          y%ptr = c_loc(x_logical4_1d%x(1))
-          y%len = size(x_logical4_1d%x)
-       end if
-    type is (logical8_1d)
-       y%type = "logical"
-       x_logical8_1d => x
-       if (associated(x_logical8_1d%x)) then
-          y%ptr = c_loc(x_logical8_1d%x(1))
-          y%len = size(x_logical8_1d%x)
-       end if
-    type is (character_1d)
-       y%type = "character"
-       x_character_1d => x
-       if (associated(x_character_1d%x)) then
-          y%len = size(x_character_1d%x)
-          if (associated(x_character_1d%x(1)%x)) then
-             y%prec = size(x_character_1d%x(1)%x)
-             allocate(y%data_character_unit(y%len * y%prec))
-             do i = 1, size(x_character_1d%x)
-                ilength = 0
-                do j = 1, y%prec
-                   if (len_trim(x_character_1d%x(i)%x(j)) > 0) ilength = j
-                end do
-                do j = 1, ilength
-                   y%data_character_unit(((i-1)*y%prec) + j) = x_character_1d%x(i)%x(j)
-                end do
-                if (ilength.lt.y%prec) then
-                   y%data_character_unit(((i-1)*y%prec) + ilength + 1) = c_null_char
-                end if
-                do j = (ilength + 2), y%prec
-                   y%data_character_unit(((i-1)*y%prec) + j) = ' '
-                end do
-             end do
-             y%ptr = c_loc(y%data_character_unit(1))
-          end if
-       end if
-    class default
-       call ygglog_error("yggarg_realloc_1darray: Unexpected type.")
-       stop "ERROR"
-    end select
-    call ygglog_debug("yggarg_realloc_1darray: end")
-  end subroutine yggarg_realloc_1darray
-    
-  subroutine yggarg_array_integer(y)
-    type(yggptr) :: y
-    integer(kind=2), dimension(:), pointer :: x_integer2
-    integer(kind=4), dimension(:), pointer :: x_integer4
-    integer(kind=8), dimension(:), pointer :: x_integer8
-    y%type = "integer"
-    select type(x=>y%item_array)
-    type is (integer(kind=2))
-       x_integer2 => x
-       y%ptr = c_loc(x_integer2(1))
-    type is (integer(kind=4))
-       x_integer4 => x
-       y%ptr = c_loc(x_integer4(1))
-    type is (integer(kind=8))
-       y%type = "size_t"
-       x_integer8 => x
-       y%ptr = c_loc(x_integer8(1))
-    class default
-       stop 'yggarg_array_integer: Unexpected type.'
-    end select
-  end subroutine yggarg_array_integer
-  subroutine yggarg_array_real(y)
-    type(yggptr) :: y
-    real(kind=4), dimension(:), pointer :: x_real4
-    real(kind=8), dimension(:), pointer :: x_real8
-    real(kind=16), dimension(:), pointer :: x_real16
-    y%type = "real"
-    select type(x=>y%item_array)
-    type is (real(kind=4))
-       x_real4 => x
-       y%ptr = c_loc(x_real4(1))
-    type is (real(kind=8))
-       x_real8 => x
-       y%ptr = c_loc(x_real8(1))
-    type is (real(kind=16))
-       x_real16 => x
-       y%ptr = c_loc(x_real16(1))
-    class default
-       stop 'yggarg_array_real: Unexpected type.'
-    end select
-  end subroutine yggarg_array_real
-  subroutine yggarg_array_complex(y)
-    type(yggptr) :: y
-    complex(kind=4), dimension(:), pointer :: x_complex4
-    complex(kind=8), dimension(:), pointer :: x_complex8
-    complex(kind=16), dimension(:), pointer :: x_complex16
-    y%type = "complex"
-    select type(x=>y%item_array)
-    type is (complex(kind=4))
-       x_complex4 => x
-       y%ptr = c_loc(x_complex4(1))
-    type is (complex(kind=8))
-       x_complex8 => x
-       y%ptr = c_loc(x_complex8(1))
-    type is (complex(kind=16))
-       x_complex16 => x
-       y%ptr = c_loc(x_complex16(1))
-    class default
-       stop 'yggarg_array_complex: Unexpected type.'
-    end select
-  end subroutine yggarg_array_complex
-  subroutine yggarg_array_logical(y)
-    type(yggptr) :: y
-    logical(kind=1), dimension(:), pointer :: x_logical1
-    logical(kind=2), dimension(:), pointer :: x_logical2
-    logical(kind=4), dimension(:), pointer :: x_logical4
-    logical(kind=8), dimension(:), pointer :: x_logical8
-    y%type = "logical"
-    select type(x=>y%item_array)
-    type is (logical(kind=1))
-       x_logical1 => x
-       y%ptr = c_loc(x_logical1(1))
-    type is (logical(kind=2))
-       x_logical2 => x
-       y%ptr = c_loc(x_logical2(1))
-    type is (logical(kind=4))
-       x_logical4 => x
-       y%ptr = c_loc(x_logical4(1))
-    type is (logical(kind=8))
-       x_logical8 => x
-       y%ptr = c_loc(x_logical8(1))
-    class default
-       stop 'yggarg_array_logical: Unexpected type.'
-    end select
-  end subroutine yggarg_array_logical
-  subroutine yggarg_array_character(y)
-    type(yggptr) :: y
-    character(len=:), dimension(:), pointer :: x_character
-    type(yggchar_r), dimension(:), pointer :: x_character_realloc
-    integer :: i, j, ilength
-    y%type = "character"
-    select type(x=>y%item_array)
-    type is (yggchar_r)
-       x_character_realloc => x
-       if ((associated(x_character_realloc(1)%x)).and. &
-            (size(x_character_realloc(1)%x).ge.1)) then
-          ! y%ptr = c_loc(x_character_realloc(1)%x(1))
-          y%prec = size(x_character_realloc(1)%x)
-          allocate(y%data_character_unit(y%len * y%prec))
-          do i = 1, size(x_character_realloc)
-             ilength = 0
-             do j = 1, ilength
-                if (len_trim(x_character_realloc(i)%x(j)) > 0) ilength = j
-             end do
-             do j = 1, ilength
-                y%data_character_unit(((i-1)*y%prec) + j) = x_character_realloc(i)%x(j)
-             end do
-             if (ilength.lt.size(x_character_realloc(i)%x)) then
-                y%data_character_unit(((i-1)*y%prec) + ilength + 1) = c_null_char
-             end if
-             do j = (ilength + 2), size(x_character_realloc(i)%x)
-                y%data_character_unit(((i-1)*y%prec) + j) = ' '
-             end do
-          end do
-          y%ptr = c_loc(y%data_character_unit(1))
-       else
-          y%ptr = c_null_ptr
-       end if
-    type is (character(*))
-       x_character => x
-       y%prec = len(x_character(1))
-       do i = 1, size(x_character)
-          ilength = len_trim(x_character(i))
-          if (ilength.lt.y%prec) then
-             x_character(i)((ilength+1):(ilength+1)) = c_null_char
-          end if
-       end do
-       allocate(y%data_character_unit(y%len * y%prec))
-       y%data_character_unit = transfer(x_character, &
-            y%data_character_unit)
-       y%ptr = c_loc(y%data_character_unit(1))
-    class default
-       stop 'yggarg_array_character: Unexpected type.'
-    end select
-  end subroutine yggarg_array_character
-  function yggarg_array(x) result(y)
-    class(*), dimension(:), target :: x
-    type(yggptr) :: y
-    y%item => x(1)
-    y%item_array => x
-    y%array = .true.
-    y%alloc = .false.
-    y%len = size(x)
-    y%prec = 1
-    select type(item=>y%item_array)
-    type is (integer(kind=2))
-       call yggarg_array_integer(y)
-    type is (integer(kind=4))
-       call yggarg_array_integer(y)
-    type is (integer(kind=8))
-       call yggarg_array_integer(y)
-    type is (real(kind=4))
-       call yggarg_array_real(y)
-    type is (real(kind=8))
-       call yggarg_array_real(y)
-    type is (real(kind=16))
-       call yggarg_array_real(y)
-    type is (complex(kind=4))
-       call yggarg_array_complex(y)
-    type is (complex(kind=8))
-       call yggarg_array_complex(y)
-    type is (complex(kind=16))
-       call yggarg_array_complex(y)
-    type is (logical(kind=1))
-       call yggarg_array_logical(y)
-    type is (logical(kind=2))
-       call yggarg_array_logical(y)
-    type is (logical(kind=4))
-       call yggarg_array_logical(y)
-    type is (logical(kind=8))
-       call yggarg_array_logical(y)
-    type is (character(*))
-       call yggarg_array_character(y)
-    type is (yggchar_r)
-       call yggarg_array_character(y)
-    class default
-       stop 'yggarg_array: Unexpected type.'
-    end select
-  end function yggarg_array
+  include "YggInterface_arg.f90"
   
   ! Utilities
   subroutine fix_format_str(x)
@@ -753,6 +296,8 @@ contains
   end subroutine fix_format_str
 
   ! YggInterface
+
+  ! Utilities
   subroutine ygglog_info(fmt)
     implicit none
     character(len=*), intent(in) :: fmt
@@ -777,7 +322,8 @@ contains
     c_fmt = trim(fmt)//c_null_char
     call ygglog_error_c(c_fmt)
   end subroutine ygglog_error
-  
+
+  ! Methods for initializing channels
   function ygg_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -858,6 +404,43 @@ contains
     channel%comm = ygg_ascii_array_input_c(c_name)
   end function ygg_ascii_array_input
   
+  function ygg_ply_output(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_ply_output_c(c_name)
+  end function ygg_ply_output
+  
+  function ygg_ply_input(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_ply_input_c(c_name)
+  end function ygg_ply_input
+  
+  function ygg_obj_output(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_obj_output_c(c_name)
+  end function ygg_obj_output
+  
+  function ygg_obj_input(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_obj_input_c(c_name)
+  end function ygg_obj_input
+
+  ! Methods for sending/receiving
   function ygg_send(ygg_q, data, data_len) result (flag)
     implicit none
     type(yggcomm), intent(in) :: ygg_q
@@ -893,7 +476,14 @@ contains
     data = c_data(:flag)
   end function ygg_recv
 
-  function ygg_send_var(ygg_q, args) result (flag)
+  function ygg_send_var_sing(ygg_q, arg) result (flag)
+    implicit none
+    type(yggcomm), intent(in) :: ygg_q
+    type(yggptr) :: arg
+    integer :: flag
+    flag = ygg_send_var_mult(ygg_q, [arg])
+  end function ygg_send_var_sing
+  function ygg_send_var_mult(ygg_q, args) result (flag)
     implicit none
     type(yggcomm), intent(in) :: ygg_q
     type(c_ptr) :: c_ygg_q
@@ -909,7 +499,7 @@ contains
     end do
     c_flag = ygg_send_var_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
     flag = c_flag
-  end function ygg_send_var
+  end function ygg_send_var_mult
 
   subroutine pre_recv(args, c_args)
     implicit none
@@ -1002,8 +592,15 @@ contains
     end if
     call ygglog_debug("post_recv: end")
   end subroutine post_recv
-  
-  function ygg_recv_var(ygg_q, args) result (flag)
+
+  function ygg_recv_var_sing(ygg_q, arg) result (flag)
+    implicit none
+    type(yggcomm) :: ygg_q
+    type(yggptr) :: arg
+    integer :: flag
+    flag = ygg_recv_var_mult(ygg_q, [arg])
+  end function ygg_recv_var_sing
+  function ygg_recv_var_mult(ygg_q, args) result (flag)
     implicit none
     type(yggcomm) :: ygg_q
     type(c_ptr) :: c_ygg_q
@@ -1018,9 +615,16 @@ contains
     c_flag = ygg_recv_var_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
     flag = c_flag
     call post_recv(args, c_args, flag, .false.)
-  end function ygg_recv_var
+  end function ygg_recv_var_mult
   
-  function ygg_recv_var_realloc(ygg_q, args) result (flag)
+  function ygg_recv_var_realloc_sing(ygg_q, arg) result (flag)
+    implicit none
+    type(yggcomm) :: ygg_q
+    type(yggptr) :: arg
+    integer :: flag
+    flag = ygg_recv_var_realloc_mult(ygg_q, [arg])
+  end function ygg_recv_var_realloc_sing
+  function ygg_recv_var_realloc_mult(ygg_q, args) result (flag)
     implicit none
     type(yggcomm) :: ygg_q
     type(c_ptr) :: c_ygg_q
@@ -1047,6 +651,62 @@ contains
     end if
     call post_recv(args, c_args, flag, .true.)
     call ygglog_debug("ygg_recv_var_realloc: end")
-  end function ygg_recv_var_realloc
+  end function ygg_recv_var_realloc_mult
+
+  ! Ply interface
+  function init_ply() result (out)
+    implicit none
+    type(yggply) :: out
+    out = init_ply_c()
+  end function init_ply
+  subroutine free_ply(pp)
+    implicit none
+    type(yggply), pointer :: pp
+    type(c_ptr) :: c_p
+    c_p = c_loc(pp%material(1))
+    call free_ply_c(c_p)
+    nullify(pp)
+  end subroutine free_ply
+  subroutine display_ply_indent(p, indent)
+    implicit none
+    type(yggply), intent(in) :: p
+    character(len=*), intent(in) :: indent
+    character(len=len(indent)+1) :: c_indent
+    c_indent = indent//c_null_char
+    call display_ply_indent_c(p, c_indent)
+  end subroutine display_ply_indent
+  subroutine display_ply(p)
+    implicit none
+    type(yggply), intent(in) :: p
+    call display_ply_c(p)
+  end subroutine display_ply
+  
+  ! Obj interface
+  function init_obj() result (out)
+    implicit none
+    type(yggobj) :: out
+    out = init_obj_c()
+  end function init_obj
+  subroutine free_obj(pp)
+    implicit none
+    type(yggobj), pointer :: pp
+    type(c_ptr) :: c_p
+    c_p = c_loc(pp)
+    call free_obj_c(c_p)
+    nullify(pp)
+  end subroutine free_obj
+  subroutine display_obj_indent(p, indent)
+    implicit none
+    type(yggobj), intent(in) :: p
+    character(len=*), intent(in) :: indent
+    character(len=len(indent)+1) :: c_indent
+    c_indent = indent//c_null_char
+    call display_obj_indent_c(p, c_indent)
+  end subroutine display_obj_indent
+  subroutine display_obj(p)
+    implicit none
+    type(yggobj), intent(in) :: p
+    call display_obj_c(p)
+  end subroutine display_obj
   
 end module fygg
