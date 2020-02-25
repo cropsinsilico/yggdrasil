@@ -25,6 +25,15 @@ void *yggPlyOutput_f(const char *name);
 void *yggPlyInput_f(const char *name);
 void *yggObjOutput_f(const char *name);
 void *yggObjInput_f(const char *name);
+void *yggGenericOutput_f(const char *name);
+void *yggGenericInput_f(const char *name);
+void *yggAnyOutput_f(const char *name);
+void *yggAnyInput_f(const char *name);
+void *yggJSONArrayOutput_f(const char *name);
+void *yggJSONArrayInput_f(const char *name);
+void *yggJSONObjectOutput_f(const char *name);
+void *yggJSONObjectInput_f(const char *name);
+  
 // Methods for sending/receiving
 int ygg_send_f(const void *yggQ, const char *data, const size_t len);
 int ygg_recv_f(void *yggQ, char *data, const size_t len);
@@ -43,6 +52,16 @@ void free_obj_f(void* p);
 obj_t copy_obj_f(obj_t p);
 void display_obj_indent_f(obj_t p, const char *indent);
 void display_obj_f(obj_t p);
+// Generic interface
+generic_t init_generic_f();
+int free_generic_f(generic_t* x);
+generic_t copy_generic_f(generic_t src);
+void display_generic_f(generic_t x);
+int add_generic_array_f(generic_t arr, generic_t x);
+int set_generic_array_f(generic_t arr, size_t i, generic_t x);
+int get_generic_array_f(generic_t arr, size_t i, void *x);
+int set_generic_object_f(generic_t arr, const char* k, generic_t x);
+int get_generic_object_f(generic_t arr, const char* k, void *x);
 
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }

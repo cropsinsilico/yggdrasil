@@ -16,6 +16,7 @@ function yggarg_scalar_integer2(x) result (y)
   xp => x
   y%type = "integer"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_integer2
 function yggarg_scalar_integer4(x) result (y)
   type(yggptr) :: y
@@ -25,6 +26,7 @@ function yggarg_scalar_integer4(x) result (y)
   xp => x
   y%type = "integer"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_integer4
 function yggarg_scalar_integer8(x) result (y)
   type(yggptr) :: y
@@ -34,6 +36,7 @@ function yggarg_scalar_integer8(x) result (y)
   xp => x
   y%type = "integer"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_integer8
 function yggarg_scalar_real4(x) result (y)
   type(yggptr) :: y
@@ -43,6 +46,7 @@ function yggarg_scalar_real4(x) result (y)
   xp => x
   y%type = "real"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_real4
 function yggarg_scalar_real8(x) result (y)
   type(yggptr) :: y
@@ -52,6 +56,7 @@ function yggarg_scalar_real8(x) result (y)
   xp => x
   y%type = "real"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_real8
 function yggarg_scalar_real16(x) result (y)
   type(yggptr) :: y
@@ -61,6 +66,7 @@ function yggarg_scalar_real16(x) result (y)
   xp => x
   y%type = "real"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_real16
 function yggarg_scalar_complex4(x) result (y)
   type(yggptr) :: y
@@ -70,6 +76,7 @@ function yggarg_scalar_complex4(x) result (y)
   xp => x
   y%type = "complex"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_complex4
 function yggarg_scalar_complex8(x) result (y)
   type(yggptr) :: y
@@ -79,6 +86,7 @@ function yggarg_scalar_complex8(x) result (y)
   xp => x
   y%type = "complex"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_complex8
 function yggarg_scalar_complex16(x) result (y)
   type(yggptr) :: y
@@ -88,6 +96,7 @@ function yggarg_scalar_complex16(x) result (y)
   xp => x
   y%type = "complex"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_complex16
 function yggarg_scalar_logical1(x) result (y)
   type(yggptr) :: y
@@ -97,6 +106,7 @@ function yggarg_scalar_logical1(x) result (y)
   xp => x
   y%type = "logical"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_logical1
 function yggarg_scalar_logical2(x) result (y)
   type(yggptr) :: y
@@ -106,6 +116,7 @@ function yggarg_scalar_logical2(x) result (y)
   xp => x
   y%type = "logical"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_logical2
 function yggarg_scalar_logical4(x) result (y)
   type(yggptr) :: y
@@ -115,6 +126,7 @@ function yggarg_scalar_logical4(x) result (y)
   xp => x
   y%type = "logical"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_logical4
 function yggarg_scalar_logical8(x) result (y)
   type(yggptr) :: y
@@ -124,6 +136,7 @@ function yggarg_scalar_logical8(x) result (y)
   xp => x
   y%type = "logical"
   y%ptr = c_loc(xp)
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_logical8
 function yggarg_scalar_character(x) result (y)
   type(yggptr) :: y
@@ -142,11 +155,12 @@ function yggarg_scalar_character(x) result (y)
      y%data_character_unit(len_trim(x) + 1) = c_null_char
   end if
   y%ptr = c_loc(y%data_character_unit(1))
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_character
 function yggarg_scalar_yggchar_r(x) result (y)
-  type(yggptr) :: y
   type(yggchar_r), target :: x
   type(yggchar_r), pointer :: xp
+  type(yggptr) :: y
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "character"
@@ -157,6 +171,7 @@ function yggarg_scalar_yggchar_r(x) result (y)
   else
      y%ptr = c_null_ptr
   end if
+  y%nbytes = sizeof(x%x)
 end function yggarg_scalar_yggchar_r
 function yggarg_scalar_ply(x) result(y)
   type(yggply), target :: x
@@ -166,6 +181,7 @@ function yggarg_scalar_ply(x) result(y)
   xp => x
   y%type = "ply"
   y%ptr = c_loc(xp%material(1))
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_ply
 function yggarg_scalar_obj(x) result(y)
   type(yggobj), target :: x
@@ -175,7 +191,18 @@ function yggarg_scalar_obj(x) result(y)
   xp => x
   y%type = "obj"
   y%ptr = c_loc(xp%material(1))
+  y%nbytes = sizeof(x)
 end function yggarg_scalar_obj
+function yggarg_scalar_generic(x) result(y)
+  type(ygggeneric), target :: x
+  type(ygggeneric), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_scalar_init(x)
+  xp => x
+  y%type = "generic"
+  y%ptr = c_loc(xp%prefix)
+  y%nbytes = sizeof(x)
+end function yggarg_scalar_generic
   
 ! 1D Reallocatable array versions
 function yggarg_realloc_1darray_init(x) result (y)

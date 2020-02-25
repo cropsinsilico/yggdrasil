@@ -605,6 +605,119 @@ extern "C" {
     return out;
   }
 
+  int add_generic_array(generic_t arr, generic_t x) {
+    int out = 0;
+    try {
+      if (!(is_generic_init(arr))) {
+	ygglog_throw_error("add_generic_array: Array is not a generic object.");
+      }
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("add_generic_array: New element is not a generic object.");
+      }
+      YggGeneric* arr_obj = (YggGeneric*)(arr.obj);
+      if (arr_obj == NULL) {
+	ygglog_throw_error("add_generic_array: Array is NULL.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("add_generic_array: New element is NULL.");
+      }
+      arr_obj->add_array_element(x_obj);
+    } catch (...) {
+      ygglog_error("add_generic_array: C++ exception thrown.");
+      out = 1;
+    }
+    return out;
+  }
+
+  int set_generic_array(generic_t arr, size_t i, generic_t x) {
+    int out = 0;
+    try {
+      if (!(is_generic_init(arr))) {
+	ygglog_throw_error("set_generic_array: Array is not a generic object.");
+      }
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("set_generic_array: New element is not a generic object.");
+      }
+      YggGeneric* arr_obj = (YggGeneric*)(arr.obj);
+      if (arr_obj == NULL) {
+	ygglog_throw_error("set_generic_array: Array is NULL.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("set_generic_array: New element is NULL.");
+      }
+      arr_obj->set_array_element(i, x_obj);
+    } catch (...) {
+      ygglog_error("set_generic_array: C++ exception thrown.");
+      out = 1;
+    }
+    return out;
+  }
+
+  int get_generic_array(generic_t arr, size_t i, generic_t *x) {
+    int out = 0;
+    x[0] = init_generic();
+    try {
+      if (!(is_generic_init(arr))) {
+	ygglog_throw_error("get_generic_array: Array is not a generic object.");
+      }
+      YggGeneric* arr_obj = (YggGeneric*)(arr.obj);
+      if (arr_obj == NULL) {
+	ygglog_throw_error("get_generic_array: Array is NULL.");
+      }
+      x[0].obj = (void*)(arr_obj->get_array_element(i));
+    } catch (...) {
+      ygglog_error("get_generic_array: C++ exception thrown.");
+      out = 1;
+    }
+    return out;
+  }
+    
+  int set_generic_object(generic_t arr, const char* k, generic_t x) {
+    int out = 0;
+    try {
+      if (!(is_generic_init(arr))) {
+	ygglog_throw_error("set_generic_object: Object is not a generic object.");
+      }
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("set_generic_object: New element is not a generic object.");
+      }
+      YggGeneric* arr_obj = (YggGeneric*)(arr.obj);
+      if (arr_obj == NULL) {
+	ygglog_throw_error("set_generic_object: Object is NULL.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("set_generic_object: New element is NULL.");
+      }
+      arr_obj->set_object_element(k, x_obj);
+    } catch (...) {
+      ygglog_error("set_generic_object: C++ exception thrown.");
+      out = 1;
+    }
+    return out;
+  }
+
+  int get_generic_object(generic_t arr, const char* k, generic_t *x) {
+    int out = 0;
+    x[0] = init_generic();
+    try {
+      if (!(is_generic_init(arr))) {
+	ygglog_throw_error("get_generic_object: Object is not a generic object.");
+      }
+      YggGeneric* arr_obj = (YggGeneric*)(arr.obj);
+      if (arr_obj == NULL) {
+	ygglog_throw_error("get_generic_object: Object is NULL.");
+      }
+      x[0].obj = (void*)(arr_obj->get_object_element(k));
+    } catch (...) {
+      ygglog_error("get_generic_object: C++ exception thrown.");
+      out = 1;
+    }
+    return out;
+  }
+    
   void destroy_python(python_t *x) {
     try {
       PyObjMetaschemaType::free_python_t(x);

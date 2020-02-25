@@ -344,6 +344,36 @@ public:
     Defaults to 1 if not provided.
    */
   void get_data(char* obj, size_t nelements) const;
+  /*!
+    @brief Add an element to the end of the array if this object is an
+    array.
+    @param[in] x YggGeneric* Pointer to new element.
+   */
+  void add_array_element(YggGeneric *x);
+  /*!
+    @brief Set an array element if this object is an array.
+    @param[in] i size_t Index where element should be assigned.
+    @param[in] x YggGeneric* Pointer to new element.
+   */
+  void set_array_element(size_t i, YggGeneric *x);
+  /*!
+    @brief Get an array element if this array is an array.
+    @param[in] i size_t Index of element that should be returned.
+    @returns YggGeneric* Pointer to element at index i.
+   */
+  YggGeneric* get_array_element(size_t i);
+  /*!
+    @brief Set an object element if this object is an object.
+    @param[in] k const char* Key where element should be assigned.
+    @param[in] x YggGeneric* Pointer to new element.
+   */
+  void set_object_element(const char *k, YggGeneric *x);
+  /*!
+    @brief Get an object element if this object is an object.
+    @param[in] k const char* Key of element that should be returned.
+    @returns YggGeneric* Pointer to element at index i.
+   */
+  YggGeneric* get_object_element(const char *k);
 };
 
 

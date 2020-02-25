@@ -67,6 +67,38 @@ void *yggObjInput_f(const char *name) {
   return (void*)yggObjInput(name);
 }
 
+void *yggGenericOutput_f(const char *name) {
+  return (void*)yggGenericOutput(name);
+}
+
+void *yggGenericInput_f(const char *name) {
+  return (void*)yggGenericInput(name);
+}
+
+void *yggAnyOutput_f(const char *name) {
+  return (void*)yggAnyOutput(name);
+}
+
+void *yggAnyInput_f(const char *name) {
+  return (void*)yggAnyInput(name);
+}
+
+void *yggJSONArrayOutput_f(const char *name) {
+  return (void*)yggJSONArrayOutput(name);
+}
+
+void *yggJSONArrayInput_f(const char *name) {
+  return (void*)yggJSONArrayInput(name);
+}
+
+void *yggJSONObjectOutput_f(const char *name) {
+  return (void*)yggJSONObjectOutput(name);
+}
+
+void *yggJSONObjectInput_f(const char *name) {
+  return (void*)yggJSONObjectInput(name);
+}
+
 // Methods for sending/receiving
 int ygg_send_f(const void *yggQ, const char *data, const size_t len) {
   return ygg_send((const comm_t*)yggQ, data, len);
@@ -114,8 +146,6 @@ void free_ply_f(void* p) {
   ply_t* c_p = (ply_t*)p;
   if (c_p != NULL) {
     free_ply(c_p);
-    free(c_p);
-    p = NULL;
   }
 }
 
@@ -140,8 +170,6 @@ void free_obj_f(void* p) {
   obj_t* c_p = (obj_t*)p;
   if (c_p != NULL) {
     free_obj(c_p);
-    free(c_p);
-    p = NULL;
   }
 }
 
@@ -156,3 +184,42 @@ void display_obj_indent_f(obj_t p, const char *indent) {
 void display_obj_f(obj_t p) {
   display_obj(p);
 }
+
+
+// Generic interface
+generic_t init_generic_f() {
+  return init_generic();
+}
+
+int free_generic_f(generic_t* x) {
+  return destroy_generic(x);
+}
+
+generic_t copy_generic_f(generic_t src) {
+  return copy_generic(src);
+}
+
+void display_generic_f(generic_t x) {
+  display_generic(x);
+}
+
+int add_generic_array_f(generic_t arr, generic_t x) {
+  return add_generic_array(arr, x);
+}
+
+int set_generic_array_f(generic_t arr, size_t i, generic_t x) {
+  return set_generic_array(arr, i, x);
+}
+
+int get_generic_array_f(generic_t arr, size_t i, void* x) {
+  return get_generic_array(arr, i, (generic_t*)x);
+}
+
+int set_generic_object_f(generic_t arr, const char* k, generic_t x) {
+  return set_generic_object(arr, k, x);
+}
+
+int get_generic_object_f(generic_t arr, const char* k, void* x) {
+  return get_generic_object(arr, k, (generic_t*)x);
+}
+

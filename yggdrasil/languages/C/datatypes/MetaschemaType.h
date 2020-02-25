@@ -370,6 +370,22 @@ public:
     *type_code_modifier = check_type();
   }
   /*!
+    @brief Dummy stand-in to allow access to array/object methods.
+    @param[in] i size_t Index where item type should be added.
+    @param[in] x MetaschemaType* Type to insert at index i.
+  */
+  virtual void update_type_element(size_t i, const MetaschemaType* x) {
+    ygglog_throw_error("MetaschemaType::update_type_element: This method is only valid for array types.");
+  }
+  /*!
+    @brief Dummy stand-in to allow access to array/object methods.
+    @param[in] k const char* Key where item type should be added.
+    @param[in] x MetaschemaType* Type to insert at key k.
+  */
+  virtual void update_type_element(const char* k, const MetaschemaType* x) {
+    ygglog_throw_error("MetaschemaType::update_type_element: This method is only valid for object types.");
+  }
+  /*!
     @brief Update the instance's use_generic flag.
     @param[in] new_use_generic const bool New flag value.
    */
@@ -1458,6 +1474,68 @@ void YggGeneric::get_data(char* obj, size_t nelements) const {
   get_data(obj, nelements, true);
 };
 
+void YggGeneric::add_array_element(YggGeneric* x) {
+  if (type->type_code() != T_ARRAY)
+    ygglog_throw_error("YggGeneric::add_array_element: Generic object is not an array.");
+  YggGenericVector* v = (YggGenericVector*)get_data();
+  size_t i = v->size();
+  set_array_element(i, x);
+};
+
+void YggGeneric::set_array_element(size_t i, YggGeneric* x) {
+  if (type->type_code() != T_ARRAY)
+    ygglog_throw_error("YggGeneric::set_array_element: Generic object is not an array.");
+  YggGenericVector* v = (YggGenericVector*)get_data();
+  if (i > v->size()) {
+    ygglog_throw_error("YggGeneric::set_array_element: Cannot set element %lu, there are only %lu elements in the array.",
+		       i, v->size());
+  } else if (i == v->size()) {
+    v->push_back(x->copy());
+  } else {
+    YggGeneric* old = (*v)[i];
+    delete old;
+    (*v)[i] = x->copy();
+  }
+  type->update_type_element(i, x->type);
+};
+
+YggGeneric* YggGeneric::get_array_element(size_t i) {
+  if (type->type_code() != T_ARRAY)
+    ygglog_throw_error("YggGeneric::get_array_element: Generic object is not an array.");
+  YggGenericVector* v = (YggGenericVector*)get_data();
+  if (i >= v->size()) {
+    ygglog_throw_error("YggGeneric::get_array_element: Cannot get element %lu, there are only %lu elements in the array.",
+		       i, v->size());
+  }
+  YggGeneric* out = (*v)[i];
+  return out;
+};
+
+void YggGeneric::set_object_element(const char* k, YggGeneric* x) {
+  if (type->type_code() != T_OBJECT)
+    ygglog_throw_error("YggGeneric::set_object_element: Generic object is not an object.");
+  YggGenericMap* v = (YggGenericMap*)get_data();
+  YggGenericMap::iterator it;
+  it = v->find(k);
+  if (it != v->end()) {
+    delete it->second;
+  }
+  (*v)[k] = x;
+  type->update_type_element(k, x->type);
+};
+
+YggGeneric* YggGeneric::get_object_element(const char* k) {
+  if (type->type_code() != T_OBJECT)
+    ygglog_throw_error("YggGeneric::get_object_element: Generic object is not an object.");
+  YggGenericMap* v = (YggGenericMap*)get_data();
+  YggGenericMap::iterator it;
+  it = v->find(k);
+  if (it == v->end()) {
+    ygglog_throw_error("YggGeneric::get_object_element: Cannot get element for key %s, it does not exist.", k);
+  }
+  YggGeneric* out = it->second;
+  return out;
+};
 
 typedef std::map<std::string, MetaschemaType*> MetaschemaTypeMap;
 typedef std::vector<MetaschemaType*> MetaschemaTypeVector;

@@ -313,6 +313,24 @@ public:
     update_items(new_info_array->items());
   }
   /*!
+    @brief Update the type at an index.
+    @param[in] i size_t Index where item type should be added.
+    @param[in] x MetaschemaType* Type to insert at index i.
+  */
+  void update_type_element(size_t i, const MetaschemaType* x) override {
+    if (i > items_.size()) {
+      ygglog_throw_error("JSONArrayMetaschemaType::update_type_element: Cannot add type at index %lu, there are only %lu types present.",
+			 i, items_.size());
+    } else if (i == items_.size()) {
+      items_.push_back(x->copy());
+    } else {
+      MetaschemaType* old = items_[i];
+      items_[i] = x->copy();
+      delete old;
+      old = NULL;
+    }
+  }
+  /*!
     @brief Update the item types.
     @param[in] new_items MetaschemaTypeVector Vector of new types describing items.
     @param[in] force bool If true, the existing items are overwritten, otherwise they are only updated.

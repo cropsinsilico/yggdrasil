@@ -199,6 +199,57 @@ generic_t* pop_generic_va_ptr(size_t* nargs, va_list_t* ap);
 
 
 /*!
+  @brief Add an element to the end of an array of generic elements.
+  @param[in] arr generic_t Array to add element to.
+  @param[in] x generic_t Element to add.
+  @returns int Flag that is 1 if there is an error and 0 otherwise.
+ */
+int add_generic_array(generic_t arr, generic_t x);
+
+
+/*!
+  @brief Set an element in the array at a given index to a new value.
+  @param[in] arr generic_t Array to add element to.
+  @param[in] i size_t Index where element should be added.
+  @param[in] x generic_t Element to add.
+  @returns int Flag that is 1 if there is an error and 0 otherwise.
+ */
+int set_generic_array(generic_t arr, size_t i, generic_t x);
+
+
+/*!
+  @brief Get an element from an array.
+  @param[in] arr generic_t Array to get element from.
+  @param[in] i size_t Index of element to get.
+  @param[out] x generic_t* Pointer to address where element should be
+  stored.
+  @returns int Flag that is 1 if there is an error and 0 otherwise.
+ */
+int get_generic_array(generic_t arr, size_t i, generic_t *x);
+
+
+/*!
+  @brief Set an element in the object at for a given key to a new value.
+  @param[in] arr generic_t Object to add element to.
+  @param[in] k const char* Key where element should be added.
+  @param[in] x generic_t Element to add.
+  @returns int Flag that is 1 if there is an error and 0 otherwise.
+ */
+int set_generic_object(generic_t arr, const char* k, generic_t x);
+
+
+/*!
+  @brief Get an element from an object.
+  @param[in] arr generic_t Object to get element from.
+  @param[in] k const char* Key of element to return.
+  @param[out] x generic_t* Pointer to address where element should be
+  stored.
+  @returns int Flag that is 1 if there is an error and 0 otherwise.
+ */
+int get_generic_object(generic_t arr, const char* k, generic_t *x);
+
+
+/*!
   @brief Destroy a structure containing a Python object.
   @param[in] x python_t* Pointer to Python object structure that should be freed.
 */

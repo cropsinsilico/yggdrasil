@@ -23,6 +23,7 @@ module fygg
      module procedure yggarg_scalar_yggchar_r
      module procedure yggarg_scalar_ply
      module procedure yggarg_scalar_obj
+     module procedure yggarg_scalar_generic
      module procedure yggarg_realloc_1darray_c_long
      module procedure yggarg_realloc_1darray_integer
      module procedure yggarg_realloc_1darray_integer2
@@ -193,6 +194,7 @@ module fygg
      logical :: alloc = .false.
      integer(kind=8) :: len = 0
      integer(kind=8) :: prec = 0
+     integer(kind=8) :: nbytes = 0
      type(c_ptr) :: ptr = c_null_ptr
      class(*), pointer :: item => null()
      class(*), dimension(:), pointer :: item_array => null()
@@ -209,6 +211,10 @@ module fygg
      character(len=20), dimension(:), pointer :: keys => null()
      type(yggptr), dimension(:), pointer :: vals => null()
   end type yggptr_map
+  type, bind(c) :: ygggeneric
+     character(kind=c_char) :: prefix
+     type(c_ptr) :: obj
+  end type ygggeneric
   type, bind(c) :: yggply
      character(kind=c_char), dimension(100) :: material
      integer(kind=c_int) :: nvert
@@ -260,7 +266,7 @@ module fygg
      type(c_ptr) :: c_surface_normals
   end type yggobj
 
-  public :: yggarg, yggchar_r, yggcomm, &
+  public :: yggarg, yggchar_r, yggcomm, ygggeneric, &
        yggptr, yggptr_arr, yggptr_map, yggply, yggobj, &
        integer_1d, real_1d, complex_1d, logical_1d, character_1d, &
        LINE_SIZE_MAX
@@ -439,6 +445,78 @@ contains
     c_name = trim(name)//c_null_char
     channel%comm = ygg_obj_input_c(c_name)
   end function ygg_obj_input
+
+  function ygg_generic_output(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_generic_output_c(c_name)
+  end function ygg_generic_output
+  
+  function ygg_generic_input(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_generic_input_c(c_name)
+  end function ygg_generic_input
+
+  function ygg_any_output(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_any_output_c(c_name)
+  end function ygg_any_output
+  
+  function ygg_any_input(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_any_input_c(c_name)
+  end function ygg_any_input
+
+  function ygg_json_array_output(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_json_array_output_c(c_name)
+  end function ygg_json_array_output
+  
+  function ygg_json_array_input(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_json_array_input_c(c_name)
+  end function ygg_json_array_input
+
+  function ygg_json_object_output(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_json_object_output_c(c_name)
+  end function ygg_json_object_output
+  
+  function ygg_json_object_input(name) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_json_object_input_c(c_name)
+  end function ygg_json_object_input
 
   ! Methods for sending/receiving
   function ygg_send(ygg_q, data, data_len) result (flag)
@@ -708,5 +786,76 @@ contains
     type(yggobj), intent(in) :: p
     call display_obj_c(p)
   end subroutine display_obj
+
+  ! Generic interface
+  function init_generic() result(out)
+    implicit none
+    type(ygggeneric) :: out
+    out = init_generic_c()
+  end function init_generic
+  function free_generic(x) result(out)
+    implicit none
+    type(ygggeneric) :: x
+    integer(kind=c_int) :: out
+    out = free_generic_c(x)
+  end function free_generic
+  function copy_generic(src) result(out)
+    implicit none
+    type(ygggeneric), intent(in) :: src
+    type(ygggeneric) :: out
+    out = copy_generic_c(src)
+  end function copy_generic
+  subroutine display_generic(x)
+    implicit none
+    type(ygggeneric), intent(in) :: x
+    call display_generic_c(x)
+  end subroutine display_generic
+  function add_generic_array(arr, x) result(out)
+    implicit none
+    type(ygggeneric) :: arr
+    type(ygggeneric), intent(in) :: x
+    integer(kind=c_int) :: out
+    out = add_generic_array_c(arr, x)
+  end function add_generic_array
+  function set_generic_array(arr, i, x) result(out)
+    implicit none
+    type(ygggeneric) :: arr
+    integer(kind=c_size_t), intent(in) :: i
+    type(ygggeneric), intent(in) :: x
+    integer(kind=c_int) :: out
+    out = set_generic_array_c(arr, i, x)
+  end function set_generic_array
+  function get_generic_array(arr, i, x) result(out)
+    implicit none
+    type(ygggeneric), intent(in) :: arr
+    integer(kind=c_size_t), intent(in) :: i
+    type(ygggeneric), pointer :: x
+    integer(kind=c_int) :: out
+    type(c_ptr) :: c_x
+    c_x = c_loc(x) ! Maybe use first element in type
+    out = get_generic_array_c(arr, i, c_x)
+  end function get_generic_array
+  function set_generic_object(arr, k, x) result(out)
+    implicit none
+    type(ygggeneric) :: arr
+    character(len=*), intent(in) :: k
+    type(ygggeneric), intent(in) :: x
+    integer(kind=c_int) :: out
+    character(len=len_trim(k)+1) :: c_k
+    c_k = trim(k)//c_null_char
+    out = set_generic_object_c(arr, c_k, x)
+  end function set_generic_object
+  function get_generic_object(arr, k, x) result(out)
+    implicit none
+    type(ygggeneric) :: arr
+    character(len=*), intent(in) :: k
+    type(ygggeneric), pointer :: x
+    integer(kind=c_int) :: out
+    character(len=len_trim(k)+1) :: c_k
+    type(c_ptr) :: c_x
+    c_k = trim(k)//c_null_char
+    c_x = c_loc(x) ! Maybe use first element in type
+    out = get_generic_object_c(arr, c_k, c_x)
+  end function get_generic_object
   
 end module fygg
