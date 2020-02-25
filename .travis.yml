@@ -42,8 +42,8 @@ env:
     YGG_TYPES_LANGUAGES=
     YGG_TEST_FLAGS="--test-suite=examples"
   matrix:
-    - YGG_TEST_FLAGS="--test-suite=examples_part1 --long-running"
-    - YGG_TEST_FLAGS="--test-suite=examples_part2 --long-running"
+    - YGG_TEST_FLAGS="--test-suite=examples_part1"
+    - YGG_TEST_FLAGS="--test-suite=examples_part2"
     - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running" INSTALLRMQ=1 INSTALLAPY=1
     # - YGG_CONDA=yes YGG_TEST_FLAGS="--test-suite=types --languages r c"
     # - YGG_TEST_FLAGS="--test-suite=types --languages matlab python cpp"
@@ -202,7 +202,7 @@ jobs:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
           - $HOME/R/Library
-      env: YGG_PYTHON=3.6 R_LIBS_USER=$HOME/R/Library YGG_TEST_FLAGS="--test-suite=types --languages r c" INSTALLR=0
+      env: YGG_PYTHON=3.6 R_LIBS_USER=$HOME/R/Library YGG_TEST_FLAGS="--test-suite=types communication/tests/test_IPCComm.py communication/tests/test_RMQAsyncComm.py --languages r c" INSTALLR=0
     - os: osx
       python: 3.8
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
@@ -211,7 +211,7 @@ jobs:
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
-      env: YGG_CONDA=3.8 YGG_TEST_FLAGS="--test-suite=examples"
+      env: YGG_CONDA=3.8 YGG_TEST_FLAGS="--test-suite=examples --test-suite=timing serialize"
       script:
         - yggconfig --remove-file
         - yggtest --ci $YGG_TEST_FLAGS

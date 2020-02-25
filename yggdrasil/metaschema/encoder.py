@@ -79,35 +79,6 @@ class JSONDecoder(_json_decoder):
         # TODO: Do this dynamically for classes based on an attribute
         return string2import(s)
 
-    @property
-    def parse_string(self):
-        r"""function: Wrapper for function that parses strings."""
-        def parse_string_ygg(*args, **kwargs):
-            out, end = self._parse_string(*args, **kwargs)
-            return self.string(out), end
-        return parse_string_ygg
-
-    @parse_string.setter
-    def parse_string(self, x):
-        self._parse_string = x
-
-    # @property
-    # def scan_once(self):
-    #     r"""function: Wrapper for function that decodes JSON documents."""
-    #     def scan_once_ygg(string, idx):
-    #         try:
-    #             if string[idx] == '"':
-    #                 return self.parse_string(string, idx + 1, self.encoding,
-    #                                          self.strict)
-    #         except IndexError:
-    #             pass
-    #         return self._scan_once(string, idx)
-    #     return scan_once_ygg
-
-    # @scan_once.setter
-    # def scan_once(self, x):
-    #     self._scan_once = x
-
     
 def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     r"""Encode a Python object in JSON format.

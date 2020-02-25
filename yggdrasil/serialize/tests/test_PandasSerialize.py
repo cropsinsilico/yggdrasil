@@ -21,6 +21,17 @@ class TestPandasSerialize(parent.TestAsciiTableSerialize):
         r"""Test errors raised by func_serialize."""
         self.assert_raises(TypeError, self.instance.func_serialize, None)
 
+    def test_deserialize_no_header(self):
+        r"""Test deserialization of frame output without a header."""
+        if self.testing_option_kws.get('no_header', False):
+            return
+        kws = self.instance.get_testing_options(no_header=True)
+        kws['kwargs'].pop('no_header', None)
+        no_head_inst = self.import_cls(**kws['kwargs'])
+        x = no_head_inst.serialize(kws['objects'][0])
+        y = self.instance.deserialize(x)[0]
+        self.assert_result_equal(y, self.testing_options['objects'][0])
+
 
 class TestPandasSerializeNoHeader(TestPandasSerialize):
     r"""Test class for PandasSerialize class when no header specified."""

@@ -5,14 +5,9 @@ import pystache
 import yaml
 import json
 import git
-import sys
 import io as sio
 from yggdrasil.schema import standardize, get_schema
-
-if sys.version_info > (3, 0):
-    from urllib.parse import urlparse
-else:
-    from urlparse import urlparse
+from urllib.parse import urlparse
 
 
 def load_yaml(fname):

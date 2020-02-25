@@ -75,10 +75,7 @@ def register_type(type_class):
         prop_class.types = tuple(set(old + new))
         # Python types
         old = copy.deepcopy(list(prop_class.python_types))
-        try:
-            new = list(type_class.python_types)
-        except TypeError:
-            new = [type_class.python_types]
+        new = list(type_class.python_types)
         prop_class.python_types = tuple(set(old + new))
     # Add to registry
     type_class._datatype = type_name

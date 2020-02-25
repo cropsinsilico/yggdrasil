@@ -776,12 +776,10 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
             arr = arr.astype(dtype)
     else:
         np_ver = tuple([float(x) for x in (np.__version__).split('.')])
+        np_kws.update(autostrip=True, dtype=None, names=names)
         if (np_ver >= (1.0, 14.0, 0.0)):
-            arr = np.genfromtxt(fd, encoding='bytes', autostrip=True, dtype=None,
-                                names=names, **np_kws)
-        else:
-            arr = np.genfromtxt(fd, autostrip=True, dtype=None,
-                                names=names, **np_kws)
+            np_kws['encoding'] = 'bytes'
+        arr = np.genfromtxt(fd, **np_kws)
         if dtype is not None:
             arr = arr.astype(dtype)
     fd.close()

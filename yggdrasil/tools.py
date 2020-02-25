@@ -32,16 +32,7 @@ if ((logging.getLogger("yggdrasil").getEffectiveLevel()
     _stack_in_timeout = True
 _thread_registry = {}
 _lock_registry = {}
-try:
-    _main_thread = threading.main_thread()
-except AttributeError:
-    _main_thread = None
-    for i in threading.enumerate():
-        if (i.name == "MainThread"):
-            _main_thread = i
-            break
-    if _main_thread is None:  # pragma: debug
-        raise RuntimeError("Could not located MainThread")
+_main_thread = threading.main_thread()
 
 
 def apply_recurse(x, func, **kwargs):

@@ -162,4 +162,4 @@ class TestExampleTransforms(ExampleTstBase):
                 if v is None:
                     del os.environ[k]
                 else:
-                    os.environ[k] = v
+                    os.environ[k] = v  # pragma: no cover
