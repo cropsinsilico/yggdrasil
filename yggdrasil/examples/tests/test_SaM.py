@@ -14,9 +14,9 @@ class TestExampleSaM(ExampleTstBase):
         r"""list: Results that should be found in the output files."""
         # 1 + 2*n_languages
         if self.language == 'all':  # pragma: matlab
-            s = 9
+            s = 11
         elif self.language == 'all_nomatlab':  # pragma: no matlab
-            s = 7
+            s = 9
         else:
             s = 3
         return ['%d' % s]
