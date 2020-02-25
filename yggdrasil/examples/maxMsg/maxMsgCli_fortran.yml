@@ -1,0 +1,7 @@
+---
+
+model:
+  name: maxMsgCli
+  driver: FortranModelDriver
+  args: ./src/maxMsgCli.f90
+  client_of: maxMsgSrv

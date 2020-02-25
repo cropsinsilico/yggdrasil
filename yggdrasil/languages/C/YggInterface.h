@@ -475,13 +475,16 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
   ygglog_debug("vrpcCall: Used %d arguments in send", sret);
   int i;
   for (i = 0; i < sret; i++) {
-    va_arg(op.va, void*);
+    va_list_t_skip(&op, sizeof(void*));
   }
   nargs = nargs - sret;
 
   // unpack the messages into the remaining variable arguments
   rret = vcommRecv(rpc, allow_realloc, nargs, op);
-  va_end(op.va);
+  if (rret < 0) {
+    ygglog_error("vrpcCall: vcommRecv error: ret %d: %s", sret, strerror(errno));
+  }
+  end_va_list(&op);
   
   return rret;
 };
@@ -512,7 +515,7 @@ int nrpcCallBase(yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
   va_list_t ap = init_va_list();
   va_start(ap.va, nargs);
   ret = vrpcCallBase(rpc, allow_realloc, nargs, ap);
-  va_end(ap.va);
+  end_va_list(&ap);
   return ret;
 };
 #define rpcCall(rpc, ...) nrpcCallBase(rpc, 0, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)

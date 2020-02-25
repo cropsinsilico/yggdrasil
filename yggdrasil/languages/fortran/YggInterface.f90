@@ -4,6 +4,7 @@ module fygg
   implicit none
 
   integer, parameter :: LINE_SIZE_MAX = 2048
+  integer, parameter :: YGG_MSG_BUF = 2048
 
   interface yggarg
      module procedure yggarg_scalar_integer2
@@ -71,6 +72,18 @@ module fygg
      module procedure ygg_recv_var_realloc_sing
      module procedure ygg_recv_var_realloc_mult
   end interface ygg_recv_var_realloc
+  interface ygg_rpc_call
+     module procedure ygg_rpc_call_1v1
+     module procedure ygg_rpc_call_1vm
+     module procedure ygg_rpc_call_mv1
+     module procedure ygg_rpc_call_mult
+  end interface ygg_rpc_call
+  interface ygg_rpc_call_realloc
+     module procedure ygg_rpc_call_realloc_1v1
+     module procedure ygg_rpc_call_realloc_1vm
+     module procedure ygg_rpc_call_realloc_mv1
+     module procedure ygg_rpc_call_realloc_mult
+  end interface ygg_rpc_call_realloc
   type :: yggcomm
      type(c_ptr) :: comm
   end type yggcomm
@@ -518,6 +531,40 @@ contains
     channel%comm = ygg_json_object_input_c(c_name)
   end function ygg_json_object_input
 
+  function ygg_rpc_client(name, out_fmt, in_fmt) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=*), intent(in) :: out_fmt
+    character(len=*), intent(in) :: in_fmt
+    character(len=len_trim(name)+1) :: c_name
+    character(len=len_trim(out_fmt)+1) :: c_out_fmt
+    character(len=len_trim(in_fmt)+1) :: c_in_fmt
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    c_out_fmt = trim(out_fmt)//c_null_char
+    c_in_fmt = trim(in_fmt)//c_null_char
+    call fix_format_str(c_out_fmt)
+    call fix_format_str(c_in_fmt)
+    channel%comm = ygg_rpc_client_c(c_name, c_out_fmt, c_in_fmt)
+  end function ygg_rpc_client
+
+  function ygg_rpc_server(name, in_fmt, out_fmt) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=*), intent(in) :: in_fmt
+    character(len=*), intent(in) :: out_fmt
+    character(len=len_trim(name)+1) :: c_name
+    character(len=len_trim(in_fmt)+1) :: c_in_fmt
+    character(len=len_trim(out_fmt)+1) :: c_out_fmt
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    c_in_fmt = trim(in_fmt)//c_null_char
+    c_out_fmt = trim(out_fmt)//c_null_char
+    call fix_format_str(c_in_fmt)
+    call fix_format_str(c_out_fmt)
+    channel%comm = ygg_rpc_server_c(c_name, c_in_fmt, c_out_fmt)
+  end function ygg_rpc_server
+
   ! Methods for sending/receiving
   function ygg_send(ygg_q, data, data_len) result (flag)
     implicit none
@@ -671,6 +718,123 @@ contains
     call ygglog_debug("post_recv: end")
   end subroutine post_recv
 
+  function ygg_rpc_call_1v1(ygg_q, oarg, iarg) result (flag)
+    implicit none
+    type(yggcomm) :: ygg_q
+    type(yggptr) :: oarg
+    type(yggptr) :: iarg
+    integer :: flag
+    flag = ygg_rpc_call_mult(ygg_q, [oarg], [iarg])
+  end function ygg_rpc_call_1v1
+  function ygg_rpc_call_1vm(ygg_q, oarg, iargs) result (flag)
+    implicit none
+    type(yggcomm) :: ygg_q
+    type(yggptr) :: oarg
+    type(yggptr) :: iargs(:)
+    integer :: flag
+    flag = ygg_rpc_call_mult(ygg_q, [oarg], iargs)
+  end function ygg_rpc_call_1vm
+  function ygg_rpc_call_mv1(ygg_q, oargs, iarg) result (flag)
+    implicit none
+    type(yggcomm) :: ygg_q
+    type(yggptr) :: oargs(:)
+    type(yggptr) :: iarg
+    integer :: flag
+    flag = ygg_rpc_call_mult(ygg_q, oargs, [iarg])
+  end function ygg_rpc_call_mv1
+  function ygg_rpc_call_mult(ygg_q, oargs, iargs) result (flag)
+    implicit none
+    type(yggcomm) :: ygg_q
+    type(c_ptr) :: c_ygg_q
+    type(yggptr) :: oargs(:)
+    type(yggptr) :: iargs(:)
+    type(c_ptr), allocatable, target :: c_args(:)
+    type(c_ptr), allocatable, target :: c_iargs(:)
+    integer :: c_nargs
+    integer :: flag, i
+    integer(kind=c_int) :: c_flag
+    c_ygg_q = ygg_q%comm
+    call pre_recv(iargs, c_iargs)
+    c_nargs = size(oargs) + size(iargs)
+    allocate(c_args(size(oargs) + size(c_iargs)))
+    do i = 1, size(oargs)
+       c_args(i) = oargs(i)%ptr
+    end do
+    do i = (size(oargs) + 1), size(c_args)
+       c_args(i) = c_iargs(i - size(oargs))
+    end do
+    c_flag = ygg_rpc_call_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
+    flag = c_flag
+    call post_recv(iargs, c_iargs, flag, .false.)
+    if (allocated(c_args)) then
+       deallocate(c_args)
+    end if
+  end function ygg_rpc_call_mult
+  
+  function ygg_rpc_call_realloc_1v1(ygg_q, oarg, iarg) result (flag)
+    implicit none
+    type(yggcomm) :: ygg_q
+    type(yggptr) :: oarg
+    type(yggptr) :: iarg
+    integer :: flag
+    flag = ygg_rpc_call_realloc_mult(ygg_q, [oarg], [iarg])
+  end function ygg_rpc_call_realloc_1v1
+  function ygg_rpc_call_realloc_1vm(ygg_q, oarg, iargs) result (flag)
+    implicit none
+    type(yggcomm) :: ygg_q
+    type(yggptr) :: oarg
+    type(yggptr) :: iargs(:)
+    integer :: flag
+    flag = ygg_rpc_call_realloc_mult(ygg_q, [oarg], iargs)
+  end function ygg_rpc_call_realloc_1vm
+  function ygg_rpc_call_realloc_mv1(ygg_q, oargs, iarg) result (flag)
+    implicit none
+    type(yggcomm) :: ygg_q
+    type(yggptr) :: oargs(:)
+    type(yggptr) :: iarg
+    integer :: flag
+    flag = ygg_rpc_call_realloc_mult(ygg_q, oargs, [iarg])
+  end function ygg_rpc_call_realloc_mv1
+  function ygg_rpc_call_realloc_mult(ygg_q, oargs, iargs) result (flag)
+    implicit none
+    type(yggcomm) :: ygg_q
+    type(c_ptr) :: c_ygg_q
+    type(yggptr) :: oargs(:)
+    type(yggptr) :: iargs(:)
+    type(c_ptr), allocatable, target :: c_args(:)
+    type(c_ptr), allocatable, target :: c_iargs(:)
+    integer :: c_nargs
+    integer :: flag
+    integer(kind=c_int) :: c_flag
+    integer :: i
+    c_ygg_q = ygg_q%comm
+    flag = 0
+    do i = 1, size(iargs)
+       if ((iargs(i)%array.or.(iargs(i)%type.eq."character")).and. &
+            (.not.(iargs(i)%alloc))) then
+          call ygglog_error("Provided array/string is not allocatable.")
+          flag = -1
+       end if
+    end do
+    if (flag.ge.0) then
+       call pre_recv(iargs, c_iargs)
+       c_nargs = size(oargs) + size(iargs)
+       allocate(c_args(size(oargs) + size(c_iargs)))
+       do i = 1, size(oargs)
+          c_args(i) = oargs(i)%ptr
+       end do
+       do i = (size(oargs) + 1), size(c_args)
+          c_args(i) = c_iargs(i - size(oargs))
+       end do
+       c_flag = ygg_rpc_call_realloc_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
+       flag = c_flag
+    end if
+    call post_recv(iargs, c_iargs, flag, .true.)
+    if (allocated(c_args)) then
+       deallocate(c_args)
+    end if
+  end function ygg_rpc_call_realloc_mult
+  
   function ygg_recv_var_sing(ygg_q, arg) result (flag)
     implicit none
     type(yggcomm) :: ygg_q
@@ -694,7 +858,7 @@ contains
     flag = c_flag
     call post_recv(args, c_args, flag, .false.)
   end function ygg_recv_var_mult
-  
+
   function ygg_recv_var_realloc_sing(ygg_q, arg) result (flag)
     implicit none
     type(yggcomm) :: ygg_q

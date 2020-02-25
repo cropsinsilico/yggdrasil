@@ -184,6 +184,26 @@
        character(kind=c_char), dimension(*), intent(in) :: name
        type(c_ptr) :: channel
      end function ygg_json_object_input_c
+
+     function ygg_rpc_client_c(name, out_fmt, in_fmt) result(channel) &
+          bind(c, name="yggRpcClient_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       character(kind=c_char), dimension(*), intent(in) :: out_fmt
+       character(kind=c_char), dimension(*), intent(in) :: in_fmt
+       type(c_ptr) :: channel
+     end function ygg_rpc_client_c
+
+     function ygg_rpc_server_c(name, in_fmt, out_fmt) result(channel) &
+          bind(c, name="yggRpcServer_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       character(kind=c_char), dimension(*), intent(in) :: in_fmt
+       character(kind=c_char), dimension(*), intent(in) :: out_fmt
+       type(c_ptr) :: channel
+     end function ygg_rpc_server_c
   
      ! Methods for sending/receiving
      function ygg_send_c(ygg_q, data, data_len) result (flag) &
@@ -237,6 +257,26 @@
        type(c_ptr), value :: args
        integer(kind=c_int) :: flag
      end function ygg_recv_var_realloc_c
+
+     function ygg_rpc_call_c(ygg_q, nargs, args) &
+          result (flag) bind(c, name="rpc_call_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_int
+       implicit none
+       type(c_ptr), value :: ygg_q
+       integer(kind=c_int), value :: nargs
+       type(c_ptr), value :: args
+       integer(kind=c_int) :: flag
+     end function ygg_rpc_call_c
+     
+     function ygg_rpc_call_realloc_c(ygg_q, nargs, args) &
+          result (flag) bind(c, name="rpc_call_realloc_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_int
+       implicit none
+       type(c_ptr), value :: ygg_q
+       integer(kind=c_int), value :: nargs
+       type(c_ptr), value :: args
+       integer(kind=c_int) :: flag
+     end function ygg_rpc_call_realloc_c
      
      ! Ply interface
      function init_ply_c() result(out) bind(c, name="init_ply_f")

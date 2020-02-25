@@ -99,6 +99,16 @@ void *yggJSONObjectInput_f(const char *name) {
   return (void*)yggJSONObjectInput(name);
 }
 
+void *yggRpcClient_f(const char *name, const char *out_fmt,
+		     const char *in_fmt) {
+  return (void*)yggRpcClient(name, out_fmt, in_fmt);
+}
+
+void *yggRpcServer_f(const char *name, const char *in_fmt,
+		     const char *out_fmt) {
+  return (void*)yggRpcServer(name, in_fmt, out_fmt);
+}
+
 // Methods for sending/receiving
 int ygg_send_f(const void *yggQ, const char *data, const size_t len) {
   return ygg_send((const comm_t*)yggQ, data, len);
@@ -135,6 +145,38 @@ int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
   va_list_t ap = init_va_ptrs(nargs, (void**)args);
   ap.for_fortran = 1;
   return vcommRecv((comm_t*)yggQ, 1, (size_t)nargs, ap);
+}
+
+int rpc_send_f(const void *yggQ, int nargs, void *args) {
+  return ygg_send_var_f(yggQ, nargs, args);
+}
+
+int rpc_recv_f(void *yggQ, int nargs, void *args) {
+  return ygg_recv_var_f(yggQ, nargs, args);
+}
+
+int rpc_recv_realloc_f(void *yggQ, int nargs, void *args) {
+  return ygg_recv_var_realloc_f(yggQ, nargs, args);
+}
+
+int rpc_call_f(void *yggQ, int nargs, void *args) {
+  if (args == NULL) {
+    ygglog_error("rpc_call_f: args pointer is NULL.");
+    return -1;
+  }
+  va_list_t ap = init_va_ptrs(nargs, (void**)args);
+  ap.for_fortran = 1;
+  return vrpcCallBase((comm_t*)yggQ, 0, (size_t)nargs, ap);
+}
+
+int rpc_call_realloc_f(void *yggQ, int nargs, void *args) {
+  if (args == NULL) {
+    ygglog_error("rpc_call_realloc_f: args pointer is NULL.");
+    return -1;
+  }
+  va_list_t ap = init_va_ptrs(nargs, (void**)args);
+  ap.for_fortran = 1;
+  return vrpcCallBase((comm_t*)yggQ, 1, (size_t)nargs, ap);
 }
 
 // Ply interface

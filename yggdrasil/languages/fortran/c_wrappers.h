@@ -33,6 +33,10 @@ void *yggJSONArrayOutput_f(const char *name);
 void *yggJSONArrayInput_f(const char *name);
 void *yggJSONObjectOutput_f(const char *name);
 void *yggJSONObjectInput_f(const char *name);
+void *yggRpcClient_f(const char *name, const char *out_fmt,
+		     const char *in_fmt);
+void *yggRpcServer_f(const char *name, const char *in_fmt,
+		     const char *out_fmt);
   
 // Methods for sending/receiving
 int ygg_send_f(const void *yggQ, const char *data, const size_t len);
@@ -40,6 +44,11 @@ int ygg_recv_f(void *yggQ, char *data, const size_t len);
 int ygg_send_var_f(const void *yggQ, int nargs, void *args);
 int ygg_recv_var_f(void *yggQ, int nargs, void *args);
 int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args);
+int rpc_send_f(const void *yggQ, int nargs, void *args);
+int rpc_recv_f(void *yggQ, int nargs, void *args);
+int rpc_recv_realloc_f(void *yggQ, int nargs, void *args);
+int rpc_call_f(void *yggQ, int nargs, void *args);
+int rpc_call_realloc_f(void *yggQ, int nargs, void *args);
 // Ply interface
 ply_t init_ply_f();
 void free_ply_f(void* p);

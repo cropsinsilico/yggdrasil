@@ -488,8 +488,19 @@ va_list_t init_va_ptrs(const int nptrs, void** ptrs) {
   out.for_fortran = 0;
   return out;
 };
+  
 
+/*! Finalize a variable argument list.
+  @param[in] va_list_t Variable argument list.
+*/
+static inline
+void end_va_list(va_list_t *ap) {
+  if (!(ap->using_ptrs)) {
+    va_end(ap->va);
+  }
+};
 
+  
 /*! Copy a variable argument list.
   @param[in] va_list_t Variable argument list structure to copy.
   @returns va_list_t New variable argument list structure.
