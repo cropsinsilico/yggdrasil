@@ -628,6 +628,31 @@ contains
     data = c_data(:flag)
   end function ygg_recv
 
+  function ygg_send_nolimit(ygg_q, data, data_len) result (flag)
+    implicit none
+    type(yggcomm), intent(in) :: ygg_q
+    type(yggchar_r) :: data
+    integer, intent(in) :: data_len
+    integer :: flag
+    integer(kind=c_size_t) :: len_used
+    len_used = data_len
+    flag = ygg_send_var(ygg_q, [yggarg(data), yggarg(len_used)])
+  end function ygg_send_nolimit
+  
+  function ygg_recv_nolimit(ygg_q, data, data_len) result (flag)
+    implicit none
+    type(yggcomm) :: ygg_q
+    type(yggchar_r) :: data
+    integer, intent(in) :: data_len
+    integer :: flag
+    integer(kind=c_size_t) :: len_used
+    len_used = data_len
+    flag = ygg_recv_var_realloc(ygg_q, [yggarg(data), yggarg(len_used)])
+    if (flag.ge.0) then
+       flag = int(len_used)
+    end if
+  end function ygg_recv_nolimit
+
   function ygg_send_var_sing(ygg_q, arg) result (flag)
     implicit none
     type(yggcomm), intent(in) :: ygg_q

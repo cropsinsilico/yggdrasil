@@ -1,0 +1,28 @@
+---
+
+models:
+  - name: timed_pipe_src
+    language: fortran
+    args:
+      - ./src/timed_pipe_src.f90
+      - "{{PIPE_MSG_COUNT}}"
+      - "{{PIPE_MSG_SIZE}}"
+    outputs:
+      - output_pipe
+
+  - name: timed_pipe_dst
+    language: fortran
+    args: ./src/timed_pipe_dst.f90
+    inputs:
+      - input_pipe
+    outputs:
+      - output_file
+
+connections:
+  - input: output_pipe
+    output: input_pipe
+  - input: output_file
+    output_file:
+      name: output_timed_pipe.txt
+      filetype: ascii
+      in_temp: True
