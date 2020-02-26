@@ -626,6 +626,17 @@ contains
     flag = c_flag
   end function ygg_send_var_mult
 
+  function is_size_t(arg) result(flag)
+    type(yggptr), intent(in) :: arg
+    logical :: flag
+    if (((arg%type.eq."integer").or.(arg%type.eq."size_t")).and. &
+         (.not.arg%array).and.(arg%nbytes.eq.8)) then
+       flag = .true.
+    else
+       flag = .false.
+    end if
+  end function is_size_t
+
   subroutine pre_recv(args, c_args)
     implicit none
     type(yggptr) :: args(:)
@@ -640,8 +651,7 @@ contains
        args(i)%prec_c = 1
        if (((args(i)%type.eq."character").or. &
             args(i)%array).and. &
-            (i.ge.size(args)).or.(args(i+1)%array).or. &
-            (args(i+1)%type.ne."size_t")) then
+            (i.ge.size(args)).or.(.not.is_size_t(args(i+1)))) then
           nargs = nargs + 1
           if ((args(i)%type.eq."character").and.args(i)%array) then
              nargs = nargs + 1
@@ -654,8 +664,7 @@ contains
        c_args(j) = args(i)%ptr
        j = j + 1
        if ((args(i)%type.eq."character").and.(.not.args(i)%array)) then
-          if ((i.lt.size(args)).and.(.not.args(i+1)%array).and. &
-               (args(i+1)%type.eq."size_t")) then
+          if ((i.lt.size(args)).and.(is_size_t(args(i+1)))) then
              args(i)%prec_ptr = args(i+1)%ptr
           else
              args(i)%prec_c = args(i)%prec
@@ -664,8 +673,7 @@ contains
              j = j + 1
           end if
        else if ((args(i)%type.eq."character").or.args(i)%array) then
-          if ((i.lt.size(args)).and.(.not.args(i+1)%array).and. &
-               (args(i+1)%type.eq."size_t")) then
+          if ((i.lt.size(args)).and.(is_size_t(args(i+1)))) then
              args(i)%len_ptr = args(i+1)%ptr
           else
              args(i)%len_c = args(i)%len
@@ -701,8 +709,7 @@ contains
           end if
           j = j + 1
           if (((args(i)%type.eq."character").or.args(i)%array).and. &
-               ((i.ge.size(args)).or.(args(i+1)%array).or. &
-               (args(i+1)%type.ne."size_t"))) then
+               ((i.ge.size(args)).or.(.not.is_size_t(args(i+1))))) then
              j = j + 1
              if ((args(i)%type.eq."character").and.args(i)%array) then
                 j = j + 1

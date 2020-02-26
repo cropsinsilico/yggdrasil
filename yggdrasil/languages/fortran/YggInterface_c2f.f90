@@ -129,9 +129,13 @@ function yggptr_c2f(x, realloc) result(flag)
   end if
   if (.not.x%array) then
      deallocate(array_len)
+  else
+     nullify(array_len)
   end if
   if (.not.(x%type.eq."character")) then
      deallocate(precision)
+  else
+     nullify(precision)
   end if
   call ygglog_debug("yggptr_c2f: end")
 end function yggptr_c2f
