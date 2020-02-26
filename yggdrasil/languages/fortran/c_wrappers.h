@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+const int YGG_MSG_MAX_F = YGG_MSG_MAX;
+
 // Utilities
 void ygg_c_free(void *x);
 void ygg_log_info_f(const char* fmt);

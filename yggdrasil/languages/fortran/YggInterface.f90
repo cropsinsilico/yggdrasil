@@ -5,6 +5,7 @@ module fygg
 
   integer, parameter :: LINE_SIZE_MAX = 2048
   integer, parameter :: YGG_MSG_BUF = 2048
+  integer(kind=c_int), bind(c, name="YGG_MSG_MAX_F") :: YGG_MSG_MAX
 
   interface yggarg
      module procedure yggarg_scalar_integer2
