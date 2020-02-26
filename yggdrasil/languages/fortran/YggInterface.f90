@@ -651,7 +651,7 @@ contains
        args(i)%prec_c = 1
        if (((args(i)%type.eq."character").or. &
             args(i)%array).and. &
-            (i.ge.size(args)).or.(.not.is_size_t(args(i+1)))) then
+            ((i.ge.size(args)).or.(.not.is_size_t(args(i+1))))) then
           nargs = nargs + 1
           if ((args(i)%type.eq."character").and.args(i)%array) then
              nargs = nargs + 1
@@ -767,11 +767,14 @@ contains
     do i = 1, size(oargs)
        c_args(i) = oargs(i)%ptr
     end do
-    do i = (size(oargs) + 1), size(c_args)
-       c_args(i) = c_iargs(i - size(oargs))
+    do i = 1, size(c_iargs)
+       c_args(i + size(oargs)) = c_iargs(i)
     end do
     c_flag = ygg_rpc_call_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
     flag = c_flag
+    do i = 1, size(c_iargs)
+       c_iargs(i) = c_args(i + size(oargs))
+    end do
     call post_recv(iargs, c_iargs, flag, .false.)
     if (allocated(c_args)) then
        deallocate(c_args)
@@ -830,11 +833,14 @@ contains
        do i = 1, size(oargs)
           c_args(i) = oargs(i)%ptr
        end do
-       do i = (size(oargs) + 1), size(c_args)
-          c_args(i) = c_iargs(i - size(oargs))
+       do i = 1, size(c_iargs)
+          c_args(i + size(oargs)) = c_iargs(i)
        end do
        c_flag = ygg_rpc_call_realloc_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
        flag = c_flag
+       do i = 1, size(c_iargs)
+          c_iargs(i) = c_args(i + size(oargs))
+       end do
     end if
     call post_recv(iargs, c_iargs, flag, .true.)
     if (allocated(c_args)) then
