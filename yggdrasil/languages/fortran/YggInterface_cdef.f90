@@ -39,6 +39,24 @@
        type(c_ptr) :: channel
      end function ygg_input_c
   
+     function ygg_output_fmt_c(name, fmt) result(channel) &
+          bind(c, name="yggOutputFmt_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       character(kind=c_char), dimension(*), intent(in) :: fmt
+       type(c_ptr) :: channel
+     end function ygg_output_fmt_c
+  
+     function ygg_input_fmt_c(name, fmt) result(channel) &
+          bind(c, name="yggInputFmt_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       character(kind=c_char), dimension(*), intent(in) :: fmt
+       type(c_ptr) :: channel
+     end function ygg_input_fmt_c
+  
      function ygg_ascii_file_output_c(name) result(channel) &
           bind(c, name="yggAsciiFileOutput_f")
        use, intrinsic :: iso_c_binding, only: c_ptr, c_char

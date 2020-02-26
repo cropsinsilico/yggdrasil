@@ -22,7 +22,6 @@ int main(int argc, char *argv[]) {
   // Initialize variables
   int ret = 0;
   int fib = -1;
-  char *logmsg = (char*)malloc(YGG_MSG_MAX*sizeof(char));
   int i;
 
   // Iterate over Fibonacci sequence
@@ -47,7 +46,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  free(logmsg);
   printf("Goodbye from C client%d\n", client_index);
   return exit_code;
     

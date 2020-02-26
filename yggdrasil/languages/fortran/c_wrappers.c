@@ -27,6 +27,14 @@ void* ygg_input_f(const char *name) {
   return (void*)yggInput(name);
 }
 
+void* yggOutputFmt_f(const char *name, const char *fmt) {
+  return (void*)yggOutputFmt(name, fmt);
+}
+
+void* yggInputFmt_f(const char *name, const char *fmt) {
+  return (void*)yggInputFmt(name, fmt);
+}
+
 void* yggAsciiFileOutput_f(const char *name) {
   return (void*)yggAsciiFileOutput(name);
 }

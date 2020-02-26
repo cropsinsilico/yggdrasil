@@ -17,6 +17,8 @@ void ygg_log_error_f(const char* fmt);
 // Methods for initializing channels
 void* ygg_output_f(const char *name);
 void* ygg_input_f(const char *name);
+void* yggOutputFmt_f(const char *name, const char *fmt);
+void* yggInputFmt_f(const char *name, const char *fmt);
 void* yggAsciiFileOutput_f(const char *name);
 void* yggAsciiFileInput_f(const char *name);
 void* yggAsciiTableOutput_f(const char *name, const char *format_str);

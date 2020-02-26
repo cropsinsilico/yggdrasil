@@ -362,6 +362,32 @@ contains
     channel%comm = ygg_input_c(c_name)
   end function ygg_input
   
+  function ygg_output_fmt(name, fmt) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=*), intent(in) :: fmt
+    character(len=len_trim(name)+1) :: c_name
+    character(len=len_trim(fmt)+1) :: c_fmt
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    c_fmt = trim(fmt)//c_null_char
+    call fix_format_str(c_fmt)
+    channel%comm = ygg_output_fmt_c(c_name, c_fmt)
+  end function ygg_output_fmt
+  
+  function ygg_input_fmt(name, fmt) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=*), intent(in) :: fmt
+    character(len=len_trim(name)+1) :: c_name
+    character(len=len_trim(fmt)+1) :: c_fmt
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    c_fmt = trim(fmt)//c_null_char
+    call fix_format_str(c_fmt)
+    channel%comm = ygg_input_fmt_c(c_name, c_fmt)
+  end function ygg_input_fmt
+  
   function ygg_ascii_file_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
