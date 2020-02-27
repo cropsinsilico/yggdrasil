@@ -2,6 +2,7 @@ import os
 import re
 import six
 import copy
+import glob
 import logging
 import warnings
 import subprocess
@@ -2103,6 +2104,37 @@ class CompiledModelDriver(ModelDriver):
         return out
 
     @classmethod
+    def get_dependency_info(cls, dep):
+        r"""Get the dictionary of information associated with a
+        dependency.
+
+        Args:
+            dep (str): Name of internal or external dependency or full path
+                to the library.
+
+        Returns:
+            dict: Dependency info.
+
+        """
+        out = None
+        if isinstance(dep, tuple):
+            assert(len(dep) == 2)
+            dep_lang, dep = dep
+            if dep_lang != cls.language:
+                drv = import_component('model', dep_lang)
+                return drv.get_dependency_info(dep)
+        if dep in cls.internal_libraries:
+            out = cls.internal_libraries[dep]
+        elif dep in cls.external_libraries:
+            out = cls.external_libraries[dep]
+        elif os.path.isfile(dep):
+            out = dep
+        if out is None:
+            raise KeyError("Could not determine information for "
+                           "dependency '%s'" % dep)
+        return out
+
+    @classmethod
     def get_dependency_source(cls, dep, default=None):
         r"""Get the path to the library source files (or header files) for a
         dependency.
@@ -2120,6 +2152,13 @@ class CompiledModelDriver(ModelDriver):
 
         """
         out = None
+        if isinstance(dep, tuple):
+            assert(len(dep) == 2)
+            dep_lang, dep = dep
+            if dep_lang != cls.language:
+                drv = import_component('model', dep_lang)
+                return drv.get_dependency_source(
+                    dep, default=default)
         if dep in cls.internal_libraries:
             dep_info = cls.internal_libraries[dep]
             out = dep_info.get('source', None)
@@ -2148,7 +2187,52 @@ class CompiledModelDriver(ModelDriver):
         return out
 
     @classmethod
-    def get_dependency_library(cls, dep, default=None, libtype=None):
+    def get_dependency_object(cls, dep, default=None, commtype=None):
+        r"""Get the location of an object file for a dependency.
+
+        Args:
+            dep (str): Name of internal or external dependency or full path
+                to the object file.
+            default (str, optional): Default that should be used if a value
+                cannot be determined form internal/external dependencies or
+                if dep is not a valid file. Defaults to None and is ignored.
+            commtype (str, optional): If provided, this is the communication
+                type that should be used for the model and flags for just that
+                comm type will be included. If None, flags for all installed
+                comm types will be included. Default to None. This keyword is
+                only used in the names of internal libraries.
+
+        Returns:
+            str: Full path to the object file.
+
+        """
+        if isinstance(dep, tuple):
+            assert(len(dep) == 2)
+            dep_lang, dep = dep
+            if dep_lang != cls.language:
+                drv = import_component('model', dep_lang)
+                return drv.get_dependency_object(
+                    dep, default=default, commtype=commtype)
+        out = None
+        if dep in cls.internal_libraries:
+            tool = cls.get_tool('compiler')
+            src = cls.get_dependency_source(dep)
+            suffix = cls.get_internal_suffix(commtype=commtype)
+            out = tool.get_output_file(
+                src, dont_link=True, suffix=suffix)
+        elif os.path.isfile(dep):
+            out = dep
+        if out is None:
+            if default is None:
+                raise ValueError("Could not determine object file path for "
+                                 "dependency '%s'" % dep)
+            else:
+                out = default
+        return out
+
+    @classmethod
+    def get_dependency_library(cls, dep, default=None, libtype=None,
+                               commtype=None):
         r"""Get the library location for a dependency.
 
         Args:
@@ -2161,6 +2245,11 @@ class CompiledModelDriver(ModelDriver):
                 Valid values are 'static' and 'shared'. Defaults to None and
                 will be set on the dependency's libtype (if it has one) or
                 the _default_libtype parameter (if it doesn't).
+            commtype (str, optional): If provided, this is the communication
+                type that should be used for the model and flags for just that
+                comm type will be included. If None, flags for all installed
+                comm types will be included. Default to None. This keyword is
+                only used in the names of internal libraries.
 
         Returns:
             str: Full path to the library file. For header only libraries,
@@ -2172,6 +2261,14 @@ class CompiledModelDriver(ModelDriver):
                 specified dependency and default is None.
 
         """
+        if isinstance(dep, tuple):
+            assert(len(dep) == 2)
+            dep_lang, dep = dep
+            if dep_lang != cls.language:
+                drv = import_component('model', dep_lang)
+                return drv.get_dependency_library(
+                    dep, default=default, libtype=libtype,
+                    commtype=commtype)
         libclass = None
         libinfo = {}
         if dep in cls.internal_libraries:
@@ -2211,9 +2308,10 @@ class CompiledModelDriver(ModelDriver):
         elif libclass == 'internal':
             tool = cls.get_tool('compiler')
             src = cls.get_dependency_source(dep)
+            suffix = cls.get_internal_suffix(commtype=commtype)
             out = tool.get_output_file(dep, libtype=libtype, no_src_ext=True,
                                        build_library=True,
-                                       suffix=_system_suffix,
+                                       suffix=suffix,
                                        working_dir=os.path.dirname(src))
         elif os.path.isfile(dep):
             out = dep
@@ -2246,6 +2344,13 @@ class CompiledModelDriver(ModelDriver):
 
         """
         out = None
+        if isinstance(dep, tuple):
+            assert(len(dep) == 2)
+            dep_lang, dep = dep
+            if dep_lang != cls.language:
+                drv = import_component('model', dep_lang)
+                return drv.get_dependency_include_dirs(
+                    dep, default=default)
         if dep in cls.internal_libraries:
             out = cls.internal_libraries[dep].get('directory', None)
             if out is None:
@@ -2290,9 +2395,19 @@ class CompiledModelDriver(ModelDriver):
             deps = [deps]
         for d in deps:
             new_deps = []
-            sub_deps = cls.internal_libraries.get(d, {}).get(
-                'internal_dependencies', [])
-            sub_deps = cls.get_dependency_order(sub_deps)
+            if isinstance(d, tuple):
+                assert(len(d) == 2)
+                d_lang = d[0]
+                if d_lang == cls.language:
+                    drv = cls
+                else:
+                    drv = import_component('model', d_lang)
+                sub_deps = [(d_lang, x) for x in
+                            drv.get_dependency_order(d[1])]
+            else:
+                sub_deps = cls.internal_libraries.get(d, {}).get(
+                    'internal_dependencies', [])
+                sub_deps = cls.get_dependency_order(sub_deps)
             min_dep = len(out)
             for sub_d in sub_deps:
                 if sub_d in out:
@@ -2420,11 +2535,10 @@ class CompiledModelDriver(ModelDriver):
         # Add internal libraries as objects for api
         additional_objs = kwargs.pop('additional_objs', [])
         for x in internal_dependencies:
-            libinfo = cls.internal_libraries[x]
+            libinfo = cls.get_dependency_info(x)
             if libinfo.get('libtype', None) == 'object':
-                src = cls.get_dependency_source(x)
-                additional_objs.append(cls.get_tool('compiler').get_output_file(
-                    src, dont_link=True, suffix=_system_suffix))
+                additional_objs.append(cls.get_dependency_object(
+                    x, commtype=commtype))
         if additional_objs:
             kwargs['additional_objs'] = additional_objs
         # Add directories for internal/external dependencies
@@ -2512,7 +2626,8 @@ class CompiledModelDriver(ModelDriver):
         # TODO: Expand library flags to include subdependencies?
         # Add flags for internal/external depenencies
         for dep in internal_dependencies + external_dependencies:
-            dep_lib = cls.get_dependency_library(dep)
+            dep_lib = cls.get_dependency_library(
+                dep, commtype=commtype)
             if dep_lib and (dep_lib not in libraries):
                 if not kwargs.get('dry_run', False):
                     if not os.path.isfile(dep_lib):  # pragma: debug
@@ -2632,6 +2747,11 @@ class CompiledModelDriver(ModelDriver):
             bool: True if the library is installed, False otherwise.
 
         """
+        if isinstance(lib, tuple) and (lib[0] != cls.language):
+            assert(len(lib) == 2)
+            lib_lang, lib = lib
+            drv = import_component("model", lib_lang)
+            return drv.is_library_installed(lib, cfg=cfg)
         if cfg is None:
             cfg = ygg_cfg
         out = True
@@ -2792,7 +2912,12 @@ class CompiledModelDriver(ModelDriver):
             # cls.call_compiler(cls.interface_library)
             dep_order = cls.get_dependency_order(cls.interface_library)
             for k in dep_order[::-1]:
-                cls.call_compiler(k, **kwargs)
+                if isinstance(k, tuple):
+                    assert(len(k) == 2)
+                    ikw = dict(kwargs, language=k[0])
+                    cls.call_compiler(k[1], **ikw)
+                else:
+                    cls.call_compiler(k, **kwargs)
 
     @classmethod
     def cleanup_dependencies(cls, products=None, **kwargs):
@@ -2800,7 +2925,13 @@ class CompiledModelDriver(ModelDriver):
         if products is None:
             products = []
         kwargs['dry_run'] = True
+        suffix = cls.get_internal_suffix(commtype=kwargs.get('commtype', None))
         cls.compile_dependencies(products=products, **kwargs)
+        new_products = []
+        for i in range(len(products)):
+            if suffix in products[i]:
+                new_products += glob.glob(products[i].replace(suffix, '*'))
+        products += new_products
         super(CompiledModelDriver, cls).cleanup_dependencies(products=products)
 
     def compile_model(self, source_files=None, skip_interface_flags=False,
@@ -2837,6 +2968,22 @@ class CompiledModelDriver(ModelDriver):
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
         return self.call_compiler(source_files, **kwargs)
+
+    @classmethod
+    def get_internal_suffix(cls, commtype=None):
+        r"""Determine the suffix that should be used for internal libraries.
+
+        Args:
+            commtype (str, optional): If provided, this is the communication
+                type that should be used for the model. If None, the
+                default comm is used.
+
+        Returns:
+            str: Suffix that should be added to internal libraries to
+                differentiate between different dependencies.
+
+        """
+        return _system_suffix
     
     @classmethod
     def call_compiler(cls, src, language=None, dont_build=None, **kwargs):
@@ -2905,11 +3052,14 @@ class CompiledModelDriver(ModelDriver):
                 return src
             elif kwargs['libtype'] in ['static', 'shared']:
                 kwargs.setdefault(
-                    'out', cls.get_dependency_library(dep, libtype=kwargs['libtype']))
+                    'out', cls.get_dependency_library(
+                        dep, libtype=kwargs['libtype'],
+                        commtype=kwargs.get('commtype', None)))
                 if (kwargs['libtype'] == 'static') and ('linker_language' in kwargs):
                     kwargs['archiver_language'] = kwargs.pop('linker_language')
-            return cls.call_compiler(src, suffix=_system_suffix,
-                                     **kwargs)
+            kwargs['suffix'] = cls.get_internal_suffix(
+                commtype=kwargs.get('commtype', None))
+            return cls.call_compiler(src, **kwargs)
         # Compile using the compiler after updating the flags
         kwargs = cls.update_compiler_kwargs(**kwargs)
         tool = cls.get_tool('compiler')

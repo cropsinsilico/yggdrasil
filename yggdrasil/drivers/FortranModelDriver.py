@@ -105,29 +105,32 @@ class FortranModelDriver(CompiledModelDriver):
     default_compiler = 'gfortran'
     default_linker = None
     supported_comm_options = dict(
-        CModelDriver.CModelDriver.supported_comm_options)
-    external_libraries = dict(
-        CModelDriver.CModelDriver.external_libraries,
-        **{'c++': {}})
+        CModelDriver.CModelDriver.supported_comm_options,
+        zmq={'libraries': [('c', x) for x in
+                           CModelDriver.CModelDriver.supported_comm_options[
+                               'zmq']['libraries']]})
+    external_libraries = {'c++': {}}
     internal_libraries = dict(
-        _c_internal_libs,
         fygg={'source': os.path.join(_incl_interface,
                                      'YggInterface.f90'),
               'libtype': 'static',
               'internal_dependencies': (
-                  _c_internal_libs['ygg']['internal_dependencies']
-                  + ['ygg', 'c_wrappers']),
+                  [('c', x) for x in
+                   _c_internal_libs['ygg']['internal_dependencies']]
+                  + [('c', 'ygg'), 'c_wrappers']),
               'external_dependencies': (
-                  _c_internal_libs['ygg']['external_dependencies']),
+                  [('c', x) for x in
+                   _c_internal_libs['ygg']['external_dependencies']]),
               'include_dirs': (
                   _c_internal_libs['ygg']['include_dirs'])},
         c_wrappers={'source': os.path.join(_incl_interface,
                                            'c_wrappers.c'),
                     'language': 'c',
                     'libtype': 'object',
-                    'internal_dependencies': ['ygg'],
+                    'internal_dependencies': [('c', 'ygg')],
                     'external_dependencies': (
-                        _c_internal_libs['ygg']['external_dependencies']),
+                        [('c', x) for x in
+                         _c_internal_libs['ygg']['external_dependencies']]),
                     'include_dirs': [_incl_interface]})
     type_map = {
         'int': 'integer(kind = X)',
@@ -192,15 +195,6 @@ class FortranModelDriver(CompiledModelDriver):
     include_channel_obj = True
     is_typed = True
     
-    @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration including things like platform dependent properties and
-        checking environment variables for default settings.
-        """
-        # cls.internal_libraries['ygg']['libtype'] = 'object'
-        CompiledModelDriver.before_registration(cls)
-        
     def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
@@ -234,3 +228,24 @@ class FortranModelDriver(CompiledModelDriver):
         kwargs.setdefault('libraries', [])
         kwargs['libraries'].append('c++')
         return super(FortranModelDriver, self).compile_model(**kwargs)
+
+    @classmethod
+    def get_internal_suffix(cls, commtype=None):
+        r"""Determine the suffix that should be used for internal libraries.
+
+        Args:
+            commtype (str, optional): If provided, this is the communication
+                type that should be used for the model. If None, the
+                default comm is used.
+
+        Returns:
+            str: Suffix that should be added to internal libraries to
+                differentiate between different dependencies.
+
+        """
+        out = super(FortranModelDriver, cls).get_internal_suffix(
+            commtype=commtype)
+        if commtype is None:
+            commtype = tools.get_default_comm()
+        out += '_%s' % commtype[:3].lower()
+        return out
