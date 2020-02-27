@@ -17,6 +17,8 @@ void ygg_log_error_f(const char* fmt);
 // Methods for initializing channels
 void* ygg_output_f(const char *name);
 void* ygg_input_f(const char *name);
+void* yggOutputType_f(const char *name, void* datatype);
+void* yggInputType_f(const char *name, void* datatype);
 void* yggOutputFmt_f(const char *name, const char *fmt);
 void* yggInputFmt_f(const char *name, const char *fmt);
 void* yggAsciiFileOutput_f(const char *name);
@@ -41,7 +43,30 @@ void *yggRpcClient_f(const char *name, const char *out_fmt,
 		     const char *in_fmt);
 void *yggRpcServer_f(const char *name, const char *in_fmt,
 		     const char *out_fmt);
-  
+// Method for constructing data types
+void *create_dtype_empty_f(const bool use_generic);
+void *create_dtype_python_f(void* pyobj, const bool use_generic);
+void *create_dtype_direct_f(const bool use_generic);
+void *create_dtype_default_f(const char* type, const bool use_generic);
+void *create_dtype_scalar_f(const char* subtype, const size_t precision,
+			    const char* units, const bool use_generic);
+void *create_dtype_1darray_f(const char* subtype, const size_t precision,
+			     const size_t length, const char* units,
+			     const bool use_generic);
+void *create_dtype_ndarray_f(const char* subtype, const size_t precision,
+			     const size_t ndim, const size_t* shape,
+			     const char* units, const bool use_generic);
+void *create_dtype_json_array_f(const size_t nitems, void* items,
+				const bool use_generic);
+void *create_dtype_json_object_f(const size_t nitems, void* keys,
+				 void* values, const bool use_generic);
+void *create_dtype_ply_f(const bool use_generic);
+void *create_dtype_obj_f(const bool use_generic);
+void *create_dtype_format_f(const char *format_str, const int as_array,
+			    const bool use_generic);
+void *create_dtype_pyobj_f(const char* type, const bool use_generic);
+void *create_dtype_schema_f(const bool use_generic);
+void *create_dtype_any_f(const bool use_generic);
 // Methods for sending/receiving
 int ygg_send_f(const void *yggQ, const char *data, const size_t len);
 int ygg_recv_f(void *yggQ, char *data, const size_t len);

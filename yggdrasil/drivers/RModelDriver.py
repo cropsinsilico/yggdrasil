@@ -110,6 +110,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)',
         'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
     brackets = (r'{', r'}')
+    zero_based = False
 
     @classmethod
     def is_library_installed(cls, lib, **kwargs):

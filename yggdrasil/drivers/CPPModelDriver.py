@@ -92,6 +92,7 @@ class CPPModelDriver(CModelDriver):
             r'(?P<name>.+?)(?(2)(?:\)|(?:)))(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?'))
     include_arg_count = True
     include_channel_obj = False
+    dont_declare_channel = True
     
     @staticmethod
     def after_registration(cls):

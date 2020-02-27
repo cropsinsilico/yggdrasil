@@ -38,7 +38,25 @@
        character(kind=c_char), dimension(*), intent(in) :: name
        type(c_ptr) :: channel
      end function ygg_input_c
-  
+
+     function ygg_output_type_c(name, datatype) result(channel) &
+          bind(c, name="yggOutputType_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       type(c_ptr), value, intent(in) :: datatype
+       type(c_ptr) :: channel
+     end function ygg_output_type_c
+     
+     function ygg_input_type_c(name, datatype) result(channel) &
+          bind(c, name="yggInputType_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       type(c_ptr), value, intent(in) :: datatype
+       type(c_ptr) :: channel
+     end function ygg_input_type_c
+     
      function ygg_output_fmt_c(name, fmt) result(channel) &
           bind(c, name="yggOutputFmt_f")
        use, intrinsic :: iso_c_binding, only: c_ptr, c_char
@@ -222,6 +240,153 @@
        character(kind=c_char), dimension(*), intent(in) :: out_fmt
        type(c_ptr) :: channel
      end function ygg_rpc_server_c
+
+     ! Method for constructing data types
+     function create_dtype_empty_c(use_generic) result(out) &
+          bind(c, name="create_dtype_empty_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool
+       implicit none
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_empty_c
+
+     function create_dtype_python_c(pyobj, use_generic) result(out) &
+          bind(c, name="create_dtype_python_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool
+       implicit none
+       type(c_ptr), value :: pyobj
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_python_c
+
+     function create_dtype_direct_c(use_generic) result(out) &
+          bind(c, name="create_dtype_direct_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool
+       implicit none
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_direct_c
+
+     function create_dtype_default_c(type, use_generic) result(out) &
+          bind(c, name="create_dtype_default_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: type
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_default_c
+
+     function create_dtype_scalar_c(subtype, precision, units, &
+          use_generic) result(out) &
+          bind(c, name="create_dtype_scalar_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool, c_char, c_size_t
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       character(kind=c_char), dimension(*), intent(in) :: units
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_scalar_c
+
+     function create_dtype_1darray_c(subtype, precision, length, &
+          units, use_generic) result(out) &
+          bind(c, name="create_dtype_1darray_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool, c_char, c_size_t
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       integer(kind=c_size_t), value, intent(in) :: length
+       character(kind=c_char), dimension(*), intent(in) :: units
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_1darray_c
+
+     function create_dtype_ndarray_c(subtype, precision, ndim, &
+          shape, units, use_generic) result(out) &
+          bind(c, name="create_dtype_ndarray_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool, c_char, c_size_t
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       integer(kind=c_size_t), value, intent(in) :: ndim
+       type(c_ptr), value, intent(in) :: shape
+       character(kind=c_char), dimension(*), intent(in) :: units
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_ndarray_c
+
+     function create_dtype_json_array_c(nitems, items, use_generic) &
+          result(out) bind(c, name="create_dtype_json_array_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool, c_size_t
+       implicit none
+       integer(kind=c_size_t), value, intent(in) :: nitems
+       type(c_ptr), value, intent(in) :: items
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_json_array_c
+
+     function create_dtype_json_object_c(nitems, keys, values, &
+          use_generic) result(out) &
+          bind(c, name="create_dtype_json_object_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool, c_size_t
+       implicit none
+       integer(kind=c_size_t), value, intent(in) :: nitems
+       type(c_ptr), value, intent(in) :: keys
+       type(c_ptr), value, intent(in) :: values
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_json_object_c
+
+     function create_dtype_ply_c(use_generic) result(out) &
+          bind(c, name="create_dtype_ply_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool
+       implicit none
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_ply_c
+  
+     function create_dtype_obj_c(use_generic) result(out) &
+          bind(c, name="create_dtype_obj_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool
+       implicit none
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_obj_c
+
+     function create_dtype_format_c(format_str, as_array, use_generic) &
+          result(out) bind(c, name="create_dtype_format_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool, c_char, c_int
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: format_str
+       integer(kind=c_int), value, intent(in) :: as_array
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_format_c
+
+     function create_dtype_pyobj_c(type, use_generic) result(out) &
+          bind(c, name="create_dtype_pyobj_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: type
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_pyobj_c
+
+     function create_dtype_schema_c(use_generic) result(out) &
+          bind(c, name="create_dtype_schema_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool
+       implicit none
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_schema_c
+  
+     function create_dtype_any_c(use_generic) result(out) &
+          bind(c, name="create_dtype_any_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool
+       implicit none
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_any_c
   
      ! Methods for sending/receiving
      function ygg_send_c(ygg_q, data, data_len) result (flag) &

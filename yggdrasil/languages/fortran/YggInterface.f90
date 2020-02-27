@@ -88,6 +88,9 @@ module fygg
   type :: yggcomm
      type(c_ptr) :: comm
   end type yggcomm
+  type :: yggdtype
+     type(c_ptr) :: ptr
+  end type yggdtype
   type :: yggchar_r
      character, dimension(:), pointer :: x => null()
   end type yggchar_r
@@ -218,6 +221,9 @@ module fygg
      integer(kind=c_size_t), pointer :: prec_c => null()
      type(c_ptr) :: prec_ptr = c_null_ptr
   end type yggptr
+  type :: yggnull
+     type(c_ptr) :: ptr = c_null_ptr
+  end type yggnull
   type :: yggptr_arr
      type(yggptr), dimension(:), pointer :: vals => null()
   end type yggptr_arr
@@ -229,6 +235,18 @@ module fygg
      character(kind=c_char) :: prefix
      type(c_ptr) :: obj
   end type ygggeneric
+  type, bind(c) :: yggarr
+     character(kind=c_char) :: prefix
+     type(c_ptr) :: obj
+  end type yggarr
+  type, bind(c) :: yggmap
+     character(kind=c_char) :: prefix
+     type(c_ptr) :: obj
+  end type yggmap
+  type, bind(c) :: yggschema
+     character(kind=c_char) :: prefix
+     type(c_ptr) :: obj
+  end type yggschema
   type, bind(c) :: yggply
      character(kind=c_char), dimension(100) :: material
      integer(kind=c_int) :: nvert
@@ -281,7 +299,7 @@ module fygg
   end type yggobj
 
   public :: yggarg, yggchar_r, yggcomm, ygggeneric, &
-       yggptr, yggptr_arr, yggptr_map, yggply, yggobj, &
+       yggptr, yggnull, yggarr, yggmap, yggschema, yggply, yggobj, &
        integer_1d, real_1d, complex_1d, logical_1d, character_1d, &
        LINE_SIZE_MAX
 
@@ -361,6 +379,30 @@ contains
     c_name = trim(name)//c_null_char
     channel%comm = ygg_input_c(c_name)
   end function ygg_input
+
+  function ygg_output_type(name, datatype) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    type(yggdtype) :: datatype
+    character(len=len_trim(name)+1) :: c_name
+    type(c_ptr) :: c_datatype
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    c_datatype = datatype%ptr
+    channel%comm = ygg_output_type_c(c_name, c_datatype)
+  end function ygg_output_type
+  
+  function ygg_input_type(name, datatype) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    type(yggdtype) :: datatype
+    character(len=len_trim(name)+1) :: c_name
+    type(c_ptr) :: c_datatype
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    c_datatype = datatype%ptr
+    channel%comm = ygg_input_type_c(c_name, c_datatype)
+  end function ygg_input_type
   
   function ygg_output_fmt(name, fmt) result(channel)
     implicit none
@@ -591,6 +633,196 @@ contains
     call fix_format_str(c_out_fmt)
     channel%comm = ygg_rpc_server_c(c_name, c_in_fmt, c_out_fmt)
   end function ygg_rpc_server
+
+  ! Method for constructing data types
+  function create_dtype_empty(use_generic) result(out)
+    implicit none
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    out%ptr = create_dtype_empty_c(use_generic)
+  end function create_dtype_empty
+
+  function create_dtype_python(pyobj, use_generic) result(out)
+    implicit none
+    type(c_ptr) :: pyobj
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    out%ptr = create_dtype_python_c(pyobj, use_generic)
+  end function create_dtype_python
+
+  function create_dtype_direct(use_generic) result(out)
+    implicit none
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    out%ptr = create_dtype_direct_c(use_generic)
+  end function create_dtype_direct
+
+  function create_dtype_default(typename, use_generic) result(out)
+    implicit none
+    character(len=*), intent(in) :: typename
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    character(len=len_trim(typename)+1) :: c_typename
+    c_typename = trim(typename)//c_null_char
+    out%ptr = create_dtype_default_c(c_typename, use_generic)
+  end function create_dtype_default
+
+  function create_dtype_scalar(subtype, precision, units, &
+       use_generic) result(out)
+    implicit none
+    character(len=*), intent(in) :: subtype
+    integer, intent(in) :: precision
+    character(len=*), intent(in) :: units
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    character(len=len_trim(subtype)+1) :: c_subtype
+    integer(kind=c_size_t) :: c_precision
+    character(len=len_trim(units)+1) :: c_units
+    c_subtype = trim(subtype)//c_null_char
+    c_precision = precision
+    c_units = trim(units)//c_null_char
+    out%ptr = create_dtype_scalar_c(c_subtype, c_precision, c_units, &
+         use_generic)
+  end function create_dtype_scalar
+
+  function create_dtype_1darray(subtype, precision, length, &
+       units, use_generic) result(out)
+    implicit none
+    character(len=*), intent(in) :: subtype
+    integer, intent(in) :: precision
+    integer, intent(in) :: length
+    character(len=*), intent(in) :: units
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    character(len=len_trim(subtype)+1) :: c_subtype
+    integer(kind=c_size_t) :: c_precision
+    integer(kind=c_size_t) :: c_length
+    character(len=len_trim(units)+1) :: c_units
+    c_subtype = trim(subtype)//c_null_char
+    c_precision = precision
+    c_length = length
+    c_units = trim(units)//c_null_char
+    out%ptr = create_dtype_1darray_c(c_subtype, c_precision, c_length, &
+         c_units, use_generic)
+  end function create_dtype_1darray
+
+  function create_dtype_ndarray(subtype, precision, ndim, &
+       shape, units, use_generic) result(out)
+    implicit none
+    character(len=*), intent(in) :: subtype
+    integer, intent(in) :: precision
+    integer, intent(in) :: ndim
+    integer, dimension(:), pointer, intent(in) :: shape
+    character(len=*), intent(in) :: units
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    character(len=len_trim(subtype)+1) :: c_subtype
+    integer(kind=c_size_t) :: c_precision
+    integer(kind=c_size_t) :: c_ndim
+    type(c_ptr) :: c_shape
+    character(len=len_trim(units)+1) :: c_units
+    c_subtype = trim(subtype)//c_null_char
+    c_precision = precision
+    c_ndim = ndim
+    c_shape = c_loc(shape(1))
+    c_units = trim(units)//c_null_char
+    out%ptr = create_dtype_ndarray_c(c_subtype, c_precision, c_ndim, &
+         c_shape, c_units, use_generic)
+  end function create_dtype_ndarray
+
+  function create_dtype_json_array(nitems, items, use_generic) &
+       result(out)
+    implicit none
+    integer, intent(in) :: nitems
+    type(yggdtype), dimension(:), intent(in) :: items
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    integer(kind=c_size_t) :: c_nitems
+    type(c_ptr), target :: c_items(size(items))
+    integer :: i
+    c_nitems = nitems
+    do i = 1, size(items)
+       c_items(i) = items(i)%ptr
+    end do
+    out%ptr = create_dtype_json_array_c(c_nitems, c_loc(c_items(1)), &
+         use_generic)
+  end function create_dtype_json_array
+
+  function create_dtype_json_object(nitems, keys, values, use_generic) &
+       result(out)
+    implicit none
+    integer, intent(in) :: nitems
+    character(len=*), dimension(:), intent(in), target :: keys
+    type(yggdtype), dimension(:), intent(in) :: values
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    integer(kind=c_size_t) :: c_nitems
+    type(c_ptr), target :: c_keys(size(keys))
+    type(c_ptr), target :: c_values(size(values))
+    character(len=len(keys(1))), target :: ikey
+    integer :: i
+    c_nitems = nitems
+    do i = 1, size(keys)
+       ikey = keys(i)
+       c_keys(i) = c_loc(ikey(i:i))
+    end do
+    do i = 1, size(values)
+       c_values(i) = values(i)%ptr
+    end do
+    out%ptr = create_dtype_json_object_c(c_nitems, c_loc(c_keys(1)), &
+         c_loc(c_values(1)), use_generic)
+  end function create_dtype_json_object
+
+  function create_dtype_ply(use_generic) result(out)
+    implicit none
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    out%ptr = create_dtype_ply_c(use_generic)
+  end function create_dtype_ply
+
+  function create_dtype_obj(use_generic) result(out)
+    implicit none
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    out%ptr = create_dtype_obj_c(use_generic)
+  end function create_dtype_obj
+
+  function create_dtype_format(format_str, as_array, use_generic) &
+       result(out)
+    implicit none
+    character(len=*), intent(in) :: format_str
+    integer, intent(in) :: as_array
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    character(len=len_trim(format_str)+1) :: c_format_str
+    c_format_str = trim(format_str)//c_null_char
+    call fix_format_str(c_format_str)
+    out%ptr = create_dtype_format_c(c_format_str, as_array, use_generic)
+  end function create_dtype_format
+
+  function create_dtype_pyobj(typename, use_generic) result(out)
+    implicit none
+    character(len=*), intent(in) :: typename
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    character(len=len_trim(typename)+1) :: c_typename
+    c_typename = trim(typename)//c_null_char
+    out%ptr = create_dtype_pyobj_c(c_typename, use_generic)
+  end function create_dtype_pyobj
+
+  function create_dtype_schema(use_generic) result(out)
+    implicit none
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    out%ptr = create_dtype_schema_c(use_generic)
+  end function create_dtype_schema
+
+  function create_dtype_any(use_generic) result(out)
+    implicit none
+    logical(kind=1), intent(in) :: use_generic
+    type(yggdtype) :: out
+    out%ptr = create_dtype_any_c(use_generic)
+  end function create_dtype_any
 
   ! Methods for sending/receiving
   function ygg_send(ygg_q, data, data_len) result (flag)

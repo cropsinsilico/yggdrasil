@@ -27,6 +27,14 @@ void* ygg_input_f(const char *name) {
   return (void*)yggInput(name);
 }
 
+void* yggOutputType_f(const char *name, void* datatype) {
+  return (void*)yggOutputType(name, (dtype_t*)datatype);
+}
+
+void* yggInputType_f(const char *name, void* datatype) {
+  return (void*)yggInputType(name, (dtype_t*)datatype);
+}
+
 void* yggOutputFmt_f(const char *name, const char *fmt) {
   return (void*)yggOutputFmt(name, fmt);
 }
@@ -115,6 +123,79 @@ void *yggRpcClient_f(const char *name, const char *out_fmt,
 void *yggRpcServer_f(const char *name, const char *in_fmt,
 		     const char *out_fmt) {
   return (void*)yggRpcServer(name, in_fmt, out_fmt);
+}
+
+// Method for constructing data types
+void *create_dtype_empty_f(const bool use_generic) {
+  return (void*)create_dtype_empty(use_generic);
+}
+
+void *create_dtype_python_f(void* pyobj, const bool use_generic) {
+  return (void*)create_dtype_python((PyObject*)pyobj, use_generic);
+}
+
+void *create_dtype_direct_f(const bool use_generic) {
+  return (void*)create_dtype_direct(use_generic);
+}
+
+void *create_dtype_default_f(const char* type, const bool use_generic) {
+  return (void*)create_dtype_default(type, use_generic);
+}
+
+void *create_dtype_scalar_f(const char* subtype, const size_t precision,
+			    const char* units, const bool use_generic) {
+  return (void*)create_dtype_scalar(subtype, precision, units, use_generic);
+}
+
+void *create_dtype_1darray_f(const char* subtype, const size_t precision,
+			     const size_t length, const char* units,
+			     const bool use_generic) {
+  return (void*)create_dtype_1darray(subtype, precision, length,
+				     units, use_generic);
+}
+
+void *create_dtype_ndarray_f(const char* subtype, const size_t precision,
+			     const size_t ndim, const size_t* shape,
+			     const char* units, const bool use_generic) {
+  return (void*)create_dtype_ndarray(subtype, precision, ndim, shape,
+				     units, use_generic);
+}
+
+void *create_dtype_json_array_f(const size_t nitems, void* items,
+				const bool use_generic) {
+  return (void*)create_dtype_json_array(nitems, (dtype_t**)items,
+					use_generic);
+}
+
+void *create_dtype_json_object_f(const size_t nitems, void* keys,
+				 void* values, const bool use_generic) {
+  return (void*)create_dtype_json_object(nitems, (char**)keys,
+					 (dtype_t**)values, use_generic);
+}
+
+void *create_dtype_ply_f(const bool use_generic) {
+  return (void*)create_dtype_ply(use_generic);
+}
+
+void *create_dtype_obj_f(const bool use_generic) {
+  return (void*)create_dtype_obj(use_generic);
+}
+
+void *create_dtype_format_f(const char *format_str, const int as_array,
+			    const bool use_generic) {
+  return (void*)create_dtype_format(format_str, as_array, use_generic);
+}
+
+void *create_dtype_pyobj_f(const char* type, const bool use_generic) {
+  return (void*)create_dtype_pyobj(type, use_generic);
+}
+
+void *create_dtype_schema_f(const bool use_generic) {
+  return (void*)create_dtype_schema(use_generic);
+}
+
+void *create_dtype_any_f(const bool use_generic) {
+  return (void*)create_dtype_any(use_generic);
 }
 
 // Methods for sending/receiving

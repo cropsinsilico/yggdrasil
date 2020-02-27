@@ -510,6 +510,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
             r'\s*(?P<name>.+?)\s*(?:(?:,(?: *... *\n)?)|$)'),
         'outputs_def_regex': (
             r'\s*(?P<name>.+?)\s*(?:,|$)')}
+    zero_based = False
 
     def __init__(self, name, args, **kwargs):
         self.using_matlab_engine = _matlab_engine_installed

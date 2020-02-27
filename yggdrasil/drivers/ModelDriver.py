@@ -15,6 +15,8 @@ from yggdrasil.config import ygg_cfg, locate_file, update_language_config
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.metaschema.datatypes import is_default_typedef
+from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
+    _valid_types)
 from threading import Event
 try:
     from Queue import Queue, Empty
@@ -290,7 +292,12 @@ class ModelDriver(Driver):
     include_arg_count = False
     include_channel_obj = False
     is_typed = False
+    types_in_funcdef = True
+    import_inside_exec = False
+    declare_functions_as_var = False
+    dont_declare_channel = False
     brackets = None
+    zero_based = True
     python_interface = {'table_input': 'YggAsciiTableInput',
                         'table_output': 'YggAsciiTableOutput',
                         'array_input': 'YggArrayInput',
@@ -1609,6 +1616,9 @@ class ModelDriver(Driver):
         # Declare variables and flag, then define flag
         free_vars = []
         if 'declare' in cls.function_param:
+            for x in inputs + outputs:
+                lines += cls.write_channel_decl(
+                    x, requires_freeing=free_vars)
             lines += cls.write_declaration(flag_var,
                                            requires_freeing=free_vars)
             lines += cls.write_declaration(iter_var,
@@ -1622,10 +1632,12 @@ class ModelDriver(Driver):
                         v, requires_freeing=free_vars)
         lines.append(cls.format_function_param(
             'assign', name=flag_var['name'],
-            value=cls.function_param['true']))
+            value=cls.function_param.get(
+                'true_flag', cls.function_param['true'])))
         lines.append(cls.format_function_param(
             'assign', name=iter_var['name'],
-            value=cls.function_param['true']))
+            value=cls.function_param.get(
+                'true_flag', cls.function_param['true'])))
         # Declare/define input and output channels
         for x in inputs:
             lines += cls.write_channel_def('input',
@@ -1658,12 +1670,14 @@ class ModelDriver(Driver):
                                                    flag_var=flag_var)
         loop_lines.append(cls.format_function_param(
             'assign', name=iter_var['name'],
-            value=cls.function_param['false']))
+            value=cls.function_param.get('false_flag',
+                                         cls.function_param['false'])))
         # Add break if there are not any inputs
         if not inputs:
             loop_lines.append(cls.format_function_param(
                 'assign', name=flag_var['name'],
-                value=cls.function_param['false']))
+                value=cls.function_param.get(
+                    'false_flag', cls.function_param['false'])))
         # Add loop in while block
         flag_cond = cls.format_function_param('flag_cond',
                                               default='{flag_var}',
@@ -1683,19 +1697,275 @@ class ModelDriver(Driver):
             ygglib = cls.interface_library
             if ygglib in cls.internal_libraries:
                 ygglib = cls.internal_libraries[ygglib]['source']
-            prefix.append(cls.format_function_param('interface',
-                                                    interface_library=ygglib))
-        if 'import' in cls.function_param:
-            prefix.append(cls.format_function_param('import',
-                                                    filename=model_file,
-                                                    function=model_function))
+            if cls.import_inside_exec:
+                lines.insert(0, cls.format_function_param(
+                    'interface', interface_library=ygglib))
+            else:
+                prefix.append(cls.format_function_param(
+                    'interface', interface_library=ygglib))
+        if ('import' in cls.function_param):
+            if cls.import_inside_exec:
+                lines.insert(0, cls.format_function_param(
+                    'import', filename=model_file,
+                    function=model_function))
+            else:
+                prefix.append(cls.format_function_param(
+                    'import', filename=model_file,
+                    function=model_function))
         out = cls.write_executable(lines, prefix=prefix)
         logger.debug('\n' + '\n'.join(out))
         return out
 
     @classmethod
+    def write_channel_decl(cls, var, **kwargs):
+        r"""Write a channel declaration.
+
+        Args:
+            var (dict): Information dictionary for the channel.
+                being declared.
+            **kwargs: Additional keyword arguments are passed to class's
+                write_declaration.
+
+        Returns:
+            list: The lines declaring the variable.
+
+        """
+        out = []
+        if not cls.dont_declare_channel:
+            out = cls.write_declaration(
+                {'name': var['channel'], 'type': 'comm'}, **kwargs)
+        if (((var.get('datatype', None) is not None)
+             and ('{channel_type}' in cls.function_param['input']))):
+            var['channel_type'] = '%s_type' % var['channel']
+            out += cls.write_type_decl(
+                var['channel_type'], var['datatype'],
+                requires_freeing=kwargs.get('requires_freeing', None))
+        return out
+
+    @classmethod
+    def write_type_decl(cls, name, datatype, name_base=None,
+                        requires_freeing=None, no_decl=False):
+        r"""Get lines declaring the datatype within the language.
+
+        Args:
+            name (str): Name of variable that should be declared.
+            datatype (dict): Type definition.
+            requires_freeing (list, optional): List that variables requiring
+                freeing should be appended to. Defaults to None.
+            no_decl (bool, optional): If True, the variable is not
+                declared, but supporting variables will be. Defaults
+                to False.
+
+        Returns:
+            list: Lines required to define a type declaration.
+
+        """
+        out = []
+        if name_base is None:
+            name_base = name
+        if datatype['type'] == 'array':
+            if 'items' in datatype:
+                assert(isinstance(datatype['items'], list))
+                out += cls.write_declaration(
+                    {'name': '%s_items' % name_base,
+                     'type': 'dtype_array',
+                     'length': len(datatype['items'])},
+                    requires_freeing=requires_freeing)
+                for i, x in enumerate(datatype['items']):
+                    # Prevent recusion
+                    x_copy = copy.deepcopy(x)
+                    x_copy.pop('items', None)
+                    x_copy.pop('properties', None)
+                    out += cls.write_type_decl(
+                        None, x_copy,
+                        name_base=('%s_item%d' % (name_base, i)),
+                        requires_freeing=requires_freeing,
+                        no_decl=True)
+        elif datatype['type'] == 'object':
+            if 'properties' in datatype:
+                assert(isinstance(datatype['properties'], dict))
+                out += cls.write_declaration(
+                    {'name': '%s_keys' % name_base,
+                     'type': '1darray', 'subtype': 'bytes',
+                     'length': len(datatype['properties']),
+                     'precision': max([len(k) for k in
+                                       datatype['properties'].keys()])},
+                    requires_freeing=requires_freeing)
+                out += cls.write_declaration(
+                    {'name': '%s_vals' % name_base,
+                     'type': 'dtype_array',
+                     'length': len(datatype['properties'])},
+                    requires_freeing=requires_freeing)
+                for i, (k, v) in enumerate(datatype['properties'].items()):
+                    # Prevent recusion
+                    v_copy = copy.deepcopy(v)
+                    v_copy.pop('items', None)
+                    v_copy.pop('properties', None)
+                    out += cls.write_type_decl(
+                        None, x_copy,
+                        name_base=('%s_prop%d' % (name_base, i)),
+                        requires_freeing=requires_freeing,
+                        no_decl=True)
+        elif datatype['type'] == 'ndarray':
+            if 'shape' in datatype:
+                out += cls.write_declaration(
+                    {'name': '%s_shape' % name_base,
+                     'type': '1darray', 'subtype': 'int',
+                     'precision': 8, 'length': len(datatype['shape'])},
+                    requires_freeing=requires_freeing)
+        elif datatype['type'] in ['ply', 'obj', '1darray',
+                                  'scalar', 'boolean', 'null',
+                                  'number', 'integer', 'string',
+                                  'class', 'function', 'instance',
+                                  'schema', 'any'] + list(_valid_types.keys()):
+            pass
+        else:  # pragma: debug
+            raise ValueError(("Cannot create %s version of type "
+                              "'%s'") % (cls.language, datatype['type']))
+        if not no_decl:
+            out += cls.write_declaration(
+                {'name': name, 'type': 'dtype'})
+        return out
+
+    @classmethod
+    def write_type_def(cls, name, datatype, name_base=None,
+                       use_generic=False):
+        r"""Get lines declaring the data type within the language.
+
+        Args:
+            name (str): Name of variable that definition should be stored in.
+            datatype (dict): Type definition.
+            use_generic (bool, optional): If True variables serialized
+                and/or deserialized by the type will be assumed to be
+                generic objects. Defaults to False.
+
+        Returns:
+            list: Lines required to define a type definition.
+
+        """
+        out = []
+        fmt = None
+        keys = {}
+        if use_generic:
+            keys['use_generic'] = cls.function_param['true']
+        else:
+            keys['use_generic'] = cls.function_param['false']
+        typename = datatype['type']
+        if name_base is None:
+            name_base = name
+        if datatype['type'] == 'array':
+            if 'items' in datatype:
+                assert(isinstance(datatype['items'], list))
+                keys['nitems'] = len(datatype['items'])
+                keys['items'] = '%s_items' % name_base
+                if cls.zero_based:
+                    idx_offset = 0
+                else:
+                    idx_offset = 1
+                for i, x in enumerate(datatype['items']):
+                    # Prevent recusion
+                    x_copy = copy.deepcopy(x)
+                    x_copy.pop('items', None)
+                    x_copy.pop('properties', None)
+                    out += cls.write_type_def(
+                        cls.format_function_param(
+                            'index', variable=keys['items'],
+                            index=(i + idx_offset)), x_copy,
+                        name_base=('%s_item%d' % (name_base, i)),
+                        use_generic=use_generic)
+            else:
+                keys['nitems'] = 0
+                keys['items'] = cls.function_param['null']
+                keys['use_generic'] = cls.function_param['true']
+        elif datatype['type'] == 'object':
+            keys['use_generic'] = cls.function_param['true']
+            if 'properties' in datatype:
+                assert(isinstance(datatype['properties'], dict))
+                keys['nitems'] = len(datatype['properties'])
+                keys['keys'] = '%s_keys' % name_base
+                keys['values'] = '%s_vals' % name_base
+                if cls.zero_based:
+                    idx_offset = 0
+                else:
+                    idx_offset = 1
+                for i, (k, v) in enumerate(datatype['properties'].items()):
+                    # Prevent recusion
+                    v_copy = copy.deepcopy(v)
+                    v_copy.pop('items', None)
+                    v_copy.pop('properties', None)
+                    out.append(cls.format_function_param(
+                        'assign', value='\"%s\"' % k,
+                        name=cls.format_function_param(
+                            'index', variable=keys['keys'],
+                            index=(i + idx_offset))))
+                    out += cls.write_type_def(
+                        cls.format_function_param(
+                            'index', variable=keys['values'],
+                            index=(i + idx_offset)), v_copy,
+                        name_base=('%s_prop%d' % (name_base, i)),
+                        use_generic=use_generic)
+            else:
+                keys['nitems'] = 0
+                keys['keys'] = cls.function_param['null']
+                keys['values'] = cls.function_param['null']
+        elif datatype['type'] in ['ply', 'obj']:
+            pass
+        elif datatype['type'] == '1darray':
+            for k in ['subtype', 'precision']:
+                keys[k] = datatype[k]
+            keys['length'] = datatype.get('length', '0')
+            keys['units'] = datatype.get('units', '')
+        elif datatype['type'] == 'ndarray':
+            for k in ['subtype', 'precision']:
+                keys[k] = datatype[k]
+            if 'shape' in datatype:
+                shape_var = '%s_shape' % name_base
+                # TODO: Make generic
+                for i, x in enumerate(datatype['shape']):
+                    out.append(cls.format_function_param(
+                        'assign', value=x,
+                        name=cls.format_function_param(
+                            'index', variable=shape_var,
+                            index=(i + idx_offset))))
+                keys['ndim'] = len(datatype['shape'])
+                keys['shape'] = shape_var
+                typename = 'ndarray_arr'
+            else:
+                keys['ndim'] = 0
+                keys['shape'] = cls.function_param['null']
+            keys['units'] = datatype.get('units', '')
+        elif (typename == 'scalar') or (typename in _valid_types):
+            keys['subtype'] = datatype.get('subtype', datatype['type'])
+            keys['units'] = datatype.get('units', '')
+            if keys['subtype'] in ['bytes', 'string', 'unicode']:
+                keys['precision'] = datatype.get('precision', 0)
+            else:
+                keys['precision'] = datatype['precision']
+            typename = 'scalar'
+        elif datatype['type'] in ['boolean', 'null', 'number',
+                                  'integer', 'string']:
+            keys['type'] = datatype['type']
+            typename = 'default'
+        elif (typename in ['class', 'function']):
+            keys['type'] = typename
+            typename = 'pyobj'
+        elif typename in ['instance', 'any']:
+            keys['use_generic'] = 'true'
+            typename = 'empty'
+        elif typename in ['schema']:
+            keys['use_generic'] = 'true'
+        else:  # pragma: debug
+            raise ValueError("Cannot create %s version of type '%s'"
+                             % (cls.language, typename))
+        fmt = cls.format_function_param('init_type_%s' % typename, **keys)
+        print('init_type_%s' % typename, keys, fmt)
+        out.append(cls.format_function_param('assign', name=name,
+                                             value=fmt))
+        return out
+
+    @classmethod
     def write_channel_def(cls, key, datatype=None, **kwargs):
-        r"""Write an channel declaration/definition.
+        r"""Write an channel definition.
 
         Args:
             key (str): Entry in cls.function_param that should be used.
@@ -1708,6 +1978,12 @@ class ModelDriver(Driver):
             list: Lines required to declare and define an output channel.
 
         """
+        out = []
+        if (datatype is not None) and ('{channel_type}' in cls.function_param[key]):
+            kwargs['channel_type'] = '%s_type' % kwargs['channel']
+            out += cls.write_type_def(
+                kwargs['channel_type'], datatype,
+                use_generic=kwargs.get('use_generic', False))
         dir_map = {'input': 'recv', 'output': 'send'}
         try_keys = [dir_map[key] + '_converter', 'transform']
         try_vals = []
@@ -1737,7 +2013,7 @@ class ModelDriver(Driver):
                         "unicode_escape").decode('utf-8')
                 else:
                     key = 'python_interface'
-        out = [cls.format_function_param(key, **kwargs)]
+        out += [cls.format_function_param(key, **kwargs)]
         return out
 
     @classmethod
@@ -2027,7 +2303,7 @@ checking if the model flag indicates
                            outputs_in_inputs=False,
                            opening_msg=None, closing_msg=None,
                            print_inputs=False, print_outputs=False,
-                           skip_interface=False,
+                           skip_interface=False, function_keys=None,
                            **kwargs):
         r"""Write a function definition.
 
@@ -2064,6 +2340,10 @@ checking if the model flag indicates
                 False.
             skip_interface (bool, optional): If True, the line including
                 the interface will be skipped. Defaults to False.
+            function_keys (tuple, optional): 2 element tuple that
+                specifies the keys for the function_param entries that
+                should be used to begin & end a function definition.
+                Defaults to ('function_def_begin', function_def_end').
             **kwargs: Additional keyword arguments are passed to
                 cls.format_function_param.
 
@@ -2078,13 +2358,18 @@ checking if the model flag indicates
         if cls.function_param is None:
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
+        if function_keys is None:
+            function_keys = ('function_def_begin', 'function_def_end')
         out = []
+        interface_lines = []
         if ('interface' in cls.function_param) and (not skip_interface):
             ygglib = cls.interface_library
             if ygglib in cls.internal_libraries:
                 ygglib = cls.internal_libraries[ygglib]['source']
-            out.append(cls.format_function_param('interface',
-                                                 interface_library=ygglib))
+            interface_lines.append(cls.format_function_param(
+                'interface', interface_library=ygglib))
+        if not cls.import_inside_exec:
+            out += interface_lines
         flag_var = {}
         if input_var is None:
             input_var = cls.prepare_input_variables(
@@ -2103,6 +2388,7 @@ checking if the model flag indicates
                 print_output_lines += cls.write_print_output_var(
                     x, prefix_msg=('OUTPUT[%s]:' % x['name']),
                     in_inputs=outputs_in_inputs)
+        old_outputs = []
         if outputs_in_inputs:
             if output_var:
                 input_var = cls.prepare_input_variables(
@@ -2111,15 +2397,23 @@ checking if the model flag indicates
             if isinstance(flag_var, str):
                 flag_var = {'name': flag_var}
             flag_var.setdefault('datatype', 'flag')
-            flag_var.setdefault('value', cls.function_param['true'])
+            flag_var.setdefault('value', cls.function_param.get(
+                'true_flag', cls.function_param['true']))
+            old_outputs = outputs
             outputs = [flag_var]
             output_var = cls.prepare_output_variables(outputs)
         out.append(cls.format_function_param(
-            'function_def_begin', function_name=function_name,
+            function_keys[0], function_name=function_name,
             input_var=input_var, output_var=output_var, **kwargs))
+        if cls.import_inside_exec:
+            out += [cls.function_param['indent'] + x
+                    for x in interface_lines]
         free_vars = []
         if 'declare' in cls.function_param:
-            for o in outputs:
+            decl_list = copy.copy(outputs)
+            if not cls.types_in_funcdef:
+                decl_list += inputs + old_outputs
+            for o in decl_list:
                 out += [cls.function_param['indent'] + x for
                         x in cls.write_declaration(
                             o, requires_freeing=free_vars)]
@@ -2154,8 +2448,11 @@ checking if the model flag indicates
             out.append(cls.function_param['indent']
                        + cls.format_function_param(
                            'return', output_var=output_var))
-        out.append(cls.function_param.get(
-            'function_def_end', cls.function_param['block_end']))
+        if function_keys[1] in cls.function_param:
+            out.append(cls.format_function_param(
+                function_keys[1], function_name=function_name))
+        else:
+            out.append(cls.function_param.get('block_end', ''))
         return out
 
     @classmethod
@@ -2197,9 +2494,13 @@ checking if the model flag indicates
             narg = len(cls.split_variables(kwargs['input_var']))
             kwargs['input_var'] = cls.prepare_input_variables(
                 [str(narg), kwargs['input_var']])
-        call_str = cls.format_function_param(
-            'function_call', default='{function_name}({input_var})',
-            function_name=function_name, **kwargs)
+        if (nout == 0) and ('function_call_noout' in cls.function_param):
+            call_str = cls.format_function_param(
+                'function_call_noout', function_name=function_name, **kwargs)
+        else:
+            call_str = cls.format_function_param(
+                'function_call', default='{function_name}({input_var})',
+                function_name=function_name, **kwargs)
         if nout == 0:
             out = [call_str + cls.function_param.get('line_end', '')]
         elif (nout > 1) and ('assign_mult' in cls.function_param):
@@ -2259,7 +2560,8 @@ checking if the model flag indicates
             for x in lines:
                 out.append(cls.function_param['indent'] + x)
             out.append(cls.function_param.get('exec_end',
-                                              cls.function_param['block_end']))
+                                              cls.function_param.get(
+                                                  'block_end', '')))
         else:
             out += lines
         if out[-1]:
@@ -2662,7 +2964,8 @@ checking if the model flag indicates
                 out.append(cls.function_param['indent'] + x)
         # Close block
         out.append(cls.function_param.get('if_end',
-                                          cls.function_param['block_end']))
+                                          cls.function_param.get(
+                                              'block_end', '')))
         return out
                    
     @classmethod
@@ -2695,7 +2998,8 @@ checking if the model flag indicates
             out.append(cls.function_param['indent'] + x)
         # Close block
         out.append(cls.function_param.get('for_end',
-                                          cls.function_param['block_end']))
+                                          cls.function_param.get(
+                                              'block_end', '')))
         return out
 
     @classmethod
@@ -2724,7 +3028,8 @@ checking if the model flag indicates
             out.append(cls.function_param['indent'] + x)
         # Close block
         out.append(cls.function_param.get('while_end',
-                                          cls.function_param['block_end']))
+                                          cls.function_param.get(
+                                              'block_end', '')))
         return out
 
     @classmethod
@@ -2768,5 +3073,6 @@ checking if the model flag indicates
             out.append(cls.function_param['indent'] + x)
         # Close block
         out.append(cls.function_param.get('try_end',
-                                          cls.function_param['block_end']))
+                                          cls.function_param.get(
+                                              'block_end', '')))
         return out

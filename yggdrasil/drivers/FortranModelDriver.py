@@ -1,4 +1,5 @@
 import os
+import re
 import copy
 from collections import OrderedDict
 from yggdrasil import platform, tools
@@ -6,6 +7,8 @@ from yggdrasil.languages import get_language_dir
 from yggdrasil.drivers import CModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (
     CompilerBase, CompiledModelDriver)
+from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
+    _valid_types)
 
 
 _top_lang_dir = get_language_dir('fortran')
@@ -98,7 +101,7 @@ class FortranModelDriver(CompiledModelDriver):
                 
     _schema_subtype_description = ('Model is written in Fortran.')
     language = 'fortran'
-    language_ext = ['.f77', '.f90', '.f', '.h']
+    language_ext = ['.f90', '.f77', '.f', '.h']
     base_languages = ['c']
     interface_library = 'fygg'
     # To prevent inheritance
@@ -133,38 +136,83 @@ class FortranModelDriver(CompiledModelDriver):
                          _c_internal_libs['ygg']['external_dependencies']]),
                     'include_dirs': [_incl_interface]})
     type_map = {
+        'comm': 'yggcomm',
+        'dtype': 'yggdtype',
         'int': 'integer(kind = X)',
-        'float': 'real',
+        'float': 'real(kind = X)',
         'string': 'character',
-        'array': None,
-        'object': None,
+        'array': 'yggarr',
+        'object': 'yggmap',
+        'integer': 'integer',
         'boolean': 'logical',
-        'null': None,
-        'uint': None,
+        'null': 'yggnull',
+        'uint': 'integer(kind = X)',  # Fortran has no unsigned int
         'complex': 'complex(kind = X)',
         'bytes': 'character',
-        'unicode': None,
-        
-    }
+        'unicode': 'character',
+        '1darray': '*',  # '{type}(kind = X), dimension({size})',
+        'ndarray': '*',  # '{type}(kind = X), dimension({shape})',
+        'ply': 'yggply',
+        'obj': 'yggobj',
+        'schema': 'yggschema',
+        'flag': 'logical',
+        'class': 'yggpyfunc',
+        'instance': 'yggpyinst',
+        'any': 'ygggeneric'}
     function_param = {
         'import_nofile': 'use {function}',
         'index': '{variable}({index})',
-        'interface': 'use {interface_library}',
-        'input': None,
-        'output': None,
+        'interface': 'use fygg',
+        'input': ('{channel} = ygg_input_type('
+                  '\"{channel_name}\", {channel_type})'),
+        'output': ('{channel} = ygg_output_type('
+                   '\"{channel_name}\", {channel_type})'),
+        'recv_heap': 'ygg_recv_var_realloc',
+        'recv_stack': 'ygg_recv_var',
+        'recv_function': 'ygg_recv_var_realloc',
+        'send_function': 'ygg_send_var',
+        'not_flag_cond': '{flag_var}.lt.0',
+        'flag_cond': '{flag_var}.ge.0',
         'declare': '{type_name} :: {variable}',
+        'init_array': 'init_generic()',
+        'init_object': 'init_generic()',
+        'init_schema': 'init_generic()',
+        'init_ply': 'init_ply()',
+        'init_obj': 'init_obj()',
+        'init_class': 'init_python()',
+        'init_function': 'init_python()',
+        'init_instance': 'init_generic()',
+        'init_any': 'init_generic()',
+        'copy_array': '{name} = copy_generic({value})',
+        'copy_object': '{name} = copy_generic({value})',
+        'copy_schema': '{name} = copy_generic({value})',
+        'copy_ply': '{name} = copy_ply({value})',
+        'copy_obj': '{name} = copy_obj({value})',
+        'copy_class': '{name} = copy_python({value})',
+        'copy_function': '{name} = copy_python({value})',
+        'copy_instance': '{name} = copy_generic({value})',
+        'copy_any': '{name} = copy_generic({value})',
+        # Free?
+        'print_generic': 'write(*, *), {object}',
+        'print': 'write(*, \'(\"{message}\")\')',
+        'fprintf': 'write(*, \'(\"{message}\")\'), {variables}',
+        'print_ply': 'display_ply({object})',
+        'print_obj': 'display_obj({object})',
+        'print_class': 'display_python({object})',
+        'print_function': 'display_python({object})',
+        'print_instance': 'display_generic({object})',
+        'print_any': 'display_generic({object})',
         'assign': '{name} = {value}',
         'comment': '!',
         'true': '.true.',
         'false': '.false.',
+        'null': 'c_null_ptr',
         'not': '.not.',
         'and': '.and.',
         'or': '.or.',
         'indent': 3 * ' ',
         'quote': "'",
-        'print': "print *, '{message}'",
-        'fprintf': "Print \"{message}\", {variables}",
-        'error': "print *, '{message}'\n return",
+        'error': "write(*, \'(\"{error_msg}\")\'); call exit(-1)",
         # 'block_end': 'END {block_type}',
         'if_begin': 'IF ({cond}) THEN',
         'if_elif': 'ELSE IF ({cond}) THEN',
@@ -175,25 +223,41 @@ class FortranModelDriver(CompiledModelDriver):
         'while_begin': 'DO WHILE ({cond})',
         'while_end': 'END DO',
         'break': 'EXIT',
-        'exec_begin': ['PROGRAM main', '   implicit none'],
-        'exec_end': 'END PROGRAM main',
+        'exec_begin': 'PROGRAM main\n   use iso_c_binding\n   implicit none',
+        'exec_end': '   call exit(0)\nEND PROGRAM main',
         'free': 'DEALLOCATE({variable})',
-        'function_def_begin': [
-            'SUBROUTINE {function_name}({input_var}, {output_var})',
-            '   {input_type} :: {input_var}',
-            '   {output_type} :: {output_var}'],
-        'return': 'return',
+        'function_def_begin': (
+            'FUNCTION {function_name}({input_var}) '
+            'result({output_var})'),
+        'function_def_end': 'END FUNCTION {function_name}',
+        'subroutine_def_begin': (
+            'SUBROUTINE {function_name}({input_var}) '),
+        'subroutine_def_end': 'END SUBROUTINE {function_name}',
+        'function_call_noout': 'call {function_name}({input_var})',
         'function_def_regex': (
             r'(?P<procedure_type>(?i:(?:subroutine)|(?:function)))\s+'
             r'{function_name}\s*\((?P<inputs>(?:[^\(]*?))\)\s*'
-            r'(?:result\s*\({outputs}\))?\s*\n'
+            r'(?:result\s*\((?P<flag_var>.+)\))?\s*\n'
+            r'(?P<preamble>(?:[^:]*?\n)*?)'
+            r'(?P<definitions>(?:(?:(?: )|(?:.))+\s*::\s*(?:.+)\n)+)'
             r'(?P<body>(?:.*?\n?)*?)'
-            r'(?i:end\s+(?P=procedure_type))\s+{function_name}')
+            r'(?i:end\s+(?P=procedure_type))\s+{function_name}'),
+        'definition_regex': (
+            r'\s*(?P<type>(?:(?: )|(?:.))+)\s*::\s*(?P<name>.+)'
+            r'(?:\s*=\s*(?P<value>.+))?\n'),
+        'inputs_def_regex': (
+            r'\s*(?P<name>.+?)\s*(?:,|$)(?:\n)?'),
+        'outputs_def_regex': (
+            r'\s*(?P<name>.+?)\s*(?:,|$)(?:\n)?')
     }
     outputs_in_inputs = True
     include_arg_count = True
     include_channel_obj = True
     is_typed = True
+    types_in_funcdef = False
+    import_inside_exec = True
+    declare_functions_as_var = True
+    zero_based = False
     
     def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
@@ -249,3 +313,141 @@ class FortranModelDriver(CompiledModelDriver):
             commtype = tools.get_default_comm()
         out += '_%s' % commtype[:3].lower()
         return out
+
+    @classmethod
+    def get_native_type(cls, **kwargs):
+        r"""Get the native type.
+
+        Args:
+            type (str, optional): Name of |yggdrasil| extended JSON
+                type or JSONSchema dictionary defining a datatype.
+            **kwargs: Additional keyword arguments may be used in determining
+                the precise declaration that should be used.
+
+        Returns:
+            str: The native type.
+
+        """
+        out = super(FortranModelDriver, cls).get_native_type(**kwargs)
+        if not ((out == '*') or ('X' in out)):
+            return out
+        from yggdrasil.metaschema.datatypes import get_type_class
+        json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
+        if isinstance(json_type, str):
+            json_type = {'type': json_type}
+        assert(isinstance(json_type, dict))
+        json_type = get_type_class(json_type['type']).normalize_definition(
+            json_type)
+        if out == '*':
+            dim_str = ''
+            if json_type['type'] == '1darray':
+                dim_str = ', dimension(%s)' % str(
+                    json_type.get('length', ':'))
+            elif json_type['type'] == 'ndarray':
+                if 'shape' in json_type:
+                    dim_str = ', dimension(%s)' % ','.join(
+                        [str(x) for x in json_type['shape']])
+                elif 'ndim' in json_type:
+                    dim_str = ', dimension(%s)' % ','.join(
+                        json_type['ndim'] * [':'])
+            json_subtype = copy.deepcopy(json_type)
+            json_subtype['type'] = json_subtype.pop('subtype')
+            out = cls.get_native_type(datatype=json_subtype) + dim_str
+        elif 'X' in out:
+            precision = json_type['precision']
+            out = out.replace('X', str(int(precision / 8)))
+        return out
+        
+    @classmethod
+    def get_json_type(cls, native_type):
+        r"""Get the JSON type from the native language type.
+
+        Args:
+            native_type (str): The native language type.
+
+        Returns:
+            str, dict: The JSON type.
+
+        """
+        out = {}
+        regex_var = (r'(type\()?(?P<type>[^,\(]+)(?(1)(?:\)))'
+                     r'(?:\s*\(\s*'
+                     r'(?:kind\s*=\s*(?P<precision>\d*))?,?'
+                     r'(?:len\s*=\s*(?P<length>\d*))?'
+                     r'\))?'
+                     r'(?:\s*,\s*dimension\((?P<shape>.*?)\))?'
+                     r'(?:\s*,\s*(?P<pointer>pointer))?'
+                     r'(?:\s*,\s*(?P<allocatable>allocatable))?'
+                     r'(?:\s*,\s*(?P<parameter>parameter))?'
+                     r'(?:\s*,\s*intent\((?P<intent>.*?)\))?')
+        grp = re.fullmatch(regex_var, native_type).groupdict()
+        if grp.get('precision', False):
+            out['precision'] = 8 * int(grp['precision'])
+            grp['type'] += '(kind = X)'
+        if grp['type'] == 'character':
+            out['type'] = 'bytes'
+            out['precision'] = grp.get('length', 0)
+        else:
+            out['type'] = super(FortranModelDriver, cls).get_json_type(grp['type'])
+        if grp.get('shape', False):
+            ndim = len(grp['shape'].split(','))
+            out['subtype'] = out['type']
+            if ndim == 1:
+                out['type'] = '1darray'
+            else:
+                out['type'] = 'ndarray'
+        if out['type'] in _valid_types:
+            out['subtype'] = out['type']
+            out['type'] = 'scalar'
+        return out
+
+    @classmethod
+    def parse_function_definition(cls, model_file, model_function, **kwargs):
+        r"""Get information about the inputs & outputs to a model from its
+        defintition if possible.
+
+        Args:
+            model_file (str): Full path to the file containing the model
+                function's declaration.
+            model_function (str): Name of the model function.
+            **kwargs: Additional keyword arugments are passed to the parent
+                class's method.
+
+        Returns:
+            dict: Parameters extracted from the function definitions.
+
+        """
+        out = super(FortranModelDriver, cls).parse_function_definition(
+            model_file, model_function, **kwargs)
+        var_type_map = {}
+        for x in re.finditer(cls.function_param['definition_regex'],
+                             out['definitions']):
+            x_vars = [v.strip() for v in
+                      x.groupdict()['name'].split(',')]
+            for v in x_vars:
+                var_type_map[v] = x.groupdict()['type']
+        for x in out.get('inputs', []) + out.get('outputs', []):
+            x['native_type'] = var_type_map[x['name']].strip()
+            x['datatype'] = cls.get_json_type(x['native_type'])
+        return out
+
+    @classmethod
+    def write_function_def(cls, function_name, **kwargs):
+        r"""Write a function definition.
+
+        Args:
+            function_name (str): Name fo the function being defined.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: Lines completing the function call.
+
+        """
+        if (((not kwargs.get('outputs_in_inputs', False))
+             and (len(kwargs.get('outputs', [])) == 0))):
+            kwargs.setdefault(
+                'function_keys',
+                ('subroutine_def_begin', 'subroutine_def_end'))
+        return super(FortranModelDriver, cls).write_function_def(
+            function_name, **kwargs)

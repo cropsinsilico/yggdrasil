@@ -318,11 +318,14 @@ class CModelDriver(CompiledModelDriver):
                                                 'python', 'numpy'],
                       'include_dirs': []}}
     type_map = {
+        'comm': 'comm_t*',
+        'dtype': 'dtype_t*',
         'int': 'intX_t',
         'float': 'double',
         'string': 'string_t',
         'array': 'json_array_t',
         'object': 'json_object_t',
+        'integer': 'int',
         'boolean': 'bool',
         'null': 'void*',
         'uint': 'uintX_t',
@@ -339,13 +342,14 @@ class CModelDriver(CompiledModelDriver):
         'function': 'python_function_t',
         'instance': 'python_instance_t',
         'any': 'generic_t'}
+    type_class_map = {}
     function_param = {
         'import': '#include \"{filename}\"',
         'index': '{variable}[{index}]',
         'interface': '#include \"{interface_library}\"',
-        'input': ('yggInput_t {channel} = yggInputType('
+        'input': ('{channel} = yggInputType('
                   '\"{channel_name}\", {channel_type});'),
-        'output': ('yggOutput_t {channel} = yggOutputType('
+        'output': ('{channel} = yggOutputType('
                    '\"{channel_name}\", {channel_type});'),
         'recv_heap': 'yggRecvRealloc',
         'recv_stack': 'yggRecv',
@@ -363,6 +367,30 @@ class CModelDriver(CompiledModelDriver):
         'init_function': 'init_python()',
         'init_instance': 'init_generic()',
         'init_any': 'init_generic()',
+        'init_type_array': ('create_dtype_json_array({nitems}, '
+                            '{items}, {use_generic})'),
+        'init_type_object': ('create_dtype_json_object({nitems}, '
+                             '{keys}, {values}, {use_generic})'),
+        'init_type_ply': 'create_dtype_ply({use_generic})',
+        'init_type_obj': 'create_dtype_obj({use_generic})',
+        'init_type_1darray': ('create_dtype_1darray(\"{subtype}\", '
+                              '{precision}, {length}, \"{units}\", '
+                              '{use_generic})'),
+        'init_type_ndarray': ('create_dtype_ndarray(\"{subtype}\", '
+                              '{precision}, {ndim}, {shape}, '
+                              '\"{units}\", {use_generic})'),
+        'init_type_ndarray_arr': ('create_dtype_ndarray(\"{subtype}\", '
+                                  '{precision}, {ndim}, {shape}, '
+                                  '\"{units}\", {use_generic})'),
+        'init_type_scalar': ('create_dtype_scalar(\"{subtype}\", '
+                             '{precision}, \"{units}\", '
+                             '{use_generic})'),
+        'init_type_default': ('create_dtype_default(\"{type}\", '
+                              '{use_generic})'),
+        'init_type_pyobj': ('create_dtype_pyobj(\"{type}\", '
+                            '{use_generic})'),
+        'init_type_empty': ('create_dtype_empty({use_generic})'),
+        'init_type_schema': ('create_dtype_schema({use_generic})'),
         'copy_array': '{name} = copy_json_array({value});',
         'copy_object': '{name} = copy_json_object({value});',
         'copy_schema': '{name} = copy_schema({value});',
@@ -400,8 +428,11 @@ class CModelDriver(CompiledModelDriver):
         'assign': '{name} = {value};',
         'assign_copy': 'memcpy({name}, {value}, {N}*sizeof({native_type}));',
         'comment': '//',
-        'true': '1',
-        'false': '0',
+        'true': 'true',
+        'false': 'false',
+        'true_flag': '1',
+        'false_flag': '0',
+        'null': 'NULL',
         'not': '!',
         'and': '&&',
         'indent': 2 * ' ',
@@ -1376,188 +1407,188 @@ class CModelDriver(CompiledModelDriver):
         return super(CModelDriver, cls).write_function_def(
             function_name, **kwargs)
         
-    @classmethod
-    def write_native_type_definition(cls, name, datatype, name_base=None,
-                                     requires_freeing=None, no_decl=False,
-                                     use_generic=False):
-        r"""Get lines declaring the data type within the language.
+    # @classmethod
+    # def write_native_type_definition(cls, name, datatype, name_base=None,
+    #                                  requires_freeing=None, no_decl=False,
+    #                                  use_generic=False):
+    #     r"""Get lines declaring the data type within the language.
 
-        Args:
-            name (str): Name of variable that definition should be stored in.
-            datatype (dict): Type definition.
-            requires_freeing (list, optional): List that variables requiring
-                freeing should be appended to. Defaults to None.
-            no_decl (bool, optional): If True, the variable is defined without
-                declaring it (assumes that variable has already been declared).
-                Defaults to False.
-            use_generic (bool, optional): If True variables serialized
-                and/or deserialized by the type will be assumed to be
-                generic objects. Defaults to False.
+    #     Args:
+    #         name (str): Name of variable that definition should be stored in.
+    #         datatype (dict): Type definition.
+    #         requires_freeing (list, optional): List that variables requiring
+    #             freeing should be appended to. Defaults to None.
+    #         no_decl (bool, optional): If True, the variable is defined without
+    #             declaring it (assumes that variable has already been declared).
+    #             Defaults to False.
+    #         use_generic (bool, optional): If True variables serialized
+    #             and/or deserialized by the type will be assumed to be
+    #             generic objects. Defaults to False.
 
-        Returns:
-            list: Lines required to define a type definition.
+    #     Returns:
+    #         list: Lines required to define a type definition.
 
-        """
-        out = []
-        fmt = None
-        keys = {}
-        if use_generic:
-            keys['use_generic'] = 'true'
-        else:
-            keys['use_generic'] = 'false'
-        typename = datatype['type']
-        if name_base is None:
-            name_base = name
-        if datatype['type'] == 'array':
-            if 'items' in datatype:
-                assert(isinstance(datatype['items'], list))
-                keys['nitems'] = len(datatype['items'])
-                keys['items'] = '%s_items' % name_base
-                fmt = ('create_dtype_json_array({nitems}, {items}, '
-                       '{use_generic})')
-                out += [('dtype_t** %s = '
-                         '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
-                        % (keys['items'], keys['nitems'])]
-                for i, x in enumerate(datatype['items']):
-                    # Prevent recusion
-                    x_copy = copy.deepcopy(x)
-                    x_copy.pop('items', None)
-                    x_copy.pop('properties', None)
-                    out += cls.write_native_type_definition(
-                        '%s[%d]' % (keys['items'], i), x_copy,
-                        name_base=('%s_item%d' % (name_base, i)),
-                        requires_freeing=requires_freeing, no_decl=True,
-                        use_generic=use_generic)
-                assert(isinstance(requires_freeing, list))
-                requires_freeing += [keys['items']]
-            else:
-                keys['use_generic'] = 'true'
-                fmt = ('create_dtype_json_array(0, NULL, '
-                       '{use_generic})')
-        elif datatype['type'] == 'object':
-            keys['use_generic'] = 'true'
-            if 'properties' in datatype:
-                assert(isinstance(datatype['properties'], dict))
-                keys['nitems'] = len(datatype['properties'])
-                keys['keys'] = '%s_keys' % name_base
-                keys['values'] = '%s_vals' % name_base
-                fmt = ('create_dtype_json_object({nitems}, {keys}, '
-                       '{values}, {use_generic})')
-                out += [('dtype_t** %s = '
-                         '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
-                        % (keys['values'], keys['nitems']),
-                        ('char** %s = (char**)malloc(%d*sizeof(char*));')
-                        % (keys['keys'], keys['nitems'])]
-                for i, (k, v) in enumerate(datatype['properties'].items()):
-                    # Prevent recusion
-                    v_copy = copy.deepcopy(v)
-                    v_copy.pop('items', None)
-                    v_copy.pop('properties', None)
-                    out += ['%s[%d] = \"%s\";' % (keys['keys'], i, k)]
-                    out += cls.write_native_type_definition(
-                        '%s[%d]' % (keys['values'], i), v_copy,
-                        name_base=('%s_prop%d' % (name_base, i)),
-                        requires_freeing=requires_freeing, no_decl=True,
-                        use_generic=use_generic)
-                assert(isinstance(requires_freeing, list))
-                requires_freeing += [keys['values'], keys['keys']]
-            else:
-                fmt = ('create_dtype_json_object(0, NULL, NULL, '
-                       '{use_generic})')
-        elif datatype['type'] in ['ply', 'obj']:
-            fmt = 'create_dtype_%s({use_generic})' % datatype['type']
-        elif datatype['type'] == '1darray':
-            fmt = ('create_dtype_1darray(\"{subtype}\", {precision}, {length}, '
-                   '\"{units}\", {use_generic})')
-            for k in ['subtype', 'precision']:
-                keys[k] = datatype[k]
-            keys['length'] = datatype.get('length', '0')
-            keys['units'] = datatype.get('units', '')
-        elif datatype['type'] == 'ndarray':
-            fmt = ('create_dtype_ndarray(\"{subtype}\", {precision},'
-                   ' {ndim}, {shape}, \"{units}\", {use_generic})')
-            for k in ['subtype', 'precision']:
-                keys[k] = datatype[k]
-            if 'shape' in datatype:
-                shape_var = '%s_shape' % name_base
-                out += ['size_t %s[%d] = {%s};' % (
-                    shape_var, len(datatype['shape']),
-                    ', '.join([str(s) for s in datatype['shape']]))]
-                keys['ndim'] = len(datatype['shape'])
-                keys['shape'] = shape_var
-                fmt = fmt.replace('create_dtype_ndarray',
-                                  'create_dtype_ndarray_arr')
-            else:
-                keys['ndim'] = 0
-                keys['shape'] = 'NULL'
-            keys['units'] = datatype.get('units', '')
-        elif (typename == 'scalar') or (typename in _valid_types):
-            fmt = ('create_dtype_scalar(\"{subtype}\", {precision}, '
-                   '\"{units}\", {use_generic})')
-            keys['subtype'] = datatype.get('subtype', datatype['type'])
-            keys['units'] = datatype.get('units', '')
-            if keys['subtype'] in ['bytes', 'string', 'unicode']:
-                keys['precision'] = datatype.get('precision', 0)
-            else:
-                keys['precision'] = datatype['precision']
-            typename = 'scalar'
-        elif datatype['type'] in ['boolean', 'null', 'number',
-                                  'integer', 'string']:
-            fmt = 'create_dtype_default(\"{type}\", {use_generic})'
-            keys['type'] = datatype['type']
-        elif (typename in ['class', 'function']):
-            fmt = 'create_dtype_pyobj(\"{type}\", {use_generic})'
-            keys['type'] = typename
-        elif typename == 'instance':
-            keys['use_generic'] = 'true'
-            # fmt = 'create_dtype_pyinst(NULL, NULL)'
-            fmt = 'create_dtype_empty({use_generic})'
-        elif typename == 'schema':
-            keys['use_generic'] = 'true'
-            fmt = 'create_dtype_schema({use_generic})'
-        elif typename == 'any':
-            keys['use_generic'] = 'true'
-            fmt = 'create_dtype_empty({use_generic})'
-        else:  # pragma: debug
-            raise ValueError("Cannot create C version of type '%s'"
-                             % typename)
-        def_line = '%s = %s;' % (name, fmt.format(**keys))
-        if not no_decl:
-            def_line = 'dtype_t* ' + def_line
-        out.append(def_line)
-        return out
+    #     """
+    #     out = []
+    #     fmt = None
+    #     keys = {}
+    #     if use_generic:
+    #         keys['use_generic'] = 'true'
+    #     else:
+    #         keys['use_generic'] = 'false'
+    #     typename = datatype['type']
+    #     if name_base is None:
+    #         name_base = name
+    #     if datatype['type'] == 'array':
+    #         if 'items' in datatype:
+    #             assert(isinstance(datatype['items'], list))
+    #             keys['nitems'] = len(datatype['items'])
+    #             keys['items'] = '%s_items' % name_base
+    #             fmt = ('create_dtype_json_array({nitems}, {items}, '
+    #                    '{use_generic})')
+    #             out += [('dtype_t** %s = '
+    #                      '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
+    #                     % (keys['items'], keys['nitems'])]
+    #             for i, x in enumerate(datatype['items']):
+    #                 # Prevent recusion
+    #                 x_copy = copy.deepcopy(x)
+    #                 x_copy.pop('items', None)
+    #                 x_copy.pop('properties', None)
+    #                 out += cls.write_native_type_definition(
+    #                     '%s[%d]' % (keys['items'], i), x_copy,
+    #                     name_base=('%s_item%d' % (name_base, i)),
+    #                     requires_freeing=requires_freeing, no_decl=True,
+    #                     use_generic=use_generic)
+    #             assert(isinstance(requires_freeing, list))
+    #             requires_freeing += [keys['items']]
+    #         else:
+    #             keys['use_generic'] = 'true'
+    #             fmt = ('create_dtype_json_array(0, NULL, '
+    #                    '{use_generic})')
+    #     elif datatype['type'] == 'object':
+    #         keys['use_generic'] = 'true'
+    #         if 'properties' in datatype:
+    #             assert(isinstance(datatype['properties'], dict))
+    #             keys['nitems'] = len(datatype['properties'])
+    #             keys['keys'] = '%s_keys' % name_base
+    #             keys['values'] = '%s_vals' % name_base
+    #             fmt = ('create_dtype_json_object({nitems}, {keys}, '
+    #                    '{values}, {use_generic})')
+    #             out += [('dtype_t** %s = '
+    #                      '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
+    #                     % (keys['values'], keys['nitems']),
+    #                     ('char** %s = (char**)malloc(%d*sizeof(char*));')
+    #                     % (keys['keys'], keys['nitems'])]
+    #             for i, (k, v) in enumerate(datatype['properties'].items()):
+    #                 # Prevent recusion
+    #                 v_copy = copy.deepcopy(v)
+    #                 v_copy.pop('items', None)
+    #                 v_copy.pop('properties', None)
+    #                 out += ['%s[%d] = \"%s\";' % (keys['keys'], i, k)]
+    #                 out += cls.write_native_type_definition(
+    #                     '%s[%d]' % (keys['values'], i), v_copy,
+    #                     name_base=('%s_prop%d' % (name_base, i)),
+    #                     requires_freeing=requires_freeing, no_decl=True,
+    #                     use_generic=use_generic)
+    #             assert(isinstance(requires_freeing, list))
+    #             requires_freeing += [keys['values'], keys['keys']]
+    #         else:
+    #             fmt = ('create_dtype_json_object(0, NULL, NULL, '
+    #                    '{use_generic})')
+    #     elif datatype['type'] in ['ply', 'obj']:
+    #         fmt = 'create_dtype_%s({use_generic})' % datatype['type']
+    #     elif datatype['type'] == '1darray':
+    #         fmt = ('create_dtype_1darray(\"{subtype}\", {precision}, {length}, '
+    #                '\"{units}\", {use_generic})')
+    #         for k in ['subtype', 'precision']:
+    #             keys[k] = datatype[k]
+    #         keys['length'] = datatype.get('length', '0')
+    #         keys['units'] = datatype.get('units', '')
+    #     elif datatype['type'] == 'ndarray':
+    #         fmt = ('create_dtype_ndarray(\"{subtype}\", {precision},'
+    #                ' {ndim}, {shape}, \"{units}\", {use_generic})')
+    #         for k in ['subtype', 'precision']:
+    #             keys[k] = datatype[k]
+    #         if 'shape' in datatype:
+    #             shape_var = '%s_shape' % name_base
+    #             out += ['size_t %s[%d] = {%s};' % (
+    #                 shape_var, len(datatype['shape']),
+    #                 ', '.join([str(s) for s in datatype['shape']]))]
+    #             keys['ndim'] = len(datatype['shape'])
+    #             keys['shape'] = shape_var
+    #             fmt = fmt.replace('create_dtype_ndarray',
+    #                               'create_dtype_ndarray_arr')
+    #         else:
+    #             keys['ndim'] = 0
+    #             keys['shape'] = 'NULL'
+    #         keys['units'] = datatype.get('units', '')
+    #     elif (typename == 'scalar') or (typename in _valid_types):
+    #         fmt = ('create_dtype_scalar(\"{subtype}\", {precision}, '
+    #                '\"{units}\", {use_generic})')
+    #         keys['subtype'] = datatype.get('subtype', datatype['type'])
+    #         keys['units'] = datatype.get('units', '')
+    #         if keys['subtype'] in ['bytes', 'string', 'unicode']:
+    #             keys['precision'] = datatype.get('precision', 0)
+    #         else:
+    #             keys['precision'] = datatype['precision']
+    #         typename = 'scalar'
+    #     elif datatype['type'] in ['boolean', 'null', 'number',
+    #                               'integer', 'string']:
+    #         fmt = 'create_dtype_default(\"{type}\", {use_generic})'
+    #         keys['type'] = datatype['type']
+    #     elif (typename in ['class', 'function']):
+    #         fmt = 'create_dtype_pyobj(\"{type}\", {use_generic})'
+    #         keys['type'] = typename
+    #     elif typename == 'instance':
+    #         keys['use_generic'] = 'true'
+    #         # fmt = 'create_dtype_pyinst(NULL, NULL)'
+    #         fmt = 'create_dtype_empty({use_generic})'
+    #     elif typename == 'schema':
+    #         keys['use_generic'] = 'true'
+    #         fmt = 'create_dtype_schema({use_generic})'
+    #     elif typename == 'any':
+    #         keys['use_generic'] = 'true'
+    #         fmt = 'create_dtype_empty({use_generic})'
+    #     else:  # pragma: debug
+    #         raise ValueError("Cannot create C version of type '%s'"
+    #                          % typename)
+    #     def_line = '%s = %s;' % (name, fmt.format(**keys))
+    #     if not no_decl:
+    #         def_line = 'dtype_t* ' + def_line
+    #     out.append(def_line)
+    #     return out
 
-    @classmethod
-    def write_channel_def(cls, key, datatype=None, requires_freeing=None,
-                          use_generic=False, **kwargs):
-        r"""Write an channel declaration/definition.
+    # @classmethod
+    # def write_channel_def(cls, key, datatype=None, requires_freeing=None,
+    #                       use_generic=False, **kwargs):
+    #     r"""Write an channel declaration/definition.
 
-        Args:
-            key (str): Entry in cls.function_param that should be used.
-            datatype (dict, optional): Data type associated with the channel.
-                Defaults to None and is ignored.
-            requires_freeing (list, optional): List that variables requiring
-                freeing should be appended to. Defaults to None.
-            use_generic (bool, optional): If True variables serialized
-                and/or deserialized by the channel will be assumed to be
-                generic objects. Defaults to False.
-            **kwargs: Additional keyword arguments are passed as parameters
-                to format_function_param.
+    #     Args:
+    #         key (str): Entry in cls.function_param that should be used.
+    #         datatype (dict, optional): Data type associated with the channel.
+    #             Defaults to None and is ignored.
+    #         requires_freeing (list, optional): List that variables requiring
+    #             freeing should be appended to. Defaults to None.
+    #         use_generic (bool, optional): If True variables serialized
+    #             and/or deserialized by the channel will be assumed to be
+    #             generic objects. Defaults to False.
+    #         **kwargs: Additional keyword arguments are passed as parameters
+    #             to format_function_param.
 
-        Returns:
-            list: Lines required to declare and define an output channel.
+    #     Returns:
+    #         list: Lines required to declare and define an output channel.
 
-        """
-        out = []
-        if (datatype is not None) and ('{channel_type}' in cls.function_param[key]):
-            kwargs['channel_type'] = '%s_type' % kwargs['channel']
-            out += cls.write_native_type_definition(
-                kwargs['channel_type'], datatype,
-                requires_freeing=requires_freeing,
-                use_generic=use_generic)
-        out += super(CModelDriver, cls).write_channel_def(key, datatype=datatype,
-                                                          **kwargs)
-        return out
+    #     """
+    #     out = []
+    #     if (datatype is not None) and ('{channel_type}' in cls.function_param[key]):
+    #         kwargs['channel_type'] = '%s_type' % kwargs['channel']
+    #         out += cls.write_native_type_definition(
+    #             kwargs['channel_type'], datatype,
+    #             requires_freeing=requires_freeing,
+    #             use_generic=use_generic)
+    #     out += super(CModelDriver, cls).write_channel_def(key, datatype=datatype,
+    #                                                       **kwargs)
+    #     return out
 
     @classmethod
     def write_assign_to_output(cls, dst_var, src_var,
