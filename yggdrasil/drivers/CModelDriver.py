@@ -379,7 +379,7 @@ class CModelDriver(CompiledModelDriver):
         'init_type_ndarray': ('create_dtype_ndarray(\"{subtype}\", '
                               '{precision}, {ndim}, {shape}, '
                               '\"{units}\", {use_generic})'),
-        'init_type_ndarray_arr': ('create_dtype_ndarray(\"{subtype}\", '
+        'init_type_ndarray_arr': ('create_dtype_ndarray_arr(\"{subtype}\", '
                                   '{precision}, {ndim}, {shape}, '
                                   '\"{units}\", {use_generic})'),
         'init_type_scalar': ('create_dtype_scalar(\"{subtype}\", '
@@ -942,6 +942,8 @@ class CModelDriver(CompiledModelDriver):
         json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
         if isinstance(json_type, str):
             json_type = {'type': json_type}
+        if 'type' in kwargs:
+            json_type.update(kwargs)
         assert(isinstance(json_type, dict))
         json_type = get_type_class(json_type['type']).normalize_definition(
             json_type)
@@ -1132,8 +1134,9 @@ class CModelDriver(CompiledModelDriver):
         if var.get('allow_realloc', False):
             type_name += '*'
             var = dict(var, native_type=type_name)
-        if ((type_name.endswith('*')
-             or (type_name in ['bytes_t', 'string_t', 'unicode_t']))):
+        if (((type_name.endswith('*')
+              or (type_name in ['bytes_t', 'string_t', 'unicode_t']))
+             and (not type_name.startswith(('comm_t', 'dtype_t'))))):
             kwargs.get('requires_freeing', []).append(var)
             kwargs.setdefault('value', 'NULL')
         elif var.get('is_length_var', False):

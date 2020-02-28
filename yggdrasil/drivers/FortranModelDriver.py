@@ -183,6 +183,30 @@ class FortranModelDriver(CompiledModelDriver):
         'init_function': 'init_python()',
         'init_instance': 'init_generic()',
         'init_any': 'init_generic()',
+        'init_type_array': ('create_dtype_json_array({nitems}, '
+                            '{items}, {use_generic})'),
+        'init_type_object': ('create_dtype_json_object({nitems}, '
+                             '{keys}, {values}, {use_generic})'),
+        'init_type_ply': 'create_dtype_ply({use_generic})',
+        'init_type_obj': 'create_dtype_obj({use_generic})',
+        'init_type_1darray': ('create_dtype_1darray(\"{subtype}\", '
+                              '{precision}, {length}, \"{units}\", '
+                              '{use_generic})'),
+        'init_type_ndarray': ('create_dtype_ndarray(\"{subtype}\", '
+                              '{precision}, {ndim}, {shape}, '
+                              '\"{units}\", {use_generic})'),
+        'init_type_ndarray_arr': ('create_dtype_ndarray(\"{subtype}\", '
+                                  '{precision}, {ndim}, {shape}, '
+                                  '\"{units}\", {use_generic})'),
+        'init_type_scalar': ('create_dtype_scalar(\"{subtype}\", '
+                             '{precision}, \"{units}\", '
+                             '{use_generic})'),
+        'init_type_default': ('create_dtype_default(\"{type}\", '
+                              '{use_generic})'),
+        'init_type_pyobj': ('create_dtype_pyobj(\"{type}\", '
+                            '{use_generic})'),
+        'init_type_empty': ('create_dtype_empty({use_generic})'),
+        'init_type_schema': ('create_dtype_schema({use_generic})'),
         'copy_array': '{name} = copy_generic({value})',
         'copy_object': '{name} = copy_generic({value})',
         'copy_schema': '{name} = copy_generic({value})',
@@ -335,6 +359,8 @@ class FortranModelDriver(CompiledModelDriver):
         json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
         if isinstance(json_type, str):
             json_type = {'type': json_type}
+        if 'type' in kwargs:
+            json_type.update(kwargs)
         assert(isinstance(json_type, dict))
         json_type = get_type_class(json_type['type']).normalize_definition(
             json_type)

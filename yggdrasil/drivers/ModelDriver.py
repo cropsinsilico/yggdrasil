@@ -1713,7 +1713,7 @@ class ModelDriver(Driver):
                     'import', filename=model_file,
                     function=model_function))
         out = cls.write_executable(lines, prefix=prefix)
-        logger.debug('\n' + '\n'.join(out))
+        logger.info('\n' + '\n'.join(out))
         return out
 
     @classmethod
@@ -1768,8 +1768,9 @@ class ModelDriver(Driver):
                 assert(isinstance(datatype['items'], list))
                 out += cls.write_declaration(
                     {'name': '%s_items' % name_base,
-                     'type': 'dtype_array',
-                     'length': len(datatype['items'])},
+                     'datatype': {
+                         'type': '1darray', 'subtype': 'dtype',
+                         'length': len(datatype['items'])}},
                     requires_freeing=requires_freeing)
                 for i, x in enumerate(datatype['items']):
                     # Prevent recusion
@@ -1786,15 +1787,17 @@ class ModelDriver(Driver):
                 assert(isinstance(datatype['properties'], dict))
                 out += cls.write_declaration(
                     {'name': '%s_keys' % name_base,
-                     'type': '1darray', 'subtype': 'bytes',
-                     'length': len(datatype['properties']),
-                     'precision': max([len(k) for k in
-                                       datatype['properties'].keys()])},
-                    requires_freeing=requires_freeing)
+                     'datatype': {
+                         'type': '1darray', 'subtype': 'bytes',
+                         'length': len(datatype['properties']),
+                         'precision': max(
+                             [len(k) for k in
+                              datatype['properties'].keys()])}})
                 out += cls.write_declaration(
                     {'name': '%s_vals' % name_base,
-                     'type': 'dtype_array',
-                     'length': len(datatype['properties'])},
+                     'datatype': {
+                         'type': '1darray', 'subtype': 'dtype',
+                         'length': len(datatype['properties'])}},
                     requires_freeing=requires_freeing)
                 for i, (k, v) in enumerate(datatype['properties'].items()):
                     # Prevent recusion
@@ -1802,7 +1805,7 @@ class ModelDriver(Driver):
                     v_copy.pop('items', None)
                     v_copy.pop('properties', None)
                     out += cls.write_type_decl(
-                        None, x_copy,
+                        None, v_copy,
                         name_base=('%s_prop%d' % (name_base, i)),
                         requires_freeing=requires_freeing,
                         no_decl=True)
@@ -1810,8 +1813,9 @@ class ModelDriver(Driver):
             if 'shape' in datatype:
                 out += cls.write_declaration(
                     {'name': '%s_shape' % name_base,
-                     'type': '1darray', 'subtype': 'int',
-                     'precision': 8, 'length': len(datatype['shape'])},
+                     'datatype': {
+                         'type': '1darray', 'subtype': 'int',
+                         'precision': 64, 'length': len(datatype['shape'])}},
                     requires_freeing=requires_freeing)
         elif datatype['type'] in ['ply', 'obj', '1darray',
                                   'scalar', 'boolean', 'null',
@@ -1920,7 +1924,10 @@ class ModelDriver(Driver):
                 keys[k] = datatype[k]
             if 'shape' in datatype:
                 shape_var = '%s_shape' % name_base
-                # TODO: Make generic
+                if cls.zero_based:
+                    idx_offset = 0
+                else:
+                    idx_offset = 1
                 for i, x in enumerate(datatype['shape']):
                     out.append(cls.format_function_param(
                         'assign', value=x,
@@ -1958,7 +1965,6 @@ class ModelDriver(Driver):
             raise ValueError("Cannot create %s version of type '%s'"
                              % (cls.language, typename))
         fmt = cls.format_function_param('init_type_%s' % typename, **keys)
-        print('init_type_%s' % typename, keys, fmt)
         out.append(cls.format_function_param('assign', name=name,
                                              value=fmt))
         return out
@@ -2453,6 +2459,7 @@ checking if the model flag indicates
                 function_keys[1], function_name=function_name))
         else:
             out.append(cls.function_param.get('block_end', ''))
+        import pprint; pprint.pprint(out)
         return out
 
     @classmethod
