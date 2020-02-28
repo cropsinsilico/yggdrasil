@@ -25,7 +25,14 @@ module fygg
      module procedure yggarg_scalar_yggchar_r
      module procedure yggarg_scalar_ply
      module procedure yggarg_scalar_obj
+     module procedure yggarg_scalar_null
      module procedure yggarg_scalar_generic
+     module procedure yggarg_scalar_yggarr
+     module procedure yggarg_scalar_yggmap
+     module procedure yggarg_scalar_yggschema
+     module procedure yggarg_scalar_yggptr
+     module procedure yggarg_scalar_yggptr_arr
+     module procedure yggarg_scalar_yggptr_map
      module procedure yggarg_realloc_1darray_c_long
      module procedure yggarg_realloc_1darray_integer
      module procedure yggarg_realloc_1darray_integer2
@@ -221,9 +228,6 @@ module fygg
      integer(kind=c_size_t), pointer :: prec_c => null()
      type(c_ptr) :: prec_ptr = c_null_ptr
   end type yggptr
-  type :: yggnull
-     type(c_ptr) :: ptr = c_null_ptr
-  end type yggnull
   type :: yggptr_arr
      type(yggptr), dimension(:), pointer :: vals => null()
   end type yggptr_arr
@@ -235,6 +239,9 @@ module fygg
      character(kind=c_char) :: prefix
      type(c_ptr) :: obj
   end type ygggeneric
+  type :: yggnull
+     type(c_ptr) :: ptr = c_null_ptr
+  end type yggnull
   type, bind(c) :: yggarr
      character(kind=c_char) :: prefix
      type(c_ptr) :: obj
