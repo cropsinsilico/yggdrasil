@@ -4,7 +4,8 @@ program main
   character(len=32) :: arg
   integer :: msg_count, msg_size
   type(yggcomm) :: outq
-  integer :: ret, i, count
+  logical :: ret
+  integer :: i, count
   integer :: exit_code = 0
   character(len=:), allocatable :: test_msg
 
@@ -36,7 +37,7 @@ program main
   count = 0
   do i = 1, msg_count
      ret = ygg_send(outq, test_msg, msg_size)
-     if (ret.lt.0) then
+     if (.not.ret) then
         write(*, '("pipe_src(F): SEND ERROR ON MSG ",i5.1)'), i
         exit_code = -1
         exit

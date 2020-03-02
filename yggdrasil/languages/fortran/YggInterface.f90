@@ -30,9 +30,10 @@ module fygg
      module procedure yggarg_scalar_yggarr
      module procedure yggarg_scalar_yggmap
      module procedure yggarg_scalar_yggschema
+     module procedure yggarg_scalar_yggpython
      module procedure yggarg_scalar_yggptr
-     module procedure yggarg_scalar_yggptr_arr
-     module procedure yggarg_scalar_yggptr_map
+     ! module procedure yggarg_scalar_yggptr_arr
+     ! module procedure yggarg_scalar_yggptr_map
      module procedure yggarg_realloc_1darray_c_long
      module procedure yggarg_realloc_1darray_integer
      module procedure yggarg_realloc_1darray_integer2
@@ -254,6 +255,12 @@ module fygg
      character(kind=c_char) :: prefix
      type(c_ptr) :: obj
   end type yggschema
+  type, bind(c) :: yggpython
+     character(kind=c_char, len=1000) :: name = c_null_char
+     type(c_ptr) :: args = c_null_ptr
+     type(c_ptr) :: kwargs = c_null_ptr
+     type(c_ptr) :: obj = c_null_ptr
+  end type yggpython
   type, bind(c) :: yggply
      character(kind=c_char), dimension(100) :: material
      integer(kind=c_int) :: nvert
@@ -306,7 +313,8 @@ module fygg
   end type yggobj
 
   public :: yggarg, yggchar_r, yggcomm, ygggeneric, &
-       yggptr, yggnull, yggarr, yggmap, yggschema, yggply, yggobj, &
+       yggptr, yggnull, yggarr, yggmap, &
+       yggschema, yggpython, yggply, yggobj, &
        integer_1d, real_1d, complex_1d, logical_1d, character_1d, &
        LINE_SIZE_MAX
 
@@ -644,34 +652,34 @@ contains
   ! Method for constructing data types
   function create_dtype_empty(use_generic) result(out)
     implicit none
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    out%ptr = create_dtype_empty_c(use_generic)
+    out%ptr = create_dtype_empty_c(logical(use_generic, kind=1))
   end function create_dtype_empty
 
   function create_dtype_python(pyobj, use_generic) result(out)
     implicit none
     type(c_ptr) :: pyobj
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    out%ptr = create_dtype_python_c(pyobj, use_generic)
+    out%ptr = create_dtype_python_c(pyobj, logical(use_generic, kind=1))
   end function create_dtype_python
 
   function create_dtype_direct(use_generic) result(out)
     implicit none
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    out%ptr = create_dtype_direct_c(use_generic)
+    out%ptr = create_dtype_direct_c(logical(use_generic, kind=1))
   end function create_dtype_direct
 
   function create_dtype_default(typename, use_generic) result(out)
     implicit none
     character(len=*), intent(in) :: typename
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
     character(len=len_trim(typename)+1) :: c_typename
     c_typename = trim(typename)//c_null_char
-    out%ptr = create_dtype_default_c(c_typename, use_generic)
+    out%ptr = create_dtype_default_c(c_typename, logical(use_generic, kind=1))
   end function create_dtype_default
 
   function create_dtype_scalar(subtype, precision, units, &
@@ -680,7 +688,7 @@ contains
     character(len=*), intent(in) :: subtype
     integer, intent(in) :: precision
     character(len=*), intent(in) :: units
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
     character(len=len_trim(subtype)+1) :: c_subtype
     integer(kind=c_size_t) :: c_precision
@@ -689,7 +697,7 @@ contains
     c_precision = precision
     c_units = trim(units)//c_null_char
     out%ptr = create_dtype_scalar_c(c_subtype, c_precision, c_units, &
-         use_generic)
+         logical(use_generic, kind=1))
   end function create_dtype_scalar
 
   function create_dtype_1darray(subtype, precision, length, &
@@ -699,7 +707,7 @@ contains
     integer, intent(in) :: precision
     integer, intent(in) :: length
     character(len=*), intent(in) :: units
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
     character(len=len_trim(subtype)+1) :: c_subtype
     integer(kind=c_size_t) :: c_precision
@@ -710,7 +718,7 @@ contains
     c_length = length
     c_units = trim(units)//c_null_char
     out%ptr = create_dtype_1darray_c(c_subtype, c_precision, c_length, &
-         c_units, use_generic)
+         c_units, logical(use_generic, kind=1))
   end function create_dtype_1darray
 
   function create_dtype_ndarray(subtype, precision, ndim, &
@@ -721,7 +729,7 @@ contains
     integer, intent(in) :: ndim
     integer, dimension(:), pointer, intent(in) :: shape
     character(len=*), intent(in) :: units
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
     character(len=len_trim(subtype)+1) :: c_subtype
     integer(kind=c_size_t) :: c_precision
@@ -734,7 +742,7 @@ contains
     c_shape = c_loc(shape(1))
     c_units = trim(units)//c_null_char
     out%ptr = create_dtype_ndarray_c(c_subtype, c_precision, c_ndim, &
-         c_shape, c_units, use_generic)
+         c_shape, c_units, logical(use_generic, kind=1))
   end function create_dtype_ndarray
 
   function create_dtype_json_array(nitems, items, use_generic) &
@@ -742,7 +750,7 @@ contains
     implicit none
     integer, intent(in) :: nitems
     type(yggdtype), dimension(:), intent(in) :: items
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
     integer(kind=c_size_t) :: c_nitems
     type(c_ptr), target :: c_items(size(items))
@@ -752,7 +760,7 @@ contains
        c_items(i) = items(i)%ptr
     end do
     out%ptr = create_dtype_json_array_c(c_nitems, c_loc(c_items(1)), &
-         use_generic)
+         logical(use_generic, kind=1))
   end function create_dtype_json_array
 
   function create_dtype_json_object(nitems, keys, values, use_generic) &
@@ -761,7 +769,7 @@ contains
     integer, intent(in) :: nitems
     character(len=*), dimension(:), intent(in), target :: keys
     type(yggdtype), dimension(:), intent(in) :: values
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
     integer(kind=c_size_t) :: c_nitems
     type(c_ptr), target :: c_keys(size(keys))
@@ -777,21 +785,21 @@ contains
        c_values(i) = values(i)%ptr
     end do
     out%ptr = create_dtype_json_object_c(c_nitems, c_loc(c_keys(1)), &
-         c_loc(c_values(1)), use_generic)
+         c_loc(c_values(1)), logical(use_generic, kind=1))
   end function create_dtype_json_object
 
   function create_dtype_ply(use_generic) result(out)
     implicit none
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    out%ptr = create_dtype_ply_c(use_generic)
+    out%ptr = create_dtype_ply_c(logical(use_generic, kind=1))
   end function create_dtype_ply
 
   function create_dtype_obj(use_generic) result(out)
     implicit none
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    out%ptr = create_dtype_obj_c(use_generic)
+    out%ptr = create_dtype_obj_c(logical(use_generic, kind=1))
   end function create_dtype_obj
 
   function create_dtype_format(format_str, as_array, use_generic) &
@@ -799,36 +807,36 @@ contains
     implicit none
     character(len=*), intent(in) :: format_str
     integer, intent(in) :: as_array
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
     character(len=len_trim(format_str)+1) :: c_format_str
     c_format_str = trim(format_str)//c_null_char
     call fix_format_str(c_format_str)
-    out%ptr = create_dtype_format_c(c_format_str, as_array, use_generic)
+    out%ptr = create_dtype_format_c(c_format_str, as_array, logical(use_generic, kind=1))
   end function create_dtype_format
 
   function create_dtype_pyobj(typename, use_generic) result(out)
     implicit none
     character(len=*), intent(in) :: typename
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
     character(len=len_trim(typename)+1) :: c_typename
     c_typename = trim(typename)//c_null_char
-    out%ptr = create_dtype_pyobj_c(c_typename, use_generic)
+    out%ptr = create_dtype_pyobj_c(c_typename, logical(use_generic, kind=1))
   end function create_dtype_pyobj
 
   function create_dtype_schema(use_generic) result(out)
     implicit none
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    out%ptr = create_dtype_schema_c(use_generic)
+    out%ptr = create_dtype_schema_c(logical(use_generic, kind=1))
   end function create_dtype_schema
 
   function create_dtype_any(use_generic) result(out)
     implicit none
-    logical(kind=1), intent(in) :: use_generic
+    logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    out%ptr = create_dtype_any_c(use_generic)
+    out%ptr = create_dtype_any_c(logical(use_generic, kind=1))
   end function create_dtype_any
 
   ! Methods for sending/receiving
@@ -840,13 +848,17 @@ contains
     character(len=len(data)+1) :: c_data
     integer, intent(in) :: data_len
     integer(kind=c_int) :: c_data_len
-    integer :: flag
+    logical :: flag
     integer(kind=c_int) :: c_flag
     c_ygg_q = ygg_q%comm
     c_data = data//c_null_char
     c_data_len = data_len
     c_flag = ygg_send_c(c_ygg_q, c_data, c_data_len)
-    flag = c_flag
+    if (c_flag.ge.0) then
+       flag = .true.
+    else
+       flag = .false.
+    end if
   end function ygg_send
   
   function ygg_recv(ygg_q, data, data_len) result (flag)
@@ -855,16 +867,21 @@ contains
     type(c_ptr) :: c_ygg_q
     character(len=*) :: data
     character(len=len(data)+1) :: c_data
-    integer, intent(in) :: data_len
+    integer :: data_len
     integer(kind=c_int) :: c_data_len
-    integer :: flag
+    logical :: flag
     integer(kind=c_int) :: c_flag
     c_ygg_q = ygg_q%comm
     c_data = data//c_null_char
     c_data_len = data_len
     c_flag = ygg_recv_c(c_ygg_q, c_data, c_data_len)
-    flag = c_flag
-    data = c_data(:flag)
+    if (c_flag.ge.0) then
+       flag = .true.
+       data = c_data(:c_flag)
+       data_len = c_flag
+    else
+       flag = .false.
+    end if
   end function ygg_recv
 
   function ygg_send_nolimit(ygg_q, data, data_len) result (flag)
@@ -872,7 +889,7 @@ contains
     type(yggcomm), intent(in) :: ygg_q
     type(yggchar_r) :: data
     integer, intent(in) :: data_len
-    integer :: flag
+    logical :: flag
     integer(kind=c_size_t) :: len_used
     len_used = data_len
     flag = ygg_send_var(ygg_q, [yggarg(data), yggarg(len_used)])
@@ -882,13 +899,13 @@ contains
     implicit none
     type(yggcomm) :: ygg_q
     type(yggchar_r) :: data
-    integer, intent(in) :: data_len
-    integer :: flag
+    integer :: data_len
+    logical :: flag
     integer(kind=c_size_t) :: len_used
     len_used = data_len
     flag = ygg_recv_var_realloc(ygg_q, [yggarg(data), yggarg(len_used)])
-    if (flag.ge.0) then
-       flag = int(len_used)
+    if (flag) then
+       data_len = int(len_used)
     end if
   end function ygg_recv_nolimit
 
@@ -896,7 +913,7 @@ contains
     implicit none
     type(yggcomm), intent(in) :: ygg_q
     type(yggptr) :: arg
-    integer :: flag
+    logical :: flag
     flag = ygg_send_var_mult(ygg_q, [arg])
   end function ygg_send_var_sing
   function ygg_send_var_mult(ygg_q, args) result (flag)
@@ -906,7 +923,8 @@ contains
     type(yggptr) :: args(:)
     type(c_ptr), target :: c_args(size(args))
     integer :: c_nargs
-    integer :: flag, i
+    integer :: i
+    logical :: flag
     integer(kind=c_int) :: c_flag
     c_ygg_q = ygg_q%comm
     c_nargs = size(args)
@@ -914,7 +932,11 @@ contains
        c_args(i) = args(i)%ptr
     end do
     c_flag = ygg_send_var_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
-    flag = c_flag
+    if (c_flag.ge.0) then
+       flag = .true.
+    else
+       flag = .false.
+    end if
   end function ygg_send_var_mult
 
   function is_size_t(arg) result(flag)
@@ -986,15 +1008,16 @@ contains
     implicit none
     type(yggptr) :: args(:)
     type(c_ptr), allocatable, target :: c_args(:)
-    integer :: flag, i, j
+    logical :: flag
+    integer :: i, j
     logical :: realloc
     call ygglog_debug("post_recv: begin")
-    if (flag.ge.0) then
+    if (flag) then
        j = 1
        do i = 1, size(args)
           args(i)%ptr = c_args(j)
           flag = yggptr_c2f(args(i), realloc)
-          if (flag.lt.0) then
+          if (.not.flag) then
              call ygglog_error("Error recovering fortran pointer for variable.")
              exit
           end if
@@ -1021,7 +1044,7 @@ contains
     type(yggcomm) :: ygg_q
     type(yggptr) :: oarg
     type(yggptr) :: iarg
-    integer :: flag
+    logical :: flag
     flag = ygg_rpc_call_mult(ygg_q, [oarg], [iarg])
   end function ygg_rpc_call_1v1
   function ygg_rpc_call_1vm(ygg_q, oarg, iargs) result (flag)
@@ -1029,7 +1052,7 @@ contains
     type(yggcomm) :: ygg_q
     type(yggptr) :: oarg
     type(yggptr) :: iargs(:)
-    integer :: flag
+    logical :: flag
     flag = ygg_rpc_call_mult(ygg_q, [oarg], iargs)
   end function ygg_rpc_call_1vm
   function ygg_rpc_call_mv1(ygg_q, oargs, iarg) result (flag)
@@ -1037,7 +1060,7 @@ contains
     type(yggcomm) :: ygg_q
     type(yggptr) :: oargs(:)
     type(yggptr) :: iarg
-    integer :: flag
+    logical :: flag
     flag = ygg_rpc_call_mult(ygg_q, oargs, [iarg])
   end function ygg_rpc_call_mv1
   function ygg_rpc_call_mult(ygg_q, oargs, iargs) result (flag)
@@ -1049,7 +1072,8 @@ contains
     type(c_ptr), allocatable, target :: c_args(:)
     type(c_ptr), allocatable, target :: c_iargs(:)
     integer :: c_nargs
-    integer :: flag, i
+    logical :: flag
+    integer :: i
     integer(kind=c_int) :: c_flag
     c_ygg_q = ygg_q%comm
     call pre_recv(iargs, c_iargs)
@@ -1062,7 +1086,11 @@ contains
        c_args(i + size(oargs)) = c_iargs(i)
     end do
     c_flag = ygg_rpc_call_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
-    flag = c_flag
+    if (c_flag.ge.0) then
+       flag = .true.
+    else
+       flag = .false.
+    end if
     do i = 1, size(c_iargs)
        c_iargs(i) = c_args(i + size(oargs))
     end do
@@ -1077,7 +1105,7 @@ contains
     type(yggcomm) :: ygg_q
     type(yggptr) :: oarg
     type(yggptr) :: iarg
-    integer :: flag
+    logical :: flag
     flag = ygg_rpc_call_realloc_mult(ygg_q, [oarg], [iarg])
   end function ygg_rpc_call_realloc_1v1
   function ygg_rpc_call_realloc_1vm(ygg_q, oarg, iargs) result (flag)
@@ -1085,7 +1113,7 @@ contains
     type(yggcomm) :: ygg_q
     type(yggptr) :: oarg
     type(yggptr) :: iargs(:)
-    integer :: flag
+    logical :: flag
     flag = ygg_rpc_call_realloc_mult(ygg_q, [oarg], iargs)
   end function ygg_rpc_call_realloc_1vm
   function ygg_rpc_call_realloc_mv1(ygg_q, oargs, iarg) result (flag)
@@ -1093,7 +1121,7 @@ contains
     type(yggcomm) :: ygg_q
     type(yggptr) :: oargs(:)
     type(yggptr) :: iarg
-    integer :: flag
+    logical :: flag
     flag = ygg_rpc_call_realloc_mult(ygg_q, oargs, [iarg])
   end function ygg_rpc_call_realloc_mv1
   function ygg_rpc_call_realloc_mult(ygg_q, oargs, iargs) result (flag)
@@ -1105,19 +1133,19 @@ contains
     type(c_ptr), allocatable, target :: c_args(:)
     type(c_ptr), allocatable, target :: c_iargs(:)
     integer :: c_nargs
-    integer :: flag
+    logical :: flag
     integer(kind=c_int) :: c_flag
     integer :: i
     c_ygg_q = ygg_q%comm
-    flag = 0
+    flag = .true.
     do i = 1, size(iargs)
        if ((iargs(i)%array.or.(iargs(i)%type.eq."character")).and. &
             (.not.(iargs(i)%alloc))) then
           call ygglog_error("Provided array/string is not allocatable.")
-          flag = -1
+          flag = .false.
        end if
     end do
-    if (flag.ge.0) then
+    if (flag) then
        call pre_recv(iargs, c_iargs)
        c_nargs = size(oargs) + size(iargs)
        allocate(c_args(size(oargs) + size(c_iargs)))
@@ -1128,7 +1156,11 @@ contains
           c_args(i + size(oargs)) = c_iargs(i)
        end do
        c_flag = ygg_rpc_call_realloc_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
-       flag = c_flag
+       if (c_flag.ge.0) then
+          flag = .true.
+       else
+          flag = .false.
+       end if
        do i = 1, size(c_iargs)
           c_iargs(i) = c_args(i + size(oargs))
        end do
@@ -1143,7 +1175,7 @@ contains
     implicit none
     type(yggcomm) :: ygg_q
     type(yggptr) :: arg
-    integer :: flag
+    logical :: flag
     flag = ygg_recv_var_mult(ygg_q, [arg])
   end function ygg_recv_var_sing
   function ygg_recv_var_mult(ygg_q, args) result (flag)
@@ -1153,13 +1185,17 @@ contains
     type(yggptr) :: args(:)
     type(c_ptr), allocatable, target :: c_args(:)
     integer :: c_nargs
-    integer :: flag
+    logical :: flag
     integer(kind=c_int) :: c_flag
     c_ygg_q = ygg_q%comm
     call pre_recv(args, c_args)
     c_nargs = size(args)
     c_flag = ygg_recv_var_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
-    flag = c_flag
+    if (c_flag.ge.0) then
+       flag = .true.
+    else
+       flag = .false.
+    end if
     call post_recv(args, c_args, flag, .false.)
   end function ygg_recv_var_mult
 
@@ -1167,7 +1203,7 @@ contains
     implicit none
     type(yggcomm) :: ygg_q
     type(yggptr) :: arg
-    integer :: flag
+    logical :: flag
     flag = ygg_recv_var_realloc_mult(ygg_q, [arg])
   end function ygg_recv_var_realloc_sing
   function ygg_recv_var_realloc_mult(ygg_q, args) result (flag)
@@ -1177,23 +1213,28 @@ contains
     type(yggptr), target :: args(:)
     type(c_ptr), allocatable, target :: c_args(:)
     integer :: c_nargs
-    integer :: flag, i
+    logical :: flag
+    integer :: i
     integer(kind=c_int) :: c_flag
     call ygglog_debug("ygg_recv_var_realloc: begin")
     c_ygg_q = ygg_q%comm
-    flag = 0
+    flag = .true.
     do i = 1, size(args)
        if ((args(i)%array.or.(args(i)%type.eq."character")).and. &
             (.not.(args(i)%alloc))) then
           call ygglog_error("Provided array/string is not allocatable.")
-          flag = -1
+          flag = .false.
        end if
     end do
-    if (flag.ge.0) then
+    if (flag) then
        call pre_recv(args, c_args)
        c_nargs = size(args)
        c_flag = ygg_recv_var_realloc_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
-       flag = c_flag
+       if (c_flag.ge.0) then
+          flag = .true.
+       else
+          flag = .false.
+       end if
     end if
     call post_recv(args, c_args, flag, .true.)
     call ygglog_debug("ygg_recv_var_realloc: end")
@@ -1261,12 +1302,39 @@ contains
     type(ygggeneric) :: out
     out = init_generic_c()
   end function init_generic
-  function free_generic(x) result(out)
+  function create_generic(type_class, data) result(out)
+    implicit none
+    type(yggdtype) :: type_class
+    type(yggptr) :: data
+    integer(kind=c_size_t) :: nbytes
+    type(c_ptr) :: c_type_class
+    type(c_ptr) :: c_data
+    type(ygggeneric) :: out
+    c_type_class = type_class%ptr
+    c_data = data%ptr
+    nbytes = data%nbytes
+    out = create_generic_c(c_type_class, c_data, nbytes)
+  end function create_generic
+  subroutine free_generic(x)
     implicit none
     type(ygggeneric) :: x
     integer(kind=c_int) :: out
     out = free_generic_c(x)
-  end function free_generic
+    if (out.ne.0) then
+       stop "Error freeing generic object."
+    end if
+  end subroutine free_generic
+  function is_generic_init(x) result(out)
+    implicit none
+    type(ygggeneric), value, intent(in) :: x
+    logical :: out
+    integer(kind=c_int) :: c_out
+    out = .false.
+    c_out = is_generic_init_c(x)
+    if (c_out.ne.0) then
+       out = .true.
+    end if
+  end function is_generic_init
   function copy_generic(src) result(out)
     implicit none
     type(ygggeneric), intent(in) :: src
@@ -1325,5 +1393,12 @@ contains
     c_x = c_loc(x) ! Maybe use first element in type
     out = get_generic_object_c(arr, c_k, c_x)
   end function get_generic_object
+
+  ! Python interface
+  function init_python() result(out)
+    implicit none
+    type(yggpython) :: out
+    out = init_python_c()
+  end function init_python
   
 end module fygg

@@ -3,7 +3,7 @@ program main
   use fygg
 
   ! Declare resulting variables and create buffer for received message
-  integer :: flag = 1
+  logical :: flag = .true.
   type(yggcomm) :: in_channel, out_channel
   integer(kind=c_size_t), target :: nrows
   type(character_1d), target :: name
@@ -16,14 +16,14 @@ program main
   out_channel = ygg_ascii_array_output("outputA", "%6s\t%d\t%f\n")
 
   ! Loop until there is no longer input or the queues are closed
-  do while (flag.ge.0)
+  do while (flag)
 
      ! Receive input from input channel
      ! If there is an error, the flag will be negative
      ! Otherwise, it is the number of variables filled
      flag = ygg_recv_var_realloc(in_channel, [ &
           yggarg(nrows), yggarg(name), yggarg(count), yggarg(siz)])
-     if (flag.lt.0) then
+     if (.not.flag) then
         print *, "Model A: No more input."
         exit
      end if
@@ -38,7 +38,7 @@ program main
      ! If there is an error, the flag will be negative
      flag = ygg_send_var(out_channel, [ &
           yggarg(nrows), yggarg(name), yggarg(count), yggarg(siz)])
-     if (flag.lt.0) then
+     if (.not.flag) then
         print *, "Model A: Error sending output."
         exit
      end if

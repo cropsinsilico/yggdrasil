@@ -4,9 +4,10 @@ program main
   character(len=32) :: arg
   integer :: msg_count, msg_size
   type(yggcomm) :: inq, outf
-  integer :: ret, i, count
+  logical :: ret
+  integer :: i, count
   integer :: exit_code = 0
-  integer :: bufsiz = 0
+  integer :: bufsiz = 0, old_bufsiz = 0
   type(yggchar_r) :: buf
 
   write(*, '("Hello from Fortran pipe_dst")')
@@ -19,17 +20,19 @@ program main
   ! Continue receiving input from the queue
   count = 0
   do while(.true.)
+     bufsiz = size(buf%x)
+     old_bufsiz = bufsiz
      ret = ygg_recv_nolimit(inq, buf, bufsiz)
-     if (ret.lt.0) then
+     if (.not.ret) then
         write(*, '("pipe_dst(F): Input channel closed")')
         exit
      end if
-     if (ret > bufsiz) then
-        bufsiz = ret + 1
-        write(*, '("pipe_dst(F): Buffer increased to ",i5.1," bytes")'), bufsiz
+     if (bufsiz.gt.old_bufsiz) then
+        write(*, '("pipe_dst(F): Buffer increased from ",&
+             &i5.1," to ",i5.1," bytes")'), old_bufsiz, bufsiz
      end if
-     ret = ygg_send_nolimit(outf, buf, ret)
-     if (ret.lt.0) then
+     ret = ygg_send_nolimit(outf, buf, bufsiz)
+     if (.not.ret) then
         write(*, '("pipe_dst(F): SEND ERROR ON MSG ",i5.1)'), count
         exit_code = -1
         exit

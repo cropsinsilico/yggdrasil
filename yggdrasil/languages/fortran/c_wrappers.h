@@ -92,14 +92,18 @@ void display_obj_indent_f(obj_t p, const char *indent);
 void display_obj_f(obj_t p);
 // Generic interface
 generic_t init_generic_f();
+generic_t create_generic_f(void* type_class, void* data, size_t nbytes);
 int free_generic_f(generic_t* x);
 generic_t copy_generic_f(generic_t src);
+int is_generic_init_f(generic_t x);
 void display_generic_f(generic_t x);
 int add_generic_array_f(generic_t arr, generic_t x);
 int set_generic_array_f(generic_t arr, size_t i, generic_t x);
 int get_generic_array_f(generic_t arr, size_t i, void *x);
 int set_generic_object_f(generic_t arr, const char* k, generic_t x);
 int get_generic_object_f(generic_t arr, const char* k, void *x);
+// Python interface
+python_t init_python_f();
 
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }

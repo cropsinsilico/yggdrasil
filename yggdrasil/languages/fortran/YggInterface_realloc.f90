@@ -3,10 +3,9 @@ function yggptr_realloc(x, array_len, precision, realloc) result(flag)
   type(yggptr) :: x
   integer(kind=c_size_t), pointer :: array_len
   integer(kind=c_size_t), pointer :: precision
-  logical :: realloc
-  integer :: flag
+  logical :: realloc, flag
   character(len=500) :: log_msg
-  flag = 0
+  flag = .true.
   if ((x%array.and.(array_len.gt.x%len)).or. &
        ((x%type.eq."character").and.(precision.gt.x%prec))) then
      if (realloc.and.x%alloc) then
@@ -64,7 +63,7 @@ function yggptr_realloc(x, array_len, precision, realloc) result(flag)
         if (precision.gt.x%prec) x%prec = precision
         call ygglog_debug("yggptr_realloc: done alloc")
      else
-        flag = -1
+        flag = .false.
         if (x%array.and.(array_len.gt.x%len)) then
            write(log_msg, '("yggptr_realloc: Destination array has ", &
                 &i7," elements, but ",i7," elements are expected.")'), &

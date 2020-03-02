@@ -4,7 +4,7 @@ program main
   character(len=32) :: arg
   integer :: iterations
   type(yggcomm) :: rpc
-  integer :: ret
+  logical :: ret
   integer :: fib, fibNo, i
 
   call get_command_argument(1, arg)
@@ -20,7 +20,7 @@ program main
   do i = 1, iterations
      write(*, '("rpcFibCliPar(F): fib(->",i2,") ::: ")'), i
      ret = ygg_send_var(rpc, yggarg(i))
-     if (ret.lt.0) then
+     if (.not.ret) then
         write(*, '("rpcFibCliPar(F): SEND FAILED")')
         call exit(-1)
      end if
@@ -31,7 +31,7 @@ program main
   fibNo = -1
   do i = 1, iterations
      ret = ygg_recv_var(rpc, [yggarg(fibNo), yggarg(fib)])
-     if (ret.lt.0) then
+     if (.not.ret) then
         write(*, '("rpcFibCliPar(F): RECV FAILED")')
         call exit(-1)
      end if

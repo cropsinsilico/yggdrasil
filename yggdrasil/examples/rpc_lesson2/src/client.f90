@@ -5,7 +5,7 @@ program main
   integer :: iterations, client_index
   type(yggcomm) :: rpc
   type(yggcomm) :: log
-  integer :: ret
+  logical :: ret
   integer :: fib, i
   integer :: exit_code = 0
   character(len=100) :: rpc_name
@@ -26,7 +26,7 @@ program main
   log = ygg_output_fmt(trim(log_name), "fib(%-2d) = %-2d\n")
 
   ! Initialize variables
-  ret = 0
+  ret = .true.
   fib = -1
 
   ! Iterate over Fibonacci sequence
@@ -36,7 +36,7 @@ program main
      write(*, '("client",i1,"(F): Calling fib(",i2,")")'), &
           client_index, i
      ret = ygg_rpc_call(rpc, yggarg(i), yggarg(fib))
-     if (ret.lt.0) then
+     if (.not.ret) then
         write(*, '("client",i1,"(F): RPC CALL ERROR")'), client_index
         exit_code = -1;
         exit
@@ -46,7 +46,7 @@ program main
 
      ! Log result by sending it to the log connection
      ret = ygg_send_var(log, [yggarg(i), yggarg(fib)])
-     if (ret.lt.0) then
+     if (.not.ret) then
         write(*, '("client",i1,"(F): SEND ERROR")'), client_index
         exit_code = -1
         exit

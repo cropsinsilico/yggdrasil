@@ -3,7 +3,8 @@ program main
   use fygg
 
   integer, parameter :: BSIZE = 8192
-  integer :: ret, error_code = 0
+  logical :: ret
+  integer :: error_code = 0
   type(yggcomm) :: file_input, file_output, &
        table_input, table_output, array_input, array_output
   integer(kind=c_size_t), target :: line_size = LINE_SIZE_MAX
@@ -35,19 +36,19 @@ program main
   ! Read lines from ASCII text file until end of file is reached.
   ! As each line is received, it is then sent to the output ASCII file.
   print *, "ascii_io(F): Receiving/sending ASCII file."
-  ret = 0
-  do while (ret.ge.0)
+  ret = .true.
+  do while (ret)
      line_size = size(line%x)  ! Reset to size of buffer
 
      ! Receive a single line
      ret = ygg_recv_var_realloc(file_input, &
           [yggarg(line), yggarg(line_size)])
-     if (ret.ge.0) then
+     if (ret) then
         ! If the receive was succesful, send the line to output
         print *, "File: ", line%x
         ret = ygg_send_var(file_output, &
              [yggarg(line), yggarg(line_size)])
-        if (ret.lt.0) then
+        if (.not.ret) then
            print *, "ascii_io(F): ERROR SENDING LINE"
            error_code = -1
            exit
@@ -62,8 +63,8 @@ program main
   ! Read rows from ASCII table until end of file is reached.
   ! As each row is received, it is then sent to the output ASCII table
   print *, "ascii_io(F): Receiving/sending ASCII table."
-  ret = 0;
-  do while (ret.ge.0)
+  ret = .true.
+  do while (ret)
      name_siz = BSIZE  ! Reset to size of the buffer
 
      ! Receive a single row with values stored in scalars declared locally
@@ -71,14 +72,14 @@ program main
           [yggarg(name), yggarg(name_siz), yggarg(number), &
           yggarg(value), yggarg(comp)])
 
-     if (ret.ge.0) then
+     if (ret) then
         ! If the receive was succesful, send the values to output. Formatting
         ! is taken care of on the output driver side.
         print *, "Table: ", trim(name), number, value, comp
         ret = ygg_send_var(table_output, &
              [yggarg(name), yggarg(name_siz), yggarg(number), &
              yggarg(value), yggarg(comp)])
-        if (ret.lt.0) then
+        if (.not.ret) then
            print *, "ascii_io(F): ERROR SENDING ROW"
            error_code = -1
            exit
@@ -94,12 +95,12 @@ program main
   ! allocated. The returned values tells us the number of elements in the
   ! columns.
   print *, "Receiving/sending ASCII table as array."
-  ret = 0
-  do while (ret.ge.0)
+  ret = .true.
+  do while (ret)
      ret = ygg_recv_var_realloc(array_input, [yggarg(nrows), &
           yggarg(name_arr), yggarg(number_arr), &
           yggarg(value_arr), yggarg(comp_arr)])
-     if (ret.ge.0) then
+     if (ret) then
         print *, "Array: (", nrows, " rows)"
         ! Print each line in the array
         do i = 1, nrows
@@ -111,7 +112,7 @@ program main
         ret = ygg_send_var(array_output, [yggarg(nrows), &
              yggarg(name_arr), yggarg(number_arr), &
              yggarg(value_arr), yggarg(comp_arr)])
-        if (ret.lt.0) then
+        if (.not.ret) then
            print *, "ascii_io(F): ERROR SENDING ARRAY"
            error_code = -1
            exit

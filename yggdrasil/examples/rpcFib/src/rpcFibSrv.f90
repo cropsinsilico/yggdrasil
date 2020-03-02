@@ -6,7 +6,7 @@ program main
   real :: time_sleep
   integer :: input
   integer :: result0, prevResult, prevPrev, idx
-  integer :: ret, flag
+  logical :: ret
 
   call get_command_argument(1, arg)
   read(arg, *) time_sleep
@@ -21,7 +21,7 @@ program main
      write(*, '("rpcFibSrv(F): receiving...")')
 
      ret = ygg_recv_var(rpc, yggarg(input))
-     if (ret.lt.0) then
+     if (.not.ret) then
         write(*, '("rpcFibSrv(F): end of input")')
         exit
      end if
@@ -42,8 +42,8 @@ program main
 
      ! Sleep and then send response back
      if (time_sleep.gt.0) call sleep(int(time_sleep))
-     flag = ygg_send_var(rpc, [yggarg(input), yggarg(result0)])
-     if (flag.lt.0) then
+     ret = ygg_send_var(rpc, [yggarg(input), yggarg(result0)])
+     if (.not.ret) then
         write(*, '("rpcFibSrv(F): ERROR sending")')
         exit
      end if

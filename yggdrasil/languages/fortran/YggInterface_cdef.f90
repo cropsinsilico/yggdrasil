@@ -516,6 +516,16 @@
        implicit none
        type(ygggeneric) :: out
      end function init_generic_c
+     function create_generic_c(type_class, data, nbytes) result(out) &
+          bind(c, name="create_generic_f")
+       use, intrinsic :: iso_c_binding, only: c_size_t, c_ptr
+       import :: ygggeneric
+       implicit none
+       type(c_ptr), value, intent(in) :: type_class
+       type(c_ptr), value, intent(in) :: data
+       integer(kind=c_size_t), value, intent(in) :: nbytes
+       type(ygggeneric) :: out
+     end function create_generic_c
      function free_generic_c(x) result(out) &
           bind(c, name="free_generic_f")
        use, intrinsic :: iso_c_binding, only: c_int
@@ -524,6 +534,14 @@
        type(ygggeneric) :: x
        integer(kind=c_int) :: out
      end function free_generic_c
+     function is_generic_init_c(x) result(out) &
+          bind(c, name="is_generic_init_f")
+       use, intrinsic :: iso_c_binding, only: c_int
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value, intent(in) :: x
+       integer(kind=c_int) :: out
+     end function is_generic_init_c
      function copy_generic_c(src) result(out) &
           bind(c, name="copy_generic_f")
        import :: ygggeneric
@@ -585,5 +603,13 @@
        type(c_ptr), value :: x
        integer(kind=c_int) :: out
      end function get_generic_object_c
+
+     ! Python interface
+     function init_python_c() result(out) &
+          bind(c, name="init_python_f")
+       import :: yggpython
+       implicit none
+       type(yggpython) :: out
+     end function init_python_c
 
   end interface

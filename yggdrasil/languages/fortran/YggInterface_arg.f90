@@ -243,39 +243,50 @@ function yggarg_scalar_yggschema(x) result(y)
   y%ptr = c_loc(xp%prefix)
   y%nbytes = sizeof(x)
 end function yggarg_scalar_yggschema
+function yggarg_scalar_yggpython(x) result(y)
+  type(yggpython), target :: x
+  type(yggpython), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_scalar_init(x)
+  xp => x
+  y%type = "python"
+  y%ptr = c_loc(xp%name)
+  y%nbytes = sizeof(x)
+end function yggarg_scalar_yggpython
 function yggarg_scalar_yggptr(x) result(y)
-  type(yggnull), target :: x
+  type(yggptr), target :: x
   type(yggptr) :: y
   y = x
 end function yggarg_scalar_yggptr
-function yggarg_scalar_yggptr_arr(x) result(y)
-  ! TODO
-  type(yggptr_arr), target :: x
-  type(yggptr_arr), pointer :: x
-  type(yggptr) :: y
-  y = yggarg_scalar_init(x)
-  xp => x
-  y%type = "array"
-  y%ptr = c_loc(xp%ptr)
-  y%nbytes = sizeof(x)
-  stop "yggarg_scalar_yggptr_arr: WIP"
-end function yggarg_scalar_yggptr_arr
-function yggarg_scalar_yggptr_map(x) result(y)
-  ! TODO
-  type(yggptr_map), target :: x
-  type(yggptr_map), pointer :: x
-  type(yggptr) :: y
-  y = yggarg_scalar_init(x)
-  xp => x
-  y%type = "object"
-  y%ptr = c_loc(xp%ptr)
-  y%nbytes = sizeof(x)
-  stop "yggarg_scalar_yggptr_map: WIP"
-end function yggarg_scalar_yggptr_map
+! function yggarg_scalar_yggptr_arr(x) result(y)
+!   ! TODO
+!   type(yggptr_arr), target :: x
+!   type(yggptr_arr), pointer :: xp
+!   type(yggptr) :: y
+!   y = yggarg_scalar_init(x)
+!   xp => x
+!   y%type = "array"
+!   y%ptr = c_loc(xp%ptr)
+!   y%nbytes = sizeof(x)
+!   stop "yggarg_scalar_yggptr_arr: WIP"
+! end function yggarg_scalar_yggptr_arr
+! function yggarg_scalar_yggptr_map(x) result(y)
+!   ! TODO
+!   type(yggptr_map), target :: x
+!   type(yggptr_map), pointer :: xp
+!   type(yggptr) :: y
+!   y = yggarg_scalar_init(x)
+!   xp => x
+!   y%type = "object"
+!   y%ptr = c_loc(xp%ptr)
+!   y%nbytes = sizeof(x)
+!   stop "yggarg_scalar_yggptr_map: WIP"
+! end function yggarg_scalar_yggptr_map
 
   
 ! 1D Reallocatable array versions
-function yggarg_realloc_1darray_init(x) result (y)
+function yggarg_realloc_1darray_init(x) &
+     result (y)
   class(*), target :: x
   type(yggptr) :: y
   y%item => x

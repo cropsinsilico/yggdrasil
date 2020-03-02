@@ -6,7 +6,7 @@ program main
   type(yggcomm) :: ymlfile
   type(yggcomm) :: rpc
   type(yggcomm) :: log
-  integer :: ret
+  logical :: ret
   integer, parameter :: msg_len = 2048  ! YGG_MSG_MAX
   character(len=msg_len) :: ycontent
   integer :: fib, fibNo, i, nlines, count_lines
@@ -27,7 +27,7 @@ program main
   ! Read entire contents of yaml
   ycontent_siz = len(ycontent)
   ret = ygg_recv(ymlfile, ycontent, ycontent_siz)
-  if (ret.lt.0) then
+  if (.not.ret) then
      write(*, '("rpcFibCli(F): RECV ERROR")')
      call exit(-1)
   end if
@@ -42,7 +42,7 @@ program main
      ! Call the server and receive response
      write(*, '("rpcFibCli(F): fib(->",i2,") ::: ")'), i
      ret = ygg_rpc_call(rpc, yggarg(i), [yggarg(fibNo), yggarg(fib)])
-     if (ret.lt.0) then
+     if (.not.ret) then
         write(*, '("rpcFibCli(F): RPC CALL ERROR")')
         call exit(-1)
      end if
@@ -54,7 +54,7 @@ program main
      write(*, '(A)', advance="no"), trim(logmsg)
      logmsg_siz = len_trim(logmsg)
      ret = ygg_send(log, logmsg, logmsg_siz)
-     if (ret.lt.0) then
+     if (.not.ret) then
         write(*, '("rpcFibCli(F): SEND ERROR")')
         call exit(-1)
      end if

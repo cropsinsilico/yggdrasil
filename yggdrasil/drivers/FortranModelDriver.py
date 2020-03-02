@@ -161,6 +161,7 @@ class FortranModelDriver(CompiledModelDriver):
         'any': 'ygggeneric'}
     function_param = {
         'import_nofile': 'use {function}',
+        'import': 'include "{filename}"',
         'index': '{variable}({index})',
         'interface': 'use fygg',
         'input': ('{channel} = ygg_input_type('
@@ -171,8 +172,8 @@ class FortranModelDriver(CompiledModelDriver):
         'recv_stack': 'ygg_recv_var',
         'recv_function': 'ygg_recv_var_realloc',
         'send_function': 'ygg_send_var',
-        'not_flag_cond': '{flag_var}.lt.0',
-        'flag_cond': '{flag_var}.ge.0',
+        'not_flag_cond': '.not.{flag_var}',
+        'flag_cond': '{flag_var}',
         'declare': '{type_name} :: {variable}',
         'init_array': 'init_generic()',
         'init_object': 'init_generic()',
@@ -215,17 +216,26 @@ class FortranModelDriver(CompiledModelDriver):
         'copy_class': '{name} = copy_python({value})',
         'copy_function': '{name} = copy_python({value})',
         'copy_instance': '{name} = copy_generic({value})',
+        'copy_generic': '{name} = copy_generic({value})',
         'copy_any': '{name} = copy_generic({value})',
-        # Free?
+        'free_array': 'call free_generic({variable})',
+        'free_object': 'call free_generic({variable})',
+        'free_schema': 'call free_generic({variable})',
+        'free_ply': 'call free_ply({variable})',
+        'free_obj': 'call free_obj({variable})',
+        'free_class': 'call free_python({variable})',
+        'free_function': 'call free_python({variable})',
+        'free_instance': 'call free_generic({variable})',
+        'free_any': 'call free_generic({variable})',
         'print_generic': 'write(*, *), {object}',
         'print': 'write(*, \'(\"{message}\")\')',
         'fprintf': 'write(*, \'(\"{message}\")\'), {variables}',
-        'print_ply': 'display_ply({object})',
-        'print_obj': 'display_obj({object})',
-        'print_class': 'display_python({object})',
-        'print_function': 'display_python({object})',
-        'print_instance': 'display_generic({object})',
-        'print_any': 'display_generic({object})',
+        'print_ply': 'call display_ply({object})',
+        'print_obj': 'call display_obj({object})',
+        'print_class': 'call display_python({object})',
+        'print_function': 'call display_python({object})',
+        'print_instance': 'call display_generic({object})',
+        'print_any': 'call display_generic({object})',
         'assign': '{name} = {value}',
         'comment': '!',
         'true': '.true.',
@@ -236,8 +246,11 @@ class FortranModelDriver(CompiledModelDriver):
         'or': '.or.',
         'indent': 3 * ' ',
         'quote': "'",
-        'error': "write(*, \'(\"{error_msg}\")\'); call exit(-1)",
-        # 'block_end': 'END {block_type}',
+        'error': ("write(*, \'(\"{error_msg}\")\')\n"
+                  "call exit(-1)"),
+        'continuation_before': '&',
+        'continuation_after': '     &',
+        'block_end': 'END',
         'if_begin': 'IF ({cond}) THEN',
         'if_elif': 'ELSE IF ({cond}) THEN',
         'if_else': 'ELSE',
@@ -247,7 +260,7 @@ class FortranModelDriver(CompiledModelDriver):
         'while_begin': 'DO WHILE ({cond})',
         'while_end': 'END DO',
         'break': 'EXIT',
-        'exec_begin': 'PROGRAM main\n   use iso_c_binding\n   implicit none',
+        'exec_begin': 'PROGRAM main\n   use iso_c_binding',
         'exec_end': '   call exit(0)\nEND PROGRAM main',
         'free': 'DEALLOCATE({variable})',
         'function_def_begin': (
@@ -275,13 +288,14 @@ class FortranModelDriver(CompiledModelDriver):
             r'\s*(?P<name>.+?)\s*(?:,|$)(?:\n)?')
     }
     outputs_in_inputs = True
-    include_arg_count = True
     include_channel_obj = True
     is_typed = True
     types_in_funcdef = False
-    import_inside_exec = True
+    interface_inside_exec = True
+    import_after_exec = True
     declare_functions_as_var = True
     zero_based = False
+    max_line_width = 72
     
     def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
@@ -354,6 +368,8 @@ class FortranModelDriver(CompiledModelDriver):
         """
         out = super(FortranModelDriver, cls).get_native_type(**kwargs)
         if not ((out == '*') or ('X' in out)):
+            if out.startswith('ygg'):
+                out = 'type(%s)' % out
             return out
         from yggdrasil.metaschema.datatypes import get_type_class
         json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
@@ -416,12 +432,15 @@ class FortranModelDriver(CompiledModelDriver):
         else:
             out['type'] = super(FortranModelDriver, cls).get_json_type(grp['type'])
         if grp.get('shape', False):
-            ndim = len(grp['shape'].split(','))
+            shape = [int(i) for i in grp['shape'].split(',')]
+            ndim = len(shape)
             out['subtype'] = out['type']
             if ndim == 1:
                 out['type'] = '1darray'
+                out['length'] = shape[0]
             else:
                 out['type'] = 'ndarray'
+                out['shape'] = shape
         if out['type'] in _valid_types:
             out['subtype'] = out['type']
             out['type'] = 'scalar'
@@ -458,6 +477,62 @@ class FortranModelDriver(CompiledModelDriver):
         return out
 
     @classmethod
+    def prepare_variables(cls, vars_list, for_yggdrasil=False, **kwargs):
+        r"""Concatenate a set of input variables such that it can be passed as a
+        single string to the function_call parameter.
+
+        Args:
+            vars_list (list): List of variable dictionaries containing info
+                (e.g. names) that should be used to prepare a string representing
+                input/output to/from a function call.
+            for_yggdrasil (bool, optional): If True, the variables will be
+                prepared in the formated expected by calls to yggdarsil
+                send/recv methods. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            str: Concatentated variables list.
+
+        """
+        new_vars_list = vars_list
+        if for_yggdrasil:
+            new_vars_list = []
+            for v in vars_list:
+                if isinstance(v, dict):
+                    v = dict(v, name=('yggarg(%s)' % v['name']))
+                else:
+                    v = 'yggarg(%s)' % v
+                new_vars_list.append(v)
+        out = super(FortranModelDriver, cls).prepare_variables(
+            new_vars_list, for_yggdrasil=for_yggdrasil, **kwargs)
+        return out
+        
+    @classmethod
+    def write_executable(cls, lines, **kwargs):
+        r"""Return the lines required to complete a program that will run
+        the provided lines.
+
+        Args:
+            lines (list): Lines of code to be wrapped as an executable.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            lines: Lines of code wrapping the provided lines with the
+                necessary code to run it as an executable (e.g. C/C++'s main).
+
+        """
+        if 'implicit none' not in lines:
+            for i, line in enumerate(lines):
+                if not line.lstrip().lower().startswith('use'):
+                    lines.insert(i, 'implicit none')
+                    break
+        out = super(FortranModelDriver, cls).write_executable(
+            lines, **kwargs)
+        return out
+        
+    @classmethod
     def write_function_def(cls, function_name, **kwargs):
         r"""Write a function definition.
 
@@ -477,3 +552,86 @@ class FortranModelDriver(CompiledModelDriver):
                 ('subroutine_def_begin', 'subroutine_def_end'))
         return super(FortranModelDriver, cls).write_function_def(
             function_name, **kwargs)
+
+    @classmethod
+    def escape_quotes(cls, x):
+        r"""Escape quotes in a string.
+
+        Args:
+           x (str): String to escape quotes in.
+
+        Returns:
+           str: x with escaped quotes.
+
+        """
+        out = x.replace('"', '""')
+        out = out.replace("'", "''")
+        return out
+
+    @classmethod
+    def split_line(cls, line, length=None):
+        r"""Split a line as close to (or before) a given character as
+        possible.
+
+        Args:
+            line (str): Line to split.
+            length (int, optional): Maximum length of split lines. Defaults
+                to cls.max_line_width if not provided.
+
+        Returns:
+            list: Set of lines resulting from spliting the provided line.
+
+        """
+        if line.lstrip().lower().startswith("include"):
+            return [line]
+        return super(FortranModelDriver, cls).split_line(
+            line, length=length)
+
+    @classmethod
+    def allows_realloc(cls, var):
+        r"""Determine if a variable allows the receive call to perform
+        realloc.
+
+        Args:
+            var (dict): Dictionary of variable properties.
+
+        Returns:
+            bool: True if the variable allows realloc, False otherwise.
+
+        """
+        if isinstance(var, dict):
+            datatype = var.get('datatype', var)
+            if ('shape' in datatype) or ('length' in datatype):
+                return False
+        return True
+        
+    @classmethod
+    def write_model_recv(cls, channel, recv_var, **kwargs):
+        r"""Write a model receive call include checking the return flag.
+
+        Args:
+            channel (str): Name of variable that the channel being received from
+                was stored in.
+            recv_var (dict, list): Information of one or more variables that
+                receieved information should be stored in.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            list: Lines required to carry out a receive call in this language.
+
+        """
+        recv_var_str = recv_var
+        if not isinstance(recv_var, str):
+            recv_var_par = cls.channels2vars(recv_var)
+            allows_realloc = [cls.allows_realloc(v)
+                              for v in recv_var_par]
+            if all(allows_realloc):
+                kwargs['alt_recv_function'] = cls.function_param['recv_heap']
+            else:
+                kwargs['alt_recv_function'] = cls.function_param['recv_stack']
+            recv_var_str = cls.prepare_output_variables(
+                recv_var_par, in_inputs=cls.outputs_in_inputs,
+                for_yggdrasil=True)
+        return super(FortranModelDriver, cls).write_model_recv(
+            channel, recv_var_str, **kwargs)

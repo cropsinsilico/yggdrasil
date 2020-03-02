@@ -293,11 +293,13 @@ class ModelDriver(Driver):
     include_channel_obj = False
     is_typed = False
     types_in_funcdef = True
-    import_inside_exec = False
+    interface_inside_exec = False
+    import_after_exec = False
     declare_functions_as_var = False
     dont_declare_channel = False
     brackets = None
     zero_based = True
+    max_line_width = None
     python_interface = {'table_input': 'YggAsciiTableInput',
                         'table_output': 'YggAsciiTableOutput',
                         'array_input': 'YggArrayInput',
@@ -1615,21 +1617,38 @@ class ModelDriver(Driver):
             outputs_in_inputs=outputs_in_inputs)
         # Declare variables and flag, then define flag
         free_vars = []
+        definitions = []
         if 'declare' in cls.function_param:
             for x in inputs + outputs:
                 lines += cls.write_channel_decl(
-                    x, requires_freeing=free_vars)
+                    x, definitions=definitions,
+                    requires_freeing=free_vars)
             lines += cls.write_declaration(flag_var,
+                                           definitions=definitions,
                                            requires_freeing=free_vars)
             lines += cls.write_declaration(iter_var,
+                                           definitions=definitions,
                                            requires_freeing=free_vars)
             if model_flag:
                 lines += cls.write_declaration(
-                    model_flag, requires_freeing=free_vars)
+                    model_flag, definitions=definitions,
+                    requires_freeing=free_vars)
             for x in inputs + outputs:
                 for v in x.get('vars', [x]):
                     lines += cls.write_declaration(
-                        v, requires_freeing=free_vars)
+                        v, definitions=definitions,
+                        requires_freeing=free_vars)
+            if cls.declare_functions_as_var:
+                if model_flag:
+                    model_var = dict(model_flag, name=model_function)
+                else:
+                    assert(len(outputs) == 1)
+                    model_var = dict(outputs[0], name=model_function)
+                assert(isinstance(model_flag, dict))
+                lines += cls.write_declaration(
+                    model_var, definitions=definitions,
+                    requires_freeing=free_vars, dont_define=True)
+            lines += definitions
         lines.append(cls.format_function_param(
             'assign', name=flag_var['name'],
             value=cls.function_param.get(
@@ -1693,26 +1712,27 @@ class ModelDriver(Driver):
             lines += cls.write_free(x)
         # Wrap as executable with interface & model import
         prefix = []
+        suffix = []
         if 'interface' in cls.function_param:
             ygglib = cls.interface_library
             if ygglib in cls.internal_libraries:
                 ygglib = cls.internal_libraries[ygglib]['source']
-            if cls.import_inside_exec:
+            if cls.interface_inside_exec:
                 lines.insert(0, cls.format_function_param(
                     'interface', interface_library=ygglib))
             else:
                 prefix.append(cls.format_function_param(
                     'interface', interface_library=ygglib))
         if ('import' in cls.function_param):
-            if cls.import_inside_exec:
-                lines.insert(0, cls.format_function_param(
+            if cls.import_after_exec:
+                suffix.append(cls.format_function_param(
                     'import', filename=model_file,
                     function=model_function))
             else:
                 prefix.append(cls.format_function_param(
                     'import', filename=model_file,
                     function=model_function))
-        out = cls.write_executable(lines, prefix=prefix)
+        out = cls.write_executable(lines, prefix=prefix, suffix=suffix)
         logger.info('\n' + '\n'.join(out))
         return out
 
@@ -1739,12 +1759,14 @@ class ModelDriver(Driver):
             var['channel_type'] = '%s_type' % var['channel']
             out += cls.write_type_decl(
                 var['channel_type'], var['datatype'],
+                definitions=kwargs.get('definitions', None),
                 requires_freeing=kwargs.get('requires_freeing', None))
         return out
 
     @classmethod
     def write_type_decl(cls, name, datatype, name_base=None,
-                        requires_freeing=None, no_decl=False):
+                        requires_freeing=None, definitions=None,
+                        no_decl=False):
         r"""Get lines declaring the datatype within the language.
 
         Args:
@@ -1752,6 +1774,10 @@ class ModelDriver(Driver):
             datatype (dict): Type definition.
             requires_freeing (list, optional): List that variables requiring
                 freeing should be appended to. Defaults to None.
+            definitions (list, optional): Existing list that variable
+                definitions should be added to. Defaults to None if not
+                provided and definitions will be included in the returned
+                lines.
             no_decl (bool, optional): If True, the variable is not
                 declared, but supporting variables will be. Defaults
                 to False.
@@ -1771,6 +1797,7 @@ class ModelDriver(Driver):
                      'datatype': {
                          'type': '1darray', 'subtype': 'dtype',
                          'length': len(datatype['items'])}},
+                    definitions=definitions,
                     requires_freeing=requires_freeing)
                 for i, x in enumerate(datatype['items']):
                     # Prevent recusion
@@ -1780,6 +1807,7 @@ class ModelDriver(Driver):
                     out += cls.write_type_decl(
                         None, x_copy,
                         name_base=('%s_item%d' % (name_base, i)),
+                        definitions=definitions,
                         requires_freeing=requires_freeing,
                         no_decl=True)
         elif datatype['type'] == 'object':
@@ -1798,6 +1826,7 @@ class ModelDriver(Driver):
                      'datatype': {
                          'type': '1darray', 'subtype': 'dtype',
                          'length': len(datatype['properties'])}},
+                    definitions=definitions,
                     requires_freeing=requires_freeing)
                 for i, (k, v) in enumerate(datatype['properties'].items()):
                     # Prevent recusion
@@ -1808,6 +1837,7 @@ class ModelDriver(Driver):
                         None, v_copy,
                         name_base=('%s_prop%d' % (name_base, i)),
                         requires_freeing=requires_freeing,
+                        definitions=definitions,
                         no_decl=True)
         elif datatype['type'] == 'ndarray':
             if 'shape' in datatype:
@@ -1816,6 +1846,7 @@ class ModelDriver(Driver):
                      'datatype': {
                          'type': '1darray', 'subtype': 'int',
                          'precision': 64, 'length': len(datatype['shape'])}},
+                    definitions=definitions,
                     requires_freeing=requires_freeing)
         elif datatype['type'] in ['ply', 'obj', '1darray',
                                   'scalar', 'boolean', 'null',
@@ -1957,10 +1988,10 @@ class ModelDriver(Driver):
             keys['type'] = typename
             typename = 'pyobj'
         elif typename in ['instance', 'any']:
-            keys['use_generic'] = 'true'
+            keys['use_generic'] = cls.function_param['true']
             typename = 'empty'
         elif typename in ['schema']:
-            keys['use_generic'] = 'true'
+            keys['use_generic'] = cls.function_param['true']
         else:  # pragma: debug
             raise ValueError("Cannot create %s version of type '%s'"
                              % (cls.language, typename))
@@ -2156,16 +2187,19 @@ checking if the model flag indicates
                 cls.function_param['not'],
                 cls.format_function_param('flag_cond', default='{flag_var}',
                                           flag_var=flag_var))
-        fail_message = "Could not receive %s." % recv_var_str
+        fail_message = cls.escape_quotes(
+            "Could not receive %s." % recv_var_str)
         if allow_failure:
-            fail_message = 'End of input from %s.' % recv_var_str
+            fail_message = cls.escape_quotes(
+                'End of input from %s.' % recv_var_str)
             if_block = [cls.format_function_param('print', message=fail_message),
                         cls.function_param.get('break', 'break')]
             if iter_var is not None:
                 if_block = cls.write_if_block(
                     iter_var,
                     [cls.format_function_param(
-                        'error', error_msg='No input from %s.' % recv_var_str)],
+                        'error', error_msg=cls.escape_quotes(
+                            'No input from %s.' % recv_var_str))],
                     if_block)
         else:
             if_block = [cls.format_function_param('error', error_msg=fail_message)]
@@ -2224,7 +2258,8 @@ checking if the model flag indicates
             cls.function_param['not'],
             cls.format_function_param('flag_cond', default='{flag_var}',
                                       flag_var=flag_var))
-        fail_message = "Could not send %s." % send_var_str
+        fail_message = cls.escape_quotes(
+            "Could not send %s." % send_var_str)
         if allow_failure:  # pragma: no cover
             # This is not particularly useful, but is included for completion
             if_block = [cls.format_function_param('print', message=fail_message),
@@ -2374,7 +2409,7 @@ checking if the model flag indicates
                 ygglib = cls.internal_libraries[ygglib]['source']
             interface_lines.append(cls.format_function_param(
                 'interface', interface_library=ygglib))
-        if not cls.import_inside_exec:
+        if not cls.interface_inside_exec:
             out += interface_lines
         flag_var = {}
         if input_var is None:
@@ -2411,18 +2446,26 @@ checking if the model flag indicates
         out.append(cls.format_function_param(
             function_keys[0], function_name=function_name,
             input_var=input_var, output_var=output_var, **kwargs))
-        if cls.import_inside_exec:
+        if cls.interface_inside_exec:
             out += [cls.function_param['indent'] + x
                     for x in interface_lines]
         free_vars = []
         if 'declare' in cls.function_param:
-            decl_list = copy.copy(outputs)
+            definitions = []
             if not cls.types_in_funcdef:
-                decl_list += inputs + old_outputs
-            for o in decl_list:
+                for o in (inputs + old_outputs):
+                    out += [cls.function_param['indent'] + x for
+                            x in cls.write_declaration(
+                                o, definitions=definitions,
+                                requires_freeing=free_vars,
+                                dont_define=True)]
+            for o in outputs:
                 out += [cls.function_param['indent'] + x for
                         x in cls.write_declaration(
-                            o, requires_freeing=free_vars)]
+                            o, definitions=definitions,
+                            requires_freeing=free_vars)]
+            out += [cls.function_param['indent'] + x
+                    for x in definitions]
         if outputs_in_inputs:
             out.append(cls.function_param['indent']
                        + cls.format_function_param(
@@ -2445,11 +2488,10 @@ checking if the model flag indicates
                            'print', message=closing_msg))
         # This is not currently used by the tests, but may be
         # needed in the future
-        assert(not free_vars)
-        # for x in free_vars:
-        #     out.append(cls.function_param['indent']
-        #                + cls.format_function_param(
-        #                    'free', variable=x))
+        # assert(not free_vars)
+        for x in free_vars:
+            out += [cls.function_param['indent'] + l
+                    for l in cls.write_free(x)]
         if output_var and ('return' in cls.function_param):
             out.append(cls.function_param['indent']
                        + cls.format_function_param(
@@ -2587,6 +2629,70 @@ checking if the model flag indicates
              and (function_definitions is not None))):  # pragma: matlab
             out += function_definitions
             out.append('')
+        if cls.max_line_width:
+            new_out = []
+            for iout in out:
+                new_out += cls.split_line(iout)
+            out = new_out
+        return out
+
+    @classmethod
+    def escape_quotes(cls, x):
+        r"""Escape quotes in a string.
+
+        Args:
+           x (str): String to escape quotes in.
+
+        Returns:
+           str: x with escaped quotes.
+
+        """
+        out = x.replace('"', '\\\"')
+        out = out.replace("'", "\\\'")
+        return out
+
+    @classmethod
+    def split_line(cls, line, length=None):
+        r"""Split a line as close to (or before) a given character as
+        possible.
+
+        Args:
+            line (str): Line to split.
+            length (int, optional): Maximum length of split lines. Defaults
+                to cls.max_line_width if not provided.
+
+        Returns:
+            list: Set of lines resulting from spliting the provided line.
+
+        """
+        out = []
+        if not line.lstrip():
+            return [line]
+        nindent = line.index(line.lstrip()[0])
+        block_end = cls.function_param['block_end'].lower()
+        if '\n' in line:
+            out = line.split('\n')
+            for i in range(1, len(out)):
+                if out[i].lstrip().lower().startswith(block_end):
+                    nindent -= len(cls.function_param['indent'])
+                out[i] = (nindent * ' ') + out[i]
+            new_out = []
+            for x in out:
+                new_out += cls.split_line(x)
+            return new_out
+        if length is None:
+            length = cls.max_line_width
+        if (length is None) or (len(line) < length):
+            return [line]
+        isplit = line[:length].rindex(' ') + 1
+        if isplit < nindent + 1:
+            out = [line]
+        else:
+            out.append(line[:isplit] + cls.function_param.get(
+                'continuation_before', ''))
+            out += cls.split_line(
+                ((nindent * ' ') + cls.function_param.get(
+                    'continuation_after', '') + line[isplit:]), length)
         return out
 
     @classmethod
@@ -2665,7 +2771,8 @@ checking if the model flag indicates
         return cls.get_inverse_type_map()[native_type]
     
     @classmethod
-    def write_declaration(cls, var, value=None, requires_freeing=None):
+    def write_declaration(cls, var, value=None, requires_freeing=None,
+                          definitions=None, dont_define=False):
         r"""Return the lines required to declare a variable with a certain
         type.
 
@@ -2677,6 +2784,12 @@ checking if the model flag indicates
             requires_freeing (list, optional): Existing list that variables
                 requiring freeing should be appended to. Defaults to None
                 and is ignored.
+            definitions (list, optional): Existing list that variable
+                definitions should be added to. Defaults to None if not
+                provided and definitions will be included in the returned
+                lines.
+            dont_define (bool, optional): If True, the variable will not
+                be defined. Defaults to False.
 
         Returns:
             list: The lines declaring the variable.
@@ -2688,6 +2801,10 @@ checking if the model flag indicates
         out = [cls.format_function_param('declare',
                                          type_name=type_name,
                                          variable=var['name'])]
+        if dont_define:
+            return out
+        if definitions is None:
+            definitions = out
         if (value is None) and isinstance(var.get('datatype', False), dict):
             init_type = 'init_%s' % var['datatype']['type']
             free_type = 'free_%s' % var['datatype']['type']
@@ -2697,7 +2814,7 @@ checking if the model flag indicates
                 if requires_freeing is not None:
                     requires_freeing.append(var)
         if value is not None:
-            out.append(cls.format_function_param(
+            definitions.append(cls.format_function_param(
                 'assign', name=var['name'], value=value))
         return out
 
@@ -2762,6 +2879,11 @@ checking if the model flag indicates
             datatype = src_var['datatype']
         else:
             kwargs['value'] = src_var
+        if ((outputs_in_inputs and isinstance(dst_var, dict)
+             and isinstance(dst_var['datatype'], dict)
+             and ('copy_' + dst_var['datatype']['type']
+                  in cls.function_param))):
+            copy = True
         if copy:
             if ((isinstance(datatype, dict)
                  and ('copy_' + datatype['type'] in cls.function_param))):

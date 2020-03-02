@@ -1768,11 +1768,6 @@ class CModelDriver(CompiledModelDriver):
                                name='%s[0]' % dst_var['name'])
             else:
                 dst_var = '%s[0]' % dst_var
-        if ((outputs_in_inputs and isinstance(dst_var, dict)
-             and isinstance(dst_var['datatype'], dict)
-             and ('copy_' + dst_var['datatype']['type']
-                  in cls.function_param))):
-            kwargs['copy'] = True
         out += super(CModelDriver, cls).write_assign_to_output(
             dst_var, src_var, outputs_in_inputs=outputs_in_inputs,
             **kwargs)

@@ -6,7 +6,7 @@ program main
   character, dimension(YGG_MSG_BUF) :: output
   type(yggchar_r) :: input
   type(yggcomm) :: rpc
-  integer :: ret
+  logical :: ret
 
   print *, "maxMsgCli(F): Hello message size is ", msg_size_output
 
@@ -22,7 +22,7 @@ program main
   ret = ygg_rpc_call_realloc(rpc, &
        [yggarg(output), yggarg(msg_size_output)], &
        [yggarg(input), yggarg(msg_size_input)])
-  if (ret.lt.0) then
+  if (.not.ret) then
      print *, "maxMsgCli(F): RPC ERROR"
      call exit(-1)
   end if

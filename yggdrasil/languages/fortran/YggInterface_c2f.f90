@@ -5,9 +5,9 @@ function yggptr_c2f(x, realloc) result(flag)
   integer(kind=c_size_t), pointer :: array_len
   integer(kind=c_size_t), pointer :: precision
   integer(kind=8) :: i, j
-  integer :: flag
+  logical :: flag
   character(len=500) :: log_msg
-  flag = 0
+  flag = .true.
   call ygglog_debug("yggptr_c2f: begin")
   allocate(array_len)
   allocate(precision)

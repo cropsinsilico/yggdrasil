@@ -322,12 +322,20 @@ generic_t init_generic_f() {
   return init_generic();
 }
 
+generic_t create_generic_f(void* type_class, void* data, size_t nbytes) {
+  return create_generic((dtype_t*)type_class, data, nbytes);
+}
+
 int free_generic_f(generic_t* x) {
   return destroy_generic(x);
 }
 
 generic_t copy_generic_f(generic_t src) {
   return copy_generic(src);
+}
+
+int is_generic_init_f(generic_t x) {
+  return is_generic_init(x);
 }
 
 void display_generic_f(generic_t x) {
@@ -354,3 +362,8 @@ int get_generic_object_f(generic_t arr, const char* k, void* x) {
   return get_generic_object(arr, k, (generic_t*)x);
 }
 
+// Python interface
+python_t init_python_f() {
+  python_t out = init_python();
+  return out;
+}

@@ -1,9 +1,11 @@
 PROGRAM SaM
   USE fygg
 
-  integer :: ret, BSIZE = 1000, a, b, sum
+  integer, parameter :: BSIZE = 1000
+  integer :: bufsiz, a, b, sum
   character(len = 1000) :: adata, bdata, outbuf
   TYPE(yggcomm) :: in1, in2, out1
+  logical :: ret = .true.
 
   ! Get input and output channels matching yaml
   in1 = ygg_input("input1_fortran")
@@ -11,8 +13,9 @@ PROGRAM SaM
   out1 = ygg_output("output_fortran")
 
   ! Get input from input1 channel
-  ret = ygg_recv(in1, adata, BSIZE)
-  IF (ret.lt.0) THEN
+  bufsiz = BSIZE
+  ret = ygg_recv(in1, adata, bufsiz)
+  IF (.not.ret) THEN
      PRINT *, "SaM(Fortran): ERROR RECV from input1"
      CALL EXIT(-1)
   END IF
@@ -20,8 +23,9 @@ PROGRAM SaM
   PRINT *, "SaM(Fortran): Received ", a, " from input1"
 
   ! Get input from static channel
-  ret = ygg_recv(in2, bdata, BSIZE)
-  IF (ret.lt.0) THEN
+  bufsiz = BSIZE
+  ret = ygg_recv(in2, bdata, bufsiz)
+  IF (.not.ret) THEN
      PRINT *, "SaM(Fortran): ERROR RECV from static"
      CALL EXIT(-1)
   END IF
@@ -33,7 +37,7 @@ PROGRAM SaM
   WRITE(outbuf, '(I4)') sum
   outbuf = ADJUSTL(outbuf)
   ret = ygg_send(out1, outbuf, LEN_TRIM(outbuf))
-  IF (ret.ne.0) THEN
+  IF (.not.ret) THEN
      PRINT *, "SaM(Fortran): ERROR SEND to output"
      CALL EXIT(-1)
   END IF
