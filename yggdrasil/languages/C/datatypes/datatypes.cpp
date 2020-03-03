@@ -489,6 +489,27 @@ extern "C" {
     return out;
   }
 
+  // generic_t create_generic_array(const size_t nitems,
+  // 				 generic_t* items) {
+  //   generic_t out = init_generic();
+  //   try {
+  //     size_t i;
+  //     MetaschemaTypeVector *types = new MetaschemaTypeVector();
+  //     YggGenericVector *data = new YggGenericVector();
+  //     for (i = 0; i < nitems; i++) {
+  // 	YggGeneric* iobj = (YggGeneric*)(items[i].obj);
+  // 	MetaschemaType* itype = iobj->get_type();
+  // 	data->push_back(iobj);
+  // 	types->push_back(itype);
+  //     }
+  //     JSONArrayMetaschemaType *new_type = new JSONArrayMetaschemaType(types, "", true);
+  //     YggGeneric* obj = new YggGeneric(new_type, (void*)data, new_type->nbytes);
+  //   } catch (...) {
+  //     ygglog_error("create_generic_array: C++ exception thrown.");
+  //   }
+  //   return out;
+  // }
+
   int destroy_generic(generic_t* x) {
     int ret = 0;
     if (x != NULL) {
