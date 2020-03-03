@@ -254,34 +254,34 @@ function yggarg_scalar_yggpython(x) result(y)
   y%nbytes = sizeof(x)
 end function yggarg_scalar_yggpython
 function yggarg_scalar_yggptr(x) result(y)
-  type(yggptr), target :: x
+  type(yggnull), target :: x
   type(yggptr) :: y
   y = x
 end function yggarg_scalar_yggptr
-! function yggarg_scalar_yggptr_arr(x) result(y)
-!   ! TODO
-!   type(yggptr_arr), target :: x
-!   type(yggptr_arr), pointer :: xp
-!   type(yggptr) :: y
-!   y = yggarg_scalar_init(x)
-!   xp => x
-!   y%type = "array"
-!   y%ptr = c_loc(xp%ptr)
-!   y%nbytes = sizeof(x)
-!   stop "yggarg_scalar_yggptr_arr: WIP"
-! end function yggarg_scalar_yggptr_arr
-! function yggarg_scalar_yggptr_map(x) result(y)
-!   ! TODO
-!   type(yggptr_map), target :: x
-!   type(yggptr_map), pointer :: xp
-!   type(yggptr) :: y
-!   y = yggarg_scalar_init(x)
-!   xp => x
-!   y%type = "object"
-!   y%ptr = c_loc(xp%ptr)
-!   y%nbytes = sizeof(x)
-!   stop "yggarg_scalar_yggptr_map: WIP"
-! end function yggarg_scalar_yggptr_map
+function yggarg_scalar_yggptr_arr(x) result(y)
+  ! TODO
+  type(yggptr_arr), target :: x
+  type(yggptr_arr), pointer :: x
+  type(yggptr) :: y
+  y = yggarg_scalar_init(x)
+  xp => x
+  y%type = "array"
+  y%ptr = c_loc(xp%ptr)
+  y%nbytes = sizeof(x)
+  stop "yggarg_scalar_yggptr_arr: WIP"
+end function yggarg_scalar_yggptr_arr
+function yggarg_scalar_yggptr_map(x) result(y)
+  ! TODO
+  type(yggptr_map), target :: x
+  type(yggptr_map), pointer :: x
+  type(yggptr) :: y
+  y = yggarg_scalar_init(x)
+  xp => x
+  y%type = "object"
+  y%ptr = c_loc(xp%ptr)
+  y%nbytes = sizeof(x)
+  stop "yggarg_scalar_yggptr_map: WIP"
+end function yggarg_scalar_yggptr_map
 
   
 ! 1D Reallocatable array versions

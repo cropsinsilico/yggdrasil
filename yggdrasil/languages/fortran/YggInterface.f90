@@ -32,8 +32,8 @@ module fygg
      module procedure yggarg_scalar_yggschema
      module procedure yggarg_scalar_yggpython
      module procedure yggarg_scalar_yggptr
-     ! module procedure yggarg_scalar_yggptr_arr
-     ! module procedure yggarg_scalar_yggptr_map
+     module procedure yggarg_scalar_yggptr_arr
+     module procedure yggarg_scalar_yggptr_map
      module procedure yggarg_realloc_1darray_c_long
      module procedure yggarg_realloc_1darray_integer
      module procedure yggarg_realloc_1darray_integer2
