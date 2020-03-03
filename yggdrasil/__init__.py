@@ -234,7 +234,10 @@ def run_tsts(**kwargs):  # pragma: no cover
             argv.append('--with-coverage')
             argv.append('--cover-package=yggdrasil')
         elif _test_package_name == 'pytest':
+            # See information about getting coverage of test fixtures
+            # https://pytest-cov.readthedocs.io/en/stable/plugins.html
             argv.append('--cov=%s' % package_dir)
+            argv.append('--cov-append')
     if args.noflaky:
         if _test_package_name == 'pytest':
             argv += ['-p', 'no:flaky']
@@ -275,9 +278,16 @@ def run_tsts(**kwargs):  # pragma: no cover
                 'YGG_ENABLE_LONG_TESTS', None)
             os.environ['YGG_ENABLE_LONG_TESTS'] = 'True'
         if args.withcoverage:
-            old_env['COVERAGE_PROCESS_START'] = os.environ.get(
-                'COVERAGE_PROCESS_START', None)
+            for k in ['COVERAGE_PROCESS_START', 'COV_CORE_SOURCE',
+                      'COV_CORE_CONFIG', 'COV_CORE_DATAFILE']:
+                old_env[k] = os.environ.get(k, None)
             os.environ['COVERAGE_PROCESS_START'] = 'True'
+            if _test_package_name == 'pytest':
+                # See information about getting coverage of test fixtures
+                # https://pytest-cov.readthedocs.io/en/stable/plugins.html
+                os.environ['COV_CORE_SOURCE'] = package_dir
+                os.environ['COV_CORE_CONFIG'] = '.coveragerc'
+                os.environ['COV_CORE_DATAFILE'] = '.coverage.eager'
             with open(pth_file, 'w') as fd:
                 fd.write("import coverage; coverage.process_startup()")
         if args.test_suites and ('timing' in args.test_suites):
