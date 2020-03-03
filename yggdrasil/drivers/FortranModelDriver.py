@@ -150,8 +150,10 @@ class FortranModelDriver(CompiledModelDriver):
         'complex': 'complex(kind = X)',
         'bytes': 'character',
         'unicode': 'character',
-        '1darray': '*',  # '{type}(kind = X), dimension({size})',
-        'ndarray': '*',  # '{type}(kind = X), dimension({shape})',
+        '1darray': '*',
+        'ndarray': '*',
+        '1darray_pointer': '{type}{precision}_1d',
+        'ndarray_pointer': '{type}{precision}_nd',
         'ply': 'yggply',
         'obj': 'yggobj',
         'schema': 'yggschema',
@@ -383,18 +385,24 @@ class FortranModelDriver(CompiledModelDriver):
         if out == '*':
             dim_str = ''
             if json_type['type'] == '1darray':
-                dim_str = ', dimension(%s)' % str(
-                    json_type.get('length', ':'))
+                if 'length' in json_type:
+                    dim_str = ', dimension(%s)' % str(json_type['length'])
             elif json_type['type'] == 'ndarray':
                 if 'shape' in json_type:
                     dim_str = ', dimension(%s)' % ','.join(
                         [str(x) for x in json_type['shape']])
-                elif 'ndim' in json_type:
-                    dim_str = ', dimension(%s)' % ','.join(
-                        json_type['ndim'] * [':'])
             json_subtype = copy.deepcopy(json_type)
             json_subtype['type'] = json_subtype.pop('subtype')
             out = cls.get_native_type(datatype=json_subtype) + dim_str
+            if not dim_str:
+                json_subtype['type'] = out.split('(')[0]
+                if json_subtype['type'] == 'character':
+                    json_subtype['precision'] = ''
+                else:
+                    json_subtype['precision'] = int(json_subtype['precision']/8)
+                out = 'type(%s)' % cls.get_native_type(
+                    type=('%s_pointer' % json_type['type'])).format(
+                        **json_subtype)
         elif 'X' in out:
             precision = json_type['precision']
             out = out.replace('X', str(int(precision / 8)))
@@ -423,6 +431,13 @@ class FortranModelDriver(CompiledModelDriver):
                      r'(?:\s*,\s*(?P<parameter>parameter))?'
                      r'(?:\s*,\s*intent\((?P<intent>.*?)\))?')
         grp = re.fullmatch(regex_var, native_type).groupdict()
+        if grp['type'].endswith(('_1d', '_nd')):
+            regex_nd = r'(?P<type>.*?)(?P<precision>\d+)?_(?P<ndim>(?:1)|(?:n))d'
+            grp = re.fullmatch(regex_nd, grp['type']).groupdict()
+            if grp['ndim'] == '1':
+                grp['shape'] = ':'
+            else:
+                grp['shape'] = ':,:'
         if grp.get('precision', False):
             out['precision'] = 8 * int(grp['precision'])
             grp['type'] += '(kind = X)'
@@ -432,15 +447,17 @@ class FortranModelDriver(CompiledModelDriver):
         else:
             out['type'] = super(FortranModelDriver, cls).get_json_type(grp['type'])
         if grp.get('shape', False):
-            shape = [int(i) for i in grp['shape'].split(',')]
+            shape = grp['shape'].split(',')
             ndim = len(shape)
             out['subtype'] = out['type']
             if ndim == 1:
                 out['type'] = '1darray'
-                out['length'] = shape[0]
+                if shape[0] != ':':
+                    out['length'] = int(shape[0])
             else:
                 out['type'] = 'ndarray'
-                out['shape'] = shape
+                if shape[0] != ':':
+                    out['shape'] = [int(i) for i in shape]
         if out['type'] in _valid_types:
             out['subtype'] = out['type']
             out['type'] = 'scalar'
@@ -635,3 +652,25 @@ class FortranModelDriver(CompiledModelDriver):
                 for_yggdrasil=True)
         return super(FortranModelDriver, cls).write_model_recv(
             channel, recv_var_str, **kwargs)
+
+    @classmethod
+    def write_print_var(cls, var, **kwargs):
+        r"""Get the lines necessary to print a variable in this language.
+
+        Args:
+            var (dict): Variable information.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: Lines printing the specified variable.
+
+        """
+        if isinstance(var, dict):
+            datatype = var.get('datatype', var)
+            typename = datatype.get('type', None)
+            if ((((typename == '1darray') and ('length' not in datatype))
+                 or ((typename == 'ndarray') and ('shape' not in datatype)))):
+                return []
+        return super(FortranModelDriver, cls).write_print_var(
+            var, **kwargs)
