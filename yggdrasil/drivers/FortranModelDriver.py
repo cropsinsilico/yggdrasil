@@ -177,14 +177,14 @@ class FortranModelDriver(CompiledModelDriver):
         'not_flag_cond': '.not.{flag_var}',
         'flag_cond': '{flag_var}',
         'declare': '{type_name} :: {variable}',
-        'init_array': 'init_generic()',
-        'init_object': 'init_generic()',
-        'init_schema': 'init_generic()',
+        'init_array': 'yggarr(init_generic())',
+        'init_object': 'yggmap(init_generic())',
+        'init_schema': 'yggschema(init_generic())',
         'init_ply': 'init_ply()',
         'init_obj': 'init_obj()',
-        'init_class': 'init_python()',
-        'init_function': 'init_python()',
-        'init_instance': 'init_generic()',
+        'init_class': 'yggpyfunc(init_python())',
+        'init_function': 'yggpyfunc(init_python())',
+        'init_instance': 'yggpyinst(init_generic())',
         'init_any': 'init_generic()',
         'init_type_array': ('create_dtype_json_array({nitems}, '
                             '{items}, {use_generic})'),
@@ -210,33 +210,36 @@ class FortranModelDriver(CompiledModelDriver):
                             '{use_generic})'),
         'init_type_empty': ('create_dtype_empty({use_generic})'),
         'init_type_schema': ('create_dtype_schema({use_generic})'),
-        'copy_array': '{name} = copy_generic({value})',
-        'copy_object': '{name} = copy_generic({value})',
-        'copy_schema': '{name} = copy_generic({value})',
+        'copy_array': '{name} = yggarr(copy_generic(ygggeneric({value})))',
+        'copy_object': '{name} = yggmap(copy_generic(ygggeneric({value})))',
+        'copy_schema': '{name} = yggschema(copy_generic(ygggeneric({value})))',
         'copy_ply': '{name} = copy_ply({value})',
         'copy_obj': '{name} = copy_obj({value})',
-        'copy_class': '{name} = copy_python({value})',
-        'copy_function': '{name} = copy_python({value})',
-        'copy_instance': '{name} = copy_generic({value})',
+        'copy_class': '{name} = yggpyfunc(copy_python(yggpython({value})))',
+        'copy_function': '{name} = yggpyfunc(copy_python(yggpython({value})))',
+        'copy_instance': '{name} = yggpyinst(copy_generic(ygggeneric({value})))',
         'copy_generic': '{name} = copy_generic({value})',
         'copy_any': '{name} = copy_generic({value})',
-        'free_array': 'call free_generic({variable})',
-        'free_object': 'call free_generic({variable})',
-        'free_schema': 'call free_generic({variable})',
+        'free_array': 'call free_generic(ygggeneric({variable}))',
+        'free_object': 'call free_generic(ygggeneric({variable}))',
+        'free_schema': 'call free_generic(ygggeneric({variable}))',
         'free_ply': 'call free_ply({variable})',
         'free_obj': 'call free_obj({variable})',
-        'free_class': 'call free_python({variable})',
-        'free_function': 'call free_python({variable})',
-        'free_instance': 'call free_generic({variable})',
+        'free_class': 'call free_python(yggpython({variable}))',
+        'free_function': 'call free_python(yggpython({variable}))',
+        'free_instance': 'call free_generic(ygggeneric({variable}))',
         'free_any': 'call free_generic({variable})',
         'print_generic': 'write(*, *) {object}',
         'print': 'write(*, \'(\"{message}\")\')',
         'fprintf': 'write(*, \'(\"{message}\")\') {variables}',
+        'print_array': 'call display_generic(ygggeneric({object}))',
+        'print_object': 'call display_generic(ygggeneric({object}))',
+        'print_schema': 'call display_generic(ygggeneric({object}))',
         'print_ply': 'call display_ply({object})',
         'print_obj': 'call display_obj({object})',
-        'print_class': 'call display_python({object})',
-        'print_function': 'call display_python({object})',
-        'print_instance': 'call display_generic({object})',
+        'print_class': 'call display_python(yggpython({object}))',
+        'print_function': 'call display_python(yggpython({object}))',
+        'print_instance': 'call display_generic(ygggeneric({object}))',
         'print_any': 'call display_generic({object})',
         'assign': '{name} = {value}',
         'comment': '!',
@@ -399,7 +402,7 @@ class FortranModelDriver(CompiledModelDriver):
                 if json_subtype['type'] == 'character':
                     json_subtype['precision'] = ''
                 else:
-                    json_subtype['precision'] = int(json_subtype['precision']/8)
+                    json_subtype['precision'] = int(json_subtype['precision'] / 8)
                 out = 'type(%s)' % cls.get_native_type(
                     type=('%s_pointer' % json_type['type'])).format(
                         **json_subtype)
@@ -674,3 +677,25 @@ class FortranModelDriver(CompiledModelDriver):
                 return []
         return super(FortranModelDriver, cls).write_print_var(
             var, **kwargs)
+
+    @classmethod
+    def write_type_decl(cls, name, datatype, **kwargs):
+        r"""Get lines declaring the datatype within the language.
+
+        Args:
+            name (str): Name of variable that should be declared.
+            datatype (dict): Type definition.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: Lines required to define a type declaration.
+
+        """
+        if datatype['type'] == 'array':
+            datatype.setdefault('items', [])
+        elif datatype['type'] == 'object':
+            datatype.setdefault('properties', {})
+        out = super(FortranModelDriver, cls).write_type_decl(
+            name, datatype, **kwargs)
+        return out

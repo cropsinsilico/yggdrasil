@@ -69,6 +69,30 @@ module fygg
      module procedure yggarg_1darray_character
      module procedure yggarg_1darray_yggchar_r
   end interface yggarg
+  interface yggarr
+     module procedure ygggeneric2yggarr
+  end interface yggarr
+  interface yggmap
+     module procedure ygggeneric2yggmap
+  end interface yggmap
+  interface yggschema
+     module procedure ygggeneric2yggschema
+  end interface yggschema
+  interface yggpyinst
+     module procedure ygggeneric2yggpyinst
+  end interface yggpyinst
+  interface ygggeneric
+     module procedure yggarr2ygggeneric
+     module procedure yggmap2ygggeneric
+     module procedure yggschema2ygggeneric
+     module procedure yggpyinst2ygggeneric
+  end interface ygggeneric
+  interface yggpyfunc
+     module procedure yggpython2yggpyfunc
+  end interface yggpyfunc
+  interface yggpython
+     module procedure yggpyfunc2yggpython
+  end interface yggpython
   interface ygg_send_var
      module procedure ygg_send_var_sing
      module procedure ygg_send_var_mult
@@ -261,6 +285,16 @@ module fygg
      character(kind=c_char) :: prefix
      type(c_ptr) :: obj
   end type yggschema
+  type, bind(c) :: yggpyinst
+     character(kind=c_char) :: prefix
+     type(c_ptr) :: obj
+  end type yggpyinst
+  type, bind(c) :: yggpyfunc
+     character(kind=c_char, len=1000) :: name = c_null_char
+     type(c_ptr) :: args = c_null_ptr
+     type(c_ptr) :: kwargs = c_null_ptr
+     type(c_ptr) :: obj = c_null_ptr
+  end type yggpyfunc
   type, bind(c) :: yggpython
      character(kind=c_char, len=1000) :: name = c_null_char
      type(c_ptr) :: args = c_null_ptr
@@ -320,7 +354,7 @@ module fygg
 
   public :: yggarg, yggchar_r, yggcomm, ygggeneric, &
        yggptr, yggnull, yggarr, yggmap, &
-       yggschema, yggpython, yggply, yggobj, &
+       yggschema, yggpython, yggply, yggobj, yggpyinst, yggpyfunc, &
        integer_1d, real_1d, complex_1d, logical_1d, character_1d, &
        LINE_SIZE_MAX
 
@@ -331,6 +365,7 @@ contains
   include "YggInterface_realloc.f90"
   include "YggInterface_c2f.f90"
   include "YggInterface_arg.f90"
+  include "YggInterface_conv.f90"
   
   ! Utilities
   subroutine fix_format_str(x)

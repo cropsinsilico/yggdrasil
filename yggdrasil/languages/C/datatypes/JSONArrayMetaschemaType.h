@@ -33,6 +33,9 @@ public:
 			  const char *format_str = "",
 			  const bool use_generic=true) :
     MetaschemaType("array", use_generic) {
+    if (items.size() == 0) {
+      update_use_generic(true);
+    }
     strncpy(format_str_, format_str, 1000);
     strncpy(item_key_, "items", 100);
     update_items(items, true);

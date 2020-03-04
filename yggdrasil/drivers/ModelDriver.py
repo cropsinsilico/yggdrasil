@@ -1813,14 +1813,18 @@ class ModelDriver(Driver):
         elif datatype['type'] == 'object':
             if 'properties' in datatype:
                 assert(isinstance(datatype['properties'], dict))
+                precision = 0
+                if datatype['properties']:
+                    precision = max([len(k) for k in
+                                     datatype['properties'].keys()])
                 out += cls.write_declaration(
                     {'name': '%s_keys' % name_base,
                      'datatype': {
                          'type': '1darray', 'subtype': 'bytes',
                          'length': len(datatype['properties']),
-                         'precision': max(
-                             [len(k) for k in
-                              datatype['properties'].keys()])}})
+                         'precision': precision}},
+                    definitions=definitions,
+                    requires_freeing=requires_freeing)
                 out += cls.write_declaration(
                     {'name': '%s_vals' % name_base,
                      'datatype': {
