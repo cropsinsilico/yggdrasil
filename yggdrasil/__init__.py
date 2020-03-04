@@ -334,7 +334,7 @@ def run_tsts(**kwargs):  # pragma: no cover
         os.chdir(initial_dir)
         for k, v in old_env.items():
             if v is None:
-                del os.environ[k]
+                os.environ.pop(k, None)
             else:
                 os.environ[k] = v
         if os.path.isfile(pth_file):
