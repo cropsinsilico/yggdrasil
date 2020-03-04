@@ -15,6 +15,7 @@ void ygg_log_info_f(const char* fmt);
 void ygg_log_debug_f(const char* fmt);
 void ygg_log_error_f(const char* fmt);
 // Methods for initializing channels
+int is_comm_format_array_type_f(const void *x);
 void* ygg_output_f(const char *name);
 void* ygg_input_f(const char *name);
 void* yggOutputType_f(const char *name, void* datatype);
@@ -44,6 +45,7 @@ void *yggRpcClient_f(const char *name, const char *out_fmt,
 void *yggRpcServer_f(const char *name, const char *in_fmt,
 		     const char *out_fmt);
 // Method for constructing data types
+int is_dtype_format_array_f(void* type_struct);
 void *create_dtype_empty_f(const bool use_generic);
 void *create_dtype_python_f(void* pyobj, const bool use_generic);
 void *create_dtype_direct_f(const bool use_generic);

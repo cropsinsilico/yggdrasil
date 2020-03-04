@@ -458,6 +458,27 @@ extern "C" {
     return (void*)out;
   }
 
+  int is_dtype_format_array(dtype_t* type_struct) {
+    int out = 0;
+    try {
+      if (type_struct->obj == NULL) {
+	return -1;
+      }
+      MetaschemaType* type = dtype2class(type_struct);
+      const char* name = type->type();
+      if (strcmp(name, "array") == 0) {
+	JSONArrayMetaschemaType* array_type = static_cast<JSONArrayMetaschemaType*>(type);
+	if ((array_type->all_arrays()) && (strlen(array_type->format_str()) > 0)) {
+	  out = 1;
+	}
+      }
+    } catch(...) {
+      ygglog_error("is_dtype_format_array: C++ exception thrown.");
+      out = -1;
+    }
+    return out;
+  }
+
   generic_t init_generic() {
     generic_t out;
     out.prefix = prefix_char;

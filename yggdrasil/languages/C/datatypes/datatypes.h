@@ -101,6 +101,15 @@ void* type_from_pyobj_c(PyObject* pyobj, const bool use_generic);
 
 
 /*!
+  @brief Determine if a datatype was created from a format.
+  @params[in] type_struct dtype_t* Datatype structure.
+  @returns int 1 if the datatype was created from a format, 0 if it
+  was not, -1 if there is an error.
+ */
+int is_dtype_format_array(dtype_t* type_struct);
+  
+
+/*!
   @brief Initialize an empty generic object.
   @returns generic_t New generic object structure.
  */

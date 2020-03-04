@@ -7,6 +7,7 @@ function yggarg_scalar_init(x) result (y)
   y%alloc = .false.
   y%len = 1
   y%prec = 1
+  y%ndim = 1
 end function yggarg_scalar_init
 function yggarg_scalar_integer2(x) result (y)
   type(yggptr) :: y
@@ -294,6 +295,7 @@ function yggarg_realloc_1darray_init(x) &
   y%alloc = .true.
   y%len = 1
   y%prec = 1
+  y%ndim = 1
   y%ptr = c_null_ptr
 end function yggarg_realloc_1darray_init
 function yggarg_realloc_1darray_c_long(x) result (y)

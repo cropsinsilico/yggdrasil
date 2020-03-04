@@ -219,15 +219,21 @@ module fygg
      logical :: alloc = .false.
      integer(kind=8) :: len = 0
      integer(kind=8) :: prec = 0
+     integer(kind=8) :: ndim = 0
      integer(kind=8) :: nbytes = 0
+     integer(kind=8), dimension(:), pointer :: shape => null()
      type(c_ptr) :: ptr = c_null_ptr
      class(*), pointer :: item => null()
      class(*), dimension(:), pointer :: item_array => null()
      character, dimension(:), pointer :: data_character_unit => null()
      integer(kind=c_size_t), pointer :: len_c => null()
-     type(c_ptr) :: len_ptr = c_null_ptr
      integer(kind=c_size_t), pointer :: prec_c => null()
+     integer(kind=c_size_t), pointer :: ndim_c => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape_c => null()
+     type(c_ptr) :: len_ptr = c_null_ptr
      type(c_ptr) :: prec_ptr = c_null_ptr
+     type(c_ptr) :: ndim_ptr = c_null_ptr
+     type(c_ptr) :: shape_ptr = c_null_ptr
   end type yggptr
   type :: yggptr_arr
      type(yggptr), dimension(:), pointer :: vals => null()
@@ -377,6 +383,33 @@ contains
   end subroutine ygglog_error
 
   ! Methods for initializing channels
+  function is_comm_format_array_type(x, args) result(out)
+    implicit none
+    type(yggcomm), intent(in) :: x
+    type(yggptr) :: args(:)
+    logical :: out
+    integer(c_int) :: c_out
+    integer :: i
+    c_out = is_comm_format_array_type_c(x%comm)
+    if (c_out.eq.0) then
+       out = .false.
+    else if (c_out.eq.1) then
+       out = .true.
+    else
+       out = .true.
+       do i = 2, size(args)
+          if (.not.args(i)%array) then
+             out = .false.
+             exit
+          end if
+       end do
+       if ((out).and.(.not.((args(1)%array).or.(is_size_t(args(1)))))) then
+          out = .false.
+       end if
+       ! stop "is_comm_format_array_type: Error checking type."
+    end if
+  end function is_comm_format_array_type
+  
   function ygg_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -650,6 +683,21 @@ contains
   end function ygg_rpc_server
 
   ! Method for constructing data types
+  function is_dtype_format_array(type_struct) result(out)
+    implicit none
+    type(yggdtype) :: type_struct
+    logical :: out
+    integer(kind=c_int) :: c_out
+    c_out = is_dtype_format_array_c(type_struct%ptr)
+    if (c_out.eq.0) then
+       out = .false.
+    else if (c_out.eq.1) then
+       out = .true.
+    else
+       stop "is_dtype_format_array: Error checking data type"
+    end if
+  end function is_dtype_format_array
+  
   function create_dtype_empty(use_generic) result(out)
     implicit none
     logical, intent(in) :: use_generic
@@ -921,23 +969,34 @@ contains
     type(yggcomm), intent(in) :: ygg_q
     type(c_ptr) :: c_ygg_q
     type(yggptr) :: args(:)
-    type(c_ptr), target :: c_args(size(args))
+    type(c_ptr), allocatable, target :: c_args(:)
     integer :: c_nargs
     integer :: i
-    logical :: flag
+    logical :: flag, is_format
     integer(kind=c_int) :: c_flag
+    is_format = is_comm_format_array_type(ygg_q, args)
     c_ygg_q = ygg_q%comm
-    c_nargs = size(args)
-    do i = 1, size(args)
-       c_args(i) = args(i)%ptr
-    end do
+    c_nargs = pre_send(args, c_args, is_format)
     c_flag = ygg_send_var_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
     if (c_flag.ge.0) then
        flag = .true.
     else
        flag = .false.
     end if
+    call post_send(args, c_args, flag)
   end function ygg_send_var_mult
+
+  function is_next_size_t(args, i) result(flag)
+    implicit none
+    type(yggptr) :: args(:)
+    integer :: i
+    logical :: flag
+    if (i.ge.size(args)) then
+       flag = .false.
+    else
+       flag = is_size_t(args(i+1))
+    end if
+  end function is_next_size_t
 
   function is_size_t(arg) result(flag)
     type(yggptr), intent(in) :: arg
@@ -950,34 +1009,71 @@ contains
     end if
   end function is_size_t
 
-  subroutine pre_recv(args, c_args)
+  function pre_send(args, c_args, is_format) result(c_nargs)
     implicit none
     type(yggptr) :: args(:)
     type(c_ptr), allocatable, target :: c_args(:)
+    logical :: is_format
+    integer(kind=c_int) :: c_nargs
     integer :: i, j
     integer :: nargs
-    nargs = size(args)
+    nargs = size(args)  ! Number of arguments passed
+    c_nargs = nargs  ! Number of arguments that C should be aware of
+    if (is_format) then
+       if (.not.is_size_t(args(1))) then
+          nargs = nargs + 1
+          c_nargs = c_nargs + 1
+       end if
+    end if
     do i = 1, size(args)
        allocate(args(i)%len_c)
        allocate(args(i)%prec_c)
+       allocate(args(i)%ndim_c)
+       allocate(args(i)%shape_c(1))
        args(i)%len_c = 1
        args(i)%prec_c = 1
-       if (((args(i)%type.eq."character").or. &
-            args(i)%array).and. &
-            ((i.ge.size(args)).or.(.not.is_size_t(args(i+1))))) then
-          nargs = nargs + 1
-          if ((args(i)%type.eq."character").and.args(i)%array) then
-             nargs = nargs + 1
+       args(i)%ndim_c = 1
+       args(i)%shape_c(1) = 1
+       if (args(i)%array) then
+          if ((.not.is_format).and.(.not.is_next_size_t(args, i))) then
+             if (args(i)%alloc) then
+                nargs = nargs + 1  ! For the array size
+                c_nargs = c_nargs + 1
+             end if
+          end if
+       else if (args(i)%type.eq."character") then
+          if (.not.is_next_size_t(args, i)) then
+             nargs = nargs + 1  ! For the string size
+             c_nargs = c_nargs + 1
           end if
        end if
     end do
     allocate(c_args(nargs))
     j = 1
+    if (is_format) then
+       if (.not.is_size_t(args(1))) then
+          args(1)%len_c = args(1)%len
+          args(1)%len_ptr = c_loc(args(1)%len_c)
+          c_args(j) = args(1)%len_ptr
+          j = j + 1
+       end if
+    end if
     do i = 1, size(args)
        c_args(j) = args(i)%ptr
        j = j + 1
-       if ((args(i)%type.eq."character").and.(.not.args(i)%array)) then
-          if ((i.lt.size(args)).and.(is_size_t(args(i+1)))) then
+       if (args(i)%array) then
+          if (is_format) then
+             args(i)%len_ptr = c_args(1)
+          else if (is_next_size_t(args, i)) then
+             args(i)%len_ptr = args(i+1)%ptr
+          else if (args(i)%alloc) then
+             args(i)%len_c = args(i)%len
+             args(i)%len_ptr = c_loc(args(i)%len_c)
+             c_args(j) = args(i)%len_ptr
+             j = j + 1
+          end if
+       else if (args(i)%type.eq."character") then
+          if (is_next_size_t(args, i)) then
              args(i)%prec_ptr = args(i+1)%ptr
           else
              args(i)%prec_c = args(i)%prec
@@ -985,8 +1081,69 @@ contains
              c_args(j) = args(i)%prec_ptr
              j = j + 1
           end if
-       else if ((args(i)%type.eq."character").or.args(i)%array) then
-          if ((i.lt.size(args)).and.(is_size_t(args(i+1)))) then
+       end if
+    end do
+  end function pre_send
+
+  function pre_recv(args, c_args, is_format) result(c_nargs)
+    implicit none
+    type(yggptr) :: args(:)
+    type(c_ptr), allocatable, target :: c_args(:)
+    logical :: is_format
+    integer(kind=c_int) :: c_nargs
+    integer :: i, j
+    integer :: nargs
+    nargs = size(args)  ! Number of arguments passed
+    c_nargs = nargs  ! Number of arguments that C should be aware of
+    if (is_format) then
+       if (.not.is_size_t(args(1))) then
+          nargs = nargs + 1
+          c_nargs = c_nargs + 1
+       end if
+    end if
+    do i = 1, size(args)
+       allocate(args(i)%len_c)
+       allocate(args(i)%prec_c)
+       allocate(args(i)%ndim_c)
+       allocate(args(i)%shape_c(1))
+       args(i)%len_c = 1
+       args(i)%prec_c = 1
+       args(i)%ndim_c = 1
+       args(i)%shape_c(1) = 1
+       if (args(i)%array) then
+          if ((.not.is_format).and.(.not.is_next_size_t(args, i))) then
+             nargs = nargs + 1  ! For the array size
+             if (args(i)%alloc) then
+                c_nargs = c_nargs + 1
+             end if
+          end if
+          if (args(i)%type.eq."character") then
+             nargs = nargs + 1  ! For the string length
+          end if
+       else if (args(i)%type.eq."character") then
+          if (.not.is_next_size_t(args, i)) then
+             nargs = nargs + 1  ! For the string size
+             c_nargs = c_nargs + 1
+          end if
+       end if
+    end do
+    allocate(c_args(nargs))
+    j = 1
+    if (is_format) then
+       if (.not.is_size_t(args(1))) then
+          args(1)%len_c = args(1)%len
+          args(1)%len_ptr = c_loc(args(1)%len_c)
+          c_args(j) = args(1)%len_ptr
+          j = j + 1
+       end if
+    end if
+    do i = 1, size(args)
+       c_args(j) = args(i)%ptr
+       j = j + 1
+       if (args(i)%array) then
+          if (is_format) then
+             args(i)%len_ptr = c_args(1)
+          else if (is_next_size_t(args, i)) then
              args(i)%len_ptr = args(i+1)%ptr
           else
              args(i)%len_c = args(i)%len
@@ -994,7 +1151,16 @@ contains
              c_args(j) = args(i)%len_ptr
              j = j + 1
           end if
-          if ((args(i)%type.eq."character").and.args(i)%array) then
+          if (args(i)%type.eq."character") then
+             args(i)%prec_c = args(i)%prec
+             args(i)%prec_ptr = c_loc(args(i)%prec_c)
+             c_args(j) = args(i)%prec_ptr
+             j = j + 1
+          end if
+       else if (args(i)%type.eq."character") then
+          if (is_next_size_t(args, i)) then
+             args(i)%prec_ptr = args(i+1)%ptr
+          else
              args(i)%prec_c = args(i)%prec
              args(i)%prec_ptr = c_loc(args(i)%prec_c)
              c_args(j) = args(i)%prec_ptr
@@ -1002,18 +1168,23 @@ contains
           end if
        end if
     end do
-  end subroutine pre_recv
+  end function pre_recv
 
-  subroutine post_recv(args, c_args, flag, realloc)
+  subroutine post_recv(args, c_args, flag, realloc, is_format)
     implicit none
     type(yggptr) :: args(:)
     type(c_ptr), allocatable, target :: c_args(:)
     logical :: flag
     integer :: i, j
-    logical :: realloc
+    logical :: realloc, is_format
     call ygglog_debug("post_recv: begin")
     if (flag) then
        j = 1
+       if (is_format) then
+          if (.not.is_size_t(args(1))) then
+             j = j + 1
+          end if
+       end if
        do i = 1, size(args)
           args(i)%ptr = c_args(j)
           flag = yggptr_c2f(args(i), realloc)
@@ -1022,15 +1193,26 @@ contains
              exit
           end if
           j = j + 1
-          if (((args(i)%type.eq."character").or.args(i)%array).and. &
-               ((i.ge.size(args)).or.(.not.is_size_t(args(i+1))))) then
-             j = j + 1
-             if ((args(i)%type.eq."character").and.args(i)%array) then
+          if (args(i)%array) then
+             if ((.not.is_format).and.(.not.is_next_size_t(args, i))) then
+                j = j + 1
+             end if
+             if (args(i)%type.eq."character") then
+                j = j + 1
+             end if
+          else if (args(i)%type.eq."character") then
+             if (.not.is_next_size_t(args, i)) then
                 j = j + 1
              end if
           end if
+       end do
+    end if
+    if (flag) then
+       do i = 1, size(args)
           deallocate(args(i)%len_c)
           deallocate(args(i)%prec_c)
+          deallocate(args(i)%ndim_c)
+          deallocate(args(i)%shape_c)
        end do
     end if
     if (allocated(c_args)) then
@@ -1038,6 +1220,27 @@ contains
     end if
     call ygglog_debug("post_recv: end")
   end subroutine post_recv
+
+  subroutine post_send(args, c_args, flag)
+    implicit none
+    type(yggptr) :: args(:)
+    type(c_ptr), allocatable, target :: c_args(:)
+    logical :: flag
+    integer :: i
+    call ygglog_debug("post_send: begin")
+    if (flag) then
+       do i = 1, size(args)
+          deallocate(args(i)%len_c)
+          deallocate(args(i)%prec_c)
+          deallocate(args(i)%ndim_c)
+          deallocate(args(i)%shape_c)
+       end do
+    end if
+    if (allocated(c_args)) then
+       deallocate(c_args)
+    end if
+    call ygglog_debug("post_send: end")
+  end subroutine post_send
 
   function ygg_rpc_call_1v1(ygg_q, oarg, iarg) result (flag)
     implicit none
@@ -1071,19 +1274,24 @@ contains
     type(yggptr) :: iargs(:)
     type(c_ptr), allocatable, target :: c_args(:)
     type(c_ptr), allocatable, target :: c_iargs(:)
+    type(c_ptr), allocatable, target :: c_oargs(:)
     integer :: c_nargs
     logical :: flag
     integer :: i
     integer(kind=c_int) :: c_flag
+    logical :: iis_format, ois_format
+    ois_format = is_comm_format_array_type(ygg_q, oargs)
+    iis_format = is_comm_format_array_type(ygg_q, iargs)
     c_ygg_q = ygg_q%comm
-    call pre_recv(iargs, c_iargs)
-    c_nargs = size(oargs) + size(iargs)
-    allocate(c_args(size(oargs) + size(c_iargs)))
-    do i = 1, size(oargs)
-       c_args(i) = oargs(i)%ptr
+    c_nargs = 0
+    c_nargs = c_nargs + pre_send(oargs, c_oargs, ois_format)
+    c_nargs = c_nargs + pre_recv(iargs, c_iargs, iis_format)
+    allocate(c_args(size(c_oargs) + size(c_iargs)))
+    do i = 1, size(c_oargs)
+       c_args(i) = c_oargs(i)
     end do
     do i = 1, size(c_iargs)
-       c_args(i + size(oargs)) = c_iargs(i)
+       c_args(i + size(c_oargs)) = c_iargs(i)
     end do
     c_flag = ygg_rpc_call_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
     if (c_flag.ge.0) then
@@ -1092,9 +1300,10 @@ contains
        flag = .false.
     end if
     do i = 1, size(c_iargs)
-       c_iargs(i) = c_args(i + size(oargs))
+       c_iargs(i) = c_args(i + size(c_oargs))
     end do
-    call post_recv(iargs, c_iargs, flag, .false.)
+    call post_send(oargs, c_oargs, flag)
+    call post_recv(iargs, c_iargs, flag, .false., iis_format)
     if (allocated(c_args)) then
        deallocate(c_args)
     end if
@@ -1131,12 +1340,15 @@ contains
     type(yggptr) :: oargs(:)
     type(yggptr) :: iargs(:)
     type(c_ptr), allocatable, target :: c_args(:)
+    type(c_ptr), allocatable, target :: c_oargs(:)
     type(c_ptr), allocatable, target :: c_iargs(:)
     integer :: c_nargs
-    logical :: flag
+    logical :: flag, iis_format, ois_format
     integer(kind=c_int) :: c_flag
     integer :: i
     c_ygg_q = ygg_q%comm
+    ois_format = is_comm_format_array_type(ygg_q, oargs)
+    iis_format = is_comm_format_array_type(ygg_q, iargs)
     flag = .true.
     do i = 1, size(iargs)
        if ((iargs(i)%array.or.(iargs(i)%type.eq."character")).and. &
@@ -1146,14 +1358,15 @@ contains
        end if
     end do
     if (flag) then
-       call pre_recv(iargs, c_iargs)
-       c_nargs = size(oargs) + size(iargs)
-       allocate(c_args(size(oargs) + size(c_iargs)))
-       do i = 1, size(oargs)
-          c_args(i) = oargs(i)%ptr
+       c_nargs = 0
+       c_nargs = c_nargs + pre_send(oargs, c_oargs, ois_format)
+       c_nargs = c_nargs + pre_recv(iargs, c_iargs, iis_format)
+       allocate(c_args(size(c_oargs) + size(c_iargs)))
+       do i = 1, size(c_oargs)
+          c_args(i) = c_oargs(i)
        end do
        do i = 1, size(c_iargs)
-          c_args(i + size(oargs)) = c_iargs(i)
+          c_args(i + size(c_oargs)) = c_iargs(i)
        end do
        c_flag = ygg_rpc_call_realloc_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
        if (c_flag.ge.0) then
@@ -1162,10 +1375,11 @@ contains
           flag = .false.
        end if
        do i = 1, size(c_iargs)
-          c_iargs(i) = c_args(i + size(oargs))
+          c_iargs(i) = c_args(i + size(c_oargs))
        end do
     end if
-    call post_recv(iargs, c_iargs, flag, .true.)
+    call post_send(oargs, c_oargs, flag)
+    call post_recv(iargs, c_iargs, flag, .true., iis_format)
     if (allocated(c_args)) then
        deallocate(c_args)
     end if
@@ -1185,18 +1399,18 @@ contains
     type(yggptr) :: args(:)
     type(c_ptr), allocatable, target :: c_args(:)
     integer :: c_nargs
-    logical :: flag
+    logical :: flag, is_format
     integer(kind=c_int) :: c_flag
+    is_format = is_comm_format_array_type(ygg_q, args)
     c_ygg_q = ygg_q%comm
-    call pre_recv(args, c_args)
-    c_nargs = size(args)
+    c_nargs = pre_recv(args, c_args, is_format)
     c_flag = ygg_recv_var_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
     if (c_flag.ge.0) then
        flag = .true.
     else
        flag = .false.
     end if
-    call post_recv(args, c_args, flag, .false.)
+    call post_recv(args, c_args, flag, .false., is_format)
   end function ygg_recv_var_mult
 
   function ygg_recv_var_realloc_sing(ygg_q, arg) result (flag)
@@ -1213,10 +1427,11 @@ contains
     type(yggptr), target :: args(:)
     type(c_ptr), allocatable, target :: c_args(:)
     integer :: c_nargs
-    logical :: flag
+    logical :: flag, is_format
     integer :: i
     integer(kind=c_int) :: c_flag
     call ygglog_debug("ygg_recv_var_realloc: begin")
+    is_format = is_comm_format_array_type(ygg_q, args)
     c_ygg_q = ygg_q%comm
     flag = .true.
     do i = 1, size(args)
@@ -1227,8 +1442,7 @@ contains
        end if
     end do
     if (flag) then
-       call pre_recv(args, c_args)
-       c_nargs = size(args)
+       c_nargs = pre_recv(args, c_args, is_format)
        c_flag = ygg_recv_var_realloc_c(c_ygg_q, c_nargs, c_loc(c_args(1)))
        if (c_flag.ge.0) then
           flag = .true.
@@ -1236,7 +1450,7 @@ contains
           flag = .false.
        end if
     end if
-    call post_recv(args, c_args, flag, .true.)
+    call post_recv(args, c_args, flag, .true., is_format)
     call ygglog_debug("ygg_recv_var_realloc: end")
   end function ygg_recv_var_realloc_mult
 

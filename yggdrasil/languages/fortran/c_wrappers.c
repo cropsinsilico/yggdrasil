@@ -19,6 +19,10 @@ void ygg_log_error_f(const char* fmt) {
 }
 
 // Methods for initializing channels
+int is_comm_format_array_type_f(const void *x) {
+  return is_comm_format_array_type((const comm_t*)x);
+}
+
 void* ygg_output_f(const char *name) {
   return (void*)yggOutput(name);
 }
@@ -126,6 +130,10 @@ void *yggRpcServer_f(const char *name, const char *in_fmt,
 }
 
 // Method for constructing data types
+int is_dtype_format_array_f(void* type_struct) {
+  return is_dtype_format_array((dtype_t*)type_struct);
+}
+
 void *create_dtype_empty_f(const bool use_generic) {
   return (void*)create_dtype_empty(use_generic);
 }

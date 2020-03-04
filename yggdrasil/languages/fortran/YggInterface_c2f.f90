@@ -16,13 +16,13 @@ function yggptr_c2f(x, realloc) result(flag)
   if (x%array) then
      deallocate(array_len)
      call c_f_pointer(x%len_ptr, array_len)
-     write(log_msg, '("array_len = ",i7)'), array_len
+     write(log_msg, '("array_len = ",i7)') array_len
      call ygglog_debug(log_msg)
   end if
   if (x%type.eq."character") then
      deallocate(precision)
      call c_f_pointer(x%prec_ptr, precision)
-     write(log_msg, '("precision = ",i7)'), precision
+     write(log_msg, '("precision = ",i7)') precision
      call ygglog_debug(log_msg)
   end if
   flag = yggptr_realloc(x, array_len, precision, realloc)
@@ -68,7 +68,7 @@ function yggptr_c2f(x, realloc) result(flag)
         type is (character_1d)
            call yggptr_c2f_1darray_character(x)
         class default
-           write(log_msg, '("yggptr_c2f (realloc array transfer): Unexpected type: ",A)'), x%type
+           write(log_msg, '("yggptr_c2f (realloc array transfer): Unexpected type: ",A)') x%type
            call ygglog_error(log_msg)
            stop "ERROR"
         end select
@@ -92,7 +92,7 @@ function yggptr_c2f(x, realloc) result(flag)
         type is (character(*))
            call yggptr_c2f_array_character(x)
         class default
-           write(log_msg, '("yggptr_c2f (realloc transfer): Unexpected type: ",A)'), x%type
+           write(log_msg, '("yggptr_c2f (realloc transfer): Unexpected type: ",A)') x%type
            call ygglog_error(log_msg)
            stop "ERROR"
         end select
@@ -121,7 +121,7 @@ function yggptr_c2f(x, realloc) result(flag)
              (x%type.eq."generic")) then
            ! Use pointer
         else
-           write(log_msg, '("yggptr_c2f (scalar transfer): Unexpected type: ",A)'), x%type
+           write(log_msg, '("yggptr_c2f (scalar transfer): Unexpected type: ",A)') x%type
            call ygglog_error(log_msg)
            stop "ERROR"
         end if

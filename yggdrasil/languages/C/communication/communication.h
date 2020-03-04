@@ -30,6 +30,18 @@ int comm_nmsg(const comm_t *x);
 
 
 /*!
+  @brief Determine if a channel has a format type associated with it.
+  @param[in] x comm_t * Pointer to communicator to check.
+  @returns int 1 if format type, 0 otherwise.
+ */
+static
+int is_comm_format_array_type(const comm_t *x) {
+  dtype_t *datatype = x->datatype;
+  return is_dtype_format_array(datatype);
+};
+
+  
+/*!
   @brief Perform deallocation for type specific communicator.
   @param[in] x comm_t * Pointer to communicator to deallocate.
   @returns int 1 if there is an error, 0 otherwise.

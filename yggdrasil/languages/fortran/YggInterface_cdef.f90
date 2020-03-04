@@ -23,6 +23,14 @@
      end subroutine ygglog_error_c
   
      ! Methods for initializing channels
+     function is_comm_format_array_type_c(x) result(out) &
+          bind(c, name="is_comm_format_array_type_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_int
+       implicit none
+       type(c_ptr), value, intent(in) :: x
+       integer(kind=c_int) :: out
+     end function is_comm_format_array_type_c
+     
      function ygg_output_c(name) result(channel) &
           bind(c, name="ygg_output_f")
        use, intrinsic :: iso_c_binding, only: c_ptr, c_char
@@ -242,6 +250,14 @@
      end function ygg_rpc_server_c
 
      ! Method for constructing data types
+     function is_dtype_format_array_c(type_struct) result(out) &
+          bind(c, name="is_dtype_format_array_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_int
+       implicit none
+       type(c_ptr), value, intent(in) :: type_struct
+       integer(kind=c_int) :: out
+     end function is_dtype_format_array_c
+     
      function create_dtype_empty_c(use_generic) result(out) &
           bind(c, name="create_dtype_empty_f")
        use, intrinsic :: iso_c_binding, only: c_ptr, c_bool

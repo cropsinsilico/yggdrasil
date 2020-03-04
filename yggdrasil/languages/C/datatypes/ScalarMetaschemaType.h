@@ -1392,24 +1392,6 @@ public:
 	return false;
       }
     }
-    if (ap.for_fortran) {
-      if (ap.using_ptrs) {
-	if (type_code() == T_1DARRAY) {
-	  ap.nptrs++;
-	  size_t * const arg_siz = (size_t* const)get_va_list_ptr_cpp(&ap);
-	  arg_siz[0] = (size_t)nelements();
-	  if ((subtype_code_ == T_BYTES) || (subtype_code_ == T_UNICODE)) {
-	    ap.nptrs++;
-	    size_t * arg_prec = (size_t*)get_va_list_ptr_cpp(&ap);
-	    arg_prec[0] = (size_t)(precision()/8);
-	  }
-	}
-      } else {
-	ygglog_error("ScalarMetaschemaType::decode_data: for_fortran not supported when not using pointers to pass variable arguments.");
-	free(decoded_bytes);
-	return false;
-      }
-    }
     free(decoded_bytes);
     return true;
   }
@@ -1848,6 +1830,22 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
       skip_after_.push_back(sizeof(size_t*));
       out = out + 2;
     }
+    if ((ap.for_fortran) && (ap.using_ptrs)) {
+      if ((!(_variable_length)) || (*nargs < 2)) {
+	va_list_t_skip(&ap, sizeof(unsigned char**));
+	out = out + 1;
+      }
+      if (!(_variable_length)) {
+	ap.nptrs++;
+	size_t * const new_length = (size_t* const)get_va_list_ptr_cpp(&ap);
+	new_length[0] = length_;
+      }
+      if ((subtype_code() == T_BYTES) || (subtype_code() == T_UNICODE)) {
+	ap.nptrs++;
+	size_t * arg_prec = (size_t*)get_va_list_ptr_cpp(&ap);
+	arg_prec[0] = (size_t)(precision()/8);
+      }
+    }
     return out;
   }
   /*!
@@ -1904,6 +1902,37 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     writer->Key("length");
     writer->Int((int)length_);
     return true;
+  }
+
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[in] allow_realloc int If 1, the passed variables will be reallocated
+    to contain the deserialized data.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On return,
+    the number of arguments assigned from the deserialized data will be assigned
+    to this address.
+    @param[out] ap va_list_t Reference to variable argument list containing
+    address where deserialized data should be assigned.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
+  bool decode_data(rapidjson::Value &data, const int allow_realloc,
+		   size_t *nargs, va_list_t &ap) const override {
+    bool out = ScalarMetaschemaType::decode_data(data, allow_realloc,
+						 nargs, ap);
+    if (out) {
+      if ((ap.for_fortran) && (ap.using_ptrs)) {
+	if (!(_variable_length)) {
+	  ap.nptrs++;
+	  va_list_t_skip(&ap, sizeof(size_t*));
+	}
+	if ((subtype_code() == T_BYTES) || (subtype_code() == T_UNICODE)) {
+	  ap.nptrs++;
+	  va_list_t_skip(&ap, sizeof(size_t*));
+	}
+      }
+    }
+    return out;
   }
   
 private:
@@ -2103,7 +2132,7 @@ size_t NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va
     skip_after_.push_back(sizeof(size_t**));
     size_t* new_shape_temp = (size_t*)realloc(new_shape[0], ndim()*sizeof(size_t));
     if (new_shape_temp == NULL) {
-      ygglog_throw_error("NDArrayMetaschemaType::decode_data: Failed to realloc memory for the provided shape array.");
+      ygglog_throw_error("NDArrayMetaschemaType::update_from_deseriali: Failed to realloc memory for the provided shape array.");
     }
     new_shape[0] = new_shape_temp;
     size_t i;
