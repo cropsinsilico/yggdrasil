@@ -237,7 +237,7 @@ def run_tsts(**kwargs):  # pragma: no cover
             # See information about getting coverage of test fixtures
             # https://pytest-cov.readthedocs.io/en/stable/plugins.html
             argv.append('--cov=%s' % package_dir)
-            argv.append('--cov-append')
+            # argv.append('--cov-append')
     if args.noflaky:
         if _test_package_name == 'pytest':
             argv += ['-p', 'no:flaky']
