@@ -1,5 +1,6 @@
 import os
 import re
+import warnings
 import copy
 import shutil
 import subprocess
@@ -241,7 +242,11 @@ _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
 _python_inc = sysconfig.get_paths()['include']
-_python_lib = tools.get_python_c_library(allow_failure=False)
+try:
+    _python_lib = tools.get_python_c_library(allow_failure=False)
+except BaseException:  # pragma: debug
+    warnings.warn("ERROR LOCATING PYTHON LIBRARY")
+    _python_lib = None
 _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
 _numpy_lib = None
 
@@ -445,7 +450,7 @@ class CModelDriver(CompiledModelDriver):
         CompiledModelDriver.after_registration(cls)
         archiver = cls.get_tool('archiver', default=None)
         linker = cls.get_tool('linker', default=None)
-        if archiver:
+        if archiver and _python_lib:
             if _python_lib.endswith(archiver.library_ext):
                 cls.external_libraries['python']['libtype'] = 'static'
                 cls.external_libraries['python']['static'] = _python_lib
