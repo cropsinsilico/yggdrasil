@@ -193,11 +193,13 @@ class SelectFieldsTransform(TransformBase):
                  'in/out_t': [({'type': 'array',
                                 'items': [
                                     {'type': 'int', 'title': x}
-                                    for x in 'abc']},
+                                    for x in 'abc'],
+                                'format_str': b'# %d\t%d\t%d\n'},
                                {'type': 'array',
                                 'items': [
                                     {'type': 'int', 'title': x}
-                                    for x in 'ac']}),
+                                    for x in 'ac'],
+                                'format_str': b'# %d\t%d\n'}),
                               ({'type': 'array',
                                 'field_names': [x for x in 'abc'],
                                 'items': [
