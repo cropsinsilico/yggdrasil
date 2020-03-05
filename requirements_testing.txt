@@ -1,5 +1,5 @@
 codecov
-coverage<=4.5.4
+coverage<5
 coveralls
 flake8
 flaky
