@@ -73,6 +73,8 @@ def register_example(example_dir):
     out_src = {}
     src_is_abs = False
     for lang in lang_avail:
+        if lang not in ext_map:  # pragma: debug
+            continue
         yml_names = []
         src_names = []
         if example_base == 'rpcFib':
