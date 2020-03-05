@@ -838,8 +838,7 @@ class SchemaRegistry(object):
             for p in rlist:
                 out['definitions'][k]['properties'].pop(p, None)
         for k, rlist in prop_required.items():
-            if 'required' not in out['definitions'][k]:
-                out['definitions'][k]['required'] = []
+            out['definitions'][k].setdefault('required', [])
             for p in rlist:
                 if p not in out['definitions'][k]['required']:
                     out['definitions'][k]['required'].append(p)
