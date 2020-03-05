@@ -211,7 +211,7 @@ jobs:
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
-      env: YGG_CONDA=3.8 YGG_TEST_FLAGS="--test-suite=examples serialize communication/tests/test_IPCComm.py communication/tests/test_RMQAsyncComm.py"
+      env: YGG_CONDA=3.8 YGG_TEST_FLAGS="--test-suite=examples serialize communication"
       script:
         - yggconfig --remove-file
         - yggtest --ci $YGG_TEST_FLAGS
