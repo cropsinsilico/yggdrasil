@@ -518,10 +518,7 @@ class ModelDriver(Driver):
         if isinstance(args, (str, bytes)):
             args = args.split()
         for i in range(len(args)):
-            if isinstance(args[i], bytes):
-                args[i] = args[i].decode("utf-8")
-            else:
-                args[i] = str(args[i])
+            args[i] = str(args[i])
         assert(isinstance(args, list))
         if default_model_dir is None:
             default_model_dir = self.working_dir
