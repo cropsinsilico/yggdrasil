@@ -88,7 +88,7 @@ class PickleSerialize(DefaultSerialize):
             out['contents'] = (
                 b'\x80\x03C\rTest message\nq\x00.'
                 + b'\x80\x03C\x0fTest message 2\nq\x00.')
-        else:
+        else:  # pragma: Python 3.8
             out['contents'] = (
                 b'\x80\x04\x95\x11\x00\x00\x00\x00\x00\x00\x00C\r'
                 + b'Test message\n\x94.\x80\x04\x95\x13'
