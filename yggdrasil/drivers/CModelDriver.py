@@ -448,29 +448,16 @@ class CModelDriver(CompiledModelDriver):
             elif platform._is_win:  # pragma: windows
                 cls.default_compiler = 'cl'
         CompiledModelDriver.after_registration(cls)
-        archiver = cls.get_tool('archiver', default=None)
-        linker = cls.get_tool('linker', default=None)
-        if archiver and _python_lib:
-            if _python_lib.endswith(archiver.library_ext):
-                cls.external_libraries['python']['libtype'] = 'static'
-                cls.external_libraries['python']['static'] = _python_lib
-            else:
-                cls.external_libraries['python']['libtype'] = 'shared'
-                cls.external_libraries['python']['shared'] = _python_lib
+        if _python_lib and _python_lib.endswith(('.lib', '.a')):
+            cls.external_libraries['python']['libtype'] = 'static'
+            cls.external_libraries['python']['static'] = _python_lib
+        else:
+            cls.external_libraries['python']['libtype'] = 'shared'
+            cls.external_libraries['python']['shared'] = _python_lib
         for x in ['zmq', 'czmq']:
             if x in cls.external_libraries:
                 if platform._is_win:  # pragma: windows
                     cls.external_libraries[x]['libtype'] = 'static'
-                libtype = cls.external_libraries[x]['libtype']
-                if libtype == 'static':  # pragma: debug
-                    tool = archiver
-                    kwargs = {}
-                else:
-                    tool = linker
-                    kwargs = {'build_library': True}
-                if tool:
-                    cls.external_libraries[x][libtype] = tool.get_output_file(
-                        x, **kwargs)
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']

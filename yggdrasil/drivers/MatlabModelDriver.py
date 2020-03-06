@@ -3,6 +3,7 @@ import uuid as uuid_gen
 import logging
 from datetime import datetime
 import os
+import glob
 import psutil
 import warnings
 import weakref
@@ -530,6 +531,20 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         self.mlsession = None
         self.mlprocess = None
 
+    @staticmethod
+    def after_registration(cls):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
+        default compiler. The order of precedence is the config file 'compiler'
+        option for the language, followed by the environment variable set by
+        _compiler_env, followed by the existing class attribute.
+        """
+        if platform._is_mac:
+            cls._executable_search_dirs = [
+                os.path.join(x, 'bin') for x in
+                glob.glob('/Applications/MATLAB*')]
+        InterpretedModelDriver.after_registration(cls)
+        
     def parse_arguments(self, args):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.
@@ -699,14 +714,19 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         return out
         
     @classmethod
-    def language_version(cls):
+    def language_version(cls, skip_config=False):
         r"""Determine the version of this language.
+
+        Args:
+            skip_config (bool, optional): If True, the config option
+                for the version (if it exists) will be ignored and
+                the version will be determined fresh.
 
         Returns:
             str: Version of compiler/interpreter for this language.
 
         """
-        if ygg_cfg.has_option(cls.language, 'version'):
+        if ygg_cfg.has_option(cls.language, 'version') and (not skip_config):
             return ygg_cfg.get(cls.language, 'version')
         return cls.get_matlab_info()[1]
         

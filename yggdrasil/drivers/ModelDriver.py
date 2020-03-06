@@ -11,7 +11,7 @@ import tempfile
 from collections import OrderedDict
 from pprint import pformat
 from yggdrasil import platform, tools, languages
-from yggdrasil.config import ygg_cfg, locate_file, update_language_config
+from yggdrasil.config import ygg_cfg
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.metaschema.datatypes import is_default_typedef
@@ -326,8 +326,10 @@ class ModelDriver(Driver):
                         'array_output': 'YggArrayOutput',
                         'pandas_input': 'YggPandasInput',
                         'pandas_output': 'YggPandasOutput'}
-
     _library_cache = {}
+    _config_keys = []
+    _config_attr_map = []
+    _executable_search_dirs = None
 
     def __init__(self, name, args, model_index=0, **kwargs):
         self.model_outputs_in_inputs = kwargs.pop('outputs_in_inputs', None)
@@ -415,12 +417,27 @@ class ModelDriver(Driver):
             cls.language_ext = [cls.language_ext]
             
     @staticmethod
+    def after_registration(cls):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
+        default compiler. The order of precedence is the config file 'compiler'
+        option for the language, followed by the environment variable set by
+        _compiler_env, followed by the existing class attribute.
+        """
+        Driver.after_registration(cls)
+        for x in cls._config_attr_map:
+            ka = x['attr']
+            k0 = x.get('key', ka)
+            kt = x.get('type', None)
+            setattr(cls, ka, ygg_cfg.get(cls.language, k0,
+                                         getattr(cls, ka)))
+            if (kt == list) and isinstance(getattr(cls, ka), str):
+                setattr(cls, ka, getattr(cls, ka).split())
+        
+    @staticmethod
     def finalize_registration(cls):
         r"""Operations that should be performed after a class has been fully
         initialized and registered."""
-        if (not cls.is_configured()):  # pragma: no cover
-            # This will only be run the first time yggdrasil is imported
-            update_language_config(cls)
         global _map_language_ext
         for x in cls.get_language_ext():
             if x not in _map_language_ext:
@@ -557,7 +574,7 @@ class ModelDriver(Driver):
         return [self.model_file] + self.model_args
 
     @classmethod
-    def language_executable(cls):
+    def language_executable(cls, **kwargs):
         r"""Command required to compile/run a model written in this language
         from the command line.
 
@@ -724,9 +741,26 @@ class ModelDriver(Driver):
                 machine.
 
         """
-        return (cls.is_language_installed() and cls.are_dependencies_installed()
+        return (cls.is_language_installed()
+                and cls.are_base_languages_installed()
+                and cls.are_dependencies_installed()
                 and cls.is_interface_installed() and cls.is_comm_installed()
                 and cls.is_configured())
+
+    @classmethod
+    def are_base_languages_installed(cls):
+        r"""Determine if the base languages are installed.
+
+        Returns:
+            bool: True if the base langauges are installed. False otherwise.
+
+        """
+        out = True
+        for x in cls.base_langauges:
+            if not out:
+                break
+            out = import_component('model', x).is_installed()
+        return out
 
     @classmethod
     def are_dependencies_installed(cls):
@@ -738,10 +772,6 @@ class ModelDriver(Driver):
 
         """
         out = (cls.language is not None)
-        for x in cls.base_languages:
-            if not out:  # pragma: no cover
-                break
-            out = import_component('model', x).are_dependencies_installed()
         for x in cls.interface_dependencies:
             if not out:  # pragma: no cover
                 break
@@ -758,10 +788,6 @@ class ModelDriver(Driver):
 
         """
         out = (cls.language is not None)
-        for x in cls.base_languages:
-            if not out:  # pragma: no cover
-                break
-            out = import_component('model', x).is_interface_installed()
         if out and (cls.interface_library is not None):
             out = cls.is_library_installed(cls.interface_library)
         return out
@@ -781,10 +807,6 @@ class ModelDriver(Driver):
                 out = (tools.which(cls.language_executable()) is not None)
             except NotImplementedError:  # pragma: debug
                 out = False
-        for x in cls.base_languages:
-            if not out:
-                break
-            out = import_component('model', x).is_language_installed()
         return out
 
     def get_source_file(self, args):
@@ -859,11 +881,10 @@ class ModelDriver(Driver):
         # Check for commtypes
         if out and (len(cls.base_languages) == 0):
             out = (ygg_cfg.get(cls.language, 'commtypes', None) is not None)
-        # Base languages
-        for x in cls.base_languages:
-            if not out:  # pragma: debug
-                break
-            out = import_component('model', x).is_configured()
+        # Check for config keys
+        for k in cls._config_keys:
+            if ygg_cfg.get(cls.language, k, None) is None:
+                out = False
         return out
 
     @classmethod
@@ -963,13 +984,7 @@ class ModelDriver(Driver):
                 be set.
 
         """
-        # Base languages
-        for x in cls.base_languages:
-            x_drv = import_component('model', x)
-            if not x_drv.is_configured():  # pragma: debug
-                # This shouldn't actually be called because configuration should
-                # occur on import
-                x_drv.configure(cfg)
+        out = []
         # Section and executable
         if (cls.language is not None) and (not cfg.has_section(cls.language)):
             cfg.add_section(cls.language)
@@ -977,13 +992,16 @@ class ModelDriver(Driver):
         if (((not cls.is_language_installed())
              and (cls.executable_type is not None))):  # pragma: debug
             try:
-                fpath = locate_file(cls.language_executable())
+                fpath = tools.locate_file(
+                    cls.language_executable(),
+                    directory_list=cls._executable_search_dirs)
                 if fpath:
                     cfg.set(cls.language, cls.executable_type, fpath)
             except NotImplementedError:
                 pass
+        # Executable type configuration
+        out += cls.configure_executable_type(cfg)
         # Only do additional configuration if no base languages
-        out = []
         if not cls.base_languages:
             # Configure libraries
             out += cls.configure_libraries(cfg)
@@ -994,6 +1012,21 @@ class ModelDriver(Driver):
                     comms.append(c)
             cfg.set(cls.language, 'commtypes', comms)
         return out
+
+    @classmethod
+    def configure_executable_type(cls, cfg):
+        r"""Add configuration options specific in the executable type
+        before the libraries are configured.
+
+        Args:
+            cfg (CisConfigParser): Config class that options should be set for.
+        
+        Returns:
+            list: Section, option, description tuples for options that could not
+                be set.
+
+        """
+        return []
 
     @classmethod
     def configure_libraries(cls, cfg):

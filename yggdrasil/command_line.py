@@ -313,8 +313,8 @@ def update_config():
         os.remove(config.usr_config_file)
     if args.show_file or args.remove_file:
         return
-    drv = [import_component('model', l) for l in args.languages]
-    config.update_language_config(drv, overwrite=args.overwrite, verbose=True,
+    config.update_language_config(args.languages, overwrite=args.overwrite,
+                                  verbose=True,
                                   disable_languages=args.disable_languages,
                                   enable_languages=args.enable_languages,
                                   lang_kwargs=lang_kwargs)

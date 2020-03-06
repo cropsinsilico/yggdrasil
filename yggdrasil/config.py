@@ -8,13 +8,11 @@ This module imports the configuration for yggdrasil.
 import os
 import sys
 import json
-import pprint
 import shutil
 import logging
 import warnings
-import subprocess
 import configparser
-from yggdrasil import platform, tools
+from yggdrasil import tools
 conda_prefix = os.environ.get('CONDA_PREFIX', '')
 config_file = '.yggdrasil.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
@@ -24,10 +22,6 @@ else:
     usr_dir = os.path.expanduser('~')
 usr_config_file = os.path.join(usr_dir, config_file)
 loc_config_file = os.path.join(os.getcwd(), config_file)
-if not os.path.isfile(usr_config_file):  # pragma: no cover
-    from yggdrasil.languages import install_languages
-    shutil.copy(def_config_file, usr_config_file)
-    install_languages.install_all_languages(from_setup=True)
 logger = logging.getLogger(__name__)
 
 
@@ -156,15 +150,20 @@ class YggConfigParser(configparser.ConfigParser, object):
 ygg_cfg_usr = YggConfigParser.from_files([usr_config_file])
 ygg_cfg = YggConfigParser.from_files([def_config_file, usr_config_file,
                                       loc_config_file])
+if not os.path.isfile(usr_config_file):  # pragma: no cover
+    from yggdrasil.languages import install_languages
+    shutil.copy(def_config_file, usr_config_file)
+    install_languages.install_all_languages(from_setup=True)
 
 
-def update_language_config(drv, skip_warnings=False,
+def update_language_config(languages=None, skip_warnings=False,
                            disable_languages=None, enable_languages=None,
                            lang_kwargs=None, overwrite=False, verbose=False):
     r"""Update configuration options for a language driver.
 
     Args:
-        drv (list, class): One or more language drivers that should be
+        languages (list, optional): List of languages to configure.
+            Defaults to None and all supported languages will be
             configured.
         skip_warnings (bool, optional): If True, warnings about missing options
             will not be raised. Defaults to False.
@@ -180,12 +179,14 @@ def update_language_config(drv, skip_warnings=False,
             specific keyword arguments. Defaults to {}.
 
     """
+    from yggdrasil.components import import_component
     if verbose:
         logger.info("Updating user configuration file for yggdrasil at:\n\t%s"
                     % usr_config_file)
     miss = []
-    if not isinstance(drv, list):
-        drv = [drv]
+    if languages is None:
+        languages = tools.get_supported_lang()
+    drv = [import_component('model', l) for l in languages]
     if disable_languages is None:
         disable_languages = []
     if enable_languages is None:
@@ -217,112 +218,6 @@ def update_language_config(drv, skip_warnings=False,
                           % (opt, sect, ygg_cfg_usr.file_to_update, desc),
                           RuntimeWarning)
     
-
-def find_all(name, path):
-    r"""Find all instances of a file with a given name within the directory
-    tree starting at a given path.
-
-    Args:
-        name (str): Name of the file to be found (with the extension).
-        path (str, None): Directory where search should start. If set to
-            None on Windows, the current directory and PATH variable are
-            searched.
-
-    Returns:
-        list: All instances of the specified file.
-
-    """
-    result = []
-    try:
-        if platform._is_win:  # pragma: windows
-            if path is None:
-                out = subprocess.check_output(["where", name],
-                                              env=os.environ,
-                                              stderr=subprocess.STDOUT)
-            else:
-                out = subprocess.check_output(["where", "/r", path, name],
-                                              env=os.environ,
-                                              stderr=subprocess.STDOUT)
-        else:
-            args = ["find", "-L", path, "-type", "f", "-name", name]
-            pfind = subprocess.Popen(args, env=os.environ,
-                                     stderr=subprocess.PIPE,
-                                     stdout=subprocess.PIPE)
-            (stdoutdata, stderrdata) = pfind.communicate()
-            out = stdoutdata
-            for l in stderrdata.splitlines():
-                if b'Permission denied' not in l:
-                    raise subprocess.CalledProcessError(pfind.returncode,
-                                                        ' '.join(args),
-                                                        output=stderrdata)
-    except subprocess.CalledProcessError:
-        out = ''
-    if not out.isspace():
-        result = sorted(out.splitlines())
-    result = [os.path.normcase(os.path.normpath(tools.bytes2str(m)))
-              for m in result]
-    return result
-
-
-def locate_file(fname, environment_variable='PATH', directory_list=None):
-    r"""Locate a file within a set of paths defined by a list or environment
-    variable.
-
-    Args:
-        fname (str, list): One or more possible names of the file that should be
-            located. If a list is provided, the path for the first entry for
-            which a match could be located will be returned and subsequent entries
-            will not be checked.
-        environment_variable (str): Environment variable containing the set of
-            paths that should be searched. Defaults to 'PATH'. If None, this
-            keyword argument will be ignored. If a list is provided, it is
-            assumed to be a list of environment variables that should be
-            searched in the specified order.
-        directory_list (list): List of paths that should be searched in addition
-            to those specified by environment_variable. Defaults to None and is
-            ignored. These directories will be searched be for those in the
-            specified environment variables.
-
-    Returns:
-        bool, str: Full path to the located file if it was located, False
-            otherwise.
-
-    """
-    if isinstance(fname, list):
-        out = False
-        for ifname in fname:
-            out = locate_file(ifname, environment_variable=environment_variable,
-                              directory_list=directory_list)
-            if out:
-                break
-        return out
-    out = []
-    if ((platform._is_win and (environment_variable == 'PATH')
-         and (directory_list is None))):  # pragma: windows
-        out += find_all(fname, None)
-    else:
-        if directory_list is None:
-            directory_list = []
-        if environment_variable is not None:
-            if not isinstance(environment_variable, list):
-                environment_variable = [environment_variable]
-            for x in environment_variable:
-                directory_list += os.environ.get(x, '').split(os.pathsep)
-        for path in directory_list:
-            if path:
-                out += find_all(fname, path)
-    if not out:
-        return False
-    first = out[0]
-    out = set(out)
-    out.remove(first)
-    if len(out) > 0:
-        warnings.warn(("More than one (%d) match to %s:\n%s\n "
-                       + "Using first match (%s)") %
-                      (len(out) + 1, fname, pprint.pformat(out),
-                       first), RuntimeWarning)
-    return first
-
 
 # Set associated environment variables
 env_map = [('debug', 'ygg', 'YGG_DEBUG'),

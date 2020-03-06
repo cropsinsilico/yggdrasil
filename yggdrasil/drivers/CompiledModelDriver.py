@@ -7,7 +7,7 @@ import warnings
 import subprocess
 from collections import OrderedDict
 from yggdrasil import platform, tools, scanf
-from yggdrasil.config import ygg_cfg, locate_file
+from yggdrasil.config import ygg_cfg
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
 from yggdrasil.components import import_component
 
@@ -1759,6 +1759,22 @@ class CompiledModelDriver(ModelDriver):
     default_linker_flags = None
     default_archiver = None
     default_archiver_flags = None
+    _config_keys = ['compiler', 'linker', 'archiver']
+    _config_attr_map = [{'attr': 'default_compiler',
+                         'key': 'compiler'},
+                        {'attr': 'default_compiler_flags',
+                         'key': 'compiler_flags',
+                         'type': list},
+                        {'attr': 'default_linker',
+                         'key': 'linker'},
+                        {'attr': 'default_linker_flags',
+                         'key': 'linker_flags',
+                         'type': list},
+                        {'attr': 'default_archiver',
+                         'key': 'archiver'},
+                        {'attr': 'default_archiver_flags',
+                         'key': 'archiver_flags',
+                         'type': list}]
 
     def __init__(self, name, args, skip_compile=False, **kwargs):
         kwargs.setdefault('overwrite', (not kwargs.pop('preserve_cache', False)))
@@ -1845,54 +1861,6 @@ class CompiledModelDriver(ModelDriver):
             self.products, source_products=self.source_products)
         self.debug("source_files: %s", str(self.source_files))
         self.debug("model_file: %s", self.model_file)
-
-    @staticmethod
-    def after_registration(cls):
-        r"""Operations that should be performed to modify class attributes after
-        registration. For compiled languages this includes selecting the
-        default compiler. The order of precedence is the config file 'compiler'
-        option for the language, followed by the environment variable set by
-        _compiler_env, followed by the existing class attribute.
-        """
-        ModelDriver.after_registration(cls)
-        if cls.language is not None:
-            compiler = None
-            for k in ['compiler', 'linker', 'archiver']:
-                # Set attribute defaults based on config options
-                for k0 in [k, '%s_flags' % k]:
-                    ka = 'default_%s' % k0
-                    if k0.endswith('_flags'):
-                        old_val = getattr(cls, ka, None)
-                        new_val = ygg_cfg.get(cls.language, k0, '').split()
-                        if new_val:  # pragma: no cover
-                            if old_val is None:
-                                setattr(cls, ka, new_val)
-                            else:
-                                old_val += new_val
-                    else:
-                        setattr(cls, ka, ygg_cfg.get(cls.language, k0,
-                                                     getattr(cls, ka)))
-                # Set default linker/archiver based on compiler
-                default_tool_name = getattr(cls, 'default_%s' % k, None)
-                if (((default_tool_name is None) and (compiler is not None)
-                     and (k in ['linker', 'archiver']))):
-                    default_tool_name = getattr(compiler, 'default_%s' % k, None)
-                # Check default tool to make sure it is installed
-                if default_tool_name:
-                    default_tool = get_compilation_tool(k, default_tool_name)
-                    if not default_tool.is_installed():  # pragma: debug
-                        warnings.warn(('Default %s for %s (%s) not installed. '
-                                       'Attempting to locate an alternative .')
-                                      % (k, cls.language, default_tool_name))
-                        default_tool_name = None
-                # Determine compilation tools based on language/platform
-                if default_tool_name is None:
-                    default_tool_name = find_compilation_tool(k, cls.language,
-                                                              allow_failure=True)
-                # Set default tool attribute & record compiler tool if set
-                setattr(cls, 'default_%s' % k, default_tool_name)
-                if (default_tool_name is not None) and (k == 'compiler'):
-                    compiler = get_compilation_tool(k, default_tool_name)
 
     def set_target_language(self):
         r"""Set the language of the target being compiled (usually the same
@@ -2646,11 +2614,66 @@ class CompiledModelDriver(ModelDriver):
 
         """
         out = ModelDriver.is_configured.__func__(cls)
-        if out:
-            for k in cls.get_external_libraries():
-                if not out:  # pragma: no cover
-                    break
-                out = cls.is_library_installed(k)
+        for k in cls.get_external_libraries():
+            if not out:  # pragma: no cover
+                break
+            out = cls.is_library_installed(k)
+        return out
+
+    @classmethod
+    def configure_executable_type(cls, cfg):
+        r"""Add configuration options specific in the executable type
+        before the libraries are configured.
+
+        Args:
+            cfg (CisConfigParser): Config class that options should be set for.
+        
+        Returns:
+            list: Section, option, description tuples for options that could not
+                be set.
+
+        """
+        out = super(CompiledModelDriver, cls).configure_executable_type(cfg)
+        if cls.language is None:
+            return out
+        compiler = None
+        linker = None
+        archiver = None
+        for k in ['compiler', 'linker', 'archiver']:
+            # Set default linker/archiver based on compiler
+            default_tool_name = cfg.get(cls.language, k, None)
+            if (((default_tool_name is None) and (compiler is not None)
+                 and (k in ['linker', 'archiver']))):
+                default_tool_name = getattr(compiler, 'default_%s' % k, None)
+            # Check default tool to make sure it is installed
+            if default_tool_name:
+                default_tool = get_compilation_tool(k, default_tool_name)
+                if not default_tool.is_installed():  # pragma: debug
+                    warnings.warn(('Default %s for %s (%s) not installed. '
+                                   'Attempting to locate an alternative .')
+                                  % (k, cls.language, default_tool_name))
+                    default_tool_name = None
+            # Determine compilation tools based on language/platform
+            if default_tool_name is None:
+                default_tool_name = find_compilation_tool(k, cls.language,
+                                                          allow_failure=True)
+            # Set default tool attribute & record compiler tool if set
+            if default_tool_name:
+                cfg.set(cls.language, k, default_tool_name)
+                if k == 'compiler':
+                    compiler = get_compilation_tool(k, default_tool_name)
+                elif k == 'linker':
+                    linker = get_compilation_tool(k, default_tool_name)
+                elif k == 'archiver':
+                    archiver = get_compilation_tool(k, default_tool_name)
+        # Check for missing library names
+        for k, v in cls.external_libraries.items():
+            libtype = v.get('libtype', None)
+            if (libtype is not None) and (libtype not in v):
+                if (libtype == 'static') and (archiver is not None):
+                    v[libtype] = archiver.get_output_file(k)
+                elif (libtype == 'shared') and (linker is not None):
+                    v[libtype] = linker.get_output_file(k, build_library=True)
         return out
 
     @classmethod
@@ -2693,17 +2716,22 @@ class CompiledModelDriver(ModelDriver):
                 if not os.path.isfile(fpath):
                     # Search the compiler/linker's search path, then the
                     # PATH environment variable.
-                    if t in ['include']:
-                        tool = cls.get_tool('compiler', default=None)
-                    else:
-                        tool = cls.get_tool('linker', default=None)
+                    tool = None
+                    try:
+                        if t in ['include']:
+                            tool = cls.get_tool('compiler', default=None)
+                        else:
+                            tool = cls.get_tool('linker', default=None)
+                    except NotImplementedError:
+                        pass
                     fpath = None
                     if tool is not None:
                         search_list = tool.get_search_path()
                         if ((platform._is_win and fname.endswith('.lib')
                              and (not fname.startswith('lib')))):  # pragma: windows
                             fname = [fname, 'lib' + fname]
-                        fpath = locate_file(fname, directory_list=search_list)
+                        fpath = tools.locate_file(
+                            fname, directory_list=search_list)
                 if fpath:
                     logger.info('Located %s: %s' % (fname, fpath))
                     # if (t in ['static']) and platform._is_mac:
