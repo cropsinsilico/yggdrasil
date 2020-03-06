@@ -54,7 +54,7 @@ environment:
       YGG_TEST_FLAGS: "--test-suite=examples_part2 drivers"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=types tests/test_config.py"
+      YGG_TEST_FLAGS: "--test-suite=types tests/test_config.py drivers/tests/test_CompiledModelDriver.py"
       INSTALLC: 0  # Acts to exclude c and cpp
     - platform: x64
       PYTHON_VERSION: "3.6"
