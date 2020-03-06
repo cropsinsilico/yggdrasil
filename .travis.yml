@@ -33,12 +33,13 @@ env:
     INSTALLAPY=0
     INSTALLLPY=0
     INSTALLR=1
+    YGG_SECOND_TEST=
     BUILDDOCS=0
     YGG_TEST_FLAGS="--test-suite=examples"
   matrix:
     - YGG_TEST_FLAGS="--test-suite=examples_part1"
     - YGG_TEST_FLAGS="--test-suite=examples_part2"
-    - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running" INSTALLRMQ=1 INSTALLAPY=1
+    - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running" INSTALLRMQ=1 INSTALLAPY=1 YGG_SECOND_TEST="yggtest --ci --default-comm=IPCComm --long-running"
     # - YGG_CONDA=yes YGG_TEST_FLAGS="--test-suite=types --languages R c"
     # - YGG_TEST_FLAGS="--test-suite=types --languages matlab python cpp"
 
@@ -152,6 +153,7 @@ install:
 
 script:
   - yggtest --ci $YGG_TEST_FLAGS
+  - $YGG_SECOND_TEST
 
 
 after_success:
