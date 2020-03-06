@@ -34,12 +34,6 @@ env:
     INSTALLLPY=0
     INSTALLR=1
     BUILDDOCS=0
-    YGG_RUN_ALL_TESTS=1
-    YGG_RUN_EXAMPLES=0
-    YGG_RUN_TYPES_EXAMPLES=0
-    YGG_RUN_TIME_TESTS=0
-    YGG_ENABLE_LONG_TESTS=0
-    YGG_TYPES_LANGUAGES=
     YGG_TEST_FLAGS="--test-suite=examples"
   matrix:
     - YGG_TEST_FLAGS="--test-suite=examples_part1"
@@ -211,7 +205,7 @@ jobs:
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
-      env: YGG_CONDA=3.8 YGG_TEST_FLAGS="--test-suite=examples serialize communication"
+      env: YGG_CONDA=3.8 YGG_TEST_FLAGS="--test-suite=examples serialize communication" INSTALLZMQ=0
       script:
         - yggconfig --remove-file
         - yggtest --ci $YGG_TEST_FLAGS
