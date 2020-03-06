@@ -85,10 +85,12 @@ class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
 
     Args:
-        name (str): Driver name.
-        args (str or list): Argument(s) for running the model on the command
-            line. This should be a complete command including the necessary
-            executable and command line arguments to that executable.
+        name (str): Unique name used to identify the model. This will
+            be used to report errors associated with the model.
+        args (str or list): The full path to the file containing the
+            model program that will be run by the driver or a list
+            starting with the program file and including any arguments
+            that should be passed as input to the program.
         products (list, optional): Paths to files created by the model that
             should be cleaned up when the model exits. Entries can be absolute
             paths or paths relative to the working directory. Defaults to [].
@@ -101,13 +103,21 @@ class ModelDriver(Driver):
             that are source files. These files will be removed without checking
             their extension so users should avoid adding files to this list
             unless they are sure they should be deleted. Defaults to [].
-        is_server (bool, optional): If True, the model is assumed to be a server
-            and an instance of :class:`yggdrasil.drivers.ServerDriver`
-            is started. Defaults to False. Use of is_server with function is
-            not currently supported.
-        client_of (str, list, optional): The names of one or more servers that
-            this model is a client of. Defaults to empty list. Use of client_of
-            with function is not currently supported.
+        is_server (bool, optional): If `True`, the model is assumed to be a
+            server for one or more client models and an instance of
+            :class:`yggdrasil.drivers.ServerDriver` is started. The
+            corresponding channel that should be passed to the yggdrasil API
+            will be the name of the model. Defaults to False. Use of `is_server`
+            with `function` is not currently supported.
+        client_of (str, list, optional): The names of one or more models that
+            this model will call as a server. If there are more than one, this
+            should be specified as a sequence collection (list). The
+            corresponding channel(s) that should be passed to the yggdrasil API
+            will be the name of the server model joined with the name of the
+            client model with an underscore `<server_model>_<client_model>`.
+            There will be one channel created for each server the model is a
+            client of. Defaults to empty list. Use of `client_of` with `function`
+            is not currently supported.
         overwrite (bool, optional): If True, any existing model products
             (compilation products, wrapper scripts, etc.) are removed prior to
             the run. If False, the products are not removed. Defaults to True.
@@ -235,16 +245,35 @@ class ModelDriver(Driver):
     _schema_properties = {
         'name': {'type': 'string'},
         'language': {'type': 'string', 'default': 'executable',
-                     'description': ('The programming language that the model '
-                                     'is written in.')},
+                     'description': (
+                         'The programming language that the model '
+                         'is written in. A list of available '
+                         'languages can be found :ref:`here <'
+                         'schema_table_model_subtype_rst>`.')},
         'args': {'type': 'array',
                  'items': {'type': 'string'}},
         'inputs': {'type': 'array', 'default': [{'name': 'default'}],
                    'items': {'$ref': '#/definitions/comm'},
-                   'description': 'Model inputs described as comm objects.'},
+                   'description': (
+                       'A mapping object containing the entry for a '
+                       'model input channel or a list of input '
+                       'channel entries. If the model does not get '
+                       'input from another model, this may be '
+                       'ommitted. A full description of channel '
+                       'entries and the options available for '
+                       'channels can be found :ref:`here<'
+                       'yaml_comm_options>`.')},
         'outputs': {'type': 'array', 'default': [{'name': 'default'}],
                     'items': {'$ref': '#/definitions/comm'},
-                    'description': 'Model outputs described as comm objects.'},
+                    'description': (
+                        'A mapping object containing the entry for a '
+                        'model output channel or a list of output '
+                        'channel entries. If the model does not '
+                        'output to another model, this may be '
+                        'ommitted. A full description of channel '
+                        'entries and the options available for '
+                        'channels can be found :ref:`here<'
+                        'yaml_comm_options>`.')},
         'products': {'type': 'array', 'default': [],
                      'items': {'type': 'string'}},
         'source_products': {'type': 'array', 'default': [],

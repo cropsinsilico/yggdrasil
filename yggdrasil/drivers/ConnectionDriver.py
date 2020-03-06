@@ -23,9 +23,9 @@ class ConnectionDriver(Driver):
         name (str): Name that should be used to set names of input/output comms.
         icomm_kws (dict, optional): Keyword arguments for the input communicator.
         ocomm_kws (dict, optional): Keyword arguments for the output communicator.
-        translator (str, func, optional): Function or string specifying function
-            that should be used to translate messages from the input communicator
-            before passing them to the output communicator. If a string, the
+        translator (str, func, optional): Function or string specifying a function
+            that should be used to translate messages from the input communicator(s)
+            before passing them to the output communicator(s). If a string, the
             format should be "<package.module>:<function>" so that <function>
             can be imported from <package>. Defaults to None and messages are
             passed directly. This can also be a list of functions/strings that
@@ -75,15 +75,23 @@ class ConnectionDriver(Driver):
         'inputs': {'type': 'array', 'minItems': 1,
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                        {'$ref': '#/definitions/file'}]},
-                   'description': ('One or more name(s) of model output(s) '
-                                   'and/or new comm/file objects that the '
-                                   'connection should receive messages from.')},
+                   'description': (
+                       'One or more name(s) of model output channel(s) '
+                       'and/or new channel/file objects that the '
+                       'connection should receive messages from. '
+                       'A full description of file entries and the '
+                       'available options can be found :ref:`here<'
+                       'yaml_file_options>`.')},
         'outputs': {'type': 'array', 'minItems': 1,
                     'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                         {'$ref': '#/definitions/file'}]},
-                    'description': ('One or more name(s) of model input(s) '
-                                    'and/or new comm/file objects that the '
-                                    'connection should send messages to.')},
+                    'description': (
+                        'One or more name(s) of model input channel(s) '
+                        'and/or new channel/file objects that the '
+                        'connection should send messages to. '
+                        'A full description of file entries and the '
+                        'available options can be found :ref:`here<'
+                        'yaml_file_options>`.')},
         'translator': {'type': 'array',
                        'items': {'oneOf': [
                            {'type': 'function'},

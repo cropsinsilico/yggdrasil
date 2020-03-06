@@ -53,8 +53,8 @@ The following is only one method for setting up a development environment. You a
      $ python utils/create_envs.py --name=ygg
      $ conda activate ygg
 
-.. note::
-   **If you use ``utils/create_envs.py`` to create your dev environment, you can skip to the last step.**
+   .. note::
+      **If you use ``utils/create_envs.py`` to create your dev environment, you can skip to the last step.**
 #. Install the requirements using conda via the helper script ``utils/install_from_requirements.py``::
 
      $ python utils/install_from_requirements.py conda requirements.txt requirements_condaonly.txt requirements_testing.txt
