@@ -1892,7 +1892,10 @@ checking if the model flag indicates
         if expanded_recv_var:
             lines.append(cls.format_function_param(
                 'print_generic', object=recv_var_str))
-            if 'assign_mult' in cls.function_param:
+            if 'expand_mult' in cls.function_param:  # pragma: matlab
+                lines.append(cls.format_function_param(
+                    'expand_mult', name=expanded_recv_var, value=recv_var_str))
+            elif 'assign_mult' in cls.function_param:
                 lines.append(cls.format_function_param(
                     'assign_mult', name=expanded_recv_var, value=recv_var_str))
             else:

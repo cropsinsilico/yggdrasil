@@ -490,6 +490,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'try_begin': 'try',
         'try_except': 'catch {error_var}',
         'assign': '{name} = {value};',
+        'expand_mult': '{name} = {value}{{:}};',
         'functions_defined_last': True,
         'function_def_begin': 'function {output_var} = {function_name}({input_var})',
         'function_def_regex': (
@@ -523,6 +524,18 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         self.mlsession = None
         self.mlprocess = None
 
+    @staticmethod
+    def finalize_registration(cls):
+        r"""Operations that should be performed after a class has been fully
+        initialized and registered."""
+        InterpretedModelDriver.finalize_registration(cls)
+        if cls.is_configured():
+            # -batch command line option introduced in 2019
+            if (((cls.language_version().lower() < 'r2019')
+                 and ('-batch' in cls.default_interpreter_flags))):
+                cls.default_interpreter_flags[
+                    cls.default_interpreter_flags.index('-batch')] = '-r'
+        
     def parse_arguments(self, args):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.
@@ -699,6 +712,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
             str: Version of compiler/interpreter for this language.
 
         """
+        if ygg_cfg.has_option(cls.language, 'version'):
+            return ygg_cfg.get(cls.language, 'version')
         return cls.get_matlab_info()[1]
         
     @classmethod
