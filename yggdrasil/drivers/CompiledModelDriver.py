@@ -2630,7 +2630,7 @@ class CompiledModelDriver(ModelDriver):
         for lib_typ in cls.external_libraries[lib].keys():
             if lib_typ in ['libtype', 'language']:
                 continue
-            if not out:
+            if not out:  # pragma: no cover
                 break
             lib_opt = '%s_%s' % (lib, lib_typ)
             out = (cfg.get(dep_lang, lib_opt, None) is not None)
@@ -2697,9 +2697,8 @@ class CompiledModelDriver(ModelDriver):
                         tool = cls.get_tool('compiler', default=None)
                     else:
                         tool = cls.get_tool('linker', default=None)
-                    if tool is None:
-                        fpath = None
-                    else:
+                    fpath = None
+                    if tool is not None:
                         search_list = tool.get_search_path()
                         if ((platform._is_win and fname.endswith('.lib')
                              and (not fname.startswith('lib')))):  # pragma: windows
