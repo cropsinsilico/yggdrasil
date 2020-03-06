@@ -53,6 +53,7 @@ The following is only one method for setting up a development environment. You a
      $ python utils/create_envs.py --name=ygg
      $ conda activate ygg
 
+.. note::
    **If you use ``utils/create_envs.py`` to create your dev environment, you can skip to the last step.**
 #. Install the requirements using conda via the helper script ``utils/install_from_requirements.py``::
 
@@ -73,6 +74,16 @@ The following is only one method for setting up a development environment. You a
 
      $ yggconfig
 
+.. note::
+   **Windows Users** If you see the warning::
+
+     "WARNING: Did not find VS in registry or in VS140COMNTOOLS env var - your compiler may not work"
+
+   during installation you will need to run the command below to enable the Visual Studio command line tools.::
+     
+     $ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+
+   Then run ``yggconfig`` to finish the installation process for C and C++.
 
 Testing
 =======
