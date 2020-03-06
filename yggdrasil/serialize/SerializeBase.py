@@ -576,11 +576,11 @@ class SerializeBase(tools.YggClass):
                 if 'type' in typedef:
                     if (typedef.get('type', None) == 'array'):
                         assert(len(typedef.get('items', [])) == len(fmts))
-                        # if len(typedef.get('items', [])) != len(fmts):
-                        #     warnings.warn(("Number of items in typedef (%d) doesn't"
-                        #                    + "match the number of formats (%d).")
-                        #                   % (len(typedef.get('items', [])), len(fmts)))
-                    continue
+                    # This continue is covered, but the optimization
+                    # causes it to be skipped at runtime
+                    # https://bitbucket.org/ned/coveragepy/issues/198/
+                    # continue-marked-as-not-covered
+                    continue  # pragma: no cover
                 as_array = self.extra_kwargs.get('as_array',
                                                  getattr(self, 'as_array', False))
                 typedef.update(type='array', items=[])
