@@ -427,7 +427,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     language_ext = '.m'
     base_languages = ['python']
     default_interpreter_flags = ['-nodisplay', '-nosplash', '-nodesktop',
-                                 '-nojvm', '-batch']
+                                 '-nojvm', '-r']
     version_flags = ["fprintf('R%s', version('-release')); exit();"]
     path_env_variable = 'MATLABPATH'
     comm_linger = (os.environ.get('YGG_MATLAB_ENGINE', '').lower() == 'true')
@@ -517,6 +517,12 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         if self.using_matlab_engine:
             kwargs['skip_interpreter'] = True
         self.model_wrapper = None
+        # -batch command line option introduced in 2019
+        if (self.is_installed()):
+            if (((self.language_version().lower() >= 'r2019')
+                 and ('-r' in self.default_interpreter_flags))):
+                self.default_interpreter_flags[
+                    self.default_interpreter_flags.index('-r')] = '-batch'
         super(MatlabModelDriver, self).__init__(name, args, **kwargs)
         self.started_matlab = False
         self.screen_session = None
@@ -524,18 +530,6 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         self.mlsession = None
         self.mlprocess = None
 
-    @staticmethod
-    def finalize_registration(cls):
-        r"""Operations that should be performed after a class has been fully
-        initialized and registered."""
-        InterpretedModelDriver.finalize_registration(cls)
-        if cls.is_configured():
-            # -batch command line option introduced in 2019
-            if (((cls.language_version().lower() < 'r2019')
-                 and ('-batch' in cls.default_interpreter_flags))):
-                cls.default_interpreter_flags[
-                    cls.default_interpreter_flags.index('-batch')] = '-r'
-        
     def parse_arguments(self, args):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.
