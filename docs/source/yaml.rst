@@ -17,8 +17,8 @@ are needed to create a YAML file for use with the |yggdrasil| framework.
 * Mappings: Mapping entries use a colon and a space (: ) to seperate a 
   ``key: value`` pair. Keys are text and values can be text or a collection.
 
-Model Options
--------------
+Models
+------
 
 At the root level of a |yggdrasil| YAML, should be a mapping key ``model:`` 
 or ``models:``. This denotes information pertaining to the model(s) that should 
@@ -40,109 +40,66 @@ or a sequence of model entries::
       language: c
       args: ./src/gs_lesson4_modelB.c
 
-At a minimum, each model entry should contain the following keys:
 
-+---------+--------------------------------------------------------------------+
-| Key     | Description                                                        |
-+=========+====================================================================+
-| name    | Unique name used to identify the model. This will be used to       |
-|         | report errors associated with the model.                           |
-+---------+--------------------------------------------------------------------+
-| language| The language that the model is written in. Valid values include:   |
-|         +------------+-------------------------------------------------------+
-|         | **Value**  | **Description**                                       |
-|         +------------+-------------------------------------------------------+
-|         | executable | The model is a pre-compiled executable.               |
-|         +------------+-------------------------------------------------------+
-|         | python     | The model is written in Python.                       |
-|         +------------+-------------------------------------------------------+
-|         | matlab     | The model is written in Matlab.                       |
-|         +------------+-------------------------------------------------------+
-|         | c          | The model is written in C.                            |
-|         +------------+-------------------------------------------------------+
-|         | c++        | The model is written in C++.                          |
-|         +------------+-------------------------------------------------------+
-|         | make       | The model is written in C/C++ and has a Makefile.     |
-|         +------------+-------------------------------------------------------+
-|         | cmake      | The model is written in C/C++ and has a CMakeLists.txt|
-|         +------------+-------------------------------------------------------+
-|         | lpy        | The model is an LPy lsystem model.                    |
-+---------+------------+-------------------------------------------------------+
-| args    | The full path to the file containing the model program that will   |
-|         | be run by the driver or a list starting with the program file and  |
-|         | including any arguments that should be passed as input to the      |
-|         | program.                                                           |
-+---------+--------------------------------------------------------------------+
-| inputs  | A mapping object containing the entry for a model input channel    |
-|         | or a list of input channel entries. If the model does not get      |
-|         | input from another model, this may be ommitted.                    |
-+---------+--------------------------------------------------------------------+
-| outputs | A mapping object containing the entry for a model output channel   |
-|         | or a list of output channel entries. If the model does not output  |
-|         | to another model, this may be ommitted.                            |
-+---------+--------------------------------------------------------------------+
-
-Models entries can also have the following optional keys:
-
-
-=========    ===================================================================
-Key          Description
-=========    ===================================================================
-is_server    If ``True``, this model will be considered to function as a 
-	     server for one or more models. The corresponding channel that 
-             should be passed to the |yggdrasil| API will be the name of 
-	     the model.
-client_of    The names of one or more models that this model will call as a 
-             server. If there are more than one, this should be specified as 
-             a sequence collection. The corresponding channel(s) that should 
-	     be passed to the |yggdrasil| API will be the name of the 
-	     server model joined with the name of the client model with an 
-	     underscore ``<server_model>_<client_model>``. There will be one 
-	     channel created for each server the model is a client of.
-=========    ===================================================================
-
-..
-   Any additional keys in the model entry will be passed to the model driver. A 
-   full description of the available model drivers and potential arguments can be 
-   found :ref:`here <model_drivers_rst>`.
-
-
-Communication Options
----------------------
-
-There are two options for specifying communication channels for the models. 
-One specifying the connections between communication channels and one 
-explicitly specifying the drivers.
-
-
-Connection Method
-*****************
-
-To specify communication via connections, each input/output entry for the models 
+Inputs and outputs to the models are then controlled via the ``input``/``inputs``
+and/or ``output``/``outputs`` keys. Each input/output entry for the models 
 need only contain a unique name for the communication channel. This can be 
 specified as text::
 
-  input: channel_name
+  models:
+    name: modelA
+    language: python
+    args: ./src/gs_lesson4_modelA.py
+    input: channel_name
 
 or a key, value mapping::
 
-  input:
-    name: channel_name
+  models:
+    name: modelA
+    language: python
+    args: ./src/gs_lesson4_modelA.py
+    input:
+      name: channel_name
 
 The key/value mapping form should be used when other information about the 
 communication channel needs to be provided (e.g. message format, field names, 
-units). 
+units). (See :ref:`yaml_comm_options` for information about the available
+options for communication channels).
 
-When using the connection format for specifying communication patterns, the 
-YAML also needs to contains a ``connections`` key at the same level as the 
-``models`` key.
+Models can also contain more than one input and/or output::
+
+  models:
+    name: modelA
+    language: python
+    args: ./src/gs_lesson4_modelA.py
+    inputs:
+      - in_channel_name1
+      - in_channel_name2
+    outputs:
+      - out_channel_name1
+      - out_channel_name2
+      - out_channel_name3
 
 
-Connection Options
-------------------
+Connections
+-----------
 
+In order to connect models inputs/outputs to files and/or other model
+inputs/outputs, the yaml(s) must all contain a ``connections`` key/value pair.
 The coordesponding value for the ``connections`` key should be one or more 
-mapping collections with the following keys:
+mapping collection describing a connection entry. At a minimum each connection 
+entry should have one input key (``input``, ``inputs``, ``input_file``) and
+one output key (``output``, ``outputs``, ``output_file``)::
+  
+  connections:
+    - input: out_channel_name1
+      output: in_channel_name1
+    - input: file1.txt
+      output: in_channel_name2
+    - inputs:
+        - out_channel_name2
+        - out_channel_name3
+      output: file2.txt
 
 ==================    ==========================================================
 Key                   Description
@@ -159,18 +116,112 @@ output/output_file    The channel/file that messages recieved from the ``input``
                       model's ``inputs`` section.
 ==================    ==========================================================
 
+Additional information about connection entries, including the full list of
+available options, can be found :ref:`here <yaml_conn_options>`.
 
-Connection mappings can also have the following optional keys:
+The connection entries are used to determine which driver should be used to 
+connect communication channels/files. Any additional keys in the connection 
+entry will be passed to the input/output driver that is created for the 
+connection.
+
+
+Validation
+----------
+
+|yggdrasil| uses a :ref:`JSON schema <schema_rst>` to validate the provided
+YAML specification files. If you would like to validate a set of YAML specification
+files without running the integration, this can be done via the ``yggvalidate`` CLI.::
+
+  $ yggvalidate name1.yml name2.yml ...
+
+
+.. _yaml_model_options:
+Model Options
+-------------
+
+General Model Options
+*********************
+
+.. include:: ./tables/schema_table_model_general.rst
+
+Available Languages
+*******************
+
+.. include:: ./tables/schema_table_model_subtype.rst
+
+Language Specific Model Options
+*******************************
+
+.. include:: ./tables/schema_table_model_specific.rst
+
+
+.. _yaml_comm_options:
+Input/Output Options
+--------------------
+
+General Input/Output Comm Options
+*********************************
+
+.. include:: ./tables/schema_table_comm_general.rst
+
+Available Comm Types
+********************
+
+.. include:: ./tables/schema_table_comm_subtype.rst
+
+..
+   Comm Type Specific Options
+   **************************
+
+   .. include:: ./tables/schema_table_comm_specific.rst
+
+
+.. _yaml_file_options:
+File Options
+------------
+
+General File Options
+********************
+
+.. include:: ./tables/schema_table_file_general.rst
+
+Available File Types
+********************
+
+.. include:: ./tables/schema_table_file_subtype.rst
+
+File Type Specific Options
+**************************
+
+.. include:: ./tables/schema_table_file_specific.rst
+
+
+.. _yaml_conn_options:
+Connection Options
+------------------
+
+General Connection Options
+**************************
+
+.. include:: ./tables/schema_table_connection_general.rst
+
+Available Connection Types
+**************************
+
+.. include:: ./tables/schema_table_connection_subtype.rst
+
+	     
+Additional Options
+******************
+
+In addition the the options above, there are several comm (channel/file)
+options that are also valid options for connections for convenience (i.e. at
+the level of the connection rather than as part of the connection's input/output
+values). These options include:
 
 +------------+-----------------------------------------------------------------+
 | Key        | Description                                                     |
 +============+=================================================================+
-| translator | One or more functions that should be used to tranlate messages  |
-|            | from the connection input before passing it alone to the        |
-|            | connection output. Translators should be specified as strings   |
-|            | with the format "<package.module>:<function>" such that         |
-|            | <function> can be imported from <package>.                      |
-+------------+-----------------------------------------------------------------+
 | format_str | A C-style format string specifying how messages should be       |
 |            | formatted/parsed from/to language specifying types (see         |
 |            | :ref:`C-Style Format Strings <c_style_format_strings_rst>`).    |
@@ -186,53 +237,17 @@ Connection mappings can also have the following optional keys:
 +------------+-----------------------------------------------------------------+
 | filetype   | Only valid for connections that direct messages from a file to  |
 |            | a model input channel or from a model output channel to a file. |
-|            | Values indicate how messages should be read from the file and   |
-|            | include:                                                        |
-|            +-------------+---------------------------------------------------+
-|            | **Value**   | **Description**                                   |
-|            +-------------+---------------------------------------------------+
-|            | binary      | The entire contents of the file are read as a     |
-|            |             | single message. This is the default if not        |
-|            |             | provided.                                         |
-|            +-------------+---------------------------------------------------+
-|            | ascii       | The contents of the file are read one line at a   |
-|            |             | time.                                             |
-|            +-------------+---------------------------------------------------+
-|            | table       | The file is assumed to be an ASCII table and read |
-|            |             | one row at a time. The format of the table is     |
-|            |             | either read from the header or inferred from the  |
-|            |             | table.                                            |
-|            +-------------+---------------------------------------------------+
-|            | pandas      | The file is a table created from a Pandas data    |
-|            |             | frame.                                            |
-|            +-------------+---------------------------------------------------+
-|            | ply         | The file contains a 3D structure in Ply format.   |
-|            +-------------+---------------------------------------------------+
-|            | obj         | The file contains a 3D structure in Obj format.   |
-|            +-------------+---------------------------------------------------+
-|            | pickle      | The file is a Python pickle file containing one   |
-|            |             | more Python objects.                              |
-|            +-------------+---------------------------------------------------+
-|            | mat         | The file is a Matlab .mat file containing one or  |
-|            |             | more Matlab variables.                            |
-|            +-------------+---------------------------------------------------+
-|            | json        | The file contains one or more JSON encoded data   |
-|            |             | structures.                                       |
-|            +-------------+---------------------------------------------------+
-|            | yaml        | The file contains one or more YAML encoded data   |
-|            |             | structures.                                       |
-+------------+-------------+---------------------------------------------------+
-
-The connection entries are used to determine which driver should be used to 
-connect communication channels/files. Any additional keys in the connection 
-entry will be passed to the input/output driver that is created for the 
-connection. A full description of the available input/output drivers and 
-potential arguments can be found :ref:`here <io_drivers_rst>`.
+|            | Values indicate how messages should be read from the file. See  |
+|            | :ref:`this table <schema_table_file_subtype_rst>` for a list    |
+|            | of available file types.                                        |
++------------+-----------------------------------------------------------------+
 
 
 Driver Method
-*************
+-------------
 
+For backwards compatibility, yggdrasil also allows connections to be specified
+using drivers. In this scheme, there is no ``connections`` section in the yaml(s).
 In specifying communication via drivers, each input/output entry for the models 
 should be a mapping collection with, at minimum, the following keys:
 
@@ -250,16 +265,11 @@ args      For connections made to other models, this should be text that matches
 	  location of the YAML file.
 ======    ======================================================================
 
+To make a connection between two models' input and outputs, the values for their
+``args`` key should match.
+
 Any additional keys in the input/output entry will be passed to the input/output 
 driver. A full description of the available input/output drivers and potential 
 arguments can be found :ref:`here <io_drivers_rst>`.
 
-
-Validation
-----------
-
-|yggdrasil| uses a :ref:`JSON schema <schema_rst>` to validate the provided
-YAML specification files. If you would like to validate a set of YAML specification
-files without running the integration, this can be done via the ``yggvalidate`` CLI.::
-
-  $ yggvalidate name1.yml name2.yml ...
+In general, this method of specifying connections is not recommended.

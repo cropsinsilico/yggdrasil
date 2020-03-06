@@ -396,7 +396,8 @@ def component2table(comp, table_type, include_required=None,
 
 def dict2table(args, key_column_name='option', val_column_name='description',
                column_order=None, wrapped_columns=None, list_columns=None,
-               sort_on_key=True, last_column=None, prune_empty_columns=False,
+               sort_on_key=True, sort_required_first=True,
+               last_column=None, prune_empty_columns=False,
                style='simple', **kwargs):
     r"""Convert a dictionary to a table.
 
@@ -426,6 +427,8 @@ def dict2table(args, key_column_name='option', val_column_name='description',
             as rows in the order determined by sorting on the keys. If False,
             the order will be determine by prop (which is not deterministic
             if a Python 2 dictionary). Defaults to True.
+        sort_required_first (bool, optional): If True, the required
+            entries are placed first in the table. Defaults to True.
         last_column (str, optional): Name of the field that should be placed
             in the last column position. Defaults to None and is ignored.
         prune_empty_columns (bool, optional): If True, empty columns will be
@@ -451,9 +454,18 @@ def dict2table(args, key_column_name='option', val_column_name='description',
     # Create dictionary of columns
     columns = {k: [] for k in column_order}
     pos = 0
+    prop_req = []
     prop_order = list(args.keys())
+    if sort_required_first:
+        for k in prop_order:
+            v = args[k]
+            if isinstance(v, dict) and v.get('required', False):
+                prop_req.append(k)
+        prop_order = list(set(prop_order) - set(prop_req))
     if sort_on_key:
+        prop_req = sorted(prop_req)
         prop_order = sorted(prop_order)
+    prop_order = prop_req + prop_order
     for k in prop_order:
         v = args[k]
         if not isinstance(v, dict):
