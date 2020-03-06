@@ -323,7 +323,7 @@ class ModelDriver(Driver):
     python_interface = {'table_input': 'YggAsciiTableInput',
                         'table_output': 'YggAsciiTableOutput',
                         'array_input': 'YggArrayInput',
-                        'array_outputs': 'YggArrayOutput',
+                        'array_output': 'YggArrayOutput',
                         'pandas_input': 'YggPandasInput',
                         'pandas_output': 'YggPandasOutput'}
 

@@ -286,13 +286,11 @@ def YggArrayInput(name, **kwargs):
     return YggInput(name, **kwargs)
 
 
-def YggArrayOutput(name, fmt, **kwargs):
+def YggArrayOutput(name, **kwargs):
     r"""Get class for handling table-like formatted output as arrays.
 
     Args:
         name (str): The name of the message queue where output should be sent.
-        fmt (str): A C style format string specifying how each 'row' of output
-            should be formated. This should include the newline character.
         **kwargs: Additional keyword arguments are passed to YggOutput.
 
     Returns:
