@@ -423,6 +423,10 @@ int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
   zrep->n_msg++;
   // Extract address
   comm_head_t head = parse_comm_header(data, len);
+  if (head.valid == 0) {
+    ygglog_error("check_reply_recv(%s): Invalid header.", comm->name);
+    return -1;
+  }
   char address[100];
   size_t address_len;
   if ((comm->is_work_comm == 1) && (zrep->nsockets == 1)) {

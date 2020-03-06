@@ -7,7 +7,7 @@ import shutil
 import itertools
 import flaky
 from yggdrasil.components import ComponentMeta
-from yggdrasil import runner, tools, platform, backwards
+from yggdrasil import runner, tools, platform
 from yggdrasil.examples import yamls, source, ext_map
 from yggdrasil.tests import YggTestBase, check_enabled_languages
 
@@ -83,7 +83,7 @@ class ExampleMeta(ComponentMeta):
             for x in itertools.product(*iter_lists):
                 if iter_pattern_match(x, iter_skip):
                     continue
-                itest_name = backwards.as_str(test_name_fmt % x)
+                itest_name = (test_name_fmt % x)
                 if itest_name not in dct:
                     itest_func = make_iter_test(
                         is_flaky=iter_pattern_match(x, iter_flaky),

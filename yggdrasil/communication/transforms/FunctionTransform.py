@@ -44,7 +44,20 @@ class FunctionTransform(TransformBase):
         """
 
         def ftran(x):
+            if isinstance(x, list):
+                return [ftran(ix) for ix in x]
             return x**3
         
         return [{'kwargs': {'function': ftran},
-                 'in/out': [(1, 1), (2, 8)]}]
+                 'in/out': [(1, 1), (2, 8)],
+                 'in/out_t': [
+                     ({'type': 'array',
+                       'items': [
+                           {'type': 'int', 'title': x,
+                            'precision': 64, 'units': ''}
+                           for x in 'abc']},
+                      {'type': 'array',
+                       'items': [
+                           {'type': 'int', 'title': x,
+                            'precision': 64, 'units': ''}
+                           for x in 'abc']})]}]

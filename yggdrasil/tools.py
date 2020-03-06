@@ -6,6 +6,7 @@ import pprint
 import os
 import sys
 import sysconfig
+import distutils
 import copy
 import shutil
 import inspect
@@ -16,7 +17,6 @@ import uuid as uuid_gen
 import subprocess
 import importlib
 from yggdrasil import platform
-from yggdrasil import backwards
 from yggdrasil.components import import_component, ComponentBase
 
 
@@ -33,16 +33,79 @@ if ((logging.getLogger("yggdrasil").getEffectiveLevel()
     _stack_in_timeout = True
 _thread_registry = {}
 _lock_registry = {}
-try:
-    _main_thread = threading.main_thread()
-except AttributeError:
-    _main_thread = None
-    for i in threading.enumerate():
-        if (i.name == "MainThread"):
-            _main_thread = i
-            break
-    if _main_thread is None:  # pragma: debug
-        raise RuntimeError("Could not located MainThread")
+_main_thread = threading.main_thread()
+
+
+def apply_recurse(x, func, **kwargs):
+    r"""Apply a function recursively to all elements of x if it is
+    a list, tuple, or dictionary.
+
+    Args:
+        x (list, tuple, dict): Object to apply function to.
+        func (function): Function to apply to elements of x.
+        **kwargs: Additional keyword arguments are passed to each
+            function call.
+
+    Returns:
+        object: Version of input, but after applying func.
+
+    """
+    if isinstance(x, (list, tuple)):
+        out = [func(ix, **kwargs) for ix in x]
+        if isinstance(x, tuple):
+            out = tuple(out)
+    elif isinstance(x, dict):
+        out = {k: func(v, **kwargs) for k, v in x.items()}
+    else:  # pragma: debug
+        raise TypeError("Recursion not supported for type '%s'"
+                        % type(x))
+    return out
+
+
+def bytes2str(x, recurse=False):
+    r"""Convert bytes type to string type.
+
+    Args:
+        x (bytes): String.
+        recurse (bool, optional): If True and x is a list, tuple, or
+            dict, the coversion will recurse. Defaults to False.
+
+    Returns:
+        str: Decoded string version of x.
+
+    """
+    if isinstance(x, bytes):
+        out = x.decode("utf-8")
+    elif isinstance(x, str):
+        out = str(x)
+    elif isinstance(x, (list, tuple, dict)) and recurse:
+        out = apply_recurse(x, bytes2str, recurse=True)
+    else:  # pragma: debug
+        raise TypeError("Cannot convert type '%s' to str." % type(x))
+    return out
+
+
+def str2bytes(x, recurse=False):
+    r"""Convert string type to bytes type.
+
+    Args:
+        x (str): String.
+        recurse (bool, optional): If True and x is a list, tuple, or
+            dict, the coversion will recurse. Defaults to False.
+
+    Returns:
+        bytes: Encoded bytes version of x.
+
+    """
+    if isinstance(x, str):
+        out = x.encode("utf-8")
+    elif isinstance(x, bytes):
+        out = bytes(x)
+    elif isinstance(x, (list, tuple, dict)) and recurse:
+        out = apply_recurse(x, str2bytes, recurse=True)
+    else:  # pragma: debug
+        raise TypeError("Cannot convert type '%s' to bytes." % type(x))
+    return out
 
 
 def check_threads():  # pragma: debug
@@ -154,6 +217,8 @@ def get_python_c_library(allow_failure=False, libtype=None):
     for k in ['stdlib', 'purelib', 'platlib', 'platstdlib', 'data']:
         dir_try.append(paths[k])
     dir_try.append(os.path.join(paths['data'], 'lib'))
+    dir_try.append(os.path.dirname(
+        distutils.sysconfig.get_python_lib(True, True)))
     dir_try = set(dir_try)
     for idir in dir_try:
         x = os.path.join(idir, base)
@@ -235,12 +300,13 @@ def ygg_atexit():  # pragma: debug
     r"""Things to do at exit."""
     check_locks()
     check_threads()
-    if not is_subprocess():
-        check_sockets()
+    # This causes a segfault in a C dependency
+    # if not is_subprocess():
+    #     check_sockets()
     # Python 3.4 no longer supported if using pip 9.0.0, but this
     # allows the code to work if somehow installed using an older
     # version of pip
-    if backwards.PY34:  # pragma: no cover
+    if sys.version_info[0:2] == (3, 4):  # pragma: no cover
         # Print empty line to ensure close
         print('', end='')
         sys.stdout.flush()
@@ -263,22 +329,7 @@ def which(program):
         out = which(program + '.exe')
         if out is not None:
             return out
-    if backwards.PY2:  # pragma: Python 2
-        def is_exe(fpath):
-            return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-
-        fpath, fname = os.path.split(program)
-        if fpath:
-            if is_exe(program):
-                return program
-        else:
-            for path in os.environ["PATH"].split(os.pathsep):
-                exe_file = os.path.join(path, program)
-                if is_exe(exe_file):
-                    return exe_file
-        return None
-    else:  # pragma: Python 3
-        return shutil.which(program)
+    return shutil.which(program)
 
 
 def locate_path(fname, basedir=os.path.abspath(os.sep)):
@@ -298,7 +349,7 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
         return False
     if out.isspace():  # pragma: debug
         return False
-    out = out.decode('utf-8').splitlines()
+    out = bytes2str(out).splitlines()
     return out
 
 
@@ -596,24 +647,7 @@ def sleep(interval):
         interval (float): Time in seconds that process should sleep.
 
     """
-    if platform._is_win and backwards.PY2:  # pragma: windows
-        while True:
-            try:
-                t = time.time()
-                time.sleep(interval)
-            except IOError as e:  # pragma: debug
-                import errno
-                if e.errno != errno.EINTR:
-                    raise
-            # except InterruptedError:  # pragma: debug
-            #     import errno
-            #     print(e.errno)
-            #     print(e)
-            interval -= time.time() - t
-            if interval <= 0:
-                break
-    else:
-        time.sleep(interval)
+    time.sleep(interval)
 
 
 def safe_eval(statement, **kwargs):
@@ -628,7 +662,6 @@ def safe_eval(statement, **kwargs):
         object: Result of the eval.
 
     """
-    from yggdrasil import units
     safe_dict = {}
     _safe_lists = {'math': ['acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
                             'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor', 'fmod',
@@ -639,22 +672,13 @@ def safe_eval(statement, **kwargs):
                                 'sum', 'tuple', 'type'],
                    'numpy': ['array', 'int8', 'int16', 'int32', 'int64',
                              'uint8', 'uint16', 'uint32', 'uint64',
-                             'float16', 'float32', 'float64']}
-    _no_eval_class = {}
-    if units._use_unyt:
-        _safe_lists['unyt.array'] = ['unyt_quantity', 'unyt_array']
-    else:
-        safe_dict['Quantity'] = units._unit_quantity
-        _no_eval_class['Quantity'] = 'Quantity'
+                             'float16', 'float32', 'float64'],
+                   'yggdrasil.units': ['get_data', 'add_units'],
+                   'unyt.array': ['unyt_quantity', 'unyt_array']}
     for mod_name, func_list in _safe_lists.items():
-        if (mod_name == 'builtins') and backwards.PY2:  # pragma: Python 2
-            mod = __builtins__
-            for func in func_list:
-                safe_dict[func] = mod[func]
-        else:
-            mod = importlib.import_module(mod_name)
-            for func in func_list:
-                safe_dict[func] = getattr(mod, func)
+        mod = importlib.import_module(mod_name)
+        for func in func_list:
+            safe_dict[func] = getattr(mod, func)
     safe_dict.update(kwargs)
     # The following replaces <Class Name(a, b)> style reprs with calls to classes
     # identified in self._no_eval_class
@@ -789,7 +813,7 @@ def print_encoded(msg, *args, **kwargs):
 
     """
     try:
-        print(backwards.as_unicode(msg), *args, **kwargs)
+        print(bytes2str(msg), *args, **kwargs)
     except (UnicodeEncodeError, UnicodeDecodeError):  # pragma: debug
         logger.debug("sys.stdout.encoding = %s, cannot print unicode",
                      sys.stdout.encoding)
@@ -797,7 +821,7 @@ def print_encoded(msg, *args, **kwargs):
         try:
             print(msg, *args, **kwargs)
         except UnicodeEncodeError:  # pragma: debug
-            print(backwards.as_bytes(msg), *args, **kwargs)
+            print(str2bytes(msg), *args, **kwargs)
 
 
 class TimeOut(object):
@@ -820,13 +844,13 @@ class TimeOut(object):
 
     def __init__(self, max_time, key=None):
         self.max_time = max_time
-        self.start_time = backwards.clock_time()
+        self.start_time = time.perf_counter()
         self.key = key
 
     @property
     def elapsed(self):
         r"""float: Total time that has elapsed since the start."""
-        return backwards.clock_time() - self.start_time
+        return time.perf_counter() - self.start_time
     
     @property
     def is_out(self):

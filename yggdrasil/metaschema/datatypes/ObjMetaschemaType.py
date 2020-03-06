@@ -2,7 +2,7 @@ import os
 import copy
 import numpy as np
 import warnings
-from yggdrasil import backwards
+from yggdrasil import tools
 from yggdrasil.metaschema.encoder import encode_json, decode_json
 from yggdrasil.metaschema.datatypes import _schema_dir
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
@@ -592,7 +592,8 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
             object: Decoded object.
 
         """
-        lines = backwards.as_str(msg).splitlines()
+        msg = tools.bytes2str(msg)
+        lines = msg.splitlines()
         metadata = {'comments': []}
         out = {}
         # Parse
@@ -634,11 +635,8 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
             object: Coerced object.
 
         """
-        if not backwards.PY2:
-            try:
-                obj['material'] = backwards.as_str(obj['material'])
-            except BaseException:
-                pass
+        if isinstance(obj, dict) and ('material' in obj):
+            obj['material'] = tools.bytes2str(obj['material'])
         return super(ObjMetaschemaType, cls).coerce_type(obj, typedef=typedef,
                                                          **kwargs)
 

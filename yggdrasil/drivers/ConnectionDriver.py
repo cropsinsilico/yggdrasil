@@ -3,7 +3,6 @@ import os
 import copy
 import numpy as np
 import threading
-from yggdrasil import backwards
 from yggdrasil.communication import new_comm
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.components import (
@@ -24,9 +23,9 @@ class ConnectionDriver(Driver):
         name (str): Name that should be used to set names of input/output comms.
         icomm_kws (dict, optional): Keyword arguments for the input communicator.
         ocomm_kws (dict, optional): Keyword arguments for the output communicator.
-        translator (str, func, optional): Function or string specifying function
-            that should be used to translate messages from the input communicator
-            before passing them to the output communicator. If a string, the
+        translator (str, func, optional): Function or string specifying a function
+            that should be used to translate messages from the input communicator(s)
+            before passing them to the output communicator(s). If a string, the
             format should be "<package.module>:<function>" so that <function>
             can be imported from <package>. Defaults to None and messages are
             passed directly. This can also be a list of functions/strings that
@@ -76,15 +75,23 @@ class ConnectionDriver(Driver):
         'inputs': {'type': 'array', 'minItems': 1,
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                        {'$ref': '#/definitions/file'}]},
-                   'description': ('One or more name(s) of model output(s) '
-                                   'and/or new comm/file objects that the '
-                                   'connection should receive messages from.')},
+                   'description': (
+                       'One or more name(s) of model output channel(s) '
+                       'and/or new channel/file objects that the '
+                       'connection should receive messages from. '
+                       'A full description of file entries and the '
+                       'available options can be found :ref:`here<'
+                       'yaml_file_options>`.')},
         'outputs': {'type': 'array', 'minItems': 1,
                     'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                         {'$ref': '#/definitions/file'}]},
-                    'description': ('One or more name(s) of model input(s) '
-                                    'and/or new comm/file objects that the '
-                                    'connection should send messages to.')},
+                    'description': (
+                        'One or more name(s) of model input channel(s) '
+                        'and/or new channel/file objects that the '
+                        'connection should send messages to. '
+                        'A full description of file entries and the '
+                        'available options can be found :ref:`here<'
+                        'yaml_file_options>`.')},
         'translator': {'type': 'array',
                        'items': {'oneOf': [
                            {'type': 'function'},
@@ -529,9 +536,10 @@ class ConnectionDriver(Driver):
     def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
         sinfo = self.icomm.serializer.typedef
-        for t in self.icomm.transform:
-            sinfo = t.transform_datatype(sinfo)
         sinfo.update(self.icomm.serializer.serializer_info)
+        for t in self.icomm.transform:
+            t.set_original_datatype(sinfo)
+            sinfo = t.transformed_datatype
         sinfo.pop('seritype', None)
         self.debug('Before update:\n'
                    + '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n'
@@ -545,7 +553,8 @@ class ConnectionDriver(Driver):
                 t.set_original_datatype(sinfo)
                 sinfo = t.transformed_datatype
         for t in self.ocomm.transform:
-            sinfo = t.transform_datatype(sinfo)
+            t.set_original_datatype(sinfo)
+            sinfo = t.transformed_datatype
         self.ocomm.serializer.initialize_serializer(sinfo)
         self.ocomm.serializer.update_serializer(skip_type=True,
                                                 **self.icomm._last_header)
@@ -708,7 +717,7 @@ class ConnectionDriver(Driver):
             return
         self.nrecv += 1
         self.state = 'received'
-        if isinstance(msg, backwards.bytes_type):
+        if isinstance(msg, bytes):
             self.debug('Received message that is %d bytes from %s.',
                        len(msg), self.icomm.address)
         elif isinstance(msg, np.ndarray):

@@ -1,12 +1,13 @@
 import os
 import re
+import warnings
 import copy
 import shutil
 import subprocess
 import numpy as np
 import sysconfig
 from collections import OrderedDict
-from yggdrasil import platform, tools, backwards
+from yggdrasil import platform, tools
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, ArchiverBase)
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
@@ -32,8 +33,8 @@ def get_OSX_SYSROOT():
     fname = None
     if platform._is_mac:
         try:
-            xcode_dir = backwards.as_str(subprocess.check_output(
-                'echo "$(xcode-select -p)"', shell=True).strip())
+            xcode_dir = subprocess.check_output(
+                'echo "$(xcode-select -p)"', shell=True).decode("utf-8").strip()
         except BaseException:  # pragma: debug
             xcode_dir = None
         fname_try = []
@@ -241,7 +242,11 @@ _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
 _python_inc = sysconfig.get_paths()['include']
-_python_lib = tools.get_python_c_library(allow_failure=False)
+try:
+    _python_lib = tools.get_python_c_library(allow_failure=False)
+except BaseException:  # pragma: debug
+    warnings.warn("ERROR LOCATING PYTHON LIBRARY")
+    _python_lib = None
 _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
 _numpy_lib = None
 
@@ -445,7 +450,7 @@ class CModelDriver(CompiledModelDriver):
         CompiledModelDriver.after_registration(cls)
         archiver = cls.get_tool('archiver', default=None)
         linker = cls.get_tool('linker', default=None)
-        if archiver:
+        if archiver and _python_lib:
             if _python_lib.endswith(archiver.library_ext):
                 cls.external_libraries['python']['libtype'] = 'static'
                 cls.external_libraries['python']['static'] = _python_lib
@@ -938,11 +943,7 @@ class CModelDriver(CompiledModelDriver):
         """
         out = {}
         regex_var = r'(?P<type>.+?(?P<precision>\d*)(?:_t)?)\s*(?P<pointer>\**)'
-        if backwards.PY2:  # pragma: Python 2
-            grp = re.search(r'^' + regex_var + r'$',
-                            native_type).groupdict()
-        else:
-            grp = re.fullmatch(regex_var, native_type).groupdict()
+        grp = re.fullmatch(regex_var, native_type).groupdict()
         if grp.get('precision', False):
             out['precision'] = int(grp['precision'])
             grp['type'] = grp['type'].replace(grp['precision'], 'X')

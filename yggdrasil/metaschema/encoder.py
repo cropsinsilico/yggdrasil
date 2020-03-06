@@ -1,18 +1,10 @@
 import importlib
-from yggdrasil import backwards
 import json as stdjson
 import yaml
-json = stdjson
-_json_encoder = stdjson.JSONEncoder
-_json_decoder = stdjson.JSONDecoder
-_use_rapidjson = True
-if _use_rapidjson:
-    try:  # pragma: Python 3
-        import rapidjson as json
-        _json_encoder = json.Encoder
-        _json_decoder = json.Decoder
-    except ImportError:  # pragma: Python 2
-        _use_rapidjson = False
+import rapidjson as json
+from yggdrasil import tools
+_json_encoder = json.Encoder
+_json_decoder = json.Decoder
 
 
 def indent_char2int(indent):
@@ -63,10 +55,7 @@ class JSONReadableEncoder(stdjson.JSONEncoder):
         try:
             return encode_data_readable(o)
         except MetaschemaTypeError:
-            if _use_rapidjson:
-                raise TypeError("Cannot encode %s" % o)
-            else:
-                return _json_encoder.default(self, o)
+            raise TypeError("Cannot encode %s" % o)
 
 
 class JSONEncoder(_json_encoder):
@@ -79,54 +68,16 @@ class JSONEncoder(_json_encoder):
         try:
             return encode_data(o)
         except MetaschemaTypeError:
-            if _use_rapidjson:
-                raise TypeError("Cannot encode %s" % o)
-            else:
-                return _json_encoder.default(self, o)
+            raise TypeError("Cannot encode %s" % o)
     
 
 class JSONDecoder(_json_decoder):
     r"""Decoder class for Ygg messages."""
 
-    def __init__(self, *args, **kwargs):
-        super(JSONDecoder, self).__init__(*args, **kwargs)
-        if not _use_rapidjson:
-            from json.scanner import py_make_scanner
-            self.scan_once = py_make_scanner(self)
-
     def string(self, s):
         r"""Try to parse string with class."""
         # TODO: Do this dynamically for classes based on an attribute
         return string2import(s)
-
-    @property
-    def parse_string(self):
-        r"""function: Wrapper for function that parses strings."""
-        def parse_string_ygg(*args, **kwargs):
-            out, end = self._parse_string(*args, **kwargs)
-            return self.string(out), end
-        return parse_string_ygg
-
-    @parse_string.setter
-    def parse_string(self, x):
-        self._parse_string = x
-
-    # @property
-    # def scan_once(self):
-    #     r"""function: Wrapper for function that decodes JSON documents."""
-    #     def scan_once_ygg(string, idx):
-    #         try:
-    #             if string[idx] == '"':
-    #                 return self.parse_string(string, idx + 1, self.encoding,
-    #                                          self.strict)
-    #         except IndexError:
-    #             pass
-    #         return self._scan_once(string, idx)
-    #     return scan_once_ygg
-
-    # @scan_once.setter
-    # def scan_once(self, x):
-    #     self._scan_once = x
 
     
 def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
@@ -148,20 +99,16 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     """
     if (indent is None) and (fd is not None):
         indent = '\t'
-    if backwards.PY2 or _use_rapidjson:  # pragma: Python 2
-        # Character indents not allowed in Python 2 json
-        indent = indent_char2int(indent)
+    # Character indents not allowed in Python 2 json
+    indent = indent_char2int(indent)
     kwargs['indent'] = indent
     kwargs['sort_keys'] = sort_keys
-    if _use_rapidjson:
-        if 'cls' in kwargs:
-            kwargs.setdefault('default', kwargs.pop('cls')().default)
-        else:
-            kwargs.setdefault('default', JSONEncoder().default)
+    if 'cls' in kwargs:
+        kwargs.setdefault('default', kwargs.pop('cls')().default)
     else:
-        kwargs.setdefault('cls', JSONEncoder)
+        kwargs.setdefault('default', JSONEncoder().default)
     if fd is None:
-        return backwards.as_bytes(json.dumps(obj, **kwargs))
+        return tools.str2bytes(json.dumps(obj, **kwargs))
     else:
         return json.dump(obj, fd, **kwargs)
 
@@ -177,17 +124,13 @@ def decode_json(msg, **kwargs):
         object: Deserialized Python object.
 
     """
-    if isinstance(msg, backwards.string_types):
-        # Should this be unicode?
-        msg_decode = backwards.as_str(msg)
+    if isinstance(msg, (str, bytes)):
+        msg_decode = tools.bytes2str(msg)
         func_decode = json.loads
     else:
         msg_decode = msg
         func_decode = json.load
-    if _use_rapidjson:
-        func_decode = JSONDecoder()
-    else:
-        kwargs.setdefault('cls', JSONDecoder)
+    func_decode = JSONDecoder()
     return func_decode(msg_decode, **kwargs)
 
 
@@ -268,5 +211,4 @@ def decode_yaml(msg, sorted_dict_type=None, **kwargs):
         construct_scalar)
     kwargs['Loader'] = OrderedLoader
     out = yaml.load(msg, **kwargs)
-    # out = backwards.as_str(out, recurse=True, allow_pass=True)
     return out

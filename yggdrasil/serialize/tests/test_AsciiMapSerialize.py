@@ -1,4 +1,3 @@
-from yggdrasil import backwards
 from yggdrasil.serialize.tests import test_SerializeBase as parent
 
 
@@ -9,8 +8,8 @@ class TestAsciiMapSerialize(parent.TestSerializeBase):
 
     def test_error_delim(self):
         r"""Test error for message with too many delimiters on a line."""
-        msg = backwards.as_bytes(self.instance.delimiter.join(
-            ['args1', 'val1', 'args2', 'val2']))
+        msg = self.instance.delimiter.join(
+            ['args1', 'val1', 'args2', 'val2']).encode("utf-8")
         self.assert_raises(ValueError, self.instance.deserialize, msg)
 
     def test_error_nonstrval(self):

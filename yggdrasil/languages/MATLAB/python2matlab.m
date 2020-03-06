@@ -73,9 +73,9 @@ function x_ml = python2matlab(x_py)
 	x_ml{i, j} = python2matlab(x_ml{i, j});
       end;
     end;
-  elseif (isa(x_py, 'py.unyt.array.unyt_quantity') || isa(x_py, 'py.unyt.array.unyt_array'))
+  elseif (isa(x_py, 'py.unyt.array.unyt_quantity') || isa(x_py, 'py.unyt.array.unyt_array') || isa(x_py, 'py.pint.quantity.Quantity'))
     sym_env = getenv('YGG_MATLAB_SYMUNIT');
-    if ((length(sym_env) > 0) && (lower(sym_env) == 'true'))
+    if ((length(sym_env) > 0) && strcmp(lower(sym_env), 'true'))
       x_ml_data = python2matlab(py.yggdrasil.units.get_data(x_py));
       x_ml_unit = python2matlab(py.yggdrasil.units.get_units(x_py));
       x_ml = x_ml_data * str2symunit(x_ml_unit);
@@ -102,10 +102,16 @@ function x_ml = python2matlab(x_py)
     elseif ndim > 2
       disp('Conversion of numpy arrays with ndim > 2 uses nested cell arrays.');
     end;
-    % if ~is_struct
-    if ismember(char_code, ['f', 'i'])
+    if (is_struct)
+      x_ml = cell2table(x_ml, 'VariableNames', ...
+			matlab.lang.makeValidName(string(python2matlab(x_py.dtype.names))));
+    elseif ismember(char_code, ['f', 'i'])
       if isa(x_ml, 'cell')
         x_ml = cell2mat(x_ml);
+      end;
+    elseif ismember(char_code, ['S'])
+      if isa(x_ml, 'cell')
+        x_ml = string(x_ml);
       end;
     end;
   elseif (isa(x_py, 'numeric') || isa(x_py, 'logical'))

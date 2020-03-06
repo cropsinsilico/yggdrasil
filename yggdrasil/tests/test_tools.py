@@ -4,6 +4,30 @@ from yggdrasil import tools, platform
 from yggdrasil.tests import YggTestClass, assert_equal
 
 
+def test_bytes2str():
+    r"""Test bytes2str."""
+    vals = [(b'hello', 'hello'),
+            ('hello', 'hello'),
+            ((b'a', b'b'), ('a', 'b')),
+            ({'a': b'a', 'b': b'b'}, {'a': 'a', 'b': 'b'}),
+            ([b'a', b'b'], ['a', 'b']),
+            ([b'a', [b'b', b'c']], ['a', ['b', 'c']])]
+    for x, exp in vals:
+        assert_equal(tools.bytes2str(x, recurse=True), exp)
+
+
+def test_str2bytes():
+    r"""Test str2bytes."""
+    vals = [('hello', b'hello'),
+            (b'hello', b'hello'),
+            (('a', 'b'), (b'a', b'b')),
+            ({'a': 'a', 'b': 'b'}, {'a': b'a', 'b': b'b'}),
+            (['a', 'b'], [b'a', b'b']),
+            (['a', ['b', 'c']], [b'a', [b'b', b'c']])]
+    for x, exp in vals:
+        assert_equal(tools.str2bytes(x, recurse=True), exp)
+
+
 def test_get_conda_prefix():
     r"""Test get_conda_prefix."""
     tools.get_conda_prefix()
@@ -55,7 +79,6 @@ def test_locate_path():
 def test_popen_nobuffer():
     r"""Test open of process without buffer."""
     ans = os.getcwd()  # + '\n'
-    # ans = backwards.as_bytes(ans)
     # Test w/o shell
     if platform._is_win:  # pragma: windows
         args = ['cmd', '/c', 'cd']
@@ -63,7 +86,7 @@ def test_popen_nobuffer():
         args = ['pwd']
     p = tools.popen_nobuffer(args)
     out, err = p.communicate()
-    res = out.decode('utf-8').splitlines()[0]
+    res = tools.bytes2str(out).splitlines()[0]
     assert_equal(res, ans)
     # Test w/ shell
     if platform._is_win:  # pragma: windows
@@ -72,7 +95,7 @@ def test_popen_nobuffer():
         args = 'pwd'
     p = tools.popen_nobuffer(args, shell=True)
     out, err = p.communicate()
-    res = out.decode('utf-8').splitlines()[0]
+    res = tools.bytes2str(out).splitlines()[0]
     assert_equal(res, ans)
 
 

@@ -24,6 +24,7 @@ class TransformBase(ComponentBase):
         super(TransformBase, self).__init__(*args, **kwargs)
         if self.initial_state:
             self._state = self.initial_state
+        self.transformed_datatype = None
         if self.original_datatype:
             self.set_original_datatype(self.original_datatype)
 
@@ -62,7 +63,15 @@ class TransformBase(ComponentBase):
 
         """
         try:
-            return encode_type(self(generate_data(datatype)))
+            out = encode_type(self(generate_data(datatype)))
+            if (((out['type'] == 'array') and (datatype['type'] == 'array')
+                 and isinstance(out['items'], list)
+                 and isinstance(datatype['items'], list)
+                 and (len(out['items']) == len(datatype['items'])))):
+                for x, y in zip(out['items'], datatype['items']):
+                    if 'title' in y:
+                        x.setdefault('title', y['title'])
+            return out
         except NotImplementedError:
             return datatype
 
@@ -98,6 +107,8 @@ class TransformBase(ComponentBase):
         """
         if (not self.original_datatype) and (not no_init):
             self.set_original_datatype(encode_type(x))
+        if isinstance(x, bytes) and (len(x) == 0) and no_init:
+            return b''
         out = self.evaluate_transform(x, no_copy=no_copy)
         return out
 

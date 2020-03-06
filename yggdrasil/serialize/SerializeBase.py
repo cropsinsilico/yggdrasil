@@ -2,7 +2,7 @@ import copy
 import pprint
 import numpy as np
 import warnings
-from yggdrasil import backwards, tools, units, serialize
+from yggdrasil import tools, units, serialize
 from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.datatypes import (
     guess_type_from_obj, get_type_from_def, get_type_class, compare_schema,
@@ -59,9 +59,9 @@ class SerializeBase(tools.YggClass):
                      'default': 'default',
                      'description': ('Serializer type.')},
         'newline': {'type': 'string',
-                    'default': backwards.as_str(serialize._default_newline)},
+                    'default': serialize._default_newline_str},
         'comment': {'type': 'string',
-                    'default': backwards.as_str(serialize._default_comment)},
+                    'default': serialize._default_comment_str},
         'datatype': {'type': 'schema'}}
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
     _attr_conv = ['newline', 'comment']
@@ -171,7 +171,7 @@ class SerializeBase(tools.YggClass):
 
     @classmethod
     def get_testing_options(cls, table_example=False, array_columns=False,
-                            include_oldkws=False):
+                            include_oldkws=False, table_string_type='bytes'):
         r"""Method to return a dictionary of testing options for this class.
 
         Arguments:
@@ -185,6 +185,8 @@ class SerializeBase(tools.YggClass):
             include_oldkws (bool, optional): If True, old-style keywords will be
                 added to the returned options. This will only have an effect if
                 table_example is True. Defaults to False.
+            table_string_type (str, optional): Type that should be used
+                for the string column in the table. Defaults to 'bytes'.
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
@@ -209,13 +211,23 @@ class SerializeBase(tools.YggClass):
         if array_columns:
             table_example = True
         if table_example:
-            rows = [(b'one', np.int32(1), 1.0),
-                    (b'two', np.int32(2), 2.0),
-                    (b'three', np.int32(3), 3.0)]
+            assert(table_string_type in ['bytes', 'unicode', 'string'])
+            if table_string_type == 'string':
+                table_string_type = 'unicode'
+            if table_string_type == 'bytes':
+                np_dtype_str = 'S'
+                rows = [(b'one', np.int32(1), 1.0),
+                        (b'two', np.int32(2), 2.0),
+                        (b'three', np.int32(3), 3.0)]
+            else:
+                np_dtype_str = 'U'
+                rows = [('one', np.int32(1), 1.0),
+                        ('two', np.int32(2), 2.0),
+                        ('three', np.int32(3), 3.0)]
             out = {'kwargs': {}, 'empty': [], 'dtype': None,
                    'extra_kwargs': {},
                    'typedef': {'type': 'array',
-                               'items': [{'type': 'bytes',
+                               'items': [{'type': table_string_type,
                                           'units': 'n/a', 'title': 'name'},
                                          {'type': 'int', 'precision': 32,
                                           'units': 'umol', 'title': 'count'},
@@ -237,13 +249,15 @@ class SerializeBase(tools.YggClass):
                 out['kwargs'].update({'format_str': '%5s\t%d\t%f\n',
                                       'field_names': ['name', 'count', 'size'],
                                       'field_units': ['n/a', 'umol', 'cm']})
-                out['extra_kwargs'].update(
-                    {'format_str': backwards.as_str(out['kwargs']['format_str'])})
+                out['extra_kwargs']['format_str'] = out['kwargs']['format_str']
+                if 'format_str' in cls._attr_conv:
+                    out['extra_kwargs']['format_str'] = tools.str2bytes(
+                        out['extra_kwargs']['format_str'])
             if array_columns:
                 out['kwargs']['as_array'] = True
                 dtype = np.dtype(
                     {'names': out['field_names'],
-                     'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
+                     'formats': ['%s5' % np_dtype_str, 'i4', 'f8']})
                 out['dtype'] = dtype
                 arr = np.array(rows, dtype=dtype)
                 lst = [units.add_units(arr[n], u) for n, u
@@ -254,6 +268,8 @@ class SerializeBase(tools.YggClass):
                     x['type'] = '1darray'
                     if x['title'] == 'name':
                         x['precision'] = 40
+                        if x['subtype'] == 'unicode':
+                            x['precision'] *= 4
         else:
             out = {'kwargs': {}, 'empty': b'', 'dtype': None,
                    'typedef': cls.default_datatype,
@@ -291,8 +307,8 @@ class SerializeBase(tools.YggClass):
             if v is not None:
                 out[k] = copy.deepcopy(v)
         for k in self._attr_conv:
-            if (k in out) and isinstance(out[k], backwards.string_types):
-                out[k] = backwards.as_str(out[k])
+            if k in out:
+                out[k] = tools.bytes2str(out[k])
         return out
         
     @property
@@ -307,12 +323,8 @@ class SerializeBase(tools.YggClass):
                 out[k] = copy.deepcopy(v)
         for k in out.keys():
             v = out[k]
-            if isinstance(v, backwards.string_types):
-                out[k] = backwards.as_str(v)
-            elif isinstance(v, (list, tuple)):
-                out[k] = []
-                for x in v:
-                    out[k].append(backwards.as_str(x, allow_pass=True))
+            if isinstance(v, (bytes, list, tuple)):
+                out[k] = tools.bytes2str(v, recurse=True)
             else:
                 out[k] = v
         return out
@@ -348,8 +360,9 @@ class SerializeBase(tools.YggClass):
 
         """
         if getattr(self, 'field_names', None) is not None:
-            out = self.field_names
-        elif self.typedef['type'] != 'array':
+            out = copy.deepcopy(self.field_names)
+        elif ((self.typedef['type'] != 'array')
+              or ('items' not in self.typedef)):
             out = None
         elif isinstance(self.typedef['items'], dict):  # pragma: debug
             raise Exception("Variable number of items not yet supported.")
@@ -365,9 +378,9 @@ class SerializeBase(tools.YggClass):
                 out = None
         if (out is not None):
             if as_bytes:
-                out = [backwards.as_bytes(x) for x in out]
+                out = tools.str2bytes(out, recurse=True)
             else:
-                out = [backwards.as_str(x) for x in out]
+                out = tools.bytes2str(out, recurse=True)
         return out
 
     def get_field_units(self, as_bytes=False):
@@ -385,7 +398,7 @@ class SerializeBase(tools.YggClass):
         if self.typedef['type'] != 'array':
             return None
         if getattr(self, 'field_units', None) is not None:
-            out = self.field_units
+            out = copy.deepcopy(self.field_units)
         elif isinstance(self.typedef['items'], dict):  # pragma: debug
             raise Exception("Variable number of items not yet supported.")
         elif isinstance(self.typedef['items'], list):
@@ -400,9 +413,9 @@ class SerializeBase(tools.YggClass):
                 out = None
         if (out is not None):
             if as_bytes:
-                out = [backwards.as_bytes(x) for x in out]
+                out = tools.str2bytes(out, recurse=True)
             else:
-                out = [backwards.as_str(x) for x in out]
+                out = tools.bytes2str(out, recurse=True)
         return out
 
     @property
@@ -519,8 +532,21 @@ class SerializeBase(tools.YggClass):
         # Enfore that strings used with messages are in bytes
         for k in self._attr_conv:
             v = getattr(self, k, None)
-            if isinstance(v, backwards.string_types):
-                setattr(self, k, backwards.as_bytes(v))
+            if isinstance(v, (str, bytes)):
+                setattr(self, k, tools.str2bytes(v))
+
+    def cformat2nptype(self, *args, **kwargs):
+        r"""Method to convert c format string to numpy data type.
+
+        Args:
+            *args: Arguments are passed to serialize.cformat2nptype.
+            **kwargs: Keyword arguments are passed to serialize.cformat2nptype.
+
+        Returns:
+            np.dtype: Corresponding numpy data type.
+
+        """
+        return serialize.cformat2nptype(*args, **kwargs)
 
     def update_typedef_from_oldstyle(self, typedef):
         r"""Update a given typedef using an old, table-style serialization spec.
@@ -545,21 +571,21 @@ class SerializeBase(tools.YggClass):
                 continue
             # Key specific changes to type
             if k == 'format_str':
-                v = backwards.as_str(v)
+                v = tools.bytes2str(v)
                 fmts = serialize.extract_formats(v)
                 if 'type' in typedef:
                     if (typedef.get('type', None) == 'array'):
                         assert(len(typedef.get('items', [])) == len(fmts))
-                        # if len(typedef.get('items', [])) != len(fmts):
-                        #     warnings.warn(("Number of items in typedef (%d) doesn't"
-                        #                    + "match the number of formats (%d).")
-                        #                   % (len(typedef.get('items', [])), len(fmts)))
-                    continue
+                    # This continue is covered, but the optimization
+                    # causes it to be skipped at runtime
+                    # https://bitbucket.org/ned/coveragepy/issues/198/
+                    # continue-marked-as-not-covered
+                    continue  # pragma: no cover
                 as_array = self.extra_kwargs.get('as_array',
                                                  getattr(self, 'as_array', False))
                 typedef.update(type='array', items=[])
                 for i, fmt in enumerate(fmts):
-                    nptype = serialize.cformat2nptype(fmt)
+                    nptype = self.cformat2nptype(fmt)
                     itype = OneDArrayMetaschemaType.encode_type(np.ones(1, nptype))
                     itype = OneDArrayMetaschemaType.extract_typedef(itype)
                     if (fmt == '%s') and ('precision' in itype):
@@ -578,7 +604,7 @@ class SerializeBase(tools.YggClass):
                 # Can only be used in conjunction with format_str
                 pass
             elif k in ['field_names', 'field_units']:
-                v = [backwards.as_str(x) for x in v]
+                v = tools.bytes2str(v, recurse=True)
                 if k == 'field_names':
                     tk = 'title'
                 else:
@@ -660,7 +686,7 @@ class SerializeBase(tools.YggClass):
         """
         if header_kwargs is None:
             header_kwargs = {}
-        if isinstance(args, backwards.bytes_type) and (args == tools.YGG_MSG_EOF):
+        if isinstance(args, bytes) and (args == tools.YGG_MSG_EOF):
             header_kwargs['raw'] = True
         self.initialize_from_message(args, **header_kwargs)
         metadata = {'no_metadata': no_metadata}
@@ -678,10 +704,10 @@ class SerializeBase(tools.YggClass):
             else:
                 data = self.func_serialize(args)
                 if (self.encoded_typedef['type'] == 'bytes'):
-                    if not isinstance(data, backwards.bytes_type):
+                    if not isinstance(data, bytes):
                         raise TypeError(("Serialization function returned object "
                                          + "of type '%s', not required '%s' type.")
-                                        % (type(data), backwards.bytes_type))
+                                        % (type(data), bytes))
                     metadata['dont_encode'] = True
                     if not no_metadata:
                         metadata['metadata'] = self.datatype.encode_type(

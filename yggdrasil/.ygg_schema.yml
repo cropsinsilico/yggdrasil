@@ -21,6 +21,7 @@ definitions:
           default: default
           description: Communication mechanism that should be used.
           enum:
+          - buffer
           - default
           - ipc
           - rmq
@@ -35,6 +36,8 @@ definitions:
             object. Defaults to {''type'': ''bytes''}. Additional information on specifying
             datatypes can be found :ref:`here <datatypes_rst>`.'
           type: schema
+        default_file:
+          $ref: '#/definitions/file'
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -54,6 +57,10 @@ definitions:
           type: array
         filter:
           $ref: '#/definitions/filter'
+        format_str:
+          description: String that should be used to format/parse messages. Default
+            to None.
+          type: string
         is_default:
           default: false
           type: boolean
@@ -134,6 +141,17 @@ definitions:
             - rmq
             type: string
         title: RMQComm
+        type: object
+      - additionalProperties: true
+        description: Schema for comm component ['buffer'] subtype.
+        properties:
+          commtype:
+            default: default
+            description: Communication mechanism that should be used.
+            enum:
+            - buffer
+            type: string
+        title: BufferComm
         type: object
       - additionalProperties: true
         description: Schema for comm component ['rmq_async'] subtype.
@@ -454,10 +472,8 @@ definitions:
         filter:
           $ref: '#/definitions/filter'
         format_str:
-          description: If provided, this string will be used to format messages from
-            a list of arguments and parse messages to get a list of arguments in C
-            printf/scanf style. Defaults to None and messages are assumed to already
-            be bytes.
+          description: String that should be used to format/parse messages. Default
+            to None.
           type: string
         in_temp:
           default: false
@@ -471,9 +487,6 @@ definitions:
           type:
           - string
           - int
-        is_default:
-          default: false
-          type: boolean
         is_series:
           default: false
           description: If True, input/output will be done to a series of files. If
@@ -499,9 +512,6 @@ definitions:
           default: false
           description: If True, headers will not be read or serialized from/to tables.
             Defaults to False.
-          type: boolean
-        outside_loop:
-          default: false
           type: boolean
         read_meth:
           default: read
@@ -555,6 +565,11 @@ definitions:
           default: true
           description: If True, the serialization of dictionaries will be in key sorted
             order. Defaults to True.
+          type: boolean
+        str_as_bytes:
+          default: false
+          description: If True, strings in columns are read as bytes. Defaults to
+            False.
           type: boolean
         transform:
           anyOf:
@@ -714,12 +729,6 @@ definitions:
             enum:
             - table
             type: string
-          format_str:
-            description: If provided, this string will be used to format messages
-              from a list of arguments and parse messages to get a list of arguments
-              in C printf/scanf style. Defaults to None and messages are assumed to
-              already be bytes.
-            type: string
           newline:
             default: '
 
@@ -812,12 +821,6 @@ definitions:
             enum:
             - pandas
             type: string
-          format_str:
-            description: If provided, this string will be used to format messages
-              from a list of arguments and parse messages to get a list of arguments
-              in C printf/scanf style. Defaults to None and messages are assumed to
-              already be bytes.
-            type: string
           newline:
             default: '
 
@@ -829,6 +832,11 @@ definitions:
             default: false
             description: If True, headers will not be read or serialized from/to tables.
               Defaults to False.
+            type: boolean
+          str_as_bytes:
+            default: false
+            description: If True, strings in columns are read as bytes. Defaults to
+              False.
             type: boolean
           use_astropy:
             default: false
@@ -1320,10 +1328,10 @@ definitions:
             is used.
           type: string
       required:
-      - args
-      - name
-      - working_dir
       - language
+      - name
+      - args
+      - working_dir
       title: model_base
       type: object
     - anyOf:
@@ -1846,6 +1854,11 @@ definitions:
           description: If True, the serialization of dictionaries will be in key sorted
             order. Defaults to True.
           type: boolean
+        str_as_bytes:
+          default: false
+          description: If True, strings in columns are read as bytes. Defaults to
+            False.
+          type: boolean
         use_astropy:
           default: false
           description: If True, the astropy package will be used to serialize/deserialize
@@ -1949,6 +1962,11 @@ definitions:
             enum:
             - pandas
             type: string
+          str_as_bytes:
+            default: false
+            description: If True, strings in columns are read as bytes. Defaults to
+              False.
+            type: boolean
           use_astropy:
             default: false
             description: If True, the astropy package will be used to serialize/deserialize

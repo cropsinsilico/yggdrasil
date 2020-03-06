@@ -1,7 +1,7 @@
 import os
 import tempfile
 from yggdrasil.tests import assert_equal, assert_warns, assert_raises
-from yggdrasil import config, backwards, tools
+from yggdrasil import config, tools
 from yggdrasil.components import import_component
 
 
@@ -68,13 +68,13 @@ def test_locate_file():
     # Single file
     sdir, spat, sans = make_temp_single()
     sout = config.locate_file(spat)
-    assert(isinstance(sout, backwards.string_types))
+    assert(isinstance(sout, (bytes, str)))
     assert_equal(sout, sans[0])
     # Multiple files
     mdir, mpat, mans = make_temp_multiple()
     with assert_warns(RuntimeWarning):
         mout = config.locate_file([mpat])
-        assert(isinstance(mout, backwards.string_types))
+        assert(isinstance(mout, (bytes, str)))
         assert_equal(mout, mans[0])
     
 

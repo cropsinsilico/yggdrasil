@@ -1,5 +1,4 @@
 import unittest
-from yggdrasil import backwards
 from yggdrasil.languages import install_languages
 
 
@@ -11,10 +10,9 @@ class TestInstallLanguages(unittest.TestCase):
         install_languages.update_argparser(arglist=['python'])
         install_languages.update_argparser(language='python',
                                            arglist=['python'])
-        if not backwards.PY2:  # pragma: Python 3
-            with self.assertRaises(SystemExit):
-                install_languages.update_argparser(arglist=['-h'])
-                unittest.main(exit=False)
+        with self.assertRaises(SystemExit):
+            install_languages.update_argparser(arglist=['-h'])
+            unittest.main(exit=False)
 
     def test_install_language(self):
         r"""Test install_language."""

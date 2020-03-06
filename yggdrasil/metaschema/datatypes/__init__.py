@@ -9,7 +9,6 @@ from yggdrasil.metaschema.encoder import decode_json
 from yggdrasil.metaschema.properties import get_metaschema_property
 
 
-_jsonschema_ver_maj = int(float(jsonschema.__version__.split('.')[0]))
 _type_registry = OrderedDict()
 _schema_dir = os.path.join(os.path.dirname(__file__), 'schemas')
 _base_validator = jsonschema.validators.validator_for({"$schema": ""})
@@ -56,10 +55,7 @@ def register_type(type_class):
     if type_name in _type_registry:
         raise ValueError("Type '%s' already registered." % type_name)
     if (not type_class._replaces_existing):  # pragma: debug
-        if _jsonschema_ver_maj < 3:
-            exist_flag = (type_name in _base_validator.DEFAULT_TYPES)
-        else:
-            exist_flag = (type_name in _base_validator.TYPE_CHECKER._type_checkers)
+        exist_flag = (type_name in _base_validator.TYPE_CHECKER._type_checkers)
         if exist_flag:
             raise ValueError(("Type '%s' is a JSON default type "
                               "which cannot be replaced.") % type_name)
@@ -79,10 +75,7 @@ def register_type(type_class):
         prop_class.types = tuple(set(old + new))
         # Python types
         old = copy.deepcopy(list(prop_class.python_types))
-        try:
-            new = list(type_class.python_types)
-        except TypeError:
-            new = [type_class.python_types]
+        new = list(type_class.python_types)
         prop_class.python_types = tuple(set(old + new))
     # Add to registry
     type_class._datatype = type_name
@@ -616,7 +609,7 @@ def type2numpy(typedef):
             dtype_list = []
             field_names = []
             for i, x in enumerate(typedef['items']):
-                if x['type'] != '1darray':
+                if x['type'] not in ['1darray', 'ndarray']:
                     as_array = False
                     break
                 dtype_list.append(definition2dtype(x))

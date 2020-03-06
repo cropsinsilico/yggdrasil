@@ -8,8 +8,9 @@ _this_dir = os.path.dirname(__file__)
 
 def main(language, transform, language_ext=None):
     yamlfile = os.path.join(_this_dir, 'transforms.yml')
-    modelfile = TestExampleTransforms.setup_model(
+    modelfile, env = TestExampleTransforms.setup_model(
         language, transform, language_ext=language_ext)
+    os.environ.update(env)
     try:
         run(yamlfile)
     finally:

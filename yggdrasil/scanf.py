@@ -58,6 +58,8 @@ Updates by Meagan Lang:
 """
 import re
 import sys
+from yggdrasil import tools
+
 
 __version__ = '1.3.3'
 
@@ -386,6 +388,12 @@ def scanf(format, s=None, collapseWhitespace=True):
     if hasattr(s, "readline"):
         s = s.readline()
 
+    as_bytes = False
+    if isinstance(s, bytes):
+        as_bytes = True
+        s = s.decode("utf-8")
+    format = tools.bytes2str(format)
+
     # print(s, format)
 
     format_re, casts = scanf_compile(format, collapseWhitespace)
@@ -393,7 +401,12 @@ def scanf(format, s=None, collapseWhitespace=True):
     found = format_re.search(s)
     if found:
         groups = found.groups()
-        return tuple([casts[i](groups[i]) for i in range(len(groups))])
+        out = [casts[i](groups[i]) for i in range(len(groups))]
+        if as_bytes:
+            for i in range(len(out)):
+                if isinstance(out[i], str):
+                    out[i] = out[i].encode("utf-8")
+        return tuple(out)
 
 
 def extractdata(pattern, text=None, filepath=None):

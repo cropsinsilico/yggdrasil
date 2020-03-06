@@ -1,6 +1,5 @@
 from yggdrasil.communication import CommBase, AsyncComm
 from yggdrasil.config import ygg_cfg
-from yggdrasil import backwards
 import logging
 logger = logging.getLogger(__name__)
 try:
@@ -14,10 +13,6 @@ except ImportError:
 
 
 _rmq_param_sep = '_RMQPARAM_'
-if backwards.PY2:  # pragma: Python 2
-    
-    class BlockingIOError:
-        pass
 
 
 def check_rmq_server(url=None, **kwargs):

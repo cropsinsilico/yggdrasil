@@ -1,5 +1,5 @@
 import numpy as np
-from yggdrasil import backwards, units, serialize
+from yggdrasil import units, serialize
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
@@ -94,7 +94,7 @@ class DefaultSerialize(SerializeBase):
             units_list = [units.get_units(ix) for ix in objects[0]]
             out = [[units.add_units(np.hstack([x[i] for x in objects]), u)
                     for i, u in enumerate(units_list)]]
-        elif isinstance(objects[0], backwards.bytes_type):
+        elif isinstance(objects[0], bytes):
             out = [b''.join(objects)]
         else:
             return super(DefaultSerialize, cls).concatenate(objects, **kwargs)

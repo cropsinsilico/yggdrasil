@@ -80,6 +80,8 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         names = None
         if isinstance(obj, pd.DataFrame):
             names = obj.columns
+            if all([isinstance(n, int) for n in names]):
+                names = None
         elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
             names = obj.dtype.names
         out = super(JSONArrayMetaschemaType, cls).encode_type(obj, **kwargs)
@@ -117,10 +119,17 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         from yggdrasil.serialize import pandas2list, numpy2list, dict2list
         if isinstance(obj, pd.DataFrame):
             obj = pandas2list(obj)
+        elif isinstance(obj, np.ndarray) and (len(obj.dtype) == 0):
+            obj = [obj]
         elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
             obj = numpy2list(obj)
         elif isinstance(obj, dict):
             if (key_order is not None) or (len(obj) == 1):
+                obj = dict2list(obj, order=key_order)
+            elif (isinstance(typedef, dict)
+                  and isinstance(typedef.get('items', None), list)
+                  and all([('title' in x) for x in typedef['items']])):
+                key_order = [x['title'] for x in typedef['items']]
                 obj = dict2list(obj, order=key_order)
             else:
                 obj = [obj]

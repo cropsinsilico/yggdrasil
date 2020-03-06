@@ -1,6 +1,7 @@
+import io as sio
 import numpy as np
 from scipy.io import savemat, loadmat
-from yggdrasil import backwards, platform
+from yggdrasil import platform
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
@@ -30,7 +31,7 @@ class MatSerialize(SerializeBase):
         if not isinstance(args, dict):
             raise TypeError('Object (type %s) is not a dictionary' %
                             type(args))
-        fd = backwards.BytesIO()
+        fd = sio.BytesIO()
         savemat(fd, args)
         out = fd.getvalue()
         fd.close()
@@ -46,7 +47,7 @@ class MatSerialize(SerializeBase):
             obj: Deserialized Python object.
 
         """
-        fd = backwards.BytesIO(msg)
+        fd = sio.BytesIO(msg)
         out = loadmat(fd, matlab_compatible=True)
         mat_keys = ['__header__', '__globals__', '__version__']
         for k in mat_keys:

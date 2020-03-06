@@ -5,7 +5,6 @@ import contextlib
 import jsonschema
 import logging
 from collections import OrderedDict
-from yggdrasil.metaschema.datatypes import get_type_class, _jsonschema_ver_maj
 
 
 logger = logging.getLogger(__name__)
@@ -372,44 +371,4 @@ def create(*args, **kwargs):
             else:
                 return self._normalized
 
-    def iter_errors_js2(self, instance, _schema=None):
-        r"""Wrapper that can be added to classes for jsonschema < 3.0 to allow
-        for boolean schema."""
-        if _schema is None:
-            _schema = self.schema
-        if _schema is True:
-            pass
-        elif _schema is False:
-            yield jsonschema.exceptions.ValidationError(
-                "False schema does not allow %r" % (instance,),
-                validator=None,
-                validator_value=None,
-                instance=instance,
-                schema=_schema)
-        else:
-            for e in super(Normalizer, self).iter_errors(instance, _schema=_schema):
-                yield e
-
-    def is_type_js2(self, instance, types):
-        r"""Jsonschema < 3.0 wrapper for method that determines if an object is
-        an example of the given type.
-
-        Args:
-            instance (object): Object to test against to the type.
-            type (str, list): Name of single type or a list of types that
-                instance should be tested against.
-
-        Returns:
-            bool: True if the instance is of the specified type(s). False
-                otherwise.
-
-        """
-        out = super(Normalizer, self).is_type(instance, types)
-        if out:
-            out = get_type_class(types).validate(instance)
-        return out
-
-    if _jsonschema_ver_maj < 3:
-        Normalizer.iter_errors = iter_errors_js2
-        Normalizer.is_type = is_type_js2
     return Normalizer

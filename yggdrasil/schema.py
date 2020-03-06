@@ -5,7 +5,7 @@ import yaml
 import json
 from collections import OrderedDict
 from jsonschema.exceptions import ValidationError
-from yggdrasil import metaschema, backwards
+from yggdrasil import metaschema
 
 
 _schema_fname = os.path.abspath(os.path.join(
@@ -36,7 +36,6 @@ def ordered_load(stream, object_pairs_hook=SchemaDict, **kwargs):
     """
     kwargs['sorted_dict_type'] = object_pairs_hook
     out = metaschema.encoder.decode_yaml(stream, **kwargs)
-    out = backwards.as_str(out, recurse=True, allow_pass=True)
     return out
 
 
@@ -164,7 +163,10 @@ def convert_extended2base(s):
                 s['type'] = [type_map.get(t, t) for t in s['type']]
                 if all([t == s['type'][0] for t in s['type']]):
                     s['type'] = s['type'][0]
+        opt = copy.deepcopy(s.get('options', None))
         s = {k: convert_extended2base(v) for k, v in s.items()}
+        if opt is not None:
+            s['options'] = opt
     return s
 
 
@@ -185,6 +187,27 @@ def get_json_schema(fname_dst=None):
     out = copy.deepcopy(s.schema)
     out['definitions']['schema'] = copy.deepcopy(metaschema._metaschema)
     out = convert_extended2base(out)
+    if fname_dst is not None:
+        with open(fname_dst, 'w') as fd:
+            json.dump(out, fd)
+    return out
+
+
+def get_model_form_schema(fname_dst=None):
+    r"""Return the yggdrasil schema that can be used to generate a form
+    for creating a model specification file.
+
+    Args:
+        fname_dst (str, optional): Full path to file where the JSON
+            schema should be saved. Defaults to None and no file is
+            created.
+
+    Returns:
+        dict: Schema structure.
+
+    """
+    s = get_schema()
+    out = s.model_form_schema
     if fname_dst is not None:
         with open(fname_dst, 'w') as fd:
             json.dump(out, fd)
@@ -250,7 +273,7 @@ class ComponentSchema(object):
                          "for document: %s" % doc)  # pragma: debug
 
     def get_subtype_schema(self, subtype, unique=False, relaxed=False,
-                           allow_instance=False):
+                           allow_instance=False, for_form=False):
         r"""Get the schema for the specified subtype.
 
         Args:
@@ -265,11 +288,17 @@ class ComponentSchema(object):
             allow_instance (bool, optional): If True, the returned schema will
                 validate instances of this component in addition to documents
                 describing a component. Defaults to False.
+            for_form (bool, optional): If True, the returned schema will be
+                formatted for easy parsing by form generation tools. Defaults
+                to False. Causes relaxed and allow_instance to be ignored.
 
         Returns:
             dict: Schema for specified subtype.
 
         """
+        if for_form:
+            relaxed = False
+            allow_instance = False
         if subtype == 'base':
             out = copy.deepcopy(self._base_schema)
             # Add additional properties that apply to specific subtypes
@@ -277,8 +306,16 @@ class ComponentSchema(object):
                 out['additionalProperties'] = False
                 for x in self._storage.values():
                     for k, v in x['properties'].items():
-                        if (k != self.subtype_key) and (k not in out['properties']):
-                            out['properties'][k] = copy.deepcopy(v)
+                        if (k != self.subtype_key):
+                            if (k not in out['properties']):
+                                out['properties'][k] = copy.deepcopy(v)
+                                if for_form:
+                                    out['properties'][k]['options'] = {
+                                        'dependencies': {self.subtype_key: []}}
+                            if for_form and ('options' in out['properties'][k]):
+                                out['properties'][k]['options']['dependencies'][
+                                    self.subtype_key] += (
+                                        x['properties'][self.subtype_key]['enum'])
         else:
             if subtype not in self._storage:
                 s2c = self.subtype2class
@@ -312,7 +349,7 @@ class ComponentSchema(object):
                                    'class': comp_cls}]}
         return out
 
-    def get_schema(self, relaxed=False, allow_instance=False):
+    def get_schema(self, relaxed=False, allow_instance=False, for_form=False):
         r"""Get the schema defining this component.
 
         Args:
@@ -323,17 +360,23 @@ class ComponentSchema(object):
             allow_instance (bool, optional): If True, the returned schema will
                 validate instances of this component in addition to documents
                 describing a component. Defaults to False.
+            for_form (bool, optional): If True, the returned schema will be
+                formatted for easy parsing by form generation tools. Defaults
+                to False. Causes relaxed and allow_instance to be ignored.
 
         Returns:
             dict: Schema for this component.
 
         """
-        r"""dict: Schema for this component."""
         out = {'description': 'Schema for %s components.' % self.schema_type,
-               'title': self.schema_type,
-               'allOf': [self.get_subtype_schema('base', relaxed=relaxed),
-                         {'anyOf': [self.get_subtype_schema(x, unique=True)
-                                    for x in self._storage.keys()]}]}
+               'title': self.schema_type}
+        if for_form:
+            out.update(self.get_subtype_schema('base', for_form=for_form))
+            allow_instance = False
+        else:
+            out['allOf'] = [self.get_subtype_schema('base', relaxed=relaxed),
+                            {'anyOf': [self.get_subtype_schema(x, unique=True)
+                                       for x in self._storage.keys()]}]
         if allow_instance:
             out['oneOf'] = [{'allOf': out.pop('allOf')},
                             {'type': 'instance',
@@ -624,7 +667,7 @@ class SchemaRegistry(object):
         r"""Return a component schema from the registry."""
         return self._storage.get(k, *args, **kwargs)
 
-    def get_definitions(self, relaxed=False, allow_instance=False):
+    def get_definitions(self, relaxed=False, allow_instance=False, for_form=False):
         r"""Get schema definitions for the registered components.
 
         Args:
@@ -635,20 +678,76 @@ class SchemaRegistry(object):
             allow_instance (bool, optional): If True, the returned definitions will
                 validate instances of the components in addition to documents
                 describing components. Defaults to False.
+            for_form (bool, optional): If True, the returned schema will be
+                formatted for easy parsing by form generation tools. Defaults
+                to False. Causes relaxed and allow_instance to be ignored.
 
         Returns:
             dict: Schema defintiions for each of the registered components.
 
         """
+        cache_key = 'definitions'
+        if for_form:
+            cache_key += '_form'
+            relaxed = False
+            allow_instance = False
         if relaxed:
-            cache_key = 'relaxed_definitions'
-        else:
-            cache_key = 'definitions'
+            cache_key += '_relaxed'
+        if allow_instance:
+            cache_key += '_instance'
         if cache_key not in self._cache:
-            out = {k: v.get_schema(relaxed=relaxed, allow_instance=allow_instance)
+            out = {k: v.get_schema(relaxed=relaxed, allow_instance=allow_instance,
+                                   for_form=for_form)
                    for k, v in self._storage.items()}
             for k in self.required_components:
                 out.setdefault(k, {'type': 'string'})
+            self._cache[cache_key] = out
+        return copy.deepcopy(self._cache[cache_key])
+
+    def get_schema(self, relaxed=False, allow_instance=False, for_form=False):
+        r"""Get the schema defining this component.
+
+        Args:
+            relaxed (bool, optional): If True, the returned schema (and any
+                definitions it includes) are relaxed to allow for objects with
+                objects with additional properties to pass validation. Defaults
+                to False.
+            allow_instance (bool, optional): If True, the returned schema will
+                validate instances of this component in addition to documents
+                describing a component. Defaults to False.
+            for_form (bool, optional): If True, the returned schema will be
+                formatted for easy parsing by form generation tools. Defaults
+                to False. Causes relaxed and allow_instance to be ignored.
+
+        Returns:
+            dict: Schema for this component.
+
+        """
+        cache_key = 'schema'
+        if for_form:
+            cache_key += '_form'
+            relaxed = False
+            allow_instance = False
+        if relaxed:
+            cache_key += '_relaxed'
+        if allow_instance:
+            cache_key += '_instance'
+        if cache_key not in self._cache:
+            out = {'title': 'YAML Schema',
+                   'description': 'Schema for yggdrasil YAML input files.',
+                   'type': 'object',
+                   'definitions': self.get_definitions(
+                       relaxed=relaxed, allow_instance=allow_instance,
+                       for_form=for_form),
+                   'required': ['models'],
+                   'additionalProperties': False,
+                   'properties': SchemaDict(
+                       [('models', {'type': 'array',
+                                    'items': {'$ref': '#/definitions/model'},
+                                    'minItems': 1}),
+                        ('connections',
+                         {'type': 'array',
+                          'items': {'$ref': '#/definitions/connection'}})])}
             self._cache[cache_key] = out
         return copy.deepcopy(self._cache[cache_key])
 
@@ -660,22 +759,103 @@ class SchemaRegistry(object):
     @property
     def schema(self):
         r"""dict: Schema for evaluating YAML input file."""
-        if 'schema' not in self._cache:
-            out = {'title': 'YAML Schema',
-                   'description': 'Schema for yggdrasil YAML input files.',
-                   'type': 'object',
-                   'definitions': self.definitions,
-                   'required': ['models'],
-                   'additionalProperties': False,
-                   'properties': SchemaDict(
-                       [('models', {'type': 'array',
-                                    'items': {'$ref': '#/definitions/model'},
-                                    'minItems': 1}),
-                        ('connections',
-                         {'type': 'array',
-                          'items': {'$ref': '#/definitions/connection'}})])}
-            self._cache['schema'] = out
-        return copy.deepcopy(self._cache['schema'])
+        return self.get_schema()
+
+    @property
+    def form_schema(self):
+        r"""dict: Schema for generating a YAML form."""
+        out = self.get_schema(for_form=True)
+        out['definitions']['schema'] = copy.deepcopy(metaschema._metaschema)
+        out = convert_extended2base(out)
+        return out
+
+    @property
+    def model_form_schema(self):
+        r"""dict: Schema for generating a model YAML form."""
+        from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
+            _valid_types)
+        out = self.get_schema(for_form=True)
+        scalar_types = list(_valid_types.keys())
+        meta = copy.deepcopy(metaschema._metaschema)
+        meta_prop = {
+            'subtype': ['1darray', 'ndarray'],
+            'units': ['1darray', 'ndarray'] + scalar_types,
+            'precision': ['1darray', 'ndarray'] + scalar_types,
+            'length': ['1darray'],
+            'shape': ['ndarray']}
+        out['definitions']['simpleTypes'] = meta['definitions']['simpleTypes']
+        out['definitions']['simpleTypes'].update(type='string',
+                                                 default='bytes')
+        out['definitions']['simpleTypes']['enum'].remove('scalar')
+        out['definitions']['schema'] = {'type': 'object',
+                                        'required': ['type'],
+                                        'properties': {}}
+        out['definitions']['schema']['properties']['type'] = {
+            '$ref': '#/definitions/simpleTypes'}
+        for k, types in meta_prop.items():
+            out['definitions']['schema']['properties'][k] = meta['properties'][k]
+            if types:
+                out['definitions']['schema']['properties'][k]['options'] = {
+                    'dependencies': {'type': types}}
+        for k in out['definitions'].keys():
+            if k in ['schema', 'simpleTypes']:
+                continue
+            out['definitions'][k].pop('title', None)
+            if ((('required' in out['definitions'][k])
+                 and ('working_dir' in out['definitions'][k]['required']))):
+                out['definitions'][k]['required'].remove('working_dir')
+            for p, v in list(out['definitions'][k]['properties'].items()):
+                if v.get('description', '').startswith('[DEPRECATED]'):
+                    out['definitions'][k]['properties'].pop(p)
+        for x in ['comm', 'file']:
+            for k in ['send_converter', 'recv_converter']:
+                out['definitions'][x]['properties'][k].pop('oneOf', None)
+                out['definitions'][x]['properties'][k].update(
+                    type='array', items={"$ref": "#/definitions/transform"})
+        for x in ['file']:
+            for k in ['serializer']:
+                out['definitions'][x]['properties'][k].pop('oneOf', None)
+                out['definitions'][x]['properties'][k].update(
+                    {"$ref": "#/definitions/serializer"})
+        prop_add = {
+            'model': {'repository_url': {'type': 'string'},
+                      'contact_email': {'type': 'string'}}}
+        prop_required = {
+            'model': ['inputs', 'outputs', 'repository_url']}
+        prop_remove = {
+            'comm': ['is_default', 'length_map', 'serializer'],
+            'file': ['is_default', 'length_map',
+                     'wait_for_creation', 'working_dir',
+                     'read_meth', 'in_temp',
+                     'serializer', 'datatype'],
+            'model': ['client_of', 'is_server', 'preserve_cache',
+                      'products', 'source_products', 'working_dir',
+                      'overwrite', 'skip_interpreter']}
+        prop_order = {
+            'model': ['name', 'language', 'args', 'inputs', 'outputs']
+        }
+        for k, rlist in prop_remove.items():
+            for p in rlist:
+                out['definitions'][k]['properties'].pop(p, None)
+        for k, rlist in prop_required.items():
+            out['definitions'][k].setdefault('required', [])
+            for p in rlist:
+                if p not in out['definitions'][k]['required']:
+                    out['definitions'][k]['required'].append(p)
+        for k, rlist in prop_order.items():
+            for i, p in enumerate(rlist):
+                out['definitions'][k]['properties'][p]['propertyOrder'] = i
+        for k, adict in prop_add.items():
+            out['definitions'][k]['properties'].update(adict)
+        out.update(out['definitions'].pop('model'))
+        out['definitions'].pop('connection')
+        out.update(
+            title='Model YAML Schema',
+            description='Schema for yggdrasil model YAML input files.')
+        out['definitions']['comm']['properties']['default_file'] = {
+            '$ref': '#/definitions/file'}
+        out = convert_extended2base(out)
+        return out
 
     @property
     def full_schema(self):
@@ -818,7 +998,8 @@ class SchemaRegistry(object):
         return True
 
     def get_component_schema(self, comp_name, subtype=None, relaxed=False,
-                             allow_instance=False, allow_instance_definitions=False):
+                             allow_instance=False, allow_instance_definitions=False,
+                             for_form=False):
         r"""Get the schema for a certain component.
 
         Args:
@@ -836,6 +1017,9 @@ class SchemaRegistry(object):
             allow_instance_definitions (bool, optional): If True, the definitions
                 in the returned schema will allow for instances of the components.
                 Defaults to False.
+            for_form (bool, optional): If True, the returned schema will be
+                formatted for easy parsing by form generation tools. Defaults
+                to False. Causes relaxed and allow_instance to be ignored.
             **kwargs: Additonal keyword arguments are paseed to get_schema or
                 get_subtype_schema for the selected component type.
 
@@ -847,12 +1031,15 @@ class SchemaRegistry(object):
             raise ValueError("Unrecognized component: %s" % comp_name)
         if subtype is None:
             out = self._storage[comp_name].get_schema(
-                relaxed=relaxed, allow_instance=allow_instance)
+                relaxed=relaxed, allow_instance=allow_instance,
+                for_form=for_form)
         else:
             out = self._storage[comp_name].get_subtype_schema(
-                subtype, relaxed=relaxed, allow_instance=allow_instance)
+                subtype, relaxed=relaxed, allow_instance=allow_instance,
+                for_form=for_form)
         out['definitions'] = self.get_definitions(
-            relaxed=relaxed, allow_instance=allow_instance_definitions)
+            relaxed=relaxed, allow_instance=allow_instance_definitions,
+            for_form=for_form)
         return out
 
     def get_component_keys(self, comp_name):
@@ -1116,6 +1303,9 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
                     x['name'] = new_name
                 if not x.get('is_default', False):
                     x.setdefault('working_dir', instance['working_dir'])
+                if 'default_file' in x:
+                    x['default_file'].setdefault('working_dir',
+                                                 instance['working_dir'])
                 for k in ['filter', 'transform']:
                     x_k = x.get(k, None)
                     if isinstance(x_k, dict) and ('function' in x_k):

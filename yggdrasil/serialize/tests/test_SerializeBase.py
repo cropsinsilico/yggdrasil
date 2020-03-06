@@ -3,7 +3,6 @@ from yggdrasil.tests import YggTestClassInfo, assert_equal
 from yggdrasil import tools
 from yggdrasil.components import import_component
 from yggdrasil.serialize import SerializeBase
-from yggdrasil.metaschema.datatypes import encode_type
 
 
 def test_demote_string():
@@ -103,13 +102,14 @@ class TestSerializeBase(YggTestClassInfo):
         if (self._cls == 'SerializeBase'):
             return
         hout = copy.deepcopy(self._header_info)
-        hout.update(self.instance.serializer_info)
         temp_seri = import_component(
             'serializer', self.instance.serializer_info['seritype'])()
         for iobj in self.testing_options['objects']:
-            hout.update(encode_type(iobj, typedef=self.instance.typedef))
             msg = self.instance.serialize(iobj, header_kwargs=self._header_info,
                                           add_serializer_info=True)
+            hout.update(self.instance.serializer_info)
+            hout.update(self.instance.datatype.encode_type(
+                iobj, typedef=self.instance.typedef))
             iout, ihead = self.instance.deserialize(msg)
             hout.update(size=ihead['size'], id=ihead['id'],
                         incomplete=False)

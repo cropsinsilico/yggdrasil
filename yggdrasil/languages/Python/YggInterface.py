@@ -1,4 +1,4 @@
-from yggdrasil import backwards, tools
+from yggdrasil import tools
 from yggdrasil.communication.DefaultComm import DefaultComm
 
 
@@ -45,7 +45,7 @@ def YggInit(_type, args=None):
     elif _type.startswith('CIS'):
         _type = _type.replace('CIS', 'YGG', 1)
     cls = eval(_type)
-    if isinstance(cls, (int, backwards.bytes_type, backwards.unicode_type)):
+    if isinstance(cls, (int, bytes, str)):
         obj = cls
     else:
         obj = cls(*args)
@@ -211,7 +211,7 @@ def YggAsciiTableInput(name, as_array=False, **kwargs):
     return YggInput(name, **kwargs)
 
 
-def YggAsciiTableOutput(name, fmt, as_array=False, **kwargs):
+def YggAsciiTableOutput(name, fmt=None, as_array=False, **kwargs):
     r"""Get class for handling table-like formatted output.
 
     Args:
@@ -227,8 +227,9 @@ def YggAsciiTableOutput(name, fmt, as_array=False, **kwargs):
         DefaultComm: Communication object.
         
     """
-    kwargs['serializer_kwargs'] = dict(as_array=as_array,
-                                       format_str=fmt)
+    kwargs['serializer_kwargs'] = dict(as_array=as_array)
+    if fmt is not None:
+        kwargs['serializer_kwargs']['format_str'] = fmt
     return YggOutput(name, **kwargs)
     
 
@@ -285,13 +286,11 @@ def YggArrayInput(name, **kwargs):
     return YggInput(name, **kwargs)
 
 
-def YggArrayOutput(name, fmt, **kwargs):
+def YggArrayOutput(name, **kwargs):
     r"""Get class for handling table-like formatted output as arrays.
 
     Args:
         name (str): The name of the message queue where output should be sent.
-        fmt (str): A C style format string specifying how each 'row' of output
-            should be formated. This should include the newline character.
         **kwargs: Additional keyword arguments are passed to YggOutput.
 
     Returns:

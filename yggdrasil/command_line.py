@@ -5,6 +5,7 @@ import copy
 import logging
 import subprocess
 import argparse
+import pprint
 
 
 logger = logging.getLogger(__name__)
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def ygginfo():
     r"""Print information about yggdrasil installation."""
-    from yggdrasil import __version__, tools, config, backwards, platform
+    from yggdrasil import __version__, tools, config, platform
     from yggdrasil.components import import_component
     lang_list = tools.get_installed_lang()
     prefix = '    '
@@ -78,7 +79,7 @@ def ygginfo():
         if args.verbose:
             # Conda info
             if os.environ.get('CONDA_PREFIX', ''):
-                out = backwards.as_str(subprocess.check_output(
+                out = tools.bytes2str(subprocess.check_output(
                     ['conda', 'info'])).strip()
                 curr_prefix += prefix
                 vardict.append((curr_prefix + 'Conda Info:', "\n%s%s"
@@ -102,7 +103,7 @@ def ygginfo():
                 vardict.append((curr_prefix + "R C Compiler:", ""))
                 curr_prefix += prefix
                 for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS']:
-                    out = backwards.as_str(subprocess.check_output(
+                    out = tools.bytes2str(subprocess.check_output(
                         [interp, 'CMD', 'config', x])).strip()
                     vardict.append((curr_prefix + x, "%s"
                                     % ("\n" + curr_prefix + prefix).join(
@@ -370,6 +371,21 @@ def ygginstall():
     else:
         for x in args.language:
             install_languages.install_language(x, args=args)
+
+
+def yggmodelform():
+    r"""Save/print a JSON schema that can be used for generating a
+    form for composing a model specification files."""
+    from yggdrasil.schema import get_model_form_schema
+    parser = argparse.ArgumentParser(
+        description=('Save/print the JSON schema for generating the '
+                     'model specification form.'))
+    parser.add_argument('--file',
+                        help='Path to file where the schema should be saved.')
+    args = parser.parse_args()
+    out = get_model_form_schema(fname_dst=args.file)
+    if not args.file:
+        pprint.pprint(out)
 
 
 if __name__ == '__main__':

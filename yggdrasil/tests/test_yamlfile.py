@@ -1,9 +1,9 @@
 import tempfile
 import os
 import yaml
+import io as sio
 from jsonschema.exceptions import ValidationError
 from yggdrasil import yamlfile
-from yggdrasil.backwards import StringIO
 from yggdrasil.tests import YggTestClass, assert_raises, assert_equal
 _yaml_env = 'TEST_YAML_FILE'
 
@@ -35,7 +35,7 @@ def test_load_yaml():
             out = yamlfile.load_yaml(fd)
             assert_equal(out, dict_read)
         # Open stream
-        out = yamlfile.load_yaml(StringIO(contents))
+        out = yamlfile.load_yaml(sio.StringIO(contents))
         assert_equal(out, dict_read)
     finally:
         # Remove file
@@ -59,12 +59,17 @@ def test_parse_component_error():
 class YamlTestBase(YggTestClass):
     r"""Test base for yamlfile."""
     _contents = tuple()
+    _include = tuple()
+    _use_json = False
 
     def __init__(self, *args, **kwargs):
         super(YamlTestBase, self).__init__(*args, **kwargs)
         self.files = []
+        self.include_files = []
         for i in range(self.nfiles):
             self.files.append(self.get_fname(i))
+        for i in range(len(self.include)):
+            self.include_files.append(self.get_fname(i, '_incl'))
 
     @property
     def nfiles(self):
@@ -75,6 +80,11 @@ class YamlTestBase(YggTestClass):
     def contents(self):
         r"""tuple: Contents of files."""
         return self._contents
+
+    @property
+    def include(self):
+        r"""tuple: Contents of included files."""
+        return self._include
 
     @property
     def yaml_env(self):
@@ -89,6 +99,12 @@ class YamlTestBase(YggTestClass):
         for fname, content in zip(self.files, self.contents):
             with open(fname, 'w') as f:
                 f.write('\n'.join(content))
+        for i, (fname, content) in enumerate(zip(self.include_files,
+                                                 self.include)):
+            os.environ['%s%d' % (self.yaml_env, i)] = os.path.join(
+                '.', os.path.basename(fname))
+            with open(fname, 'w') as f:
+                f.write('\n'.join(content))
 
     def teardown(self):
         r"""Remove the temporary file if it exists."""
@@ -97,11 +113,16 @@ class YamlTestBase(YggTestClass):
                 os.remove(fname)
         super(YamlTestBase, self).teardown()
 
-    def get_fname(self, idx=0):
+    def get_fname(self, idx=0, suffix=''):
         r"""Path to temporary file."""
+        if self._use_json:
+            ext = '.json'
+        else:
+            ext = '.yml'
         return os.path.join(tempfile.gettempdir(),
-                            '%s_%s_%d.yml' % (
-                                tempfile.gettempprefix(), self.uuid, idx))
+                            '%s_%s_%d%s%s' % (
+                                tempfile.gettempprefix(), self.uuid,
+                                idx, suffix, ext))
 
     def create_instance(self):
         r"""Disabled: Create a new instance of the class."""
@@ -134,6 +155,15 @@ class YamlTestBaseError(YamlTestBase):
             return
         assert_raises(self._error, yamlfile.parse_yaml, self.files)
 
+
+class TestJSONModelOnly(YamlTestBase):
+    r"""Test parsing of different numbers/styles of models from JSON."""
+    _use_json = True
+    _contents = (['{"models":',
+                  '   [{"name": "modelA",',
+                  '     "driver": "GCCModelDriver",',
+                  '     "args": "./src/modelA.c"}]}'],)
+        
 
 class TestYamlModelOnly(YamlTestBase):
     r"""Test parsing of different numbers/styles of models."""
@@ -239,6 +269,27 @@ class TestYamlConnection(YamlTestBase):
                   '    args: ./src/modelB.c',
                   '    outputs:',
                   '      - outputB'],)
+
+
+class TestYamlInclude(YamlTestBase):
+    r"""Test connection between I/O channels in yaml included from one."""
+    _contents = (['include: {{ %s0 }}' % _yaml_env,
+                  'models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - inputA',
+                  '',
+                  'connections:',
+                  '  - input: outputB',
+                  '    output: inputA'],)
+    _include = (['models:',
+                 '  - name: modelB',
+                 '    driver: GCCModelDriver',
+                 '    args: ./src/modelB.c',
+                 '    outputs:',
+                 '      - outputB'],)
 
 
 class TestYamlIODatatype(YamlTestBase):

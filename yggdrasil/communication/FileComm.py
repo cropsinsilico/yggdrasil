@@ -1,7 +1,7 @@
 import os
 import copy
 import tempfile
-from yggdrasil import backwards, platform
+from yggdrasil import platform, tools
 from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.communication import CommBase
 
@@ -79,8 +79,9 @@ class FileComm(CommBase.CommBase):
                                  {'type': 'instance',
                                   'class': SerializeBase}],
                        'default': {'seritype': 'direct'}}}
-    _schema_excluded_from_inherit = ['commtype', 'datatype', 'read_meth',
-                                     'serializer']
+    _schema_excluded_from_inherit = (
+        ['commtype', 'datatype', 'read_meth', 'serializer']
+        + CommBase.CommBase._model_schema_prop)
     _schema_excluded_from_class_validation = ['serializer']
     _schema_base_class = None
     _default_serializer = 'direct'
@@ -165,8 +166,9 @@ class FileComm(CommBase.CommBase):
         if read_meth == 'readline':
             out['recv_partial'] = [[x] for x in out['recv']]
             if cls._default_serializer == 'direct':
-                comment = backwards.as_bytes(
-                    cls._schema_properties['comment']['default'] + 'Comment\n')
+                comment = tools.str2bytes(
+                    cls._schema_properties['comment']['default']
+                    + 'Comment\n')
                 out['send'].append(comment)
                 out['contents'] += comment
                 out['recv_partial'].append([])

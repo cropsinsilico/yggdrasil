@@ -11,6 +11,7 @@ import importlib
 from ._version import get_versions
 _test_package_name = None
 _test_package = None
+logging.basicConfig()
 logger = logging.getLogger(__name__)
 order = ['pytest', 'nose']
 try:
@@ -151,13 +152,17 @@ def run_tsts(**kwargs):  # pragma: no cover
     parser.add_argument('--language', '--languages', default=[],
                         nargs="+", type=str,
                         help='Language(s) that should be tested.')
+    parser.add_argument('--default-comm', '--defaultcomm', type=str,
+                        help=('Comm type that default should be set '
+                              'to before running tests.'))
     parser.add_argument('--ci', action='store_true',
                         help=('Perform addition operations required '
                               'for testing on continuous integration '
                               'services.'))
     suite_args = ('--test-suite', '--test-suites')
     suite_kws = dict(nargs='+', action="extend", type=str,
-                     choices=['examples', 'types', 'timing'],
+                     choices=['examples', 'examples_part1',
+                              'examples_part2', 'types', 'timing'],
                      help='Test suite(s) that should be run.',
                      dest='test_suites')
     try:
@@ -196,6 +201,19 @@ def run_tsts(**kwargs):  # pragma: no cover
             if x == 'examples':
                 args.withexamples = True
                 test_paths.append('examples')
+            elif x == 'examples_part1':
+                args.withexamples = True
+                test_paths.append(os.path.join(
+                    'examples', 'tests', 'test_[a-g]*.py'))
+            elif x == 'examples_part2':
+                args.withexamples = True
+                test_paths.append(os.path.join(
+                    'examples', 'tests', 'test_[g-z]*.py'))
+            # elif x.startswith('examples_'):
+            #     args.withexamples = True
+            #     test_paths.append(os.path.join(
+            #         'examples', 'tests',
+            #         'test_%s*.py'.format(x.split('examples_')[-1])))
             elif x == 'types':
                 args.withexamples = True
                 args.longrunning = True
@@ -219,7 +237,10 @@ def run_tsts(**kwargs):  # pragma: no cover
             argv.append('--with-coverage')
             argv.append('--cover-package=yggdrasil')
         elif _test_package_name == 'pytest':
+            # See information about getting coverage of test fixtures
+            # https://pytest-cov.readthedocs.io/en/stable/plugins.html
             argv.append('--cov=%s' % package_dir)
+            # argv.append('--cov-append')
     if args.noflaky:
         if _test_package_name == 'pytest':
             argv += ['-p', 'no:flaky']
@@ -239,41 +260,41 @@ def run_tsts(**kwargs):  # pragma: no cover
     argv += expanded_test_paths
     # Run test command and perform cleanup before logging any errors
     logger.info("Running %s from %s", argv, os.getcwd())
+    new_env = {}
     old_env = {}
     pth_file = 'ygg_coverage.pth'
     assert(not os.path.isfile(pth_file))
     try:
         # Set env
         if args.withexamples:
-            old_env['YGG_ENABLE_EXAMPLE_TESTS'] = os.environ.get(
-                'YGG_ENABLE_EXAMPLE_TESTS', None)
-            os.environ['YGG_ENABLE_EXAMPLE_TESTS'] = 'True'
+            new_env['YGG_ENABLE_EXAMPLE_TESTS'] = 'True'
         if args.language:
             from yggdrasil.components import import_component
             args.language = [import_component('model', x).language
                              for x in args.language]
-            old_env['YGG_TEST_LANGUAGE'] = os.environ.get(
-                'YGG_TEST_LANGUAGE', None)
-            os.environ['YGG_TEST_LANGUAGE'] = ','.join(args.language)
+            new_env['YGG_TEST_LANGUAGE'] = ','.join(args.language)
+        if args.default_comm:
+            new_env['YGG_DEFAULT_COMM'] = args.default_comm
         if args.longrunning:
-            old_env['YGG_ENABLE_LONG_TESTS'] = os.environ.get(
-                'YGG_ENABLE_LONG_TESTS', None)
-            os.environ['YGG_ENABLE_LONG_TESTS'] = 'True'
+            new_env['YGG_ENABLE_LONG_TESTS'] = 'True'
         if args.withcoverage:
-            old_env['COVERAGE_PROCESS_START'] = os.environ.get(
-                'COVERAGE_PROCESS_START', None)
-            os.environ['COVERAGE_PROCESS_START'] = 'True'
+            new_env['COVERAGE_PROCESS_START'] = 'True'
+            # if _test_package_name == 'pytest':
+            #     # See information about getting coverage of test fixtures
+            #     # https://pytest-cov.readthedocs.io/en/stable/plugins.html
+            #     new_env['COV_CORE_SOURCE'] = package_dir
+            #     new_env['COV_CORE_CONFIG'] = '.coveragerc'
+            #     new_env['COV_CORE_DATAFILE'] = '.coverage.eager'
             with open(pth_file, 'w') as fd:
                 fd.write("import coverage; coverage.process_startup()")
         if args.test_suites and ('timing' in args.test_suites):
-            old_env['YGG_TEST_PRODUCTION_RUNS'] = os.environ.get(
-                'YGG_TEST_PRODUCTION_RUNS', None)
-            os.environ['YGG_TEST_PRODUCTION_RUNS'] = 'True'
+            new_env['YGG_TEST_PRODUCTION_RUNS'] = 'True'
         if not args.validatecomponents:
-            old_env['YGG_SKIP_COMPONENT_VALIDATION'] = os.environ.get(
-                'YGG_SKIP_COMPONENT_VALIDATION', None)
-            if old_env['YGG_SKIP_COMPONENT_VALIDATION'] is None:
-                os.environ['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
+            new_env['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
+        # Update environment
+        for k, v in new_env.items():
+            old_env[k] = os.environ.get(k, None)
+            os.environ[k] = v
         # Perform CI specific pretest operations
         if args.ci:
             top_dir = os.path.dirname(os.getcwd())
@@ -309,7 +330,7 @@ def run_tsts(**kwargs):  # pragma: no cover
         os.chdir(initial_dir)
         for k, v in old_env.items():
             if v is None:
-                del os.environ[k]
+                os.environ.pop(k, None)
             else:
                 os.environ[k] = v
         if os.path.isfile(pth_file):

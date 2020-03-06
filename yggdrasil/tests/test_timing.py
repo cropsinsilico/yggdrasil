@@ -1,7 +1,8 @@
 import os
+import sys
 import copy
 import unittest
-from yggdrasil import tools, timing, backwards, platform
+from yggdrasil import tools, timing, platform
 from yggdrasil.tests import YggTestClass, assert_raises, long_running
 
 
@@ -15,7 +16,7 @@ if 'c' not in timing.get_lang_list():  # pragma: windows
 # _test_run = timing.TimedRun(_test_lang, _test_lang)
 # _test_run.time_run(_test_count, _test_size, nrep=_test_nrep)
 _this_platform = (platform._platform,
-                  backwards._python_version,
+                  '%d.%d' % sys.version_info[:2],
                   tools.get_default_comm())
 _base_environment = {'platform': 'Linux',
                      'python_ver': '2.7',
@@ -41,10 +42,10 @@ def test_get_source():
 
 def test_platform_error():
     r"""Test error when test cannot be performed."""
-    if platform._is_mac:
-        test_platform = 'Linux'
-    else:
-        test_platform = 'MacOS'
+    test_platform_map = {'MacOS': 'Linux',
+                         'Linux': 'Windows',
+                         'Windows': 'MacOS'}
+    test_platform = test_platform_map[platform._platform]
     x = timing.TimedRun(_test_lang, _test_lang, platform=test_platform)
     assert_raises(RuntimeError, x.can_run, raise_error=True)
 

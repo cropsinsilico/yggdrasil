@@ -10,7 +10,7 @@ import uuid
 import tempfile
 from collections import OrderedDict
 from pprint import pformat
-from yggdrasil import platform, tools, backwards, languages
+from yggdrasil import platform, tools, languages
 from yggdrasil.config import ygg_cfg, locate_file, update_language_config
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
@@ -85,10 +85,12 @@ class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
 
     Args:
-        name (str): Driver name.
-        args (str or list): Argument(s) for running the model on the command
-            line. This should be a complete command including the necessary
-            executable and command line arguments to that executable.
+        name (str): Unique name used to identify the model. This will
+            be used to report errors associated with the model.
+        args (str or list): The full path to the file containing the
+            model program that will be run by the driver or a list
+            starting with the program file and including any arguments
+            that should be passed as input to the program.
         products (list, optional): Paths to files created by the model that
             should be cleaned up when the model exits. Entries can be absolute
             paths or paths relative to the working directory. Defaults to [].
@@ -101,13 +103,21 @@ class ModelDriver(Driver):
             that are source files. These files will be removed without checking
             their extension so users should avoid adding files to this list
             unless they are sure they should be deleted. Defaults to [].
-        is_server (bool, optional): If True, the model is assumed to be a server
-            and an instance of :class:`yggdrasil.drivers.ServerDriver`
-            is started. Defaults to False. Use of is_server with function is
-            not currently supported.
-        client_of (str, list, optional): The names of one or more servers that
-            this model is a client of. Defaults to empty list. Use of client_of
-            with function is not currently supported.
+        is_server (bool, optional): If `True`, the model is assumed to be a
+            server for one or more client models and an instance of
+            :class:`yggdrasil.drivers.ServerDriver` is started. The
+            corresponding channel that should be passed to the yggdrasil API
+            will be the name of the model. Defaults to False. Use of `is_server`
+            with `function` is not currently supported.
+        client_of (str, list, optional): The names of one or more models that
+            this model will call as a server. If there are more than one, this
+            should be specified as a sequence collection (list). The
+            corresponding channel(s) that should be passed to the yggdrasil API
+            will be the name of the server model joined with the name of the
+            client model with an underscore `<server_model>_<client_model>`.
+            There will be one channel created for each server the model is a
+            client of. Defaults to empty list. Use of `client_of` with `function`
+            is not currently supported.
         overwrite (bool, optional): If True, any existing model products
             (compilation products, wrapper scripts, etc.) are removed prior to
             the run. If False, the products are not removed. Defaults to True.
@@ -235,16 +245,35 @@ class ModelDriver(Driver):
     _schema_properties = {
         'name': {'type': 'string'},
         'language': {'type': 'string', 'default': 'executable',
-                     'description': ('The programming language that the model '
-                                     'is written in.')},
+                     'description': (
+                         'The programming language that the model '
+                         'is written in. A list of available '
+                         'languages can be found :ref:`here <'
+                         'schema_table_model_subtype_rst>`.')},
         'args': {'type': 'array',
                  'items': {'type': 'string'}},
         'inputs': {'type': 'array', 'default': [{'name': 'default'}],
                    'items': {'$ref': '#/definitions/comm'},
-                   'description': 'Model inputs described as comm objects.'},
+                   'description': (
+                       'A mapping object containing the entry for a '
+                       'model input channel or a list of input '
+                       'channel entries. If the model does not get '
+                       'input from another model, this may be '
+                       'ommitted. A full description of channel '
+                       'entries and the options available for '
+                       'channels can be found :ref:`here<'
+                       'yaml_comm_options>`.')},
         'outputs': {'type': 'array', 'default': [{'name': 'default'}],
                     'items': {'$ref': '#/definitions/comm'},
-                    'description': 'Model outputs described as comm objects.'},
+                    'description': (
+                        'A mapping object containing the entry for a '
+                        'model output channel or a list of output '
+                        'channel entries. If the model does not '
+                        'output to another model, this may be '
+                        'ommitted. A full description of channel '
+                        'entries and the options available for '
+                        'channels can be found :ref:`here<'
+                        'yaml_comm_options>`.')},
         'products': {'type': 'array', 'default': [],
                      'items': {'type': 'string'}},
         'source_products': {'type': 'array', 'default': [],
@@ -294,7 +323,7 @@ class ModelDriver(Driver):
     python_interface = {'table_input': 'YggAsciiTableInput',
                         'table_output': 'YggAsciiTableOutput',
                         'array_input': 'YggArrayInput',
-                        'array_outputs': 'YggArrayOutput',
+                        'array_output': 'YggArrayOutput',
                         'pandas_input': 'YggPandasInput',
                         'pandas_output': 'YggPandasOutput'}
 
@@ -486,19 +515,16 @@ class ModelDriver(Driver):
                 Defaults to None and is set to the working_dir.
 
         """
-        if isinstance(args, backwards.string_types):
+        if isinstance(args, (str, bytes)):
             args = args.split()
+        for i in range(len(args)):
+            args[i] = str(args[i])
         assert(isinstance(args, list))
         if default_model_dir is None:
             default_model_dir = self.working_dir
-        self.raw_model_file = backwards.as_str(args[0])
+        self.raw_model_file = args[0]
         self.model_file = self.raw_model_file
-        self.model_args = []
-        for a in args[1:]:
-            try:
-                self.model_args.append(backwards.as_str(a))
-            except TypeError:
-                self.model_args.append(str(a))
+        self.model_args = args[1:]
         if (self.language != 'executable') and (not os.path.isabs(self.model_file)):
             model_file = os.path.normpath(os.path.join(default_model_dir,
                                                        self.model_file))
@@ -614,7 +640,7 @@ class ModelDriver(Driver):
                 logger.error(out)
                 raise RuntimeError("Command '%s' failed with code %d."
                                    % (' '.join(cmd), proc.returncode))
-            out = backwards.as_str(out)
+            out = out.decode("utf-8")
             logger.debug('%s\n%s' % (' '.join(cmd), out))
             return out
         except (subprocess.CalledProcessError, OSError) as e:  # pragma: debug
@@ -1731,12 +1757,16 @@ class ModelDriver(Driver):
         # to be applied by the connection driver
         if try_vals and isinstance(try_vals[-1], str):
             try_key = '%s_%s' % (try_vals[-1], key)
-            if try_key in cls.function_param:
-                key = try_key
-            elif ((('python_interface' in cls.function_param)
-                   and (try_key in cls.python_interface))):
+            if ((('python_interface' in cls.function_param)
+                 and (try_key in cls.python_interface))):
                 kwargs['python_interface'] = cls.python_interface[try_key]
-                key = 'python_interface'
+                if ((('format_str' in kwargs)
+                     and ('python_interface_format' in cls.function_param))):
+                    key = 'python_interface_format'
+                    kwargs['format_str'] = kwargs['format_str'].encode(
+                        "unicode_escape").decode('utf-8')
+                else:
+                    key = 'python_interface'
         out = [cls.format_function_param(key, **kwargs)]
         return out
 
@@ -1892,7 +1922,10 @@ checking if the model flag indicates
         if expanded_recv_var:
             lines.append(cls.format_function_param(
                 'print_generic', object=recv_var_str))
-            if 'assign_mult' in cls.function_param:
+            if 'expand_mult' in cls.function_param:  # pragma: matlab
+                lines.append(cls.format_function_param(
+                    'expand_mult', name=expanded_recv_var, value=recv_var_str))
+            elif 'assign_mult' in cls.function_param:
                 lines.append(cls.format_function_param(
                     'assign_mult', name=expanded_recv_var, value=recv_var_str))
             else:

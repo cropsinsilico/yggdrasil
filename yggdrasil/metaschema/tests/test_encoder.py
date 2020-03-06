@@ -1,6 +1,6 @@
+import io as sio
 from collections import OrderedDict
 from yggdrasil.metaschema import encoder
-from yggdrasil.backwards import StringIO
 from yggdrasil.tests import assert_raises
 
 
@@ -17,6 +17,6 @@ def test_JSONEncoder():
 def test_encode_yaml():
     r"""Test encode_yaml with dict representer and file."""
     x = OrderedDict([('a', 1), ('b', 2)])
-    fd = StringIO()
+    fd = sio.StringIO()
     encoder.encode_yaml(x, fd=fd, sorted_dict_type=OrderedDict)
     fd.close()

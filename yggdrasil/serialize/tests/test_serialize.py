@@ -1,5 +1,5 @@
 import numpy as np
-from yggdrasil import serialize, backwards, platform
+from yggdrasil import serialize, platform
 from yggdrasil.tests import assert_raises, assert_equal
 
 
@@ -51,8 +51,8 @@ map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
                       (['u', 'o', 'x', 'X'], 'uintc'),
                       (['lu', 'lo', 'lx', 'lX'], 'uint64'),
                       (['llu', 'llo', 'llx', 'llX', 'l64u'], 'ulonglong'),
-                      (['c', 's'], backwards.np_dtype_str),
-                      ('s', backwards.np_dtype_str)]
+                      (['c', 's'], 'S'),
+                      ('s', 'S')]
 # if np.dtype('int_') != np.dtype('intc'):
 #     map_cformat2nptype.append((['ld', 'li'], 'int_'))
 map_cformat2nptype.append(
@@ -66,8 +66,8 @@ def test_extract_formats():
     test_fmt = [['%10s', '%5.2f', '%4d', '%g%+gj']]
     for s, f in zip(test_str, test_fmt):
         assert_equal(serialize.extract_formats(s), f)
-        assert_equal(serialize.extract_formats(backwards.as_bytes(s)),
-                     [backwards.as_bytes(i) for i in f])
+        assert_equal(serialize.extract_formats(s.encode("utf-8")),
+                     [i.encode("utf-8") for i in f])
 
 
 def test_nptype2cformat():
@@ -98,7 +98,7 @@ def test_nptype2cformat_structured():
     for a, b in zip(alist, blist):
         assert_equal(serialize.nptype2cformat(a), b)
         assert_equal(serialize.nptype2cformat(a, asbytes=True),
-                     [backwards.as_bytes(ib) for ib in b])
+                     [ib.encode("utf-8") for ib in b])
 
 
 def test_cformat2nptype():
@@ -107,10 +107,10 @@ def test_cformat2nptype():
         if isinstance(a, str):
             a = [a]
         for _ia in a:
-            if _ia.startswith(backwards.as_str(serialize._fmt_char)):
-                ia = backwards.as_bytes(_ia)
+            if _ia.startswith(serialize._fmt_char_str):
+                ia = _ia.encode("utf-8")
             else:
-                ia = serialize._fmt_char + backwards.as_bytes(_ia)
+                ia = serialize._fmt_char + _ia.encode("utf-8")
             assert_equal(serialize.cformat2nptype(ia), np.dtype(b))  # .str)
             # assert_equal(serialize.cformat2nptype(ia), np.dtype(b).str)
     assert_raises(TypeError, serialize.cformat2nptype, 0)
@@ -120,7 +120,7 @@ def test_cformat2nptype():
                   '%d\t%f', names=['one'])
     for a in unsupported_nptype:
         assert_raises(ValueError, serialize.cformat2nptype,
-                      backwards.as_bytes('%' + a))
+                      ('%' + a).encode("utf-8"))
 
 
 def test_cformat2nptype_structured():
@@ -151,8 +151,8 @@ def test_cformat2pyscanf():
         if isinstance(a, str):
             a = [a]
         for _ia in a:
-            ia = backwards.as_bytes(_ia)
-            ib = backwards.as_bytes(b)
+            ia = _ia.encode("utf-8")
+            ib = b.encode("utf-8")
             all_a.append(ia)
             all_b.append(ib)
             assert_equal(serialize.cformat2pyscanf(ia), ib)
@@ -171,7 +171,6 @@ def test_format_message():
     dtype = serialize.cformat2nptype(fmt)
     x_arr = np.ones(1, dtype)
     x_tup = [x_arr[n][0] for n in x_arr.dtype.names]
-    # x_tup[0] = backwards.as_str(x_tup[0])
     flist = [fmt, "%ld"]
     alist = [tuple(x_tup), 0]
     for a, f in zip(alist, flist):
@@ -181,6 +180,9 @@ def test_format_message():
             assert_equal(b, (a, ))
         else:
             assert_equal(b, a)
+    # Formats with mixed types
+    assert_equal(serialize.format_message(b'hello', '%s'), 'hello')
+    assert_equal(serialize.format_message('hello', b'%s'), b'hello')
     # Errors
     assert_raises(RuntimeError, serialize.format_message, (0, ), "%d %d")
     assert_raises(TypeError, serialize.process_message, 0, "%d")
@@ -201,6 +203,15 @@ def test_combine_flds():
                                   np.zeros(nele, dtype0))
     np.testing.assert_array_equal(serialize.combine_flds(arrs, dtype=dtype1),
                                   np.zeros(nele, dtype1))
+    # Version of test where width of string field needs to be found
+    dtype = np.dtype([("name", "S"), ("number", "i8"),
+                      ("value", "f8"), ("complex", "c16")])
+    arrs[0][0] = b"hello"
+    result = np.zeros(nele, dtype1)
+    result["name"][0] = b"hello"
+    np.testing.assert_array_equal(serialize.combine_flds(arrs, dtype=dtype),
+                                  result)
+    # Errors
     assert_raises(ValueError, serialize.combine_flds, arrs[:-1], dtype=dtype0)
     arrs[0] = np.zeros(nele - 1, dtype=dtype0[0])
     assert_raises(ValueError, serialize.combine_flds, arrs)
@@ -227,14 +238,10 @@ def test_combine_eles():
     arrs_mixd = [a.tolist() for a in res1]
     arrs_mixd[-1] = arrs_void[-1]
     if platform._is_win:  # pragma: windows
-        if backwards.PY2:  # pragma: Python 2
-            res0_list = res0
-            res1_list = res1
-        else:  # pragma: Python 3
-            dtype0_w = np.dtype({'names': names0, 'formats': ['S5', 'i4', 'f8', 'c16']})
-            dtype1_w = np.dtype({'names': names1, 'formats': ['S5', 'i4', 'f8', 'c16']})
-            res0_list = res0.astype(dtype0_w)
-            res1_list = res1.astype(dtype1_w)
+        dtype0_w = np.dtype({'names': names0, 'formats': ['S5', 'i4', 'f8', 'c16']})
+        dtype1_w = np.dtype({'names': names1, 'formats': ['S5', 'i4', 'f8', 'c16']})
+        res0_list = res0.astype(dtype0_w)
+        res1_list = res1.astype(dtype1_w)
     else:
         res0_list = res0
         res1_list = res1
@@ -264,11 +271,8 @@ def test_consolidate_array():
     dtypes = ['S5', 'i8', 'f8', 'c16']
     dtype0 = np.dtype([(n, f) for n, f in zip(names0, dtypes)])
     if platform._is_win:  # pragma: windows
-        if backwards.PY2:  # pragma: Python 2
-            dtype0_list = dtype0
-        else:  # pragma: Python 3
-            dtype0_list = np.dtype({'names': names0,
-                                    'formats': ['S5', 'i4', 'f8', 'c16']})
+        dtype0_list = np.dtype({'names': names0,
+                                'formats': ['S5', 'i4', 'f8', 'c16']})
     else:
         dtype0_list = dtype0
     # dtype1 = np.dtype([(n, f) for n, f in zip(names1, dtypes)])
@@ -341,7 +345,7 @@ def test_format2table():
            'newline': b'\n',
            'comment': b'# ',
            'fmts': ["%5s", "%ld", "%lf", "%g%+gj"]}
-    out['fmts'] = [backwards.as_bytes(f) for f in out['fmts']]
+    out['fmts'] = [f.encode("utf-8") for f in out['fmts']]
     sfmt = out['fmts'][0]
     sout = dict(**out)
     sout['fmts'] = [sfmt]
@@ -423,9 +427,9 @@ def test_format_header():
     for x in [kws_all, res_all]:
         for k, v in x.items():
             if isinstance(v, str):
-                x[k] = backwards.as_bytes(v)
+                x[k] = v.encode("utf-8")
             elif isinstance(v, list):
-                x[k] = [backwards.as_bytes(iv) for iv in v]
+                x[k] = [iv.encode("utf-8") for iv in v]
     test_list = [(['format_str', 'field_names', 'field_units'],
                   ['names', 'units', 'format']),
                  (['field_names', 'field_units', 'dtype'],
@@ -443,21 +447,14 @@ def test_format_header():
 
 def test_parse_header():
     r"""Test parsing header."""
-    header = ["# name\tnumber\tvalue\tcomplex\n",
-              "# n/a\tg\tcm\tn/a\n",
-              "# %5s\t%ld\t%lf\t%g%+gj\n"]
-    res = dict(delimiter='\t', comment='# ', newline='\n',
-               format_str="%5s\t%ld\t%lf\t%g%+gj\n",
-               fmts=['%5s', '%ld', '%lf', '%g%+gj'],
-               field_names=['name', 'number', 'value', 'complex'],
-               field_units=['n/a', 'g', 'cm', 'n/a'])
-    for i in range(len(header)):
-        header[i] = backwards.as_bytes(header[i])
-    for k, v in res.items():
-        if isinstance(v, str):
-            res[k] = backwards.as_bytes(v)
-        elif isinstance(v, list):
-            res[k] = [backwards.as_bytes(s) for s in v]
+    header = [b"# name\tnumber\tvalue\tcomplex\n",
+              b"# n/a\tg\tcm\tn/a\n",
+              b"# %5s\t%ld\t%lf\t%g%+gj\n"]
+    res = dict(delimiter=b'\t', comment=b'# ', newline=b'\n',
+               format_str=b"%5s\t%ld\t%lf\t%g%+gj\n",
+               fmts=[b'%5s', b'%ld', b'%lf', b'%g%+gj'],
+               field_names=[b'name', b'number', b'value', b'complex'],
+               field_units=[b'n/a', b'g', b'cm', b'n/a'])
     assert_equal(serialize.parse_header(header), res)
     assert_equal(serialize.parse_header(header[::-1]), res)
     _empty = b''
@@ -534,14 +531,16 @@ def test_numpy2dict():
     dtype = np.dtype([(n, f) for n, f in zip(names, dtypes)])
     arr_mix = np.zeros(nele, dtype)
     arr_mix['name'][0] = 'hello'
-    test_arrs = [arr_mix]
+    test_arrs = [arr_mix, np.zeros(0, dtype)]
+    np.testing.assert_array_equal(serialize.dict2numpy({}),
+                                  np.array([]))
     for ans in test_arrs:
         d = serialize.numpy2dict(ans)
         # Sorted
         res = serialize.dict2numpy(d)
         np.testing.assert_array_equal(ans, res)
         # Provided
-        res = serialize.dict2numpy(d, order=names)
+        res = serialize.dict2numpy(d, order=ans.dtype.names)
         np.testing.assert_array_equal(ans, res)
 
 

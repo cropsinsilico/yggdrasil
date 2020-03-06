@@ -1,6 +1,5 @@
 import copy
 from collections import OrderedDict
-from yggdrasil import backwards
 from yggdrasil.metaschema.datatypes import (
     get_type_class, MetaschemaTypeError)
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
@@ -49,7 +48,7 @@ class MultiMetaschemaType(MetaschemaType):
 
         """
         if (typedef is not None) and isinstance(typedef['type'],
-                                                backwards.string_types):
+                                                (str, bytes)):
             type_name = typedef['type']
         else:
             type_name = TypeMetaschemaProperty.encode(obj)

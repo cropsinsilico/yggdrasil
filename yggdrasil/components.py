@@ -5,7 +5,6 @@ import six
 import importlib
 # import warnings
 from collections import OrderedDict
-from yggdrasil import backwards
 from yggdrasil.doctools import docs2args
 
 
@@ -551,7 +550,7 @@ class ComponentBase(object):
             if default is not None:
                 kwargs.setdefault(k, copy.deepcopy(default))
             if v.get('type', None) == 'array':
-                if isinstance(kwargs.get(k, None), backwards.string_types):
+                if isinstance(kwargs.get(k, None), (bytes, str)):
                     kwargs[k] = kwargs[k].split()
         # Parse keyword arguments using schema
         if (comptype is not None) and (subtype is not None):

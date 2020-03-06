@@ -65,4 +65,4 @@ class PandasTransform(ArrayTransform):
                 {'kwargs': {'original_datatype': t},
                  'in/out': [(None, TypeError)]},
                 {'kwargs': {},
-                 'in/out': [([0, 1, 2], ValueError)]}]
+                 'in/out': [([0, 1, 2], AssertionError)]}]
