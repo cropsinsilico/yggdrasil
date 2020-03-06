@@ -146,7 +146,7 @@ class CompilationToolMeta(type):
                     reg['by_language'][l] = OrderedDict()
             for x in [cls.toolname] + cls.aliases:
                 # Register by toolname
-                if x in reg:  # pragma: debug
+                if (x in reg) and (reg[x] != cls):  # pragma: debug
                     raise ValueError("%s toolname '%s' already registered (class = %s)."
                                      % (cls.tooltype.title(), x, cls))
                 reg[x] = cls
