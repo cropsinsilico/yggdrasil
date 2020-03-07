@@ -161,14 +161,10 @@ def get_language_order(drivers):
     out = OrderedDict()
     for d, drv in drivers.items():
         if d == 'cpp':
-            if 'c++' in drivers:
-                continue
             d = 'c++'
         new_deps = OrderedDict()
         sub_deps = OrderedDict()
         for sub_d in drv.base_languages:
-            if sub_d == 'cpp':
-                sub_d = 'c++'
             if sub_d in drivers:
                 sub_deps[sub_d] = drivers[sub_d]
             else:

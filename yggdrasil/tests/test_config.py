@@ -20,7 +20,7 @@ def test_YggConfigParser():
 def test_update_language_config():
     r"""Test updating configuration for installed languages."""
     languages = tools.get_supported_lang()
-    config.update_language_config(languages, overwrite=True, verbose=True)
+    config.update_language_config(overwrite=True, verbose=True)
     try:
         config.update_language_config(
             languages[0], disable_languages=[languages[0]])
