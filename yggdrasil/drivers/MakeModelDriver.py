@@ -223,7 +223,6 @@ class MakeCompiler(BuildToolBase):
                   'env_linker', 'env_linker_flags']:
             kwargs.setdefault(k, cls._schema_properties[k]['default'])
         out[kwargs['env_compiler']] = compiler.get_executable()
-        print(compile_flags)
         out[kwargs['env_compiler_flags']] = ' '.join(compile_flags)
         # yggdrasil requires that linking be done in C++
         if (((compiler.languages[0].lower() == 'c')
@@ -307,6 +306,16 @@ class MakeModelDriver(BuildModelDriver):
     base_languages = ['c', 'c++']
     built_where_called = True
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        BuildModelDriver.before_registration(cls)
+        if platform._is_win:  # pragma: windows
+            cls.default_compiler = 'nmake'
+        
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
         is a source file, compilation flag, or runtime option/flag that should
