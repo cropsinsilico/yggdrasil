@@ -93,14 +93,20 @@ class InterpretedModelDriver(ModelDriver):
                     setattr(self, k, getattr(self, 'default_%s' % k))
 
     @staticmethod
-    def after_registration(cls):
+    def after_registration(cls, cfg=None):
         r"""Operations that should be performed to modify class attributes after
         registration. For compiled languages this includes selecting the
         default compiler. The order of precedence is the config file 'compiler'
         option for the language, followed by the environment variable set by
         _compiler_env, followed by the existing class attribute.
+
+        Args:
+            cfg (YggConfigParser, optional): Config class that should
+                be used to set options for the driver. Defaults to
+                None and yggdrasil.config.ygg_cfg is used.
+
         """
-        ModelDriver.after_registration(cls)
+        ModelDriver.after_registration(cls, cfg=cfg)
         if cls.language is not None:
             # Set default interpreter based on language
             if cls.default_interpreter is None:

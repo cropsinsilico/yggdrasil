@@ -1,5 +1,4 @@
 import os
-from yggdrasil.config import ygg_cfg
 from yggdrasil import tools
 
 
@@ -53,6 +52,7 @@ class Driver(tools.YggThreadLoop):
         #     self.sleeptime = 1.0
         # Set defaults
         if namespace is None:
+            from yggdrasil.config import ygg_cfg
             namespace = ygg_cfg.get('rmq', 'namespace')
             self.debug("Setting namespace to %s", namespace)
         if kwargs.get('working_dir', None) is None:

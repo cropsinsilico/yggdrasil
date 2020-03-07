@@ -7,7 +7,6 @@ import warnings
 import subprocess
 from collections import OrderedDict
 from yggdrasil import platform, tools, scanf
-from yggdrasil.config import ygg_cfg
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
 from yggdrasil.components import import_component
 
@@ -1797,6 +1796,29 @@ class CompiledModelDriver(ModelDriver):
             assert(os.path.isfile(self.model_file))
             self.debug("Compiled %s", self.model_file)
 
+    @staticmethod
+    def after_registration(cls, cfg=None):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
+        default compiler. The order of precedence is the config file 'compiler'
+        option for the language, followed by the environment variable set by
+        _compiler_env, followed by the existing class attribute.
+
+        Args:
+            cfg (YggConfigParser, optional): Config class that should
+                be used to set options for the driver. Defaults to
+                None and yggdrasil.config.ygg_cfg is used.
+
+        """
+        ModelDriver.after_registration(cls, cfg=cfg)
+        for k, v in cls.external_libraries.items():
+            libtype = v.get('libtype', None)
+            if (libtype is not None) and (libtype not in v):
+                libfile = cls.cfg.get(cls.language,
+                                      '%s_%s' % (k, libtype), None)
+                if libfile is not None:
+                    v[libtype] = libfile
+        
     def parse_arguments(self, args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.
@@ -2104,7 +2126,7 @@ class CompiledModelDriver(ModelDriver):
                 out = os.path.join(out_dir, out)
         elif dep in cls.external_libraries:
             dep_lang = cls.external_libraries[dep].get('language', cls.language)
-            out = ygg_cfg.get(dep_lang, '%s_%s' % (dep, 'include'), None)
+            out = cls.cfg.get(dep_lang, '%s_%s' % (dep, 'include'), None)
         elif os.path.isfile(dep):
             out = dep
         if out is None:
@@ -2165,11 +2187,11 @@ class CompiledModelDriver(ModelDriver):
                 if os.path.isfile(libinfo[libtype]):
                     out = libinfo[libtype]
                 else:
-                    out = ygg_cfg.get(dep_lang, '%s_%s' % (dep, libtype), None)
+                    out = cls.cfg.get(dep_lang, '%s_%s' % (dep, libtype), None)
             else:
                 libtype_found = []
                 for k in libtype_list:
-                    if ygg_cfg.has_option(dep_lang, '%s_%s' % (dep, k)):
+                    if cls.cfg.has_option(dep_lang, '%s_%s' % (dep, k)):
                         libtype_found.append(k)
                 if len(libtype_found) > 0:
                     raise ValueError(("A '%s' library could not be located for "
@@ -2226,7 +2248,7 @@ class CompiledModelDriver(ModelDriver):
             out += cls.internal_libraries[dep].get('include_dirs', [])
         elif dep in cls.external_libraries:
             dep_lang = cls.external_libraries[dep].get('language', cls.language)
-            out = ygg_cfg.get(dep_lang, '%s_include' % dep, None)
+            out = cls.cfg.get(dep_lang, '%s_include' % dep, None)
             if os.path.isfile(out):
                 out = os.path.dirname(out)
         elif os.path.isfile(dep):
@@ -2601,7 +2623,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         if cfg is None:
-            cfg = ygg_cfg
+            cfg = cls.cfg
         out = True
         if lib in cls.internal_libraries:
             src = cls.get_dependency_source(lib)

@@ -11,7 +11,7 @@ import tempfile
 from collections import OrderedDict
 from pprint import pformat
 from yggdrasil import platform, tools, languages
-from yggdrasil.config import ygg_cfg
+# from yggdrasil.config import ygg_cfg
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.metaschema.datatypes import is_default_typedef
@@ -417,19 +417,29 @@ class ModelDriver(Driver):
             cls.language_ext = [cls.language_ext]
             
     @staticmethod
-    def after_registration(cls):
+    def after_registration(cls, cfg=None):
         r"""Operations that should be performed to modify class attributes after
         registration. For compiled languages this includes selecting the
         default compiler. The order of precedence is the config file 'compiler'
         option for the language, followed by the environment variable set by
         _compiler_env, followed by the existing class attribute.
+
+        Args:
+            cfg (YggConfigParser, optional): Config class that should
+                be used to set options for the driver. Defaults to
+                None and yggdrasil.config.ygg_cfg is used.
+
         """
+        if cfg is None:
+            from yggdrasil.config import ygg_cfg
+            cfg = ygg_cfg
         Driver.after_registration(cls)
+        cls.cfg = cfg
         for x in cls._config_attr_map:
             ka = x['attr']
             k0 = x.get('key', ka)
             kt = x.get('type', None)
-            setattr(cls, ka, ygg_cfg.get(cls.language, k0,
+            setattr(cls, ka, cls.cfg.get(cls.language, k0,
                                          getattr(cls, ka)))
             if (kt == list) and isinstance(getattr(cls, ka), str):
                 setattr(cls, ka, getattr(cls, ka).split())
@@ -864,7 +874,7 @@ class ModelDriver(Driver):
 
     @classmethod
     def is_disabled(cls):
-        return (ygg_cfg.get(cls.language, 'disable', 'false').lower() == 'true')
+        return (cls.cfg.get(cls.language, 'disable', 'false').lower() == 'true')
 
     @classmethod
     def is_configured(cls):
@@ -876,14 +886,14 @@ class ModelDriver(Driver):
 
         """
         # Check for section & diable
-        disable_flag = ygg_cfg.get(cls.language, 'disable', 'false').lower()
-        out = (ygg_cfg.has_section(cls.language) and (disable_flag != 'true'))
+        disable_flag = cls.cfg.get(cls.language, 'disable', 'false').lower()
+        out = (cls.cfg.has_section(cls.language) and (disable_flag != 'true'))
         # Check for commtypes
         if out and (len(cls.base_languages) == 0):
-            out = (ygg_cfg.get(cls.language, 'commtypes', None) is not None)
+            out = (cls.cfg.get(cls.language, 'commtypes', None) is not None)
         # Check for config keys
         for k in cls._config_keys:
-            if ygg_cfg.get(cls.language, k, None) is None:
+            if cls.cfg.get(cls.language, k, None) is None:
                 out = False
         return out
 
@@ -930,7 +940,7 @@ class ModelDriver(Driver):
             return out
         # Check for installation based on config option
         if not skip_config:
-            installed_comms = ygg_cfg.get(cls.language, 'commtypes', [])
+            installed_comms = cls.cfg.get(cls.language, 'commtypes', [])
             if commtype is None:
                 return (len(installed_comms) > 0)
             else:
@@ -1011,6 +1021,8 @@ class ModelDriver(Driver):
                 if cls.is_comm_installed(commtype=c, cfg=cfg, skip_config=True):
                     comms.append(c)
             cfg.set(cls.language, 'commtypes', comms)
+        cls.after_registration(cls, cfg=cfg)
+        print(cls, cls.is_configured())
         return out
 
     @classmethod

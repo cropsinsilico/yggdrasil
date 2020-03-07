@@ -532,18 +532,24 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         self.mlprocess = None
 
     @staticmethod
-    def after_registration(cls):
+    def after_registration(cls, cfg=None):
         r"""Operations that should be performed to modify class attributes after
         registration. For compiled languages this includes selecting the
         default compiler. The order of precedence is the config file 'compiler'
         option for the language, followed by the environment variable set by
         _compiler_env, followed by the existing class attribute.
+
+        Args:
+            cfg (YggConfigParser, optional): Config class that should
+                be used to set options for the driver. Defaults to
+                None and yggdrasil.config.ygg_cfg is used.
+
         """
         if platform._is_mac:
             cls._executable_search_dirs = [
                 os.path.join(x, 'bin') for x in
                 glob.glob('/Applications/MATLAB*')]
-        InterpretedModelDriver.after_registration(cls)
+        InterpretedModelDriver.after_registration(cls, cfg=cfg)
         
     def parse_arguments(self, args):
         r"""Sort model arguments to determine which one is the executable
@@ -726,8 +732,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
             str: Version of compiler/interpreter for this language.
 
         """
-        if ygg_cfg.has_option(cls.language, 'version') and (not skip_config):
-            return ygg_cfg.get(cls.language, 'version')
+        if cls.cfg.has_option(cls.language, 'version') and (not skip_config):
+            return cls.cfg.get(cls.language, 'version')
         return cls.get_matlab_info()[1]
         
     @classmethod
