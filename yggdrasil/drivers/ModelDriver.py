@@ -11,7 +11,6 @@ import tempfile
 from collections import OrderedDict
 from pprint import pformat
 from yggdrasil import platform, tools, languages
-# from yggdrasil.config import ygg_cfg
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.metaschema.datatypes import is_default_typedef
@@ -435,6 +434,7 @@ class ModelDriver(Driver):
         if cfg is None:
             from yggdrasil.config import ygg_cfg
             cfg = ygg_cfg
+            cfg.reload()
         Driver.after_registration(cls)
         cls.cfg = cfg
         for x in cls._config_attr_map:
