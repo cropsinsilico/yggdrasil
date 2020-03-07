@@ -2015,11 +2015,13 @@ class ModelDriver(Driver):
         elif datatype['type'] == '1darray':
             for k in ['subtype', 'precision']:
                 keys[k] = datatype[k]
+            keys['precision'] = int(keys['precision'])
             keys['length'] = datatype.get('length', '0')
             keys['units'] = datatype.get('units', '')
         elif datatype['type'] == 'ndarray':
             for k in ['subtype', 'precision']:
                 keys[k] = datatype[k]
+            keys['precision'] = int(keys['precision'])
             if 'shape' in datatype:
                 shape_var = '%s_shape' % name_base
                 if cls.zero_based:
@@ -2043,9 +2045,9 @@ class ModelDriver(Driver):
             keys['subtype'] = datatype.get('subtype', datatype['type'])
             keys['units'] = datatype.get('units', '')
             if keys['subtype'] in ['bytes', 'string', 'unicode']:
-                keys['precision'] = datatype.get('precision', 0)
+                keys['precision'] = int(datatype.get('precision', 0))
             else:
-                keys['precision'] = datatype['precision']
+                keys['precision'] = int(datatype['precision'])
             typename = 'scalar'
         elif datatype['type'] in ['boolean', 'null', 'number',
                                   'integer', 'string']:

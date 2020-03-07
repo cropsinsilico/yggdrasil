@@ -140,7 +140,7 @@ class FortranModelDriver(CompiledModelDriver):
         'dtype': 'yggdtype',
         'int': 'integer(kind = X)',
         'float': 'real(kind = X)',
-        'string': 'character',
+        'string': 'character(len = X)',
         'array': 'yggarr',
         'object': 'yggmap',
         'integer': 'integer',
@@ -148,8 +148,8 @@ class FortranModelDriver(CompiledModelDriver):
         'null': 'yggnull',
         'uint': 'integer(kind = X)',  # Fortran has no unsigned int
         'complex': 'complex(kind = X)',
-        'bytes': 'character',
-        'unicode': 'character',
+        'bytes': 'character(len = X)',
+        'unicode': 'character(len = X)',
         '1darray': '*',
         'ndarray': '*',
         '1darray_pointer': '{type}{precision}_1d',
@@ -497,6 +497,35 @@ class FortranModelDriver(CompiledModelDriver):
         return out
 
     @classmethod
+    def update_io_from_function(cls, model_file, model_function, **kwargs):
+        r"""Update inputs/outputs from the function definition.
+
+        Args:
+            model_file (str): Full path to the file containing the model
+                function's declaration.
+            model_function (str): Name of the model function.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            dict, None: Flag variable used by the model. If None, the
+                model does not use a flag variable.
+
+        """
+        out = super(FortranModelDriver, cls).update_io_from_function(
+            model_file, model_function, **kwargs)
+        for x in kwargs.get('inputs', []) + kwargs.get('outputs', []):
+            if x['datatype']['type'] == 'array':
+                nvars_items = len(x['datatype'].get('items', []))
+                nvars = sum([(not ix.get('is_length_var', False))
+                             for ix in x['vars']])
+                if nvars_items == nvars:
+                    x['use_generic'] = False
+                else:
+                    x['use_generic'] = True
+        return out
+        
+    @classmethod
     def prepare_variables(cls, vars_list, for_yggdrasil=False, **kwargs):
         r"""Concatenate a set of input variables such that it can be passed as a
         single string to the function_call parameter.
@@ -526,6 +555,8 @@ class FortranModelDriver(CompiledModelDriver):
                 new_vars_list.append(v)
         out = super(FortranModelDriver, cls).prepare_variables(
             new_vars_list, for_yggdrasil=for_yggdrasil, **kwargs)
+        if for_yggdrasil and (len(new_vars_list) > 1):
+            return '[%s]' % out
         return out
         
     @classmethod
@@ -623,6 +654,9 @@ class FortranModelDriver(CompiledModelDriver):
             datatype = var.get('datatype', var)
             if ('shape' in datatype) or ('length' in datatype):
                 return False
+            if ((datatype.get('subtype', datatype.get('type', None))
+                 in ['bytes', 'unicode']) and ('precision' in datatype)):
+                return False
         return True
         
     @classmethod
@@ -678,6 +712,28 @@ class FortranModelDriver(CompiledModelDriver):
         return super(FortranModelDriver, cls).write_print_var(
             var, **kwargs)
 
+    @classmethod
+    def write_type_def(cls, name, datatype, **kwargs):
+        r"""Get lines declaring the data type within the language.
+
+        Args:
+            name (str): Name of variable that definition should be stored in.
+            datatype (dict): Type definition.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: Lines required to define a type definition.
+
+        """
+        if datatype['type'] == 'array':
+            datatype.setdefault('items', [])
+        elif datatype['type'] == 'object':
+            datatype.setdefault('properties', {})
+        out = super(FortranModelDriver, cls).write_type_def(
+            name, datatype, **kwargs)
+        return out
+    
     @classmethod
     def write_type_decl(cls, name, datatype, **kwargs):
         r"""Get lines declaring the datatype within the language.

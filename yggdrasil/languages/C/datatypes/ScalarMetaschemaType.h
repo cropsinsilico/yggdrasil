@@ -1354,6 +1354,8 @@ public:
       size_t * const arg_siz = arg_siz_x;
       (*nargs)--;
       skip_terminal = false;
+      if (ap.for_fortran)
+	skip_terminal = true;
       int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
 			       p, arg_siz[0], allow_realloc, skip_terminal);
       if (ret < 0) {
