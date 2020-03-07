@@ -1814,7 +1814,7 @@ class CompiledModelDriver(ModelDriver):
                     v[libtype] = libfile
         for k in ['compiler', 'linker', 'archiver']:
             # Set default linker/archiver based on compiler
-            default_tool_name = getattr(cls, 'default_%s' % k, None))
+            default_tool_name = getattr(cls, 'default_%s' % k, None)
             if default_tool_name:
                 default_tool = get_compilation_tool(k, default_tool_name)
                 if not default_tool.is_installed():  # pragma: debug
