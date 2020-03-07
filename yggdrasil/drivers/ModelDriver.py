@@ -757,7 +757,7 @@ class ModelDriver(Driver):
                 and cls.are_base_languages_installed()
                 and cls.are_dependencies_installed()
                 and cls.is_interface_installed() and cls.is_comm_installed()
-                and cls.is_configured())
+                and cls.is_configured() and (not cls.is_disabled()))
 
     @classmethod
     def are_base_languages_installed(cls):
@@ -769,7 +769,7 @@ class ModelDriver(Driver):
         """
         out = True
         for x in cls.base_languages:
-            if not out:
+            if not out:  # pragma: no cover
                 break
             out = import_component('model', x).is_installed()
         return out
@@ -888,15 +888,14 @@ class ModelDriver(Driver):
 
         """
         # Check for section & diable
-        disable_flag = cls.cfg.get(cls.language, 'disable', 'false').lower()
-        out = (cls.cfg.has_section(cls.language) and (disable_flag != 'true'))
+        disable_flag = cls.is_disabled()
+        out = (cls.cfg.has_section(cls.language) and (not disable_flag))
         # Check for commtypes
         if out and (len(cls.base_languages) == 0):
             out = (cls.cfg.get(cls.language, 'commtypes', None) is not None)
         # Check for config keys
         for k in cls._config_keys:
-            if cls.cfg.get(cls.language, k, None) is None:
-                out = False
+            out = (cls.cfg.get(cls.language, k, None) is not None)
         return out
 
     @classmethod

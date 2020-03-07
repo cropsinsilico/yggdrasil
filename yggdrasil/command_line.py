@@ -80,6 +80,8 @@ def ygginfo():
                                 drv.is_comm_installed()))
                 vardict.append((curr_prefix + "Configured",
                                 drv.is_configured()))
+                vardict.append((curr_prefix + "Disabled",
+                                drv.is_disabled()))
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
         # Add verbose information

@@ -2641,7 +2641,7 @@ class CompiledModelDriver(ModelDriver):
             bool: True if the language has been configured.
 
         """
-        out = ModelDriver.is_configured.__func__(cls)
+        out = super(CompiledModelDriver, cls).is_configured()
         for k in cls.get_external_libraries():
             if not out:  # pragma: no cover
                 break
