@@ -442,7 +442,7 @@ class ConnectionDriver(Driver):
                 elif ((self.ocomm.n_msg_send_drain == 0)
                       and self.ocomm.is_confirmed_send):
                     break
-            self.sleep()
+            self.sleep()  # pragma: no cover
         self.stop_timeout()
 
     def before_loop(self):
