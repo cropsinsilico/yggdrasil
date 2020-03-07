@@ -144,7 +144,7 @@ class FortranModelDriver(CompiledModelDriver):
         'array': 'yggarr',
         'object': 'yggmap',
         'integer': 'integer',
-        'boolean': 'logical',
+        'boolean': 'logical(kind = X)',
         'null': 'yggnull',
         'uint': 'integer(kind = X)',  # Fortran has no unsigned int
         'complex': 'complex(kind = X)',
@@ -407,7 +407,10 @@ class FortranModelDriver(CompiledModelDriver):
                     type=('%s_pointer' % json_type['type'])).format(
                         **json_subtype)
         elif 'X' in out:
-            precision = json_type['precision']
+            if out.startswith('logical'):
+                precision = json_type.get('precision', 8)
+            else:
+                precision = json_type['precision']
             out = out.replace('X', str(int(precision / 8)))
         return out
         
@@ -443,6 +446,7 @@ class FortranModelDriver(CompiledModelDriver):
                 grp['shape'] = ':,:'
         if grp.get('precision', False):
             out['precision'] = 8 * int(grp['precision'])
+        if grp.get('precision', False) or (grp['type'] == 'logical'):
             grp['type'] += '(kind = X)'
         if grp['type'] == 'character':
             out['type'] = 'bytes'

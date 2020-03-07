@@ -474,7 +474,10 @@ class ModelDriver(Driver):
 
         """
         if cls.inverse_type_map is None:
-            cls.inverse_type_map = {v: k for k, v in cls.type_map.items()}
+            cls.inverse_type_map = {}
+            for k, v in cls.type_map.items():
+                if k != 'flag':
+                    cls.inverse_type_map[v] = k
         return cls.inverse_type_map
 
     @classmethod
