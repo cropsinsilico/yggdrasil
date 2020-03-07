@@ -1011,7 +1011,11 @@ public:
 	} else {
 	  p = va_arg(ap.va, bool**);
 	}
-	arg = (bool*)realloc(*p, sizeof(bool));
+	if (ap.for_fortran) {
+	  arg = *p;
+	} else {
+	  arg = (bool*)realloc(*p, sizeof(bool));
+	}
 	if (arg == NULL)
 	  ygglog_throw_error("MetaschemaType::decode_data: could not realloc bool pointer.");
 	*p = arg;
@@ -1037,7 +1041,11 @@ public:
 	} else {
 	  p = va_arg(ap.va, int**);
 	}
-	arg = (int*)realloc(*p, sizeof(int));
+	if (ap.for_fortran) {
+	  arg = *p;
+	} else {
+	  arg = (int*)realloc(*p, sizeof(int));
+	}
 	if (arg == NULL)
 	  ygglog_throw_error("MetaschemaType::decode_data: could not realloc int pointer.");
 	*p = arg;
@@ -1063,7 +1071,11 @@ public:
 	} else {
 	  p = va_arg(ap.va, void***);
 	}
-	arg = (void**)realloc(*p, sizeof(void*));
+	if (ap.for_fortran) {
+	  arg = *p;
+	} else {
+	  arg = (void**)realloc(*p, sizeof(void*));
+	}
 	if (arg == NULL)
 	  ygglog_throw_error("MetaschemaType::decode_data: could not realloc void* pointer.");
 	*p = arg;
@@ -1089,7 +1101,11 @@ public:
 	} else {
 	  p = va_arg(ap.va, double**);
 	}
-	arg = (double*)realloc(*p, sizeof(double));
+	if (ap.for_fortran) {
+	  arg = *p;
+	} else {
+	  arg = (double*)realloc(*p, sizeof(double));
+	}
 	if (arg == NULL)
 	  ygglog_throw_error("MetaschemaType::decode_data: could not realloc double pointer.");
 	*p = arg;
