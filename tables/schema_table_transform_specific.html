@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -183,7 +184,12 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>function</p></td>
+<tr class="row-even"><td><p>field_names</p></td>
+<td><p>array</p></td>
+<td></td>
+<td><p>[‘array’, ‘pandas’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>function</p></td>
 <td><p>function</p></td>
 <td><p>The handle for a callable Python object (e.g. function) that should be used to
 transform messages or a string of the form “&lt;function file&gt;:&lt;function name&gt;”
@@ -192,29 +198,29 @@ containing the function and “&lt;function name&gt;” is the name of the funct
 function should take the message as input and return the transformed message.</p></td>
 <td><p>[‘function’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>map</p></td>
+<tr class="row-even"><td><p>map</p></td>
 <td><p>object</p></td>
 <td><p>A mapping from original field name to new field names.</p></td>
 <td><p>[‘map_fields’]</p></td>
 </tr>
-<tr class="row-even"><td><p>original_order</p></td>
+<tr class="row-odd"><td><p>original_order</p></td>
 <td><p>array</p></td>
 <td><p>The original order of fields that should be used for selecting from
 lists/tuples.</p></td>
 <td><p>[‘select_fields’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>selected</p></td>
+<tr class="row-even"><td><p>selected</p></td>
 <td><p>array</p></td>
 <td><p>A list of fields that should be selected.</p></td>
 <td><p>[‘select_fields’]</p></td>
 </tr>
-<tr class="row-even"><td><p>single_as_scalar</p></td>
+<tr class="row-odd"><td><p>single_as_scalar</p></td>
 <td><p>boolean</p></td>
 <td><p>If True and only a single field is selected, the transformed messages will be
 scalars rather than arrays with single elements. Defaults to False.</p></td>
 <td><p>[‘select_fields’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>statement</p></td>
+<tr class="row-even"><td><p>statement</p></td>
 <td><p>string</p></td>
 <td><p>Python statement in terms of the message as represented by the string “%x%” that
 should evaluate to the transformed message. The statement should only use a

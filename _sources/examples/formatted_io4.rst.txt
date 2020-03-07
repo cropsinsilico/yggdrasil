@@ -28,11 +28,11 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io4/src/formatted_io4_modelB.cpp
+.. literalinclude:: /../../yggdrasil/examples/formatted_io4/src/formatted_io4_modelA.cpp
    :language: c++
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io4/src/formatted_io4_modelA.cpp
+.. literalinclude:: /../../yggdrasil/examples/formatted_io4/src/formatted_io4_modelB.cpp
    :language: c++
    :linenos:
 

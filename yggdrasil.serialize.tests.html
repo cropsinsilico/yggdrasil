@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.serialize.tests package &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.serialize.tests package &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -242,6 +243,30 @@
 <dl class="attribute">
 <dt id="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_asarray.testing_option_kws">
 <code class="sig-name descname">testing_option_kws</code><em class="property"> = {'array_columns': True}</em><a class="headerlink" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_asarray.testing_option_kws" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_object">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.tests.test_AsciiTableSerialize.</code><code class="sig-name descname">TestAsciiTableSerialize_object</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerialize_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize" title="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize</span></code></a></p>
+<p>Test class for AsciiTableSerialize class with object.</p>
+<dl class="method">
+<dt id="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_object.get_options">
+<code class="sig-name descname">get_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerialize_object.get_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_object.get_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get testing options.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_object.map_sent2recv">
+<code class="sig-name descname">map_sent2recv</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerialize_object.map_sent2recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_object.map_sent2recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a sent object into a received one.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_object.testing_option_kws">
+<code class="sig-name descname">testing_option_kws</code><em class="property"> = {}</em><a class="headerlink" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_object.testing_option_kws" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -492,10 +517,40 @@ routines.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize.test_deserialize_no_header">
+<code class="sig-name descname">test_deserialize_no_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_PandasSerialize.html#TestPandasSerialize.test_deserialize_no_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize.test_deserialize_no_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test deserialization of frame output without a header.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize.test_func_serialize_errors">
 <code class="sig-name descname">test_func_serialize_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_PandasSerialize.html#TestPandasSerialize.test_func_serialize_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize.test_func_serialize_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test errors raised by func_serialize.</p>
 </dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerializeBytes">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.tests.test_PandasSerialize.</code><code class="sig-name descname">TestPandasSerializeBytes</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_PandasSerialize.html#TestPandasSerializeBytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerializeBytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize" title="yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize</span></code></a></p>
+<p>Test class for PandasSerialize class when strings are bytes.</p>
+<dl class="attribute">
+<dt id="yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerializeBytes.testing_option_kws">
+<code class="sig-name descname">testing_option_kws</code><em class="property"> = {'table_string_type': 'bytes'}</em><a class="headerlink" href="#yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerializeBytes.testing_option_kws" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerializeNoHeader">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.tests.test_PandasSerialize.</code><code class="sig-name descname">TestPandasSerializeNoHeader</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_PandasSerialize.html#TestPandasSerializeNoHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerializeNoHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize" title="yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize</span></code></a></p>
+<p>Test class for PandasSerialize class when no header specified.</p>
+<dl class="attribute">
+<dt id="yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerializeNoHeader.testing_option_kws">
+<code class="sig-name descname">testing_option_kws</code><em class="property"> = {'no_header': True}</em><a class="headerlink" href="#yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerializeNoHeader.testing_option_kws" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

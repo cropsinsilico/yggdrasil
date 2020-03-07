@@ -5,6 +5,7 @@ Option           Description                                                    
 ==============   ================================================================================   ========   ===========
 args             The model executable and any arguments that should be passed to the model          X          str or list
                  executable.                                                                                              
+name             Driver name.                                                                       X          str        
 compiler         Command or path to executable that should be used to compile the model. If not                str        
                  provided, the compiler will be determined based on configuration options for the                         
                  language (if present) and the registered compilers that are available on the                             
@@ -21,7 +22,6 @@ linker_flags     Flags that should be passed to the linker during compilation. I
                  the linker flags will be determined based on configuration options for the                               
                  language (if present), the linker defaults, and the default_linker_flags class                           
                  attribute.                                                                                               
-name             Driver name.                                                                       X          str        
 source_files     Source files that should be compiled into an executable. Defaults to an empty                 list       
                  list and the driver will search for a source file based on the model executable                          
                  (the first model argument).                                                                              

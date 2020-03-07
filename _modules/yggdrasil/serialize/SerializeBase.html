@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.serialize.SerializeBase &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.serialize.SerializeBase &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -171,12 +172,13 @@
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">serialize</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">serialize</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="k">import</span> <span class="n">get_metaschema</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">guess_type_from_obj</span><span class="p">,</span> <span class="n">get_type_from_def</span><span class="p">,</span> <span class="n">get_type_class</span><span class="p">,</span> <span class="n">compare_schema</span><span class="p">)</span>
+    <span class="n">guess_type_from_obj</span><span class="p">,</span> <span class="n">get_type_from_def</span><span class="p">,</span> <span class="n">get_type_class</span><span class="p">,</span> <span class="n">compare_schema</span><span class="p">,</span>
+    <span class="n">type2numpy</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ScalarMetaschemaProperties</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">definition2dtype</span><span class="p">,</span> <span class="n">_flexible_types</span><span class="p">)</span>
+    <span class="n">_flexible_types</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.MetaschemaType</span> <span class="k">import</span> <span class="n">MetaschemaType</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.ArrayMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">OneDArrayMetaschemaType</span><span class="p">)</span>
@@ -227,9 +229,9 @@
                      <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span>
                      <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Serializer type.&#39;</span><span class="p">)},</span>
         <span class="s1">&#39;newline&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">_default_newline</span><span class="p">)},</span>
+                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">serialize</span><span class="o">.</span><span class="n">_default_newline_str</span><span class="p">},</span>
         <span class="s1">&#39;comment&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">_default_comment</span><span class="p">)},</span>
+                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">serialize</span><span class="o">.</span><span class="n">_default_comment_str</span><span class="p">},</span>
         <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;schema&#39;</span><span class="p">}}</span>
     <span class="n">_oldstyle_kws</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">]</span>
     <span class="n">_attr_conv</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;newline&#39;</span><span class="p">,</span> <span class="s1">&#39;comment&#39;</span><span class="p">]</span>
@@ -339,7 +341,7 @@
 
 <div class="viewcode-block" id="SerializeBase.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.SerializeBase.SerializeBase.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">table_example</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">array_columns</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                            <span class="n">include_oldkws</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                            <span class="n">include_oldkws</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">table_string_type</span><span class="o">=</span><span class="s1">&#39;bytes&#39;</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Arguments:</span>
@@ -353,6 +355,8 @@
 <span class="sd">            include_oldkws (bool, optional): If True, old-style keywords will be</span>
 <span class="sd">                added to the returned options. This will only have an effect if</span>
 <span class="sd">                table_example is True. Defaults to False.</span>
+<span class="sd">            table_string_type (str, optional): Type that should be used</span>
+<span class="sd">                for the string column in the table. Defaults to &#39;bytes&#39;.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>
@@ -377,13 +381,23 @@
         <span class="k">if</span> <span class="n">array_columns</span><span class="p">:</span>
             <span class="n">table_example</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">table_example</span><span class="p">:</span>
-            <span class="n">rows</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">b</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">),</span>
-                    <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;two&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mf">2.0</span><span class="p">),</span>
-                    <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;three&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mf">3.0</span><span class="p">)]</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">table_string_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">table_string_type</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
+                <span class="n">table_string_type</span> <span class="o">=</span> <span class="s1">&#39;unicode&#39;</span>
+            <span class="k">if</span> <span class="n">table_string_type</span> <span class="o">==</span> <span class="s1">&#39;bytes&#39;</span><span class="p">:</span>
+                <span class="n">np_dtype_str</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span>
+                <span class="n">rows</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">b</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">),</span>
+                        <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;two&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mf">2.0</span><span class="p">),</span>
+                        <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;three&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mf">3.0</span><span class="p">)]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">np_dtype_str</span> <span class="o">=</span> <span class="s1">&#39;U&#39;</span>
+                <span class="n">rows</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s1">&#39;two&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mf">2.0</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s1">&#39;three&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mf">3.0</span><span class="p">)]</span>
             <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                    <span class="s1">&#39;extra_kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span>
                    <span class="s1">&#39;typedef&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
-                               <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">table_string_type</span><span class="p">,</span>
                                           <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;name&#39;</span><span class="p">},</span>
                                          <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
                                           <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;umol&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;count&#39;</span><span class="p">},</span>
@@ -405,13 +419,15 @@
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span>
                                       <span class="s1">&#39;field_names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">],</span>
                                       <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="s1">&#39;umol&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">]})</span>
-                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;extra_kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="p">{</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;format_str&#39;</span><span class="p">])})</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;extra_kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;format_str&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;format_str&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">&#39;format_str&#39;</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_attr_conv</span><span class="p">:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;extra_kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;format_str&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span>
+                        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;extra_kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;format_str&#39;</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">array_columns</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;as_array&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span>
                     <span class="p">{</span><span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">],</span>
-                     <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">5&#39;</span> <span class="o">%</span> <span class="n">backwards</span><span class="o">.</span><span class="n">np_dtype_str</span><span class="p">,</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">]})</span>
+                     <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">5&#39;</span> <span class="o">%</span> <span class="n">np_dtype_str</span><span class="p">,</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">]})</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype</span>
                 <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
                 <span class="n">lst</span> <span class="o">=</span> <span class="p">[</span><span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">u</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">u</span>
@@ -422,6 +438,8 @@
                     <span class="n">x</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1darray&#39;</span>
                     <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span>
                         <span class="n">x</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">40</span>
+                        <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;unicode&#39;</span><span class="p">:</span>
+                            <span class="n">x</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="mi">4</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                    <span class="s1">&#39;typedef&#39;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">default_datatype</span><span class="p">,</span>
@@ -459,8 +477,8 @@
             <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attr_conv</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">backwards</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">out</span>
         
     <span class="nd">@property</span>
@@ -475,12 +493,8 @@
                 <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
-                    <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">allow_pass</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
         <span class="k">return</span> <span class="n">out</span>
@@ -516,8 +530,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;array&#39;</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_names</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span>
+              <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;items&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Variable number of items not yet supported.&quot;</span><span class="p">)</span>
@@ -533,9 +548,9 @@
                 <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">as_bytes</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">]</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">]</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="SerializeBase.get_field_units"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.SerializeBase.SerializeBase.get_field_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_field_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_bytes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -553,7 +568,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;array&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_units</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_units</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Variable number of items not yet supported.&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
@@ -568,34 +583,16 @@
                 <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">as_bytes</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">]</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">]</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">numpy_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;np.dtype: Corresponding structured data type. Will be None unless the</span>
 <span class="sd">        type is an array of 1darrays.&quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;items&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">as_array</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;1darray&#39;</span><span class="p">,</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">])</span>
-                <span class="k">if</span> <span class="n">as_array</span><span class="p">:</span>
-                    <span class="n">out</span> <span class="o">=</span> <span class="n">definition2dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">])</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-                <span class="n">as_array</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">dtype_list</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="n">field_names</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]):</span>
-                    <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;1darray&#39;</span><span class="p">:</span>
-                        <span class="n">as_array</span> <span class="o">=</span> <span class="kc">False</span>
-                        <span class="k">break</span>
-                    <span class="n">dtype_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">definition2dtype</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-                    <span class="n">field_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;f</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">))</span>
-                <span class="k">if</span> <span class="n">as_array</span><span class="p">:</span>
-                    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">names</span><span class="o">=</span><span class="n">field_names</span><span class="p">,</span> <span class="n">formats</span><span class="o">=</span><span class="n">dtype_list</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">type2numpy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SerializeBase.initialize_from_message"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.SerializeBase.SerializeBase.initialize_from_message">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_from_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">metadata</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize the serializer based on recieved message.</span>
@@ -705,8 +702,21 @@
         <span class="c1"># Enfore that strings used with messages are in bytes</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attr_conv</span><span class="p">:</span>
             <span class="n">v</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">v</span><span class="p">))</span></div>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span><span class="n">v</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SerializeBase.cformat2nptype"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.SerializeBase.SerializeBase.cformat2nptype">[docs]</a>    <span class="k">def</span> <span class="nf">cformat2nptype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to convert c format string to numpy data type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Arguments are passed to serialize.cformat2nptype.</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to serialize.cformat2nptype.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.dtype: Corresponding numpy data type.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SerializeBase.update_typedef_from_oldstyle"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.SerializeBase.SerializeBase.update_typedef_from_oldstyle">[docs]</a>    <span class="k">def</span> <span class="nf">update_typedef_from_oldstyle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update a given typedef using an old, table-style serialization spec.</span>
@@ -731,21 +741,21 @@
                 <span class="k">continue</span>
             <span class="c1"># Key specific changes to type</span>
             <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;format_str&#39;</span><span class="p">:</span>
-                <span class="n">v</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                 <span class="n">fmts</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">extract_formats</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                 <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">typedef</span><span class="p">:</span>
                     <span class="k">if</span> <span class="p">(</span><span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">):</span>
                         <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">,</span> <span class="p">[]))</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">fmts</span><span class="p">))</span>
-                        <span class="c1"># if len(typedef.get(&#39;items&#39;, [])) != len(fmts):</span>
-                        <span class="c1">#     warnings.warn((&quot;Number of items in typedef (%d) doesn&#39;t&quot;</span>
-                        <span class="c1">#                    + &quot;match the number of formats (%d).&quot;)</span>
-                        <span class="c1">#                   % (len(typedef.get(&#39;items&#39;, [])), len(fmts)))</span>
-                    <span class="k">continue</span>
+                    <span class="c1"># This continue is covered, but the optimization</span>
+                    <span class="c1"># causes it to be skipped at runtime</span>
+                    <span class="c1"># https://bitbucket.org/ned/coveragepy/issues/198/</span>
+                    <span class="c1"># continue-marked-as-not-covered</span>
+                    <span class="k">continue</span>  <span class="c1"># pragma: no cover</span>
                 <span class="n">as_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;as_array&#39;</span><span class="p">,</span>
                                                  <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
                 <span class="n">typedef</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="n">items</span><span class="o">=</span><span class="p">[])</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fmts</span><span class="p">):</span>
-                    <span class="n">nptype</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+                    <span class="n">nptype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
                     <span class="n">itype</span> <span class="o">=</span> <span class="n">OneDArrayMetaschemaType</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nptype</span><span class="p">))</span>
                     <span class="n">itype</span> <span class="o">=</span> <span class="n">OneDArrayMetaschemaType</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">itype</span><span class="p">)</span>
                     <span class="k">if</span> <span class="p">(</span><span class="n">fmt</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;precision&#39;</span> <span class="ow">in</span> <span class="n">itype</span><span class="p">):</span>
@@ -764,7 +774,7 @@
                 <span class="c1"># Can only be used in conjunction with format_str</span>
                 <span class="k">pass</span>
             <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">]:</span>
-                <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;field_names&#39;</span><span class="p">:</span>
                     <span class="n">tk</span> <span class="o">=</span> <span class="s1">&#39;title&#39;</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -846,7 +856,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">header_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">header_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">args</span> <span class="o">==</span> <span class="n">tools</span><span class="o">.</span><span class="n">YGG_MSG_EOF</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">args</span> <span class="o">==</span> <span class="n">tools</span><span class="o">.</span><span class="n">YGG_MSG_EOF</span><span class="p">):</span>
             <span class="n">header_kwargs</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_from_message</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">header_kwargs</span><span class="p">)</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no_metadata&#39;</span><span class="p">:</span> <span class="n">no_metadata</span><span class="p">}</span>
@@ -864,10 +874,10 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_serialize</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
                 <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoded_typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;bytes&#39;</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
                         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span><span class="s2">&quot;Serialization function returned object &quot;</span>
                                          <span class="o">+</span> <span class="s2">&quot;of type &#39;</span><span class="si">%s</span><span class="s2">&#39;, not required &#39;</span><span class="si">%s</span><span class="s2">&#39; type.&quot;</span><span class="p">)</span>
-                                        <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">))</span>
+                                        <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="nb">bytes</span><span class="p">))</span>
                     <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;dont_encode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">no_metadata</span><span class="p">:</span>
                         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span>

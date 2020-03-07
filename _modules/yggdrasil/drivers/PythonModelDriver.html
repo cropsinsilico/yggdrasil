@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -216,10 +217,9 @@
         <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="s1">&#39;import </span><span class="si">{interface_library}</span><span class="s1"> as ygg&#39;</span><span class="p">,</span>
         <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = ygg.YggInput(</span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = ygg.YggOutput(</span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;table_input&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = YggInterface.YggAsciiTableInput(&#39;</span>
-                        <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="si">{channel_name}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">),</span>
-        <span class="s1">&#39;table_output&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = YggInterface.YggAsciiTableOutput(&#39;</span>
-                         <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="si">{channel_name}</span><span class="se">\&quot;</span><span class="s1">, </span><span class="se">\&quot;</span><span class="si">{format_str}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;python_interface&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = ygg.</span><span class="si">{python_interface}</span><span class="s1">(</span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;python_interface_format&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = ygg.</span><span class="si">{python_interface}</span><span class="s1">&#39;</span>
+                                    <span class="s1">&#39;(</span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="si">{format_str}</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">),</span>
         <span class="s1">&#39;recv_function&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1">.recv&#39;</span><span class="p">,</span>
         <span class="s1">&#39;send_function&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1">.send&#39;</span><span class="p">,</span>
         <span class="s1">&#39;multiple_outputs&#39;</span><span class="p">:</span> <span class="s1">&#39;[</span><span class="si">{outputs}</span><span class="s1">]&#39;</span><span class="p">,</span>

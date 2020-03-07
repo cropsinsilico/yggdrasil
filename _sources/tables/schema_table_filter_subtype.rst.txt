@@ -1,9 +1,11 @@
 .. _schema_table_filter_subtype_rst:
 
-==========
-Filtertype
-==========
-direct    
-function  
-statement 
-==========
++------------+
+| Filtertype |
++============+
+| direct     |
++------------+
+| function   |
++------------+
+| statement  |
++------------+

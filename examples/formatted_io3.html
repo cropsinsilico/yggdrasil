@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>formatted_io3 Example &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>formatted_io3 Example &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -95,6 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -126,6 +127,7 @@
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson2.html">rpc_lesson2 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="model_function.html">model_function Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_io.html">conditional_io Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transformed_io.html">transformed_io Example</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
@@ -261,8 +263,8 @@
 
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
   <span class="c1">// Initialize input/output channels</span>
-  <span class="n">yggAsciiArrayInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">yggAsciiArrayInput</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
-  <span class="n">yggAsciiArrayOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">yggAsciiArrayOutput</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">,</span> <span class="s">&quot;%6s</span><span class="se">\t</span><span class="s">%d</span><span class="se">\t</span><span class="s">%f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+  <span class="n">yggAsciiArrayInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">yggAsciiArrayInput</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
+  <span class="n">yggAsciiArrayOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">yggAsciiArrayOutput</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">,</span> <span class="s">&quot;%6s</span><span class="se">\t</span><span class="s">%d</span><span class="se">\t</span><span class="s">%f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 
   <span class="c1">// Declare resulting variables and create buffer for received message</span>
   <span class="kt">size_t</span> <span class="n">nrows</span><span class="p">;</span>
@@ -279,12 +281,12 @@
     <span class="c1">// Otherwise, it is the size of the received message</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">yggRecvRealloc</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nrows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// Print received message</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: (%lu rows)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: (%lu rows)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">);</span>
     <span class="kt">size_t</span> <span class="n">i</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nrows</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;   %.6s, %d, %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">[</span><span class="mi">6</span><span class="o">*</span><span class="n">i</span><span class="p">],</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
@@ -293,12 +295,12 @@
     <span class="c1">// If there is an error, the flag will be negative</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">out_channel</span><span class="p">,</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: Error sending output.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: Error sending output.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
   <span class="p">}</span>
-  
+
   <span class="c1">// Free dynamically allocated columns</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">count</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">count</span><span class="p">);</span>
@@ -366,8 +368,8 @@
 
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
   <span class="c1">// Initialize input/output channels</span>
-  <span class="n">yggAsciiArrayInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">yggAsciiArrayInput</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
-  <span class="n">yggAsciiArrayOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">yggAsciiArrayOutput</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">,</span> <span class="s">&quot;%6s</span><span class="se">\t</span><span class="s">%d</span><span class="se">\t</span><span class="s">%f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+  <span class="n">yggAsciiArrayInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">yggAsciiArrayInput</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
+  <span class="n">yggAsciiArrayOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">yggAsciiArrayOutput</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">,</span> <span class="s">&quot;%6s</span><span class="se">\t</span><span class="s">%d</span><span class="se">\t</span><span class="s">%f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 
   <span class="c1">// Declare resulting variables and create buffer for received message</span>
   <span class="kt">size_t</span> <span class="n">nrows</span><span class="p">;</span>
@@ -384,12 +386,12 @@
     <span class="c1">// Otherwise, it is the size of the received message</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">yggRecvRealloc</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nrows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// Print received message</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: (%lu rows)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: (%lu rows)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">);</span>
     <span class="kt">size_t</span> <span class="n">i</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nrows</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;   %.6s, %d, %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">[</span><span class="mi">6</span><span class="o">*</span><span class="n">i</span><span class="p">],</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
@@ -398,12 +400,12 @@
     <span class="c1">// If there is an error, the flag will be negative</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">out_channel</span><span class="p">,</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: Error sending output.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: Error sending output.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
   <span class="p">}</span>
-
+  
   <span class="c1">// Free dynamically allocated columns</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">count</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">count</span><span class="p">);</span>
@@ -781,8 +783,8 @@
 31
 32
 33</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Initialize input/output channels </span>
-<span class="n">in_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggAsciiArrayInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputB&#39;</span><span class="p">);</span>
-<span class="n">out_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggAsciiArrayOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputB&#39;</span><span class="p">,</span> <span class="s">&#39;%6s\t%d\t%f\n&#39;</span><span class="p">);</span>
+<span class="n">in_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggAsciiArrayInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputA&#39;</span><span class="p">);</span>
+<span class="n">out_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggAsciiArrayOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputA&#39;</span><span class="p">,</span> <span class="s">&#39;%6s\t%d\t%f\n&#39;</span><span class="p">);</span>
 
 <span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
 
@@ -793,13 +795,13 @@
   <span class="c">% If there is an error, the flag will be False.</span>
   <span class="p">[</span><span class="n">flag</span><span class="p">,</span> <span class="n">arr</span><span class="p">]</span> <span class="p">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv_array</span><span class="p">();</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Model B: No more input.&#39;</span><span class="p">);</span>
+    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Model A: No more input.&#39;</span><span class="p">);</span>
     <span class="k">break</span><span class="p">;</span>
   <span class="k">end</span><span class="p">;</span>
 
   <span class="c">% Print received message</span>
   <span class="n">nr</span> <span class="p">=</span> <span class="nb">size</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Model B: (%d rows)\n&#39;</span><span class="p">,</span> <span class="n">nr</span><span class="p">);</span>
+  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Model A: (%d rows)\n&#39;</span><span class="p">,</span> <span class="n">nr</span><span class="p">);</span>
   <span class="k">for</span> <span class="nb">i</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">nr</span>
     <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;   %s, %d, %f\n&#39;</span><span class="p">,</span> <span class="n">arr</span><span class="p">{</span><span class="nb">i</span><span class="p">,</span><span class="mi">1</span><span class="p">},</span> <span class="n">arr</span><span class="p">{</span><span class="nb">i</span><span class="p">,</span><span class="mi">2</span><span class="p">},</span> <span class="n">arr</span><span class="p">{</span><span class="nb">i</span><span class="p">,</span><span class="mi">3</span><span class="p">});</span>
   <span class="k">end</span><span class="p">;</span>
@@ -808,7 +810,7 @@
   <span class="c">% If there is an error, the flag will be False</span>
   <span class="n">flag</span> <span class="p">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send_array</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="n">error</span><span class="p">(</span><span class="s">&#39;Model B: Error sending output.&#39;</span><span class="p">);</span>
+    <span class="n">error</span><span class="p">(</span><span class="s">&#39;Model A: Error sending output.&#39;</span><span class="p">);</span>
     <span class="k">break</span><span class="p">;</span>
   <span class="k">end</span><span class="p">;</span>
   
@@ -848,8 +850,8 @@
 31
 32
 33</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Initialize input/output channels </span>
-<span class="n">in_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggAsciiArrayInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputA&#39;</span><span class="p">);</span>
-<span class="n">out_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggAsciiArrayOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputA&#39;</span><span class="p">,</span> <span class="s">&#39;%6s\t%d\t%f\n&#39;</span><span class="p">);</span>
+<span class="n">in_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggAsciiArrayInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputB&#39;</span><span class="p">);</span>
+<span class="n">out_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggAsciiArrayOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputB&#39;</span><span class="p">,</span> <span class="s">&#39;%6s\t%d\t%f\n&#39;</span><span class="p">);</span>
 
 <span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
 
@@ -860,13 +862,13 @@
   <span class="c">% If there is an error, the flag will be False.</span>
   <span class="p">[</span><span class="n">flag</span><span class="p">,</span> <span class="n">arr</span><span class="p">]</span> <span class="p">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv_array</span><span class="p">();</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Model A: No more input.&#39;</span><span class="p">);</span>
+    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Model B: No more input.&#39;</span><span class="p">);</span>
     <span class="k">break</span><span class="p">;</span>
   <span class="k">end</span><span class="p">;</span>
 
   <span class="c">% Print received message</span>
   <span class="n">nr</span> <span class="p">=</span> <span class="nb">size</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Model A: (%d rows)\n&#39;</span><span class="p">,</span> <span class="n">nr</span><span class="p">);</span>
+  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Model B: (%d rows)\n&#39;</span><span class="p">,</span> <span class="n">nr</span><span class="p">);</span>
   <span class="k">for</span> <span class="nb">i</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">nr</span>
     <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;   %s, %d, %f\n&#39;</span><span class="p">,</span> <span class="n">arr</span><span class="p">{</span><span class="nb">i</span><span class="p">,</span><span class="mi">1</span><span class="p">},</span> <span class="n">arr</span><span class="p">{</span><span class="nb">i</span><span class="p">,</span><span class="mi">2</span><span class="p">},</span> <span class="n">arr</span><span class="p">{</span><span class="nb">i</span><span class="p">,</span><span class="mi">3</span><span class="p">});</span>
   <span class="k">end</span><span class="p">;</span>
@@ -875,7 +877,7 @@
   <span class="c">% If there is an error, the flag will be False</span>
   <span class="n">flag</span> <span class="p">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send_array</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="n">error</span><span class="p">(</span><span class="s">&#39;Model A: Error sending output.&#39;</span><span class="p">);</span>
+    <span class="n">error</span><span class="p">(</span><span class="s">&#39;Model B: Error sending output.&#39;</span><span class="p">);</span>
     <span class="k">break</span><span class="p">;</span>
   <span class="k">end</span><span class="p">;</span>
   
@@ -1156,8 +1158,8 @@
 library(yggdrasil)
 
 # Initialize input/output channels
-in_channel &lt;- YggInterface(&#39;YggAsciiArrayInput&#39;, &#39;inputB&#39;)
-out_channel &lt;- YggInterface(&#39;YggAsciiArrayOutput&#39;, &#39;outputB&#39;, &#39;%6s\t%d\t%f\n&#39;)
+in_channel &lt;- YggInterface(&#39;YggAsciiArrayInput&#39;, &#39;inputA&#39;)
+out_channel &lt;- YggInterface(&#39;YggAsciiArrayOutput&#39;, &#39;outputA&#39;, &#39;%6s\t%d\t%f\n&#39;)
 
 # Loop until there is no longer input or the queues are closed
 while(TRUE) {
@@ -1166,13 +1168,13 @@ while(TRUE) {
   # If there is an error, the flag will be False
   c(flag, arr) %&lt;-% in_channel$recv_array()
   if (!flag) {
-    print(&#39;Model B: No more input.&#39;)
+    print(&#39;Model A: No more input.&#39;)
     break
   }
 
   # Print received message
   nr = length(arr);
-  fprintf(&#39;Model B: (%d rows)&#39;, nr)
+  fprintf(&#39;Model A: (%d rows)&#39;, nr)
   for (i in 1:nr) {
     fprintf(&#39;   %s, %d, %f&#39;, arr[[i]][[1]], arr[[i]][[2]], arr[[i]][[3]])
   }
@@ -1181,7 +1183,7 @@ while(TRUE) {
   # If there is an error, the flag will be False
   flag = out_channel$send_array(arr)
   if (!flag) {
-    stop(&#39;Model B: Error sending output.&#39;)
+    stop(&#39;Model A: Error sending output.&#39;)
   }
 
 }
@@ -1223,8 +1225,8 @@ while(TRUE) {
 library(yggdrasil)
 
 # Initialize input/output channels
-in_channel &lt;- YggInterface(&#39;YggAsciiArrayInput&#39;, &#39;inputA&#39;)
-out_channel &lt;- YggInterface(&#39;YggAsciiArrayOutput&#39;, &#39;outputA&#39;, &#39;%6s\t%d\t%f\n&#39;)
+in_channel &lt;- YggInterface(&#39;YggAsciiArrayInput&#39;, &#39;inputB&#39;)
+out_channel &lt;- YggInterface(&#39;YggAsciiArrayOutput&#39;, &#39;outputB&#39;, &#39;%6s\t%d\t%f\n&#39;)
 
 # Loop until there is no longer input or the queues are closed
 while(TRUE) {
@@ -1233,13 +1235,13 @@ while(TRUE) {
   # If there is an error, the flag will be False
   c(flag, arr) %&lt;-% in_channel$recv_array()
   if (!flag) {
-    print(&#39;Model A: No more input.&#39;)
+    print(&#39;Model B: No more input.&#39;)
     break
   }
 
   # Print received message
   nr = length(arr);
-  fprintf(&#39;Model A: (%d rows)&#39;, nr)
+  fprintf(&#39;Model B: (%d rows)&#39;, nr)
   for (i in 1:nr) {
     fprintf(&#39;   %s, %d, %f&#39;, arr[[i]][[1]], arr[[i]][[2]], arr[[i]][[3]])
   }
@@ -1248,7 +1250,7 @@ while(TRUE) {
   # If there is an error, the flag will be False
   flag = out_channel$send_array(arr)
   if (!flag) {
-    stop(&#39;Model A: Error sending output.&#39;)
+    stop(&#39;Model B: Error sending output.&#39;)
   }
 
 }

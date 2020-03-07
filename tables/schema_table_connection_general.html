@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -183,42 +184,42 @@
 </tr>
 </thead>
 <tbody>
+<tr class="row-even"><td><p>inputs</p></td>
+<td><p>array</p></td>
+<td><p>X</p></td>
+<td><p>One or more name(s) of model output(s) and/or new comm/file objects that the
+connection should receive messages from.</p></td>
+</tr>
+<tr class="row-odd"><td><p>outputs</p></td>
+<td><p>array</p></td>
+<td><p>X</p></td>
+<td><p>One or more name(s) of model input(s) and/or new comm/file objects that the
+connection should send messages to.</p></td>
+</tr>
 <tr class="row-even"><td><p>args</p></td>
 <td><p>string</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>[DEPRECATED] Arguments that should be provided to the driver.</p></td>
 </tr>
 <tr class="row-odd"><td><p>connection_type</p></td>
 <td><p>string</p></td>
-<td><p>X</p></td>
-<td><p>(Options described <a class="reference internal" href="schema_table_connection_subtype.html#schema-table-connection-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
+<td></td>
+<td><p>(Options described <a class="reference internal" href="../yaml.html#schema-table-connection-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p>driver</p></td>
 <td><p>string</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>inputs</p></td>
-<td><p>array</p></td>
-<td></td>
-<td><p>One or more name(s) of model output(s) and/or new comm/file objects that the
-connection should receive messages from.</p></td>
-</tr>
-<tr class="row-even"><td><p>onexit</p></td>
+<tr class="row-odd"><td><p>onexit</p></td>
 <td><p>string</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>Class method that should be called when a model that the connection interacts
 with exits, but before the connection driver is shut down. Defaults to None.</p></td>
 </tr>
-<tr class="row-odd"><td><p>outputs</p></td>
-<td><p>array</p></td>
-<td></td>
-<td><p>One or more name(s) of model input(s) and/or new comm/file objects that the
-connection should send messages to.</p></td>
-</tr>
 <tr class="row-even"><td><p>translator</p></td>
 <td><p>array</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>Function or string specifying function that should be used to translate messages
 from the input communicator before passing them to the output communicator. If a
 string, the format should be “&lt;package.module&gt;:&lt;function&gt;” so that &lt;function&gt;

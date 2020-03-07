@@ -21,4 +21,5 @@ Examples
    rpc_lesson2
    model_function
    conditional_io
+   transformed_io
 

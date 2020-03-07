@@ -67,6 +67,14 @@ yggdrasil.serialize.MatSerialize module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.serialize.NetCDFSerialize module
+------------------------------------------
+
+.. automodule:: yggdrasil.serialize.NetCDFSerialize
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.serialize.ObjSerialize module
 ---------------------------------------
 
@@ -103,6 +111,14 @@ yggdrasil.serialize.SerializeBase module
 ----------------------------------------
 
 .. automodule:: yggdrasil.serialize.SerializeBase
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.serialize.WOFOSTParamSerialize module
+-----------------------------------------------
+
+.. automodule:: yggdrasil.serialize.WOFOSTParamSerialize
    :members:
    :undoc-members:
    :show-inheritance:

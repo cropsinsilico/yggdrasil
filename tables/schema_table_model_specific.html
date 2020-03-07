@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -195,7 +196,7 @@ be relative to working_dir or absolute.</p></td>
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
 current operating system.</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘make’, ‘cmake’, ‘c’]</p></td>
+<td><p>[‘make’, ‘cpp’, ‘c’, ‘cmake’, ‘c++’]</p></td>
 </tr>
 <tr class="row-even"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
@@ -203,7 +204,7 @@ current operating system.</p></td>
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
 class attribute.</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘make’, ‘cmake’, ‘c’]</p></td>
+<td><p>[‘make’, ‘cpp’, ‘c’, ‘cmake’, ‘c++’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>configuration</p></td>
 <td><p>string</p></td>
@@ -239,14 +240,14 @@ required to link against the yggdrasil interface). Defaults to ‘LDFLAGS’.</p
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
-<td><p>[‘r’, ‘python’, ‘R’, ‘matlab’, ‘lpy’]</p></td>
+<td><p>[‘r’, ‘R’, ‘matlab’, ‘lpy’, ‘python’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
-<td><p>[‘r’, ‘python’, ‘R’, ‘matlab’, ‘lpy’]</p></td>
+<td><p>[‘r’, ‘R’, ‘matlab’, ‘lpy’, ‘python’]</p></td>
 </tr>
 <tr class="row-even"><td><p>linker</p></td>
 <td><p>string</p></td>
@@ -254,7 +255,7 @@ language (if present) and the default_interpreter_flags class attribute.</p></td
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
 current operating system</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘make’, ‘cmake’, ‘c’]</p></td>
+<td><p>[‘make’, ‘cpp’, ‘c’, ‘cmake’, ‘c++’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
@@ -262,7 +263,7 @@ current operating system</p></td>
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
 attribute.</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘make’, ‘cmake’, ‘c’]</p></td>
+<td><p>[‘make’, ‘cpp’, ‘c’, ‘cmake’, ‘c++’]</p></td>
 </tr>
 <tr class="row-even"><td><p>makedir</p></td>
 <td><p>string</p></td>
@@ -282,14 +283,14 @@ relative to working_dir. Defaults to Makefile.</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
-<td><p>[‘r’, ‘python’, ‘R’, ‘matlab’, ‘lpy’]</p></td>
+<td><p>[‘r’, ‘R’, ‘matlab’, ‘lpy’, ‘python’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>source_files</p></td>
 <td><p>array</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘make’, ‘cmake’, ‘c’]</p></td>
+<td><p>[‘make’, ‘cpp’, ‘c’, ‘cmake’, ‘c++’]</p></td>
 </tr>
 <tr class="row-even"><td><p>sourcedir</p></td>
 <td><p>string</p></td>
@@ -302,13 +303,13 @@ relative to working_dir or absolute.</p></td>
 <td><p>string</p></td>
 <td><p>Make target that should be built to create the model executable. Defaults to
 None.</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>target_language</p></td>
 <td><p>string</p></td>
 <td><p>Language that the target is written in. Defaults to None and will be set based
 on the source files provided.</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>use_symunit</p></td>
 <td><p>boolean</p></td>

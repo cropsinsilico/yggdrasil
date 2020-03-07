@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -185,69 +186,74 @@
 <tbody>
 <tr class="row-even"><td><p>args</p></td>
 <td><p>array</p></td>
-<td></td>
+<td><p>X</p></td>
 <td><p>Argument(s) for running the model on the command line. This should be a complete
 command including the necessary executable and command line arguments to that
 executable.</p></td>
 </tr>
-<tr class="row-odd"><td><p>client_of</p></td>
-<td><p>array</p></td>
+<tr class="row-odd"><td><p>language</p></td>
+<td><p>string</p></td>
 <td><p>X</p></td>
+<td><p>The programming language that the model is written in. (Options described
+<a class="reference internal" href="../yaml.html#schema-table-model-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
+</tr>
+<tr class="row-even"><td><p>name</p></td>
+<td><p>string</p></td>
+<td><p>X</p></td>
+<td><p>Name used for component in log messages.</p></td>
+</tr>
+<tr class="row-odd"><td><p>working_dir</p></td>
+<td><p>string</p></td>
+<td><p>X</p></td>
+<td><p>Working directory. If not provided, the current working directory is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>client_of</p></td>
+<td><p>array</p></td>
+<td></td>
 <td><p>The names of one or more servers that this model is a client of. Defaults to
 empty list. Use of client_of with function is not currently supported.</p></td>
 </tr>
-<tr class="row-even"><td><p>driver</p></td>
+<tr class="row-odd"><td><p>driver</p></td>
 <td><p>string</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>function</p></td>
+<tr class="row-even"><td><p>function</p></td>
 <td><p>string</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>If provided, an integrated model is created by wrapping the function named here.
 The function must be located within the file specified by the source file listed
 in the first argument. If not provided, the model must contain it’s own calls to
 the yggdrasil interface.</p></td>
 </tr>
-<tr class="row-even"><td><p>inputs</p></td>
+<tr class="row-odd"><td><p>inputs</p></td>
 <td><p>array</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>Model inputs described as comm objects.</p></td>
 </tr>
-<tr class="row-odd"><td><p>is_server</p></td>
+<tr class="row-even"><td><p>is_server</p></td>
 <td><p>boolean</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>If True, the model is assumed to be a server and an instance of
 <a class="reference internal" href="../yggdrasil.drivers.html#module-yggdrasil.drivers.ServerDriver" title="yggdrasil.drivers.ServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code></a> is started. Defaults to False. Use of
 is_server with function is not currently supported.</p></td>
 </tr>
-<tr class="row-even"><td><p>language</p></td>
-<td><p>string</p></td>
-<td></td>
-<td><p>The programming language that the model is written in. (Options described
-<a class="reference internal" href="schema_table_model_subtype.html#schema-table-model-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
-</tr>
-<tr class="row-odd"><td><p>name</p></td>
-<td><p>string</p></td>
-<td></td>
-<td><p>Name used for component in log messages.</p></td>
-</tr>
-<tr class="row-even"><td><p>outputs</p></td>
+<tr class="row-odd"><td><p>outputs</p></td>
 <td><p>array</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>Model outputs described as comm objects.</p></td>
 </tr>
-<tr class="row-odd"><td><p>outputs_in_inputs</p></td>
+<tr class="row-even"><td><p>outputs_in_inputs</p></td>
 <td><p>boolean</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>If True, outputs from wrapped model functions are passed by pointer as inputs
 for modification and the return value will be a flag. If False, outputs are
 limited to return values. Defaults to the value of the class attribute
 outputs_in_inputs.</p></td>
 </tr>
-<tr class="row-even"><td><p>overwrite</p></td>
+<tr class="row-odd"><td><p>overwrite</p></td>
 <td><p>boolean</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>If True, any existing model products (compilation products, wrapper scripts,
 etc.) are removed prior to the run. If False, the products are not removed.
 Defaults to True. Setting this to False can improve the performance,
@@ -256,51 +262,46 @@ be done once the model has been fully debugged to ensure that each run is tested
 on a clean copy of the model. The value of this keyword also determines whether
 or not products are removed after a run.</p></td>
 </tr>
-<tr class="row-odd"><td><p>preserve_cache</p></td>
+<tr class="row-even"><td><p>preserve_cache</p></td>
 <td><p>boolean</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>If True model products will be kept following the run, otherwise all products
 will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.</p></td>
 </tr>
-<tr class="row-even"><td><p>products</p></td>
+<tr class="row-odd"><td><p>products</p></td>
 <td><p>array</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>Paths to files created by the model that should be cleaned up when the model
 exits. Entries can be absolute paths or paths relative to the working directory.
 Defaults to [].</p></td>
 </tr>
-<tr class="row-odd"><td><p>source_products</p></td>
+<tr class="row-even"><td><p>source_products</p></td>
 <td><p>array</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>Files created by running the model that are source files. These files will be
 removed without checking their extension so users should avoid adding files to
 this list unless they are sure they should be deleted. Defaults to [].</p></td>
 </tr>
-<tr class="row-even"><td><p>strace_flags</p></td>
+<tr class="row-odd"><td><p>strace_flags</p></td>
 <td><p>array</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>Flags to pass to strace (or dtrace). Defaults to [].</p></td>
 </tr>
-<tr class="row-odd"><td><p>valgrind_flags</p></td>
+<tr class="row-even"><td><p>valgrind_flags</p></td>
 <td><p>array</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>Flags to pass to valgrind. Defaults to [].</p></td>
 </tr>
-<tr class="row-even"><td><p>with_strace</p></td>
+<tr class="row-odd"><td><p>with_strace</p></td>
 <td><p>boolean</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>If True, the command is run with strace (on Linux) or dtrace (on MacOS).
 Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>with_valgrind</p></td>
+<tr class="row-even"><td><p>with_valgrind</p></td>
 <td><p>boolean</p></td>
-<td><p>X</p></td>
-<td><p>If True, the command is run with valgrind. Defaults to False.</p></td>
-</tr>
-<tr class="row-even"><td><p>working_dir</p></td>
-<td><p>string</p></td>
 <td></td>
-<td><p>Working directory. If not provided, the current working directory is used.</p></td>
+<td><p>If True, the command is run with valgrind. Defaults to False.</p></td>
 </tr>
 </tbody>
 </table>

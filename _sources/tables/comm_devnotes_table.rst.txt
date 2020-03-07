@@ -1,34 +1,35 @@
 .. _comm_devnotes_table_rst:
 
-====   ========================================   ================================================================================
-Comm   Address                                    Developer Notes                                                                 
-====   ========================================   ================================================================================
-ipc    An IPC message queue key.                  The default size limit for IPC message queues is 2048 bytes on Mac operating    
-                                                  systems so it is important that implementation of this communication mechanism  
-                                                  properly split and send messages larger than this limit as more than one        
-                                                  message.                                                                        
-rmq    AMPQ queue address of the form ``<url>_R   It is not advised that new language implement a RabbitMQ communication          
-       MQPARAM_<exchange>_RMQPARAM_<queue>``      interface. Rather RMQ communication is included explicitly for connections      
-       where ``url`` is the broker address (see   between models that are not co-located on the same machine and are used by the  
-       explanation `here <https://pika.readthed   |yggdrasil| framework connections on the Python side.                           
-       ocs.io/en/stable/examples/using_urlparam                                                                                   
-       eters.html>`_), ``exchange`` is the name                                                                                   
-       of the exchange on the queue that should                                                                                   
-       be used, and ``queue`` is the name of                                                                                      
-       the queue.                                                                                                                 
-zmq    A ZeroMQ endpoint of the form              |yggdrasil| uses the tcp transport by default with a PAIR socket type. For every
-       <transport>://<address>, where the         connection, |yggdrasil| establishes a second request/reply connection that is   
-       format of address depends on the           used to confirm messages passed between the primary PAIR of sockets. On the     
-       transport. Additional information can be   first send, the model should create a REP socket on an open tcp address and send
-       found `here                                that address in the header of the first message under the key 'zmq_reply'.      
-       <http://api.zeromq.org/3-2:zmq-bind>`_.    Receiving models should check message headers for this key and, on receipt,     
-                                                  establish the partner REQ socket with the specified address (receiving comms can
-                                                  receive from more than one source so they can have more than one request        
-                                                  addresses at at time for this purpose). Following every message, the sending    
-                                                  model should wait for a message on the reply socket and, on receipt, return the 
-                                                  message. Following every message, the receiving model should send the message   
-                                                  'YGG_REPLY' on the request socket and wait for a reply. When creating worker    
-                                                  comms for sending large messages, the sending model should create the reply comm
-                                                  for the worker in advanced and send it in the header with the worker address    
-                                                  under the key 'zmq_reply_worker'.                                               
-====   ========================================   ================================================================================
+======   ========================================   ================================================================================
+Comm     Address                                    Developer Notes                                                                 
+======   ========================================   ================================================================================
+buffer                                                                                                                              
+ipc      An IPC message queue key.                  The default size limit for IPC message queues is 2048 bytes on Mac operating    
+                                                    systems so it is important that implementation of this communication mechanism  
+                                                    properly split and send messages larger than this limit as more than one        
+                                                    message.                                                                        
+rmq      AMPQ queue address of the form ``<url>_R   It is not advised that new language implement a RabbitMQ communication          
+         MQPARAM_<exchange>_RMQPARAM_<queue>``      interface. Rather RMQ communication is included explicitly for connections      
+         where ``url`` is the broker address (see   between models that are not co-located on the same machine and are used by the  
+         explanation `here <https://pika.readthed   |yggdrasil| framework connections on the Python side.                           
+         ocs.io/en/stable/examples/using_urlparam                                                                                   
+         eters.html>`_), ``exchange`` is the name                                                                                   
+         of the exchange on the queue that should                                                                                   
+         be used, and ``queue`` is the name of                                                                                      
+         the queue.                                                                                                                 
+zmq      A ZeroMQ endpoint of the form              |yggdrasil| uses the tcp transport by default with a PAIR socket type. For every
+         <transport>://<address>, where the         connection, |yggdrasil| establishes a second request/reply connection that is   
+         format of address depends on the           used to confirm messages passed between the primary PAIR of sockets. On the     
+         transport. Additional information can be   first send, the model should create a REP socket on an open tcp address and send
+         found `here                                that address in the header of the first message under the key 'zmq_reply'.      
+         <http://api.zeromq.org/3-2:zmq-bind>`_.    Receiving models should check message headers for this key and, on receipt,     
+                                                    establish the partner REQ socket with the specified address (receiving comms can
+                                                    receive from more than one source so they can have more than one request        
+                                                    addresses at at time for this purpose). Following every message, the sending    
+                                                    model should wait for a message on the reply socket and, on receipt, return the 
+                                                    message. Following every message, the receiving model should send the message   
+                                                    'YGG_REPLY' on the request socket and wait for a reply. When creating worker    
+                                                    comms for sending large messages, the sending model should create the reply comm
+                                                    for the worker in advanced and send it in the header with the worker address    
+                                                    under the key 'zmq_reply_worker'.                                               
+======   ========================================   ================================================================================

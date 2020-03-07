@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.normalizer &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.metaschema.normalizer &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -176,7 +177,6 @@
 <span class="kn">import</span> <span class="nn">jsonschema</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">get_type_class</span><span class="p">,</span> <span class="n">_jsonschema_ver_maj</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -543,46 +543,6 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span>
 
-    <span class="k">def</span> <span class="nf">iter_errors_js2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wrapper that can be added to classes for jsonschema &lt; 3.0 to allow</span>
-<span class="sd">        for boolean schema.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">_schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span>
-        <span class="k">if</span> <span class="n">_schema</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">elif</span> <span class="n">_schema</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span>
-                <span class="s2">&quot;False schema does not allow </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">instance</span><span class="p">,),</span>
-                <span class="n">validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">validator_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">instance</span><span class="o">=</span><span class="n">instance</span><span class="p">,</span>
-                <span class="n">schema</span><span class="o">=</span><span class="n">_schema</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">iter_errors</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="n">_schema</span><span class="p">):</span>
-                <span class="k">yield</span> <span class="n">e</span>
-
-    <span class="k">def</span> <span class="nf">is_type_js2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">types</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Jsonschema &lt; 3.0 wrapper for method that determines if an object is</span>
-<span class="sd">        an example of the given type.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            instance (object): Object to test against to the type.</span>
-<span class="sd">            type (str, list): Name of single type or a list of types that</span>
-<span class="sd">                instance should be tested against.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            bool: True if the instance is of the specified type(s). False</span>
-<span class="sd">                otherwise.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">types</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">types</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span>
-
-    <span class="k">if</span> <span class="n">_jsonschema_ver_maj</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="n">Normalizer</span><span class="o">.</span><span class="n">iter_errors</span> <span class="o">=</span> <span class="n">iter_errors_js2</span>
-        <span class="n">Normalizer</span><span class="o">.</span><span class="n">is_type</span> <span class="o">=</span> <span class="n">is_type_js2</span>
     <span class="k">return</span> <span class="n">Normalizer</span></div>
 </pre></div>
 

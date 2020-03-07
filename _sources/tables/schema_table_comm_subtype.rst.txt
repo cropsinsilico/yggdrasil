@@ -3,6 +3,7 @@
 =========   ================================================================================
 Commtype    Description                                                                     
 =========   ================================================================================
+buffer      Communication mechanism that should be used.                                    
 default     [DEFAULT] Communication mechanism selected based on the current platform.       
 ipc         Interprocess communication (IPC) queue.                                         
 rmq         RabbitMQ connection.                                                            

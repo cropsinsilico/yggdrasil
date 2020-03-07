@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.ZMQComm &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.communication.ZMQComm &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -175,7 +176,7 @@
 <span class="kn">import</span> <span class="nn">zmq</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">AsyncComm</span>
 
 
@@ -565,10 +566,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">socket_action</span> <span class="o">=</span> <span class="n">socket_action</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">socket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">LINGER</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">topic_filter</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">topic_filter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topic_filter</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span><span class="n">topic_filter</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dealer_identity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dealer_identity</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dealer_identity</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">dealer_identity</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dealer_identity</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span><span class="n">dealer_identity</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_openned</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span> <span class="o">=</span> <span class="kc">False</span>
@@ -815,11 +816,12 @@
 
 <div class="viewcode-block" id="ZMQComm.set_reply_socket_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.set_reply_socket_recv">[docs]</a>    <span class="k">def</span> <span class="nf">set_reply_socket_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the recv reply socket if the address dosn&#39;t exist.&quot;&quot;&quot;</span>
+        <span class="n">address</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">address</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_recv</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">REQ</span><span class="p">)</span>
             <span class="n">s</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">LINGER</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="s1">&#39;REPLY_RECV_&#39;</span> <span class="o">+</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">address</span><span class="p">),</span> <span class="n">s</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="s1">&#39;REPLY_RECV_&#39;</span> <span class="o">+</span> <span class="n">address</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_lock</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_n_reply_recv</span><span class="p">[</span><span class="n">address</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_n_zmq_recv</span><span class="p">[</span><span class="n">address</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -966,7 +968,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">socket</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_recv</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">socket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="s2">&quot;REPLY_RECV_&quot;</span> <span class="o">+</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="s2">&quot;REPLY_RECV_&quot;</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ZMQComm.server_exists"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.server_exists">[docs]</a>    <span class="k">def</span> <span class="nf">server_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srv_address</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a server exists.</span>
@@ -1162,8 +1164,8 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">identity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">identity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dealer_identity</span>
-        <span class="n">topic</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
-        <span class="n">identity</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">identity</span><span class="p">)</span>
+        <span class="n">topic</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
+        <span class="n">identity</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span><span class="n">identity</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket_type_name</span> <span class="o">==</span> <span class="s1">&#39;PUB&#39;</span><span class="p">:</span>
             <span class="n">total_msg</span> <span class="o">=</span> <span class="n">topic</span> <span class="o">+</span> <span class="n">_flag_zmq_filter</span> <span class="o">+</span> <span class="n">msg</span>
         <span class="k">else</span><span class="p">:</span>

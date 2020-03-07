@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.examples.tests.test_types &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.examples.tests.test_types &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
@@ -173,6 +174,7 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="k">import</span> <span class="n">get_language_ext</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">get_type_class</span>
@@ -182,17 +184,38 @@
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">encode_type</span>
 
 
+<span class="n">_all_lang</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">()</span>
+<span class="n">_typed_lang</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_all_lang</span> <span class="k">if</span>
+                     <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">is_typed</span><span class="p">])</span>
+
+
 <div class="viewcode-block" id="TestExampleTypes"><a class="viewcode-back" href="../../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_types.TestExampleTypes">[docs]</a><span class="nd">@long_running</span>
 <span class="k">class</span> <span class="nc">TestExampleTypes</span><span class="p">(</span><span class="n">ExampleTstBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the Types example.&quot;&quot;&quot;</span>
 
     <span class="n">example_name</span> <span class="o">=</span> <span class="s1">&#39;types&#39;</span>
-    <span class="n">iter_over</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">]</span>
+    <span class="n">iter_over</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span><span class="p">]</span>
+    <span class="n">iter_skip</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">set</span><span class="p">(</span><span class="n">_typed_lang</span><span class="p">),</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;run_example_generic&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">_typed_lang</span><span class="p">),</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;run_example_pointers&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="s1">&#39;c&#39;</span><span class="p">]),</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;run_example_c_nolengths&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="s1">&#39;c&#39;</span><span class="p">]),</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;run_example_c_prefixes&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode&#39;</span><span class="p">]),</span> <span class="s1">&#39;run_example_c_nolengths&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;1darray&#39;</span><span class="p">,</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">]),</span> <span class="s1">&#39;run_example_c_prefixes&#39;</span><span class="p">),</span>
+                 <span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;array&#39;</span><span class="p">]),</span> <span class="s1">&#39;run_example_split_array&#39;</span><span class="p">)]</span>
+    <span class="n">iter_flaky</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;instance&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;instance&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)]</span>
+    <span class="n">iter_list_language</span> <span class="o">=</span> <span class="n">_all_lang</span>
+    <span class="n">iter_list_method</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;run_example&#39;</span><span class="p">,</span> <span class="s1">&#39;run_example_generic&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;run_example_pointers&#39;</span><span class="p">,</span> <span class="s1">&#39;run_example_c_nolengths&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;run_example_c_prefixes&#39;</span><span class="p">,</span> <span class="s1">&#39;run_example_split_array&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestExampleTypes</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">datatype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of datatype being used by the current iteration.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -415,49 +438,47 @@
 <div class="viewcode-block" id="TestExampleTypes.check_results"><a class="viewcode-back" href="../../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_types.TestExampleTypes.check_results">[docs]</a>    <span class="k">def</span> <span class="nf">check_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;This should be overridden with checks for the result.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
-    
-<div class="viewcode-block" id="TestExampleTypes.run_example"><a class="viewcode-back" href="../../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_types.TestExampleTypes.run_example">[docs]</a>    <span class="k">def</span> <span class="nf">run_example</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestExampleTypes.run_example"><a class="viewcode-back" href="../../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_types.TestExampleTypes.run_example">[docs]</a>    <span class="k">def</span> <span class="nf">run_example</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;This runs an example in the correct language.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaml</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">setup_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
-                                                   <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">)]</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestExampleTypes</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">,</span>
+                                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestExampleTypes</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="TestExampleTypes.run_example_generic"><a class="viewcode-back" href="../../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_types.TestExampleTypes.run_example_generic">[docs]</a>    <span class="k">def</span> <span class="nf">run_example_generic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Version of the example using generic type.&quot;&quot;&quot;</span>
         <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">drv</span><span class="o">.</span><span class="n">is_typed</span><span class="p">:</span>
-            <span class="c1"># Version using generic type</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">setup_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
-                                                   <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">,</span>
-                                                   <span class="n">using_generics</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
-            <span class="nb">super</span><span class="p">(</span><span class="n">TestExampleTypes</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
-            <span class="c1"># Version using pointers</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">setup_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
-                                                   <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">,</span>
-                                                   <span class="n">using_pointers</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
-            <span class="nb">super</span><span class="p">(</span><span class="n">TestExampleTypes</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
-            <span class="c1"># C Specific tests</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode&#39;</span><span class="p">]:</span>
-                    <span class="c1"># Version using pointers &amp; no lengths</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span> <span class="o">=</span> <span class="p">[</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">setup_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
-                                         <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">,</span>
-                                         <span class="n">using_pointers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                         <span class="n">dont_add_lengths</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
-                    <span class="nb">super</span><span class="p">(</span><span class="n">TestExampleTypes</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
-                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">:</span>
-                    <span class="c1"># Version using pointers &amp; prefixes</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span> <span class="o">=</span> <span class="p">[</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">setup_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
-                                         <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">,</span>
-                                         <span class="n">using_pointers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                         <span class="n">length_prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
-                    <span class="nb">super</span><span class="p">(</span><span class="n">TestExampleTypes</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
-        <span class="c1"># Version splitting array</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">(</span><span class="n">using_generics</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestExampleTypes.run_example_pointers"><a class="viewcode-back" href="../../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_types.TestExampleTypes.run_example_pointers">[docs]</a>    <span class="k">def</span> <span class="nf">run_example_pointers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Version of the example using pointers.&quot;&quot;&quot;</span>
+        <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">drv</span><span class="o">.</span><span class="n">is_typed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">(</span><span class="n">using_pointers</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="TestExampleTypes.run_example_c_nolengths"><a class="viewcode-back" href="../../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_types.TestExampleTypes.run_example_c_nolengths">[docs]</a>    <span class="k">def</span> <span class="nf">run_example_c_nolengths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Version of the example in C using pointers &amp; no lengths.&quot;&quot;&quot;</span>
+        <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">drv</span><span class="o">.</span><span class="n">is_typed</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode&#39;</span><span class="p">]))):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">(</span><span class="n">using_pointers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">dont_add_lengths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="TestExampleTypes.run_example_c_prefixes"><a class="viewcode-back" href="../../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_types.TestExampleTypes.run_example_c_prefixes">[docs]</a>    <span class="k">def</span> <span class="nf">run_example_c_prefixes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Version of the example in C using pointers &amp; prefixes.&quot;&quot;&quot;</span>
+        <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">drv</span><span class="o">.</span><span class="n">is_typed</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;1darray&#39;</span><span class="p">,</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">]))):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">(</span><span class="n">using_pointers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">length_prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestExampleTypes.run_example_split_array"><a class="viewcode-back" href="../../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_types.TestExampleTypes.run_example_split_array">[docs]</a>    <span class="k">def</span> <span class="nf">run_example_split_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Version of the example where array is split.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">setup_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
-                                                   <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">,</span>
-                                                   <span class="n">split_array</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
-            <span class="nb">super</span><span class="p">(</span><span class="n">TestExampleTypes</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">(</span><span class="n">split_array</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

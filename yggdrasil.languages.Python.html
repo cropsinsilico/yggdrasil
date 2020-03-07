@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.languages.Python package &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.languages.Python package &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -190,6 +191,47 @@
 used. Defaults to DefaultComm if not provided.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to DefaultComm.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.languages.Python.YggInterface.YggArrayInput">
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggArrayInput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggArrayInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggArrayInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling table-like formatted input as arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the input message queue that input should be
+received from.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm.DefaultComm" title="yggdrasil.communication.DefaultComm.DefaultComm">DefaultComm</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.languages.Python.YggInterface.YggArrayOutput">
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggArrayOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggArrayOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggArrayOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling table-like formatted output as arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the message queue where output should be sent.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Communication object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm.DefaultComm" title="yggdrasil.communication.DefaultComm.DefaultComm">DefaultComm</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -304,7 +346,7 @@ entries. Default to False.</p></li>
 
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggAsciiTableOutput">
-<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggAsciiTableOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">fmt</em>, <em class="sig-param">as_array=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggAsciiTableOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">fmt=None</em>, <em class="sig-param">as_array=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling table-like formatted output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -463,7 +505,7 @@ received from.</p></li>
 <dl class="function">
 <dt id="yggdrasil.languages.Python.YggInterface.YggPandasOutput">
 <code class="sig-prename descclassname">yggdrasil.languages.Python.YggInterface.</code><code class="sig-name descname">YggPandasOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggPandasOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.languages.Python.YggInterface.YggPandasOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get class for handling pandasd output.</p>
+<dd><p>Get class for handling Pandas output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

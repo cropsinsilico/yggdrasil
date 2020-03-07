@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -200,14 +201,9 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘table’, ‘pandas’, ‘map’]</p></td>
+<td><p>[‘map’, ‘table’, ‘pandas’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>dont_write_header</p></td>
-<td><p>boolean</p></td>
-<td><p>If True, headers will not be added to serialized tables. Defaults to False.</p></td>
-<td><p>[‘pandas’]</p></td>
-</tr>
-<tr class="row-even"><td><p>encoded_datatype</p></td>
+<tr class="row-odd"><td><p>encoded_datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema describing the type that serialized objects should conform to.
 Defaults to the class attribute default_encoded_datatype. If either
@@ -215,49 +211,55 @@ func_serialize or func_deserialize are not provided, this needs to be specified
 in order to serialize non-bytes objects.</p></td>
 <td><p>[‘functional’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>encoding</p></td>
+<tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
 <td><p>Encoding that should be used to serialize the object. Defaults to ‘utf-8’.</p></td>
 <td><p>[‘yaml’]</p></td>
 </tr>
-<tr class="row-even"><td><p>field_names</p></td>
+<tr class="row-odd"><td><p>field_names</p></td>
 <td><p>array</p></td>
 <td><p>The names of fields in the format string. If not provided, names are set based
 on the order of the fields in the format string.</p></td>
 <td><p>[‘table’, ‘pandas’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>field_units</p></td>
+<tr class="row-even"><td><p>field_units</p></td>
 <td><p>array</p></td>
 <td><p>The units of fields in the format string. If not provided, all fields are
 assumed to be dimensionless.</p></td>
 <td><p>[‘table’, ‘pandas’]</p></td>
 </tr>
-<tr class="row-even"><td><p>format_str</p></td>
+<tr class="row-odd"><td><p>format_str</p></td>
 <td><p>string</p></td>
 <td><p>If provided, this string will be used to format messages from a list of
 arguments and parse messages to get a list of arguments in C printf/scanf style.
 Defaults to None and messages are assumed to already be bytes.</p></td>
 <td><p>[‘table’, ‘pandas’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>func_deserialize</p></td>
+<tr class="row-even"><td><p>func_deserialize</p></td>
 <td><p>function</p></td>
 <td><p>Callable object that takes objects of a type that conforms to encoded_datatype
 and returns a deserialized Python object. Defaults to None and the default
 deserialization for encoded_datatype will be used.</p></td>
 <td><p>[‘functional’]</p></td>
 </tr>
-<tr class="row-even"><td><p>func_serialize</p></td>
+<tr class="row-odd"><td><p>func_serialize</p></td>
 <td><p>function</p></td>
 <td><p>Callable object that takes Python objects as input and returns a representation
 that conforms to encoded_datatype. Defaults to None and the default
 serialization for encoded_datatype will be used.</p></td>
 <td><p>[‘functional’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>indent</p></td>
+<tr class="row-even"><td><p>indent</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
 <td><p>[‘json’, ‘yaml’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>no_header</p></td>
+<td><p>boolean</p></td>
+<td><p>If True, headers will not be read or serialized from/to tables. Defaults to
+False.</p></td>
+<td><p>[‘pandas’]</p></td>
 </tr>
 <tr class="row-even"><td><p>sort_keys</p></td>
 <td><p>boolean</p></td>
@@ -265,7 +267,12 @@ seiralized structure. Defaults to ‘t’.</p></td>
 to True.</p></td>
 <td><p>[‘json’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>use_astropy</p></td>
+<tr class="row-odd"><td><p>str_as_bytes</p></td>
+<td><p>boolean</p></td>
+<td><p>If True, strings in columns are read as bytes. Defaults to False.</p></td>
+<td><p>[‘pandas’]</p></td>
+</tr>
+<tr class="row-even"><td><p>use_astropy</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>

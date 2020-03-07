@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests.test_schema &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.tests.test_schema &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -265,7 +266,11 @@
         <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">classes</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">ksub</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">classes</span><span class="p">:</span>
             <span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_properties</span><span class="p">(</span><span class="n">ksub</span><span class="p">)</span>
-            <span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">default_subtype</span></div>
+            <span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">default_subtype</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">get_schema</span><span class="p">(</span><span class="n">relaxed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">get_schema</span><span class="p">(</span><span class="n">allow_instance</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">definitions</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">form_schema</span></div>
 
 
 <div class="viewcode-block" id="test_create_schema"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_schema.test_create_schema">[docs]</a><span class="k">def</span> <span class="nf">test_create_schema</span><span class="p">():</span>
@@ -350,6 +355,17 @@
                          <span class="n">allow_instance</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">s</span><span class="o">.</span><span class="n">validate_component</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">invalid</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="s1">&#39;base&#39;</span><span class="p">,</span>
                          <span class="n">allow_instance</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_get_model_form_schema"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_schema.test_get_model_form_schema">[docs]</a><span class="k">def</span> <span class="nf">test_get_model_form_schema</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_model_form_schema.&quot;&quot;&quot;</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span> <span class="s1">&#39;temp.json&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">schema</span><span class="o">.</span><span class="n">get_model_form_schema</span><span class="p">(</span><span class="n">fname_dst</span><span class="o">=</span><span class="n">fname</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

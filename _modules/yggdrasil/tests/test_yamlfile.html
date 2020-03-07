@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests.test_yamlfile &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.tests.test_yamlfile &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -172,9 +173,9 @@
 <span></span><span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">io</span> <span class="k">as</span> <span class="nn">sio</span>
 <span class="kn">from</span> <span class="nn">jsonschema.exceptions</span> <span class="k">import</span> <span class="n">ValidationError</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">yamlfile</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.backwards</span> <span class="k">import</span> <span class="n">StringIO</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">YggTestClass</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
 <span class="n">_yaml_env</span> <span class="o">=</span> <span class="s1">&#39;TEST_YAML_FILE&#39;</span>
 
@@ -206,13 +207,13 @@
             <span class="n">out</span> <span class="o">=</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">load_yaml</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">dict_read</span><span class="p">)</span>
         <span class="c1"># Open stream</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">load_yaml</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">contents</span><span class="p">))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">load_yaml</span><span class="p">(</span><span class="n">sio</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">contents</span><span class="p">))</span>
         <span class="n">assert_equal</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">dict_read</span><span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="c1"># Remove file</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
-            
+
 
 <div class="viewcode-block" id="test_load_yaml_error"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.test_load_yaml_error">[docs]</a><span class="k">def</span> <span class="nf">test_load_yaml_error</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error on loading invalid file.&quot;&quot;&quot;</span>
@@ -230,12 +231,17 @@
 <div class="viewcode-block" id="YamlTestBase"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase">[docs]</a><span class="k">class</span> <span class="nc">YamlTestBase</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test base for yamlfile.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
+    <span class="n">_include</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
+    <span class="n">_use_json</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_files</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nfiles</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_fname</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">include</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">include_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_fname</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;_incl&#39;</span><span class="p">))</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -246,6 +252,11 @@
     <span class="k">def</span> <span class="nf">contents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Contents of files.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contents</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">include</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Contents of included files.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_include</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">yaml_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -259,6 +270,12 @@
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">yaml_env</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">fname</span><span class="p">,</span> <span class="n">content</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">):</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">include_files</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">include</span><span class="p">)):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yaml_env</span><span class="p">,</span> <span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">content</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="YamlTestBase.teardown"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -268,11 +285,16 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="YamlTestBase.get_fname"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase.get_fname">[docs]</a>    <span class="k">def</span> <span class="nf">get_fname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="YamlTestBase.get_fname"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase.get_fname">[docs]</a>    <span class="k">def</span> <span class="nf">get_fname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Path to temporary file.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_json</span><span class="p">:</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="s1">&#39;.json&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="s1">&#39;.yml&#39;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span>
-                            <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%d</span><span class="s1">.yml&#39;</span> <span class="o">%</span> <span class="p">(</span>
-                                <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempprefix</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span></div>
+                            <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%d%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                                <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempprefix</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
+                                <span class="n">idx</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">ext</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="YamlTestBase.create_instance"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase.create_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Create a new instance of the class.&quot;&quot;&quot;</span>
@@ -285,7 +307,14 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">nfiles</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span></div></div>
+            <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YamlTestBase.test_load_yaml_git"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase.test_load_yaml_git">[docs]</a>    <span class="k">def</span> <span class="nf">test_load_yaml_git</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">yml</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/cropsinsilico/example-fakemodel/fakemodel.yml&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">load_yaml</span><span class="p">,</span> <span class="n">yml</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s1">&#39;model&#39;</span> <span class="ow">in</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">load_yaml</span><span class="p">(</span><span class="s1">&#39;git:&#39;</span> <span class="o">+</span> <span class="n">yml</span><span class="p">))</span>
+        <span class="n">yml</span> <span class="o">=</span> <span class="s2">&quot;cropsinsilico/example-fakemodel/fakemodel.yml&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s1">&#39;model&#39;</span> <span class="ow">in</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">load_yaml</span><span class="p">(</span><span class="s1">&#39;git:&#39;</span> <span class="o">+</span> <span class="n">yml</span><span class="p">))</span></div></div>
 
 
 <div class="viewcode-block" id="YamlTestBaseError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBaseError">[docs]</a><span class="k">class</span> <span class="nc">YamlTestBaseError</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
@@ -298,6 +327,15 @@
             <span class="k">return</span>
         <span class="n">assert_raises</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error</span><span class="p">,</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span></div></div>
 
+
+<div class="viewcode-block" id="TestJSONModelOnly"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestJSONModelOnly">[docs]</a><span class="k">class</span> <span class="nc">TestJSONModelOnly</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parsing of different numbers/styles of models from JSON.&quot;&quot;&quot;</span>
+    <span class="n">_use_json</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;{&quot;models&quot;:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;   [{&quot;name&quot;: &quot;modelA&quot;,&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;     &quot;driver&quot;: &quot;GCCModelDriver&quot;,&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;     &quot;args&quot;: &quot;./src/modelA.c&quot;}]}&#39;</span><span class="p">],)</span></div>
+        
 
 <div class="viewcode-block" id="TestYamlModelOnly"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlModelOnly">[docs]</a><span class="k">class</span> <span class="nc">TestYamlModelOnly</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parsing of different numbers/styles of models.&quot;&quot;&quot;</span>
@@ -403,6 +441,27 @@
                   <span class="s1">&#39;    args: ./src/modelB.c&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    outputs:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;      - outputB&#39;</span><span class="p">],)</span></div>
+
+
+<div class="viewcode-block" id="TestYamlInclude"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlInclude">[docs]</a><span class="k">class</span> <span class="nc">TestYamlInclude</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection between I/O channels in yaml included from one.&quot;&quot;&quot;</span>
+    <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;include: {{ </span><span class="si">%s</span><span class="s1">0 }}&#39;</span> <span class="o">%</span> <span class="n">_yaml_env</span><span class="p">,</span>
+                  <span class="s1">&#39;models:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    args: ./src/modelA.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    inputs:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;      - inputA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;connections:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - input: outputB&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    output: inputA&#39;</span><span class="p">],)</span>
+    <span class="n">_include</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;  - name: modelB&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;    args: ./src/modelB.c&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;    outputs:&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;      - outputB&#39;</span><span class="p">],)</span></div>
 
 
 <div class="viewcode-block" id="TestYamlIODatatype"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlIODatatype">[docs]</a><span class="k">class</span> <span class="nc">TestYamlIODatatype</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>

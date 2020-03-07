@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Conditional I/O &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>Conditional I/O &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -36,7 +36,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="YAML Files" href="yaml.html" />
+    <link rel="next" title="Transformed I/O" href="transformed_io.html" />
     <link rel="prev" title="Autowrapping Model Functions" href="autowrap.html" /> 
 </head>
 
@@ -96,8 +96,15 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Conditional I/O</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#conditional-output">Conditional Output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#filter-options">Filter Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#general-filter-options">General Filter Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#filter-types">Filter Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#type-specific-filter-options">Type Specific Filter Options</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -179,6 +186,48 @@
 <div class="section" id="conditional-output">
 <h2>Conditional Output<a class="headerlink" href="#conditional-output" title="Permalink to this headline">¶</a></h2>
 <p>In the example below, the process represented by model B changes depending on the value of the input so that we can represent the relationship as a piecewise set of two functions with each one being valid under different conditions. In this case modelB_function1 is only valid if the input is &lt;=2 and modelB_function2 is only valid if the input is &gt;2.</p>
+<p>Model Code:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+    <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">out_val</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelB_function1</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+    <span class="c1"># Only valid if in_val &lt;= 2</span>
+    <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelB_function1(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelB_function2</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+    <span class="c1"># Only valid if in_val &gt; 2</span>
+    <span class="n">out_val</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelB_function2(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
+
+
+<span class="k">def</span> <span class="nf">condition_function2</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">in_val</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/conditional_io.html">Example in other languages</a>)</p>
+<p>To instruct yggdrasil to pass output from model A to the correct model B function under the required conditions, the YAML should contain a connection to both model B function inputs with the <code class="docutils literal notranslate"><span class="pre">filter</span></code> parameter added to both.</p>
 <p>Model YAML:</p>
 <div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -254,7 +303,101 @@
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/conditional_io.html">Example in other languages</a>)</p>
-<p><code class="docutils literal notranslate"><span class="pre">condition</span></code> values can be simple expressions of equality/inequality (in Python syntax) that reference the connection input as <code class="docutils literal notranslate"><span class="pre">%x%</span></code> (e.g. the condition for <code class="docutils literal notranslate"><span class="pre">inputB1</span></code> above). Alternatively, you can provide a value for the <code class="docutils literal notranslate"><span class="pre">condition_function</span></code> parameters. <code class="docutils literal notranslate"><span class="pre">condition_function</span></code> values should be of the form <code class="docutils literal notranslate"><span class="pre">&lt;filename&gt;:&lt;function</span> <span class="pre">name&gt;</span></code> where <code class="docutils literal notranslate"><span class="pre">filename</span></code> is the full path to the location of a Python source file containing the desired function that should be used to determine if the condition is satisfied and <code class="docutils literal notranslate"><span class="pre">function</span> <span class="pre">name</span></code> is the name of the desired funtion (e.g. the condition for <code class="docutils literal notranslate"><span class="pre">inputB2</span></code> above). Functions used in such cases should take a single argument (the variable or tuple of variables being passed by the connection), and return a boolean (the validity of the condition being represented). The path to the file containing the function can be absolute or relative to the directory containing the yaml file.</p>
+<p><code class="docutils literal notranslate"><span class="pre">filter</span></code> values are maps with either <code class="docutils literal notranslate"><span class="pre">statement</span></code> or <code class="docutils literal notranslate"><span class="pre">function</span></code> parameters (see <a class="reference internal" href="tables/schema_table_filter_general.html#schema-table-filter-general-rst"><span class="std std-ref">here</span></a>) and any additional filter parameters (see <a class="reference internal" href="tables/schema_table_filter_specific.html#schema-table-filter-specific-rst"><span class="std std-ref">here</span></a>). <code class="docutils literal notranslate"><span class="pre">statement</span></code> filters are simple expressions of equality/inequality (in Python syntax) that reference the connection input as <code class="docutils literal notranslate"><span class="pre">%x%</span></code> (e.g. the filter for <code class="docutils literal notranslate"><span class="pre">python_modelB1:input</span></code> above). Alternatively, you can provide a value for the <code class="docutils literal notranslate"><span class="pre">function</span></code> parameter which encodes a filter using a Python function. <code class="docutils literal notranslate"><span class="pre">function</span></code> values should be of the form <code class="docutils literal notranslate"><span class="pre">&lt;filename&gt;:&lt;function</span> <span class="pre">name&gt;</span></code> where <code class="docutils literal notranslate"><span class="pre">filename</span></code> is the full path to the location of a Python source file containing the desired function that should be used to determine if the condition is satisfied and <code class="docutils literal notranslate"><span class="pre">function</span> <span class="pre">name</span></code> is the name of the desired function (e.g. the filter for <code class="docutils literal notranslate"><span class="pre">python_modelB2:input</span></code> above). Functions used in such cases should take a single argument (the variable or tuple of variables being passed by the connection), and return a boolean (the validity of the condition being represented). The path to the file containing the function can be absolute or relative to the directory containing the yaml file.</p>
+</div>
+<div class="section" id="filter-options">
+<h2>Filter Options<a class="headerlink" href="#filter-options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="general-filter-options">
+<h3>General Filter Options<a class="headerlink" href="#general-filter-options" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default" id="schema-table-filter-general-rst">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 6%" />
+<col style="width: 7%" />
+<col style="width: 75%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>filtertype</p></td>
+<td></td>
+<td></td>
+<td><p>(Options described <a class="reference internal" href="tables/schema_table_filter_subtype.html#schema-table-filter-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p>initial_state</p></td>
+<td><p>object</p></td>
+<td></td>
+<td><p>Dictionary of initial state variables that should be set when the filter is
+created.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="filter-types">
+<h3>Filter Types<a class="headerlink" href="#filter-types" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default" id="schema-table-filter-subtype-rst">
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Filtertype</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>direct</p></td>
+</tr>
+<tr class="row-odd"><td><p>function</p></td>
+</tr>
+<tr class="row-even"><td><p>statement</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="type-specific-filter-options">
+<h3>Type Specific Filter Options<a class="headerlink" href="#type-specific-filter-options" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default" id="schema-table-filter-specific-rst">
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 66%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Valid For ‘Filtertype’ Of</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>function</p></td>
+<td><p>function</p></td>
+<td><p>The handle for a callable Python object (e.g. function) that should be used to
+determine if a message should be filtered or a string of the form “&lt;function
+file&gt;:&lt;function name&gt;” identifying a function where “&lt;function file&gt;” is the
+module or Python file containing the function and “&lt;function name&gt;” is the name
+of the function. The function should take the message as input and return a
+boolean, True if the message should pass through the filter, False if it should
+not.</p></td>
+<td><p>[‘function’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>statement</p></td>
+<td><p>string</p></td>
+<td><p>Python statement in terms of the message as represented by the string “%x%” that
+should evaluate to a boolean, True if the message should pass through the
+filter, False if it should not. The statement should only use a limited set of
+builtins and the math library (See yggdrasil.tools.safe_eval). If more complex
+relationships are required, use the FunctionFilter class.</p></td>
+<td><p>[‘statement’]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 
@@ -266,7 +409,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="yaml.html" class="btn btn-neutral float-right" title="YAML Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="transformed_io.html" class="btn btn-neutral float-right" title="Transformed I/O" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="autowrap.html" class="btn btn-neutral float-left" title="Autowrapping Model Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

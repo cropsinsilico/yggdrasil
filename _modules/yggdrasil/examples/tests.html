@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.examples.tests &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.examples.tests &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -174,8 +175,9 @@
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">flaky</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">ComponentMeta</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">runner</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">backwards</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">runner</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.examples</span> <span class="k">import</span> <span class="n">yamls</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">ext_map</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">YggTestBase</span><span class="p">,</span> <span class="n">check_enabled_languages</span>
 
@@ -185,9 +187,40 @@
 <span class="n">_default_comm</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_default_comm</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="make_iter_test"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.make_iter_test">[docs]</a><span class="k">def</span> <span class="nf">make_iter_test</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="iter_pattern_match"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.iter_pattern_match">[docs]</a><span class="k">def</span> <span class="nf">iter_pattern_match</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if two sets of iteration parameters match, allowing</span>
+<span class="sd">    for wild cards.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        a (tuple): Iteration parameters.</span>
+<span class="sd">        b (tuple): Iteration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the parameters match, False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="p">[</span><span class="n">iter_pattern_match</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">ib</span><span class="p">)</span> <span class="k">for</span> <span class="n">ib</span> <span class="ow">in</span> <span class="n">b</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span>
+    <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ia</span><span class="p">,</span> <span class="n">ib</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">ia</span> <span class="o">==</span> <span class="n">ib</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ia</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ib</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ia</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ib</span> <span class="ow">in</span> <span class="n">ia</span><span class="p">))</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ib</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ia</span> <span class="ow">in</span> <span class="n">ib</span><span class="p">))</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ia</span><span class="p">,</span> <span class="nb">set</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ia</span><span class="p">))</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ib</span><span class="p">,</span> <span class="nb">set</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ia</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ib</span><span class="p">))):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="make_iter_test"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.make_iter_test">[docs]</a><span class="k">def</span> <span class="nf">make_iter_test</span><span class="p">(</span><span class="n">is_flaky</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">itest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">is_flaky</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_flaky</span><span class="p">:</span>
+        <span class="n">itest</span> <span class="o">=</span> <span class="n">flaky</span><span class="o">.</span><span class="n">flaky</span><span class="p">(</span><span class="n">max_runs</span><span class="o">=</span><span class="mi">3</span><span class="p">)(</span><span class="n">itest</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">itest</span></div>
 
 
@@ -197,27 +230,35 @@
         <span class="n">iter_lists</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">iter_keys</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">test_name_fmt</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span>
+        <span class="n">iter_skip</span> <span class="o">=</span> <span class="n">dct</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;iter_skip&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">iter_flaky</span> <span class="o">=</span> <span class="n">dct</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;iter_flaky&#39;</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">iter_over</span> <span class="o">=</span> <span class="n">dct</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;iter_over&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;language&#39;</span><span class="p">])</span>
+        <span class="n">iter_aliases</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lang&#39;</span><span class="p">:</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;datatype&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;types&#39;</span><span class="p">:</span> <span class="s1">&#39;datatype&#39;</span><span class="p">}</span>
+        <span class="n">iter_over</span> <span class="o">=</span> <span class="p">[</span><span class="n">iter_aliases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">iter_over</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">iter_over</span><span class="p">:</span>
             <span class="n">test_name_fmt</span> <span class="o">+=</span> <span class="s1">&#39;_</span><span class="si">%s</span><span class="s1">&#39;</span>
-            <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;lang&#39;</span><span class="p">]:</span>
-                <span class="n">iter_lists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">()</span>
-                                  <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="s1">&#39;all_nomatlab&#39;</span><span class="p">])</span>
-                <span class="n">iter_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]:</span>
-                <span class="n">iter_lists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">get_supported_comm</span><span class="p">())</span>
-                <span class="n">iter_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;types&#39;</span><span class="p">]:</span>
-                <span class="n">iter_lists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">get_supported_type</span><span class="p">())</span>
-                <span class="n">iter_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">)</span>
+            <span class="n">x_iter_list</span> <span class="o">=</span> <span class="n">dct</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;iter_list_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ibase</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">x_iter_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">x_iter_list</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ibase</span><span class="p">,</span> <span class="s1">&#39;iter_list_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">x_iter_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">iter_lists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_iter_list</span><span class="p">)</span>
+                <span class="n">iter_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported iter dimension: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dct</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;example_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">iter_lists</span><span class="p">):</span>
-                <span class="n">itest_name</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">test_name_fmt</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">iter_pattern_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">iter_skip</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">itest_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">test_name_fmt</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">itest_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dct</span><span class="p">:</span>
-                    <span class="n">itest_func</span> <span class="o">=</span> <span class="n">make_iter_test</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span>
-                                                   <span class="nb">zip</span><span class="p">(</span><span class="n">iter_keys</span><span class="p">,</span> <span class="n">x</span><span class="p">)})</span>
+                    <span class="n">itest_func</span> <span class="o">=</span> <span class="n">make_iter_test</span><span class="p">(</span>
+                        <span class="n">is_flaky</span><span class="o">=</span><span class="n">iter_pattern_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">iter_flaky</span><span class="p">),</span>
+                        <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span>
+                           <span class="nb">zip</span><span class="p">(</span><span class="n">iter_keys</span><span class="p">,</span> <span class="n">x</span><span class="p">)})</span>
                     <span class="n">itest_func</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">itest_name</span>
                     <span class="n">dct</span><span class="p">[</span><span class="n">itest_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">itest_func</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ExampleMeta</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
@@ -237,14 +278,29 @@
     <span class="n">expects_error</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">env</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">iter_over</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;language&#39;</span><span class="p">]</span>
+    <span class="n">iter_skip</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">iter_flaky</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">iter_list_language</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="s1">&#39;all_nomatlab&#39;</span><span class="p">]</span>
+    <span class="n">iter_list_comm</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_comm</span><span class="p">()</span>
+    <span class="n">iter_list_datatype</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_type</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">example_name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iter_param</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">runner</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># self.debug_flag = True</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ExampleTstBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">language</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Language of the currect test.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Comm used by the current test.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">_default_comm</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">description_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -400,29 +456,52 @@
                 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fout</span><span class="p">):</span>
                     <span class="n">tools</span><span class="o">.</span><span class="n">remove_path</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">timer_class</span><span class="o">=</span><span class="n">timer_class</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ExampleTstBase.run_iteration"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.run_iteration">[docs]</a>    <span class="k">def</span> <span class="nf">run_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">datatype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ExampleTstBase.setup_iteration"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.setup_iteration">[docs]</a>    <span class="k">def</span> <span class="nf">setup_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform setup associated with an iteration.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">k_setup</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;setup_iteration_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">k_setup</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">k_setup</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iter_param</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
+
+<div class="viewcode-block" id="ExampleTstBase.teardown_iteration"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.teardown_iteration">[docs]</a>    <span class="k">def</span> <span class="nf">teardown_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform teardown associated with an iteration.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">k_teardown</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;teardown_iteration_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">k_teardown</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">k_teardown</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_param</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_param</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iter_param</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="ExampleTstBase.setup_iteration_language"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.setup_iteration_language">[docs]</a>    <span class="k">def</span> <span class="nf">setup_iteration_language</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform setup associated with a language iteration.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">check_enabled_languages</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">language</span></div>
+
+<div class="viewcode-block" id="ExampleTstBase.setup_iteration_comm"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.setup_iteration_comm">[docs]</a>    <span class="k">def</span> <span class="nf">setup_iteration_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform setup associated with a comm iteration.&quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="p">(</span><span class="n">comm</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> library not installed.&quot;</span>
+                                    <span class="o">%</span> <span class="n">comm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_default_comm</span><span class="p">(</span><span class="n">default_comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">comm</span></div>
+
+<div class="viewcode-block" id="ExampleTstBase.teardown_iteration_comm"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.teardown_iteration_comm">[docs]</a>    <span class="k">def</span> <span class="nf">teardown_iteration_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Peform teardown associated with a comm iteration.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_default_comm</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExampleTstBase.run_iteration"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.run_iteration">[docs]</a>    <span class="k">def</span> <span class="nf">run_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run a test for the specified parameters.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">check_environ_bool</span><span class="p">(</span><span class="s1">&#39;YGG_ENABLE_EXAMPLE_TESTS&#39;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="s2">&quot;Example tests not enabled.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">comm</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="p">(</span><span class="n">comm</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> library not installed.&quot;</span>
-                                    <span class="o">%</span> <span class="n">comm</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">check_enabled_languages</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">language</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="n">datatype</span>
-        <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">_default_comm</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">comm</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_default_comm</span><span class="p">(</span><span class="n">default_comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_iteration</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="s1">&#39;run_example&#39;</span><span class="p">))()</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reset_default_comm</span><span class="p">()</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">teardown_iteration</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

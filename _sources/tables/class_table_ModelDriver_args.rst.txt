@@ -3,20 +3,28 @@
 =================   ================================================================================   ========   ===========
 Option              Description                                                                        Required   Type       
 =================   ================================================================================   ========   ===========
-args                Argument(s) for running the model on the command line. This should be a complete   X          str or list
-                    command including the necessary executable and command line arguments to that                            
-                    executable.                                                                                              
-client_of           The names of one or more servers that this model is a client of. Defaults to                  str, list  
-                    empty list. Use of client_of with function is not currently supported.                                   
+args                The full path to the file containing the model program that will be run by the     X          str or list
+                    driver or a list starting with the program file and including any arguments that                         
+                    should be passed as input to the program.                                                                
+name                Unique name used to identify the model. This will be used to report errors         X          str        
+                    associated with the model.                                                                               
+client_of           The names of one or more models that this model will call as a server. If there               str, list  
+                    are more than one, this should be specified as a sequence collection (list). The                         
+                    corresponding channel(s) that should be passed to the yggdrasil API will be the                          
+                    name of the server model joined with the name of the client model with an                                
+                    underscore `<server_model>_<client_model>`. There will be one channel created                            
+                    for each server the model is a client of. Defaults to empty list. Use of                                 
+                    `client_of` with `function` is not currently supported.                                                  
 function            If provided, an integrated model is created by wrapping the function named here.              str        
                     The function must be located within the file specified by the source file listed                         
                     in the first argument. If not provided, the model must contain it's own calls to                         
                     the |yggdrasil| interface.                                                                               
-is_server           If True, the model is assumed to be a server and an instance of                               bool       
-                    :class:`yggdrasil.drivers.ServerDriver` is started. Defaults to False. Use of                            
-                    is_server with function is not currently supported.                                                      
+is_server           If `True`, the model is assumed to be a server for one or more client models and              bool       
+                    an instance of :class:`yggdrasil.drivers.ServerDriver` is started. The                                   
+                    corresponding channel that should be passed to the yggdrasil API will be the                             
+                    name of the model. Defaults to False. Use of `is_server` with `function` is not                          
+                    currently supported.                                                                                     
 model_index         Index of model in list of models being run. Defaults to 0.                                    int        
-name                Driver name.                                                                       X          str        
 outputs_in_inputs   If True, outputs from wrapped model functions are passed by pointer as inputs                 bool       
                     for modification and the return value will be a flag. If False, outputs are                              
                     limited to return values. Defaults to the value of the class attribute                                   

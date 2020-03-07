@@ -228,6 +228,22 @@ yggdrasil.examples.tests.test\_timed\_pipe module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.examples.tests.test\_transformed\_io module
+-----------------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_transformed_io
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.examples.tests.test\_transforms module
+------------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_transforms
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.examples.tests.test\_types module
 -------------------------------------------
 

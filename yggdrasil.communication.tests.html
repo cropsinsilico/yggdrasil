@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.tests package &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.communication.tests package &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -252,6 +253,25 @@
 
 </dd></dl>
 
+<dl class="class">
+<dt id="yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm_single">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.communication.tests.test_AsciiTableComm.</code><code class="sig-name descname">TestAsciiTableComm_single</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm_single"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm" title="yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm</span></code></a></p>
+<p>Test for AsciiTableComm communication class with field names sent.</p>
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm_single.get_options">
+<code class="sig-name descname">get_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm_single.get_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm_single.get_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get testing options.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm_single.test_send_dict_default">
+<code class="sig-name descname">test_send_dict_default</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm_single.test_send_dict_default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_AsciiTableComm.TestAsciiTableComm_single.test_send_dict_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test automated conversion of dictionary to pandas data frame.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="yggdrasil.communication.tests.test_AsciiTableComm.test_AsciiTableComm_nofmt">
 <code class="sig-prename descclassname">yggdrasil.communication.tests.test_AsciiTableComm.</code><code class="sig-name descname">test_AsciiTableComm_nofmt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_AsciiTableComm.html#test_AsciiTableComm_nofmt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_AsciiTableComm.test_AsciiTableComm_nofmt" title="Permalink to this definition">¶</a></dt>
@@ -286,6 +306,27 @@
 <dt id="yggdrasil.communication.tests.test_AsyncComm.TestAsyncComm.test_send_recv_direct">
 <code class="sig-name descname">test_send_recv_direct</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_AsyncComm.html#TestAsyncComm.test_send_recv_direct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_AsyncComm.TestAsyncComm.test_send_recv_direct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test send/recv direct.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-yggdrasil.communication.tests.test_BufferComm">
+<span id="yggdrasil-communication-tests-test-buffercomm-module"></span><h2>yggdrasil.communication.tests.test_BufferComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_BufferComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yggdrasil.communication.tests.test_BufferComm.TestBufferComm">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.communication.tests.test_BufferComm.</code><code class="sig-name descname">TestBufferComm</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_BufferComm.html#TestBufferComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_BufferComm.TestBufferComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase" title="yggdrasil.communication.tests.test_CommBase.TestCommBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_CommBase.TestCommBase</span></code></a></p>
+<p>Tests for BufferComm communication class.</p>
+<dl class="attribute">
+<dt id="yggdrasil.communication.tests.test_BufferComm.TestBufferComm.comm">
+<code class="sig-name descname">comm</code><em class="property"> = 'BufferComm'</em><a class="headerlink" href="#yggdrasil.communication.tests.test_BufferComm.TestBufferComm.comm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_BufferComm.TestBufferComm.test_error_name">
+<code class="sig-name descname">test_error_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_BufferComm.html#TestBufferComm.test_error_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_BufferComm.TestBufferComm.test_error_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on missing address.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1159,11 +1200,6 @@ close returns false.</p>
 <code class="sig-name descname">comm</code><em class="property"> = 'PandasFileComm'</em><a class="headerlink" href="#yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm.comm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm.testing_option_kws">
-<code class="sig-name descname">testing_option_kws</code><em class="property"> = {'not_as_frames': True}</em><a class="headerlink" href="#yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm.testing_option_kws" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -1173,7 +1209,7 @@ close returns false.</p>
 <p>Test for PandasFileComm communication class without field names sent.</p>
 <dl class="attribute">
 <dt id="yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm_nonames.testing_option_kws">
-<code class="sig-name descname">testing_option_kws</code><em class="property"> = {'no_names': True, 'not_as_frames': True}</em><a class="headerlink" href="#yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm_nonames.testing_option_kws" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">testing_option_kws</code><em class="property"> = {'no_names': True}</em><a class="headerlink" href="#yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm_nonames.testing_option_kws" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1228,11 +1264,74 @@ close returns false.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="yggdrasil-communication-tests-test-rmqasynccomm-module">
-<h2>yggdrasil.communication.tests.test_RMQAsyncComm module<a class="headerlink" href="#yggdrasil-communication-tests-test-rmqasynccomm-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-yggdrasil.communication.tests.test_RMQAsyncComm">
+<span id="yggdrasil-communication-tests-test-rmqasynccomm-module"></span><h2>yggdrasil.communication.tests.test_RMQAsyncComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_RMQAsyncComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.communication.tests.test_RMQAsyncComm.</code><code class="sig-name descname">TestRMQAsyncComm</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQAsyncComm.html#TestRMQAsyncComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_RMQComm.TestRMQComm" title="yggdrasil.communication.tests.test_RMQComm.TestRMQComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_RMQComm.TestRMQComm</span></code></a></p>
+<p>Test for RMQAsyncComm communication class.</p>
+<dl class="attribute">
+<dt id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.attr_list">
+<code class="sig-name descname">attr_list</code><em class="property"> = ['name', 'address', 'direction', 'serializer', 'recv_timeout', 'close_on_eof_recv', 'opp_address', 'opp_comms', 'maxMsgSize', 'dont_backlog', 'backlog_send_ready', 'backlog_recv_ready', 'connection', 'channel', 'times_connected', 'rmq_thread', 'rmq_lock']</em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.attr_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.comm">
+<code class="sig-name descname">comm</code><em class="property"> = 'RMQAsyncComm'</em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.comm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.test_reconnect">
+<code class="sig-name descname">test_reconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQAsyncComm.html#TestRMQAsyncComm.test_reconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.test_reconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test reconnect after unexpected disconnect.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.communication.tests.test_RMQAsyncComm.test_not_running">
+<code class="sig-prename descclassname">yggdrasil.communication.tests.test_RMQAsyncComm.</code><code class="sig-name descname">test_not_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQAsyncComm.html#test_not_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQAsyncComm.test_not_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test raise of an error if a RMQ server is not running.</p>
+</dd></dl>
+
 </div>
-<div class="section" id="yggdrasil-communication-tests-test-rmqcomm-module">
-<h2>yggdrasil.communication.tests.test_RMQComm module<a class="headerlink" href="#yggdrasil-communication-tests-test-rmqcomm-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-yggdrasil.communication.tests.test_RMQComm">
+<span id="yggdrasil-communication-tests-test-rmqcomm-module"></span><h2>yggdrasil.communication.tests.test_RMQComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_RMQComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yggdrasil.communication.tests.test_RMQComm.TestRMQComm">
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.communication.tests.test_RMQComm.</code><code class="sig-name descname">TestRMQComm</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQComm.html#TestRMQComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.TestRMQComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_AsyncComm.TestAsyncComm" title="yggdrasil.communication.tests.test_AsyncComm.TestAsyncComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_AsyncComm.TestAsyncComm</span></code></a></p>
+<p>Test for RMQComm communication class.</p>
+<dl class="attribute">
+<dt id="yggdrasil.communication.tests.test_RMQComm.TestRMQComm.attr_list">
+<code class="sig-name descname">attr_list</code><em class="property"> = ['name', 'address', 'direction', 'serializer', 'recv_timeout', 'close_on_eof_recv', 'opp_address', 'opp_comms', 'maxMsgSize', 'dont_backlog', 'backlog_send_ready', 'backlog_recv_ready', 'connection', 'channel']</em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.TestRMQComm.attr_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.communication.tests.test_RMQComm.TestRMQComm.comm">
+<code class="sig-name descname">comm</code><em class="property"> = 'RMQComm'</em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.TestRMQComm.comm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.communication.tests.test_RMQComm.TestRMQComm.timeout">
+<code class="sig-name descname">timeout</code><em class="property"> = 10.0</em><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.TestRMQComm.timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.communication.tests.test_RMQComm.test_not_running">
+<code class="sig-prename descclassname">yggdrasil.communication.tests.test_RMQComm.</code><code class="sig-name descname">test_not_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQComm.html#test_not_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.test_not_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test raise of an error if a RMQ server is not running.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.communication.tests.test_RMQComm.test_running">
+<code class="sig-prename descclassname">yggdrasil.communication.tests.test_RMQComm.</code><code class="sig-name descname">test_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_RMQComm.html#test_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_RMQComm.test_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test checking for server w/ URL.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-yggdrasil.communication.tests.test_ServerComm">
 <span id="yggdrasil-communication-tests-test-servercomm-module"></span><h2>yggdrasil.communication.tests.test_ServerComm module<a class="headerlink" href="#module-yggdrasil.communication.tests.test_ServerComm" title="Permalink to this headline">¶</a></h2>

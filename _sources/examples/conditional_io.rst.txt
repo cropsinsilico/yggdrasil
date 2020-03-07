@@ -32,7 +32,7 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelB2.cpp
+.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelA.cpp
    :language: c++
    :linenos:
 
@@ -40,7 +40,7 @@ Model Code:
    :language: c++
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelA.cpp
+.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelB2.cpp
    :language: c++
    :linenos:
 
@@ -84,11 +84,11 @@ Python Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelB1.py
+.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelA.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelA.py
+.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelB1.py
    :language: python
    :linenos:
 
@@ -110,15 +110,15 @@ R Version
 
 Model Code:
 
+.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelA.R
+   :language: python
+   :linenos:
+
 .. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelB1.R
    :language: python
    :linenos:
 
 .. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelB2.R
-   :language: python
-   :linenos:
-
-.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelA.R
    :language: python
    :linenos:
 

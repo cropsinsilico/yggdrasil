@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.CommBase &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.communication.CommBase &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -175,7 +176,10 @@
 <span class="kn">import</span> <span class="nn">atexit</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">serialize</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_equal</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="k">import</span> <span class="n">YGG_MSG_EOF</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">new_comm</span><span class="p">,</span> <span class="n">get_comm</span><span class="p">,</span> <span class="n">determine_suffix</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span><span class="p">,</span> <span class="n">create_component</span>
@@ -185,6 +189,7 @@
     <span class="n">JSONArrayMetaschemaType</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">JSONObjectMetaschemaType</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.transforms.TransformBase</span> <span class="k">import</span> <span class="n">TransformBase</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -380,7 +385,7 @@
 <span class="sd">            to &#39;send&#39;.</span>
 <span class="sd">        is_interface (bool, optional): Set to True if this comm is a Python</span>
 <span class="sd">            interface binding. Defaults to False.</span>
-<span class="sd">        langauge (str, optional): Programming language of the calling model.</span>
+<span class="sd">        language (str, optional): Programming language of the calling model.</span>
 <span class="sd">            Defaults to &#39;python&#39;.</span>
 <span class="sd">        partner_language (str, optional): Programming language of this comm&#39;s</span>
 <span class="sd">            partner comm. Defaults to &#39;python&#39;.</span>
@@ -452,10 +457,17 @@
 <span class="sd">        filter (:class:.FilterBase, optional): Callable class that will be used to</span>
 <span class="sd">            determine when messages should be sent/received. Defaults to None</span>
 <span class="sd">            and is ignored.</span>
+<span class="sd">        transform (:class:.TransformBase, optional): Callable class that will be</span>
+<span class="sd">            used to transform messages that are sent/received. Defaults to None</span>
+<span class="sd">            and is ignored.</span>
 <span class="sd">        is_default (bool, optional): If True, this comm was created to handle</span>
 <span class="sd">            all input/output variables to/from a model. Defaults to False. This</span>
 <span class="sd">            variable is used internally and should not be set explicitly in</span>
 <span class="sd">            the YAML.</span>
+<span class="sd">        outside_loop (bool, optional): If True, and the comm is an</span>
+<span class="sd">            input/outputs to/from a model being wrapped. The receive/send</span>
+<span class="sd">            calls for this comm will be outside the loop for the model.</span>
+<span class="sd">            Defaults to False.</span>
 <span class="sd">        **kwargs: Additional keywords arguments are passed to parent class.</span>
 
 <span class="sd">    Class Attributes:</span>
@@ -514,18 +526,18 @@
                                                        <span class="s1">&#39;that should be used.&#39;</span><span class="p">)},</span>
                           <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;schema&#39;</span><span class="p">,</span>
                                        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">}},</span>
-                          <span class="s1">&#39;recv_converter&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;oneOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+                          <span class="s1">&#39;recv_converter&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[</span>
                               <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/transform&#39;</span><span class="p">},</span>
                               <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">]},</span>
                               <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
-                               <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;oneOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+                               <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[</span>
                                    <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/transform&#39;</span><span class="p">},</span>
                                    <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">]}]}}]},</span>
-                          <span class="s1">&#39;send_converter&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;oneOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+                          <span class="s1">&#39;send_converter&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[</span>
                               <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/transform&#39;</span><span class="p">},</span>
                               <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">]},</span>
                               <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
-                               <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;oneOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+                               <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[</span>
                                    <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/transform&#39;</span><span class="p">},</span>
                                    <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">]}]}}]},</span>
                           <span class="s1">&#39;vars&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
@@ -533,13 +545,24 @@
                           <span class="s1">&#39;length_map&#39;</span><span class="p">:</span> <span class="p">{</span>
                               <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
                               <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
+                          <span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
                           <span class="s1">&#39;field_names&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
                                           <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
                           <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
                                           <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
                           <span class="s1">&#39;as_array&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
                           <span class="s1">&#39;filter&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/filter&#39;</span><span class="p">},</span>
-                          <span class="s1">&#39;is_default&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}</span>
+                          <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+                              <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/transform&#39;</span><span class="p">},</span>
+                              <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">]},</span>
+                              <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+                                   <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/transform&#39;</span><span class="p">},</span>
+                                   <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">]}]}}]},</span>
+                          <span class="s1">&#39;is_default&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+                          <span class="s1">&#39;outside_loop&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+                          <span class="s1">&#39;default_file&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/file&#39;</span><span class="p">}}</span>
     <span class="n">_schema_excluded_from_class</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
     <span class="n">_default_serializer</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span>
     <span class="n">_default_serializer_class</span> <span class="o">=</span> <span class="kc">None</span>
@@ -547,6 +570,8 @@
     <span class="n">is_file</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">_maxMsgSize</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">address_description</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">no_serialization</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">_model_schema_prop</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;is_default&#39;</span><span class="p">,</span> <span class="s1">&#39;outside_loop&#39;</span><span class="p">,</span> <span class="s1">&#39;default_file&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="n">dont_open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">is_interface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">partner_language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span>
@@ -592,6 +617,10 @@
             <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;python&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">language</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">partner_language</span> <span class="o">=</span> <span class="n">partner_language</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partner_language_driver</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">partner_language</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">partner_language_driver</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span>
+                <span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner_language</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language_driver</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span> <span class="o">=</span> <span class="n">is_client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_server</span> <span class="o">=</span> <span class="n">is_server</span>
@@ -678,22 +707,44 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;seri_kws = </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">seri_kws</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span> <span class="o">=</span> <span class="n">seri_cls</span><span class="p">(</span><span class="o">**</span><span class="n">seri_kws</span><span class="p">)</span>
         <span class="c1"># Set send/recv converter based on the serializer</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;recv_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;send_converter&#39;</span><span class="p">]:</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="p">:</span>
-                <span class="n">v</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                    <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span>
-                <span class="n">oldv</span> <span class="o">=</span> <span class="n">v</span>
-                <span class="n">v</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">iv</span> <span class="ow">in</span> <span class="n">oldv</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                        <span class="n">cls_conv</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language_driver</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span>
-                        <span class="n">iv</span> <span class="o">=</span> <span class="n">cls_conv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">iv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="n">v</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iv</span><span class="p">)</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="n">dir_conv</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_converter&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;transform&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_conv</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="c1"># setattr(self, dir_conv, self.transform)</span>
+        <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_conv</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_conv</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="p">,</span> <span class="n">dir_conv</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">iv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">cls_conv</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language_driver</span><span class="p">,</span> <span class="n">dir_conv</span> <span class="o">+</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span>
+                    <span class="n">iv</span> <span class="o">=</span> <span class="n">cls_conv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="n">iv</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">iv</span> <span class="o">=</span> <span class="n">create_component</span><span class="p">(</span><span class="s1">&#39;transform&#39;</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">iv</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">iv</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">get_schema</span>
+                    <span class="n">transform_schema</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transform&#39;</span><span class="p">)</span>
+                    <span class="n">transform_kws</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                        <span class="n">iv</span><span class="p">,</span>
+                        <span class="n">subtype</span><span class="o">=</span><span class="n">transform_schema</span><span class="o">.</span><span class="n">identify_subtype</span><span class="p">(</span><span class="n">iv</span><span class="p">))</span>
+                    <span class="n">iv</span> <span class="o">=</span> <span class="n">create_component</span><span class="p">(</span><span class="s1">&#39;transform&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">transform_kws</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="n">TransformBase</span><span class="p">):</span>
+                    <span class="k">pass</span>
+                <span class="k">elif</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">BuiltinFunctionType</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">,</span>
+                                       <span class="n">types</span><span class="o">.</span><span class="n">BuiltinMethodType</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">))</span>
+                       <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">))):</span>  <span class="c1"># pragma: matlab</span>
+                    <span class="n">iv</span> <span class="o">=</span> <span class="n">create_component</span><span class="p">(</span><span class="s1">&#39;transform&#39;</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">,</span>
+                                          <span class="n">function</span><span class="o">=</span><span class="n">iv</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unsupported transform type: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">iv</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">iv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="k">if</span> <span class="n">x</span><span class="p">]</span>
         <span class="c1"># Set filter</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">get_schema</span>
@@ -751,7 +802,7 @@
         <span class="n">msg_array</span> <span class="o">=</span> <span class="n">seri_cls</span><span class="o">.</span><span class="n">object2array</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">msg_array</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg_array&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg_array</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">],</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">):</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg_long&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_maxMsgSize</span> <span class="o">*</span> <span class="sa">b</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg_long&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span>
@@ -828,7 +879,8 @@
                     <span class="n">out</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="k">break</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">comm_class</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CommBase&#39;</span><span class="p">,</span> <span class="s1">&#39;AsyncComm&#39;</span><span class="p">,</span> <span class="s1">&#39;ForkComm&#39;</span><span class="p">,</span> <span class="s1">&#39;ErrorClass&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">comm_class</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CommBase&#39;</span><span class="p">,</span> <span class="s1">&#39;AsyncComm&#39;</span><span class="p">,</span> <span class="s1">&#39;ForkComm&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;ErrorClass&#39;</span><span class="p">]:</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">language</span> <span class="ow">in</span> <span class="n">lang_list</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Check driver</span>
@@ -1164,57 +1216,39 @@
 <span class="sd">            bool: True if the message indicates an EOF, False otherwise.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="CommBase.apply_recv_converter"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.apply_recv_converter">[docs]</a>    <span class="k">def</span> <span class="nf">apply_recv_converter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_in</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply recv_converter.</span>
+<div class="viewcode-block" id="CommBase.apply_transform"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.apply_transform">[docs]</a>    <span class="k">def</span> <span class="nf">apply_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_in</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Evaluate the transform to alter the emssage being sent/received.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            msg_in (object): Message to convert.</span>
-<span class="sd">        </span>
-<span class="sd">        Returns:</span>
-<span class="sd">            object: Converted message.</span>
-<span class="sd"> </span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_converter</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Applying converters to received message.&quot;</span><span class="p">)</span>
-        <span class="n">msg_out</span> <span class="o">=</span> <span class="n">msg_in</span>
-        <span class="k">for</span> <span class="n">iconv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_converter</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">iconv</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">iconv</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;pandas&#39;</span><span class="p">]:</span>
-                    <span class="c1"># These are referenced by string since they require the</span>
-                    <span class="c1"># serializer customized with information from the received</span>
-                    <span class="c1"># message(s) (e.g. column names).</span>
-                    <span class="n">msg_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">consolidate_array</span><span class="p">(</span><span class="n">msg_out</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">iconv</span> <span class="o">==</span> <span class="s1">&#39;pandas&#39;</span><span class="p">:</span>
-                        <span class="n">msg_out</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">numpy2pandas</span><span class="p">(</span><span class="n">msg_out</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unrecognized recv_converter string: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span>
-                                       <span class="n">iconv</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">msg_out</span> <span class="o">=</span> <span class="n">iconv</span><span class="p">(</span><span class="n">msg_out</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">msg_out</span></div>
+<span class="sd">            msg_in (object): Message being transformed.</span>
 
-<div class="viewcode-block" id="CommBase.apply_send_converter"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.apply_send_converter">[docs]</a>    <span class="k">def</span> <span class="nf">apply_send_converter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_in</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply send converter.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            msg_in (object): Message to convert.</span>
-<span class="sd">        </span>
 <span class="sd">        Returns:</span>
-<span class="sd">            object: Converted message.</span>
-<span class="sd"> </span>
+<span class="sd">            object: Transformed message.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_converter</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Applying converters to message being sent.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">msg_in</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Applying transformations to message being </span><span class="si">%s</span><span class="s2">.&quot;</span>
+                   <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
+        <span class="c1"># If receiving, update the expected datatypes to use information</span>
+        <span class="c1"># about the received datatype that was recorded by the serializer</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">initialized</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">original_datatype</span><span class="p">))):</span>
+            <span class="n">typedef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">typedef</span>
+            <span class="k">for</span> <span class="n">iconv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">iconv</span><span class="o">.</span><span class="n">original_datatype</span><span class="p">:</span>
+                    <span class="n">iconv</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
+                <span class="n">typedef</span> <span class="o">=</span> <span class="n">iconv</span><span class="o">.</span><span class="n">transformed_datatype</span>
+        <span class="c1"># Actual conversion</span>
         <span class="n">msg_out</span> <span class="o">=</span> <span class="n">msg_in</span>
-        <span class="k">for</span> <span class="n">iconv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_converter</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">iconv</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unrecognized send_converter string: &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span>
-                                   <span class="n">iconv</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">msg_out</span> <span class="o">=</span> <span class="n">iconv</span><span class="p">(</span><span class="n">msg_out</span><span class="p">)</span>
+        <span class="n">no_init</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span>
+                   <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">initialized</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">iconv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>
+            <span class="n">msg_out</span> <span class="o">=</span> <span class="n">iconv</span><span class="p">(</span><span class="n">msg_out</span><span class="p">,</span> <span class="n">no_init</span><span class="o">=</span><span class="n">no_init</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">msg_out</span></div>
 
 <div class="viewcode-block" id="CommBase.evaluate_filter"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.evaluate_filter">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">msg_in</span><span class="p">):</span>
@@ -1240,8 +1274,25 @@
     <span class="k">def</span> <span class="nf">empty_obj_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;obj: Empty message object.&quot;&quot;&quot;</span>
         <span class="n">emsg</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
-        <span class="n">emsg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_recv_converter</span><span class="p">(</span><span class="n">emsg</span><span class="p">)</span>
+        <span class="n">emsg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_transform</span><span class="p">(</span><span class="n">emsg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">emsg</span>
+
+<div class="viewcode-block" id="CommBase.is_empty"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">emsg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that a message matches an empty message object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (object): Message object.</span>
+<span class="sd">            emsg (object): Empty message object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the object is empty, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">assert_equal</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">emsg</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="CommBase.is_empty_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.is_empty_recv">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if a received message object is empty.</span>
@@ -1253,14 +1304,10 @@
 <span class="sd">            bool: True if the object is empty, False otherwise.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_eof</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="n">emsg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_obj_recv</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">emsg</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span> <span class="o">==</span> <span class="n">emsg</span><span class="p">))</span>
-        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="n">out</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_empty</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_obj_recv</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="CommBase.is_empty_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.is_empty_send">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if a message object being sent is empty.</span>
@@ -1272,13 +1319,9 @@
 <span class="sd">            bool: True if the object is empty, False otherwise.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">smsg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_send_converter</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">smsg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_transform</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="n">emsg</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">smsg</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">emsg</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">smsg</span> <span class="o">==</span> <span class="n">emsg</span><span class="p">))</span>
-        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="n">out</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_empty</span><span class="p">(</span><span class="n">smsg</span><span class="p">,</span> <span class="n">emsg</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="CommBase.chunk_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.chunk_message">[docs]</a>    <span class="k">def</span> <span class="nf">chunk_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Yield chunks of message of size maxMsgSize</span>
@@ -1510,7 +1553,7 @@
                 <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_n_sent</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_last_send</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">clock_time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_send</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span>
     
     <span class="k">def</span> <span class="nf">_send_1st</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1619,20 +1662,24 @@
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">,</span> <span class="n">work_comm</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_eof</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
             <span class="n">flag</span><span class="p">,</span> <span class="n">msg_s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_send_eof</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="c1"># Covert object</span>
-            <span class="n">msg_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_send_converter</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">msg_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_transform</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="c1"># Serialize</span>
             <span class="n">add_sinfo</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_send_serializer</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">add_sinfo</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Sending sinfo: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">)</span>
             <span class="n">msg_s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">msg_</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="n">header_kwargs</span><span class="p">,</span>
                                    <span class="n">add_serializer_info</span><span class="o">=</span><span class="n">add_sinfo</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_serialization</span><span class="p">:</span>
+                <span class="n">msg_len</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg_s</span><span class="p">)</span>
             <span class="c1"># Create work comm if message too large to be sent all at once</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msg_s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">msg_len</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">header_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">header_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
                 <span class="n">work_comm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_work_comm</span><span class="p">()</span>
@@ -1712,7 +1759,10 @@
         <span class="n">flag</span><span class="p">,</span> <span class="n">msg_s</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_send</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="n">header_kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">flag</span>
-        <span class="n">msg_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg_s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_serialization</span><span class="p">:</span>
+            <span class="n">msg_len</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg_s</span><span class="p">)</span>
         <span class="c1"># Sent first part of message which includes the header describing the</span>
         <span class="c1"># work comm</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">special_debug</span><span class="p">(</span><span class="s1">&#39;Sending </span><span class="si">%d</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="n">msg_len</span><span class="p">)</span>
@@ -1728,7 +1778,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">special_debug</span><span class="p">(</span><span class="s2">&quot;Sending message header failed.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Sent </span><span class="si">%d</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="n">msg_len</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">special_debug</span><span class="p">(</span><span class="s1">&#39;Failed to send </span><span class="si">%d</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="n">msg_len</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">flag</span></div>
 
@@ -1761,9 +1811,9 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_empty</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_n_recv</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_last_recv</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">clock_time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_recv</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1856,7 +1906,7 @@
             <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_recv_eof</span><span class="p">()</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="n">msg_</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incomplete&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_recv_converter</span><span class="p">(</span><span class="n">msg_</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_transform</span><span class="p">(</span><span class="n">msg_</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="n">msg_</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">second_pass</span><span class="p">:</span>
@@ -1933,8 +1983,12 @@
                 <span class="k">return</span> <span class="n">flag</span><span class="p">,</span> <span class="n">s_msg</span>
             <span class="c1"># Parse complete message</span>
             <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">header2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_recv</span><span class="p">(</span><span class="n">s_msg</span><span class="p">,</span> <span class="n">second_pass</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">flag</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_msg</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> bytes received&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_msg</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s_msg</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">msg_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg_len</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">flag</span> <span class="ow">and</span> <span class="p">(</span><span class="n">msg_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> bytes received&#39;</span><span class="p">,</span> <span class="n">msg_len</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span></div>
         
 <div class="viewcode-block" id="CommBase.recv_nolimit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

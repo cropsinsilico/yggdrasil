@@ -1,0 +1,382 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>yggdrasil.serialize.WOFOSTParamSerialize &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>yggdrasil.serialize.WOFOSTParamSerialize</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yggdrasil.serialize.WOFOSTParamSerialize</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">units</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.serialize.AsciiMapSerialize</span> <span class="k">import</span> <span class="n">AsciiMapSerialize</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="k">import</span> <span class="n">JSONReadableEncoder</span>
+
+
+<div class="viewcode-block" id="WOFOSTParamSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize">[docs]</a><span class="k">class</span> <span class="nc">WOFOSTParamSerialize</span><span class="p">(</span><span class="n">AsciiMapSerialize</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for serializing/deserializing WOFOST parameter files.&quot;&quot;&quot;</span>
+
+    <span class="n">_seritype</span> <span class="o">=</span> <span class="s1">&#39;wofost&#39;</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Serialization of mapping between &#39;</span>
+                                   <span class="s1">&#39;keys and scalar or array values &#39;</span>
+                                   <span class="s1">&#39;as used in the WOFOST parameter files.&#39;</span><span class="p">)</span>
+    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;delimiter&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39; = &#39;</span><span class="p">}}</span>
+    <span class="n">default_datatype</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">}</span>
+    <span class="n">concats_as_str</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_delimiter</span> <span class="o">=</span> <span class="s1">&#39; = &#39;</span>
+    <span class="n">_array_fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%5.5f</span><span class="s1">, </span><span class="si">%5.5f</span><span class="s1">&#39;</span>
+
+<div class="viewcode-block" id="WOFOSTParamSerialize.func_serialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (dict): Python dictionary to be serialized.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes, str: Serialized message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Serialization of non-string keys not supported.&quot;</span><span class="p">)</span>
+            <span class="n">iline</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="n">indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">iline</span><span class="p">)</span>
+                <span class="n">arr_lines</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">assert</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="k">assert</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">arr_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_array_fmt</span> <span class="o">%</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">iline</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;,</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">indent</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">arr_lines</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">iline</span> <span class="o">+=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">JSONReadableEncoder</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="n">iline</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+            
+<div class="viewcode-block" id="WOFOSTParamSerialize.func_deserialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (bytes): Message to be deserialized.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Deserialized Python dictionary.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">regex</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?:(?:(?P&lt;name&gt;.*?)\s+=\s+)|(?:\s+))&#39;</span>
+                 <span class="sa">r</span><span class="s1">&#39;(?P&lt;value1&gt;.*?)(?:,\s+(?P&lt;value2&gt;.*?)&#39;</span>
+                 <span class="sa">r</span><span class="s1">&#39;(?:,))?\s*(?:!\s*(?P&lt;description&gt;.*?)&#39;</span>
+                 <span class="sa">r</span><span class="s1">&#39;(?:[(?P&lt;units&gt;)]))?&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">),</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">units</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">is_arr</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="ow">or</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;**&#39;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">is_arr</span><span class="p">:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">units</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">is_arr</span><span class="p">:</span>
+                        <span class="n">u1</span><span class="p">,</span> <span class="n">u2</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+                        <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">u1</span><span class="p">)</span>
+                        <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">u2</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">units</span><span class="p">)</span>
+                <span class="n">is_arr</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value2&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+                <span class="n">k</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">if</span> <span class="n">is_arr</span><span class="p">:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[],</span> <span class="p">[]]</span>
+            <span class="n">desc</span> <span class="o">+=</span> <span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">units</span> <span class="o">+=</span> <span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">v1</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">is_arr</span><span class="p">:</span>
+                <span class="n">v2</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value2&#39;</span><span class="p">])</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v1</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="WOFOSTParamSerialize.concatenate"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.concatenate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">concatenate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">objects</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concatenate objects to get object that would be recieved if</span>
+<span class="sd">        the concatenated serialization were deserialized.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            objects (list): Objects to be concatenated.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Set of objects that results from concatenating those provided.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
+            <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">total</span><span class="p">]</span></div>
+        
+<div class="viewcode-block" id="WOFOSTParamSerialize.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary of variables to use for testing.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">WOFOSTParamSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">()</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;CRPNAM&#39;</span><span class="p">:</span> <span class="s1">&#39;Grain maize CSA practicals&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;TBASEM&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="s1">&#39;cel&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;TEFFMX&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">30.0</span><span class="p">,</span> <span class="s1">&#39;cel&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;TSUMEM&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">110.0</span><span class="p">,</span> <span class="s1">&#39;cel d&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;IDSL&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                           <span class="s1">&#39;DLO&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="o">-</span><span class="mf">99.0</span><span class="p">,</span> <span class="s1">&#39;hr&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;DLC&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="o">-</span><span class="mf">99.0</span><span class="p">,</span> <span class="s1">&#39;hr&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;TSUM1&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">900.0</span><span class="p">,</span> <span class="s1">&#39;cel d&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;TSUM2&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="s1">&#39;cel d&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;DTSMTB&#39;</span><span class="p">:</span> <span class="p">[</span>
+                               <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span>
+                                   <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">]),</span> <span class="s1">&#39;cel&#39;</span><span class="p">),</span>
+                               <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span>
+                                   <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">]),</span> <span class="s1">&#39;cell d&#39;</span><span class="p">)],</span>
+                           <span class="s1">&#39;DVSI&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                           <span class="s1">&#39;DVSEND&#39;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">}]</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;empty&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">b</span><span class="s1">&#39;CRPNAM=</span><span class="se">\&#39;</span><span class="s1">Grain maize CSA practicals</span><span class="se">\&#39;\n\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;** emergence</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;TBASEM   =   4.0    ! lower threshold temp. for emergence [cel]</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;TEFFMX   =  30.0    ! max. eff. temp. for emergence [cel]</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;TSUMEM   = 110.     ! temperature sum from sowing to emergence [cel d]</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;** phenology</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;IDSL     =   0      ! indicates whether pre-anthesis development depends</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;                    ! on temp. (=0), daylength (=1) , or both (=2)</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;DLO      = -99.0    ! optimum daylength for development [hr]</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;DLC      = -99.0    ! critical daylength (lower threshold) [hr]</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;TSUM1    = 900.     ! temperature sum from emergence to anthesis [cel d]</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;TSUM2    = 800.     ! temperature sum from anthesis to maturity [cel d]</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;DTSMTB   =   0.00,    0.00,     ! daily increase in temp. sum</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;            10.00,    0.00,     ! as function of av. temp. &#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;[cel; cel d]</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;            30.00,   24.00,</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;            35.00,   24.00</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;DVSI = 0.           ! initial DVS</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;DVSEND   =   2.00   ! development stage at harvest (= 2.0 at &#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;maturity [-]))</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

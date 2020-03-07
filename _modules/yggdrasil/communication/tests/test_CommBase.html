@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.tests.test_CommBase &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.communication.tests.test_CommBase &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
@@ -171,7 +172,6 @@
   <h1>Source code for yggdrasil.communication.tests.test_CommBase</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">YggTestClassInfo</span><span class="p">,</span> <span class="n">assert_equal</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">new_comm</span><span class="p">,</span> <span class="n">get_comm</span><span class="p">,</span> <span class="n">CommBase</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication.filters.StatementFilter</span> <span class="k">import</span> <span class="n">StatementFilter</span>
@@ -276,7 +276,7 @@
     <span class="k">def</span> <span class="nf">msg_long</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Small test message for sending.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span> <span class="o">*</span> <span class="sa">b</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
             
@@ -421,7 +421,10 @@
         <span class="n">recv_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_work_comm_kwargs</span>
         <span class="n">recv_kwargs</span><span class="p">[</span><span class="s1">&#39;work_comm_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;test_worker_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">header_recv</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
         <span class="n">recv_kwargs</span><span class="p">[</span><span class="s1">&#39;new_comm_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wc_send</span><span class="o">.</span><span class="n">comm_class</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">recv_kwargs</span><span class="p">[</span><span class="s1">&#39;work_comm_name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">wc_send</span><span class="o">.</span><span class="n">opp_address</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wc_send</span><span class="o">.</span><span class="n">opp_address</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">recv_kwargs</span><span class="p">[</span><span class="s1">&#39;work_comm_name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">wc_send</span><span class="o">.</span><span class="n">opp_address</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">recv_kwargs</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wc_send</span><span class="o">.</span><span class="n">opp_address</span>
         <span class="n">wc_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">create_work_comm</span><span class="p">(</span><span class="o">**</span><span class="n">recv_kwargs</span><span class="p">)</span>
         <span class="c1"># wc_recv = self.instance.get_work_comm(header_recv)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CommBase&#39;</span><span class="p">,</span> <span class="s1">&#39;AsyncComm&#39;</span><span class="p">]:</span>
@@ -673,7 +676,7 @@
         <span class="c1"># receiving side during tests</span>
         <span class="c1"># if direction == &#39;recv&#39;:</span>
         <span class="c1">#     msg = self.map_sent2recv(msg)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
             <span class="n">statement</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%x</span><span class="s1">% != &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">statement</span> <span class="o">=</span> <span class="s1">&#39;repr(</span><span class="si">%x</span><span class="s1">%) != r&quot;&quot;&quot;&#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&quot;&quot;&quot;&#39;</span>

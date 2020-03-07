@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.encoder &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.metaschema.encoder &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -170,20 +171,12 @@
             
   <h1>Source code for yggdrasil.metaschema.encoder</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span>
 <span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">stdjson</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
-<span class="n">json</span> <span class="o">=</span> <span class="n">stdjson</span>
-<span class="n">_json_encoder</span> <span class="o">=</span> <span class="n">stdjson</span><span class="o">.</span><span class="n">JSONEncoder</span>
-<span class="n">_json_decoder</span> <span class="o">=</span> <span class="n">stdjson</span><span class="o">.</span><span class="n">JSONDecoder</span>
-<span class="n">_use_rapidjson</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">if</span> <span class="n">_use_rapidjson</span><span class="p">:</span>
-    <span class="k">try</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
-        <span class="kn">import</span> <span class="nn">rapidjson</span> <span class="k">as</span> <span class="nn">json</span>
-        <span class="n">_json_encoder</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">Encoder</span>
-        <span class="n">_json_decoder</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">Decoder</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
-        <span class="n">_use_rapidjson</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="kn">import</span> <span class="nn">rapidjson</span> <span class="k">as</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
+<span class="n">_json_encoder</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">Encoder</span>
+<span class="n">_json_decoder</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">Decoder</span>
 
 
 <div class="viewcode-block" id="indent_char2int"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.indent_char2int">[docs]</a><span class="k">def</span> <span class="nf">indent_char2int</span><span class="p">(</span><span class="n">indent</span><span class="p">):</span>
@@ -234,10 +227,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">encode_data_readable</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">MetaschemaTypeError</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">_use_rapidjson</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot encode </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">o</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">_json_encoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span></div></div>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot encode </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">o</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="JSONEncoder"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.JSONEncoder">[docs]</a><span class="k">class</span> <span class="nc">JSONEncoder</span><span class="p">(</span><span class="n">_json_encoder</span><span class="p">):</span>
@@ -250,54 +240,16 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">encode_data</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">MetaschemaTypeError</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">_use_rapidjson</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot encode </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">o</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">_json_encoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span></div></div>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot encode </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">o</span><span class="p">)</span></div></div>
     
 
 <div class="viewcode-block" id="JSONDecoder"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.JSONDecoder">[docs]</a><span class="k">class</span> <span class="nc">JSONDecoder</span><span class="p">(</span><span class="n">_json_decoder</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decoder class for Ygg messages.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">JSONDecoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_use_rapidjson</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">json.scanner</span> <span class="k">import</span> <span class="n">py_make_scanner</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scan_once</span> <span class="o">=</span> <span class="n">py_make_scanner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-
 <div class="viewcode-block" id="JSONDecoder.string"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.JSONDecoder.string">[docs]</a>    <span class="k">def</span> <span class="nf">string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Try to parse string with class.&quot;&quot;&quot;</span>
         <span class="c1"># TODO: Do this dynamically for classes based on an attribute</span>
-        <span class="k">return</span> <span class="n">string2import</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">parse_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;function: Wrapper for function that parses strings.&quot;&quot;&quot;</span>
-        <span class="k">def</span> <span class="nf">parse_string_ygg</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="n">out</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_string</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">string</span><span class="p">(</span><span class="n">out</span><span class="p">),</span> <span class="n">end</span>
-        <span class="k">return</span> <span class="n">parse_string_ygg</span>
-
-    <span class="nd">@parse_string</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">parse_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_string</span> <span class="o">=</span> <span class="n">x</span></div>
-
-    <span class="c1"># @property</span>
-    <span class="c1"># def scan_once(self):</span>
-    <span class="c1">#     r&quot;&quot;&quot;function: Wrapper for function that decodes JSON documents.&quot;&quot;&quot;</span>
-    <span class="c1">#     def scan_once_ygg(string, idx):</span>
-    <span class="c1">#         try:</span>
-    <span class="c1">#             if string[idx] == &#39;&quot;&#39;:</span>
-    <span class="c1">#                 return self.parse_string(string, idx + 1, self.encoding,</span>
-    <span class="c1">#                                          self.strict)</span>
-    <span class="c1">#         except IndexError:</span>
-    <span class="c1">#             pass</span>
-    <span class="c1">#         return self._scan_once(string, idx)</span>
-    <span class="c1">#     return scan_once_ygg</span>
-
-    <span class="c1"># @scan_once.setter</span>
-    <span class="c1"># def scan_once(self, x):</span>
-    <span class="c1">#     self._scan_once = x</span>
+        <span class="k">return</span> <span class="n">string2import</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div></div>
 
     
 <div class="viewcode-block" id="encode_json"><a class="viewcode-back" href="../../../yggdrasil.metaschema.html#yggdrasil.metaschema.encoder.encode_json">[docs]</a><span class="k">def</span> <span class="nf">encode_json</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">fd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -319,20 +271,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">indent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span>
-    <span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span> <span class="ow">or</span> <span class="n">_use_rapidjson</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
-        <span class="c1"># Character indents not allowed in Python 2 json</span>
-        <span class="n">indent</span> <span class="o">=</span> <span class="n">indent_char2int</span><span class="p">(</span><span class="n">indent</span><span class="p">)</span>
+    <span class="c1"># Character indents not allowed in Python 2 json</span>
+    <span class="n">indent</span> <span class="o">=</span> <span class="n">indent_char2int</span><span class="p">(</span><span class="n">indent</span><span class="p">)</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">indent</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;sort_keys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sort_keys</span>
-    <span class="k">if</span> <span class="n">_use_rapidjson</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;cls&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;cls&#39;</span><span class="p">)()</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">JSONEncoder</span><span class="p">()</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;cls&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;cls&#39;</span><span class="p">)()</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;cls&#39;</span><span class="p">,</span> <span class="n">JSONEncoder</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">JSONEncoder</span><span class="p">()</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">fd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -348,17 +296,13 @@
 <span class="sd">        object: Deserialized Python object.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-        <span class="c1"># Should this be unicode?</span>
-        <span class="n">msg_decode</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
+        <span class="n">msg_decode</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="n">func_decode</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">msg_decode</span> <span class="o">=</span> <span class="n">msg</span>
         <span class="n">func_decode</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span>
-    <span class="k">if</span> <span class="n">_use_rapidjson</span><span class="p">:</span>
-        <span class="n">func_decode</span> <span class="o">=</span> <span class="n">JSONDecoder</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;cls&#39;</span><span class="p">,</span> <span class="n">JSONDecoder</span><span class="p">)</span>
+    <span class="n">func_decode</span> <span class="o">=</span> <span class="n">JSONDecoder</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">func_decode</span><span class="p">(</span><span class="n">msg_decode</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
@@ -439,7 +383,6 @@
         <span class="n">construct_scalar</span><span class="p">)</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;Loader&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedLoader</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="c1"># out = backwards.as_str(out, recurse=True, allow_pass=True)</span>
     <span class="k">return</span> <span class="n">out</span></div>
 </pre></div>
 

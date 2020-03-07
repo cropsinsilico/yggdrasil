@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -183,6 +184,16 @@
 </tr>
 </thead>
 <tbody>
+<tr class="row-even"><td><p>description</p></td>
+<td><p>A short description of the type.</p></td>
+<td><p>X</p></td>
+<td><p>str</p></td>
+</tr>
+<tr class="row-odd"><td><p>name</p></td>
+<td><p>Name of the type for use in YAML files &amp; form options.</p></td>
+<td><p>X</p></td>
+<td><p>str</p></td>
+</tr>
 <tr class="row-even"><td><p>cross_language_support</p></td>
 <td><p>If True, this indicates the types should be serializable across most (if not
 all) of the supported languages. If False, this type is not required to be
@@ -198,19 +209,14 @@ Defaults to [‘type’].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>description</p></td>
-<td><p>A short description of the type.</p></td>
-<td><p>X</p></td>
-<td><p>str</p></td>
-</tr>
-<tr class="row-odd"><td><p>extract_properties</p></td>
+<tr class="row-even"><td><p>extract_properties</p></td>
 <td><p>Properties that will be extracted from the metadata of a message to construct
 the type definition. These properties will be added to those from the parent
 class unless inherit_properties is False. Defaults to [‘type’, ‘title’].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>inherit_properties</p></td>
+<tr class="row-odd"><td><p>inherit_properties</p></td>
 <td><p>If True, a type class’s properties will be a combination of the parent class’s
 properties and those explicitly defined in the child class. If False, a type
 class’s properties will only be those explicitly defined in the child class. If
@@ -219,28 +225,23 @@ will be inherited from the parent class.</p></td>
 <td></td>
 <td><p>bool, list</p></td>
 </tr>
-<tr class="row-odd"><td><p>is_fixed</p></td>
+<tr class="row-even"><td><p>is_fixed</p></td>
 <td><p>True if the type is a fixed version of another type. See FixedMetaschemaType for
 details.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-even"><td><p>loaded_schema_file</p></td>
+<tr class="row-odd"><td><p>loaded_schema_file</p></td>
 <td><p>The path to the file the schema for the type was loaded from if it was loaded.</p></td>
 <td></td>
 <td><p>str, None</p></td>
 </tr>
-<tr class="row-odd"><td><p>metadata_properties</p></td>
+<tr class="row-even"><td><p>metadata_properties</p></td>
 <td><p>Type properties that are required for deserializing instances of the type that
 have been serialized. These properties will be added to those from the parent
 class unless inherit_properties is False. Defaults to [‘type’].</p></td>
 <td></td>
 <td><p>list</p></td>
-</tr>
-<tr class="row-even"><td><p>name</p></td>
-<td><p>Name of the type for use in YAML files &amp; form options.</p></td>
-<td><p>X</p></td>
-<td><p>str</p></td>
 </tr>
 <tr class="row-odd"><td><p>properties</p></td>
 <td><p>List of JSON schema properties that this type uses. These properties will be

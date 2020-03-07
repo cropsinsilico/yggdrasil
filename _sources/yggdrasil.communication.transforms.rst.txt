@@ -11,6 +11,14 @@ Subpackages
 Submodules
 ----------
 
+yggdrasil.communication.transforms.ArrayTransform module
+--------------------------------------------------------
+
+.. automodule:: yggdrasil.communication.transforms.ArrayTransform
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.transforms.DirectTransform module
 ---------------------------------------------------------
 
@@ -31,6 +39,14 @@ yggdrasil.communication.transforms.MapFieldsTransform module
 ------------------------------------------------------------
 
 .. automodule:: yggdrasil.communication.transforms.MapFieldsTransform
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.communication.transforms.PandasTransform module
+---------------------------------------------------------
+
+.. automodule:: yggdrasil.communication.transforms.PandasTransform
    :members:
    :undoc-members:
    :show-inheritance:

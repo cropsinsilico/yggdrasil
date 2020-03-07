@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.config &mdash; yggdrasil 0.8.7 documentation</title>
+  <title>yggdrasil.config &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.8.7
+                1.0.0
               </div>
             
           
@@ -90,22 +90,21 @@
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../formatted_io.html">Formatted I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html">Server/Client I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../io_drivers.html">Input/Output Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../model_interface.html">Model Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metaschema.html">JSON Metaschema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../schema.html">YAML Validation Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -178,22 +177,117 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.backwards</span> <span class="k">import</span> <span class="n">configparser</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">backwards</span>
+<span class="kn">import</span> <span class="nn">configparser</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
+<span class="n">conda_prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CONDA_PREFIX&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 <span class="n">config_file</span> <span class="o">=</span> <span class="s1">&#39;.yggdrasil.cfg&#39;</span>
 <span class="n">def_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;defaults.cfg&#39;</span><span class="p">)</span>
-<span class="n">usr_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="n">config_file</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">conda_prefix</span><span class="p">:</span>
+    <span class="n">usr_dir</span> <span class="o">=</span> <span class="n">conda_prefix</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">usr_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">)</span>
+<span class="n">usr_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">usr_dir</span><span class="p">,</span> <span class="n">config_file</span><span class="p">)</span>
 <span class="n">loc_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">config_file</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="YggConfigParser"><a class="viewcode-back" href="../../code_python.html#yggdrasil.config.YggConfigParser">[docs]</a><span class="k">class</span> <span class="nc">YggConfigParser</span><span class="p">(</span><span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">YggConfigParser</span><span class="p">(</span><span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Config parser that returns None if option not provided on get.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="YggConfigParser.get"><a class="viewcode-back" href="../../code_python.html#yggdrasil.config.YggConfigParser.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="n">files</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YggConfigParser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reload parameters from the original files.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">file_to_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Full path to file that should be updated if update_file is</span>
+<span class="sd">        called without an explicit file path.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="nf">update_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write out updated contents to a file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fname (str, optional): Full path to file where contents should be</span>
+<span class="sd">               saved. If None, file_to_update is used. Defaults to None.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If fname is None and file_to_update is None.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_to_update</span>
+        <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No file provided or set at creation.&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">YggConfigParser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">alias_map</span> <span class="o">=</span> <span class="p">[((</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;psi&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">)),</span>
+                     <span class="p">((</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;cis&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">))]</span>
+        <span class="k">for</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="n">alias_map</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">*</span><span class="n">old</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">new</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_files</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Construct a config parser from a set of files.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            files (list): One or more files that options should be read from in</span>
+<span class="sd">                the order they should be loaded.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the class</span>
+<span class="sd">                constructor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           YggConfigParser: Config parser with information loaded from the</span>
+<span class="sd">               provided files.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set an option.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YggConfigParser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">backwards_str2val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">val</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">backwards_str2val</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                           <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">elif</span> <span class="n">val</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">val</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">):</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return None if the section/option does not exist.</span>
 
 <span class="sd">        Args:</span>
@@ -218,254 +312,137 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">default</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">out</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">backwards_str2val</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">default</span></div></div>
+            <span class="k">return</span> <span class="n">default</span>
 
 
-<div class="viewcode-block" id="find_all"><a class="viewcode-back" href="../../code_python.html#yggdrasil.config.find_all">[docs]</a><span class="k">def</span> <span class="nf">find_all</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find all instances of a file with a given name within the directory</span>
-<span class="sd">    tree starting at a given path.</span>
+<span class="k">def</span> <span class="nf">get_language_order</span><span class="p">(</span><span class="n">drivers</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the correct language order, including any base languages.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        name (str): Name of the file to be found (with the extension).</span>
-<span class="sd">        path (str, None): Directory where search should start. If set to</span>
-<span class="sd">            None on Windows, the current directory and PATH variable are</span>
-<span class="sd">            searched.</span>
+<span class="sd">        drivers (dict): Drivers in order.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        list: All instances of the specified file.</span>
+<span class="sd">        dict: Drivers in sorted order.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-            <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;where&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">],</span>
-                                              <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span>
-                                              <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">drv</span> <span class="ow">in</span> <span class="n">drivers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="s1">&#39;cpp&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;c++&#39;</span> <span class="ow">in</span> <span class="n">drivers</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
+        <span class="n">new_deps</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">sub_deps</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">sub_d</span> <span class="ow">in</span> <span class="n">drv</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sub_d</span> <span class="o">==</span> <span class="s1">&#39;cpp&#39;</span><span class="p">:</span>
+                <span class="n">sub_d</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
+            <span class="k">if</span> <span class="n">sub_d</span> <span class="ow">in</span> <span class="n">drivers</span><span class="p">:</span>
+                <span class="n">sub_deps</span><span class="p">[</span><span class="n">sub_d</span><span class="p">]</span> <span class="o">=</span> <span class="n">drivers</span><span class="p">[</span><span class="n">sub_d</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;where&quot;</span><span class="p">,</span> <span class="s2">&quot;/r&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">name</span><span class="p">],</span>
-                                              <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span>
-                                              <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+                <span class="n">sub_deps</span><span class="p">[</span><span class="n">sub_d</span><span class="p">]</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">sub_d</span><span class="p">)</span>
+        <span class="n">sub_deps</span> <span class="o">=</span> <span class="n">get_language_order</span><span class="p">(</span><span class="n">sub_deps</span><span class="p">)</span>
+        <span class="n">min_dep</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">sub_d</span><span class="p">,</span> <span class="n">sub_drv</span> <span class="ow">in</span> <span class="n">sub_deps</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">sub_d</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">min_dep</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">min_dep</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">sub_d</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_deps</span><span class="p">[</span><span class="n">sub_d</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub_drv</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">dpos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">dpos</span> <span class="o">&gt;</span> <span class="n">min_dep</span><span class="p">)</span>
+            <span class="n">min_dep</span> <span class="o">=</span> <span class="n">dpos</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;find&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;-type&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;-name&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
-            <span class="n">pfind</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span>
-                                     <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                                     <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
-            <span class="p">(</span><span class="n">stdoutdata</span><span class="p">,</span> <span class="n">stderrdata</span><span class="p">)</span> <span class="o">=</span> <span class="n">pfind</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">stdoutdata</span>
-            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">stderrdata</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
-                <span class="k">if</span> <span class="sa">b</span><span class="s1">&#39;Permission denied&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">(</span><span class="n">pfind</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span>
-                                                        <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">),</span>
-                                                        <span class="n">output</span><span class="o">=</span><span class="n">stderrdata</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">:</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normcase</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">result</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">result</span></div>
+            <span class="n">new_deps</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">drv</span>
+        <span class="n">new_out</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">())[:(</span><span class="n">min_dep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]:</span>
+            <span class="n">new_out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">new_out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_deps</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">())[(</span><span class="n">min_dep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):]:</span>
+            <span class="n">new_out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">new_out</span>
+    <span class="k">return</span> <span class="n">out</span>
 
 
-<div class="viewcode-block" id="locate_file"><a class="viewcode-back" href="../../code_python.html#yggdrasil.config.locate_file">[docs]</a><span class="k">def</span> <span class="nf">locate_file</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Locate a file on PATH.</span>
+<span class="k">def</span> <span class="nf">update_language_config</span><span class="p">(</span><span class="n">languages</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_warnings</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                           <span class="n">disable_languages</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">enable_languages</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">lang_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update configuration options for a language driver.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        fname (str): Name of the file that should be located.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        bool, str: Full path to the located file if it was located, False</span>
-<span class="sd">            otherwise.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-        <span class="n">out</span> <span class="o">+=</span> <span class="n">find_all</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PATH&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">+=</span> <span class="n">find_all</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span>
-    <span class="n">first</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;More than one (</span><span class="si">%d</span><span class="s2">) match to </span><span class="si">%s</span><span class="s2">. &quot;</span>
-                       <span class="o">+</span> <span class="s2">&quot;Using first match (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">)</span> <span class="o">%</span>
-                      <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">),</span> <span class="n">fname</span><span class="p">,</span> <span class="n">first</span><span class="p">),</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">first</span></div>
-
-
-<div class="viewcode-block" id="update_config_matlab"><a class="viewcode-back" href="../../code_python.html#yggdrasil.config.update_config_matlab">[docs]</a><span class="k">def</span> <span class="nf">update_config_matlab</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update config options specific to matlab.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        config (YggConfigParser): Config class that options should be set for.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        list: Section, option, description tuples for options that could not be</span>
-<span class="sd">            set.</span>
+<span class="sd">        languages (list, optional): List of languages to configure.</span>
+<span class="sd">            Defaults to None and all supported languages will be</span>
+<span class="sd">            configured.</span>
+<span class="sd">        skip_warnings (bool, optional): If True, warnings about missing options</span>
+<span class="sd">            will not be raised. Defaults to False.</span>
+<span class="sd">        disable_languages (list, optional): List of languages that should be</span>
+<span class="sd">            disabled. Defaults to an empty list.</span>
+<span class="sd">        enable_languages (list, optional): List of languages that should be</span>
+<span class="sd">            enabled. Defaults to an empty list.</span>
+<span class="sd">        overwrite (bool, optional): If True, the existing file will be overwritten.</span>
+<span class="sd">            Defaults to False.</span>
+<span class="sd">        verbose (bool, optional): If True, information about the config file</span>
+<span class="sd">            will be displayed. Defaults to False.</span>
+<span class="sd">        lang_kwargs (dict, optional): Dictionary containing language</span>
+<span class="sd">            specific keyword arguments. Defaults to {}.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="c1"># This should be uncommented if the matlab section is removed from the</span>
-    <span class="c1"># default config file</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="n">config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">)</span>
-    <span class="n">opts</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;startup_waittime_s&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="s1">&#39;The time allowed for a Matlab engine to start&#39;</span>
-                               <span class="o">+</span> <span class="s1">&#39;before timing out and reporting an error.&#39;</span><span class="p">),</span>
-                               <span class="s1">&#39;10&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;release&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;The version (release number) of matlab that is installed.&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;matlabroot&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;The path to the default installation of matlab.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]}</span>
-    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
-        <span class="n">mtl_id</span> <span class="o">=</span> <span class="s1">&#39;=MATLABROOT=&#39;</span>
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;fprintf(&#39;&quot;</span> <span class="o">+</span> <span class="n">mtl_id</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">mtl_id</span> <span class="o">+</span> <span class="s2">&quot;R</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">mtl_id</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
-               <span class="o">+</span> <span class="s2">&quot;,matlabroot,version(&#39;-release&#39;)); exit();&quot;</span><span class="p">)</span>
-        <span class="n">mtl_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;-nodisplay&#39;</span><span class="p">,</span> <span class="s1">&#39;-nosplash&#39;</span><span class="p">,</span> <span class="s1">&#39;-nodesktop&#39;</span><span class="p">,</span> <span class="s1">&#39;-nojvm&#39;</span><span class="p">,</span>
-                   <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cmd</span><span class="p">]</span>
-        <span class="k">try</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
-            <span class="n">mtl_proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">mtl_cmd</span><span class="p">)</span>
-            <span class="n">mtl_id</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">match_stype</span><span class="p">(</span><span class="n">mtl_proc</span><span class="p">,</span> <span class="n">mtl_id</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">mtl_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mtl_proc</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;Could not locate matlab root id (</span><span class="si">%s</span><span class="s2">) in &quot;</span>
-                                    <span class="s2">&quot;output (</span><span class="si">%s</span><span class="s2">).&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">mtl_id</span><span class="p">,</span> <span class="n">mtl_proc</span><span class="p">))</span>
-            <span class="n">opts</span><span class="p">[</span><span class="s1">&#39;matlabroot&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">mtl_proc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">mtl_id</span><span class="p">)[</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
-            <span class="n">opts</span><span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">mtl_proc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">mtl_id</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
-        <span class="k">except</span> <span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>  <span class="c1"># pragma: no matlab</span>
-            <span class="k">pass</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">opts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">opts</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># pragma: matlab</span>
-                <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">opts</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">opts</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
-    <span class="k">return</span> <span class="n">out</span></div>
-
-
-<div class="viewcode-block" id="update_config_windows"><a class="viewcode-back" href="../../code_python.html#yggdrasil.config.update_config_windows">[docs]</a><span class="k">def</span> <span class="nf">update_config_windows</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update config options specific to windows.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        config (YggConfigParser): Config class that options should be set for.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        list: Section, option, description tuples for options that could not be</span>
-<span class="sd">            set.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s1">&#39;windows&#39;</span><span class="p">):</span>
-        <span class="n">config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;windows&#39;</span><span class="p">)</span>
-    <span class="c1"># Find paths</span>
-    <span class="n">clibs</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;libzmq_include&#39;</span><span class="p">,</span> <span class="s1">&#39;zmq.h&#39;</span><span class="p">,</span>
-              <span class="s1">&#39;The full path to the zmq.h header file.&#39;</span><span class="p">),</span>
-             <span class="p">(</span><span class="s1">&#39;libzmq_static&#39;</span><span class="p">,</span> <span class="s1">&#39;zmq.lib&#39;</span><span class="p">,</span>
-              <span class="s1">&#39;The full path to the zmq.lib static library.&#39;</span><span class="p">),</span>
-             <span class="p">(</span><span class="s1">&#39;czmq_include&#39;</span><span class="p">,</span> <span class="s1">&#39;czmq.h&#39;</span><span class="p">,</span>
-              <span class="s1">&#39;The full path to the czmq.h header file.&#39;</span><span class="p">),</span>
-             <span class="p">(</span><span class="s1">&#39;czmq_static&#39;</span><span class="p">,</span> <span class="s1">&#39;czmq.lib&#39;</span><span class="p">,</span>
-              <span class="s1">&#39;The full path to the czmq.lib static library.&#39;</span><span class="p">)]</span>
-    <span class="k">for</span> <span class="n">opt</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">clibs</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="s1">&#39;windows&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
-            <span class="n">fpath</span> <span class="o">=</span> <span class="n">locate_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">fpath</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Located </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">fpath</span><span class="p">))</span>
-                <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;windows&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">fpath</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;windows&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">desc</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">out</span></div>
-
-
-<div class="viewcode-block" id="update_config_c"><a class="viewcode-back" href="../../code_python.html#yggdrasil.config.update_config_c">[docs]</a><span class="k">def</span> <span class="nf">update_config_c</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update config options specific to C/C++.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        config (CisConfigParser): Config class that options should be set for.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        list: Section, option, description tuples for options that could not be</span>
-<span class="sd">            set.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">):</span>
-        <span class="n">config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
-    <span class="c1"># Find paths</span>
-    <span class="n">clibs</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;rapidjson_include&#39;</span><span class="p">,</span> <span class="s1">&#39;rapidjson.h&#39;</span><span class="p">,</span>
-              <span class="s1">&#39;The full path to the directory containing rapidjson headers.&#39;</span><span class="p">)]</span>
-    <span class="k">for</span> <span class="n">opt</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">clibs</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
-            <span class="n">fpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="s1">&#39;rapidjson&#39;</span><span class="p">,</span>
-                                 <span class="s1">&#39;include&#39;</span><span class="p">,</span> <span class="s1">&#39;rapidjson&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-                <span class="n">fpath</span> <span class="o">=</span> <span class="n">locate_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">fpath</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">opt</span> <span class="o">==</span> <span class="s1">&#39;rapidjson_include&#39;</span><span class="p">:</span>
-                    <span class="n">fpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fpath</span><span class="p">))</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Located </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">fpath</span><span class="p">))</span>
-                <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">fpath</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">desc</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">out</span></div>
-
-
-<div class="viewcode-block" id="update_config"><a class="viewcode-back" href="../../code_python.html#yggdrasil.config.update_config">[docs]</a><span class="k">def</span> <span class="nf">update_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">config_base</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update config options for the current platform.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        config_file (str): Full path to the config file that should be created</span>
-<span class="sd">            and/or updated.</span>
-<span class="sd">        config_base (str, optional): Full path to existing config file that should</span>
-<span class="sd">            be used as a base for building the new one if it dosn&#39;t already exist.</span>
-<span class="sd">            Defaults to &#39;defaults.cfg&#39; if not provided.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">config_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">config_base</span> <span class="o">=</span> <span class="n">def_config_file</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">config_base</span><span class="p">))</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
-        <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">config_base</span><span class="p">,</span> <span class="n">config_file</span><span class="p">)</span>
-    <span class="n">cp</span> <span class="o">=</span> <span class="n">YggConfigParser</span><span class="p">()</span>
-    <span class="n">cp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating user configuration file for yggdrasil at:</span><span class="se">\n\t</span><span class="si">%s</span><span class="s2">&quot;</span>
+                    <span class="o">%</span> <span class="n">usr_config_file</span><span class="p">)</span>
     <span class="n">miss</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-        <span class="n">miss</span> <span class="o">+=</span> <span class="n">update_config_windows</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-    <span class="n">miss</span> <span class="o">+=</span> <span class="n">update_config_c</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-    <span class="n">miss</span> <span class="o">+=</span> <span class="n">update_config_matlab</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
-        <span class="n">cp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">sect</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">miss</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;Could not set option </span><span class="si">%s</span><span class="s2"> in section </span><span class="si">%s</span><span class="s2">. &quot;</span>
-                       <span class="o">+</span> <span class="s2">&quot;Please set this in </span><span class="si">%s</span><span class="s2"> to: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
-                      <span class="o">%</span> <span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">sect</span><span class="p">,</span> <span class="n">config_file</span><span class="p">,</span> <span class="n">desc</span><span class="p">),</span> <span class="ne">RuntimeWarning</span><span class="p">)</span></div>
-        
-
-<span class="c1"># In order read: defaults, user, local files</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">usr_config_file</span><span class="p">):</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Creating user config file: &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">usr_config_file</span><span class="p">)</span>
-    <span class="n">update_config</span><span class="p">(</span><span class="n">usr_config_file</span><span class="p">)</span>
-<span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">usr_config_file</span><span class="p">))</span>
-<span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">def_config_file</span><span class="p">))</span>
-<span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">def_config_file</span><span class="p">,</span> <span class="n">usr_config_file</span><span class="p">,</span> <span class="n">loc_config_file</span><span class="p">]</span>
-<span class="n">ygg_cfg</span> <span class="o">=</span> <span class="n">YggConfigParser</span><span class="p">()</span>
-<span class="n">ygg_cfg</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
-
-
-<span class="c1"># Aliases for old versions of config options</span>
-<span class="n">alias_map</span> <span class="o">=</span> <span class="p">[((</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;psi&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">)),</span>
-             <span class="p">((</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;cis&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">))]</span>
-<span class="k">for</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="n">alias_map</span><span class="p">:</span>
-    <span class="n">v</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">*</span><span class="n">old</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-        <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">new</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
-
+    <span class="k">if</span> <span class="n">languages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">all_languages</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">()</span>
+        <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;lpy&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;matlab&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">all_languages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
+                <span class="n">languages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">languages</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="n">languages</span><span class="p">]</span>
+    <span class="n">drivers</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">l</span><span class="p">,</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">l</span><span class="p">))</span>
+                           <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">])</span>
+    <span class="n">drv</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_language_order</span><span class="p">(</span><span class="n">drivers</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">disable_languages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">disable_languages</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">enable_languages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">enable_languages</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">lang_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lang_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">overwrite</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">def_config_file</span><span class="p">,</span> <span class="n">usr_config_file</span><span class="p">)</span>
+        <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">idrv</span> <span class="ow">in</span> <span class="n">drv</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="n">disable_languages</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="n">enable_languages</span><span class="p">))):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> language both enabled and disabled. &quot;</span>
+                         <span class="s2">&quot;No action will be taken.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">idrv</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="n">disable_languages</span><span class="p">:</span>
+            <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">idrv</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="n">enable_languages</span><span class="p">:</span>
+            <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="k">continue</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">miss</span> <span class="o">+=</span> <span class="n">idrv</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">ygg_cfg_usr</span><span class="p">,</span>
+                               <span class="o">**</span><span class="n">lang_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">update_file</span><span class="p">()</span>
+    <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_warnings</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">sect</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">miss</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;Could not set option </span><span class="si">%s</span><span class="s2"> in section </span><span class="si">%s</span><span class="s2">. &quot;</span>
+                           <span class="o">+</span> <span class="s2">&quot;Please set this in </span><span class="si">%s</span><span class="s2"> to: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">sect</span><span class="p">,</span> <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">file_to_update</span><span class="p">,</span> <span class="n">desc</span><span class="p">),</span>
+                          <span class="ne">RuntimeWarning</span><span class="p">)</span>
+    
 
 <span class="c1"># Set associated environment variables</span>
 <span class="n">env_map</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">,</span> <span class="s1">&#39;YGG_DEBUG&#39;</span><span class="p">),</span>
            <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;RMQ_DEBUG&#39;</span><span class="p">),</span>
            <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="s1">&#39;YGG_CLIENT_DEBUG&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;jsonschema&#39;</span><span class="p">,</span> <span class="s1">&#39;validate_components&#39;</span><span class="p">,</span> <span class="s1">&#39;YGG_SKIP_COMPONENT_VALIDATION&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;jsonschema&#39;</span><span class="p">,</span> <span class="s1">&#39;validate_all_messages&#39;</span><span class="p">,</span> <span class="s1">&#39;YGG_VALIDATE_ALL_MESSAGES&#39;</span><span class="p">),</span>
            <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;namespace&#39;</span><span class="p">,</span> <span class="s1">&#39;YGG_NAMESPACE&#39;</span><span class="p">),</span>
            <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;YGG_MSG_HOST&#39;</span><span class="p">),</span>
            <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;vhost&#39;</span><span class="p">,</span> <span class="s1">&#39;YGG_MSG_VHOST&#39;</span><span class="p">),</span>
@@ -475,7 +452,54 @@
            <span class="p">]</span>
 
 
-<div class="viewcode-block" id="cfg_logging"><a class="viewcode-back" href="../../code_python.html#yggdrasil.config.cfg_logging">[docs]</a><span class="k">def</span> <span class="nf">cfg_logging</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_ygg_loglevel</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the current log level.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):</span>
+<span class="sd">            Config parser with options that should be used to determine the</span>
+<span class="sd">            log level. Defaults to :data:`yggdrasil.config.ygg_cfg`.</span>
+<span class="sd">        default (str, optional): Log level that should be returned if the log</span>
+<span class="sd">            level option is not set in cfg. Defaults to &#39;DEBUG&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Log level string.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">is_model</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_subprocess</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">ygg_cfg</span>
+    <span class="k">if</span> <span class="n">is_model</span><span class="p">:</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="s1">&#39;client&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="s1">&#39;ygg&#39;</span>
+    <span class="k">return</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">set_ygg_loglevel</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the current log level.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        level (str): Level that the log should be set to.</span>
+<span class="sd">        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):</span>
+<span class="sd">            Config parser with options that should be used to update the</span>
+<span class="sd">            environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">is_model</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_subprocess</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">ygg_cfg</span>
+    <span class="k">if</span> <span class="n">is_model</span><span class="p">:</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="s1">&#39;client&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="s1">&#39;ygg&#39;</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
+    <span class="n">logLevelYGG</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;logging.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">level</span><span class="p">)</span>
+    <span class="n">ygg_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;yggdrasil&quot;</span><span class="p">)</span>
+    <span class="n">ygg_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logLevelYGG</span><span class="p">)</span>
+        
+    
+<span class="k">def</span> <span class="nf">cfg_logging</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set logging levels from config options.</span>
 
 <span class="sd">    Args:</span>
@@ -484,27 +508,31 @@
 <span class="sd">            environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">is_model</span> <span class="o">=</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_SUBPROCESS&#39;</span><span class="p">,</span> <span class="s2">&quot;False&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;True&quot;</span><span class="p">)</span>
+    <span class="n">is_model</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_subprocess</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">cfg</span> <span class="o">=</span> <span class="n">ygg_cfg</span>
     <span class="n">_LOG_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%(levelname)s</span><span class="s2">:</span><span class="si">%(module)s</span><span class="s2">.</span><span class="si">%(funcName)s</span><span class="s2">[</span><span class="si">%(lineno)d</span><span class="s2">]:</span><span class="si">%(message)s</span><span class="s2">&quot;</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">_LOG_FORMAT</span><span class="p">)</span>
     <span class="n">logLevelYGG</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;logging.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">,</span> <span class="s1">&#39;NOTSET&#39;</span><span class="p">))</span>
     <span class="n">logLevelRMQ</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;logging.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">))</span>
+    <span class="n">logLevelCLI</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;logging.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">))</span>
     <span class="n">ygg_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;yggdrasil&quot;</span><span class="p">)</span>
     <span class="n">rmq_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pika&quot;</span><span class="p">)</span>
-    <span class="n">ygg_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logLevelYGG</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_model</span><span class="p">:</span>
+        <span class="n">ygg_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logLevelCLI</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ygg_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logLevelYGG</span><span class="p">)</span>
     <span class="n">rmq_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logLevelRMQ</span><span class="p">)</span>
     <span class="c1"># For models, route the loggs to stdout so that they are displayed by the</span>
     <span class="c1"># model driver.</span>
     <span class="k">if</span> <span class="n">is_model</span><span class="p">:</span>
         <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
-        <span class="n">handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logLevelYGG</span><span class="p">)</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logLevelCLI</span><span class="p">)</span>
         <span class="n">ygg_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
-        <span class="n">rmq_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span></div>
+        <span class="n">rmq_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="cfg_environment"><a class="viewcode-back" href="../../code_python.html#yggdrasil.config.cfg_environment">[docs]</a><span class="k">def</span> <span class="nf">cfg_environment</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">cfg_environment</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables based on config options.</span>
 
 <span class="sd">    Args:</span>
@@ -522,9 +550,15 @@
     <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">env_map</span><span class="p">:</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
-            <span class="n">env</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
+            <span class="n">env</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
 
             
+<span class="c1"># Initialize config</span>
+<span class="n">ygg_cfg_usr</span> <span class="o">=</span> <span class="n">YggConfigParser</span><span class="o">.</span><span class="n">from_files</span><span class="p">([</span><span class="n">usr_config_file</span><span class="p">])</span>
+<span class="n">ygg_cfg</span> <span class="o">=</span> <span class="n">YggConfigParser</span><span class="o">.</span><span class="n">from_files</span><span class="p">([</span><span class="n">def_config_file</span><span class="p">,</span> <span class="n">usr_config_file</span><span class="p">,</span>
+                                      <span class="n">loc_config_file</span><span class="p">])</span>
+
+
 <span class="c1"># Do initial update of logging &amp; environment (legacy)</span>
 <span class="n">cfg_logging</span><span class="p">()</span>
 <span class="n">cfg_environment</span><span class="p">()</span>

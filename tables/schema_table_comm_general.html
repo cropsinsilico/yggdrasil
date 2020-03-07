@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -183,82 +184,102 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>args</p></td>
-<td><p>string</p></td>
-<td><p>X</p></td>
-<td><p>[DEPRECATED] Arguments that should be provided to the driver.</p></td>
-</tr>
-<tr class="row-odd"><td><p>as_array</p></td>
-<td><p>boolean</p></td>
-<td><p>X</p></td>
-<td><p>[DEPRECATED] If True and the datatype is table-like, tables are sent/recieved
-with either columns rather than row by row. Defaults to False.</p></td>
-</tr>
 <tr class="row-even"><td><p>commtype</p></td>
 <td><p>string</p></td>
-<td></td>
-<td><p>Communication mechanism that should be used. (Options described <a class="reference internal" href="schema_table_comm_subtype.html#schema-table-comm-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
+<td><p>X</p></td>
+<td><p>Communication mechanism that should be used. (Options described <a class="reference internal" href="../yaml.html#schema-table-comm-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
-<td></td>
+<td><p>X</p></td>
 <td><p>JSON schema (with expanded core types defined by yggdrasil) that constrains
 the type of data that should be sent/received by this object. Defaults to
 {‘type’: ‘bytes’}. Additional information on specifying datatypes can be found
 <a class="reference internal" href="../advanced/datatypes.html#datatypes-rst"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p>driver</p></td>
+<tr class="row-even"><td><p>name</p></td>
 <td><p>string</p></td>
 <td><p>X</p></td>
+<td><p>Name used for component in log messages.</p></td>
+</tr>
+<tr class="row-odd"><td><p>args</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>[DEPRECATED] Arguments that should be provided to the driver.</p></td>
+</tr>
+<tr class="row-even"><td><p>as_array</p></td>
+<td><p>boolean</p></td>
+<td></td>
+<td><p>[DEPRECATED] If True and the datatype is table-like, tables are sent/recieved
+with either columns rather than row by row. Defaults to False.</p></td>
+</tr>
+<tr class="row-odd"><td><p>default_file</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>driver</p></td>
+<td><p>string</p></td>
+<td></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>field_names</p></td>
 <td><p>array</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>[DEPRECATED] Field names that should be used to label fields in sent/received
 tables. This keyword is only valid for table-like datatypes. If not provided,
 field names are created based on the field order.</p></td>
 </tr>
 <tr class="row-even"><td><p>field_units</p></td>
 <td><p>array</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>[DEPRECATED] Field units that should be used to convert fields in sent/received
 tables. This keyword is only valid for table-like datatypes. If not provided,
 all fields are assumed to be unitless.</p></td>
 </tr>
 <tr class="row-odd"><td><p>filter</p></td>
 <td></td>
-<td><p>X</p></td>
+<td></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>is_default</p></td>
-<td><p>boolean</p></td>
-<td><p>X</p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>length_map</p></td>
-<td><p>object</p></td>
-<td><p>X</p></td>
-<td><p>Map from pointer variable names to</p></td>
-</tr>
-<tr class="row-even"><td><p>name</p></td>
+<tr class="row-even"><td><p>format_str</p></td>
 <td><p>string</p></td>
 <td></td>
-<td><p>Name used for component in log messages.</p></td>
+<td><p>String that should be used to format/parse messages. Default to None.</p></td>
 </tr>
-<tr class="row-odd"><td><p>recv_converter</p></td>
+<tr class="row-odd"><td><p>is_default</p></td>
+<td><p>boolean</p></td>
 <td></td>
-<td><p>X</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>length_map</p></td>
+<td><p>object</p></td>
+<td></td>
+<td><p>Map from pointer variable names to</p></td>
+</tr>
+<tr class="row-odd"><td><p>outside_loop</p></td>
+<td><p>boolean</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>recv_converter</p></td>
+<td></td>
+<td></td>
 <td><p>Converter that should be used on received objects. Defaults to None.</p></td>
 </tr>
-<tr class="row-even"><td><p>send_converter</p></td>
+<tr class="row-odd"><td><p>send_converter</p></td>
 <td></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>Converter that should be used on sent objects. Defaults to None.</p></td>
+</tr>
+<tr class="row-even"><td><p>transform</p></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><p>vars</p></td>
 <td><p>array</p></td>
-<td><p>X</p></td>
+<td></td>
 <td><p>Names of variables to be sent/received by this comm. Defaults to [].</p></td>
 </tr>
 </tbody>

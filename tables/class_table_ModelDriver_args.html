@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -184,19 +185,30 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>args</p></td>
-<td><p>Argument(s) for running the model on the command line. This should be a complete
-command including the necessary executable and command line arguments to that
-executable.</p></td>
+<td><p>The full path to the file containing the model program that will be run by the
+driver or a list starting with the program file and including any arguments that
+should be passed as input to the program.</p></td>
 <td><p>X</p></td>
 <td><p>str or list</p></td>
 </tr>
-<tr class="row-odd"><td><p>client_of</p></td>
-<td><p>The names of one or more servers that this model is a client of. Defaults to
-empty list. Use of client_of with function is not currently supported.</p></td>
+<tr class="row-odd"><td><p>name</p></td>
+<td><p>Unique name used to identify the model. This will be used to report errors
+associated with the model.</p></td>
+<td><p>X</p></td>
+<td><p>str</p></td>
+</tr>
+<tr class="row-even"><td><p>client_of</p></td>
+<td><p>The names of one or more models that this model will call as a server. If there
+are more than one, this should be specified as a sequence collection (list). The
+corresponding channel(s) that should be passed to the yggdrasil API will be the
+name of the server model joined with the name of the client model with an
+underscore <cite>&lt;server_model&gt;_&lt;client_model&gt;</cite>. There will be one channel created
+for each server the model is a client of. Defaults to empty list. Use of
+<cite>client_of</cite> with <cite>function</cite> is not currently supported.</p></td>
 <td></td>
 <td><p>str, list</p></td>
 </tr>
-<tr class="row-even"><td><p>function</p></td>
+<tr class="row-odd"><td><p>function</p></td>
 <td><p>If provided, an integrated model is created by wrapping the function named here.
 The function must be located within the file specified by the source file listed
 in the first argument. If not provided, the model must contain it’s own calls to
@@ -204,22 +216,19 @@ the yggdrasil interface.</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td><p>is_server</p></td>
-<td><p>If True, the model is assumed to be a server and an instance of
-<a class="reference internal" href="../yggdrasil.drivers.html#module-yggdrasil.drivers.ServerDriver" title="yggdrasil.drivers.ServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code></a> is started. Defaults to False. Use of
-is_server with function is not currently supported.</p></td>
+<tr class="row-even"><td><p>is_server</p></td>
+<td><p>If <cite>True</cite>, the model is assumed to be a server for one or more client models and
+an instance of <a class="reference internal" href="../yggdrasil.drivers.html#module-yggdrasil.drivers.ServerDriver" title="yggdrasil.drivers.ServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code></a> is started. The
+corresponding channel that should be passed to the yggdrasil API will be the
+name of the model. Defaults to False. Use of <cite>is_server</cite> with <cite>function</cite> is not
+currently supported.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-even"><td><p>model_index</p></td>
+<tr class="row-odd"><td><p>model_index</p></td>
 <td><p>Index of model in list of models being run. Defaults to 0.</p></td>
 <td></td>
 <td><p>int</p></td>
-</tr>
-<tr class="row-odd"><td><p>name</p></td>
-<td><p>Driver name.</p></td>
-<td><p>X</p></td>
-<td><p>str</p></td>
 </tr>
 <tr class="row-even"><td><p>outputs_in_inputs</p></td>
 <td><p>If True, outputs from wrapped model functions are passed by pointer as inputs

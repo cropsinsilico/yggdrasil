@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.tests.test_PandasFileComm &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.communication.tests.test_PandasFileComm &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
@@ -170,20 +171,20 @@
             
   <h1>Source code for yggdrasil.communication.tests.test_PandasFileComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication.tests</span> <span class="k">import</span> <span class="n">test_AsciiTableComm</span> <span class="k">as</span> <span class="n">parent</span>
 
 
 <div class="viewcode-block" id="TestPandasFileComm"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm">[docs]</a><span class="k">class</span> <span class="nc">TestPandasFileComm</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestAsciiTableComm</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for PandasFileComm communication class.&quot;&quot;&quot;</span>
 
-    <span class="n">comm</span> <span class="o">=</span> <span class="s1">&#39;PandasFileComm&#39;</span>
-    <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;not_as_frames&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+    <span class="n">comm</span> <span class="o">=</span> <span class="s1">&#39;PandasFileComm&#39;</span></div>
 
 
 <div class="viewcode-block" id="TestPandasFileComm_nonames"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm_nonames">[docs]</a><span class="k">class</span> <span class="nc">TestPandasFileComm_nonames</span><span class="p">(</span><span class="n">TestPandasFileComm</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for PandasFileComm communication class without field names sent.&quot;&quot;&quot;</span>
 
-    <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;not_as_frames&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;no_names&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+    <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no_names&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="TestPandasFileComm_single"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_PandasFileComm.TestPandasFileComm_single">[docs]</a><span class="k">class</span> <span class="nc">TestPandasFileComm_single</span><span class="p">(</span><span class="n">TestPandasFileComm</span><span class="p">):</span>
@@ -195,13 +196,16 @@
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">formats</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;float&#39;</span><span class="p">],</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">]))</span>
         <span class="n">arr1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nele</span><span class="p">,</span> <span class="p">),</span> <span class="n">dtype</span><span class="p">)</span>
         <span class="n">arr2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nele</span><span class="p">,</span> <span class="p">),</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="n">pd1</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">arr1</span><span class="p">)</span>
+        <span class="n">pd2</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">arr2</span><span class="p">)</span>
+        <span class="n">pdcat</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">]))</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span>
                <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;f0</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">nele</span> <span class="o">*</span> <span class="sa">b</span><span class="s1">&#39;0.0</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">nele</span> <span class="o">*</span> <span class="sa">b</span><span class="s1">&#39;1.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">),</span>
-               <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="n">arr1</span><span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">]],</span> <span class="p">[</span><span class="n">arr2</span><span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">]]],</span>
-               <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">])[</span><span class="s1">&#39;f0&#39;</span><span class="p">]]],</span>
-               <span class="s1">&#39;recv_partial&#39;</span><span class="p">:</span> <span class="p">[[[</span><span class="n">arr1</span><span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">]]],</span> <span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">])[</span><span class="s1">&#39;f0&#39;</span><span class="p">]]]],</span>
+               <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">pd1</span><span class="p">,</span> <span class="n">pd2</span><span class="p">],</span>
+               <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">pdcat</span><span class="p">],</span>
+               <span class="s1">&#39;recv_partial&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="n">pd1</span><span class="p">],</span> <span class="p">[</span><span class="n">pdcat</span><span class="p">]],</span>
                <span class="s1">&#39;dict&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;f0&#39;</span><span class="p">:</span> <span class="n">arr1</span><span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">]},</span>
-               <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="n">arr1</span><span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">]],</span> <span class="p">[</span><span class="n">arr2</span><span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">]]]}</span>
+               <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">pd1</span><span class="p">,</span> <span class="n">pd2</span><span class="p">]}</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;send&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;msg_array&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr1</span>
         <span class="k">return</span> <span class="n">out</span></div>

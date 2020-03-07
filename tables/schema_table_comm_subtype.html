@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -179,19 +180,22 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>default</p></td>
+<tr class="row-even"><td><p>buffer</p></td>
+<td><p>Communication mechanism that should be used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
 <td><p>[DEFAULT] Communication mechanism selected based on the current platform.</p></td>
 </tr>
-<tr class="row-odd"><td><p>ipc</p></td>
+<tr class="row-even"><td><p>ipc</p></td>
 <td><p>Interprocess communication (IPC) queue.</p></td>
 </tr>
-<tr class="row-even"><td><p>rmq</p></td>
+<tr class="row-odd"><td><p>rmq</p></td>
 <td><p>RabbitMQ connection.</p></td>
 </tr>
-<tr class="row-odd"><td><p>rmq_async</p></td>
+<tr class="row-even"><td><p>rmq_async</p></td>
 <td><p>Asynchronous RabbitMQ connection.</p></td>
 </tr>
-<tr class="row-even"><td><p>zmq</p></td>
+<tr class="row-odd"><td><p>zmq</p></td>
 <td><p>ZeroMQ socket.</p></td>
 </tr>
 </tbody>

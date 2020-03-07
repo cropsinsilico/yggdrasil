@@ -4,7 +4,7 @@
 Option         Description                                                                        Required   Type
 ============   ================================================================================   ========   ====
 name           Name of the property.                                                              X          str 
-python_types   Python types of instances that the property is valid for. [AUTOMATED]                         list
 schema         JSON schema describing valid values for the property.                              X          dict
+python_types   Python types of instances that the property is valid for. [AUTOMATED]                         list
 types          Types of instances that the property is valid for. [AUTOMATED]                                list
 ============   ================================================================================   ========   ====

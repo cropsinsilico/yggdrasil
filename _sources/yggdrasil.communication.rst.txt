@@ -45,6 +45,14 @@ yggdrasil.communication.AsyncComm module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.communication.BufferComm module
+-----------------------------------------
+
+.. automodule:: yggdrasil.communication.BufferComm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.ClientComm module
 -----------------------------------------
 

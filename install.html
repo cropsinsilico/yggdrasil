@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>Installation &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -105,6 +105,7 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -215,6 +216,18 @@ the list of accepted channels by running the following command from
 the terminal (or Anaconda Prompt on Windows).:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda config --add channels conda-forge
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Windows Users</strong> If you see the warning:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;WARNING: Did not find VS in registry or in VS140COMNTOOLS env var - your compiler may not work&quot;</span>
+</pre></div>
+</div>
+<p>during installation you will need to run the command below to enable the Visual Studio command line tools.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ call &quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat&quot; amd64
+</pre></div>
+</div>
+<p>Then run <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> to finish the installation process for C and C++.</p>
 </div>
 </div>
 <div class="section" id="development-installation">

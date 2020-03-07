@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.CompiledModelDriver &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.drivers.CompiledModelDriver &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -177,8 +178,7 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">scanf</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">locate_file</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">scanf</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.ModelDriver</span> <span class="k">import</span> <span class="n">ModelDriver</span><span class="p">,</span> <span class="n">remove_products</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
 
@@ -303,7 +303,11 @@
             <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_dont_register</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">cls</span>
             <span class="k">assert</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">toolname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">languages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;is_build_tool&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">build_language</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">languages</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">languages</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">languages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">toolname</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;The name &#39;</span><span class="si">%s</span><span class="s2">&#39; for class </span><span class="si">%s</span><span class="s2"> is also in &quot;</span>
                                   <span class="s2">&quot;its list of aliases: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -312,17 +316,19 @@
             <span class="n">reg</span> <span class="o">=</span> <span class="n">get_compilation_tool_registry</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tooltype</span><span class="p">)</span>
             <span class="k">if</span> <span class="s1">&#39;by_language&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">reg</span><span class="p">:</span>
                 <span class="n">reg</span><span class="p">[</span><span class="s1">&#39;by_language&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">languages</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">l</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">reg</span><span class="p">[</span><span class="s1">&#39;by_language&#39;</span><span class="p">]:</span>
                     <span class="n">reg</span><span class="p">[</span><span class="s1">&#39;by_language&#39;</span><span class="p">][</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">toolname</span><span class="p">]</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
                 <span class="c1"># Register by toolname</span>
-                <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">reg</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> toolname &#39;</span><span class="si">%s</span><span class="s2">&#39; already registered (class = </span><span class="si">%s</span><span class="s2">).&quot;</span>
-                                     <span class="o">%</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tooltype</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span> <span class="n">x</span><span class="p">,</span> <span class="bp">cls</span><span class="p">))</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">reg</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">reg</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">cls</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> toolname &#39;</span><span class="si">%s</span><span class="s2">&#39; already registered &quot;</span>
+                         <span class="s2">&quot;(class = </span><span class="si">%s</span><span class="s2">, existing = </span><span class="si">%s</span><span class="s2">).&quot;</span><span class="p">)</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tooltype</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span> <span class="n">x</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">reg</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span>
                 <span class="n">reg</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span>
                 <span class="c1"># Register by language</span>
-                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">languages</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">reg</span><span class="p">[</span><span class="s1">&#39;by_language&#39;</span><span class="p">][</span><span class="n">l</span><span class="p">]:</span>  <span class="c1"># pragma: debug</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> toolname &#39;</span><span class="si">%s</span><span class="s2">&#39; already registered for &quot;</span>
                                           <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> language.&quot;</span><span class="p">)</span>
@@ -1005,7 +1011,7 @@
                                  <span class="n">additional_args</span><span class="o">=</span><span class="n">additional_args</span><span class="p">,</span>
                                  <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># Add additional arguments</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
             <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">args</span><span class="p">]</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">additional_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1052,7 +1058,7 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Command: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">))</span>
             <span class="n">proc</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">popen_nobuffer</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="o">**</span><span class="n">unused_kwargs</span><span class="p">)</span>
             <span class="n">output</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">allow_error</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Command &#39;</span><span class="si">%s</span><span class="s2">&#39; failed with code </span><span class="si">%d</span><span class="s2">:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">.&quot;</span>
                                    <span class="o">%</span> <span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">),</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span> <span class="n">output</span><span class="p">))</span>
@@ -1930,6 +1936,22 @@
     <span class="n">default_linker_flags</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">default_archiver</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">default_archiver_flags</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_config_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="s1">&#39;archiver&#39;</span><span class="p">]</span>
+    <span class="n">_config_attr_map</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="s1">&#39;default_compiler&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;compiler&#39;</span><span class="p">},</span>
+                        <span class="p">{</span><span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="s1">&#39;default_compiler_flags&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;compiler_flags&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">},</span>
+                        <span class="p">{</span><span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="s1">&#39;default_linker&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;linker&#39;</span><span class="p">},</span>
+                        <span class="p">{</span><span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="s1">&#39;default_linker_flags&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;linker_flags&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">},</span>
+                        <span class="p">{</span><span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="s1">&#39;default_archiver&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;archiver&#39;</span><span class="p">},</span>
+                        <span class="p">{</span><span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="s1">&#39;default_archiver_flags&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;archiver_flags&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">}]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">skip_compile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;overwrite&#39;</span><span class="p">,</span> <span class="p">(</span><span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;preserve_cache&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)))</span>
@@ -1946,6 +1968,23 @@
             <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Compiled </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">)</span>
 
+<div class="viewcode-block" id="CompiledModelDriver.after_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
+<span class="sd">        registration. For compiled languages this includes selecting the</span>
+<span class="sd">        default compiler. The order of precedence is the config file &#39;compiler&#39;</span>
+<span class="sd">        option for the language, followed by the environment variable set by</span>
+<span class="sd">        _compiler_env, followed by the existing class attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ModelDriver</span><span class="o">.</span><span class="n">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">libtype</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;libtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">libtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">libtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">):</span>
+                <span class="n">libfile</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+                                      <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">libtype</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">libfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">v</span><span class="p">[</span><span class="n">libtype</span><span class="p">]</span> <span class="o">=</span> <span class="n">libfile</span></div>
+        
 <div class="viewcode-block" id="CompiledModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
 <span class="sd">        and which ones are arguments.</span>
@@ -2016,54 +2055,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="p">,</span> <span class="n">source_products</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">source_products</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;source_files: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_files</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;model_file: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="CompiledModelDriver.after_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
-<span class="sd">        registration. For compiled languages this includes selecting the</span>
-<span class="sd">        default compiler. The order of precedence is the config file &#39;compiler&#39;</span>
-<span class="sd">        option for the language, followed by the environment variable set by</span>
-<span class="sd">        _compiler_env, followed by the existing class attribute.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">ModelDriver</span><span class="o">.</span><span class="n">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">compiler</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="s1">&#39;archiver&#39;</span><span class="p">]:</span>
-                <span class="c1"># Set attribute defaults based on config options</span>
-                <span class="k">for</span> <span class="n">k0</span> <span class="ow">in</span> <span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_flags&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">]:</span>
-                    <span class="n">ka</span> <span class="o">=</span> <span class="s1">&#39;default_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k0</span>
-                    <span class="k">if</span> <span class="n">k0</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_flags&#39;</span><span class="p">):</span>
-                        <span class="n">old_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ka</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                        <span class="n">new_val</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">k0</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-                        <span class="k">if</span> <span class="n">new_val</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-                            <span class="k">if</span> <span class="n">old_val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                                <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ka</span><span class="p">,</span> <span class="n">new_val</span><span class="p">)</span>
-                            <span class="k">else</span><span class="p">:</span>
-                                <span class="n">old_val</span> <span class="o">+=</span> <span class="n">new_val</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ka</span><span class="p">,</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">k0</span><span class="p">,</span>
-                                                     <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ka</span><span class="p">)))</span>
-                <span class="c1"># Set default linker/archiver based on compiler</span>
-                <span class="n">default_tool_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;default_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="k">if</span> <span class="p">(((</span><span class="n">default_tool_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">compiler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-                     <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="s1">&#39;archiver&#39;</span><span class="p">]))):</span>
-                    <span class="n">default_tool_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">compiler</span><span class="p">,</span> <span class="s1">&#39;default_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="c1"># Check default tool to make sure it is installed</span>
-                <span class="k">if</span> <span class="n">default_tool_name</span><span class="p">:</span>
-                    <span class="n">default_tool</span> <span class="o">=</span> <span class="n">get_compilation_tool</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">default_tool_name</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">default_tool</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s1">&#39;Default </span><span class="si">%s</span><span class="s1"> for </span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">) not installed. &#39;</span>
-                                       <span class="s1">&#39;Attempting to locate an alternative .&#39;</span><span class="p">)</span>
-                                      <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">default_tool_name</span><span class="p">))</span>
-                        <span class="n">default_tool_name</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="c1"># Determine compilation tools based on language/platform</span>
-                <span class="k">if</span> <span class="n">default_tool_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">default_tool_name</span> <span class="o">=</span> <span class="n">find_compilation_tool</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
-                                                              <span class="n">allow_failure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="c1"># Set default tool attribute &amp; record compiler tool if set</span>
-                <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;default_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="n">default_tool_name</span><span class="p">)</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">default_tool_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;compiler&#39;</span><span class="p">):</span>
-                    <span class="n">compiler</span> <span class="o">=</span> <span class="n">get_compilation_tool</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">default_tool_name</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CompiledModelDriver.set_target_language"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.set_target_language">[docs]</a>    <span class="k">def</span> <span class="nf">set_target_language</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the language of the target being compiled (usually the same</span>
@@ -2168,8 +2159,9 @@
             <span class="c1"># used to retrieve them</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">tooltype</span> <span class="o">==</span> <span class="s1">&#39;compiler&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">return_prop</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;flags&#39;</span><span class="p">]):</span>
                 <span class="c1"># Get tool name</span>
-                <span class="n">toolname</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">tooltype</span><span class="p">,</span>
-                                   <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;default_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">tooltype</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+                <span class="n">toolname</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">tooltype</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">toolname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">toolname</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;default_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">tooltype</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">toolname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> not set for language &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span>
@@ -2178,18 +2170,23 @@
                 <span class="k">if</span> <span class="n">return_prop</span> <span class="o">==</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">toolname</span>
                 <span class="c1"># Get flags</span>
-                <span class="n">tool_flags</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_flags&#39;</span> <span class="o">%</span> <span class="n">tooltype</span><span class="p">,</span>
-                                     <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;default_</span><span class="si">%s</span><span class="s1">_flags&#39;</span> <span class="o">%</span> <span class="n">tooltype</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+                <span class="n">tool_flags</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_flags&#39;</span> <span class="o">%</span> <span class="n">tooltype</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">tool_flags</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">tool_flags</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;default_</span><span class="si">%s</span><span class="s1">_flags&#39;</span> <span class="o">%</span> <span class="n">tooltype</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">return_prop</span> <span class="o">==</span> <span class="s1">&#39;flags&#39;</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">tool_flags</span>
                 <span class="c1"># Get tool</span>
                 <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;executable&#39;</span><span class="p">:</span> <span class="n">toolname</span><span class="p">,</span> <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">tool_flags</span><span class="p">}</span>
                 <span class="k">if</span> <span class="n">tooltype</span> <span class="o">==</span> <span class="s1">&#39;compiler&#39;</span><span class="p">:</span>
                     <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                        <span class="n">linker</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="n">return_prop</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">),</span>
-                        <span class="n">linker_flags</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="n">return_prop</span><span class="o">=</span><span class="s1">&#39;flags&#39;</span><span class="p">),</span>
-                        <span class="n">archiver</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;archiver&#39;</span><span class="p">,</span> <span class="n">return_prop</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">),</span>
-                        <span class="n">archiver_flags</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;archiver&#39;</span><span class="p">,</span> <span class="n">return_prop</span><span class="o">=</span><span class="s1">&#39;flags&#39;</span><span class="p">))</span>
+                        <span class="n">linker</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span>
+                            <span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="n">return_prop</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+                        <span class="n">linker_flags</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span>
+                            <span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="n">return_prop</span><span class="o">=</span><span class="s1">&#39;flags&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+                        <span class="n">archiver</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span>
+                            <span class="s1">&#39;archiver&#39;</span><span class="p">,</span> <span class="n">return_prop</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+                        <span class="n">archiver_flags</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span>
+                            <span class="s1">&#39;archiver&#39;</span><span class="p">,</span> <span class="n">return_prop</span><span class="o">=</span><span class="s1">&#39;flags&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">get_compilation_tool</span><span class="p">(</span><span class="n">tooltype</span><span class="p">,</span> <span class="n">toolname</span><span class="p">)(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">out_tool</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
@@ -2295,7 +2292,7 @@
                 <span class="n">out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">dep</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">:</span>
             <span class="n">dep_lang</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">dep</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dep_lang</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="s1">&#39;include&#39;</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dep_lang</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="s1">&#39;include&#39;</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dep</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">dep</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2356,11 +2353,11 @@
                 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">libinfo</span><span class="p">[</span><span class="n">libtype</span><span class="p">]):</span>
                     <span class="n">out</span> <span class="o">=</span> <span class="n">libinfo</span><span class="p">[</span><span class="n">libtype</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">out</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dep_lang</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">libtype</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dep_lang</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">libtype</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">libtype_found</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">libtype_list</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">dep_lang</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">k</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">dep_lang</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">k</span><span class="p">)):</span>
                         <span class="n">libtype_found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">libtype_found</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;A &#39;</span><span class="si">%s</span><span class="s2">&#39; library could not be located for &quot;</span>
@@ -2417,7 +2414,7 @@
             <span class="n">out</span> <span class="o">+=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="n">dep</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;include_dirs&#39;</span><span class="p">,</span> <span class="p">[])</span>
         <span class="k">elif</span> <span class="n">dep</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">:</span>
             <span class="n">dep_lang</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">dep</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dep_lang</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_include&#39;</span> <span class="o">%</span> <span class="n">dep</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dep_lang</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_include&#39;</span> <span class="o">%</span> <span class="n">dep</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dep</span><span class="p">):</span>
@@ -2792,7 +2789,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cfg</span> <span class="o">=</span> <span class="n">ygg_cfg</span>
+            <span class="n">cfg</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cfg</span>
         <span class="n">out</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">lib</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">:</span>
             <span class="n">src</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_dependency_source</span><span class="p">(</span><span class="n">lib</span><span class="p">)</span>
@@ -2801,7 +2798,7 @@
         <span class="k">for</span> <span class="n">lib_typ</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">lib</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">lib_typ</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;libtype&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">]:</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
                 <span class="k">break</span>
             <span class="n">lib_opt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">lib</span><span class="p">,</span> <span class="n">lib_typ</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dep_lang</span><span class="p">,</span> <span class="n">lib_opt</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
@@ -2817,11 +2814,68 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">ModelDriver</span><span class="o">.</span><span class="n">is_configured</span><span class="o">.</span><span class="vm">__func__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_external_libraries</span><span class="p">():</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-                    <span class="k">break</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_library_installed</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_external_libraries</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="k">break</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_library_installed</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="CompiledModelDriver.configure_executable_type"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.configure_executable_type">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">configure_executable_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options specific in the executable type</span>
+<span class="sd">        before the libraries are configured.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg (CisConfigParser): Config class that options should be set for.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Section, option, description tuples for options that could not</span>
+<span class="sd">                be set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">configure_executable_type</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">out</span>
+        <span class="n">compiler</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">linker</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">archiver</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="s1">&#39;archiver&#39;</span><span class="p">]:</span>
+            <span class="c1"># Set default linker/archiver based on compiler</span>
+            <span class="n">default_tool_name</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;default_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="k">if</span> <span class="p">(((</span><span class="n">default_tool_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">compiler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                 <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="s1">&#39;archiver&#39;</span><span class="p">]))):</span>
+                <span class="n">default_tool_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">compiler</span><span class="p">,</span> <span class="s1">&#39;default_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="c1"># Check default tool to make sure it is installed</span>
+            <span class="k">if</span> <span class="n">default_tool_name</span><span class="p">:</span>
+                <span class="n">default_tool</span> <span class="o">=</span> <span class="n">get_compilation_tool</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">default_tool_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">default_tool</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s1">&#39;Default </span><span class="si">%s</span><span class="s1"> for </span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">) not installed. &#39;</span>
+                                   <span class="s1">&#39;Attempting to locate an alternative .&#39;</span><span class="p">)</span>
+                                  <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">default_tool_name</span><span class="p">))</span>
+                    <span class="n">default_tool_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1"># Determine compilation tools based on language/platform</span>
+            <span class="k">if</span> <span class="n">default_tool_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">default_tool_name</span> <span class="o">=</span> <span class="n">find_compilation_tool</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+                                                          <span class="n">allow_failure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># Set default tool attribute &amp; record compiler tool if set</span>
+            <span class="k">if</span> <span class="n">default_tool_name</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;default_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="n">default_tool_name</span><span class="p">)</span>
+                <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">default_tool_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;compiler&#39;</span><span class="p">:</span>
+                    <span class="n">compiler</span> <span class="o">=</span> <span class="n">get_compilation_tool</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">default_tool_name</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;linker&#39;</span><span class="p">:</span>
+                    <span class="n">linker</span> <span class="o">=</span> <span class="n">get_compilation_tool</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">default_tool_name</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;archiver&#39;</span><span class="p">:</span>
+                    <span class="n">archiver</span> <span class="o">=</span> <span class="n">get_compilation_tool</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">default_tool_name</span><span class="p">)</span>
+        <span class="c1"># Check for missing library names</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">libtype</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;libtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">libtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">libtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">libtype</span> <span class="o">==</span> <span class="s1">&#39;static&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">archiver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">v</span><span class="p">[</span><span class="n">libtype</span><span class="p">]</span> <span class="o">=</span> <span class="n">archiver</span><span class="o">.</span><span class="n">get_output_file</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">libtype</span> <span class="o">==</span> <span class="s1">&#39;shared&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">linker</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">v</span><span class="p">[</span><span class="n">libtype</span><span class="p">]</span> <span class="o">=</span> <span class="n">linker</span><span class="o">.</span><span class="n">get_output_file</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">build_library</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="CompiledModelDriver.configure_libraries"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.configure_libraries">[docs]</a>    <span class="nd">@classmethod</span>
@@ -2864,18 +2918,22 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
                     <span class="c1"># Search the compiler/linker&#39;s search path, then the</span>
                     <span class="c1"># PATH environment variable.</span>
-                    <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;include&#39;</span><span class="p">]:</span>
-                        <span class="n">tool</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">tool</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">tool</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="n">fpath</span> <span class="o">=</span> <span class="kc">None</span>
-                    <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tool</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;include&#39;</span><span class="p">]:</span>
+                            <span class="n">tool</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">tool</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="n">fpath</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="n">tool</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">search_list</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">get_search_path</span><span class="p">()</span>
                         <span class="k">if</span> <span class="p">((</span><span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span> <span class="ow">and</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.lib&#39;</span><span class="p">)</span>
                              <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">fname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;lib&#39;</span><span class="p">)))):</span>  <span class="c1"># pragma: windows</span>
                             <span class="n">fname</span> <span class="o">=</span> <span class="p">[</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;lib&#39;</span> <span class="o">+</span> <span class="n">fname</span><span class="p">]</span>
-                        <span class="n">fpath</span> <span class="o">=</span> <span class="n">locate_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">directory_list</span><span class="o">=</span><span class="n">search_list</span><span class="p">)</span>
+                        <span class="n">fpath</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">locate_file</span><span class="p">(</span>
+                            <span class="n">fname</span><span class="p">,</span> <span class="n">directory_list</span><span class="o">=</span><span class="n">search_list</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">fpath</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Located </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">fpath</span><span class="p">))</span>
                     <span class="c1"># if (t in [&#39;static&#39;]) and platform._is_mac:</span>

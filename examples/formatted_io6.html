@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>formatted_io6 Example &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>formatted_io6 Example &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -95,6 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -126,6 +127,7 @@
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson2.html">rpc_lesson2 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="model_function.html">model_function Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_io.html">conditional_io Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transformed_io.html">transformed_io Example</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
@@ -479,18 +481,14 @@
 41
 42
 43
-44
-45
-46</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+44</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
 <span class="c1">// Include methods for input/output channels</span>
 <span class="cp">#include</span> <span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
 
-<span class="cp">#define MYBUFSIZ 1000</span>
-
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
   <span class="c1">// Initialize input/output channels</span>
-  <span class="n">YggObjInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
-  <span class="n">YggObjOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
+  <span class="n">YggObjInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
+  <span class="n">YggObjOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
 
   <span class="c1">// Declare resulting variables and create buffer for received message</span>
   <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
@@ -504,19 +502,19 @@
     <span class="c1">// Otherwise, it is the size of the received message</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// Print received message</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: (%d verts, %d faces)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">nvert</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">nface</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: (%d verts, %d faces)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">nvert</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">nface</span><span class="p">);</span>
     <span class="n">display_obj_indent</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s">&quot;  &quot;</span><span class="p">);</span>
 
     <span class="c1">// Send output to output channel</span>
     <span class="c1">// If there is an error, the flag will be negative</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
@@ -572,14 +570,18 @@
 41
 42
 43
-44</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+44
+45
+46</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
 <span class="c1">// Include methods for input/output channels</span>
 <span class="cp">#include</span> <span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
 
+<span class="cp">#define MYBUFSIZ 1000</span>
+
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
   <span class="c1">// Initialize input/output channels</span>
-  <span class="n">YggObjInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
-  <span class="n">YggObjOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
+  <span class="n">YggObjInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
+  <span class="n">YggObjOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
 
   <span class="c1">// Declare resulting variables and create buffer for received message</span>
   <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
@@ -593,19 +595,19 @@
     <span class="c1">// Otherwise, it is the size of the received message</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// Print received message</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: (%d verts, %d faces)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">nvert</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">nface</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: (%d verts, %d faces)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">nvert</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">nface</span><span class="p">);</span>
     <span class="n">display_obj_indent</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s">&quot;  &quot;</span><span class="p">);</span>
 
     <span class="c1">// Send output to output channel</span>
     <span class="c1">// If there is an error, the flag will be negative</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
@@ -877,8 +879,8 @@
     <span class="n">YggObjInput</span><span class="p">,</span> <span class="n">YggObjOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggObjInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggObjOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggObjInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggObjOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -887,18 +889,18 @@
     <span class="c1"># If there is an error, the flag will be False</span>
     <span class="n">flag</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
         <span class="k">break</span>
 
     <span class="c1"># Print received message</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model B: (</span><span class="si">%d</span><span class="s1"> verts, </span><span class="si">%d</span><span class="s1"> faces)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">nvert</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">nface</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model A: (</span><span class="si">%d</span><span class="s1"> verts, </span><span class="si">%d</span><span class="s1"> faces)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">nvert</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">nface</span><span class="p">))</span>
     <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 
     <span class="c1"># Send output to output channel</span>
     <span class="c1"># If there is an error, the flag will be False</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
 <div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
@@ -934,8 +936,8 @@
     <span class="n">YggObjInput</span><span class="p">,</span> <span class="n">YggObjOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggObjInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggObjOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggObjInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggObjOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -944,18 +946,18 @@
     <span class="c1"># If there is an error, the flag will be False</span>
     <span class="n">flag</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
         <span class="k">break</span>
 
     <span class="c1"># Print received message</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model A: (</span><span class="si">%d</span><span class="s1"> verts, </span><span class="si">%d</span><span class="s1"> faces)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">nvert</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">nface</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model B: (</span><span class="si">%d</span><span class="s1"> verts, </span><span class="si">%d</span><span class="s1"> faces)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">nvert</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">nface</span><span class="p">))</span>
     <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 
     <span class="c1"># Send output to output channel</span>
     <span class="c1"># If there is an error, the flag will be False</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>

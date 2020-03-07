@@ -5,11 +5,11 @@ Option               Type      Description                                      
 ==================   =======   ================================================================================   =====================================
 builddir             string    Directory where the build should be saved. Defaults to <sourcedir>/build. It can   ['cmake']                            
                                be relative to working_dir or absolute.                                                                                 
-compiler             string    Command or path to executable that should be used to compile the model. If not     ['c++', 'cpp', 'make', 'cmake', 'c'] 
+compiler             string    Command or path to executable that should be used to compile the model. If not     ['make', 'cpp', 'c', 'cmake', 'c++'] 
                                provided, the compiler will be determined based on configuration options for the                                        
                                language (if present) and the registered compilers that are available on the                                            
                                current operating system.                                                                                               
-compiler_flags       array     Flags that should be passed to the compiler during compilation. If nto provided,   ['c++', 'cpp', 'make', 'cmake', 'c'] 
+compiler_flags       array     Flags that should be passed to the compiler during compilation. If nto provided,   ['make', 'cpp', 'c', 'cmake', 'c++'] 
                                the compiler flags will be determined based on configuration options for the                                            
                                language (if present), the compiler defaults, and the default_compiler_flags                                            
                                class attribute.                                                                                                        
@@ -22,17 +22,17 @@ env_linker           string    Environment variable where the linker executable 
                                the Makefile. Defaults to 'CC'.                                                                                         
 env_linker_flags     string    Environment variable where the linker flags should be stored (including those      ['make']                             
                                required to link against the |yggdrasil| interface). Defaults to 'LDFLAGS'.                                             
-interpreter          string    Name or path of interpreter executable that should be used to run the model. If    ['r', 'python', 'R', 'matlab', 'lpy']
+interpreter          string    Name or path of interpreter executable that should be used to run the model. If    ['r', 'R', 'matlab', 'lpy', 'python']
                                not provided, the interpreter will be determined based on configuration options                                         
                                for the language (if present) and the default_interpreter class attribute.                                              
-interpreter_flags    array     Flags that should be passed to the interpreter when running the model. If not      ['r', 'python', 'R', 'matlab', 'lpy']
+interpreter_flags    array     Flags that should be passed to the interpreter when running the model. If not      ['r', 'R', 'matlab', 'lpy', 'python']
                                provided, the flags are determined based on configuration options for the                                               
                                language (if present) and the default_interpreter_flags class attribute.                                                
-linker               string    Command or path to executable that should be used to link the model. If not        ['c++', 'cpp', 'make', 'cmake', 'c'] 
+linker               string    Command or path to executable that should be used to link the model. If not        ['make', 'cpp', 'c', 'cmake', 'c++'] 
                                provided, the linker will be determined based on configuration options for the                                          
                                language (if present) and the registered linkers that are available on the                                              
                                current operating system                                                                                                
-linker_flags         array     Flags that should be passed to the linker during compilation. If nto provided,     ['c++', 'cpp', 'make', 'cmake', 'c'] 
+linker_flags         array     Flags that should be passed to the linker during compilation. If nto provided,     ['make', 'cpp', 'c', 'cmake', 'c++'] 
                                the linker flags will be determined based on configuration options for the                                              
                                language (if present), the linker defaults, and the default_linker_flags class                                          
                                attribute.                                                                                                              
@@ -41,18 +41,18 @@ makedir              string    Directory where make should be invoked from if it
                                provided, otherwise working_dir.                                                                                        
 makefile             string    Path to make file either absolute, relative to makedir (if provided), or           ['make']                             
                                relative to working_dir. Defaults to Makefile.                                                                          
-skip_interpreter     boolean   If True, no interpreter will be added to the arguments. This should only be used   ['r', 'python', 'R', 'matlab', 'lpy']
+skip_interpreter     boolean   If True, no interpreter will be added to the arguments. This should only be used   ['r', 'R', 'matlab', 'lpy', 'python']
                                for subclasses that will not be invoking the model via the command line.                                                
                                Defaults to False.                                                                                                      
-source_files         array     Source files that should be compiled into an executable. Defaults to an empty      ['c++', 'cpp', 'make', 'cmake', 'c'] 
+source_files         array     Source files that should be compiled into an executable. Defaults to an empty      ['make', 'cpp', 'c', 'cmake', 'c++'] 
                                list and the driver will search for a source file based on the model executable                                         
                                (the first model argument).                                                                                             
 sourcedir            string    Source directory to call cmake on. If not provided it is set to working_dir.       ['cmake']                            
                                This should be the directory containing the CMakeLists.txt file. It can be                                              
                                relative to working_dir or absolute.                                                                                    
-target               string    Make target that should be built to create the model executable. Defaults to       ['cmake', 'make']                    
+target               string    Make target that should be built to create the model executable. Defaults to       ['make', 'cmake']                    
                                None.                                                                                                                   
-target_language      string    Language that the target is written in. Defaults to None and will be set based     ['cmake', 'make']                    
+target_language      string    Language that the target is written in. Defaults to None and will be set based     ['make', 'cmake']                    
                                on the source files provided.                                                                                           
 use_symunit          boolean   If True, input/output variables with units will be represented in Matlab using     ['matlab']                           
                                symunit. Defaults to False.                                                                                             

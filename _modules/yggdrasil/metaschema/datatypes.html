@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.metaschema.datatypes &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -174,12 +175,12 @@
 <span class="kn">import</span> <span class="nn">jsonschema</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="k">import</span> <span class="n">decode_json</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties</span> <span class="k">import</span> <span class="n">get_metaschema_property</span>
 
 
-<span class="n">_jsonschema_ver_maj</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">jsonschema</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span>
 <span class="n">_type_registry</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 <span class="n">_schema_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;schemas&#39;</span><span class="p">)</span>
 <span class="n">_base_validator</span> <span class="o">=</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">validator_for</span><span class="p">({</span><span class="s2">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
@@ -226,10 +227,7 @@
     <span class="k">if</span> <span class="n">type_name</span> <span class="ow">in</span> <span class="n">_type_registry</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Type &#39;</span><span class="si">%s</span><span class="s2">&#39; already registered.&quot;</span> <span class="o">%</span> <span class="n">type_name</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">type_class</span><span class="o">.</span><span class="n">_replaces_existing</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="k">if</span> <span class="n">_jsonschema_ver_maj</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="n">exist_flag</span> <span class="o">=</span> <span class="p">(</span><span class="n">type_name</span> <span class="ow">in</span> <span class="n">_base_validator</span><span class="o">.</span><span class="n">DEFAULT_TYPES</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">exist_flag</span> <span class="o">=</span> <span class="p">(</span><span class="n">type_name</span> <span class="ow">in</span> <span class="n">_base_validator</span><span class="o">.</span><span class="n">TYPE_CHECKER</span><span class="o">.</span><span class="n">_type_checkers</span><span class="p">)</span>
+        <span class="n">exist_flag</span> <span class="o">=</span> <span class="p">(</span><span class="n">type_name</span> <span class="ow">in</span> <span class="n">_base_validator</span><span class="o">.</span><span class="n">TYPE_CHECKER</span><span class="o">.</span><span class="n">_type_checkers</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">exist_flag</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;Type &#39;</span><span class="si">%s</span><span class="s2">&#39; is a JSON default type &quot;</span>
                               <span class="s2">&quot;which cannot be replaced.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">type_name</span><span class="p">)</span>
@@ -249,10 +247,7 @@
         <span class="n">prop_class</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">old</span> <span class="o">+</span> <span class="n">new</span><span class="p">))</span>
         <span class="c1"># Python types</span>
         <span class="n">old</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">prop_class</span><span class="o">.</span><span class="n">python_types</span><span class="p">))</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">new</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">type_class</span><span class="o">.</span><span class="n">python_types</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-            <span class="n">new</span> <span class="o">=</span> <span class="p">[</span><span class="n">type_class</span><span class="o">.</span><span class="n">python_types</span><span class="p">]</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">type_class</span><span class="o">.</span><span class="n">python_types</span><span class="p">)</span>
         <span class="n">prop_class</span><span class="o">.</span><span class="n">python_types</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">old</span> <span class="o">+</span> <span class="n">new</span><span class="p">))</span>
     <span class="c1"># Add to registry</span>
     <span class="n">type_class</span><span class="o">.</span><span class="n">_datatype</span> <span class="o">=</span> <span class="n">type_name</span>
@@ -642,35 +637,33 @@
     <span class="k">return</span> <span class="n">obj</span></div>
 
 
-<span class="c1"># def resolve_schema_references(schema, resolver=None):</span>
-<span class="c1">#     r&quot;&quot;&quot;Resolve references within a schema.</span>
-<span class="c1">#</span>
-<span class="c1">#     Args:</span>
-<span class="c1">#         schema (dict): Schema with references to resolve.</span>
-<span class="c1">#         top_level (dict, optional): Reference to the top level schema.</span>
-<span class="c1">#</span>
-<span class="c1">#     Returns:</span>
-<span class="c1">#         dict: Schema with references replaced with internal references.</span>
-<span class="c1">#</span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#     if resolver is None:</span>
-<span class="c1">#         if &#39;definitions&#39; not in schema:</span>
-<span class="c1">#             return schema</span>
-<span class="c1">#         out = copy.deepcopy(schema)</span>
-<span class="c1">#         resolver = jsonschema.RefResolver.from_schema(out)</span>
-<span class="c1">#     else:</span>
-<span class="c1">#         out = schema</span>
-<span class="c1">#     if isinstance(out, dict):</span>
-<span class="c1">#         if (len(out) == 1) and (&#39;$ref&#39; in out):</span>
-<span class="c1">#             scope, resolved = resolver.resolve(out[&#39;$ref&#39;])</span>
-<span class="c1">#             out = resolved</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             for k, v in out.items():</span>
-<span class="c1">#                 out[k] = resolve_schema_references(v, resolver=resolver)</span>
-<span class="c1">#     elif isinstance(out, (list, tuple)):</span>
-<span class="c1">#         for i in range(len(out)):</span>
-<span class="c1">#             out[i] = resolve_schema_references(out[i])</span>
-<span class="c1">#     return out</span>
+<div class="viewcode-block" id="resolve_schema_references"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.resolve_schema_references">[docs]</a><span class="k">def</span> <span class="nf">resolve_schema_references</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resolve references within a schema.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        schema (dict): Schema with references to resolve.</span>
+<span class="sd">        top_level (dict, optional): Reference to the top level schema.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Schema with references replaced with internal references.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">resolver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+        <span class="n">resolver</span> <span class="o">=</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">RefResolver</span><span class="o">.</span><span class="n">from_schema</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">schema</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;$ref&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">):</span>
+            <span class="n">scope</span><span class="p">,</span> <span class="n">resolved</span> <span class="o">=</span> <span class="n">resolver</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;$ref&#39;</span><span class="p">])</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">resolved</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">resolve_schema_references</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="n">resolver</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)):</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">resolve_schema_references</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">resolver</span><span class="o">=</span><span class="n">resolver</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="compare_schema"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.compare_schema">[docs]</a><span class="k">def</span> <span class="nf">compare_schema</span><span class="p">(</span><span class="n">schema1</span><span class="p">,</span> <span class="n">schema2</span><span class="p">,</span> <span class="n">root1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -748,6 +741,54 @@
                 <span class="k">yield</span> <span class="n">e</span>
     <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">yield</span> <span class="n">e</span></div>
+
+
+<div class="viewcode-block" id="generate_data"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.generate_data">[docs]</a><span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="n">typedef</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate mock data for the specified type.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        typedef (dict): Type definition.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        object: Python object of the specified type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">type_cls</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">type_cls</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="type2numpy"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.type2numpy">[docs]</a><span class="k">def</span> <span class="nf">type2numpy</span><span class="p">(</span><span class="n">typedef</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a type definition into a numpy dtype.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        typedef (dict): Type definition.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.dtype: Numpy data type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ScalarMetaschemaProperties</span> <span class="k">import</span> <span class="p">(</span>
+        <span class="n">definition2dtype</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">typedef</span><span class="p">)</span>
+         <span class="ow">and</span> <span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;items&#39;</span> <span class="ow">in</span> <span class="n">typedef</span><span class="p">))):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">as_array</span> <span class="o">=</span> <span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;1darray&#39;</span><span class="p">,</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">as_array</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">definition2dtype</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">as_array</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">dtype_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">field_names</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;1darray&#39;</span><span class="p">,</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">]:</span>
+                    <span class="n">as_array</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">break</span>
+                <span class="n">dtype_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">definition2dtype</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">field_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;f</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">as_array</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">names</span><span class="o">=</span><span class="n">field_names</span><span class="p">,</span> <span class="n">formats</span><span class="o">=</span><span class="n">dtype_list</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">out</span></div>
 </pre></div>
 
            </div>

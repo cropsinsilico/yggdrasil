@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema package &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.metaschema package &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -272,20 +273,9 @@
 <span id="yggdrasil-metaschema-encoder-module"></span><h2>yggdrasil.metaschema.encoder module<a class="headerlink" href="#module-yggdrasil.metaschema.encoder" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="yggdrasil.metaschema.encoder.JSONDecoder">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.encoder.</code><code class="sig-name descname">JSONDecoder</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONDecoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONDecoder" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.encoder.</code><code class="sig-name descname">JSONDecoder</code><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONDecoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONDecoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rapidjson.Decoder</span></code></p>
 <p>Decoder class for Ygg messages.</p>
-<dl class="method">
-<dt id="yggdrasil.metaschema.encoder.JSONDecoder.parse_string">
-<em class="property">property </em><code class="sig-name descname">parse_string</code><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONDecoder.parse_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wrapper for function that parses strings.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>function</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="method">
 <dt id="yggdrasil.metaschema.encoder.JSONDecoder.string">
 <code class="sig-name descname">string</code><span class="sig-paren">(</span><em class="sig-param">s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONDecoder.string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONDecoder.string" title="Permalink to this definition">¶</a></dt>

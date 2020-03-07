@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.properties package &mdash; yggdrasil 1.0.0 documentation</title>
+  <title>yggdrasil.metaschema.properties package &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
   
 
   
@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -93,6 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -338,7 +339,7 @@ value using cls.compare.</p>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.ndarray'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.ndarray'&gt;, &lt;class 'unyt.array.unyt_array'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -377,7 +378,7 @@ value using cls.compare.</p>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.ndarray'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.ndarray'&gt;, &lt;class 'unyt.array.unyt_array'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -496,7 +497,7 @@ the second.</p>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'pandas.core.frame.DataFrame'&gt;, &lt;class 'tuple'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'list'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'tuple'&gt;, &lt;class 'pandas.core.frame.DataFrame'&gt;, &lt;class 'list'&gt;, &lt;class 'numpy.ndarray'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -847,7 +848,7 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'float'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;, &lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'complex'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -857,7 +858,7 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.types">
-<code class="sig-name descname">types</code><em class="property"> = ('unicode', '1darray', 'bytes', 'uint', 'ndarray', 'complex', 'float', 'scalar', 'int')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">types</code><em class="property"> = ('1darray', 'ndarray', 'unicode', 'float', 'complex', 'uint', 'int', 'bytes', 'scalar')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -886,7 +887,7 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'float'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;, &lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'complex'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -896,7 +897,7 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.types">
-<code class="sig-name descname">types</code><em class="property"> = ('ndarray', 'scalar', '1darray')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">types</code><em class="property"> = ('ndarray', '1darray', 'scalar')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -925,7 +926,7 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'float'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;, &lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'complex'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -935,7 +936,7 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.types">
-<code class="sig-name descname">types</code><em class="property"> = ('unicode', '1darray', 'bytes', 'uint', 'ndarray', 'complex', 'float', 'scalar', 'int')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">types</code><em class="property"> = ('1darray', 'ndarray', 'unicode', 'float', 'complex', 'uint', 'int', 'bytes', 'scalar')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -989,12 +990,12 @@ not be registered. Defaults to False.</p></li>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numbers.Number'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'pandas.core.frame.DataFrame'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'float'&gt;, &lt;class 'method'&gt;, &lt;class 'object'&gt;, &lt;class 'builtin_function_or_method'&gt;, &lt;class 'function'&gt;, &lt;class 'dict'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;, &lt;class 'tuple'&gt;, &lt;class 'type'&gt;, &lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'complex'&gt;, &lt;class 'list'&gt;, &lt;class 'NoneType'&gt;, &lt;class 'bool'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numbers.Number'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'method'&gt;, &lt;class 'object'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'builtin_function_or_method'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'dict'&gt;, &lt;class 'function'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'tuple'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'type'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'list'&gt;, &lt;class 'NoneType'&gt;, &lt;class 'bool'&gt;, &lt;class 'pandas.core.frame.DataFrame'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.types">
-<code class="sig-name descname">types</code><em class="property"> = ('scalar', 'unicode', 'array', '1darray', 'string', 'bytes', 'null', 'number', 'integer', 'ndarray', 'instance', 'any', 'object', 'function', 'complex', 'uint', 'float', 'boolean', 'class', 'int')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">types</code><em class="property"> = ('null', 'class', 'string', 'boolean', 'array', '1darray', 'number', 'ndarray', 'instance', 'any', 'unicode', 'float', 'function', 'uint', 'integer', 'complex', 'object', 'int', 'bytes', 'scalar')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1078,12 +1079,12 @@ is ignored.</p></li>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numbers.Number'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'pandas.core.frame.DataFrame'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'float'&gt;, &lt;class 'method'&gt;, &lt;class 'object'&gt;, &lt;class 'builtin_function_or_method'&gt;, &lt;class 'function'&gt;, &lt;class 'dict'&gt;, &lt;class 'int'&gt;, &lt;class 'yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;, &lt;class 'tuple'&gt;, &lt;class 'type'&gt;, &lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'complex'&gt;, &lt;class 'list'&gt;, &lt;class 'NoneType'&gt;, &lt;class 'bool'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numbers.Number'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'method'&gt;, &lt;class 'object'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'builtin_function_or_method'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'dict'&gt;, &lt;class 'function'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'tuple'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'type'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'list'&gt;, &lt;class 'NoneType'&gt;, &lt;class 'bool'&gt;, &lt;class 'pandas.core.frame.DataFrame'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.types">
-<code class="sig-name descname">types</code><em class="property"> = ('unicode', '1darray', 'obj', 'null', 'number', 'function', 'schema', 'integer', 'class', 'string', 'array', 'instance', 'any', 'object', 'complex', 'boolean', 'bytes', 'ply', 'ndarray', 'uint', 'int', 'float', 'scalar')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">types</code><em class="property"> = ('boolean', 'array', 'number', 'bytes', 'null', 'unicode', 'float', 'integer', 'uint', 'ply', 'class', 'any', 'function', 'object', 'int', 'scalar', 'string', '1darray', 'schema', 'ndarray', 'instance', 'complex', 'obj')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

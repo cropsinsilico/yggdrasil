@@ -1,11 +1,19 @@
 .. _schema_table_transform_subtype_rst:
 
-=============
-Transformtype
-=============
-direct       
-function     
-map_fields   
-select_fields
-statement    
-=============
++---------------+
+| Transformtype |
++===============+
+| array         |
++---------------+
+| direct        |
++---------------+
+| function      |
++---------------+
+| map_fields    |
++---------------+
+| pandas        |
++---------------+
+| select_fields |
++---------------+
+| statement     |
++---------------+

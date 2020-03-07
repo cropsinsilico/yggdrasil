@@ -6,11 +6,11 @@ C Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io2/src/formatted_io2_modelB.c
+.. literalinclude:: /../../yggdrasil/examples/formatted_io2/src/formatted_io2_modelA.c
    :language: c
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io2/src/formatted_io2_modelA.c
+.. literalinclude:: /../../yggdrasil/examples/formatted_io2/src/formatted_io2_modelB.c
    :language: c
    :linenos:
 
@@ -50,11 +50,11 @@ Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io2/src/formatted_io2_modelB.m
+.. literalinclude:: /../../yggdrasil/examples/formatted_io2/src/formatted_io2_modelA.m
    :language: matlab
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io2/src/formatted_io2_modelA.m
+.. literalinclude:: /../../yggdrasil/examples/formatted_io2/src/formatted_io2_modelB.m
    :language: matlab
    :linenos:
 
@@ -94,11 +94,11 @@ R Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io2/src/formatted_io2_modelB.R
+.. literalinclude:: /../../yggdrasil/examples/formatted_io2/src/formatted_io2_modelA.R
    :language: python
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/formatted_io2/src/formatted_io2_modelA.R
+.. literalinclude:: /../../yggdrasil/examples/formatted_io2/src/formatted_io2_modelB.R
    :language: python
    :linenos:
 
