@@ -6,7 +6,7 @@ import tempfile
 import shutil
 import itertools
 import flaky
-from yggdrasil.components import ComponentMeta
+from yggdrasil.components import ComponentMeta, import_component
 from yggdrasil import runner, tools, platform
 from yggdrasil.examples import yamls, source, ext_map
 from yggdrasil.tests import YggTestBase, check_enabled_languages
@@ -240,18 +240,20 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                 raise unittest.SkipTest("Could not locate example %s in language %s." %
                                         (self.name, self.language))
         else:
-            # Copy platform specific makefile
-            if self.language == 'make':
-                makefile = os.path.join(self.yamldir, 'src', 'Makefile')
-                if platform._is_win:  # pragma: windows
-                    make_ext = '_windows'
-                else:
-                    make_ext = '_linux'
-                shutil.copy(makefile + make_ext, makefile)
             # Check that language is installed
             for x in self.languages_tested:
                 if not tools.is_lang_installed(x):
                     raise unittest.SkipTest("%s not installed." % x)
+            # Copy platform specific makefile
+            if self.language == 'make':
+                makefile = os.path.join(self.yamldir, 'src', 'Makefile')
+                if platform._is_win:  # pragma: windows
+                    makedrv = import_component('model', 'make')
+                    assert(makedrv.get_tool('compiler').toolname == 'nmake')
+                    make_ext = '_windows'
+                else:
+                    make_ext = '_linux'
+                shutil.copy(makefile + make_ext, makefile)
             # Check that comm is installed
             if self.comm in ['ipc', 'IPCComm']:
                 from yggdrasil.communication.IPCComm import (
