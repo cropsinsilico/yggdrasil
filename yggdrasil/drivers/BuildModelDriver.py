@@ -33,8 +33,6 @@ class BuildToolBase(CompilerBase):
 
         """
         build_language = cls.build_language
-        if build_language is None:
-            build_language = cls.toolname
         for x in cls.languages:
             if x != build_language:
                 return x

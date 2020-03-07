@@ -952,7 +952,6 @@ class ModelDriver(Driver):
                 if cls.is_comm_installed(commtype=c, skip_config=skip_config,
                                          **kwargs):
                     return True
-            return False
         # Check that comm is explicitly supported
         if commtype not in cls.supported_comms:
             return False
@@ -972,17 +971,6 @@ class ModelDriver(Driver):
                     return False
         return True
     
-    @classmethod
-    def update_config_argparser(cls, parser):
-        r"""Add arguments for configuration options specific to this
-        language.
-
-        Args:
-            parser (argparse.ArgumentParser): Parser to add arguments to.
-
-        """
-        pass
-
     @classmethod
     def configure(cls, cfg):
         r"""Add configuration options for this language.

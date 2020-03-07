@@ -481,21 +481,6 @@ class CModelDriver(CompiledModelDriver):
                     cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
         
     @classmethod
-    def update_config_argparser(cls, parser):
-        r"""Add arguments for configuration options specific to this
-        language.
-
-        Args:
-            parser (argparse.ArgumentParser): Parser to add arguments to.
-
-        """
-        super(CModelDriver, cls).update_config_argparser(parser)
-        if platform._is_mac and (cls.language == 'c'):
-            parser.add_argument('--macos-sdkroot', '--sdkroot',
-                                help=('The full path to the MacOS SDK '
-                                      'that should be used.'))
-        
-    @classmethod
     def configure(cls, cfg, macos_sdkroot=None):
         r"""Add configuration options for this language. This includes locating
         any required external libraries and setting option defaults.

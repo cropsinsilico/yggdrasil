@@ -2180,7 +2180,7 @@ class CompiledModelDriver(ModelDriver):
             if libtype in libinfo:
                 if os.path.isfile(libinfo[libtype]):
                     out = libinfo[libtype]
-                else:
+                else:  # pragma: no cover
                     out = cls.cfg.get(dep_lang, '%s_%s' % (dep, libtype), None)
             else:
                 libtype_found = []
@@ -2683,7 +2683,7 @@ class CompiledModelDriver(ModelDriver):
                                   % (k, cls.language, default_tool_name))
                     default_tool_name = None
             # Determine compilation tools based on language/platform
-            if default_tool_name is None:
+            if default_tool_name is None:  # pragma: no cover
                 default_tool_name = find_compilation_tool(k, cls.language,
                                                           allow_failure=True)
             # Set default tool attribute & record compiler tool if set
@@ -2699,7 +2699,7 @@ class CompiledModelDriver(ModelDriver):
         # Check for missing library names
         for k, v in cls.external_libraries.items():
             libtype = v.get('libtype', None)
-            if (libtype is not None) and (libtype not in v):
+            if (libtype is not None) and (libtype not in v):  # pragma: no cover
                 if (libtype == 'static') and (archiver is not None):
                     v[libtype] = archiver.get_output_file(k)
                 elif (libtype == 'shared') and (linker is not None):
@@ -2752,7 +2752,7 @@ class CompiledModelDriver(ModelDriver):
                             tool = cls.get_tool('compiler', default=None)
                         else:
                             tool = cls.get_tool('linker', default=None)
-                    except NotImplementedError:
+                    except NotImplementedError:  # pragma: debug
                         pass
                     fpath = None
                     if tool is not None:
