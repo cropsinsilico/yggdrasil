@@ -223,6 +223,7 @@ class MakeCompiler(BuildToolBase):
                   'env_linker', 'env_linker_flags']:
             kwargs.setdefault(k, cls._schema_properties[k]['default'])
         out[kwargs['env_compiler']] = compiler.get_executable()
+        print(compile_flags)
         out[kwargs['env_compiler_flags']] = ' '.join(compile_flags)
         # yggdrasil requires that linking be done in C++
         if (((compiler.languages[0].lower() == 'c')

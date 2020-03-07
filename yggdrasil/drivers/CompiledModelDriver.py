@@ -1825,6 +1825,16 @@ class CompiledModelDriver(ModelDriver):
                                       '%s_%s' % (k, libtype), None)
                 if libfile is not None:
                     v[libtype] = libfile
+        for k in ['compiler', 'linker', 'archiver']:
+            # Set default linker/archiver based on compiler
+            default_tool_name = getattr(cls, 'default_%s' % k, None)
+            if default_tool_name:
+                default_tool = get_compilation_tool(k, default_tool_name)
+                if not default_tool.is_installed():  # pragma: debug
+                    warnings.warn(('Default %s for %s (%s) not installed. '
+                                   'Attempting to locate an alternative .')
+                                  % (k, cls.language, default_tool_name))
+                    setattr(cls, 'default_%s' % k, None)
         
     def parse_arguments(self, args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
@@ -2821,8 +2831,8 @@ class CompiledModelDriver(ModelDriver):
                 default_tool_name = find_compilation_tool(k, cls.language,
                                                           allow_failure=True)
             # Set default tool attribute & record compiler tool if set
+            setattr(cls, 'default_%s' % k, default_tool_name)
             if default_tool_name:
-                setattr(cls, 'default_%s' % k, default_tool_name)
                 cfg.set(cls.language, k, default_tool_name)
                 if k == 'compiler':
                     compiler = get_compilation_tool(k, default_tool_name)
