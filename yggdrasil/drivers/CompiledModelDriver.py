@@ -1797,20 +1797,14 @@ class CompiledModelDriver(ModelDriver):
             self.debug("Compiled %s", self.model_file)
 
     @staticmethod
-    def after_registration(cls, cfg=None):
+    def after_registration(cls, **kwargs):
         r"""Operations that should be performed to modify class attributes after
         registration. For compiled languages this includes selecting the
         default compiler. The order of precedence is the config file 'compiler'
         option for the language, followed by the environment variable set by
         _compiler_env, followed by the existing class attribute.
-
-        Args:
-            cfg (YggConfigParser, optional): Config class that should
-                be used to set options for the driver. Defaults to
-                None and yggdrasil.config.ygg_cfg is used.
-
         """
-        ModelDriver.after_registration(cls, cfg=cfg)
+        ModelDriver.after_registration(cls, **kwargs)
         for k, v in cls.external_libraries.items():
             libtype = v.get('libtype', None)
             if (libtype is not None) and (libtype not in v):

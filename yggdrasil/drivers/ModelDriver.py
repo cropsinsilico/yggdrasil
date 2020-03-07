@@ -417,7 +417,7 @@ class ModelDriver(Driver):
             cls.language_ext = [cls.language_ext]
             
     @staticmethod
-    def after_registration(cls, cfg=None):
+    def after_registration(cls, cfg=None, second_pass=False):
         r"""Operations that should be performed to modify class attributes after
         registration. For compiled languages this includes selecting the
         default compiler. The order of precedence is the config file 'compiler'
@@ -428,6 +428,8 @@ class ModelDriver(Driver):
             cfg (YggConfigParser, optional): Config class that should
                 be used to set options for the driver. Defaults to
                 None and yggdrasil.config.ygg_cfg is used.
+            second_pass (bool, optional): If True, the class as already
+                been registered. Defaults to False.
 
         """
         if cfg is None:
@@ -1021,8 +1023,7 @@ class ModelDriver(Driver):
                 if cls.is_comm_installed(commtype=c, cfg=cfg, skip_config=True):
                     comms.append(c)
             cfg.set(cls.language, 'commtypes', comms)
-        cls.after_registration(cls, cfg=cfg)
-        print(cls, cls.is_configured())
+        cls.after_registration(cls, cfg=cfg, second_pass=True)
         return out
 
     @classmethod

@@ -111,7 +111,7 @@ class BuildModelDriver(CompiledModelDriver):
         super(BuildModelDriver, self).__init__(*args, **kwargs)
 
     @staticmethod
-    def after_registration(cls):
+    def after_registration(cls, **kwargs):
         r"""Operations that should be performed to modify class attributes after
         registration. For compiled languages this includes selecting the
         default compiler. The order of precedence is the config file 'compiler'
@@ -123,7 +123,7 @@ class BuildModelDriver(CompiledModelDriver):
                 cls._config_keys.remove(k)
         if getattr(cls, 'default_compiler', None) is None:
             cls.default_compiler = cls.language
-        CompiledModelDriver.after_registration(cls)
+        CompiledModelDriver.after_registration(cls, **kwargs)
         
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument

@@ -437,16 +437,9 @@ class CModelDriver(CompiledModelDriver):
     brackets = (r'{', r'}')
 
     @staticmethod
-    def after_registration(cls, cfg=None):
+    def after_registration(cls, **kwargs):
         r"""Operations that should be performed to modify class attributes after
-        registration.
-
-        Args:
-            cfg (YggConfigParser, optional): Config class that should
-                be used to set options for the driver. Defaults to
-                None and yggdrasil.config.ygg_cfg is used.
-
-        """
+        registration."""
         if cls.default_compiler is None:
             if platform._is_linux:
                 cls.default_compiler = 'gcc'
@@ -454,7 +447,9 @@ class CModelDriver(CompiledModelDriver):
                 cls.default_compiler = 'clang'
             elif platform._is_win:  # pragma: windows
                 cls.default_compiler = 'cl'
-        CompiledModelDriver.after_registration(cls, cfg=cfg)
+        CompiledModelDriver.after_registration(cls, **kwargs)
+        if kwargs.get('second_pass', False):
+            return
         if _python_lib and _python_lib.endswith(('.lib', '.a')):
             cls.external_libraries['python']['libtype'] = 'static'
             cls.external_libraries['python']['static'] = _python_lib

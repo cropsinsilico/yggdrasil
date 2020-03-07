@@ -4,11 +4,13 @@ from yggdrasil import platform
 import os
 import sys
 import glob
+import shutil
 import logging
 import argparse
 import subprocess
 import importlib
 from ._version import get_versions
+from yggdrasil import config
 _test_package_name = None
 _test_package = None
 logging.basicConfig()
@@ -341,3 +343,11 @@ def run_tsts(**kwargs):  # pragma: no cover
 __all__ = []
 __version__ = get_versions()['version']
 del get_versions
+
+
+if not os.path.isfile(config.usr_config_file):  # pragma: no cover
+    from yggdrasil.languages import install_languages
+    shutil.copy(config.def_config_file, config.usr_config_file)
+    install_languages.install_all_languages(from_setup=True)
+    config.update_language_config()
+    print('after config')

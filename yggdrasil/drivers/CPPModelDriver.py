@@ -94,16 +94,9 @@ class CPPModelDriver(CModelDriver):
     include_channel_obj = False
     
     @staticmethod
-    def after_registration(cls, cfg=None):
+    def after_registration(cls, **kwargs):
         r"""Operations that should be performed to modify class attributes after
-        registration.
-
-        Args:
-            cfg (YggConfigParser, optional): Config class that should
-                be used to set options for the driver. Defaults to
-                None and yggdrasil.config.ygg_cfg is used.
-
-        """
+        registration."""
         if cls.default_compiler is None:
             if platform._is_linux:
                 cls.default_compiler = 'g++'
@@ -112,7 +105,9 @@ class CPPModelDriver(CModelDriver):
             elif platform._is_win:  # pragma: windows
                 cls.default_compiler = 'cl'
         cls.function_param['print'] = 'std::cout << "{message}" << std::endl;'
-        CModelDriver.after_registration(cls, cfg=cfg)
+        CModelDriver.after_registration(cls, **kwargs)
+        if kwargs.get('second_pass', False):
+            return
         internal_libs = copy.deepcopy(cls.internal_libraries)
         internal_libs[cls.interface_library] = internal_libs.pop(
             CModelDriver.interface_library)

@@ -230,14 +230,9 @@ def update_language_config(languages=None, skip_warnings=False,
         for l in all_languages:
             if l.lower() not in languages:
                 languages.append(l)
-        print('languages', languages)
-        print('all', all_languages)
-        print('here', import_component('model','python'))
     drivers = OrderedDict([(l, import_component('model', l))
                            for l in languages])
-    print('drivers', drivers)
     drv = list(get_language_order(drivers).values())
-    print('drv', drv)
     if disable_languages is None:
         disable_languages = []
     if enable_languages is None:
@@ -390,12 +385,6 @@ def cfg_environment(env=None, cfg=None):
 ygg_cfg_usr = YggConfigParser.from_files([usr_config_file])
 ygg_cfg = YggConfigParser.from_files([def_config_file, usr_config_file,
                                       loc_config_file])
-if not os.path.isfile(usr_config_file):  # pragma: no cover
-    from yggdrasil.languages import install_languages
-    shutil.copy(def_config_file, usr_config_file)
-    install_languages.install_all_languages(from_setup=True)
-    update_language_config()
-    print('after config')
 
 
 # Do initial update of logging & environment (legacy)
