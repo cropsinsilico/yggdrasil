@@ -12,6 +12,16 @@ class BuildToolBase(CompilerBase):
     is_build_tool = True
     build_language = None
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        CompilerBase.before_registration(cls)
+        if cls.build_language is None:
+            cls.build_language = cls.toolname
+        
     @classmethod
     def get_default_target_language(cls):
         r"""Determine the default target language for the build tool.
@@ -100,6 +110,21 @@ class BuildModelDriver(CompiledModelDriver):
         self.target_language_driver = None
         super(BuildModelDriver, self).__init__(*args, **kwargs)
 
+    @staticmethod
+    def after_registration(cls):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
+        default compiler. The order of precedence is the config file 'compiler'
+        option for the language, followed by the environment variable set by
+        _compiler_env, followed by the existing class attribute.
+        """
+        for k in ['linker', 'archiver']:
+            if k in cls._config_keys:
+                cls._config_keys.remove(k)
+        if getattr(cls, 'default_compiler', None) is None:
+            cls.default_compiler = cls.language
+        CompiledModelDriver.after_registration(cls)
+        
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
         is a source file, compilation flag, or runtime option/flag that should

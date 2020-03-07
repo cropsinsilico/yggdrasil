@@ -12,6 +12,7 @@ import shutil
 import logging
 import warnings
 import configparser
+from collections import OrderedDict
 from yggdrasil import tools
 conda_prefix = os.environ.get('CONDA_PREFIX', '')
 config_file = '.yggdrasil.cfg'
@@ -146,14 +147,53 @@ class YggConfigParser(configparser.ConfigParser, object):
             return default
 
 
-# Initialize config
-ygg_cfg_usr = YggConfigParser.from_files([usr_config_file])
-ygg_cfg = YggConfigParser.from_files([def_config_file, usr_config_file,
-                                      loc_config_file])
-if not os.path.isfile(usr_config_file):  # pragma: no cover
-    from yggdrasil.languages import install_languages
-    shutil.copy(def_config_file, usr_config_file)
-    install_languages.install_all_languages(from_setup=True)
+def get_language_order(drivers):
+    r"""Get the correct language order, including any base languages.
+
+    Args:
+        drivers (dict): Drivers in order.
+
+    Returns:
+        dict: Drivers in sorted order.
+
+    """
+    from yggdrasil.components import import_component
+    out = OrderedDict()
+    for d, drv in drivers.items():
+        if d == 'cpp':
+            if 'c++' in drivers:
+                continue
+            d = 'c++'
+        new_deps = OrderedDict()
+        sub_deps = OrderedDict()
+        for sub_d in drv.base_languages:
+            if sub_d == 'cpp':
+                sub_d = 'c++'
+            if sub_d in drivers:
+                sub_deps[sub_d] = drivers[sub_d]
+            else:
+                sub_deps[sub_d] = import_component('model', sub_d)
+        sub_deps = get_language_order(sub_deps)
+        min_dep = -1
+        for sub_d, sub_drv in sub_deps.items():
+            if sub_d in out:
+                min_dep = max(min_dep, list(out.keys()).index(sub_d))
+            else:
+                new_deps[sub_d] = sub_drv
+        if d in out.keys():
+            dpos = list(out.keys()).index(d)
+            assert(dpos > min_dep)
+            min_dep = dpos
+        else:
+            new_deps[d] = drv
+        new_out = OrderedDict()
+        for k in list(out.keys())[:(min_dep + 1)]:
+            new_out[k] = out[k]
+        new_out.update(new_deps)
+        for k in list(out.keys())[(min_dep + 1):]:
+            new_out[k] = out[k]
+        out = new_out
+    return out
 
 
 def update_language_config(languages=None, skip_warnings=False,
@@ -186,7 +226,9 @@ def update_language_config(languages=None, skip_warnings=False,
     miss = []
     if languages is None:
         languages = tools.get_supported_lang()
-    drv = [import_component('model', l) for l in languages]
+    drivers = OrderedDict([(l, import_component('model', l))
+                           for l in languages])
+    drv = list(get_language_order(drivers).values())
     if disable_languages is None:
         disable_languages = []
     if enable_languages is None:
@@ -335,6 +377,17 @@ def cfg_environment(env=None, cfg=None):
             env[e] = v
 
             
+# Initialize config
+ygg_cfg_usr = YggConfigParser.from_files([usr_config_file])
+ygg_cfg = YggConfigParser.from_files([def_config_file, usr_config_file,
+                                      loc_config_file])
+if not os.path.isfile(usr_config_file):  # pragma: no cover
+    from yggdrasil.languages import install_languages
+    shutil.copy(def_config_file, usr_config_file)
+    install_languages.install_all_languages(from_setup=True)
+    update_language_config()
+
+
 # Do initial update of logging & environment (legacy)
 cfg_logging()
 cfg_environment()

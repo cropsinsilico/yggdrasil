@@ -756,7 +756,7 @@ class ModelDriver(Driver):
 
         """
         out = True
-        for x in cls.base_langauges:
+        for x in cls.base_languages:
             if not out:
                 break
             out = import_component('model', x).is_installed()
@@ -988,6 +988,8 @@ class ModelDriver(Driver):
         # Section and executable
         if (cls.language is not None) and (not cfg.has_section(cls.language)):
             cfg.add_section(cls.language)
+        # Executable type configuration
+        out += cls.configure_executable_type(cfg)
         # Locate executable
         if (((not cls.is_language_installed())
              and (cls.executable_type is not None))):  # pragma: debug
@@ -999,8 +1001,6 @@ class ModelDriver(Driver):
                     cfg.set(cls.language, cls.executable_type, fpath)
             except NotImplementedError:
                 pass
-        # Executable type configuration
-        out += cls.configure_executable_type(cfg)
         # Only do additional configuration if no base languages
         if not cls.base_languages:
             # Configure libraries

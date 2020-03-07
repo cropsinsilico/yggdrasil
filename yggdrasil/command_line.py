@@ -65,6 +65,13 @@ def ygginfo():
                 curr_prefix += prefix
                 vardict.append((curr_prefix + "Language Installed",
                                 drv.is_language_installed()))
+                vardict.append((curr_prefix + "Base Languages Installed",
+                                drv.are_base_languages_installed()))
+                if not drv.are_base_languages_installed():
+                    vardict.append(
+                        (curr_prefix + "Base Languages Not Installed",
+                         [b for b in drv.base_languages if
+                          (not import_component('model', b).is_installed())]))
                 vardict.append((curr_prefix + "Dependencies Installed",
                                 drv.are_dependencies_installed()))
                 vardict.append((curr_prefix + "Interface Installed",
@@ -273,8 +280,7 @@ def validate_yaml():
 
 def update_config():
     r"""Update the user config file for yggdrasil."""
-    from yggdrasil import config, tools
-    from yggdrasil.components import import_component
+    from yggdrasil import config, tools, platform
     parser = argparse.ArgumentParser(
         description='Update the user config file.')
     parser.add_argument('--show-file', action='store_true',
@@ -297,16 +303,23 @@ def update_config():
     else:
         prelang = parser.parse_known_args()[0].languages
     lang_args = {}
-    old_args = set([x.dest for x in parser._actions])
+    lang_args2kwargs = {}
+    if platform._is_mac:
+        lang_args.setdefault('c', [])
+        lang_args['c'].append(
+            (('--macos-sdkroot', '--sdkroot'),
+             {'help': (
+                 'The full path to the MacOS SDK '
+                 'that should be used.')}))
     for l in prelang:
-        drv = import_component('model', l)
-        drv.update_config_argparser(parser)
-        new_args = set([x.dest for x in parser._actions])
-        lang_args[drv.language] = list(new_args - old_args)
-        old_args = new_args
+        if l in lang_args:
+            lang_args2kwargs[l] = []
+            for args, kwargs in lang_args.get(l, []):
+                parser.add_argument(*args, **kwargs)
+                lang_args2kwargs[l].append(parser._actions[-1].dest)
     args = parser.parse_args()
     lang_kwargs = {l: {k: getattr(args, k) for k in alist}
-                   for l, alist in lang_args.items()}
+                   for l, alist in lang_args2kwargs.items()}
     if args.show_file:
         print('Config file located here: %s' % config.usr_config_file)
     if args.remove_file and os.path.isfile(config.usr_config_file):

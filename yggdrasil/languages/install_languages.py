@@ -239,7 +239,7 @@ def install_all_languages(from_setup=False, arglist=None, **kwargs):
             no_import=kwargs.get('no_import', None),
             arglist=arglist).parse_known_args(args=arglist)
     installed_languages = {}
-    for ilang in get_language_directories():
+    for ilang in sorted(get_language_directories()):
         install_language(ilang, installed_languages, **kwargs)
     return installed_languages
 

@@ -132,7 +132,11 @@ class CompilationToolMeta(type):
             if cls._dont_register:
                 return cls
             assert(cls.toolname is not None)
-            assert(len(cls.languages) > 0)
+            if getattr(cls, 'is_build_tool', False):
+                languages = [cls.build_language]
+            else:
+                languages = cls.languages
+            assert(len(languages) > 0)
             if cls.toolname in cls.aliases:  # pragma: debug
                 raise ValueError(("The name '%s' for class %s is also in "
                                   "its list of aliases: %s")
@@ -141,7 +145,7 @@ class CompilationToolMeta(type):
             reg = get_compilation_tool_registry(cls.tooltype)
             if 'by_language' not in reg:
                 reg['by_language'] = OrderedDict()
-            for l in cls.languages:
+            for l in languages:
                 if l not in reg['by_language']:
                     reg['by_language'][l] = OrderedDict()
             for x in [cls.toolname] + cls.aliases:
@@ -151,7 +155,7 @@ class CompilationToolMeta(type):
                                      % (cls.tooltype.title(), x, cls))
                 reg[x] = cls
                 # Register by language
-                for l in cls.languages:
+                for l in languages:
                     if x in reg['by_language'][l]:  # pragma: debug
                         raise ValueError(("%s toolname '%s' already registered for "
                                           "%s language.")
@@ -1965,8 +1969,9 @@ class CompiledModelDriver(ModelDriver):
             # used to retrieve them
             if (tooltype == 'compiler') or (return_prop in ['name', 'flags']):
                 # Get tool name
-                toolname = getattr(cls, tooltype,
-                                   getattr(cls, 'default_%s' % tooltype, None))
+                toolname = getattr(cls, tooltype, None)
+                if toolname is None:
+                    toolname = getattr(cls, 'default_%s' % tooltype, None)
                 if toolname is None:
                     if default is False:
                         raise NotImplementedError("%s not set for language '%s'."
@@ -1975,18 +1980,23 @@ class CompiledModelDriver(ModelDriver):
                 if return_prop == 'name':
                     return toolname
                 # Get flags
-                tool_flags = getattr(cls, '%s_flags' % tooltype,
-                                     getattr(cls, 'default_%s_flags' % tooltype, None))
+                tool_flags = getattr(cls, '%s_flags' % tooltype, None)
+                if tool_flags is None:
+                    tool_flags = getattr(cls, 'default_%s_flags' % tooltype, None)
                 if return_prop == 'flags':
                     return tool_flags
                 # Get tool
                 kwargs = {'executable': toolname, 'flags': tool_flags}
                 if tooltype == 'compiler':
                     kwargs.update(
-                        linker=cls.get_tool('linker', return_prop='name'),
-                        linker_flags=cls.get_tool('linker', return_prop='flags'),
-                        archiver=cls.get_tool('archiver', return_prop='name'),
-                        archiver_flags=cls.get_tool('archiver', return_prop='flags'))
+                        linker=cls.get_tool(
+                            'linker', return_prop='name', default=None),
+                        linker_flags=cls.get_tool(
+                            'linker', return_prop='flags', default=None),
+                        archiver=cls.get_tool(
+                            'archiver', return_prop='name', default=None),
+                        archiver_flags=cls.get_tool(
+                            'archiver', return_prop='flags', default=None))
                 out = get_compilation_tool(tooltype, toolname)(**kwargs)
             else:
                 out_tool = cls.get_tool('compiler', default=None)
@@ -2641,7 +2651,8 @@ class CompiledModelDriver(ModelDriver):
         archiver = None
         for k in ['compiler', 'linker', 'archiver']:
             # Set default linker/archiver based on compiler
-            default_tool_name = cfg.get(cls.language, k, None)
+            default_tool_name = cfg.get(
+                cls.language, k, getattr(cls, 'default_%s' % k, None))
             if (((default_tool_name is None) and (compiler is not None)
                  and (k in ['linker', 'archiver']))):
                 default_tool_name = getattr(compiler, 'default_%s' % k, None)
@@ -2659,6 +2670,7 @@ class CompiledModelDriver(ModelDriver):
                                                           allow_failure=True)
             # Set default tool attribute & record compiler tool if set
             if default_tool_name:
+                setattr(cls, 'default_%s' % k, default_tool_name)
                 cfg.set(cls.language, k, default_tool_name)
                 if k == 'compiler':
                     compiler = get_compilation_tool(k, default_tool_name)
