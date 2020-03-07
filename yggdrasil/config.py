@@ -230,6 +230,8 @@ def update_language_config(languages=None, skip_warnings=False,
         for l in all_languages:
             if l.lower() not in languages:
                 languages.append(l)
+    elif not isinstance(languages, list):
+        languages = [languages]
     drivers = OrderedDict([(l, import_component('model', l))
                            for l in languages])
     drv = list(get_language_order(drivers).values())

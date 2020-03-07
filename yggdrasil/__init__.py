@@ -34,6 +34,13 @@ if platform._is_win:  # pragma: windows
     os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = 'T'
 
 
+if not os.path.isfile(config.usr_config_file):  # pragma: no cover
+    from yggdrasil.languages import install_languages
+    shutil.copy(config.def_config_file, config.usr_config_file)
+    install_languages.install_all_languages(from_setup=True)
+    config.update_language_config()
+
+
 def expand_and_add(path, path_list, dir_list):  # pragma: no cover
     r"""Expand the specified path and add it's expanded forms to the provided
     list.
@@ -343,11 +350,3 @@ def run_tsts(**kwargs):  # pragma: no cover
 __all__ = []
 __version__ = get_versions()['version']
 del get_versions
-
-
-if not os.path.isfile(config.usr_config_file):  # pragma: no cover
-    from yggdrasil.languages import install_languages
-    shutil.copy(config.def_config_file, config.usr_config_file)
-    install_languages.install_all_languages(from_setup=True)
-    config.update_language_config()
-    print('after config')
