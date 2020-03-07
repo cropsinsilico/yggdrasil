@@ -155,9 +155,11 @@ class TestExampleTransforms(ExampleTstBase):
             for k, v in env.items():
                 self.oldenv_yaml[k] = os.environ.get(k, None)
                 os.environ[k] = v
-        super(TestExampleTransforms, self).run_example()
-        for k, v in self.oldenv_yaml.items():
-            if v is None:
-                del os.environ[k]
-            else:
-                os.environ[k] = v
+        try:
+            super(TestExampleTransforms, self).run_example()
+        finally:
+            for k, v in self.oldenv_yaml.items():
+                if v is None:
+                    del os.environ[k]
+                else:
+                    os.environ[k] = v  # pragma: no cover

@@ -5,14 +5,9 @@ import pystache
 import yaml
 import json
 import git
-import sys
 import io as sio
 from yggdrasil.schema import standardize, get_schema
-
-if sys.version_info > (3, 0):
-    from urllib.parse import urlparse
-else:
-    from urlparse import urlparse
+from urllib.parse import urlparse
 
 
 def load_yaml(fname):
@@ -329,8 +324,6 @@ def parse_connection(yml, existing):
                 fname = os.path.join(x['working_dir'], fname)
             fname = os.path.normpath(fname)
             if (not os.path.isfile(fname)) and (not x.get('wait_for_creation', False)):
-                import pprint
-                pprint.pprint(x)
                 raise RuntimeError(("Input '%s' not found in any of the registered "
                                     + "model outputs and is not a file.") % x['name'])
             x['address'] = fname

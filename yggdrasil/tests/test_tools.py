@@ -1,7 +1,36 @@
 import os
 import sys
+import tempfile
 from yggdrasil import tools, platform
-from yggdrasil.tests import YggTestClass, assert_equal
+from yggdrasil.tests import YggTestClass, assert_equal, assert_warns
+
+
+def make_temp(fname_base, count=1):
+    r"""Create temporary copies of same file with different extensions."""
+    fname_base = fname_base.lower()
+    tempdir = os.path.normcase(os.path.normpath(tempfile.gettempdir()))
+    if (tempdir + os.pathsep) not in os.environ['PATH']:
+        os.environ['PATH'] = os.pathsep.join([tempdir, os.environ.get('PATH')])
+    fname_pattern = fname_base + '.*'
+    fname = os.path.join(tempdir, fname_base)
+    out = []
+    for i in range(count):
+        fname_i = '%s.%d' % (fname, i)
+        out.append(fname_i)
+        if not os.path.isfile(fname_i):
+            with open(fname_i, 'w') as fd:
+                fd.write('Test file %d' % i)
+    return tempdir, fname_pattern, out
+
+
+def make_temp_single():
+    r"""Create single temporary file."""
+    return make_temp('single_test_file')
+
+
+def make_temp_multiple():
+    r"""Create multiple temporary files."""
+    return make_temp('multiple_test_file', count=2)
 
 
 def test_bytes2str():
@@ -59,6 +88,40 @@ def test_which():
     else:
         assert(tools.which('python') is not None)
     assert(tools.which('invalid') is None)
+
+
+def test_locate_file():
+    r"""Test file location method."""
+    # Missing file
+    assert(not tools.locate_file('missing_file.fake'))
+    assert(not tools.locate_file(['missing_file.fake']))
+    # Single file
+    sdir, spat, sans = make_temp_single()
+    sout = tools.locate_file(spat)
+    assert(isinstance(sout, (bytes, str)))
+    assert_equal(sout, sans[0])
+    # Multiple files
+    mdir, mpat, mans = make_temp_multiple()
+    with assert_warns(RuntimeWarning):
+        mout = tools.locate_file([mpat])
+        assert(isinstance(mout, (bytes, str)))
+        assert_equal(mout, mans[0])
+    
+
+def test_find_all():
+    r"""Test find_all."""
+    # Missing file
+    assert(not tools.find_all('missing_file.fake', 'invalid'))
+    # Single file
+    sdir, spat, sans = make_temp_single()
+    sout = tools.find_all(spat, sdir)
+    assert(isinstance(sout, list))
+    assert_equal(sout, sans)
+    # Multiple files
+    mdir, mpat, mans = make_temp_multiple()
+    mout = tools.find_all(mpat, mdir)
+    assert(isinstance(mout, list))
+    assert_equal(mout, mans)
 
 
 def test_locate_path():

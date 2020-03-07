@@ -40,6 +40,17 @@ the terminal (or Anaconda Prompt on Windows).::
 
   $ conda config --add channels conda-forge
 
+.. note::
+   **Windows Users** If you see the warning::
+
+     "WARNING: Did not find VS in registry or in VS140COMNTOOLS env var - your compiler may not work"
+
+   during installation you will need to run the command below to enable the Visual Studio command line tools.::
+     
+     $ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+
+   Then run ``yggconfig`` to finish the installation process for C and C++.
+
 
 Development Installation
 ------------------------

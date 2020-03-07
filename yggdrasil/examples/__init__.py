@@ -155,7 +155,7 @@ def register_example(example_dir):
                                                '*' + ext_map[lsrc])))
             else:
                 src_names = sorted(
-                    glob.glob(os.path.join(srcdir, '*' + ext_map[lang])))
+                    glob.glob(os.path.join(srcdir, '*' + ext_map.get(lang, ''))))
         out_yml[lang] = [os.path.join(example_dir, y) for y in yml_names]
         if src_is_abs:
             out_src[lang] = src_names

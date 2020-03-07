@@ -33,18 +33,14 @@ env:
     INSTALLAPY=0
     INSTALLLPY=0
     INSTALLR=1
+    YGG_SECOND_TEST=
     BUILDDOCS=0
-    YGG_RUN_ALL_TESTS=1
-    YGG_RUN_EXAMPLES=0
-    YGG_RUN_TYPES_EXAMPLES=0
-    YGG_RUN_TIME_TESTS=0
-    YGG_ENABLE_LONG_TESTS=0
-    YGG_TYPES_LANGUAGES=
     YGG_TEST_FLAGS="--test-suite=examples"
   matrix:
-    - YGG_TEST_FLAGS="--test-suite=examples"
-    - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running"
-    # - YGG_CONDA=yes YGG_TEST_FLAGS="--test-suite=types --languages r c"
+    - YGG_TEST_FLAGS="--test-suite=examples_part1"
+    - YGG_TEST_FLAGS="--test-suite=examples_part2"
+    - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running" INSTALLRMQ=1 INSTALLAPY=1 YGG_SECOND_TEST="yggtest --ci --default-comm=IPCComm --long-running"
+    # - YGG_CONDA=yes YGG_TEST_FLAGS="--test-suite=types --languages R c"
     # - YGG_TEST_FLAGS="--test-suite=types --languages matlab python cpp"
 
 before_install:
@@ -157,6 +153,7 @@ install:
 
 script:
   - yggtest --ci $YGG_TEST_FLAGS
+  - $YGG_SECOND_TEST
 
 
 after_success:
@@ -183,7 +180,12 @@ jobs:
       dist: xenial
       sudo: true
     - os: linux
-      env: YGG_TEST_FLAGS="--test-suite=types --languages r c"
+      env: YGG_TEST_FLAGS="--test-suite=types --languages R c"
+      python: 3.7
+      dist: xenial
+      sudo: true
+    - os: linux
+      env: YGG_TEST_FLAGS="--test-suite=timing" YGG_DEFAULT_COMM=ZMQComm
       python: 3.7
       dist: xenial
       sudo: true
@@ -196,19 +198,19 @@ jobs:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
           - $HOME/R/Library
-      env: YGG_PYTHON=3.6 R_LIBS_USER=$HOME/R/Library YGG_TEST_FLAGS="--test-suite=types --language=c" INSTALLRMQ=1
+      env: YGG_PYTHON=3.6 R_LIBS_USER=$HOME/R/Library YGG_TEST_FLAGS="--test-suite=types --test-suite=timing --languages R c" INSTALLR=0
     - os: osx
-      python: 3.8
+      python: 3.7
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
         pip: false
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
-      env: YGG_CONDA=3.8 YGG_TEST_FLAGS="--test-suite=examples"
+      env: YGG_CONDA=3.7 YGG_TEST_FLAGS="--test-suite=examples serialize communication" INSTALLZMQ=0
       script:
         - yggconfig --remove-file
-        - yggtest --ci $YGG_TEST_FLAGS
+        - yggtest --ci tests/test_config.py $YGG_TEST_FLAGS
       
     - name: "Build docs"
       python: 3.6

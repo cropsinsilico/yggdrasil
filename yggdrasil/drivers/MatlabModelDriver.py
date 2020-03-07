@@ -3,6 +3,7 @@ import uuid as uuid_gen
 import logging
 from datetime import datetime
 import os
+import glob
 import psutil
 import warnings
 import weakref
@@ -427,7 +428,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     language_ext = '.m'
     base_languages = ['python']
     default_interpreter_flags = ['-nodisplay', '-nosplash', '-nodesktop',
-                                 '-nojvm', '-batch']
+                                 '-nojvm', '-r']
     version_flags = ["fprintf('R%s', version('-release')); exit();"]
     path_env_variable = 'MATLABPATH'
     comm_linger = (os.environ.get('YGG_MATLAB_ENGINE', '').lower() == 'true')
@@ -490,6 +491,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'try_begin': 'try',
         'try_except': 'catch {error_var}',
         'assign': '{name} = {value};',
+        'expand_mult': '{name} = {value}{{:}};',
         'functions_defined_last': True,
         'function_def_begin': 'function {output_var} = {function_name}({input_var})',
         'function_def_regex': (
@@ -517,6 +519,12 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         if self.using_matlab_engine:
             kwargs['skip_interpreter'] = True
         self.model_wrapper = None
+        # -batch command line option introduced in 2019
+        if (self.is_installed()):
+            if (((self.language_version().lower() >= 'r2019')
+                 and ('-r' in self.default_interpreter_flags))):
+                self.default_interpreter_flags[
+                    self.default_interpreter_flags.index('-r')] = '-batch'
         super(MatlabModelDriver, self).__init__(name, args, **kwargs)
         self.started_matlab = False
         self.screen_session = None
@@ -524,6 +532,20 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         self.mlsession = None
         self.mlprocess = None
 
+    @staticmethod
+    def after_registration(cls, **kwargs):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
+        default compiler. The order of precedence is the config file 'compiler'
+        option for the language, followed by the environment variable set by
+        _compiler_env, followed by the existing class attribute.
+        """
+        if platform._is_mac:
+            cls._executable_search_dirs = [
+                os.path.join(x, 'bin') for x in
+                glob.glob('/Applications/MATLAB*')]
+        InterpretedModelDriver.after_registration(cls, **kwargs)
+        
     def parse_arguments(self, args):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.
@@ -693,13 +715,20 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         return out
         
     @classmethod
-    def language_version(cls):
+    def language_version(cls, skip_config=False):
         r"""Determine the version of this language.
+
+        Args:
+            skip_config (bool, optional): If True, the config option
+                for the version (if it exists) will be ignored and
+                the version will be determined fresh.
 
         Returns:
             str: Version of compiler/interpreter for this language.
 
         """
+        if cls.cfg.has_option(cls.language, 'version') and (not skip_config):
+            return cls.cfg.get(cls.language, 'version')
         return cls.get_matlab_info()[1]
         
     @classmethod

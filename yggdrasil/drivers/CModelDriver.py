@@ -1,5 +1,6 @@
 import os
 import re
+import warnings
 import copy
 import shutil
 import subprocess
@@ -253,7 +254,11 @@ _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
 _python_inc = sysconfig.get_paths()['include']
-_python_lib = tools.get_python_c_library(allow_failure=False)
+try:
+    _python_lib = tools.get_python_c_library(allow_failure=False)
+except BaseException:  # pragma: debug
+    warnings.warn("ERROR LOCATING PYTHON LIBRARY")
+    _python_lib = None
 _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
 _numpy_lib = None
 
@@ -476,7 +481,7 @@ class CModelDriver(CompiledModelDriver):
     brackets = (r'{', r'}')
 
     @staticmethod
-    def after_registration(cls):
+    def after_registration(cls, **kwargs):
         r"""Operations that should be performed to modify class attributes after
         registration."""
         if cls.default_compiler is None:
@@ -486,30 +491,19 @@ class CModelDriver(CompiledModelDriver):
                 cls.default_compiler = 'clang'
             elif platform._is_win:  # pragma: windows
                 cls.default_compiler = 'cl'
-        CompiledModelDriver.after_registration(cls)
-        archiver = cls.get_tool('archiver', default=None)
-        linker = cls.get_tool('linker', default=None)
-        if archiver:
-            if _python_lib.endswith(archiver.library_ext):
-                cls.external_libraries['python']['libtype'] = 'static'
-                cls.external_libraries['python']['static'] = _python_lib
-            else:
-                cls.external_libraries['python']['libtype'] = 'shared'
-                cls.external_libraries['python']['shared'] = _python_lib
+        CompiledModelDriver.after_registration(cls, **kwargs)
+        if kwargs.get('second_pass', False):
+            return
+        if _python_lib and _python_lib.endswith(('.lib', '.a')):
+            cls.external_libraries['python']['libtype'] = 'static'
+            cls.external_libraries['python']['static'] = _python_lib
+        else:
+            cls.external_libraries['python']['libtype'] = 'shared'
+            cls.external_libraries['python']['shared'] = _python_lib
         for x in ['zmq', 'czmq']:
             if x in cls.external_libraries:
                 if platform._is_win:  # pragma: windows
                     cls.external_libraries[x]['libtype'] = 'static'
-                libtype = cls.external_libraries[x]['libtype']
-                if libtype == 'static':  # pragma: debug
-                    tool = archiver
-                    kwargs = {}
-                else:
-                    tool = linker
-                    kwargs = {'build_library': True}
-                if tool:
-                    cls.external_libraries[x][libtype] = tool.get_output_file(
-                        x, **kwargs)
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']
@@ -529,21 +523,6 @@ class CModelDriver(CompiledModelDriver):
                     cls.internal_libraries[x]['compiler_flags'] = []
                 if '-fPIC' not in cls.internal_libraries[x]['compiler_flags']:
                     cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
-        
-    @classmethod
-    def update_config_argparser(cls, parser):
-        r"""Add arguments for configuration options specific to this
-        language.
-
-        Args:
-            parser (argparse.ArgumentParser): Parser to add arguments to.
-
-        """
-        super(CModelDriver, cls).update_config_argparser(parser)
-        if platform._is_mac and (cls.language == 'c'):
-            parser.add_argument('--macos-sdkroot', '--sdkroot',
-                                help=('The full path to the MacOS SDK '
-                                      'that should be used.'))
         
     @classmethod
     def configure(cls, cfg, macos_sdkroot=None):

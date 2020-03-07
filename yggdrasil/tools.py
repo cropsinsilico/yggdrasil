@@ -6,6 +6,8 @@ import pprint
 import os
 import sys
 import sysconfig
+import distutils
+import warnings
 import copy
 import shutil
 import inspect
@@ -32,16 +34,7 @@ if ((logging.getLogger("yggdrasil").getEffectiveLevel()
     _stack_in_timeout = True
 _thread_registry = {}
 _lock_registry = {}
-try:
-    _main_thread = threading.main_thread()
-except AttributeError:
-    _main_thread = None
-    for i in threading.enumerate():
-        if (i.name == "MainThread"):
-            _main_thread = i
-            break
-    if _main_thread is None:  # pragma: debug
-        raise RuntimeError("Could not located MainThread")
+_main_thread = threading.main_thread()
 
 
 def apply_recurse(x, func, **kwargs):
@@ -225,6 +218,8 @@ def get_python_c_library(allow_failure=False, libtype=None):
     for k in ['stdlib', 'purelib', 'platlib', 'platstdlib', 'data']:
         dir_try.append(paths[k])
     dir_try.append(os.path.join(paths['data'], 'lib'))
+    dir_try.append(os.path.dirname(
+        distutils.sysconfig.get_python_lib(True, True)))
     dir_try = set(dir_try)
     for idir in dir_try:
         x = os.path.join(idir, base)
@@ -306,8 +301,9 @@ def ygg_atexit():  # pragma: debug
     r"""Things to do at exit."""
     check_locks()
     check_threads()
-    if not is_subprocess():
-        check_sockets()
+    # # This causes a segfault in a C dependency
+    # if not is_subprocess():
+    #     check_sockets()
     # Python 3.4 no longer supported if using pip 9.0.0, but this
     # allows the code to work if somehow installed using an older
     # version of pip
@@ -335,6 +331,112 @@ def which(program):
         if out is not None:
             return out
     return shutil.which(program)
+
+
+def find_all(name, path):
+    r"""Find all instances of a file with a given name within the directory
+    tree starting at a given path.
+
+    Args:
+        name (str): Name of the file to be found (with the extension).
+        path (str, None): Directory where search should start. If set to
+            None on Windows, the current directory and PATH variable are
+            searched.
+
+    Returns:
+        list: All instances of the specified file.
+
+    """
+    result = []
+    try:
+        if platform._is_win:  # pragma: windows
+            if path is None:
+                out = subprocess.check_output(["where", name],
+                                              env=os.environ,
+                                              stderr=subprocess.STDOUT)
+            else:
+                out = subprocess.check_output(["where", "/r", path, name],
+                                              env=os.environ,
+                                              stderr=subprocess.STDOUT)
+        else:
+            args = ["find", "-L", path, "-type", "f", "-name", name]
+            pfind = subprocess.Popen(args, env=os.environ,
+                                     stderr=subprocess.PIPE,
+                                     stdout=subprocess.PIPE)
+            (stdoutdata, stderrdata) = pfind.communicate()
+            out = stdoutdata
+            for l in stderrdata.splitlines():
+                if b'Permission denied' not in l:
+                    raise subprocess.CalledProcessError(pfind.returncode,
+                                                        ' '.join(args),
+                                                        output=stderrdata)
+    except subprocess.CalledProcessError:
+        out = ''
+    if not out.isspace():
+        result = sorted(out.splitlines())
+    result = [os.path.normcase(os.path.normpath(bytes2str(m)))
+              for m in result]
+    return result
+
+
+def locate_file(fname, environment_variable='PATH', directory_list=None):
+    r"""Locate a file within a set of paths defined by a list or environment
+    variable.
+
+    Args:
+        fname (str, list): One or more possible names of the file that should be
+            located. If a list is provided, the path for the first entry for
+            which a match could be located will be returned and subsequent entries
+            will not be checked.
+        environment_variable (str): Environment variable containing the set of
+            paths that should be searched. Defaults to 'PATH'. If None, this
+            keyword argument will be ignored. If a list is provided, it is
+            assumed to be a list of environment variables that should be
+            searched in the specified order.
+        directory_list (list): List of paths that should be searched in addition
+            to those specified by environment_variable. Defaults to None and is
+            ignored. These directories will be searched be for those in the
+            specified environment variables.
+
+    Returns:
+        bool, str: Full path to the located file if it was located, False
+            otherwise.
+
+    """
+    if isinstance(fname, list):
+        out = False
+        for ifname in fname:
+            out = locate_file(ifname, environment_variable=environment_variable,
+                              directory_list=directory_list)
+            if out:
+                break
+        return out
+    out = []
+    if ((platform._is_win and (environment_variable == 'PATH')
+         and (directory_list is None))):  # pragma: windows
+        out += find_all(fname, None)
+    else:
+        if directory_list is None:
+            directory_list = []
+        if environment_variable is not None:
+            if not isinstance(environment_variable, list):
+                environment_variable = [environment_variable]
+            for x in environment_variable:
+                directory_list += os.environ.get(x, '').split(os.pathsep)
+        for path in directory_list:
+            if path:
+                out += find_all(fname, path)
+    if not out:
+        return False
+    first = out[0]
+    out = set(out)
+    out.remove(first)
+    if len(out) > 0:
+        warnings.warn(("More than one (%d) match to %s:\n%s\n "
+                       + "Using first match (%s)") %
+                      (len(out) + 1, fname, pprint.pformat(out),
+                       first), RuntimeWarning)
+    return first
 
 
 def locate_path(fname, basedir=os.path.abspath(os.sep)):

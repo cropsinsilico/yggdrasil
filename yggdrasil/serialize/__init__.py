@@ -638,7 +638,9 @@ def table2format(fmts=[], delimiter=None, newline=None, comment=None):
     if isinstance(fmts, np.dtype):
         fmts = nptype2cformat(fmts)
     bytes_fmts = tools.str2bytes(fmts, recurse=True)
-    fmt_str = comment + delimiter.join(bytes_fmts) + newline
+    fmt_str = (tools.str2bytes(comment)
+               + tools.str2bytes(delimiter).join(bytes_fmts)
+               + tools.str2bytes(newline))
     return fmt_str
 
 
@@ -774,12 +776,10 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
             arr = arr.astype(dtype)
     else:
         np_ver = tuple([float(x) for x in (np.__version__).split('.')])
+        np_kws.update(autostrip=True, dtype=None, names=names)
         if (np_ver >= (1.0, 14.0, 0.0)):
-            arr = np.genfromtxt(fd, encoding='bytes', autostrip=True, dtype=None,
-                                names=names, **np_kws)
-        else:
-            arr = np.genfromtxt(fd, autostrip=True, dtype=None,
-                                names=names, **np_kws)
+            np_kws['encoding'] = 'bytes'
+        arr = np.genfromtxt(fd, **np_kws)
         if dtype is not None:
             arr = arr.astype(dtype)
     fd.close()

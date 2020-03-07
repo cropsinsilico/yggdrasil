@@ -11,7 +11,6 @@ import tempfile
 from collections import OrderedDict
 from pprint import pformat
 from yggdrasil import platform, tools, languages
-from yggdrasil.config import ygg_cfg, locate_file, update_language_config
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.metaschema.datatypes import is_default_typedef
@@ -87,10 +86,12 @@ class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
 
     Args:
-        name (str): Driver name.
-        args (str or list): Argument(s) for running the model on the command
-            line. This should be a complete command including the necessary
-            executable and command line arguments to that executable.
+        name (str): Unique name used to identify the model. This will
+            be used to report errors associated with the model.
+        args (str or list): The full path to the file containing the
+            model program that will be run by the driver or a list
+            starting with the program file and including any arguments
+            that should be passed as input to the program.
         products (list, optional): Paths to files created by the model that
             should be cleaned up when the model exits. Entries can be absolute
             paths or paths relative to the working directory. Defaults to [].
@@ -103,13 +104,21 @@ class ModelDriver(Driver):
             that are source files. These files will be removed without checking
             their extension so users should avoid adding files to this list
             unless they are sure they should be deleted. Defaults to [].
-        is_server (bool, optional): If True, the model is assumed to be a server
-            and an instance of :class:`yggdrasil.drivers.ServerDriver`
-            is started. Defaults to False. Use of is_server with function is
-            not currently supported.
-        client_of (str, list, optional): The names of one or more servers that
-            this model is a client of. Defaults to empty list. Use of client_of
-            with function is not currently supported.
+        is_server (bool, optional): If `True`, the model is assumed to be a
+            server for one or more client models and an instance of
+            :class:`yggdrasil.drivers.ServerDriver` is started. The
+            corresponding channel that should be passed to the yggdrasil API
+            will be the name of the model. Defaults to False. Use of `is_server`
+            with `function` is not currently supported.
+        client_of (str, list, optional): The names of one or more models that
+            this model will call as a server. If there are more than one, this
+            should be specified as a sequence collection (list). The
+            corresponding channel(s) that should be passed to the yggdrasil API
+            will be the name of the server model joined with the name of the
+            client model with an underscore `<server_model>_<client_model>`.
+            There will be one channel created for each server the model is a
+            client of. Defaults to empty list. Use of `client_of` with `function`
+            is not currently supported.
         overwrite (bool, optional): If True, any existing model products
             (compilation products, wrapper scripts, etc.) are removed prior to
             the run. If False, the products are not removed. Defaults to True.
@@ -237,16 +246,35 @@ class ModelDriver(Driver):
     _schema_properties = {
         'name': {'type': 'string'},
         'language': {'type': 'string', 'default': 'executable',
-                     'description': ('The programming language that the model '
-                                     'is written in.')},
+                     'description': (
+                         'The programming language that the model '
+                         'is written in. A list of available '
+                         'languages can be found :ref:`here <'
+                         'schema_table_model_subtype_rst>`.')},
         'args': {'type': 'array',
                  'items': {'type': 'string'}},
         'inputs': {'type': 'array', 'default': [{'name': 'default'}],
                    'items': {'$ref': '#/definitions/comm'},
-                   'description': 'Model inputs described as comm objects.'},
+                   'description': (
+                       'A mapping object containing the entry for a '
+                       'model input channel or a list of input '
+                       'channel entries. If the model does not get '
+                       'input from another model, this may be '
+                       'ommitted. A full description of channel '
+                       'entries and the options available for '
+                       'channels can be found :ref:`here<'
+                       'yaml_comm_options>`.')},
         'outputs': {'type': 'array', 'default': [{'name': 'default'}],
                     'items': {'$ref': '#/definitions/comm'},
-                    'description': 'Model outputs described as comm objects.'},
+                    'description': (
+                        'A mapping object containing the entry for a '
+                        'model output channel or a list of output '
+                        'channel entries. If the model does not '
+                        'output to another model, this may be '
+                        'ommitted. A full description of channel '
+                        'entries and the options available for '
+                        'channels can be found :ref:`here<'
+                        'yaml_comm_options>`.')},
         'products': {'type': 'array', 'default': [],
                      'items': {'type': 'string'}},
         'source_products': {'type': 'array', 'default': [],
@@ -303,11 +331,13 @@ class ModelDriver(Driver):
     python_interface = {'table_input': 'YggAsciiTableInput',
                         'table_output': 'YggAsciiTableOutput',
                         'array_input': 'YggArrayInput',
-                        'array_outputs': 'YggArrayOutput',
+                        'array_output': 'YggArrayOutput',
                         'pandas_input': 'YggPandasInput',
                         'pandas_output': 'YggPandasOutput'}
-
     _library_cache = {}
+    _config_keys = []
+    _config_attr_map = []
+    _executable_search_dirs = None
 
     def __init__(self, name, args, model_index=0, **kwargs):
         self.model_outputs_in_inputs = kwargs.pop('outputs_in_inputs', None)
@@ -395,12 +425,40 @@ class ModelDriver(Driver):
             cls.language_ext = [cls.language_ext]
             
     @staticmethod
+    def after_registration(cls, cfg=None, second_pass=False):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
+        default compiler. The order of precedence is the config file 'compiler'
+        option for the language, followed by the environment variable set by
+        _compiler_env, followed by the existing class attribute.
+
+        Args:
+            cfg (YggConfigParser, optional): Config class that should
+                be used to set options for the driver. Defaults to
+                None and yggdrasil.config.ygg_cfg is used.
+            second_pass (bool, optional): If True, the class as already
+                been registered. Defaults to False.
+
+        """
+        if cfg is None:
+            from yggdrasil.config import ygg_cfg
+            cfg = ygg_cfg
+            cfg.reload()
+        Driver.after_registration(cls)
+        cls.cfg = cfg
+        for x in cls._config_attr_map:
+            ka = x['attr']
+            k0 = x.get('key', ka)
+            kt = x.get('type', None)
+            setattr(cls, ka, cls.cfg.get(cls.language, k0,
+                                         getattr(cls, ka)))
+            if (kt == list) and isinstance(getattr(cls, ka), str):
+                setattr(cls, ka, getattr(cls, ka).split())
+        
+    @staticmethod
     def finalize_registration(cls):
         r"""Operations that should be performed after a class has been fully
         initialized and registered."""
-        if (not cls.is_configured()):  # pragma: no cover
-            # This will only be run the first time yggdrasil is imported
-            update_language_config(cls)
         global _map_language_ext
         for x in cls.get_language_ext():
             if x not in _map_language_ext:
@@ -498,10 +556,7 @@ class ModelDriver(Driver):
         if isinstance(args, (str, bytes)):
             args = args.split()
         for i in range(len(args)):
-            if isinstance(args[i], bytes):
-                args[i] = args[i].decode("utf-8")
-            else:
-                args[i] = str(args[i])
+            args[i] = str(args[i])
         assert(isinstance(args, list))
         if default_model_dir is None:
             default_model_dir = self.working_dir
@@ -540,7 +595,7 @@ class ModelDriver(Driver):
         return [self.model_file] + self.model_args
 
     @classmethod
-    def language_executable(cls):
+    def language_executable(cls, **kwargs):
         r"""Command required to compile/run a model written in this language
         from the command line.
 
@@ -707,9 +762,26 @@ class ModelDriver(Driver):
                 machine.
 
         """
-        return (cls.is_language_installed() and cls.are_dependencies_installed()
+        return (cls.is_language_installed()
+                and cls.are_base_languages_installed()
+                and cls.are_dependencies_installed()
                 and cls.is_interface_installed() and cls.is_comm_installed()
-                and cls.is_configured())
+                and cls.is_configured() and (not cls.is_disabled()))
+
+    @classmethod
+    def are_base_languages_installed(cls):
+        r"""Determine if the base languages are installed.
+
+        Returns:
+            bool: True if the base langauges are installed. False otherwise.
+
+        """
+        out = True
+        for x in cls.base_languages:
+            if not out:  # pragma: no cover
+                break
+            out = import_component('model', x).is_installed()
+        return out
 
     @classmethod
     def are_dependencies_installed(cls):
@@ -721,10 +793,6 @@ class ModelDriver(Driver):
 
         """
         out = (cls.language is not None)
-        for x in cls.base_languages:
-            if not out:  # pragma: no cover
-                break
-            out = import_component('model', x).are_dependencies_installed()
         for x in cls.interface_dependencies:
             if not out:  # pragma: no cover
                 break
@@ -741,10 +809,6 @@ class ModelDriver(Driver):
 
         """
         out = (cls.language is not None)
-        for x in cls.base_languages:
-            if not out:  # pragma: no cover
-                break
-            out = import_component('model', x).is_interface_installed()
         if out and (cls.interface_library is not None):
             out = cls.is_library_installed(cls.interface_library)
         return out
@@ -764,10 +828,6 @@ class ModelDriver(Driver):
                 out = (tools.which(cls.language_executable()) is not None)
             except NotImplementedError:  # pragma: debug
                 out = False
-        for x in cls.base_languages:
-            if not out:
-                break
-            out = import_component('model', x).is_language_installed()
         return out
 
     def get_source_file(self, args):
@@ -824,6 +884,10 @@ class ModelDriver(Driver):
                                   % cls.language)
 
     @classmethod
+    def is_disabled(cls):
+        return (cls.cfg.get(cls.language, 'disable', 'false').lower() == 'true')
+
+    @classmethod
     def is_configured(cls):
         r"""Determine if the appropriate configuration has been performed (e.g.
         installation of supporting libraries etc.)
@@ -833,16 +897,14 @@ class ModelDriver(Driver):
 
         """
         # Check for section & diable
-        disable_flag = ygg_cfg.get(cls.language, 'disable', 'false').lower()
-        out = (ygg_cfg.has_section(cls.language) and (disable_flag != 'true'))
+        disable_flag = cls.is_disabled()
+        out = (cls.cfg.has_section(cls.language) and (not disable_flag))
         # Check for commtypes
         if out and (len(cls.base_languages) == 0):
-            out = (ygg_cfg.get(cls.language, 'commtypes', None) is not None)
-        # Base languages
-        for x in cls.base_languages:
-            if not out:  # pragma: debug
-                break
-            out = import_component('model', x).is_configured()
+            out = (cls.cfg.get(cls.language, 'commtypes', None) is not None)
+        # Check for config keys
+        for k in cls._config_keys:
+            out = (cls.cfg.get(cls.language, k, None) is not None)
         return out
 
     @classmethod
@@ -888,7 +950,7 @@ class ModelDriver(Driver):
             return out
         # Check for installation based on config option
         if not skip_config:
-            installed_comms = ygg_cfg.get(cls.language, 'commtypes', [])
+            installed_comms = cls.cfg.get(cls.language, 'commtypes', [])
             if commtype is None:
                 return (len(installed_comms) > 0)
             else:
@@ -899,7 +961,6 @@ class ModelDriver(Driver):
                 if cls.is_comm_installed(commtype=c, skip_config=skip_config,
                                          **kwargs):
                     return True
-            return False
         # Check that comm is explicitly supported
         if commtype not in cls.supported_comms:
             return False
@@ -920,17 +981,6 @@ class ModelDriver(Driver):
         return True
     
     @classmethod
-    def update_config_argparser(cls, parser):
-        r"""Add arguments for configuration options specific to this
-        language.
-
-        Args:
-            parser (argparse.ArgumentParser): Parser to add arguments to.
-
-        """
-        pass
-
-    @classmethod
     def configure(cls, cfg):
         r"""Add configuration options for this language.
 
@@ -942,27 +992,24 @@ class ModelDriver(Driver):
                 be set.
 
         """
-        # Base languages
-        for x in cls.base_languages:
-            x_drv = import_component('model', x)
-            if not x_drv.is_configured():  # pragma: debug
-                # This shouldn't actually be called because configuration should
-                # occur on import
-                x_drv.configure(cfg)
+        out = []
         # Section and executable
         if (cls.language is not None) and (not cfg.has_section(cls.language)):
             cfg.add_section(cls.language)
+        # Executable type configuration
+        out += cls.configure_executable_type(cfg)
         # Locate executable
         if (((not cls.is_language_installed())
              and (cls.executable_type is not None))):  # pragma: debug
             try:
-                fpath = locate_file(cls.language_executable())
+                fpath = tools.locate_file(
+                    cls.language_executable(),
+                    directory_list=cls._executable_search_dirs)
                 if fpath:
                     cfg.set(cls.language, cls.executable_type, fpath)
             except NotImplementedError:
                 pass
         # Only do additional configuration if no base languages
-        out = []
         if not cls.base_languages:
             # Configure libraries
             out += cls.configure_libraries(cfg)
@@ -972,7 +1019,23 @@ class ModelDriver(Driver):
                 if cls.is_comm_installed(commtype=c, cfg=cfg, skip_config=True):
                     comms.append(c)
             cfg.set(cls.language, 'commtypes', comms)
+        cls.after_registration(cls, cfg=cfg, second_pass=True)
         return out
+
+    @classmethod
+    def configure_executable_type(cls, cfg):
+        r"""Add configuration options specific in the executable type
+        before the libraries are configured.
+
+        Args:
+            cfg (CisConfigParser): Config class that options should be set for.
+        
+        Returns:
+            list: Section, option, description tuples for options that could not
+                be set.
+
+        """
+        return []
 
     @classmethod
     def configure_libraries(cls, cfg):
@@ -2212,7 +2275,10 @@ checking if the model flag indicates
         if expanded_recv_var:
             lines.append(cls.format_function_param(
                 'print_generic', object=recv_var_str))
-            if 'assign_mult' in cls.function_param:
+            if 'expand_mult' in cls.function_param:  # pragma: matlab
+                lines.append(cls.format_function_param(
+                    'expand_mult', name=expanded_recv_var, value=recv_var_str))
+            elif 'assign_mult' in cls.function_param:
                 lines.append(cls.format_function_param(
                     'assign_mult', name=expanded_recv_var, value=recv_var_str))
             else:

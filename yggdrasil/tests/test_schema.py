@@ -95,6 +95,10 @@ def test_default_schema():
         for ksub in s[k].classes:
             s[k].get_subtype_properties(ksub)
             s[k].default_subtype
+    s.get_schema(relaxed=True)
+    s.get_schema(allow_instance=True)
+    s.definitions
+    s.form_schema
 
 
 def test_create_schema():
@@ -179,3 +183,14 @@ def test_get_schema_subtype():
                          allow_instance=True)
     s.validate_component(component, invalid, subtype='base',
                          allow_instance=True)
+
+
+def test_get_model_form_schema():
+    r"""Test get_model_form_schema."""
+    fname = os.path.join(tempfile.gettempdir(), 'temp.json')
+    try:
+        schema.get_model_form_schema(fname_dst=fname)
+        assert(os.path.isfile(fname))
+    finally:
+        if os.path.isfile(fname):
+            os.remove(fname)

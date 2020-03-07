@@ -242,7 +242,7 @@ class ZMQProxy(CommBase.CommServer):
                 self.srv_socket.send(msg, zmq.NOBLOCK)
                 # self.srv_socket.send_multipart(msg, zmq.NOBLOCK)
                 break
-            except zmq.ZMQError:
+            except zmq.ZMQError:  # pragma: no cover
                 self.sleep(0.0001)
 
     def poll(self):

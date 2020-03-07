@@ -218,6 +218,8 @@ class PandasSerialize(AsciiTableSerialize):
                 out = out.astype(new_dtypes, copy=False)
         # Reorder if necessary
         out = self.apply_field_names(out, self.get_field_names())
+        if dtype is not None:
+            out = out.astype(dtype, copy=False)
         if (self.field_names is None) and (not self.no_header):
             self.field_names = out.columns.tolist()
         if not self.initialized:

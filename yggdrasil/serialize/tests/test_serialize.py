@@ -180,6 +180,9 @@ def test_format_message():
             assert_equal(b, (a, ))
         else:
             assert_equal(b, a)
+    # Formats with mixed types
+    assert_equal(serialize.format_message(b'hello', '%s'), 'hello')
+    assert_equal(serialize.format_message('hello', b'%s'), b'hello')
     # Errors
     assert_raises(RuntimeError, serialize.format_message, (0, ), "%d %d")
     assert_raises(TypeError, serialize.process_message, 0, "%d")
@@ -200,6 +203,15 @@ def test_combine_flds():
                                   np.zeros(nele, dtype0))
     np.testing.assert_array_equal(serialize.combine_flds(arrs, dtype=dtype1),
                                   np.zeros(nele, dtype1))
+    # Version of test where width of string field needs to be found
+    dtype = np.dtype([("name", "S"), ("number", "i8"),
+                      ("value", "f8"), ("complex", "c16")])
+    arrs[0][0] = b"hello"
+    result = np.zeros(nele, dtype1)
+    result["name"][0] = b"hello"
+    np.testing.assert_array_equal(serialize.combine_flds(arrs, dtype=dtype),
+                                  result)
+    # Errors
     assert_raises(ValueError, serialize.combine_flds, arrs[:-1], dtype=dtype0)
     arrs[0] = np.zeros(nele - 1, dtype=dtype0[0])
     assert_raises(ValueError, serialize.combine_flds, arrs)
@@ -520,6 +532,8 @@ def test_numpy2dict():
     arr_mix = np.zeros(nele, dtype)
     arr_mix['name'][0] = 'hello'
     test_arrs = [arr_mix, np.zeros(0, dtype)]
+    np.testing.assert_array_equal(serialize.dict2numpy({}),
+                                  np.array([]))
     for ans in test_arrs:
         d = serialize.numpy2dict(ans)
         # Sorted

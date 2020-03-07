@@ -95,7 +95,7 @@ class CPPModelDriver(CModelDriver):
     dont_declare_channel = True
     
     @staticmethod
-    def after_registration(cls):
+    def after_registration(cls, **kwargs):
         r"""Operations that should be performed to modify class attributes after
         registration."""
         if cls.default_compiler is None:
@@ -106,7 +106,9 @@ class CPPModelDriver(CModelDriver):
             elif platform._is_win:  # pragma: windows
                 cls.default_compiler = 'cl'
         cls.function_param['print'] = 'std::cout << "{message}" << std::endl;'
-        CModelDriver.after_registration(cls)
+        CModelDriver.after_registration(cls, **kwargs)
+        if kwargs.get('second_pass', False):
+            return
         internal_libs = copy.deepcopy(cls.internal_libraries)
         internal_libs[cls.interface_library] = internal_libs.pop(
             CModelDriver.interface_library)

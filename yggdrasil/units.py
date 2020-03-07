@@ -2,9 +2,16 @@ import re
 import numpy as np
 import unyt
 from yggdrasil import tools
-_ureg_unyt = unyt.UnitRegistry()
+_ureg_unyt = unyt.UnitRegistry('mks')
 _unit_quantity = unyt.array.unyt_quantity
 _unit_array = unyt.array.unyt_array
+_ureg_unyt.add("ac", 4046.86, dimensions=unyt.dimensions.area,
+               tex_repr=r"\rm{ac}", offset=0.0, prefixable=False)
+_ureg_unyt.add("a", 100.0, dimensions=unyt.dimensions.area,
+               tex_repr=r"\rm{a}", offset=0.0, prefixable=True)
+unyt._unit_lookup_table.inv_name_alternatives["acre"] = "ac"
+unyt._unit_lookup_table.inv_name_alternatives["are"] = "a"
+unyt._unit_lookup_table.inv_name_alternatives["hectare"] = "ha"
 
 
 def convert_R_unit_string(r_str):
@@ -107,9 +114,11 @@ def add_units(arr, unit_str, dtype=None):
         else:
             dtype = np.array([arr]).dtype
     if isinstance(arr, np.ndarray) and (arr.ndim > 0):
-        out = unyt.unyt_array(arr, unit_str, dtype=dtype)
+        out = unyt.unyt_array(arr, unit_str, dtype=dtype,
+                              registry=_ureg_unyt)
     else:
-        out = unyt.unyt_quantity(arr, unit_str, dtype=dtype)
+        out = unyt.unyt_quantity(arr, unit_str, dtype=dtype,
+                                 registry=_ureg_unyt)
     return out
 
 
@@ -166,7 +175,7 @@ def as_unit(ustr):
 
     """
     try:
-        out = unyt.Unit(ustr)
+        out = unyt.Unit(ustr, registry=_ureg_unyt)
     except unyt.exceptions.UnitParseError as e:
         raise ValueError(str(e))
     return out
