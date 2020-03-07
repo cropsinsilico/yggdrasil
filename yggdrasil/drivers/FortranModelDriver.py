@@ -450,7 +450,7 @@ class FortranModelDriver(CompiledModelDriver):
             grp['type'] += '(kind = X)'
         if grp['type'] == 'character':
             out['type'] = 'bytes'
-            out['precision'] = grp.get('length', 0)
+            out['precision'] = int(grp.get('length', 0)) * 8
         else:
             out['type'] = super(FortranModelDriver, cls).get_json_type(grp['type'])
         if grp.get('shape', False):
