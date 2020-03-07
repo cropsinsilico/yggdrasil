@@ -63,7 +63,7 @@ or a key, value mapping::
 
 The key/value mapping form should be used when other information about the 
 communication channel needs to be provided (e.g. message format, field names, 
-units). (See :ref:`yaml_comm_options` for information about the available
+units). (See :ref:`Input/Output Options <yaml_comm_options>` for information about the available
 options for communication channels).
 
 Models can also contain more than one input and/or output::
@@ -136,6 +136,7 @@ files without running the integration, this can be done via the ``yggvalidate`` 
 
 
 .. _yaml_model_options:
+
 Model Options
 -------------
 
@@ -156,6 +157,7 @@ Language Specific Model Options
 
 
 .. _yaml_comm_options:
+
 Input/Output Options
 --------------------
 
@@ -177,6 +179,7 @@ Available Comm Types
 
 
 .. _yaml_file_options:
+
 File Options
 ------------
 
@@ -197,6 +200,7 @@ File Type Specific Options
 
 
 .. _yaml_conn_options:
+
 Connection Options
 ------------------
 
