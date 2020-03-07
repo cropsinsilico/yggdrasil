@@ -372,6 +372,9 @@ class FortranModelDriver(CompiledModelDriver):
 
         """
         out = super(FortranModelDriver, cls).get_native_type(**kwargs)
+        intent_regex = r'(,\s*intent\(.+?\))'
+        for x in re.finditer(intent_regex, out):
+            out = out.replace(x.group(0), '')
         if not ((out == '*') or ('X' in out)):
             if out.startswith('ygg'):
                 out = 'type(%s)' % out
@@ -452,7 +455,14 @@ class FortranModelDriver(CompiledModelDriver):
             out['type'] = 'bytes'
             out['precision'] = int(grp.get('length', 0)) * 8
         else:
-            out['type'] = super(FortranModelDriver, cls).get_json_type(grp['type'])
+            try:
+                out['type'] = super(FortranModelDriver, cls).get_json_type(grp['type'])
+            except KeyError as e:
+                try:
+                    out['type'] = super(FortranModelDriver, cls).get_json_type(
+                        grp['type'] + '(kind = X)')
+                except KeyError:  # pragma: debug
+                    raise e
         if grp.get('shape', False):
             shape = grp['shape'].split(',')
             ndim = len(shape)
@@ -734,6 +744,10 @@ class FortranModelDriver(CompiledModelDriver):
             datatype.setdefault('items', [])
         elif datatype['type'] == 'object':
             datatype.setdefault('properties', {})
+        elif datatype.get('subtype', datatype['type']) in ['bytes', 'unicode']:
+            datatype.setdefault('precision', 0)
+        elif datatype.get('subtype', datatype['type']) in _valid_types:
+            datatype.setdefault('precision', 32)
         out = super(FortranModelDriver, cls).write_type_def(
             name, datatype, **kwargs)
         return out

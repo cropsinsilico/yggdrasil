@@ -1705,15 +1705,16 @@ class ModelDriver(Driver):
                         v, definitions=definitions,
                         requires_freeing=free_vars)
             if cls.declare_functions_as_var:
+                model_var = None
                 if model_flag:
                     model_var = dict(model_flag, name=model_function)
-                else:
+                elif not outputs_in_inputs:
                     assert(len(outputs) == 1)
                     model_var = dict(outputs[0], name=model_function)
-                assert(isinstance(model_flag, dict))
-                lines += cls.write_declaration(
-                    model_var, definitions=definitions,
-                    requires_freeing=free_vars, dont_define=True)
+                if model_var:
+                    lines += cls.write_declaration(
+                        model_var, definitions=definitions,
+                        requires_freeing=free_vars, dont_define=True)
             lines += definitions
         lines.append(cls.format_function_param(
             'assign', name=flag_var['name'],
@@ -2608,9 +2609,11 @@ checking if the model flag indicates
             inputs = inputs + [cls.prepare_output_variables(
                 outputs, in_inputs=outputs_in_inputs)]
             flag_var = kwargs.get('flag_var', None)
-            if flag_var is None:
+            if (flag_var is None) and ('function_call_noout' not in cls.function_param):
                 flag_var = 'flag'
-            outputs = [flag_var]
+            outputs = []
+            if flag_var:
+                outputs.append(flag_var)
         kwargs.setdefault('input_var', cls.prepare_input_variables(inputs))
         kwargs.setdefault('output_var', cls.prepare_output_variables(outputs))
         nout = len(cls.split_variables(kwargs['output_var']))

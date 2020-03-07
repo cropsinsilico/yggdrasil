@@ -1367,7 +1367,7 @@ public:
       arg_siz[0] = (size_t)ret;
     } else {
       size_t *arg_siz = &nbytes_expected;
-      if (allow_realloc) {
+      if ((allow_realloc) && (!((type_code() == T_SCALAR) && ap.for_fortran))) {
 	arg_siz[0] = 0;
       }
       skip_terminal = true;
