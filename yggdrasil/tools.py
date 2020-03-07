@@ -301,9 +301,9 @@ def ygg_atexit():  # pragma: debug
     r"""Things to do at exit."""
     check_locks()
     check_threads()
-    # This causes a segfault in a C dependency
-    if not is_subprocess():
-        check_sockets()
+    # # This causes a segfault in a C dependency
+    # if not is_subprocess():
+    #     check_sockets()
     # Python 3.4 no longer supported if using pip 9.0.0, but this
     # allows the code to work if somehow installed using an older
     # version of pip
