@@ -2182,6 +2182,8 @@ class CompiledModelDriver(ModelDriver):
                     out = libinfo[libtype]
                 else:  # pragma: no cover
                     out = cls.cfg.get(dep_lang, '%s_%s' % (dep, libtype), None)
+            elif cls.cfg.has_option(dep_lang, '%s_%s' % (dep, libtype)):
+                out = cls.cfg.get(dep_lang, '%s_%s' % (dep, libtype))
             else:
                 libtype_found = []
                 for k in libtype_list:
