@@ -627,5 +627,23 @@
        implicit none
        type(yggpython) :: out
      end function init_python_c
+     subroutine free_python_c(x) bind(c, name="free_python_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr
+       import :: yggpython
+       implicit none
+       type(c_ptr), value :: x
+     end subroutine free_python_c
+     function copy_python_c(x) result(out) &
+          bind(c, name="copy_python_f")
+       import :: yggpython
+       implicit none
+       type(yggpython), value :: x
+       type(yggpython) :: out
+     end function copy_python_c
+     subroutine display_python_c(x) bind(c, name="display_python_f")
+       import :: yggpython
+       implicit none
+       type(yggpython), value :: x
+     end subroutine display_python_c
 
   end interface

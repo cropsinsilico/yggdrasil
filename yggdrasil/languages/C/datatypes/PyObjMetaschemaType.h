@@ -343,7 +343,12 @@ public:
       } else {
 	p = va_arg(ap.va, python_t**);
       }
-      python_t *temp = (python_t *)realloc(p[0], sizeof(python_t));
+      python_t *temp;
+      if (ap.for_fortran) {
+	temp = p[0];
+      } else {
+	temp = (python_t *)realloc(p[0], sizeof(python_t));
+      }
       if (temp == NULL) {
 	ygglog_throw_error("PyObjMetaschemaType::decode_data: Failed to realloc variable.");
       }

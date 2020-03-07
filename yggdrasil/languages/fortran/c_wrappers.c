@@ -375,3 +375,17 @@ python_t init_python_f() {
   python_t out = init_python();
   return out;
 }
+
+void free_python_f(void *x) {
+  destroy_python((python_t*)x);
+}
+
+python_t copy_python_f(python_t x) {
+  python_t out = copy_python(x);
+  return out;
+}
+
+void display_python_f(python_t x) {
+  display_python(x);
+}
+  

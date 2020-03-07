@@ -106,6 +106,9 @@ int set_generic_object_f(generic_t arr, const char* k, generic_t x);
 int get_generic_object_f(generic_t arr, const char* k, void *x);
 // Python interface
 python_t init_python_f();
+void free_python_f(void *x);
+python_t copy_python_f(python_t x);
+void display_python_f(python_t x);
 
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }

@@ -119,7 +119,9 @@ function yggptr_c2f(x, realloc) result(flag)
      class default
         if ((x%type.eq."ply").or.(x%type.eq."obj").or. &
              (x%type.eq."generic").or.(x%type.eq."object").or. &
-             (x%type.eq."array").or.(x%type.eq."schema")) then
+             (x%type.eq."array").or.(x%type.eq."schema").or. &
+             (x%type.eq."python").or.(x%type.eq."class").or. &
+             (x%type.eq."instance").or.(x%type.eq."function")) then
            ! Use pointer
         else
            write(log_msg, '("yggptr_c2f (scalar transfer): Unexpected type: ",A)') x%type

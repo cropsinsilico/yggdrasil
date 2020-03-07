@@ -31,6 +31,8 @@ module fygg
      module procedure yggarg_scalar_yggmap
      module procedure yggarg_scalar_yggschema
      module procedure yggarg_scalar_yggpython
+     module procedure yggarg_scalar_yggpyinst
+     module procedure yggarg_scalar_yggpyfunc
      module procedure yggarg_scalar_yggptr
      ! module procedure yggarg_scalar_yggptr_arr
      ! module procedure yggarg_scalar_yggptr_map
@@ -1649,5 +1651,26 @@ contains
     type(yggpython) :: out
     out = init_python_c()
   end function init_python
+  subroutine free_python(x)
+    implicit none
+    type(yggpython), target :: x
+    type(yggpython), pointer :: xp
+    type(c_ptr) :: c_x
+    xp => x
+    c_x = c_loc(xp)
+    call free_python_c(c_x)
+    nullify(xp)
+  end subroutine free_python
+  function copy_python(x) result(out)
+    implicit none
+    type(yggpython) :: x
+    type(yggpython) :: out
+    out = copy_python_c(x)
+  end function copy_python
+  subroutine display_python(x)
+    implicit none
+    type(yggpython) :: x
+    call display_python_c(x)
+  end subroutine display_python
   
 end module fygg

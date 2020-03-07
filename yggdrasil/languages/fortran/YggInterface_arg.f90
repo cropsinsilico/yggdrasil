@@ -244,6 +244,16 @@ function yggarg_scalar_yggschema(x) result(y)
   y%ptr = c_loc(xp%prefix)
   y%nbytes = sizeof(x)
 end function yggarg_scalar_yggschema
+function yggarg_scalar_yggpyinst(x) result(y)
+  type(yggpyinst), target :: x
+  type(yggpyinst), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_scalar_init(x)
+  xp => x
+  y%type = "instance"
+  y%ptr = c_loc(xp%prefix)
+  y%nbytes = sizeof(x)
+end function yggarg_scalar_yggpyinst
 function yggarg_scalar_yggpython(x) result(y)
   type(yggpython), target :: x
   type(yggpython), pointer :: xp
@@ -254,6 +264,16 @@ function yggarg_scalar_yggpython(x) result(y)
   y%ptr = c_loc(xp%name)
   y%nbytes = sizeof(x)
 end function yggarg_scalar_yggpython
+function yggarg_scalar_yggpyfunc(x) result(y)
+  type(yggpyfunc), target :: x
+  type(yggpyfunc), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_scalar_init(x)
+  xp => x
+  y%type = "class"
+  y%ptr = c_loc(xp%name)
+  y%nbytes = sizeof(x)
+end function yggarg_scalar_yggpyfunc
 function yggarg_scalar_yggptr(x) result(y)
   type(yggptr), target :: x
   type(yggptr) :: y
