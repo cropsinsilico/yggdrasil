@@ -295,10 +295,11 @@ class FortranModelDriver(CompiledModelDriver):
             r'(type\()?(?P<type>[^,\(]+)(?(1)(?:\)))'
             r'(?:\s*\(\s*'
             r'(?:kind\s*=\s*(?P<precision>\d*))?,?'
-            r'(?:len\s*=\s*(?:(?P<length>(?:\d*))|'
-            r'(?P<length_var>.*?)))?'
+            r'(?:len\s*=\s*(?:(?P<length>(?:\d+))|'
+            r'(?P<length_var>.+?)))?'
             r'\))?'
-            r'(?:\s*,\s*dimension\((?P<shape>.*?)\))?'
+            r'(?:\s*,\s*dimension\((?:(?P<shape>\d+(?:,\s*\d+)*?)'
+            r'|(?P<shape_var>.+?(?:,\s*.+)*?))\))?'
             r'(?:\s*,\s*(?P<pointer>pointer))?'
             r'(?:\s*,\s*(?P<target>target))?'
             r'(?:\s*,\s*(?P<allocatable>allocatable))?'
@@ -391,8 +392,13 @@ class FortranModelDriver(CompiledModelDriver):
         type_match = re.search(cls.function_param['type_regex'], out)
         if type_match:
             type_match = type_match.groupdict()
-            if type_match.get('shape', None):
+            if type_match.get('shape_var', None):
+                if ('pointer' not in out) and ('allocatable' not in out):
+                    out += ', allocatable'
+                if type_match['shape_var'][0] == '*':
+                    out = out.replace('*', ':')
                 import pprint
+                print(out)
                 pprint.pprint(type_match)
                 raise Exception("Used default native_type, but need alias")
             elif type_match.get('length_var', None):
@@ -740,17 +746,23 @@ class FortranModelDriver(CompiledModelDriver):
                 if 'native_type' in var:
                     regex_native = r'type\((?:yggchar_r)|(?:.+?\d*_(?:(?:1)|(?:n))d)\)'
                     match = re.search(regex_native, var['native_type'])
-                    if not match:
-                        return False
+                    if match:
+                        return True
             else:
                 datatype = var.get('datatype', var)
-                if ('shape' in datatype) or ('length' in datatype):
-                    return False
+                if isinstance(datatype, str):
+                    datatype = {'type': datatype}
                 if (((datatype.get('subtype', datatype.get('type', None))
                       in ['bytes', 'unicode'])
-                     and (datatype.get('precision', 0) > 0))):
-                    return False
-        return True
+                     and (datatype.get('precision', 0) == 0))):
+                    return True
+                elif (((datatype.get('type', None) == '1darray')
+                       and (datatype.get('length', 0) == 0))):
+                    return True
+                elif (((datatype.get('type', None) == 'ndarray')
+                       and ('shape' not in datatype))):
+                    return True
+        return False
         
     @classmethod
     def write_declaration(cls, var, **kwargs):
@@ -771,7 +783,7 @@ class FortranModelDriver(CompiledModelDriver):
         if ((cls.allows_realloc(var)
              and (not cls.allows_realloc(var, from_native_type=True)))):
             var = dict(var, name='%s_realloc' % var['name'])
-            var.pop('native_type')
+            var.pop('native_type', None)
             out += super(FortranModelDriver, cls).write_declaration(var, **kwargs)
         return out
             
