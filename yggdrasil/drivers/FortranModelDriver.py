@@ -158,7 +158,8 @@ class FortranModelDriver(CompiledModelDriver):
         'obj': 'yggobj',
         'schema': 'yggschema',
         'flag': 'logical',
-        'class': 'yggpyfunc',
+        'class': 'yggpython',
+        'function': 'yggpyfunc',
         'instance': 'yggpyinst',
         'any': 'ygggeneric'}
     function_param = {
@@ -182,7 +183,7 @@ class FortranModelDriver(CompiledModelDriver):
         'init_schema': 'yggschema(init_generic())',
         'init_ply': 'init_ply()',
         'init_obj': 'init_obj()',
-        'init_class': 'yggpyfunc(init_python())',
+        'init_class': 'init_python()',
         'init_function': 'yggpyfunc(init_python())',
         'init_instance': 'yggpyinst(init_generic())',
         'init_any': 'init_generic()',
@@ -215,7 +216,7 @@ class FortranModelDriver(CompiledModelDriver):
         'copy_schema': '{name} = yggschema(copy_generic(ygggeneric({value})))',
         'copy_ply': '{name} = copy_ply({value})',
         'copy_obj': '{name} = copy_obj({value})',
-        'copy_class': '{name} = yggpyfunc(copy_python(yggpython({value})))',
+        'copy_class': '{name} = copy_python({value})',
         'copy_function': '{name} = yggpyfunc(copy_python(yggpython({value})))',
         'copy_instance': '{name} = yggpyinst(copy_generic(ygggeneric({value})))',
         'copy_generic': '{name} = copy_generic({value})',
@@ -225,7 +226,7 @@ class FortranModelDriver(CompiledModelDriver):
         'free_schema': 'call free_generic(ygggeneric({variable}))',
         'free_ply': 'call free_ply({variable})',
         'free_obj': 'call free_obj({variable})',
-        'free_class': 'call free_python(yggpython({variable}))',
+        'free_class': 'call free_python({variable})',
         'free_function': 'call free_python(yggpython({variable}))',
         'free_instance': 'call free_generic(ygggeneric({variable}))',
         'free_any': 'call free_generic({variable})',
@@ -237,7 +238,7 @@ class FortranModelDriver(CompiledModelDriver):
         'print_schema': 'call display_generic(ygggeneric({object}))',
         'print_ply': 'call display_ply({object})',
         'print_obj': 'call display_obj({object})',
-        'print_class': 'call display_python(yggpython({object}))',
+        'print_class': 'call display_python({object})',
         'print_function': 'call display_python(yggpython({object}))',
         'print_instance': 'call display_generic(ygggeneric({object}))',
         'print_any': 'call display_generic({object})',
@@ -397,12 +398,10 @@ class FortranModelDriver(CompiledModelDriver):
                     out += ', allocatable'
                 if type_match['shape_var'][0] == '*':
                     out = out.replace('*', ':')
-                import pprint
-                print(out)
-                pprint.pprint(type_match)
                 raise Exception("Used default native_type, but need alias")
             elif type_match.get('length_var', None):
-                if ('pointer' not in out) and ('allocatable' not in out):
+                if ((('pointer' not in out) and ('allocatable' not in out)
+                     and (type_match['length_var'] != 'X'))):
                     out += ', allocatable'
                 if type_match['length_var'] == '*':
                     out = out.replace('*', ':')
@@ -742,22 +741,21 @@ class FortranModelDriver(CompiledModelDriver):
 
         """
         if isinstance(var, dict):
-            if from_native_type:
-                if 'native_type' in var:
-                    regex_native = r'type\((?:yggchar_r)|(?:.+?\d*_(?:(?:1)|(?:n))d)\)'
-                    match = re.search(regex_native, var['native_type'])
-                    if match:
-                        return True
+            if from_native_type and ('native_type' in var):
+                regex_native = r'type\((?:yggchar_r)|(?:.+?\d*_(?:(?:1)|(?:n))d)\)'
+                match = re.search(regex_native, var['native_type'])
+                if match:
+                    return True
             else:
                 datatype = var.get('datatype', var)
                 if isinstance(datatype, str):
                     datatype = {'type': datatype}
                 if (((datatype.get('subtype', datatype.get('type', None))
                       in ['bytes', 'unicode'])
-                     and (datatype.get('precision', 0) == 0))):
+                     and ('precision' not in datatype))):
                     return True
                 elif (((datatype.get('type', None) == '1darray')
-                       and (datatype.get('length', 0) == 0))):
+                       and ('length' not in datatype))):
                     return True
                 elif (((datatype.get('type', None) == 'ndarray')
                        and ('shape' not in datatype))):
@@ -869,7 +867,7 @@ class FortranModelDriver(CompiledModelDriver):
         elif datatype['type'] == 'object':
             datatype.setdefault('properties', {})
         elif datatype.get('subtype', datatype['type']) in ['bytes', 'unicode']:
-            datatype.setdefault('precision', 0)
+            datatype = dict(datatype, precision=0)
         elif datatype.get('subtype', datatype['type']) in _valid_types:
             datatype.setdefault('precision', 32)
         out = super(FortranModelDriver, cls).write_type_def(

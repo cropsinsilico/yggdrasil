@@ -97,6 +97,7 @@ module fygg
      module procedure yggpython2yggpyfunc
   end interface yggpyfunc
   interface yggpython
+     module procedure yggpython2yggpython
      module procedure yggpyfunc2yggpython
   end interface yggpython
   interface ygg_send_var
