@@ -437,6 +437,11 @@ class TestCommBase(YggTestClassInfo):
         self.assert_equal(getattr(send_instance, n_msg_send_meth), 0)
         self.assert_equal(getattr(recv_instance, n_msg_recv_meth), 0)
 
+    def test_cleanup_comms(self):
+        r"""Test cleanup_comms for comm class."""
+        CommBase.cleanup_comms(self.recv_instance.comm_class)
+        assert(len(CommBase.get_comm_registry(self.recv_instance.comm_class)) == 0)
+
     def test_drain_messages(self):
         r"""Test waiting for messages to drain."""
         self.send_instance.drain_messages(timeout=self.timeout)
