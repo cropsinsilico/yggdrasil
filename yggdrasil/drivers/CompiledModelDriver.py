@@ -2674,8 +2674,6 @@ class CompiledModelDriver(ModelDriver):
 
         """
         out = super(CompiledModelDriver, cls).configure_executable_type(cfg)
-        if cls.language is None:
-            return out
         compiler = None
         linker = None
         archiver = None
