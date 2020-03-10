@@ -1778,8 +1778,7 @@ class ModelDriver(Driver):
         for x in free_vars:
             lines += cls.write_free(x)
         # Wrap as executable with interface & model import
-        prefix = []
-        suffix = []
+        prefix = None
         if 'interface' in cls.function_param:
             ygglib = cls.interface_library
             if ygglib in cls.internal_libraries:
@@ -1788,18 +1787,11 @@ class ModelDriver(Driver):
                 lines.insert(0, cls.format_function_param(
                     'interface', interface_library=ygglib))
             else:
-                prefix.append(cls.format_function_param(
-                    'interface', interface_library=ygglib))
-        if ('import' in cls.function_param):
-            if cls.import_after_exec:
-                suffix.append(cls.format_function_param(
-                    'import', filename=model_file,
-                    function=model_function))
-            else:
-                prefix.append(cls.format_function_param(
-                    'import', filename=model_file,
-                    function=model_function))
-        out = cls.write_executable(lines, prefix=prefix, suffix=suffix)
+                prefix = [cls.format_function_param(
+                    'interface', interface_library=ygglib)]
+        out = cls.write_executable(lines, prefix=prefix,
+                                   imports={'filename': model_file,
+                                            'function': model_function})
         logger.info('\n' + '\n'.join(out))
         return out
 
@@ -2577,7 +2569,8 @@ checking if the model flag indicates
                 function_keys[1], function_name=function_name))
         else:
             out.append(cls.function_param.get('block_end', ''))
-        import pprint; pprint.pprint(out)
+        import pprint
+        pprint.pprint(out)
         return out
 
     @classmethod
@@ -2639,8 +2632,26 @@ checking if the model flag indicates
         return out
         
     @classmethod
+    def write_executable_import(cls, **kwargs):
+        r"""Add import statements to executable lines.
+       
+        Args:
+            **kwargs: Keyword arguments for import statement.
+
+        Returns:
+            list: Lines required to complete the import.
+ 
+        """
+        if ('filename' not in kwargs) and ('import_nofile' in cls.function_param):
+            key = 'import_nofile'
+        else:
+            key = 'import'
+        out = [cls.format_function_param(key, **kwargs)]
+        return out
+
+    @classmethod
     def write_executable(cls, lines, prefix=None, suffix=None,
-                         function_definitions=None):
+                         function_definitions=None, imports=None):
         r"""Return the lines required to complete a program that will run
         the provided lines.
 
@@ -2654,6 +2665,9 @@ checking if the model flag indicates
             function_definitions (list, optional): Lines of code defining
                 functions that will beused by the code contained in lines.
                 Defaults to None and is ignored.
+            imports (list, optional): Kwargs for packages that should
+                be imported for use by the executable. Defaults to
+                None and is ignored.
 
         Returns:
             lines: Lines of code wrapping the provided lines with the
@@ -2664,6 +2678,21 @@ checking if the model flag indicates
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
         out = []
+        # Add imports
+        if imports is not None:
+            if not isinstance(imports, list):
+                imports = [imports]
+            import_lines = []
+            for kws in imports:
+                import_lines += cls.write_executable_import(**kws)
+            if cls.import_after_exec:
+                if suffix is None:
+                    suffix = []
+                suffix += import_lines
+            else:
+                if prefix is None:
+                    prefix = []
+                prefix += import_lines
         # Add standard & user defined prefixes
         if ((('exec_prefix' in cls.function_param)
              and (cls.function_param['exec_prefix'] not in lines))):

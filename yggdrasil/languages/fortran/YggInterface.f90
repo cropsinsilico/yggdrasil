@@ -71,6 +71,10 @@ module fygg
      module procedure yggarg_1darray_character
      module procedure yggarg_1darray_yggchar_r
   end interface yggarg
+  interface yggassign
+     module procedure yggassign_yggchar2character
+     ! module procedure yggassign_character2yggchar
+  end interface yggassign
   interface yggarr
      module procedure ygggeneric2yggarr
   end interface yggarr
@@ -368,6 +372,7 @@ contains
   include "YggInterface_c2f.f90"
   include "YggInterface_arg.f90"
   include "YggInterface_conv.f90"
+  include "YggInterface_assign.f90"
   
   ! Utilities
   subroutine fix_format_str(x)

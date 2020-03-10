@@ -290,15 +290,28 @@ class FortranModelDriver(CompiledModelDriver):
         'inputs_def_regex': (
             r'\s*(?P<name>.+?)\s*(?:,|$)(?:\n)?'),
         'outputs_def_regex': (
-            r'\s*(?P<name>.+?)\s*(?:,|$)(?:\n)?')
+            r'\s*(?P<name>.+?)\s*(?:,|$)(?:\n)?'),
+        'type_regex': (
+            r'(type\()?(?P<type>[^,\(]+)(?(1)(?:\)))'
+            r'(?:\s*\(\s*'
+            r'(?:kind\s*=\s*(?P<precision>\d*))?,?'
+            r'(?:len\s*=\s*(?:(?P<length>(?:\d*))|'
+            r'(?P<length_var>.*?)))?'
+            r'\))?'
+            r'(?:\s*,\s*dimension\((?P<shape>.*?)\))?'
+            r'(?:\s*,\s*(?P<pointer>pointer))?'
+            r'(?:\s*,\s*(?P<target>target))?'
+            r'(?:\s*,\s*(?P<allocatable>allocatable))?'
+            r'(?:\s*,\s*(?P<parameter>parameter))?'
+            r'(?:\s*,\s*intent\((?P<intent>.*?)\))?')
     }
     outputs_in_inputs = True
     include_channel_obj = True
     is_typed = True
     types_in_funcdef = False
     interface_inside_exec = True
-    import_after_exec = True
-    declare_functions_as_var = True
+    import_after_exec = False
+    declare_functions_as_var = False
     zero_based = False
     max_line_width = 72
     
@@ -375,6 +388,18 @@ class FortranModelDriver(CompiledModelDriver):
         intent_regex = r'(,\s*intent\(.+?\))'
         for x in re.finditer(intent_regex, out):
             out = out.replace(x.group(0), '')
+        type_match = re.search(cls.function_param['type_regex'], out)
+        if type_match:
+            type_match = type_match.groupdict()
+            if type_match.get('shape', None):
+                import pprint
+                pprint.pprint(type_match)
+                raise Exception("Used default native_type, but need alias")
+            elif type_match.get('length_var', None):
+                if ('pointer' not in out) and ('allocatable' not in out):
+                    out += ', allocatable'
+                if type_match['length_var'] == '*':
+                    out = out.replace('*', ':')
         if not ((out == '*') or ('X' in out)):
             if out.startswith('ygg'):
                 out = 'type(%s)' % out
@@ -410,11 +435,14 @@ class FortranModelDriver(CompiledModelDriver):
                     type=('%s_pointer' % json_type['type'])).format(
                         **json_subtype)
         elif 'X' in out:
-            if out.startswith('logical'):
-                precision = json_type.get('precision', 8)
+            if cls.allows_realloc(kwargs):
+                out = 'type(yggchar_r)'
             else:
-                precision = json_type['precision']
-            out = out.replace('X', str(int(precision / 8)))
+                if out.startswith('logical'):
+                    precision = json_type.get('precision', 8)
+                else:
+                    precision = json_type['precision']
+                out = out.replace('X', str(int(precision / 8)))
         return out
         
     @classmethod
@@ -429,16 +457,7 @@ class FortranModelDriver(CompiledModelDriver):
 
         """
         out = {}
-        regex_var = (r'(type\()?(?P<type>[^,\(]+)(?(1)(?:\)))'
-                     r'(?:\s*\(\s*'
-                     r'(?:kind\s*=\s*(?P<precision>\d*))?,?'
-                     r'(?:len\s*=\s*(?P<length>\d*))?'
-                     r'\))?'
-                     r'(?:\s*,\s*dimension\((?P<shape>.*?)\))?'
-                     r'(?:\s*,\s*(?P<pointer>pointer))?'
-                     r'(?:\s*,\s*(?P<allocatable>allocatable))?'
-                     r'(?:\s*,\s*(?P<parameter>parameter))?'
-                     r'(?:\s*,\s*intent\((?P<intent>.*?)\))?')
+        regex_var = cls.function_param['type_regex']
         grp = re.fullmatch(regex_var, native_type).groupdict()
         if grp['type'].endswith(('_1d', '_nd')):
             regex_nd = r'(?P<type>.*?)(?P<precision>\d+)?_(?P<ndim>(?:1)|(?:n))d'
@@ -453,7 +472,8 @@ class FortranModelDriver(CompiledModelDriver):
             grp['type'] += '(kind = X)'
         if grp['type'] == 'character':
             out['type'] = 'bytes'
-            out['precision'] = int(grp.get('length', 0)) * 8
+            if grp.get('length', None):
+                out['precision'] = int(grp.get('length', 0)) * 8
         else:
             try:
                 out['type'] = super(FortranModelDriver, cls).get_json_type(grp['type'])
@@ -558,6 +578,8 @@ class FortranModelDriver(CompiledModelDriver):
             str: Concatentated variables list.
 
         """
+        if not isinstance(vars_list, list):
+            vars_list = [vars_list]
         new_vars_list = vars_list
         if for_yggdrasil:
             new_vars_list = []
@@ -571,6 +593,31 @@ class FortranModelDriver(CompiledModelDriver):
             new_vars_list, for_yggdrasil=for_yggdrasil, **kwargs)
         if for_yggdrasil and (len(new_vars_list) > 1):
             return '[%s]' % out
+        return out
+        
+    @classmethod
+    def write_executable_import(cls, module=False, **kwargs):
+        r"""Add import statements to executable lines.
+       
+        Args:
+            module (str, optional): If provided, the include statement
+                importing code will be wrapped in a module of the provided
+                name. Defaults to False and the include will not be
+                wrapped.
+                
+            **kwargs: Keyword arguments for import statement.
+
+        Returns:
+            list: Lines required to complete the import.
+ 
+        """
+        out = super(FortranModelDriver, cls).write_executable_import(
+            **kwargs)
+        if module:
+            out = (['module %s' % module,
+                    'contains']
+                   + [cls.function_param['indent'] + x for x in out]
+                   + ['end module %s' % module])
         return out
         
     @classmethod
@@ -588,13 +635,34 @@ class FortranModelDriver(CompiledModelDriver):
                 necessary code to run it as an executable (e.g. C/C++'s main).
 
         """
+        last_use = 0
+        for i, line in enumerate(lines):
+            if not line.lstrip().lower().startswith('use'):
+                last_use = i - 1
+                break
+        imports = kwargs.pop('imports', None)
+        if imports is not None:
+            if not isinstance(imports, list):
+                imports = [imports]
+            for kws in imports:
+                if ('filename' in kws) and os.path.isfile(kws['filename']):
+                    with open(kws['filename'], 'r') as fd:
+                        contents = fd.read()
+                    regex_module = (r'(?i)\s*module\s+(?P<module>.*?)'
+                                    r'(?:.*?\n)*?'
+                                    r'\s*end\s+module\s+(?P=module)')
+                    match_module = re.search(regex_module, contents)
+                    if match_module:
+                        module = match_module.groupdict('module')
+                    else:
+                        module = '%s_module' % kws['function']
+                        kws['module'] = module
+                    lines.insert(last_use + 1, 'use %s' % module)
+                    last_use += 1
         if 'implicit none' not in lines:
-            for i, line in enumerate(lines):
-                if not line.lstrip().lower().startswith('use'):
-                    lines.insert(i, 'implicit none')
-                    break
+            lines.insert(last_use + 1, 'implicit none')
         out = super(FortranModelDriver, cls).write_executable(
-            lines, **kwargs)
+            lines, imports=imports, **kwargs)
         return out
         
     @classmethod
@@ -653,26 +721,60 @@ class FortranModelDriver(CompiledModelDriver):
             line, length=length)
 
     @classmethod
-    def allows_realloc(cls, var):
+    def allows_realloc(cls, var, from_native_type=False):
         r"""Determine if a variable allows the receive call to perform
         realloc.
 
         Args:
             var (dict): Dictionary of variable properties.
+            from_native_type (bool, optional): If True, the reallocability
+                of the variable will be determined from the native type.
+                Defaults to False.
 
         Returns:
             bool: True if the variable allows realloc, False otherwise.
 
         """
         if isinstance(var, dict):
-            datatype = var.get('datatype', var)
-            if ('shape' in datatype) or ('length' in datatype):
-                return False
-            if ((datatype.get('subtype', datatype.get('type', None))
-                 in ['bytes', 'unicode']) and ('precision' in datatype)):
-                return False
+            if from_native_type:
+                if 'native_type' in var:
+                    regex_native = r'type\((?:yggchar_r)|(?:.+?\d*_(?:(?:1)|(?:n))d)\)'
+                    match = re.search(regex_native, var['native_type'])
+                    if not match:
+                        return False
+            else:
+                datatype = var.get('datatype', var)
+                if ('shape' in datatype) or ('length' in datatype):
+                    return False
+                if (((datatype.get('subtype', datatype.get('type', None))
+                      in ['bytes', 'unicode'])
+                     and (datatype.get('precision', 0) > 0))):
+                    return False
         return True
         
+    @classmethod
+    def write_declaration(cls, var, **kwargs):
+        r"""Return the lines required to declare a variable with a certain
+        type.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being declared.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: The lines declaring the variable.
+
+        """
+        out = super(FortranModelDriver, cls).write_declaration(var, **kwargs)
+        if ((cls.allows_realloc(var)
+             and (not cls.allows_realloc(var, from_native_type=True)))):
+            var = dict(var, name='%s_realloc' % var['name'])
+            var.pop('native_type')
+            out += super(FortranModelDriver, cls).write_declaration(var, **kwargs)
+        return out
+            
     @classmethod
     def write_model_recv(cls, channel, recv_var, **kwargs):
         r"""Write a model receive call include checking the return flag.
@@ -690,19 +792,29 @@ class FortranModelDriver(CompiledModelDriver):
 
         """
         recv_var_str = recv_var
+        out_after = []
         if not isinstance(recv_var, str):
             recv_var_par = cls.channels2vars(recv_var)
             allows_realloc = [cls.allows_realloc(v)
                               for v in recv_var_par]
             if all(allows_realloc):
                 kwargs['alt_recv_function'] = cls.function_param['recv_heap']
+                new_recv_var_par = []
+                for v in recv_var_par:
+                    if not cls.allows_realloc(v, from_native_type=True):
+                        out_after.append('call yggassign(%s_realloc, %s)'
+                                         % (v['name'], v['name']))
+                        v = dict(v, name=('%s_realloc' % v['name']))
+                    new_recv_var_par.append(v)
+                recv_var_par = new_recv_var_par
             else:
                 kwargs['alt_recv_function'] = cls.function_param['recv_stack']
             recv_var_str = cls.prepare_output_variables(
                 recv_var_par, in_inputs=cls.outputs_in_inputs,
                 for_yggdrasil=True)
-        return super(FortranModelDriver, cls).write_model_recv(
+        out = super(FortranModelDriver, cls).write_model_recv(
             channel, recv_var_str, **kwargs)
+        return out + out_after
 
     @classmethod
     def write_print_var(cls, var, **kwargs):
