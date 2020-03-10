@@ -256,8 +256,12 @@ def test_combine_eles():
     np.testing.assert_array_equal(serialize.combine_eles(arrs_list, dtype=dtype1),
                                   res1)
     # Version of test where width of string field needs to be found
-    dtype = np.dtype([("f0", "S"), ("f1", "i8"),
-                      ("f2", "f8"), ("f3", "c16")])
+    if platform._is_win:  # pragma: windows
+        dtype = np.dtype([("f0", "S"), ("f1", "i4"),
+                          ("f2", "f8"), ("f3", "c16")])
+    else:
+        dtype = np.dtype([("f0", "S"), ("f1", "i8"),
+                          ("f2", "f8"), ("f3", "c16")])
     np.testing.assert_array_equal(serialize.combine_eles(arrs_list,
                                                          dtype=dtype),
                                   res0_list)
