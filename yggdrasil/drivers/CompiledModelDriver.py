@@ -1816,8 +1816,10 @@ class CompiledModelDriver(ModelDriver):
             # Set default linker/archiver based on compiler
             default_tool_name = getattr(cls, 'default_%s' % k, None)
             if default_tool_name:
-                default_tool = get_compilation_tool(k, default_tool_name)
-                if not default_tool.is_installed():  # pragma: debug
+                default_tool = get_compilation_tool(k, default_tool_name,
+                                                    default=None)
+                if (((default_tool is None)
+                     or (not default_tool.is_installed()))):  # pragma: debug
                     warnings.warn(('Default %s for %s (%s) not installed. '
                                    'Attempting to locate an alternative .')
                                   % (k, cls.language, default_tool_name))
