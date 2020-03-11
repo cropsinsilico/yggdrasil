@@ -440,11 +440,8 @@ class ModelDriver(Driver):
         for x in cls._config_attr_map:
             ka = x['attr']
             k0 = x.get('key', ka)
-            kt = x.get('type', None)
             setattr(cls, ka, cls.cfg.get(cls.language, k0,
                                          getattr(cls, ka)))
-            if (kt == list) and isinstance(getattr(cls, ka), str):
-                setattr(cls, ka, getattr(cls, ka).split())
         
     @staticmethod
     def finalize_registration(cls):
