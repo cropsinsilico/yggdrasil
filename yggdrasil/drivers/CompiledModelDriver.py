@@ -2736,8 +2736,6 @@ class CompiledModelDriver(ModelDriver):
             k_lang = v.get('language', cls.language)
             for t in v.keys():
                 fname = v[t]
-                if not isinstance(fname, str):
-                    print(k, t, fname, type(fname), v)
                 assert(isinstance(fname, str))
                 opt = '%s_%s' % (k, t)
                 if t in ['libtype', 'language']:
