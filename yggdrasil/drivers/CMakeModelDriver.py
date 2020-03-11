@@ -754,7 +754,7 @@ class CMakeModelDriver(BuildModelDriver):
             include_base = 'ygg_cmake_%s.txt' % self.target
         include_file = os.path.join(self.sourcedir, include_base)
         self.get_tool_instance('compiler').create_include(
-            include_file, self.target,
+            include_file, self.target, verbose=True,
             driver=self.target_language_driver,
             logging_level=self.logger.getEffectiveLevel(),
             configuration=self.configuration)
@@ -803,7 +803,7 @@ class CMakeModelDriver(BuildModelDriver):
             # Write contents to the build file, check for new lines that may
             # already be included
             log_msg = 'New CMakeLists.txt:\n\t' + '\n\t'.join(lines)
-            if kwargs.get('verbose', False):
+            if kwargs.get('verbose', True):  # False):
                 logger.info(log_msg)
             else:
                 logger.debug(log_msg)
