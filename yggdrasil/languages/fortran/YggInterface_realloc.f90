@@ -1,23 +1,28 @@
-function yggptr_realloc(x, array_len, precision, realloc) result(flag)
+function yggptr_realloc(x, array_shape, precision, realloc) result(flag)
   implicit none
   type(yggptr) :: x
-  integer(kind=c_size_t), pointer :: array_len
+  integer(kind=c_size_t), dimension(:), pointer :: array_shape
   integer(kind=c_size_t), pointer :: precision
   logical :: realloc, flag
   character(len=500) :: log_msg
+  integer(kind=c_size_t), pointer :: array_len
   integer(kind=c_size_t) :: old_len = 1
   integer(kind=c_size_t) :: i
+  allocate(array_len)
+  array_len = 1
   if (x%array) then
      if (x%ndim.gt.1) then
         do i = 1, x%ndim
            old_len = old_len * x%shape(i)
+           array_len = array_len * array_shape(i)
         end do
      else
         old_len = x%len
+        array_len = array_shape(1)
      end if
   end if
   flag = .true.
-  if ((x%array.and.(array_len.gt.old_len)).or. &
+  if ((x%array.and.any(array_shape.gt.x%shape)).or. &
        ((x%type.eq."character").and.(precision.gt.x%prec))) then
      if (realloc.and.x%alloc) then
         write(log_msg, '("yggptr_realloc: begin realloc. &
@@ -70,12 +75,13 @@ function yggptr_realloc(x, array_len, precision, realloc) result(flag)
            call ygglog_error(log_msg)
            stop "ERROR"
         end select
-        if (array_len.gt.old_len) old_len = array_len
+        if (any(array_shape.gt.x%shape)) x%shape = array_shape
+        if (array_len.gt.x%len) x%len = array_len
         if (precision.gt.x%prec) x%prec = precision
         call ygglog_debug("yggptr_realloc: done alloc")
      else
         flag = .false.
-        if (x%array.and.(array_len.gt.old_len)) then
+        if (x%array.and.any(array_shape.gt.x%shape)) then
            write(log_msg, '("yggptr_realloc: Destination array has ", &
                 &i7," elements, but ",i7," elements are expected.")') &
                 old_len, array_len
@@ -90,6 +96,7 @@ function yggptr_realloc(x, array_len, precision, realloc) result(flag)
         stop "ERROR"
      end if
   end if
+  deallocate(array_len)
 end function yggptr_realloc
 
 

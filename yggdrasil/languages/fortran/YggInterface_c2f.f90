@@ -33,6 +33,7 @@ function yggptr_c2f(x, realloc) result(flag)
      else
         deallocate(array_len)
         call c_f_pointer(x%len_ptr, array_len)
+        array_shape(1) = array_len
      end if
      write(log_msg, '("array_len = ",i7)') array_len
      call ygglog_debug(log_msg)
@@ -43,7 +44,7 @@ function yggptr_c2f(x, realloc) result(flag)
      write(log_msg, '("precision = ",i7)') precision
      call ygglog_debug(log_msg)
   end if
-  flag = yggptr_realloc(x, array_len, precision, realloc)
+  flag = yggptr_realloc(x, array_shape, precision, realloc)
   if (x%array) then
      if (x%alloc) then
         select type(item=>x%item)

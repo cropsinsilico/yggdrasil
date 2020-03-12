@@ -332,6 +332,7 @@ function yggarg_realloc_1darray_c_long(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_c_long
 function yggarg_realloc_1darray_integer(x) result (y)
@@ -344,6 +345,7 @@ function yggarg_realloc_1darray_integer(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_integer
 function yggarg_realloc_1darray_integer2(x) result (y)
@@ -356,6 +358,7 @@ function yggarg_realloc_1darray_integer2(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_integer2
 function yggarg_realloc_1darray_integer4(x) result (y)
@@ -368,6 +371,7 @@ function yggarg_realloc_1darray_integer4(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_integer4
 function yggarg_realloc_1darray_integer8(x) result (y)
@@ -380,6 +384,7 @@ function yggarg_realloc_1darray_integer8(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_integer8
 function yggarg_realloc_1darray_real(x) result (y)
@@ -392,6 +397,7 @@ function yggarg_realloc_1darray_real(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_real
 function yggarg_realloc_1darray_real4(x) result (y)
@@ -404,6 +410,7 @@ function yggarg_realloc_1darray_real4(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_real4
 function yggarg_realloc_1darray_real8(x) result (y)
@@ -416,6 +423,7 @@ function yggarg_realloc_1darray_real8(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_real8
 function yggarg_realloc_1darray_real16(x) result (y)
@@ -428,6 +436,7 @@ function yggarg_realloc_1darray_real16(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_real16
 function yggarg_realloc_1darray_complex(x) result (y)
@@ -440,6 +449,7 @@ function yggarg_realloc_1darray_complex(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_complex
 function yggarg_realloc_1darray_complex4(x) result (y)
@@ -452,6 +462,7 @@ function yggarg_realloc_1darray_complex4(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_complex4
 function yggarg_realloc_1darray_complex8(x) result (y)
@@ -464,6 +475,7 @@ function yggarg_realloc_1darray_complex8(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_complex8
 function yggarg_realloc_1darray_complex16(x) result (y)
@@ -476,6 +488,7 @@ function yggarg_realloc_1darray_complex16(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_complex16
 function yggarg_realloc_1darray_logical(x) result (y)
@@ -488,6 +501,7 @@ function yggarg_realloc_1darray_logical(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_logical
 function yggarg_realloc_1darray_logical1(x) result (y)
@@ -500,6 +514,7 @@ function yggarg_realloc_1darray_logical1(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_logical1
 function yggarg_realloc_1darray_logical2(x) result (y)
@@ -512,6 +527,7 @@ function yggarg_realloc_1darray_logical2(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_logical2
 function yggarg_realloc_1darray_logical4(x) result (y)
@@ -524,6 +540,7 @@ function yggarg_realloc_1darray_logical4(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_logical4
 function yggarg_realloc_1darray_logical8(x) result (y)
@@ -536,6 +553,7 @@ function yggarg_realloc_1darray_logical8(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
   end if
 end function yggarg_realloc_1darray_logical8
 function yggarg_realloc_1darray_character(x) result (y)
@@ -549,6 +567,7 @@ function yggarg_realloc_1darray_character(x) result (y)
   y%type = "character"
   if (associated(xp%x)) then
      y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
      if (associated(xp%x(1)%x)) then
         y%prec = size(xp%x(1)%x)
         allocate(y%data_character_unit(y%len * y%prec))

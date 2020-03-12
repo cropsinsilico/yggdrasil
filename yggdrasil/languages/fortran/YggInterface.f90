@@ -1060,15 +1060,22 @@ contains
     if (i.ge.size(args)) then
        flag = .false.
     else
-       flag = is_size_t(args(i+1), req_array)
+       if (present(req_array)) then
+          flag = is_size_t(args(i+1), req_array)
+       else
+          flag = is_size_t(args(i+1))
+       end if
     end if
   end function is_next_size_t
 
-  function is_size_t(arg, req_array) result(flag)
+  function is_size_t(arg, req_array_in) result(flag)
     type(yggptr), intent(in) :: arg
-    logical, optional :: req_array
+    logical, optional :: req_array_in
+    logical :: req_array
     logical :: flag
-    if (.not.present(req_array)) then
+    if (present(req_array_in)) then
+       req_array = req_array_in
+    else
        req_array = .false.
     end if
     if (((arg%type.eq."integer").or.(arg%type.eq."size_t")).and. &
