@@ -20,7 +20,7 @@ function yggptr_c2f(x, realloc) result(flag)
   array_shape(1) = 1
   precision = 1
   if (x%array) then
-     if (x%ndim.gt.1) then
+     if ((x%ndim.gt.1).or.x%ndarray) then
         deallocate(array_ndim)
         deallocate(array_shape)
         call c_f_pointer(x%ndim_ptr, array_ndim)
@@ -86,6 +86,44 @@ function yggptr_c2f(x, realloc) result(flag)
            call yggptr_c2f_1darray_realloc_logical(x)
         type is (character_1d)
            call yggptr_c2f_1darray_realloc_character(x)
+        type is (c_long_nd)
+           call yggptr_c2f_ndarray_realloc_integer(x)
+        type is (integer_nd)
+           call yggptr_c2f_ndarray_realloc_integer(x)
+        type is (integer2_nd)
+           call yggptr_c2f_ndarray_realloc_integer(x)
+        type is (integer4_nd)
+           call yggptr_c2f_ndarray_realloc_integer(x)
+        type is (integer8_nd)
+           call yggptr_c2f_ndarray_realloc_integer(x)
+        type is (real_nd)
+           call yggptr_c2f_ndarray_realloc_real(x)
+        type is (real4_nd)
+           call yggptr_c2f_ndarray_realloc_real(x)
+        type is (real8_nd)
+           call yggptr_c2f_ndarray_realloc_real(x)
+        type is (real16_nd)
+           call yggptr_c2f_ndarray_realloc_real(x)
+        type is (complex_nd)
+           call yggptr_c2f_ndarray_realloc_complex(x)
+        type is (complex4_nd)
+           call yggptr_c2f_ndarray_realloc_complex(x)
+        type is (complex8_nd)
+           call yggptr_c2f_ndarray_realloc_complex(x)
+        type is (complex16_nd)
+           call yggptr_c2f_ndarray_realloc_complex(x)
+        type is (logical_nd)
+           call yggptr_c2f_ndarray_realloc_logical(x)
+        type is (logical1_nd)
+           call yggptr_c2f_ndarray_realloc_logical(x)
+        type is (logical2_nd)
+           call yggptr_c2f_ndarray_realloc_logical(x)
+        type is (logical4_nd)
+           call yggptr_c2f_ndarray_realloc_logical(x)
+        type is (logical8_nd)
+           call yggptr_c2f_ndarray_realloc_logical(x)
+        type is (character_nd)
+           call yggptr_c2f_ndarray_realloc_character(x)
         class default
            write(log_msg, '("yggptr_c2f (realloc array transfer): Unexpected type: ",A)') x%type
            call ygglog_error(log_msg)
@@ -677,3 +715,228 @@ subroutine yggptr_c2f_1darray_realloc_character(x)
      stop "ERROR"
   end select
 end subroutine yggptr_c2f_1darray_realloc_character
+
+
+! ND reallocatable
+subroutine yggptr_c2f_ndarray_realloc_integer(x)
+  implicit none
+  type(yggptr) :: x
+  type(c_long_nd), pointer :: x_c_long_nd
+  type(integer_nd), pointer :: x_integer_nd
+  type(integer2_nd), pointer :: x_integer2_nd
+  type(integer4_nd), pointer :: x_integer4_nd
+  type(integer8_nd), pointer :: x_integer8_nd
+  select type(item=>x%item)
+  type is (c_long_nd)
+     x_c_long_nd => item
+     if (.not.associated(x_c_long_nd%x)) then
+        call c_f_pointer(x%ptr, x_c_long_nd%x, [x%len])
+     end if
+     if (.not.associated(x_c_long_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_c_long_nd%shape, [x%ndim])
+     end if
+  type is (integer_nd)
+     x_integer_nd => item
+     if (.not.associated(x_integer_nd%x)) then
+        call c_f_pointer(x%ptr, x_integer_nd%x, [x%len])
+     end if
+     if (.not.associated(x_integer_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_integer_nd%shape, [x%ndim])
+     end if
+  type is (integer2_nd)
+     x_integer2_nd => item
+     if (.not.associated(x_integer2_nd%x)) then
+        call c_f_pointer(x%ptr, x_integer2_nd%x, [x%len])
+     end if
+     if (.not.associated(x_integer2_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_integer2_nd%shape, [x%ndim])
+     end if
+  type is (integer4_nd)
+     x_integer4_nd => item
+     if (.not.associated(x_integer4_nd%x)) then
+        call c_f_pointer(x%ptr, x_integer4_nd%x, [x%len])
+     end if
+     if (.not.associated(x_integer4_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_integer4_nd%shape, [x%ndim])
+     end if
+  type is (integer8_nd)
+     x_integer8_nd => item
+     if (.not.associated(x_integer8_nd%x)) then
+        call c_f_pointer(x%ptr, x_integer8_nd%x, [x%len])
+     end if
+     if (.not.associated(x_integer8_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_integer8_nd%shape, [x%ndim])
+     end if
+  class default
+     call ygglog_error("yggptr_c2f_ndarray_realloc_integer: Unexpected type.")
+     stop "ERROR"
+  end select
+end subroutine yggptr_c2f_ndarray_realloc_integer
+subroutine yggptr_c2f_ndarray_realloc_real(x)
+  implicit none
+  type(yggptr) :: x
+  type(real_nd), pointer :: x_real_nd
+  type(real4_nd), pointer :: x_real4_nd
+  type(real8_nd), pointer :: x_real8_nd
+  type(real16_nd), pointer :: x_real16_nd
+  select type(item=>x%item)
+  type is (real_nd)
+     x_real_nd => item
+     if (.not.associated(x_real_nd%x)) then
+        call c_f_pointer(x%ptr, x_real_nd%x, [x%len])
+     end if
+     if (.not.associated(x_real_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_real_nd%shape, [x%ndim])
+     end if
+  type is (real4_nd)
+     x_real4_nd => item
+     if (.not.associated(x_real4_nd%x)) then
+        call c_f_pointer(x%ptr, x_real4_nd%x, [x%len])
+     end if
+     if (.not.associated(x_real4_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_real4_nd%shape, [x%ndim])
+     end if
+  type is (real8_nd)
+     x_real8_nd => item
+     if (.not.associated(x_real8_nd%x)) then
+        call c_f_pointer(x%ptr, x_real8_nd%x, [x%len])
+     end if
+     if (.not.associated(x_real8_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_real8_nd%shape, [x%ndim])
+     end if
+  type is (real16_nd)
+     x_real16_nd => item
+     if (.not.associated(x_real16_nd%x)) then
+        call c_f_pointer(x%ptr, x_real16_nd%x, [x%len])
+     end if
+     if (.not.associated(x_real16_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_real16_nd%shape, [x%ndim])
+     end if
+  class default
+     call ygglog_error("yggptr_c2f_ndarray_realloc_real: Unexpected type.")
+     stop "ERROR"
+  end select
+end subroutine yggptr_c2f_ndarray_realloc_real
+subroutine yggptr_c2f_ndarray_realloc_complex(x)
+  implicit none
+  type(yggptr) :: x
+  type(complex_nd), pointer :: x_complex_nd
+  type(complex4_nd), pointer :: x_complex4_nd
+  type(complex8_nd), pointer :: x_complex8_nd
+  type(complex16_nd), pointer :: x_complex16_nd
+  select type(item=>x%item)
+  type is (complex_nd)
+     x_complex_nd => item
+     if (.not.associated(x_complex_nd%x)) then
+        call c_f_pointer(x%ptr, x_complex_nd%x, [x%len])
+     end if
+     if (.not.associated(x_complex_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_complex_nd%shape, [x%ndim])
+     end if
+  type is (complex4_nd)
+     x_complex4_nd => item
+     if (.not.associated(x_complex4_nd%x)) then
+        call c_f_pointer(x%ptr, x_complex4_nd%x, [x%len])
+     end if
+     if (.not.associated(x_complex4_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_complex4_nd%shape, [x%ndim])
+     end if
+  type is (complex8_nd)
+     x_complex8_nd => item
+     if (.not.associated(x_complex8_nd%x)) then
+        call c_f_pointer(x%ptr, x_complex8_nd%x, [x%len])
+     end if
+     if (.not.associated(x_complex8_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_complex8_nd%shape, [x%ndim])
+     end if
+  type is (complex16_nd)
+     x_complex16_nd => item
+     if (.not.associated(x_complex16_nd%x)) then
+        call c_f_pointer(x%ptr, x_complex16_nd%x, [x%len])
+     end if
+     if (.not.associated(x_complex16_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_complex16_nd%shape, [x%ndim])
+     end if
+  class default
+     call ygglog_error("yggptr_c2f_ndarray_realloc_complex: Unexpected type.")
+     stop "ERROR"
+  end select
+end subroutine yggptr_c2f_ndarray_realloc_complex
+subroutine yggptr_c2f_ndarray_realloc_logical(x)
+  implicit none
+  type(yggptr) :: x
+  type(logical_nd), pointer :: x_logical_nd
+  type(logical1_nd), pointer :: x_logical1_nd
+  type(logical2_nd), pointer :: x_logical2_nd
+  type(logical4_nd), pointer :: x_logical4_nd
+  type(logical8_nd), pointer :: x_logical8_nd
+  select type(item=>x%item)
+  type is (logical_nd)
+     x_logical_nd => item
+     if (.not.associated(x_logical_nd%x)) then
+        call c_f_pointer(x%ptr, x_logical_nd%x, [x%len])
+     end if
+     if (.not.associated(x_logical_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_logical_nd%shape, [x%ndim])
+     end if
+  type is (logical1_nd)
+     x_logical1_nd => item
+     if (.not.associated(x_logical1_nd%x)) then
+        call c_f_pointer(x%ptr, x_logical1_nd%x, [x%len])
+     end if
+     if (.not.associated(x_logical1_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_logical1_nd%shape, [x%ndim])
+     end if
+  type is (logical2_nd)
+     x_logical2_nd => item
+     if (.not.associated(x_logical2_nd%x)) then
+        call c_f_pointer(x%ptr, x_logical2_nd%x, [x%len])
+     end if
+     if (.not.associated(x_logical2_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_logical2_nd%shape, [x%ndim])
+     end if
+  type is (logical4_nd)
+     x_logical4_nd => item
+     if (.not.associated(x_logical4_nd%x)) then
+        call c_f_pointer(x%ptr, x_logical4_nd%x, [x%len])
+     end if
+     if (.not.associated(x_logical4_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_logical4_nd%shape, [x%ndim])
+     end if
+  type is (logical8_nd)
+     x_logical8_nd => item
+     if (.not.associated(x_logical8_nd%x)) then
+        call c_f_pointer(x%ptr, x_logical8_nd%x, [x%len])
+     end if
+     if (.not.associated(x_logical8_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_logical8_nd%shape, [x%ndim])
+     end if
+  class default
+     call ygglog_error("yggptr_c2f_ndarray_realloc_logical: Unexpected type.")
+     stop "ERROR"
+  end select
+end subroutine yggptr_c2f_ndarray_realloc_logical
+subroutine yggptr_c2f_ndarray_realloc_character(x)
+  implicit none
+  type(yggptr) :: x
+  integer(kind=8) :: i, j
+  type(character_nd), pointer :: x_character_nd
+  select type(item=>x%item)
+  type is (character_nd)
+     x_character_nd => item
+     if (.not.associated(x%data_character_unit)) then
+        call c_f_pointer(x%ptr, x%data_character_unit, [x%prec*x%len])
+     end if
+     do i = 1, x%len
+        x_character_nd%x(i)%x = x%data_character_unit( &
+             (1+(i-1)*x%prec):(i*x%prec))
+     end do
+     deallocate(x%data_character_unit)
+     if (.not.associated(x_character_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_character_nd%shape, [x%ndim])
+     end if
+  class default
+     call ygglog_error("yggptr_c2f_ndarray_realloc_character: Unexpected type.")
+     stop "ERROR"
+  end select
+end subroutine yggptr_c2f_ndarray_realloc_character

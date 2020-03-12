@@ -2138,7 +2138,7 @@ size_t NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va
     if (ap.using_ptrs) {
       size_t * const new_ndim = (size_t* const)get_va_list_ptr_cpp(&ap);
       new_ndim[0] = ndim();
-      new_shape = (size_t**)get_va_list_ptr_ref_cpp(&ap);
+      new_shape = (size_t**)get_va_list_ptr_ref_cpp(&ap, 1);
     } else {
       size_t * const new_ndim = va_arg(ap.va, size_t*);
       new_ndim[0] = ndim();

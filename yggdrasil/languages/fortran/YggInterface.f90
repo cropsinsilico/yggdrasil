@@ -71,6 +71,25 @@ module fygg
      module procedure yggarg_1darray_logical8
      module procedure yggarg_1darray_character
      module procedure yggarg_1darray_yggchar_r
+     module procedure yggarg_realloc_ndarray_c_long
+     module procedure yggarg_realloc_ndarray_integer
+     module procedure yggarg_realloc_ndarray_integer2
+     module procedure yggarg_realloc_ndarray_integer4
+     module procedure yggarg_realloc_ndarray_integer8
+     module procedure yggarg_realloc_ndarray_real
+     module procedure yggarg_realloc_ndarray_real4
+     module procedure yggarg_realloc_ndarray_real8
+     module procedure yggarg_realloc_ndarray_real16
+     module procedure yggarg_realloc_ndarray_complex
+     module procedure yggarg_realloc_ndarray_complex4
+     module procedure yggarg_realloc_ndarray_complex8
+     module procedure yggarg_realloc_ndarray_complex16
+     module procedure yggarg_realloc_ndarray_logical
+     module procedure yggarg_realloc_ndarray_logical1
+     module procedure yggarg_realloc_ndarray_logical2
+     module procedure yggarg_realloc_ndarray_logical4
+     module procedure yggarg_realloc_ndarray_logical8
+     module procedure yggarg_realloc_ndarray_character
      module procedure yggarg_2darray_integer2
      module procedure yggarg_2darray_integer4
      module procedure yggarg_2darray_integer8
@@ -206,62 +225,164 @@ module fygg
   type :: character_1d
      type(yggchar_r), dimension(:), contiguous, pointer :: x => null()
   end type character_1d
+  type :: c_long_nd
+     integer(kind=c_long), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type c_long_nd
+  type :: integer_nd
+     integer, dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type integer_nd
+  type :: integer2_nd
+     integer(kind=2), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type integer2_nd
+  type :: integer4_nd
+     integer(kind=4), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type integer4_nd
+  type :: integer8_nd
+     integer(kind=8), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type integer8_nd
+  type :: real_nd
+     real, dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type real_nd
+  type :: real4_nd
+     real(kind=4), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+   ! contains
+   !   procedure :: copy_real4_nd
+   !   generic :: assignment(=) => copy_real4_nd
+  end type real4_nd
+  type :: real8_nd
+     real(kind=8), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type real8_nd
+  type :: real16_nd
+     real(kind=16), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type real16_nd
+  type :: complex_nd
+     complex, dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type complex_nd
+  type :: complex4_nd
+     complex(kind=4), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type complex4_nd
+  type :: complex8_nd
+     complex(kind=8), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type complex8_nd
+  type :: complex16_nd
+     complex(kind=16), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type complex16_nd
+  type :: logical_nd
+     logical, dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type logical_nd
+  type :: logical1_nd
+     logical(kind=1), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type logical1_nd
+  type :: logical2_nd
+     logical(kind=2), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type logical2_nd
+  type :: logical4_nd
+     logical(kind=4), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type logical4_nd
+  type :: logical8_nd
+     logical(kind=8), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type logical8_nd
+  type :: character_nd
+     type(yggchar_r), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type character_nd
+  type :: c_long_2d
+     integer(kind=c_long), dimension(:, :), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type c_long_2d
   type :: integer_2d
-     integer, dimension(:, :), pointer :: x => null()
+     integer, dimension(:, :), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type integer_2d
   type :: integer2_2d
-     integer(kind=2), dimension(:, :), pointer :: x => null()
+     integer(kind=2), dimension(:, :), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type integer2_2d
   type :: integer4_2d
-     integer(kind=4), dimension(:, :), pointer :: x => null()
+     integer(kind=4), dimension(:, :), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type integer4_2d
   type :: integer8_2d
-     integer(kind=8), dimension(:, :), pointer :: x => null()
+     integer(kind=8), dimension(:, :), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type integer8_2d
   type :: real_2d
      real, dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type real_2d
   type :: real4_2d
      real(kind=4), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type real4_2d
   type :: real8_2d
      real(kind=8), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type real8_2d
   type :: real16_2d
      real(kind=16), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type real16_2d
   type :: complex_2d
      complex, dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type complex_2d
   type :: complex4_2d
      complex(kind=4), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type complex4_2d
   type :: complex8_2d
      complex(kind=8), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type complex8_2d
   type :: complex16_2d
      complex(kind=16), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type complex16_2d
   type :: logical_2d
      logical, dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type logical_2d
   type :: logical1_2d
      logical(kind=1), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type logical1_2d
   type :: logical2_2d
      logical(kind=2), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type logical2_2d
   type :: logical4_2d
      logical(kind=4), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type logical4_2d
   type :: logical8_2d
      logical(kind=8), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type logical8_2d
   type :: character_2d
      type(yggchar_r), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type character_2d
   type :: yggptr
      character(len=15) :: type = "none"
+     logical :: ndarray = .false.
      logical :: array = .false.
      logical :: alloc = .false.
      integer(kind=8) :: len = 0
@@ -380,13 +501,13 @@ module fygg
   public :: yggarg, yggchar_r, yggcomm, ygggeneric, &
        yggptr, yggnull, yggarr, yggmap, &
        yggschema, yggpython, yggply, yggobj, yggpyinst, yggpyfunc, &
-       integer_1d, real_1d, complex_1d, logical_1d, character_1d, &
        LINE_SIZE_MAX
 
   include "YggInterface_cdef.f90"
 
 contains
 
+  ! include "YggInterface_copy.f90"
   include "YggInterface_realloc.f90"
   include "YggInterface_c2f.f90"
   include "YggInterface_arg.f90"
@@ -1100,6 +1221,7 @@ contains
     integer(kind=c_size_t) :: k
     integer :: i, j
     integer :: nargs
+    call ygglog_debug("pre_send: begin")
     nargs = size(args)  ! Number of arguments passed
     c_nargs = nargs  ! Number of arguments that C should be aware of
     if (is_format) then
@@ -1147,6 +1269,7 @@ contains
           end if
        end if
     end do
+    call ygglog_debug("pre_send: counted variables")
     allocate(c_args(nargs))
     j = 1
     if (is_format) then
@@ -1205,6 +1328,7 @@ contains
           end if
        end if
     end do
+    call ygglog_debug("pre_send: end")
   end function pre_send
 
   function pre_recv(args, c_args, is_format) result(c_nargs)
@@ -1216,9 +1340,10 @@ contains
     integer(kind=c_size_t) :: k
     integer :: i, j
     integer :: nargs
+    call ygglog_debug("pre_recv: begin")
     nargs = size(args)  ! Number of arguments passed
     c_nargs = nargs  ! Number of arguments that C should be aware of
-    if (is_format) then
+    if ((is_format).and.(nargs.gt.0)) then
        if (.not.is_size_t(args(1))) then
           nargs = nargs + 1
           c_nargs = c_nargs + 1
@@ -1228,16 +1353,17 @@ contains
        allocate(args(i)%len_c)
        allocate(args(i)%prec_c)
        allocate(args(i)%ndim_c)
-       allocate(args(i)%shape_c(args(i)%ndim))
        args(i)%len_c = 1
        args(i)%prec_c = 1
        args(i)%ndim_c = 1
-       do k = 1, args(i)%ndim
-          args(i)%shape_c(k) = args(i)%shape(k)
-       end do
+       if (associated(args(i)%shape)) then
+          allocate(args(i)%shape_c(args(i)%ndim))
+          do k = 1, args(i)%ndim
+             args(i)%shape_c(k) = args(i)%shape(k)
+          end do
+       end if
        if (args(i)%array) then
-          if (args(i)%ndim.gt.1) then
-
+          if ((args(i)%ndim.gt.1).or.args(i)%ndarray) then
              if (is_next_size_t(args, i).and.is_next_size_t(args, i+1, req_array=.true.)) then
                 ! Do nothing, vars already exist
              else if (is_next_size_t(args, i, req_array=.true.)) then
@@ -1270,6 +1396,7 @@ contains
        end if
     end do
     allocate(c_args(nargs))
+    call ygglog_debug("pre_recv: counted and allocated for arguments")
     j = 1
     if (is_format) then
        if (.not.is_size_t(args(1))) then
@@ -1285,7 +1412,7 @@ contains
        if (args(i)%array) then
           ! TODO: handle case where shape is explicit and ensure
           ! that length of shape variable is not appended
-          if (args(i)%ndim.gt.1) then
+          if ((args(i)%ndim.gt.1).or.args(i)%ndarray) then
              if (is_next_size_t(args, i).and.is_next_size_t(args, i+1, req_array=.true.)) then
                 args(i)%ndim_ptr = args(i+1)%ptr
                 args(i)%shape_ptr = args(i+2)%ptr
@@ -1300,7 +1427,11 @@ contains
                 args(i)%ndim_ptr = c_loc(args(i)%ndim_c)
                 c_args(j) = args(i)%ndim_ptr
                 j = j + 1
-                args(i)%shape_ptr = c_loc(args(i)%shape_c(1))
+                if (associated(args(i)%shape_c)) then
+                   args(i)%shape_ptr = c_loc(args(i)%shape_c(1))
+                else
+                   args(i)%shape_ptr = c_null_ptr
+                end if
                 c_args(j) = args(i)%shape_ptr
                 j = j + 1
              end if
@@ -1333,6 +1464,7 @@ contains
           end if
        end if
     end do
+    call ygglog_debug("pre_recv: end")
   end function pre_recv
 
   subroutine post_recv(args, c_args, flag, realloc, is_format)
@@ -1352,6 +1484,9 @@ contains
        end if
        do i = 1, size(args)
           args(i)%ptr = c_args(j)
+          if ((args(i)%ndim.gt.1).or.args(i)%ndarray) then
+             args(i)%shape_ptr = c_args(j+2)
+          end if
           flag = yggptr_c2f(args(i), realloc)
           if (.not.flag) then
              call ygglog_error("Error recovering fortran pointer for variable.")
@@ -1359,7 +1494,7 @@ contains
           end if
           j = j + 1
           if (args(i)%array) then
-             if (args(i)%ndim.gt.1) then
+             if ((args(i)%ndim.gt.1).or.args(i)%ndarray) then
                 if (is_next_size_t(args, i).and.is_next_size_t(args, i+1, req_array=.true.)) then
                    ! Do nothing, process variables as normal
                 else if (is_next_size_t(args, i, req_array=.true.)) then
@@ -1387,7 +1522,9 @@ contains
           deallocate(args(i)%len_c)
           deallocate(args(i)%prec_c)
           deallocate(args(i)%ndim_c)
-          deallocate(args(i)%shape_c)
+          if (associated(args(i)%shape_c)) then
+             deallocate(args(i)%shape_c)
+          end if
        end do
     end if
     if (allocated(c_args)) then
@@ -1616,6 +1753,7 @@ contains
           flag = .false.
        end if
     end do
+    call ygglog_debug("ygg_recv_var_realloc: checked variables")
     if (flag) then
        c_nargs = pre_recv(args, c_args, is_format)
        c_flag = ygg_recv_var_realloc_c(c_ygg_q, c_nargs, c_loc(c_args(1)))

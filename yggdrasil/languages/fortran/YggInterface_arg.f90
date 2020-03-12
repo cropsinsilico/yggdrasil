@@ -1008,3 +1008,305 @@ function yggarg_2darray_yggchar_r(x) result (y)
   call yggarg_2darray_init(y, x)
 end function yggarg_2darray_yggchar_r
 
+! ND Reallocatable array versions
+function yggarg_realloc_ndarray_init(x) &
+     result (y)
+  class(*), target :: x
+  type(yggptr) :: y
+  y%item => x
+  y%ndarray = .true.
+  y%array = .true.
+  y%alloc = .true.
+  y%len = 1
+  y%prec = 1
+  y%ndim = 1
+  y%shape => null()
+  y%ptr = c_null_ptr
+end function yggarg_realloc_ndarray_init
+function yggarg_realloc_ndarray_c_long(x) result (y)
+  type(c_long_nd), target :: x
+  type(c_long_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "c_long"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_c_long
+function yggarg_realloc_ndarray_integer(x) result (y)
+  type(integer_nd), target :: x
+  type(integer_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "integer"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_integer
+function yggarg_realloc_ndarray_integer2(x) result (y)
+  type(integer2_nd), target :: x
+  type(integer2_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "integer"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_integer2
+function yggarg_realloc_ndarray_integer4(x) result (y)
+  type(integer4_nd), target :: x
+  type(integer4_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "integer"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_integer4
+function yggarg_realloc_ndarray_integer8(x) result (y)
+  type(integer8_nd), target :: x
+  type(integer8_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "integer"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_integer8
+function yggarg_realloc_ndarray_real(x) result (y)
+  type(real_nd), target :: x
+  type(real_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "real"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_real
+function yggarg_realloc_ndarray_real4(x) result (y)
+  type(real4_nd), target :: x
+  type(real4_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "real"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_real4
+function yggarg_realloc_ndarray_real8(x) result (y)
+  type(real8_nd), target :: x
+  type(real8_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "real"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_real8
+function yggarg_realloc_ndarray_real16(x) result (y)
+  type(real16_nd), target :: x
+  type(real16_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "real"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_real16
+function yggarg_realloc_ndarray_complex(x) result (y)
+  type(complex_nd), target :: x
+  type(complex_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "complex"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_complex
+function yggarg_realloc_ndarray_complex4(x) result (y)
+  type(complex4_nd), target :: x
+  type(complex4_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "complex"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_complex4
+function yggarg_realloc_ndarray_complex8(x) result (y)
+  type(complex8_nd), target :: x
+  type(complex8_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "complex"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_complex8
+function yggarg_realloc_ndarray_complex16(x) result (y)
+  type(complex16_nd), target :: x
+  type(complex16_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "complex"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_complex16
+function yggarg_realloc_ndarray_logical(x) result (y)
+  type(logical_nd), target :: x
+  type(logical_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "logical"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_logical
+function yggarg_realloc_ndarray_logical1(x) result (y)
+  type(logical1_nd), target :: x
+  type(logical1_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "logical"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_logical1
+function yggarg_realloc_ndarray_logical2(x) result (y)
+  type(logical2_nd), target :: x
+  type(logical2_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "logical"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_logical2
+function yggarg_realloc_ndarray_logical4(x) result (y)
+  type(logical4_nd), target :: x
+  type(logical4_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "logical"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_logical4
+function yggarg_realloc_ndarray_logical8(x) result (y)
+  type(logical8_nd), target :: x
+  type(logical8_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "logical"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_logical8
+function yggarg_realloc_ndarray_character(x) result (y)
+  type(character_nd), target :: x
+  type(character_nd), pointer :: xp
+  type(yggptr) :: y
+  integer :: i
+  integer(kind=c_size_t) :: j, ilength
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "character"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%len = size(xp%x)
+     if (associated(xp%x(1)%x)) then
+        y%prec = size(xp%x(1)%x)
+        allocate(y%data_character_unit(y%len * y%prec))
+        do i = 1, size(xp%x)
+           ilength = 0
+           do j = 1, y%prec
+              if (len_trim(xp%x(i)%x(j)) > 0) ilength = j
+           end do
+           do j = 1, ilength
+              y%data_character_unit(((i-1)*y%prec) + j) = xp%x(i)%x(j)
+           end do
+           if (ilength.lt.y%prec) then
+              y%data_character_unit(((i-1)*y%prec) + ilength + 1) = c_null_char
+           end if
+           do j = (ilength + 2), y%prec
+              y%data_character_unit(((i-1)*y%prec) + j) = ' '
+           end do
+        end do
+        y%ptr = c_loc(y%data_character_unit(1))
+     end if
+  end if
+end function yggarg_realloc_ndarray_character
+

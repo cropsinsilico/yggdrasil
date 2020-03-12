@@ -154,7 +154,7 @@ class FortranModelDriver(CompiledModelDriver):
         '1darray': '*',
         'ndarray': '*',
         '1darray_pointer': '{type}{precision}_1d',
-        'ndarray_pointer': '{type}{precision}_nd',
+        'ndarray_pointer': '{type}{precision}_{ndim}d',
         'ply': 'yggply',
         'obj': 'yggobj',
         'schema': 'yggschema',
@@ -437,6 +437,7 @@ class FortranModelDriver(CompiledModelDriver):
                     json_subtype['precision'] = ''
                 else:
                     json_subtype['precision'] = int(json_subtype['precision'] / 8)
+                json_subtype.setdefault('ndim', 'n')
                 out = 'type(%s)' % cls.get_native_type(
                     type=('%s_pointer' % json_type['type'])).format(
                         **json_subtype)
@@ -867,8 +868,14 @@ class FortranModelDriver(CompiledModelDriver):
             datatype.setdefault('items', [])
         elif datatype['type'] == 'object':
             datatype.setdefault('properties', {})
-        elif datatype.get('subtype', datatype['type']) in ['bytes', 'unicode']:
-            datatype = dict(datatype, precision=0)
+        elif datatype['type'] == 'ndarray':
+            if 'shape' not in datatype:
+                datatype = dict(datatype, shape=[])
+            if 'ndim' not in datatype:
+                datatype = dict(datatype, ndim=len(datatype['shape']))
+        if datatype.get('subtype', datatype['type']) in ['bytes', 'unicode']:
+            if 'precision' not in datatype:
+                datatype = dict(datatype, precision=0)
         elif datatype.get('subtype', datatype['type']) in _valid_types:
             datatype.setdefault('precision', 32)
         out = super(FortranModelDriver, cls).write_type_def(
@@ -893,6 +900,11 @@ class FortranModelDriver(CompiledModelDriver):
             datatype.setdefault('items', [])
         elif datatype['type'] == 'object':
             datatype.setdefault('properties', {})
+        elif datatype['type'] == 'ndarray':
+            if 'shape' not in datatype:
+                datatype = dict(datatype, shape=[])
+            if 'ndim' not in datatype:
+                datatype = dict(datatype, ndim=len(datatype['shape']))
         out = super(FortranModelDriver, cls).write_type_decl(
             name, datatype, **kwargs)
         return out
