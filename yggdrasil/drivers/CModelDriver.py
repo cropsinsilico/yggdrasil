@@ -253,9 +253,16 @@ _top_lang_dir = get_language_dir('c')
 _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
-_python_inc = sysconfig.get_paths()['include']
+_python_inc = ygg_cfg.get('c', 'python_include', None)
+if (_python_inc is None) or (not os.path.isfile(_python_inc)):
+    _python_inc = sysconfig.get_paths()['include']
+else:
+    _python_inc = os.path.dirname(_python_inc)
 try:
-    _python_lib = tools.get_python_c_library(allow_failure=False)
+    _python_lib = ygg_cfg.get('c', 'python_shared',
+                              ygg_cfg.get('c', 'python_static', None))
+    if (_python_lib is None) or (not os.path.isfile(_python_lib)):
+        _python_lib = tools.get_python_c_library(allow_failure=False)
 except BaseException:  # pragma: debug
     warnings.warn("ERROR LOCATING PYTHON LIBRARY")
     _python_lib = None
@@ -494,12 +501,13 @@ class CModelDriver(CompiledModelDriver):
         CompiledModelDriver.after_registration(cls, **kwargs)
         if kwargs.get('second_pass', False):
             return
-        if _python_lib and _python_lib.endswith(('.lib', '.a')):
-            cls.external_libraries['python']['libtype'] = 'static'
-            cls.external_libraries['python']['static'] = _python_lib
-        else:
-            cls.external_libraries['python']['libtype'] = 'shared'
-            cls.external_libraries['python']['shared'] = _python_lib
+        if _python_lib:
+            if _python_lib.endswith(('.lib', '.a')):
+                cls.external_libraries['python']['libtype'] = 'static'
+                cls.external_libraries['python']['static'] = _python_lib
+            else:
+                cls.external_libraries['python']['libtype'] = 'shared'
+                cls.external_libraries['python']['shared'] = _python_lib
         for x in ['zmq', 'czmq']:
             if x in cls.external_libraries:
                 if platform._is_win:  # pragma: windows

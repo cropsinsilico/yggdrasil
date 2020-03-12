@@ -44,20 +44,23 @@ environment:
   matrix:
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=examples_part1 serialize communication tests/test_tools.py"
+      YGG_TEST_FLAGS: "--test-suite=examples_part1"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      INSTALLZMQ: 0
+      YGG_TEST_FLAGS: "--test-suite=examples_part2"
+    - platform: x64
+      PYTHON_VERSION: "3.6"
       YGG_TEST_FLAGS: "--long-running"
     - platform: x64
-      PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=examples_part2 drivers"
+      PYTHON_VERSION: "3.7"
+      INSTALLZMQ: 0
+      YGG_TEST_FLAGS: "--long-running"
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_TEST_FLAGS: "--test-suite=types tests/test_config.py drivers/tests/test_CompiledModelDriver.py"
       INSTALLC: 0  # Acts to exclude c and cpp
     - platform: x64
-      PYTHON_VERSION: "3.6"
+      PYTHON_VERSION: "3.7"
       YGG_TEST_FLAGS: "--test-suite=types --languages c cpp"
 
 install:
