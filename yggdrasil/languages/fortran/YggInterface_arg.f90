@@ -585,6 +585,8 @@ function yggarg_ndarray_init(x, x_shape) result (y)
      y%shape = x_shape
   else
      y%ndim = 1
+     allocate(y%shape(1))
+     y%shape(1) = y%len
   end if
   y%ptr = c_null_ptr
 end function yggarg_ndarray_init
@@ -594,7 +596,11 @@ function yggarg_1darray_integer2(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "integer"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_integer2
@@ -604,7 +610,11 @@ function yggarg_1darray_integer4(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "integer"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_integer4
@@ -614,7 +624,11 @@ function yggarg_1darray_integer8(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "integer"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_integer8
@@ -624,7 +638,11 @@ function yggarg_1darray_real4(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "real"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_real4
@@ -634,7 +652,11 @@ function yggarg_1darray_real8(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "real"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_real8
@@ -644,7 +666,11 @@ function yggarg_1darray_real16(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "real"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_real16
@@ -654,7 +680,11 @@ function yggarg_1darray_complex4(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "complex"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_complex4
@@ -664,7 +694,11 @@ function yggarg_1darray_complex8(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "complex"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_complex8
@@ -674,7 +708,11 @@ function yggarg_1darray_complex16(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "complex"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_complex16
@@ -684,7 +722,11 @@ function yggarg_1darray_logical1(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "logical"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_logical1
@@ -694,7 +736,11 @@ function yggarg_1darray_logical2(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "logical"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_logical2
@@ -704,7 +750,11 @@ function yggarg_1darray_logical4(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "logical"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_logical4
@@ -714,7 +764,11 @@ function yggarg_1darray_logical8(x, x_shape) result (y)
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "logical"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_logical8
@@ -725,7 +779,11 @@ function yggarg_1darray_character(x, x_shape) result (y)
   type(yggptr) :: y
   integer :: i, ilength
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "character"
   y%prec = len(xp(1))
   do i = 1, size(xp)
@@ -745,7 +803,11 @@ function yggarg_1darray_yggchar_r(x, x_shape) result (y)
   type(yggptr) :: y
   integer :: i, j, ilength
   xp => x
-  y = yggarg_ndarray_init(x, x_shape)
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
   y%type = "character"
   if ((associated(xp(1)%x)).and.(size(xp(1)%x).ge.1)) then
      y%prec = size(xp(1)%x)

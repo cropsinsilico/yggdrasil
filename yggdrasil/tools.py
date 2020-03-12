@@ -6,7 +6,10 @@ import pprint
 import os
 import sys
 import sysconfig
-import distutils
+try:
+    from distutils import sysconfig as distutils_sysconfig
+except ImportError:  # pragma: debug
+    distutils_sysconfig = None
 import warnings
 import copy
 import shutil
@@ -218,8 +221,9 @@ def get_python_c_library(allow_failure=False, libtype=None):
     for k in ['stdlib', 'purelib', 'platlib', 'platstdlib', 'data']:
         dir_try.append(paths[k])
     dir_try.append(os.path.join(paths['data'], 'lib'))
-    dir_try.append(os.path.dirname(
-        distutils.sysconfig.get_python_lib(True, True)))
+    if distutils_sysconfig is not None:
+        dir_try.append(os.path.dirname(
+            distutils_sysconfig.get_python_lib(True, True)))
     dir_try = set(dir_try)
     for idir in dir_try:
         x = os.path.join(idir, base)
