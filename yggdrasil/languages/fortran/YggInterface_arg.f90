@@ -568,143 +568,164 @@ function yggarg_realloc_1darray_character(x) result (y)
   end if
 end function yggarg_realloc_1darray_character
 
-
 ! 1D array versions
-function yggarg_1darray_init(x) result (y)
+function yggarg_ndarray_init(x, x_shape) result (y)
   class(*), dimension(:), target :: x
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   y%item => x(1)
   y%item_array => x
   y%array = .true.
   y%alloc = .false.
-  y%len = size(x)
   y%prec = 1
+  y%len = size(x)
+  if (present(x_shape)) then
+     y%ndim = size(x_shape)
+     allocate(y%shape(y%ndim))
+     y%shape = x_shape
+  else
+     y%ndim = 1
+  end if
   y%ptr = c_null_ptr
-end function yggarg_1darray_init
-function yggarg_1darray_integer2(x) result (y)
+end function yggarg_ndarray_init
+function yggarg_1darray_integer2(x, x_shape) result (y)
   integer(kind=2), dimension(:), target :: x
   integer(kind=2), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "integer"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_integer2
-function yggarg_1darray_integer4(x) result (y)
+function yggarg_1darray_integer4(x, x_shape) result (y)
   integer(kind=4), dimension(:), target :: x
   integer(kind=4), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "integer"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_integer4
-function yggarg_1darray_integer8(x) result (y)
+function yggarg_1darray_integer8(x, x_shape) result (y)
   integer(kind=8), dimension(:), target :: x
   integer(kind=8), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "integer"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_integer8
-function yggarg_1darray_real4(x) result (y)
+function yggarg_1darray_real4(x, x_shape) result (y)
   real(kind=4), dimension(:), target :: x
   real(kind=4), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "real"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_real4
-function yggarg_1darray_real8(x) result (y)
+function yggarg_1darray_real8(x, x_shape) result (y)
   real(kind=8), dimension(:), target :: x
   real(kind=8), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "real"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_real8
-function yggarg_1darray_real16(x) result (y)
+function yggarg_1darray_real16(x, x_shape) result (y)
   real(kind=16), dimension(:), target :: x
   real(kind=16), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "real"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_real16
-function yggarg_1darray_complex4(x) result (y)
+function yggarg_1darray_complex4(x, x_shape) result (y)
   complex(kind=4), dimension(:), target :: x
   complex(kind=4), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "complex"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_complex4
-function yggarg_1darray_complex8(x) result (y)
+function yggarg_1darray_complex8(x, x_shape) result (y)
   complex(kind=8), dimension(:), target :: x
   complex(kind=8), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "complex"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_complex8
-function yggarg_1darray_complex16(x) result (y)
+function yggarg_1darray_complex16(x, x_shape) result (y)
   complex(kind=16), dimension(:), target :: x
   complex(kind=16), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "complex"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_complex16
-function yggarg_1darray_logical1(x) result (y)
+function yggarg_1darray_logical1(x, x_shape) result (y)
   logical(kind=1), dimension(:), target :: x
   logical(kind=1), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "logical"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_logical1
-function yggarg_1darray_logical2(x) result (y)
+function yggarg_1darray_logical2(x, x_shape) result (y)
   logical(kind=2), dimension(:), target :: x
   logical(kind=2), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "logical"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_logical2
-function yggarg_1darray_logical4(x) result (y)
+function yggarg_1darray_logical4(x, x_shape) result (y)
   logical(kind=4), dimension(:), target :: x
   logical(kind=4), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "logical"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_logical4
-function yggarg_1darray_logical8(x) result (y)
+function yggarg_1darray_logical8(x, x_shape) result (y)
   logical(kind=8), dimension(:), target :: x
   logical(kind=8), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "logical"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_logical8
-function yggarg_1darray_character(x) result (y)
+function yggarg_1darray_character(x, x_shape) result (y)
   character(len=*), dimension(:), target :: x
   character(len=len(x(1))), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   integer :: i, ilength
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "character"
   y%prec = len(xp(1))
   do i = 1, size(xp)
@@ -717,13 +738,14 @@ function yggarg_1darray_character(x) result (y)
   y%data_character_unit = transfer(x, y%data_character_unit)
   y%ptr = c_loc(y%data_character_unit(1))
 end function yggarg_1darray_character
-function yggarg_1darray_yggchar_r(x) result (y)
+function yggarg_1darray_yggchar_r(x, x_shape) result (y)
   type(yggchar_r), dimension(:), target :: x
   type(yggchar_r), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
   integer :: i, j, ilength
   xp => x
-  y = yggarg_1darray_init(x)
+  y = yggarg_ndarray_init(x, x_shape)
   y%type = "character"
   if ((associated(xp(1)%x)).and.(size(xp(1)%x).ge.1)) then
      y%prec = size(xp(1)%x)
@@ -746,3 +768,158 @@ function yggarg_1darray_yggchar_r(x) result (y)
      y%ptr = c_loc(y%data_character_unit(1))
   end if
 end function yggarg_1darray_yggchar_r
+
+! ND array versions
+! #define myint INTEGER*8
+! #define call yggarg_2darray_shape(x, xp) print *, x, xp
+! allocate(xp(size(x)), mold=x(:,1)); xp = reshape(x, [size(x)]);
+
+subroutine yggarg_2darray_init(y, x)
+  type(yggptr) :: y
+  class(*), dimension(:, :), intent(in), target :: x
+  y%item_array_2d => x
+  ! allocate(y%item_array(size(x)), mold=x(:,1))
+  ! y%item_array = reshape(x, [size(x)])
+end subroutine yggarg_2darray_init
+! subroutine yggarg_2darray_shape(x, xp)
+!   class(*), dimension(:, :), intent(in), target :: x
+!   class(*), dimension(:), intent(out), pointer :: xp
+!   allocate(xp(size(x)), mold=x(:,1))
+!   xp = reshape(x, [size(x)])
+! end subroutine yggarg_2darray_shape
+function yggarg_2darray_integer2(x) result (y)
+  integer(kind=2), dimension(:, :), target :: x
+  integer(kind=2), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_integer2
+function yggarg_2darray_integer4(x) result (y)
+  integer(kind=4), dimension(:, :), target :: x
+  integer(kind=4), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_integer4
+function yggarg_2darray_integer8(x) result (y)
+  integer(kind=8), dimension(:, :), target :: x
+  integer(kind=8), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_integer8
+function yggarg_2darray_real4(x) result (y)
+  real(kind=4), dimension(:, :), target :: x
+  real(kind=4), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_real4
+function yggarg_2darray_real8(x) result (y)
+  real(kind=8), dimension(:, :), target :: x
+  real(kind=8), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_real8
+function yggarg_2darray_real16(x) result (y)
+  real(kind=16), dimension(:, :), target :: x
+  real(kind=16), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_real16
+function yggarg_2darray_complex4(x) result (y)
+  complex(kind=4), dimension(:, :), target :: x
+  complex(kind=4), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_complex4
+function yggarg_2darray_complex8(x) result (y)
+  complex(kind=8), dimension(:, :), target :: x
+  complex(kind=8), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_complex8
+function yggarg_2darray_complex16(x) result (y)
+  complex(kind=16), dimension(:, :), target :: x
+  complex(kind=16), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_complex16
+function yggarg_2darray_logical1(x) result (y)
+  logical(kind=1), dimension(:, :), target :: x
+  logical(kind=1), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_logical1
+function yggarg_2darray_logical2(x) result (y)
+  logical(kind=2), dimension(:, :), target :: x
+  logical(kind=2), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_logical2
+function yggarg_2darray_logical4(x) result (y)
+  logical(kind=4), dimension(:, :), target :: x
+  logical(kind=4), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_logical4
+function yggarg_2darray_logical8(x) result (y)
+  logical(kind=8), dimension(:, :), target :: x
+  logical(kind=8), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_logical8
+function yggarg_2darray_character(x) result (y)
+  character(len=*), dimension(:, :), target :: x
+  character(len=:), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(character(len=len(x(1,1))) :: xp(size(x)))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_character
+function yggarg_2darray_yggchar_r(x) result (y)
+  type(yggchar_r), dimension(:, :), target :: x
+  type(yggchar_r), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_yggchar_r
+

@@ -1386,7 +1386,7 @@ public:
 	}
       }
       int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
-			       p, *arg_siz, allow_realloc, skip_terminal);
+      			       p, *arg_siz, allow_realloc, skip_terminal);
       if (ret < 0) {
 	ygglog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for %s.",
 		     subtype());
@@ -1610,6 +1610,20 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[in] allow_realloc int If 1, the passed variables will be reallocated
+    to contain the deserialized data.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On return,
+    the number of arguments assigned from the deserialized data will be assigned
+    to this address.
+    @param[out] ap va_list_t Reference to variable argument list containing
+    address where deserialized data should be assigned.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
+  bool decode_data(rapidjson::Value &data, const int allow_realloc,
+		   size_t *nargs, va_list_t &ap) const override;
   
 private:
   std::vector<size_t> shape_;
@@ -2143,6 +2157,33 @@ size_t NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va
     }
     out = out + 3;
   }
+  if ((ap.for_fortran) && (ap.using_ptrs)) {
+    if ((!(_variable_shape)) || (*nargs < 3)) {
+      va_list_t_skip(&ap, sizeof(unsigned char**));
+      out = out + 1;
+    }
+    if (!(_variable_shape)) {
+      ap.nptrs++;
+      size_t * new_ndim = (size_t*)get_va_list_ptr_cpp(&ap);
+      new_ndim[0] = ndim();
+      ap.nptrs++;
+      size_t** new_shape = (size_t**)get_va_list_ptr_ref_cpp(&ap, 1);
+      // size_t* new_shape_temp = (size_t*)realloc(new_shape[0], ndim()*sizeof(size_t));
+      // if (new_shape_temp == NULL) {
+      // 	ygglog_throw_error("NDArrayMetaschemaType::update_from_deseriali: Failed to realloc memory for the provided shape array.");
+      // }
+      // new_shape[0] = new_shape_temp;
+      size_t i;
+      for (i = 0; i < ndim(); i++) {
+	(*new_shape)[i] = shape_[i];
+      }
+    }
+    if ((subtype_code() == T_BYTES) || (subtype_code() == T_UNICODE)) {
+      ap.nptrs++;
+      size_t * arg_prec = (size_t*)get_va_list_ptr_cpp(&ap);
+      arg_prec[0] = (size_t)(precision()/8);
+    }
+  }
   return out;
 };
 void NDArrayMetaschemaType::set_shape(std::vector<size_t> new_shape, bool force) {
@@ -2183,6 +2224,26 @@ bool NDArrayMetaschemaType::encode_type_prop(rapidjson::Writer<rapidjson::String
   writer->EndArray();
   return true;
 };
+bool NDArrayMetaschemaType::decode_data(rapidjson::Value &data, const int allow_realloc,
+					size_t *nargs, va_list_t &ap) const {
+    bool out = ScalarMetaschemaType::decode_data(data, allow_realloc,
+						 nargs, ap);
+    if (out) {
+      if ((ap.for_fortran) && (ap.using_ptrs)) {
+	if (!(_variable_shape)) {
+	  ap.nptrs++;
+	  va_list_t_skip(&ap, sizeof(size_t*));
+	  ap.nptrs++;
+	  va_list_t_skip(&ap, sizeof(size_t**));
+	}
+	if ((subtype_code() == T_BYTES) || (subtype_code() == T_UNICODE)) {
+	  ap.nptrs++;
+	  va_list_t_skip(&ap, sizeof(size_t*));
+	}
+      }
+    }
+    return out;
+  };
 
 
 #endif /*SCALAR_METASCHEMA_TYPE_H_*/

@@ -1,4 +1,5 @@
 module fygg
+
   ! TODO: Ensure that dynamically allocated C/C++ variables are freed.
   use iso_c_binding
   implicit none
@@ -70,6 +71,21 @@ module fygg
      module procedure yggarg_1darray_logical8
      module procedure yggarg_1darray_character
      module procedure yggarg_1darray_yggchar_r
+     module procedure yggarg_2darray_integer2
+     module procedure yggarg_2darray_integer4
+     module procedure yggarg_2darray_integer8
+     module procedure yggarg_2darray_real4
+     module procedure yggarg_2darray_real8
+     module procedure yggarg_2darray_real16
+     module procedure yggarg_2darray_complex4
+     module procedure yggarg_2darray_complex8
+     module procedure yggarg_2darray_complex16
+     module procedure yggarg_2darray_logical1
+     module procedure yggarg_2darray_logical2
+     module procedure yggarg_2darray_logical4
+     module procedure yggarg_2darray_logical8
+     module procedure yggarg_2darray_character
+     module procedure yggarg_2darray_yggchar_r
   end interface yggarg
   interface yggassign
      module procedure yggassign_yggchar2character
@@ -131,64 +147,64 @@ module fygg
      type(c_ptr) :: ptr
   end type yggdtype
   type :: yggchar_r
-     character, dimension(:), pointer :: x => null()
+     character, dimension(:), contiguous, pointer :: x => null()
   end type yggchar_r
   type :: c_long_1d
-     integer(kind=c_long), dimension(:), pointer :: x => null()
+     integer(kind=c_long), dimension(:), contiguous, pointer :: x => null()
   end type c_long_1d
   type :: integer_1d
-     integer, dimension(:), pointer :: x => null()
+     integer, dimension(:), contiguous, pointer :: x => null()
   end type integer_1d
   type :: integer2_1d
-     integer(kind=2), dimension(:), pointer :: x => null()
+     integer(kind=2), dimension(:), contiguous, pointer :: x => null()
   end type integer2_1d
   type :: integer4_1d
-     integer(kind=4), dimension(:), pointer :: x => null()
+     integer(kind=4), dimension(:), contiguous, pointer :: x => null()
   end type integer4_1d
   type :: integer8_1d
-     integer(kind=8), dimension(:), pointer :: x => null()
+     integer(kind=8), dimension(:), contiguous, pointer :: x => null()
   end type integer8_1d
   type :: real_1d
-     real, dimension(:), pointer :: x => null()
+     real, dimension(:), contiguous, pointer :: x => null()
   end type real_1d
   type :: real4_1d
-     real(kind=4), dimension(:), pointer :: x => null()
+     real(kind=4), dimension(:), contiguous, pointer :: x => null()
   end type real4_1d
   type :: real8_1d
-     real(kind=8), dimension(:), pointer :: x => null()
+     real(kind=8), dimension(:), contiguous, pointer :: x => null()
   end type real8_1d
   type :: real16_1d
-     real(kind=16), dimension(:), pointer :: x => null()
+     real(kind=16), dimension(:), contiguous, pointer :: x => null()
   end type real16_1d
   type :: complex_1d
-     complex, dimension(:), pointer :: x => null()
+     complex, dimension(:), contiguous, pointer :: x => null()
   end type complex_1d
   type :: complex4_1d
-     complex(kind=4), dimension(:), pointer :: x => null()
+     complex(kind=4), dimension(:), contiguous, pointer :: x => null()
   end type complex4_1d
   type :: complex8_1d
-     complex(kind=8), dimension(:), pointer :: x => null()
+     complex(kind=8), dimension(:), contiguous, pointer :: x => null()
   end type complex8_1d
   type :: complex16_1d
-     complex(kind=16), dimension(:), pointer :: x => null()
+     complex(kind=16), dimension(:), contiguous, pointer :: x => null()
   end type complex16_1d
   type :: logical_1d
-     logical, dimension(:), pointer :: x => null()
+     logical, dimension(:), contiguous, pointer :: x => null()
   end type logical_1d
   type :: logical1_1d
-     logical(kind=1), dimension(:), pointer :: x => null()
+     logical(kind=1), dimension(:), contiguous, pointer :: x => null()
   end type logical1_1d
   type :: logical2_1d
-     logical(kind=2), dimension(:), pointer :: x => null()
+     logical(kind=2), dimension(:), contiguous, pointer :: x => null()
   end type logical2_1d
   type :: logical4_1d
-     logical(kind=4), dimension(:), pointer :: x => null()
+     logical(kind=4), dimension(:), contiguous, pointer :: x => null()
   end type logical4_1d
   type :: logical8_1d
-     logical(kind=8), dimension(:), pointer :: x => null()
+     logical(kind=8), dimension(:), contiguous, pointer :: x => null()
   end type logical8_1d
   type :: character_1d
-     type(yggchar_r), dimension(:), pointer :: x => null()
+     type(yggchar_r), dimension(:), contiguous, pointer :: x => null()
   end type character_1d
   type :: integer_2d
      integer, dimension(:, :), pointer :: x => null()
@@ -252,15 +268,17 @@ module fygg
      integer(kind=8) :: prec = 0
      integer(kind=8) :: ndim = 0
      integer(kind=8) :: nbytes = 0
-     integer(kind=8), dimension(:), pointer :: shape => null()
+     integer(kind=8), dimension(:), contiguous, pointer :: shape => null()
      type(c_ptr) :: ptr = c_null_ptr
      class(*), pointer :: item => null()
      class(*), dimension(:), pointer :: item_array => null()
-     character, dimension(:), pointer :: data_character_unit => null()
+     class(*), dimension(:, :), pointer :: item_array_2d => null()
+     class(*), dimension(:, :, :), pointer :: item_array_3d => null()
+     character, dimension(:), contiguous, pointer :: data_character_unit => null()
      integer(kind=c_size_t), pointer :: len_c => null()
      integer(kind=c_size_t), pointer :: prec_c => null()
      integer(kind=c_size_t), pointer :: ndim_c => null()
-     integer(kind=c_size_t), dimension(:), pointer :: shape_c => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape_c => null()
      type(c_ptr) :: len_ptr = c_null_ptr
      type(c_ptr) :: prec_ptr = c_null_ptr
      type(c_ptr) :: ndim_ptr = c_null_ptr
@@ -818,15 +836,17 @@ contains
     character(len=*), intent(in) :: subtype
     integer, intent(in) :: precision
     integer, intent(in) :: ndim
-    integer, dimension(:), pointer, intent(in) :: shape
+    integer(kind=c_size_t), dimension(:), target, intent(in) :: shape
     character(len=*), intent(in) :: units
     logical, intent(in) :: use_generic
     type(yggdtype) :: out
+    integer(kind=c_size_t), dimension(:), pointer :: pshape
     character(len=len_trim(subtype)+1) :: c_subtype
     integer(kind=c_size_t) :: c_precision
     integer(kind=c_size_t) :: c_ndim
     type(c_ptr) :: c_shape
     character(len=len_trim(units)+1) :: c_units
+    pshape => shape
     c_subtype = trim(subtype)//c_null_char
     c_precision = precision
     c_ndim = ndim
@@ -1029,24 +1049,34 @@ contains
     call post_send(args, c_args, flag)
   end function ygg_send_var_mult
 
-  function is_next_size_t(args, i) result(flag)
+  function is_next_size_t(args, i, req_array) result(flag)
     implicit none
     type(yggptr) :: args(:)
     integer :: i
+    logical, intent(in), optional :: req_array
     logical :: flag
     if (i.ge.size(args)) then
        flag = .false.
     else
-       flag = is_size_t(args(i+1))
+       flag = is_size_t(args(i+1), req_array)
     end if
   end function is_next_size_t
 
-  function is_size_t(arg) result(flag)
+  function is_size_t(arg, req_array) result(flag)
     type(yggptr), intent(in) :: arg
+    logical, optional :: req_array
     logical :: flag
+    if (.not.present(req_array)) then
+       req_array = .false.
+    end if
     if (((arg%type.eq."integer").or.(arg%type.eq."size_t")).and. &
-         (.not.arg%array).and.(arg%nbytes.eq.8)) then
+         (arg%nbytes.eq.8)) then
        flag = .true.
+       if (req_array.and.(.not.arg%array)) then
+          flag = .false.
+       else if ((.not.req_array).and.arg%array) then
+          flag = .false.
+       end if
     else
        flag = .false.
     end if
@@ -1058,6 +1088,7 @@ contains
     type(c_ptr), allocatable, target :: c_args(:)
     logical :: is_format
     integer(kind=c_int) :: c_nargs
+    integer(kind=c_size_t) :: k
     integer :: i, j
     integer :: nargs
     nargs = size(args)  ! Number of arguments passed
@@ -1072,16 +1103,32 @@ contains
        allocate(args(i)%len_c)
        allocate(args(i)%prec_c)
        allocate(args(i)%ndim_c)
-       allocate(args(i)%shape_c(1))
+       allocate(args(i)%shape_c(args(i)%ndim))
        args(i)%len_c = 1
        args(i)%prec_c = 1
        args(i)%ndim_c = 1
-       args(i)%shape_c(1) = 1
+       do k = 1, args(i)%ndim
+          args(i)%shape_c(k) = args(i)%shape(k)
+       end do
        if (args(i)%array) then
-          if ((.not.is_format).and.(.not.is_next_size_t(args, i))) then
-             if (args(i)%alloc) then
-                nargs = nargs + 1  ! For the array size
-                c_nargs = c_nargs + 1
+          if (args(i)%ndim.gt.1) then
+             if (is_next_size_t(args, i).and.is_next_size_t(args, i+1, req_array=.true.)) then
+                ! Do nothing, vars already exist
+             else if (is_next_size_t(args, i, req_array=.true.)) then
+                if (args(i)%alloc) then
+                   nargs = nargs + 1  ! For ndim
+                   c_nargs = c_nargs + 1
+                end if
+             else if (args(i)%alloc) then
+                nargs = nargs + 2  ! For ndim and shape
+                c_nargs = c_nargs + 2
+             end if
+          else
+             if ((.not.is_format).and.(.not.is_next_size_t(args, i))) then
+                if (args(i)%alloc) then
+                   nargs = nargs + 1  ! For the array size
+                   c_nargs = c_nargs + 1
+                end if
              end if
           end if
        else if (args(i)%type.eq."character") then
@@ -1105,15 +1152,38 @@ contains
        c_args(j) = args(i)%ptr
        j = j + 1
        if (args(i)%array) then
-          if (is_format) then
-             args(i)%len_ptr = c_args(1)
-          else if (is_next_size_t(args, i)) then
-             args(i)%len_ptr = args(i+1)%ptr
-          else if (args(i)%alloc) then
-             args(i)%len_c = args(i)%len
-             args(i)%len_ptr = c_loc(args(i)%len_c)
-             c_args(j) = args(i)%len_ptr
-             j = j + 1
+          if (args(i)%ndim.gt.1) then
+             if (is_next_size_t(args, i).and.is_next_size_t(args, i+1, req_array=.true.)) then
+                args(i)%ndim_ptr = args(i+1)%ptr
+                args(i)%shape_ptr = args(i+2)%ptr
+             else if (is_next_size_t(args, i, req_array=.true.)) then
+                args(i)%shape_ptr = args(i+1)%ptr
+                if (args(i)%alloc) then
+                   args(i)%ndim_c = args(i)%ndim
+                   args(i)%ndim_ptr = c_loc(args(i)%ndim_c)
+                   c_args(j) = args(i)%ndim_ptr
+                   j = j + 1
+                end if
+             else if (args(i)%alloc) then
+                args(i)%ndim_c = args(i)%ndim
+                args(i)%ndim_ptr = c_loc(args(i)%ndim_c)
+                c_args(j) = args(i)%ndim_ptr
+                j = j + 1
+                args(i)%shape_ptr = c_loc(args(i)%shape_c(1))
+                c_args(j) = args(i)%shape_ptr
+                j = j + 1
+             end if
+          else
+             if (is_format) then
+                args(i)%len_ptr = c_args(1)
+             else if (is_next_size_t(args, i)) then
+                args(i)%len_ptr = args(i+1)%ptr
+             else if (args(i)%alloc) then
+                args(i)%len_c = args(i)%len
+                args(i)%len_ptr = c_loc(args(i)%len_c)
+                c_args(j) = args(i)%len_ptr
+                j = j + 1
+             end if
           end if
        else if (args(i)%type.eq."character") then
           if (is_next_size_t(args, i)) then
@@ -1134,6 +1204,7 @@ contains
     type(c_ptr), allocatable, target :: c_args(:)
     logical :: is_format
     integer(kind=c_int) :: c_nargs
+    integer(kind=c_size_t) :: k
     integer :: i, j
     integer :: nargs
     nargs = size(args)  ! Number of arguments passed
@@ -1148,16 +1219,35 @@ contains
        allocate(args(i)%len_c)
        allocate(args(i)%prec_c)
        allocate(args(i)%ndim_c)
-       allocate(args(i)%shape_c(1))
+       allocate(args(i)%shape_c(args(i)%ndim))
        args(i)%len_c = 1
        args(i)%prec_c = 1
        args(i)%ndim_c = 1
-       args(i)%shape_c(1) = 1
+       do k = 1, args(i)%ndim
+          args(i)%shape_c(k) = args(i)%shape(k)
+       end do
        if (args(i)%array) then
-          if ((.not.is_format).and.(.not.is_next_size_t(args, i))) then
-             nargs = nargs + 1  ! For the array size
-             if (args(i)%alloc) then
-                c_nargs = c_nargs + 1
+          if (args(i)%ndim.gt.1) then
+
+             if (is_next_size_t(args, i).and.is_next_size_t(args, i+1, req_array=.true.)) then
+                ! Do nothing, vars already exist
+             else if (is_next_size_t(args, i, req_array=.true.)) then
+                nargs = nargs + 1  ! For ndim
+                if (args(i)%alloc) then
+                   c_nargs = c_nargs + 1
+                end if
+             else
+                nargs = nargs + 2  ! For ndim and shape
+                if (args(i)%alloc) then
+                   c_nargs = c_nargs + 2
+                end if
+             end if
+          else
+             if ((.not.is_format).and.(.not.is_next_size_t(args, i))) then
+                nargs = nargs + 1  ! For the array size
+                if (args(i)%alloc) then
+                   c_nargs = c_nargs + 1
+                end if
              end if
           end if
           if (args(i)%type.eq."character") then
@@ -1184,15 +1274,38 @@ contains
        c_args(j) = args(i)%ptr
        j = j + 1
        if (args(i)%array) then
-          if (is_format) then
-             args(i)%len_ptr = c_args(1)
-          else if (is_next_size_t(args, i)) then
-             args(i)%len_ptr = args(i+1)%ptr
+          ! TODO: handle case where shape is explicit and ensure
+          ! that length of shape variable is not appended
+          if (args(i)%ndim.gt.1) then
+             if (is_next_size_t(args, i).and.is_next_size_t(args, i+1, req_array=.true.)) then
+                args(i)%ndim_ptr = args(i+1)%ptr
+                args(i)%shape_ptr = args(i+2)%ptr
+             else if (is_next_size_t(args, i, req_array=.true.)) then
+                args(i)%shape_ptr = args(i+1)%ptr
+                args(i)%ndim_c = args(i)%ndim
+                args(i)%ndim_ptr = c_loc(args(i)%ndim_c)
+                c_args(j) = args(i)%ndim_ptr
+                j = j + 1
+             else
+                args(i)%ndim_c = args(i)%ndim
+                args(i)%ndim_ptr = c_loc(args(i)%ndim_c)
+                c_args(j) = args(i)%ndim_ptr
+                j = j + 1
+                args(i)%shape_ptr = c_loc(args(i)%shape_c(1))
+                c_args(j) = args(i)%shape_ptr
+                j = j + 1
+             end if
           else
-             args(i)%len_c = args(i)%len
-             args(i)%len_ptr = c_loc(args(i)%len_c)
-             c_args(j) = args(i)%len_ptr
-             j = j + 1
+             if (is_format) then
+                args(i)%len_ptr = c_args(1)
+             else if (is_next_size_t(args, i)) then
+                args(i)%len_ptr = args(i+1)%ptr
+             else
+                args(i)%len_c = args(i)%len
+                args(i)%len_ptr = c_loc(args(i)%len_c)
+                c_args(j) = args(i)%len_ptr
+                j = j + 1
+             end if
           end if
           if (args(i)%type.eq."character") then
              args(i)%prec_c = args(i)%prec
@@ -1237,8 +1350,18 @@ contains
           end if
           j = j + 1
           if (args(i)%array) then
-             if ((.not.is_format).and.(.not.is_next_size_t(args, i))) then
-                j = j + 1
+             if (args(i)%ndim.gt.1) then
+                if (is_next_size_t(args, i).and.is_next_size_t(args, i+1, req_array=.true.)) then
+                   ! Do nothing, process variables as normal
+                else if (is_next_size_t(args, i, req_array=.true.)) then
+                   j = j + 1
+                else
+                   j = j + 2
+                end if
+             else
+                if ((.not.is_format).and.(.not.is_next_size_t(args, i))) then
+                   j = j + 1
+                end if
              end if
              if (args(i)%type.eq."character") then
                 j = j + 1

@@ -5,13 +5,24 @@ function yggptr_realloc(x, array_len, precision, realloc) result(flag)
   integer(kind=c_size_t), pointer :: precision
   logical :: realloc, flag
   character(len=500) :: log_msg
+  integer(kind=c_size_t) :: old_len = 1
+  integer(kind=c_size_t) :: i
+  if (x%array) then
+     if (x%ndim.gt.1) then
+        do i = 1, x%ndim
+           old_len = old_len * x%shape(i)
+        end do
+     else
+        old_len = x%len
+     end if
+  end if
   flag = .true.
-  if ((x%array.and.(array_len.gt.x%len)).or. &
+  if ((x%array.and.(array_len.gt.old_len)).or. &
        ((x%type.eq."character").and.(precision.gt.x%prec))) then
      if (realloc.and.x%alloc) then
         write(log_msg, '("yggptr_realloc: begin realloc. &
              &size: ",i7,i7," precision: ",i7,i7)') &
-             x%len, array_len, x%prec, precision
+             old_len, array_len, x%prec, precision
         call ygglog_debug(log_msg)
         select type(item=>x%item)
         type is (yggchar_r)
@@ -59,15 +70,15 @@ function yggptr_realloc(x, array_len, precision, realloc) result(flag)
            call ygglog_error(log_msg)
            stop "ERROR"
         end select
-        if (array_len.gt.x%len) x%len = array_len
+        if (array_len.gt.old_len) old_len = array_len
         if (precision.gt.x%prec) x%prec = precision
         call ygglog_debug("yggptr_realloc: done alloc")
      else
         flag = .false.
-        if (x%array.and.(array_len.gt.x%len)) then
+        if (x%array.and.(array_len.gt.old_len)) then
            write(log_msg, '("yggptr_realloc: Destination array has ", &
                 &i7," elements, but ",i7," elements are expected.")') &
-                x%len, array_len
+                old_len, array_len
            call ygglog_error(log_msg)
         end if
         if ((x%type.eq."character").and.(precision.gt.x%prec)) then

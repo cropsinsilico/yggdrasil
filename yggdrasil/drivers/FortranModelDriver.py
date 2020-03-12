@@ -43,7 +43,8 @@ class FortranCompilerBase(CompilerBase):
         """
         kwargs.setdefault('module-dir', _top_lang_dir)
         kwargs.setdefault('module-search-path', _top_lang_dir)
-        out = super(FortranCompilerBase, cls).get_flags(**kwargs)
+        out = ['-x', 'f95-cpp-input', '-cpp']
+        out += super(FortranCompilerBase, cls).get_flags(**kwargs)
         for x in ['-O', '-O2', '-O3', 'Os', 'Ofast']:
             if x in out:
                 out.remove(x)
@@ -146,7 +147,7 @@ class FortranModelDriver(CompiledModelDriver):
         'integer': 'integer',
         'boolean': 'logical(kind = X)',
         'null': 'yggnull',
-        'uint': 'integer(kind = X)',  # Fortran has no unsigned int
+        # 'uint': 'integer(kind = X)',  # Fortran has no unsigned int
         'complex': 'complex(kind = X)',
         'bytes': 'character(len = X)',
         'unicode': 'character(len = X)',
