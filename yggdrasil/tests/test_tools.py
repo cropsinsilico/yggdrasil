@@ -65,6 +65,11 @@ def test_get_conda_prefix():
 def test_get_conda_env():
     r"""Test get_conda_env."""
     tools.get_conda_env()
+
+
+def test_get_python_c_library():
+    r"""Test get_python_c_library."""
+    tools.get_python_c_library(allow_failure=True)
     
 
 def test_get_supported():
