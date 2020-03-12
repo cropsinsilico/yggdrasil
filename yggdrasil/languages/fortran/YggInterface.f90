@@ -456,6 +456,8 @@ contains
        out = .false.
     else if (c_out.eq.1) then
        out = .true.
+    else if (size(args).eq.1) then
+       out = .false.
     else
        out = .true.
        do i = 2, size(args)

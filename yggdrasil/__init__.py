@@ -135,7 +135,9 @@ def run_tsts(**kwargs):  # pragma: no cover
                    'a decrease in performance so it is turned off '
                    'by default.')}),
         (['noflaky', 'no-flaky'], ['flaky'],
-         False, {'help': 'Don\'t re-run flaky tests.'})]
+         False, {'help': 'Don\'t re-run flaky tests.'}),
+        (['debug'], ['nodebug'],
+         False, {'help': 'Turn on debug messages.'})]
     for pos_dest, neg_dest, default, kws in arguments:
         dest = pos_dest[0]
         for x in [pos_dest, neg_dest]:
@@ -269,6 +271,8 @@ def run_tsts(**kwargs):  # pragma: no cover
     argv += expanded_test_paths
     # Run test command and perform cleanup before logging any errors
     logger.info("Running %s from %s", argv, os.getcwd())
+    new_config = {}
+    old_config = {}
     new_env = {}
     old_env = {}
     pth_file = 'ygg_coverage.pth'
@@ -296,14 +300,21 @@ def run_tsts(**kwargs):  # pragma: no cover
             #     new_env['COV_CORE_DATAFILE'] = '.coverage.eager'
             with open(pth_file, 'w') as fd:
                 fd.write("import coverage; coverage.process_startup()")
+        if args.debug:
+            new_config[('debug', 'ygg')] = 'DEBUG'
+            new_config[('debug', 'client')] = 'DEBUG'
         if args.test_suites and ('timing' in args.test_suites):
             new_env['YGG_TEST_PRODUCTION_RUNS'] = 'True'
         if not args.validatecomponents:
             new_env['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
-        # Update environment
+        # Update environment and config
         for k, v in new_env.items():
             old_env[k] = os.environ.get(k, None)
             os.environ[k] = v
+        for k, v in new_config.items():
+            old_config[k] = config.ygg_cfg.get(k[0], k[1], None)
+            config.ygg_cfg.set(k[0], k[1], v)
+        config.ygg_cfg.update_file()
         # Perform CI specific pretest operations
         if args.ci:
             top_dir = os.path.dirname(os.getcwd())
@@ -342,6 +353,12 @@ def run_tsts(**kwargs):  # pragma: no cover
                 os.environ.pop(k, None)
             else:
                 os.environ[k] = v
+        for k, v in old_config.items():
+            if v is None:
+                config.ygg_cfg.pop(k[0], k[1])
+            else:
+                config.ygg_cfg.set(k[0], k[1], v)
+        config.ygg_cfg.update_file()
         if os.path.isfile(pth_file):
             os.remove(pth_file)
     return error_code
