@@ -207,7 +207,7 @@ jobs:
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
-      env: YGG_CONDA=3.7 YGG_TEST_FLAGS="--test-suite=examples communication/tests/test_IPCComm.py communication/tests/test_RMQAsyncComm.py" INSTALLZMQ=0
+      env: YGG_CONDA=3.7 YGG_TEST_FLAGS="--test-suite=examples_part1 communication/tests/test_IPCComm.py communication/tests/test_RMQAsyncComm.py" INSTALLZMQ=0
       script:
         - yggconfig --remove-file
         - yggtest --ci tests/test_config.py $YGG_TEST_FLAGS
