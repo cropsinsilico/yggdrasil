@@ -418,6 +418,9 @@ module fygg
   end type ygggeneric
   type :: yggnull
      type(c_ptr) :: ptr = c_null_ptr
+   contains
+     procedure :: write_null
+     generic :: write(formatted) => write_null
   end type yggnull
   type, bind(c) :: yggarr
      character(kind=c_char) :: prefix
@@ -515,6 +518,16 @@ contains
   include "YggInterface_assign.f90"
   
   ! Utilities
+  subroutine write_null(dtv, unit, iotype, v_list, iostat, iomsg)
+    ! Argument names here from the std, but you can name them differently.
+    class(yggnull), intent(in) :: dtv   ! Object to write.
+    integer, intent(in) :: unit         ! Internal unit to write to.
+    character(*), intent(in) :: iotype  ! LISTDIRECTED or DTxxx
+    integer, intent(in) :: v_list(:)    ! parameters from fmt spec.
+    integer, intent(out) :: iostat      ! non zero on error, etc.
+    character(*), intent(inout) :: iomsg  ! define if iostat non zero.
+    write (unit, '("NULL")', IOSTAT=iostat, IOMSG=iomsg)
+  end subroutine write_null
   subroutine fix_format_str(x)
     implicit none
     character(len=*) :: x
