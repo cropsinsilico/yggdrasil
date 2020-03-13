@@ -254,14 +254,14 @@ _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
 _python_inc = ygg_cfg.get('c', 'python_include', None)
-if (_python_inc is None) or (not os.path.isfile(_python_inc)):
+if (_python_inc is None) or (not os.path.isfile(_python_inc)):  # pragma: no cover
     _python_inc = sysconfig.get_paths()['include']
 else:
     _python_inc = os.path.dirname(_python_inc)
 try:
     _python_lib = ygg_cfg.get('c', 'python_shared',
                               ygg_cfg.get('c', 'python_static', None))
-    if (_python_lib is None) or (not os.path.isfile(_python_lib)):
+    if (_python_lib is None) or (not os.path.isfile(_python_lib)):  # pragma: no cover
         _python_lib = tools.get_python_c_library(allow_failure=False)
 except BaseException:  # pragma: debug
     warnings.warn("ERROR LOCATING PYTHON LIBRARY")
