@@ -1021,12 +1021,16 @@ contains
     integer(kind=c_size_t) :: c_nitems
     type(c_ptr), target :: c_keys(size(keys))
     type(c_ptr), target :: c_values(size(values))
-    character(len=len(keys(1))), target :: ikey
-    integer :: i
+    character(kind=c_char, len=len(keys(1))), pointer :: ikey
+    integer :: i, ikey_len
     c_nitems = nitems
     do i = 1, size(keys)
-       ikey = keys(i)
-       c_keys(i) = c_loc(ikey(i:i))
+       ikey => keys(i)
+       ikey_len = len_trim(ikey)
+       if (ikey_len.lt.len(ikey)) then
+          ikey((ikey_len+1):(ikey_len+1)) = c_null_char
+       end if
+       c_keys(i) = c_loc(ikey(1:1))
     end do
     do i = 1, size(values)
        c_values(i) = values(i)%ptr

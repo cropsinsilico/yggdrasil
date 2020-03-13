@@ -1873,6 +1873,7 @@ class ModelDriver(Driver):
                 if datatype['properties']:
                     precision = max([len(k) for k in
                                      datatype['properties'].keys()])
+                precision = max(80, precision)
                 out += cls.write_declaration(
                     {'name': '%s_keys' % name_base,
                      'datatype': {
