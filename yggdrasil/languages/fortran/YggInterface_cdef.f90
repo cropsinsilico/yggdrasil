@@ -488,6 +488,12 @@
        implicit none
        type(c_ptr), value :: p
      end subroutine free_ply_c
+     function copy_ply_c(p) result(out) bind(c, name="copy_ply_f")
+       import :: yggply
+       implicit none
+       type(yggply), value, intent(in) :: p
+       type(yggply) :: out
+     end function copy_ply_c
      subroutine display_ply_indent_c(p, indent) bind(c, name="display_ply_indent_f")
        use, intrinsic :: iso_c_binding, only: c_char
        import :: yggply
@@ -519,6 +525,12 @@
        type(yggobj), value, intent(in) :: p
        character(kind=c_char), dimension(*), intent(in) :: indent
      end subroutine display_obj_indent_c
+     function copy_obj_c(p) result(out) bind(c, name="copy_obj_f")
+       import :: yggobj
+       implicit none
+       type(yggobj), value, intent(in) :: p
+       type(yggobj) :: out
+     end function copy_obj_c
      subroutine display_obj_c(p) bind(c, name="display_obj_f")
        import :: yggobj
        implicit none

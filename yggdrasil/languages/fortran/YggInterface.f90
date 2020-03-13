@@ -1786,14 +1786,22 @@ contains
     type(yggply) :: out
     out = init_ply_c()
   end function init_ply
-  subroutine free_ply(pp)
+  subroutine free_ply(p)
     implicit none
+    type(yggply), target :: p
     type(yggply), pointer :: pp
     type(c_ptr) :: c_p
-    c_p = c_loc(pp%material(1))
+    pp => p
+    c_p = c_loc(pp)
     call free_ply_c(c_p)
     nullify(pp)
   end subroutine free_ply
+  function copy_ply(p) result(out)
+    implicit none
+    type(yggply), intent(in) :: p
+    type(yggply) :: out
+    out = copy_ply_c(p)
+  end function copy_ply
   subroutine display_ply_indent(p, indent)
     implicit none
     type(yggply), intent(in) :: p
@@ -1814,14 +1822,22 @@ contains
     type(yggobj) :: out
     out = init_obj_c()
   end function init_obj
-  subroutine free_obj(pp)
+  subroutine free_obj(p)
     implicit none
+    type(yggobj), target :: p
     type(yggobj), pointer :: pp
     type(c_ptr) :: c_p
+    pp => p
     c_p = c_loc(pp)
     call free_obj_c(c_p)
     nullify(pp)
   end subroutine free_obj
+  function copy_obj(p) result(out)
+    implicit none
+    type(yggobj), intent(in) :: p
+    type(yggobj) :: out
+    out = copy_obj_c(p)
+  end function copy_obj
   subroutine display_obj_indent(p, indent)
     implicit none
     type(yggobj), intent(in) :: p
