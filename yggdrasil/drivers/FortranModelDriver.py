@@ -447,6 +447,8 @@ class FortranModelDriver(CompiledModelDriver):
             else:
                 if out.startswith('logical'):
                     precision = json_type.get('precision', 8)
+                elif out.startswith('complex'):
+                    precision = json_type['precision'] / 2
                 else:
                     precision = json_type['precision']
                 out = out.replace('X', str(int(precision / 8)))
@@ -475,6 +477,8 @@ class FortranModelDriver(CompiledModelDriver):
                 grp['shape'] = ':,:'
         if grp.get('precision', False):
             out['precision'] = 8 * int(grp['precision'])
+            if grp['type'] == 'complex':
+                out['precision'] *= 2
         if grp.get('precision', False) or (grp['type'] == 'logical'):
             grp['type'] += '(kind = X)'
         if grp['type'] == 'character':
