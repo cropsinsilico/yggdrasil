@@ -3,16 +3,11 @@ import copy
 import pprint
 import pystache
 import yaml
+import json
 import git
-import sys
-
-from yggdrasil import backwards
+import io as sio
 from yggdrasil.schema import standardize, get_schema
-
-if sys.version_info > (3, 0):
-    from urllib.parse import urlparse
-else:
-    from urlparse import urlparse
+from urllib.parse import urlparse
 
 
 def load_yaml(fname):
@@ -80,8 +75,11 @@ def load_yaml(fname):
     # Mustache replace vars
     yamlparsed = fd.read()
     yamlparsed = pystache.render(
-        backwards.StringIO(yamlparsed).getvalue(), dict(os.environ))
-    yamlparsed = yaml.safe_load(yamlparsed)
+        sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
+    if fname.endswith('.json'):
+        yamlparsed = json.loads(yamlparsed)
+    else:
+        yamlparsed = yaml.safe_load(yamlparsed)
     if not isinstance(yamlparsed, dict):  # pragma: debug
         raise ValueError("Loaded yaml is not a dictionary.")
     yamlparsed['working_dir'] = os.path.dirname(fname)
@@ -107,6 +105,16 @@ def prep_yaml(files):
     if not isinstance(files, list):
         files = [files]
     yamls = [load_yaml(f) for f in files]
+    # Load files pointed to
+    for y in yamls:
+        if 'include' in y:
+            new_files = y.pop('include')
+            if not isinstance(new_files, list):
+                new_files = [new_files]
+            for f in new_files:
+                if not os.path.isabs(f):
+                    f = os.path.join(y['working_dir'], f)
+                yamls.append(load_yaml(f))
     # Standardize format of models and connections to be lists and
     # add working_dir to each
     comp_keys = ['models', 'connections']
@@ -156,12 +164,19 @@ def parse_yaml(files):
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
     # Make sure that I/O channels initialized
+    opp_map = {'input': 'output', 'output': 'input'}
     for io in ['input', 'output']:
         remove = []
-        for k, v in existing[io].items():
+        for k in list(existing[io].keys()):
+            v = existing[io][k]
             if 'driver' not in v:
                 if v.get('is_default', False):
                     remove.append(k)
+                elif 'default_file' in v:
+                    new_conn = {io + 's': [v['default_file']],
+                                opp_map[io] + 's': [v]}
+                    existing = parse_component(new_conn, 'connection',
+                                               existing=existing)
                 else:
                     raise RuntimeError("No driver established for %s channel %s" % (
                         io, k))
@@ -247,7 +262,8 @@ def parse_model(yml, existing):
 
     """
     _lang2driver = get_schema()['model'].subtype2class
-    yml['driver'] = _lang2driver[yml.pop('language')]
+    language = yml.pop('language')
+    yml['driver'] = _lang2driver[language]
     # Add server driver
     if yml.get('is_server', False):
         srv = {'name': '%s:%s' % (yml['name'], yml['name']),
@@ -275,6 +291,7 @@ def parse_model(yml, existing):
     for io in ['inputs', 'outputs']:
         for x in yml[io]:
             x['model_driver'] = [yml['name']]
+            x['partner_language'] = language
             existing = parse_component(x, io[:-1], existing=existing)
     return existing
 
@@ -353,7 +370,8 @@ def parse_connection(yml, existing):
         # Add single non-file intermediate output comm if there are any non-file
         # outputs and an output comm for each file output
         if (sum(is_file['outputs']) < len(is_file['outputs'])):
-            xo['ocomm_kws']['comm'].append({'name': args, 'no_suffix': True})
+            xo['ocomm_kws']['comm'].append({'name': args, 'no_suffix': True,
+                                            'comm': 'buffer'})
         for i, y in enumerate(yml['outputs']):
             if is_file['outputs'][i]:
                 xo['ocomm_kws']['comm'].append(y)
@@ -376,7 +394,8 @@ def parse_connection(yml, existing):
         # Add single non-file intermediate input comm if there are any non-file
         # inputs and an input comm for each file input
         if (sum(is_file['inputs']) < len(is_file['inputs'])):
-            xi['icomm_kws']['comm'].append({'name': args, 'no_suffix': True})
+            xi['icomm_kws']['comm'].append({'name': args, 'no_suffix': True,
+                                            'comm': 'buffer'})
         for i, y in enumerate(yml['inputs']):
             if is_file['inputs'][i]:
                 xi['icomm_kws']['comm'].append(y)

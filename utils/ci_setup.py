@@ -54,7 +54,7 @@ def call_script(lines):
     finally:
         if os.path.isfile(fname):
             os.remove(fname)
-            
+
 
 def setup_package_on_ci(method, python):
     r"""Setup a test environment on a CI resource.
@@ -89,11 +89,16 @@ def setup_package_on_ci(method, python):
             setup_package_on_ci('conda', python)
         elif _is_osx:
             cmds.append("echo Installing Python using virtualenv...")
+            pip_cmd = 'pip'
             if sys.version_info[0] != major:
-                cmds.append('brew install python%d' % major)
+                pip_cmd = 'pip%d' % major
+                try:
+                    call_script(['python%d --version' % major])
+                except BaseException:
+                    cmds.append('brew install python%d' % major)
             cmds += [
-                "pip install --upgrade pip virtualenv",
-                "virtualenv -p python%s venv" % python
+                "%s install --upgrade pip virtualenv" % pip_cmd,
+                "virtualenv -p python%d venv" % major
             ]
     else:  # pragma: debug
         raise ValueError("Method must be 'conda' or 'pip', not '%s'"
@@ -121,9 +126,16 @@ def deploy_package_on_ci(method):
         # Check that we have the expected version of Python
         "python --version",
         # Upgrade pip and setuptools and wheel to get clean install
-        "pip install --upgrade pip",
-        "pip install --upgrade wheel",
-        "pip install --upgrade setuptools",
+        "pip install --upgrade wheel"
+    ]
+    if not _is_win:
+        cmds += ["pip install --upgrade pip"]
+    cmds += ["pip install --upgrade wheel"]
+    if PY2:  # Python 2
+        cmds.append("pip install setuptools==43.0.0")
+    else:
+        cmds.append("pip install --upgrade setuptools")
+    cmds += [
         # Uninstall default numpy and matplotlib to allow installation
         # of specific versions
         "pip uninstall -y numpy",

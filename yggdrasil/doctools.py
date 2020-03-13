@@ -363,9 +363,9 @@ def component2table(comp, table_type, include_required=None,
                                'description': v.get('description', '')}
                     if include_required:
                         if k in s_comp.get('required', []):
-                            args[k]['required'] = ''
-                        else:
                             args[k]['required'] = 'X'
+                        else:
+                            args[k]['required'] = ''
                 if (table_type == 'specific'):
                     if k not in out_apply:
                         out_apply[k] = []
@@ -396,7 +396,8 @@ def component2table(comp, table_type, include_required=None,
 
 def dict2table(args, key_column_name='option', val_column_name='description',
                column_order=None, wrapped_columns=None, list_columns=None,
-               sort_on_key=True, last_column=None, prune_empty_columns=False,
+               sort_on_key=True, sort_required_first=True,
+               last_column=None, prune_empty_columns=False,
                style='simple', **kwargs):
     r"""Convert a dictionary to a table.
 
@@ -426,6 +427,8 @@ def dict2table(args, key_column_name='option', val_column_name='description',
             as rows in the order determined by sorting on the keys. If False,
             the order will be determine by prop (which is not deterministic
             if a Python 2 dictionary). Defaults to True.
+        sort_required_first (bool, optional): If True, the required
+            entries are placed first in the table. Defaults to True.
         last_column (str, optional): Name of the field that should be placed
             in the last column position. Defaults to None and is ignored.
         prune_empty_columns (bool, optional): If True, empty columns will be
@@ -451,9 +454,18 @@ def dict2table(args, key_column_name='option', val_column_name='description',
     # Create dictionary of columns
     columns = {k: [] for k in column_order}
     pos = 0
+    prop_req = []
     prop_order = list(args.keys())
+    if sort_required_first:
+        for k in prop_order:
+            v = args[k]
+            if isinstance(v, dict) and v.get('required', False):
+                prop_req.append(k)
+        prop_order = list(set(prop_order) - set(prop_req))
     if sort_on_key:
+        prop_req = sorted(prop_req)
         prop_order = sorted(prop_order)
+    prop_order = prop_req + prop_order
     for k in prop_order:
         v = args[k]
         if not isinstance(v, dict):
@@ -500,6 +512,8 @@ def dict2table(args, key_column_name='option', val_column_name='description',
             w = column_widths[k]
         column_widths[k] = max(w, len(k))
     # Create format string
+    if len(columns) == 1:
+        style = 'complex'
     if style == 'simple':
         column_beg = ''
         column_end = ''
@@ -508,6 +522,9 @@ def dict2table(args, key_column_name='option', val_column_name='description',
         hline_end = ''
         hline_char = '='
         hline_sep = column_sep
+        hline_beg_header = ''
+        hline_end_header = ''
+        hline_char_header = '='
     else:
         column_beg = '| '
         column_end = ' |'
@@ -516,6 +533,9 @@ def dict2table(args, key_column_name='option', val_column_name='description',
         hline_end = '-+'
         hline_char = '-'
         hline_sep = '-+-'
+        hline_beg_header = '+='
+        hline_end_header = '=+'
+        hline_char_header = '='
     column_format = (column_beg
                      + column_sep.join(['%-' + str(column_widths[k]) + 's'
                                         for k in column_order])
@@ -524,13 +544,18 @@ def dict2table(args, key_column_name='option', val_column_name='description',
                + hline_sep.join([hline_char * column_widths[k]
                                  for k in column_order])
                + hline_end)
+    divider_header = (
+        hline_beg_header
+        + hline_sep.join([hline_char_header * column_widths[k]
+                          for k in column_order])
+        + hline_end_header)
     header = column_format % tuple([k.title() for k in column_order])
     # Table
     if len(columns) == 0:
         pos = 0
     else:
         pos = len(columns[list(columns.keys())[0]])
-    lines = [divider, header, divider]
+    lines = [divider, header, divider_header]
     for i in range(pos):
         row = []
         max_row_len = 1

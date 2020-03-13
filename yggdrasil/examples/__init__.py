@@ -55,7 +55,7 @@ def register_example(example_dir):
         lang_avail += ['all', 'all_nomatlab', 'c', 'python']
     elif example_base == 'fakeplant':
         lang_avail += ['all', 'all_nomatlab', 'c', 'cpp', 'matlab', 'python']
-    elif example_base == 'types':
+    elif example_base in ['types', 'transforms']:
         lang_avail += tools.get_supported_lang()
         for k in ['cmake', 'make', 'lpy', 'executable']:
             lang_avail.remove(k)
@@ -126,7 +126,7 @@ def register_example(example_dir):
                     yml_names.append('growth.yml')
                     src_names.append('growth.m')
             elif lang == 'python':
-                yml_names = ['photosynthesis.yml', 'photosynthesis_files.yml']
+                yml_names = ['photosynthesis.yml']
                 src_names = ['photosynthesis.py']
             elif lang == 'c':
                 yml_names = ['light.yml', 'light_files.yml']
@@ -137,8 +137,8 @@ def register_example(example_dir):
             elif lang == 'matlab':
                 yml_names = ['growth.yml', 'growth_files.yml']
                 src_names = ['growth.m']
-        elif example_base == 'types':
-            yml_names = ['types.yml']
+        elif example_base in ['types', 'transforms']:
+            yml_names = ['%s.yml' % example_base]
             src_names = ['src.py', 'dst.py']
         else:
             src_is_abs = True
@@ -150,10 +150,12 @@ def register_example(example_dir):
                         continue
                     elif (lang == 'all_nomatlab') and (lsrc == 'matlab'):
                         continue
-                    src_names += glob.glob(os.path.join(srcdir,
-                                                        '*' + ext_map[lsrc]))
+                    src_names += sorted(
+                        glob.glob(os.path.join(srcdir,
+                                               '*' + ext_map[lsrc])))
             else:
-                src_names = glob.glob(os.path.join(srcdir, '*' + ext_map[lang]))
+                src_names = sorted(
+                    glob.glob(os.path.join(srcdir, '*' + ext_map.get(lang, ''))))
         out_yml[lang] = [os.path.join(example_dir, y) for y in yml_names]
         if src_is_abs:
             out_src[lang] = src_names

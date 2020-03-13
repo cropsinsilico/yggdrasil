@@ -1,5 +1,5 @@
 import numpy as np
-from yggdrasil import units, backwards, platform
+from yggdrasil import units, platform
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 from collections import OrderedDict
@@ -11,17 +11,10 @@ _flexible_types = ['string', 'bytes', 'unicode']
 _python_scalars = OrderedDict([('float', [float]),
                                ('int', [int]), ('uint', []),
                                ('complex', [complex])])
-if backwards.PY2:  # pragma: Python 2
-    from __builtin__ import unicode
-    _valid_numpy_types += ['string', 'unicode']
-    _valid_types['bytes'] = 'string'
-    _valid_types['unicode'] = 'unicode'
-    _python_scalars.update([('bytes', [str]), ('unicode', [unicode])])
-else:  # pragma: Python 3
-    _valid_numpy_types += ['bytes', 'unicode', 'str']
-    _valid_types['bytes'] = 'bytes'
-    _valid_types['unicode'] = 'str'
-    _python_scalars.update([('bytes', [bytes]), ('unicode', [str])])
+_valid_numpy_types += ['bytes', 'unicode', 'str']
+_valid_types['bytes'] = 'bytes'
+_valid_types['unicode'] = 'str'
+_python_scalars.update([('bytes', [bytes]), ('unicode', [str])])
 for t, t_np in _valid_types.items():
     prec_list = []
     if t in ['float']:

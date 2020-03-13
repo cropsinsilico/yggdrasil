@@ -1,3 +1,5 @@
+import numpy as np
+from yggdrasil import units
 from yggdrasil.communication.filters.FilterBase import FilterBase
 
 
@@ -41,7 +43,12 @@ class FunctionFilter(FilterBase):
         """
 
         def fcond(x):
-            return (x != 3)
+            return (units.get_data(x) != 3)
         
         return [{'kwargs': {'function': fcond},
-                 'pass': [1, 2], 'fail': [3]}]
+                 'pass': [1, 2, units.add_units(1, 'cm'),
+                          np.ones(3, int),
+                          units.add_units(np.ones(3, int), 'cm')],
+                 'fail': [3, units.add_units(3, 'cm'),
+                          3 * np.ones(3, int),
+                          units.add_units(3 * np.ones(3, int), 'cm')]}]

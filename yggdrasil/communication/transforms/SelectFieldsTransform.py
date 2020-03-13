@@ -1,5 +1,7 @@
 import numpy as np
+import pandas
 import copy
+from yggdrasil import serialize
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 
 
@@ -21,8 +23,7 @@ class SelectFieldsTransform(TransformBase):
                                        'items': {'type': 'string'}},
                           'original_order': {'type': 'array',
                                              'items': {'type': 'string'}},
-                          'single_as_scalar': {'type': 'boolean',
-                                               'default': False}}
+                          'single_as_scalar': {'type': 'boolean'}}
 
     def set_original_datatype(self, datatype):
         r"""Set datatype.
@@ -33,7 +34,10 @@ class SelectFieldsTransform(TransformBase):
         """
         super(SelectFieldsTransform, self).set_original_datatype(datatype)
         if not self.original_order:
-            if datatype['type'] == 'array':
+            self.original_order = self.original_datatype.get('field_names', None)
+        if not self.original_order:
+            if (((datatype['type'] == 'array')
+                 and isinstance(datatype['items'], list))):
                 self.original_order = [x.get('title', 'f%d' % i) for i, x in
                                        enumerate(self.original_datatype['items'])]
             elif datatype['type'] == 'object':
@@ -69,14 +73,26 @@ class SelectFieldsTransform(TransformBase):
         """
         if (((datatype.get('type', None) == 'array')
              and isinstance(datatype.get('items', None), list))):
-            order = [x.get('title', 'f%d' % i) for i, x in enumerate(datatype['items'])]
+            order = datatype.get('field_names',
+                                 [x.get('title', 'f%d' % i)
+                                  for i, x in enumerate(datatype['items'])])
             if self.as_single:
                 datatype = copy.deepcopy(datatype['items'][
                     order.index(self.selected[0])])
+                datatype['title'] = self.selected[0]
             else:
                 datatype = copy.deepcopy(datatype)
                 datatype['items'] = [datatype['items'][order.index(k)]
                                      for k in self.selected]
+                for i, k in enumerate(self.selected):
+                    datatype['items'][i]['title'] = k
+                if 'field_names' in datatype:
+                    datatype['field_names'] = copy.deepcopy(self.selected)
+                if 'format_str' in datatype:
+                    info = serialize.format2table(datatype['format_str'])
+                    info['fmts'] = [info['fmts'][order.index(k)]
+                                    for k in self.selected]
+                    datatype['format_str'] = serialize.table2format(**info)
         elif (((datatype.get('type', None) == 'array')
                and isinstance(datatype.get('items', None), dict)
                and self.as_single)):
@@ -118,7 +134,7 @@ class SelectFieldsTransform(TransformBase):
             else:
                 out = type(x)([x[self.original_order.index(k)]
                                for k in self.selected])
-        elif isinstance(x, np.ndarray):
+        elif isinstance(x, (np.ndarray, pandas.DataFrame)):
             if self.as_single:
                 out = x[self.selected[0]]
             else:
@@ -162,7 +178,10 @@ class SelectFieldsTransform(TransformBase):
                                 'properties': {x: {'type': 'int'}
                                                for x in 'abc'}},
                                {'type': 'int'})]},
-                {'kwargs': {'selected': ['a', 'c']},
+                {'kwargs': {'selected': ['a', 'c'],
+                            'original_datatype': {
+                                'type': 'array',
+                                'items': {'type': 'int'}}},
                  'in/out': [([0, 1, 2], ValueError)]},
                 {'kwargs': {'selected': ['a', 'c'],
                             'original_datatype': {
@@ -174,8 +193,20 @@ class SelectFieldsTransform(TransformBase):
                  'in/out_t': [({'type': 'array',
                                 'items': [
                                     {'type': 'int', 'title': x}
+                                    for x in 'abc'],
+                                'format_str': b'# %d\t%d\t%d\n'},
+                               {'type': 'array',
+                                'items': [
+                                    {'type': 'int', 'title': x}
+                                    for x in 'ac'],
+                                'format_str': b'# %d\t%d\n'}),
+                              ({'type': 'array',
+                                'field_names': [x for x in 'abc'],
+                                'items': [
+                                    {'type': 'int', 'title': x}
                                     for x in 'abc']},
                                {'type': 'array',
+                                'field_names': [x for x in 'ac'],
                                 'items': [
                                     {'type': 'int', 'title': x}
                                     for x in 'ac']})]},
@@ -222,5 +253,8 @@ class SelectFieldsTransform(TransformBase):
                  'in/out': [(np.zeros(3, np.dtype({'names': ['a', 'b', 'c'],
                                                    'formats': ['i4', 'i4', 'i4']})),
                              np.zeros(3, np.dtype('i4')))]},
-                {'kwargs': {'selected': ['a', 'b']},
+                {'kwargs': {'selected': ['a', 'b'],
+                            'original_datatype': {
+                                'type': 'array',
+                                'items': {'type': 'int'}}},
                  'in/out': [(None, TypeError)]}]

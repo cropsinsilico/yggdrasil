@@ -4,7 +4,7 @@ import uuid
 import zmq
 import threading
 import logging
-from yggdrasil import backwards, tools
+from yggdrasil import tools
 from yggdrasil.communication import CommBase, AsyncComm
 
 
@@ -242,7 +242,7 @@ class ZMQProxy(CommBase.CommServer):
                 self.srv_socket.send(msg, zmq.NOBLOCK)
                 # self.srv_socket.send_multipart(msg, zmq.NOBLOCK)
                 break
-            except zmq.ZMQError:
+            except zmq.ZMQError:  # pragma: no cover
                 self.sleep(0.0001)
 
     def poll(self):
@@ -394,10 +394,10 @@ class ZMQComm(AsyncComm.AsyncComm):
         self.socket_action = socket_action
         self.socket = self.context.socket(self.socket_type)
         self.socket.setsockopt(zmq.LINGER, 0)
-        self.topic_filter = backwards.as_bytes(topic_filter)
+        self.topic_filter = tools.str2bytes(topic_filter)
         if dealer_identity is None:
             dealer_identity = str(uuid.uuid4())
-        self.dealer_identity = backwards.as_bytes(dealer_identity)
+        self.dealer_identity = tools.str2bytes(dealer_identity)
         self._openned = False
         self._bound = False
         self._connected = False
@@ -644,11 +644,12 @@ class ZMQComm(AsyncComm.AsyncComm):
 
     def set_reply_socket_recv(self, address):
         r"""Set the recv reply socket if the address dosn't exist."""
+        address = tools.bytes2str(address)
         if address not in self.reply_socket_recv:
             s = self.context.socket(zmq.REQ)
             s.setsockopt(zmq.LINGER, 0)
             s.connect(address)
-            self.register_comm('REPLY_RECV_' + backwards.as_str(address), s)
+            self.register_comm('REPLY_RECV_' + address, s)
             with self.reply_socket_lock:
                 self._n_reply_recv[address] = 0
                 self._n_zmq_recv[address] = 0
@@ -795,7 +796,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         else:
             for k, socket in self.reply_socket_recv.items():
                 socket.close(linger=0)
-                self.unregister_comm("REPLY_RECV_" + backwards.as_str(k))
+                self.unregister_comm("REPLY_RECV_" + k)
 
     def server_exists(self, srv_address):
         r"""Determine if a server exists.
@@ -991,8 +992,8 @@ class ZMQComm(AsyncComm.AsyncComm):
             return False
         if identity is None:
             identity = self.dealer_identity
-        topic = backwards.as_bytes(topic)
-        identity = backwards.as_bytes(identity)
+        topic = tools.str2bytes(topic)
+        identity = tools.str2bytes(identity)
         if self.socket_type_name == 'PUB':
             total_msg = topic + _flag_zmq_filter + msg
         else:

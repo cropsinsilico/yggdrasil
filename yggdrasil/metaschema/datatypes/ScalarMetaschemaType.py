@@ -1,7 +1,8 @@
 import numpy as np
 import copy
 import warnings
-from yggdrasil import units, backwards
+import base64
+from yggdrasil import units
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.FixedMetaschemaType import (
     create_fixed_type_class)
@@ -48,9 +49,8 @@ class ScalarMetaschemaType(MetaschemaType):
                         cls.fixed_properties['subtype']]]
             else:
                 type_list = ScalarMetaschemaProperties._valid_numpy_types
-            for k in type_list:
-                if dtype.name.startswith(k):
-                    return True
+            if dtype.name.startswith(tuple(type_list)):
+                return True
             else:
                 if raise_errors:
                     raise ValueError(("dtype %s dosn't corresponding with any "
@@ -91,15 +91,15 @@ class ScalarMetaschemaType(MetaschemaType):
         """
         if cls.is_fixed and ('subtype' in cls.fixed_properties):
             if (cls.fixed_properties['subtype'] == 'bytes'):
-                if isinstance(obj, backwards.string_types):
-                    obj = backwards.as_bytes(obj)
-                else:
-                    obj = backwards.as_bytes(str(obj))
+                if isinstance(obj, str):
+                    obj = obj.encode("utf-8")
+                elif not isinstance(obj, bytes):
+                    obj = str(obj).encode("utf-8")
             elif (cls.fixed_properties['subtype'] == 'unicode'):
-                if isinstance(obj, backwards.string_types):
-                    obj = backwards.as_unicode(obj)
+                if isinstance(obj, bytes):
+                    obj = obj.decode("utf-8")
                 else:
-                    obj = backwards.as_unicode(str(obj))
+                    obj = str(obj)
             else:
                 dtype = ScalarMetaschemaProperties._python_scalars[
                     cls.fixed_properties['subtype']][0]
@@ -123,8 +123,7 @@ class ScalarMetaschemaType(MetaschemaType):
 
         """
         arr = cls.to_array(obj)
-        bytes = arr.tobytes()
-        out = backwards.base64_encode(bytes).decode('ascii')
+        out = base64.encodebytes(arr.tobytes()).decode('ascii')
         return out
 
     @classmethod
@@ -157,7 +156,12 @@ class ScalarMetaschemaType(MetaschemaType):
         elif subtype in ['complex']:
             return str(complex(arr[0]))
         elif subtype in ['bytes', 'unicode']:
-            return str(backwards.as_str(arr[0]))
+            out = arr[0]
+            if isinstance(out, bytes):
+                out = out.decode("utf-8")
+            else:
+                out = str(out)
+            return out
         else:  # pragma: debug
             warnings.warn(("No method for handling readable serialization of "
                            + "subtype '%s', falling back to default.") % subtype)
@@ -176,7 +180,7 @@ class ScalarMetaschemaType(MetaschemaType):
             object: Decoded object.
 
         """
-        bytes = backwards.base64_decode(obj.encode('ascii'))
+        bytes = base64.decodebytes(obj.encode('ascii'))
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
         arr = np.frombuffer(bytes, dtype=dtype)
         # arr = np.fromstring(bytes, dtype=dtype)
@@ -297,6 +301,27 @@ class ScalarMetaschemaType(MetaschemaType):
             if np.dtype(py_type) == type(obj):
                 obj = py_type(obj)
         return obj
+
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
+        if typedef['type'] == '1darray':
+            out = np.zeros(typedef.get('length', 2), dtype)
+        elif typedef['type'] == 'ndarray':
+            out = np.zeros(typedef['shape'], dtype)
+        else:
+            out = np.zeros(1, dtype)[0]
+        out = units.add_units(out, typedef.get('units', ''))
+        return out
 
 
 # Dynamically create explicity scalar classes for shorthand

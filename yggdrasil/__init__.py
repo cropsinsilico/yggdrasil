@@ -4,13 +4,16 @@ from yggdrasil import platform
 import os
 import sys
 import glob
+import shutil
 import logging
 import argparse
 import subprocess
 import importlib
 from ._version import get_versions
+from yggdrasil import config
 _test_package_name = None
 _test_package = None
+logging.basicConfig()
 logger = logging.getLogger(__name__)
 order = ['pytest', 'nose']
 try:
@@ -29,6 +32,13 @@ if platform._is_win:  # pragma: windows
     # This is required to fix crash on Windows in case of Ctrl+C
     # https://github.com/ContinuumIO/anaconda-issues/issues/905#issuecomment-232498034
     os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = 'T'
+
+
+if not os.path.isfile(config.usr_config_file):  # pragma: no cover
+    from yggdrasil.languages import install_languages
+    shutil.copy(config.def_config_file, config.usr_config_file)
+    install_languages.install_all_languages(from_setup=True)
+    config.update_language_config()
 
 
 def expand_and_add(path, path_list, dir_list):  # pragma: no cover
@@ -125,7 +135,9 @@ def run_tsts(**kwargs):  # pragma: no cover
                    'a decrease in performance so it is turned off '
                    'by default.')}),
         (['noflaky', 'no-flaky'], ['flaky'],
-         False, {'help': 'Don\'t re-run flaky tests.'})]
+         False, {'help': 'Don\'t re-run flaky tests.'}),
+        (['debug'], ['nodebug'],
+         False, {'help': 'Turn on debug messages.'})]
     for pos_dest, neg_dest, default, kws in arguments:
         dest = pos_dest[0]
         for x in [pos_dest, neg_dest]:
@@ -151,13 +163,17 @@ def run_tsts(**kwargs):  # pragma: no cover
     parser.add_argument('--language', '--languages', default=[],
                         nargs="+", type=str,
                         help='Language(s) that should be tested.')
+    parser.add_argument('--default-comm', '--defaultcomm', type=str,
+                        help=('Comm type that default should be set '
+                              'to before running tests.'))
     parser.add_argument('--ci', action='store_true',
                         help=('Perform addition operations required '
                               'for testing on continuous integration '
                               'services.'))
     suite_args = ('--test-suite', '--test-suites')
     suite_kws = dict(nargs='+', action="extend", type=str,
-                     choices=['examples', 'types', 'timing'],
+                     choices=['examples', 'examples_part1',
+                              'examples_part2', 'types', 'timing'],
                      help='Test suite(s) that should be run.',
                      dest='test_suites')
     try:
@@ -196,6 +212,19 @@ def run_tsts(**kwargs):  # pragma: no cover
             if x == 'examples':
                 args.withexamples = True
                 test_paths.append('examples')
+            elif x == 'examples_part1':
+                args.withexamples = True
+                test_paths.append(os.path.join(
+                    'examples', 'tests', 'test_[a-g]*.py'))
+            elif x == 'examples_part2':
+                args.withexamples = True
+                test_paths.append(os.path.join(
+                    'examples', 'tests', 'test_[g-z]*.py'))
+            # elif x.startswith('examples_'):
+            #     args.withexamples = True
+            #     test_paths.append(os.path.join(
+            #         'examples', 'tests',
+            #         'test_%s*.py'.format(x.split('examples_')[-1])))
             elif x == 'types':
                 args.withexamples = True
                 args.longrunning = True
@@ -219,7 +248,10 @@ def run_tsts(**kwargs):  # pragma: no cover
             argv.append('--with-coverage')
             argv.append('--cover-package=yggdrasil')
         elif _test_package_name == 'pytest':
+            # See information about getting coverage of test fixtures
+            # https://pytest-cov.readthedocs.io/en/stable/plugins.html
             argv.append('--cov=%s' % package_dir)
+            # argv.append('--cov-append')
     if args.noflaky:
         if _test_package_name == 'pytest':
             argv += ['-p', 'no:flaky']
@@ -239,41 +271,50 @@ def run_tsts(**kwargs):  # pragma: no cover
     argv += expanded_test_paths
     # Run test command and perform cleanup before logging any errors
     logger.info("Running %s from %s", argv, os.getcwd())
+    new_config = {}
+    old_config = {}
+    new_env = {}
     old_env = {}
     pth_file = 'ygg_coverage.pth'
     assert(not os.path.isfile(pth_file))
     try:
         # Set env
         if args.withexamples:
-            old_env['YGG_ENABLE_EXAMPLE_TESTS'] = os.environ.get(
-                'YGG_ENABLE_EXAMPLE_TESTS', None)
-            os.environ['YGG_ENABLE_EXAMPLE_TESTS'] = 'True'
+            new_env['YGG_ENABLE_EXAMPLE_TESTS'] = 'True'
         if args.language:
             from yggdrasil.components import import_component
             args.language = [import_component('model', x).language
                              for x in args.language]
-            old_env['YGG_TEST_LANGUAGE'] = os.environ.get(
-                'YGG_TEST_LANGUAGE', None)
-            os.environ['YGG_TEST_LANGUAGE'] = ','.join(args.language)
+            new_env['YGG_TEST_LANGUAGE'] = ','.join(args.language)
+        if args.default_comm:
+            new_env['YGG_DEFAULT_COMM'] = args.default_comm
         if args.longrunning:
-            old_env['YGG_ENABLE_LONG_TESTS'] = os.environ.get(
-                'YGG_ENABLE_LONG_TESTS', None)
-            os.environ['YGG_ENABLE_LONG_TESTS'] = 'True'
+            new_env['YGG_ENABLE_LONG_TESTS'] = 'True'
         if args.withcoverage:
-            old_env['COVERAGE_PROCESS_START'] = os.environ.get(
-                'COVERAGE_PROCESS_START', None)
-            os.environ['COVERAGE_PROCESS_START'] = 'True'
+            new_env['COVERAGE_PROCESS_START'] = 'True'
+            # if _test_package_name == 'pytest':
+            #     # See information about getting coverage of test fixtures
+            #     # https://pytest-cov.readthedocs.io/en/stable/plugins.html
+            #     new_env['COV_CORE_SOURCE'] = package_dir
+            #     new_env['COV_CORE_CONFIG'] = '.coveragerc'
+            #     new_env['COV_CORE_DATAFILE'] = '.coverage.eager'
             with open(pth_file, 'w') as fd:
                 fd.write("import coverage; coverage.process_startup()")
+        if args.debug:
+            new_config[('debug', 'ygg')] = 'DEBUG'
+            new_config[('debug', 'client')] = 'DEBUG'
         if args.test_suites and ('timing' in args.test_suites):
-            old_env['YGG_TEST_PRODUCTION_RUNS'] = os.environ.get(
-                'YGG_TEST_PRODUCTION_RUNS', None)
-            os.environ['YGG_TEST_PRODUCTION_RUNS'] = 'True'
+            new_env['YGG_TEST_PRODUCTION_RUNS'] = 'True'
         if not args.validatecomponents:
-            old_env['YGG_SKIP_COMPONENT_VALIDATION'] = os.environ.get(
-                'YGG_SKIP_COMPONENT_VALIDATION', None)
-            if old_env['YGG_SKIP_COMPONENT_VALIDATION'] is None:
-                os.environ['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
+            new_env['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
+        # Update environment and config
+        for k, v in new_env.items():
+            old_env[k] = os.environ.get(k, None)
+            os.environ[k] = v
+        for k, v in new_config.items():
+            old_config[k] = config.ygg_cfg.get(k[0], k[1], None)
+            config.ygg_cfg.set(k[0], k[1], v)
+        config.ygg_cfg.update_file()
         # Perform CI specific pretest operations
         if args.ci:
             top_dir = os.path.dirname(os.getcwd())
@@ -309,9 +350,15 @@ def run_tsts(**kwargs):  # pragma: no cover
         os.chdir(initial_dir)
         for k, v in old_env.items():
             if v is None:
-                del os.environ[k]
+                os.environ.pop(k, None)
             else:
                 os.environ[k] = v
+        for k, v in old_config.items():
+            if v is None:
+                config.ygg_cfg.pop(k[0], k[1])
+            else:
+                config.ygg_cfg.set(k[0], k[1], v)
+        config.ygg_cfg.update_file()
         if os.path.isfile(pth_file):
             os.remove(pth_file)
     return error_code

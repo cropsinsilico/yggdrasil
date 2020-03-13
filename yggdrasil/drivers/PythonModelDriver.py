@@ -45,10 +45,9 @@ class PythonModelDriver(InterpretedModelDriver):
         'interface': 'import {interface_library} as ygg',
         'input': '{channel} = ygg.YggInput(\'{channel_name}\')',
         'output': '{channel} = ygg.YggOutput(\'{channel_name}\')',
-        'table_input': ('{channel} = YggInterface.YggAsciiTableInput('
-                        '\"{channel_name}\")'),
-        'table_output': ('{channel} = YggInterface.YggAsciiTableOutput('
-                         '\"{channel_name}\", \"{format_str}\")'),
+        'python_interface': '{channel} = ygg.{python_interface}(\'{channel_name}\')',
+        'python_interface_format': ('{channel} = ygg.{python_interface}'
+                                    '(\'{channel_name}\', \'{format_str}\')'),
         'recv_function': '{channel}.recv',
         'send_function': '{channel}.send',
         'multiple_outputs': '[{outputs}]',

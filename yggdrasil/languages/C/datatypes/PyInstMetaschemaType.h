@@ -55,7 +55,7 @@ public:
   PyInstMetaschemaType(const rapidjson::Value &type_doc,
 		       const bool use_generic=false) :
     // Always generic
-    PyObjMetaschemaType(type_doc, true), args_type_(NULL) {
+    PyObjMetaschemaType(type_doc, true), args_type_(NULL), kwargs_type_(NULL) {
     UNUSED(use_generic);
     class_name_[0] = '\0';
     // Class

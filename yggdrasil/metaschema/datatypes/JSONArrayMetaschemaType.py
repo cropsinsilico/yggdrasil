@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from yggdrasil.metaschema.datatypes import generate_data
 from yggdrasil.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
 
@@ -64,6 +65,34 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         return obj
 
     @classmethod
+    def encode_type(cls, obj, **kwargs):
+        r"""Encode an object's type definition.
+
+        Args:
+            obj (object): Object to encode.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            dict: Encoded type definition.
+
+        """
+        names = None
+        if isinstance(obj, pd.DataFrame):
+            names = obj.columns
+            if all([isinstance(n, int) for n in names]):
+                names = None
+        elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
+            names = obj.dtype.names
+        out = super(JSONArrayMetaschemaType, cls).encode_type(obj, **kwargs)
+        if names is not None:
+            assert('items' in out)
+            assert(len(out['items']) == len(names))
+            for n, x in zip(names, out['items']):
+                x.setdefault('title', n)
+        return out
+        
+    @classmethod
     def coerce_type(cls, obj, typedef=None, key_order=None,
                     dont_wrap_single=False, **kwargs):
         r"""Coerce objects of specific types to match the data type.
@@ -90,10 +119,17 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         from yggdrasil.serialize import pandas2list, numpy2list, dict2list
         if isinstance(obj, pd.DataFrame):
             obj = pandas2list(obj)
+        elif isinstance(obj, np.ndarray) and (len(obj.dtype) == 0):
+            obj = [obj]
         elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
             obj = numpy2list(obj)
         elif isinstance(obj, dict):
             if (key_order is not None) or (len(obj) == 1):
+                obj = dict2list(obj, order=key_order)
+            elif (isinstance(typedef, dict)
+                  and isinstance(typedef.get('items', None), list)
+                  and all([('title' in x) for x in typedef['items']])):
+                key_order = [x['title'] for x in typedef['items']]
                 obj = dict2list(obj, order=key_order)
             else:
                 obj = [obj]
@@ -178,3 +214,23 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             return container
         return super(JSONArrayMetaschemaType, cls)._get_element(
             container, index, default)
+
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        if isinstance(typedef[cls._json_property], dict):
+            nitems = typedef.get('minItems', 1)
+            out = cls._container_type()
+            for i in range(nitems):
+                cls._assign(out, i, generate_data(typedef[cls._json_property]))
+        else:
+            out = super(JSONArrayMetaschemaType, cls)._generate_data(typedef)
+        return out

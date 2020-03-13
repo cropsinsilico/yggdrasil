@@ -4,7 +4,7 @@ import uuid
 import pprint
 import importlib
 import jsonschema
-from yggdrasil import backwards, tools
+from yggdrasil import tools
 from yggdrasil.metaschema import (get_metaschema, get_validator, encoder,
                                   validate_instance)
 from yggdrasil.metaschema.datatypes import (
@@ -652,7 +652,7 @@ class MetaschemaType(object):
             bytes, str: Serialized message.
 
         """
-        if ((isinstance(obj, backwards.bytes_type)
+        if ((isinstance(obj, bytes)
              and ((obj == tools.YGG_MSG_EOF) or kwargs.get('raw', False)
                   or dont_encode))):
             metadata = kwargs
@@ -701,7 +701,7 @@ class MetaschemaType(object):
             ValueError: If msg does not contain the header separator.
 
         """
-        if not isinstance(msg, backwards.bytes_type):
+        if not isinstance(msg, bytes):
             raise TypeError("Message to be deserialized is not bytes type.")
         # Check for header
         if YGG_MSG_HEAD in msg:
@@ -739,6 +739,36 @@ class MetaschemaType(object):
         return obj, metadata
 
     # TESTING METHODS
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        raise NotImplementedError  # pragma: debug
+    
+    @classmethod
+    def generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        cls.validate_definition(typedef)
+        typedef = cls.normalize_definition(typedef)
+        if hasattr(cls, 'example_data'):
+            return cls.example_data
+        return cls._generate_data(typedef)
+    
     @classmethod
     def import_test_class(cls):
         r"""Import the test class for this class.

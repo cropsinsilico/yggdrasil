@@ -3,16 +3,19 @@ models:
     language: matlab
     args: ./src/conditional_io_modelA.m
     function: conditional_io_modelA
+    use_symunit: true
 
   - name: matlab_modelB1
     language: matlab
     args: ./src/conditional_io_modelB1.m
     function: conditional_io_modelB1
+    use_symunit: true
 
   - name: matlab_modelB2
     language: matlab
     args: ./src/conditional_io_modelB2.m
     function: conditional_io_modelB2
+    use_symunit: true
 
 connections:
   - input: ./Input/input.txt  # Connection between file and model A input

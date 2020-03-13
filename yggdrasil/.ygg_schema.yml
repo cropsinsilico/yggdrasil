@@ -21,6 +21,7 @@ definitions:
           default: default
           description: Communication mechanism that should be used.
           enum:
+          - buffer
           - default
           - ipc
           - rmq
@@ -35,6 +36,8 @@ definitions:
             object. Defaults to {''type'': ''bytes''}. Additional information on specifying
             datatypes can be found :ref:`here <datatypes_rst>`.'
           type: schema
+        default_file:
+          $ref: '#/definitions/file'
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -54,6 +57,10 @@ definitions:
           type: array
         filter:
           $ref: '#/definitions/filter'
+        format_str:
+          description: String that should be used to format/parse messages. Default
+            to None.
+          type: string
         is_default:
           default: false
           type: boolean
@@ -65,31 +72,47 @@ definitions:
         name:
           description: Name used for component in log messages.
           type: string
+        outside_loop:
+          default: false
+          type: boolean
         recv_converter:
-          description: Converter that should be used on received objects. Defaults
-            to None.
-          oneOf:
+          anyOf:
           - $ref: '#/definitions/transform'
           - type:
             - function
             - string
           - items:
-              oneOf:
+              anyOf:
               - $ref: '#/definitions/transform'
               - type:
                 - function
                 - string
             type: array
+          description: Converter that should be used on received objects. Defaults
+            to None.
         send_converter:
-          description: Converter that should be used on sent objects. Defaults to
-            None.
-          oneOf:
+          anyOf:
           - $ref: '#/definitions/transform'
           - type:
             - function
             - string
           - items:
-              oneOf:
+              anyOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
+          description: Converter that should be used on sent objects. Defaults to
+            None.
+        transform:
+          anyOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              anyOf:
               - $ref: '#/definitions/transform'
               - type:
                 - function
@@ -102,9 +125,9 @@ definitions:
             type: string
           type: array
       required:
+      - name
       - commtype
       - datatype
-      - name
       title: comm_base
       type: object
     - anyOf:
@@ -118,6 +141,17 @@ definitions:
             - rmq
             type: string
         title: RMQComm
+        type: object
+      - additionalProperties: true
+        description: Schema for comm component ['buffer'] subtype.
+        properties:
+          commtype:
+            default: default
+            description: Communication mechanism that should be used.
+            enum:
+            - buffer
+            type: string
+        title: BufferComm
         type: object
       - additionalProperties: true
         description: Schema for comm component ['rmq_async'] subtype.
@@ -397,11 +431,6 @@ definitions:
           description: Delimiter that should be used to separate name/value pairs
             in the map. Defaults to \t.
           type: string
-        dont_write_header:
-          default: false
-          description: If True, headers will not be added to serialized tables. Defaults
-            to False.
-          type: boolean
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -443,10 +472,8 @@ definitions:
         filter:
           $ref: '#/definitions/filter'
         format_str:
-          description: If provided, this string will be used to format messages from
-            a list of arguments and parse messages to get a list of arguments in C
-            printf/scanf style. Defaults to None and messages are assumed to already
-            be bytes.
+          description: String that should be used to format/parse messages. Default
+            to None.
           type: string
         in_temp:
           default: false
@@ -460,9 +487,6 @@ definitions:
           type:
           - string
           - int
-        is_default:
-          default: false
-          type: boolean
         is_series:
           default: false
           description: If True, input/output will be done to a series of files. If
@@ -484,6 +508,11 @@ definitions:
             '
           description: One or more characters indicating a newline. Defaults to '\n'.
           type: string
+        no_header:
+          default: false
+          description: If True, headers will not be read or serialized from/to tables.
+            Defaults to False.
+          type: boolean
         read_meth:
           default: read
           description: Method that should be used to read data from the file. Defaults
@@ -493,35 +522,35 @@ definitions:
           - readline
           type: string
         recv_converter:
+          anyOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              anyOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
           description: Converter that should be used on received objects. Defaults
             to None.
-          oneOf:
+        send_converter:
+          anyOf:
           - $ref: '#/definitions/transform'
           - type:
             - function
             - string
           - items:
-              oneOf:
+              anyOf:
               - $ref: '#/definitions/transform'
               - type:
                 - function
                 - string
             type: array
-        send_converter:
           description: Converter that should be used on sent objects. Defaults to
             None.
-          oneOf:
-          - $ref: '#/definitions/transform'
-          - type:
-            - function
-            - string
-          - items:
-              oneOf:
-              - $ref: '#/definitions/transform'
-              - type:
-                - function
-                - string
-            type: array
         serializer:
           default:
             seritype: direct
@@ -537,6 +566,24 @@ definitions:
           description: If True, the serialization of dictionaries will be in key sorted
             order. Defaults to True.
           type: boolean
+        str_as_bytes:
+          default: false
+          description: If True, strings in columns are read as bytes. Defaults to
+            False.
+          type: boolean
+        transform:
+          anyOf:
+          - $ref: '#/definitions/transform'
+          - type:
+            - function
+            - string
+          - items:
+              anyOf:
+              - $ref: '#/definitions/transform'
+              - type:
+                - function
+                - string
+            type: array
         use_astropy:
           default: false
           description: If True, the astropy package will be used to serialize/deserialize
@@ -559,9 +606,9 @@ definitions:
             is used.
           type: string
       required:
-      - filetype
       - name
       - working_dir
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -682,12 +729,6 @@ definitions:
             enum:
             - table
             type: string
-          format_str:
-            description: If provided, this string will be used to format messages
-              from a list of arguments and parse messages to get a list of arguments
-              in C printf/scanf style. Defaults to None and messages are assumed to
-              already be bytes.
-            type: string
           newline:
             default: '
 
@@ -774,22 +815,11 @@ definitions:
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
-          dont_write_header:
-            default: false
-            description: If True, headers will not be added to serialized tables.
-              Defaults to False.
-            type: boolean
           filetype:
             default: binary
             description: The file is a Pandas frame output as a table.
             enum:
             - pandas
-            type: string
-          format_str:
-            description: If provided, this string will be used to format messages
-              from a list of arguments and parse messages to get a list of arguments
-              in C printf/scanf style. Defaults to None and messages are assumed to
-              already be bytes.
             type: string
           newline:
             default: '
@@ -798,6 +828,16 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
+          no_header:
+            default: false
+            description: If True, headers will not be read or serialized from/to tables.
+              Defaults to False.
+            type: boolean
+          str_as_bytes:
+            default: false
+            description: If True, strings in columns are read as bytes. Defaults to
+              False.
+            type: boolean
           use_astropy:
             default: false
             description: If True, the astropy package will be used to serialize/deserialize
@@ -1288,10 +1328,10 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
-      - args
-      - name
       - language
+      - name
+      - args
+      - working_dir
       title: model_base
       type: object
     - anyOf:
@@ -1735,11 +1775,6 @@ definitions:
           description: Character(s) that should be used to separate columns. Defaults
             to '\t'.
           type: string
-        dont_write_header:
-          default: false
-          description: If True, headers will not be added to serialized tables. Defaults
-            to False.
-          type: boolean
         encoded_datatype:
           description: JSON schema describing the type that serialized objects should
             conform to. Defaults to the class attribute default_encoded_datatype.
@@ -1792,6 +1827,11 @@ definitions:
             '
           description: One or more characters indicating a newline. Defaults to '\n'.
           type: string
+        no_header:
+          default: false
+          description: If True, headers will not be read or serialized from/to tables.
+            Defaults to False.
+          type: boolean
         seritype:
           default: default
           description: Serializer type.
@@ -1813,6 +1853,11 @@ definitions:
           default: true
           description: If True, the serialization of dictionaries will be in key sorted
             order. Defaults to True.
+          type: boolean
+        str_as_bytes:
+          default: false
+          description: If True, strings in columns are read as bytes. Defaults to
+            False.
           type: boolean
         use_astropy:
           default: false
@@ -1888,11 +1933,6 @@ definitions:
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
-          dont_write_header:
-            default: false
-            description: If True, headers will not be added to serialized tables.
-              Defaults to False.
-            type: boolean
           field_names:
             description: The names of fields in the format string. If not provided,
               names are set based on the order of the fields in the format string.
@@ -1911,12 +1951,22 @@ definitions:
               in C printf/scanf style. Defaults to None and messages are assumed to
               already be bytes.
             type: string
+          no_header:
+            default: false
+            description: If True, headers will not be read or serialized from/to tables.
+              Defaults to False.
+            type: boolean
           seritype:
             default: default
             description: Serializes tables using the pandas package.
             enum:
             - pandas
             type: string
+          str_as_bytes:
+            default: false
+            description: If True, strings in columns are read as bytes. Defaults to
+              False.
+            type: boolean
           use_astropy:
             default: false
             description: If True, the astropy package will be used to serialize/deserialize
@@ -2086,6 +2136,10 @@ definitions:
         - args
       description: Base schema for all subtypes of transform components.
       properties:
+        field_names:
+          items:
+            type: string
+          type: array
         function:
           description: The handle for a callable Python object (e.g. function) that
             should be used to transform messages or a string of the form "<function
@@ -2118,7 +2172,6 @@ definitions:
             type: string
           type: array
         single_as_scalar:
-          default: false
           description: If True and only a single field is selected, the transformed
             messages will be scalars rather than arrays with single elements. Defaults
             to False.
@@ -2132,14 +2185,40 @@ definitions:
           type: string
         transformtype:
           enum:
+          - array
           - direct
           - function
           - map_fields
+          - pandas
           - select_fields
           - statement
       title: transform_base
       type: object
     - anyOf:
+      - additionalProperties: true
+        description: Schema for transform component ['array'] subtype.
+        properties:
+          field_names:
+            items:
+              type: string
+            type: array
+          transformtype:
+            enum:
+            - array
+        title: ArrayTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['pandas'] subtype.
+        properties:
+          field_names:
+            items:
+              type: string
+            type: array
+          transformtype:
+            enum:
+            - pandas
+        title: PandasTransform
+        type: object
       - additionalProperties: true
         description: Schema for transform component ['select_fields'] subtype.
         properties:
@@ -2155,7 +2234,6 @@ definitions:
               type: string
             type: array
           single_as_scalar:
-            default: false
             description: If True and only a single field is selected, the transformed
               messages will be scalars rather than arrays with single elements. Defaults
               to False.

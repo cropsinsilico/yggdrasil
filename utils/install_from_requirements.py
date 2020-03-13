@@ -39,8 +39,6 @@ def prune(fname_in, fname_out=None, excl_suffix=None):
                 if req.marker and (not req.marker.evaluate()):
                     continue
                 new_lines.append(req.name + str(req.specifier))
-                print('prune', line, line.endswith(excl_suffix), req.name,
-                      excl_suffix, type(line), type(excl_suffix))
             except InvalidRequirement as e:
                 print(e)
                 continue
@@ -80,11 +78,17 @@ def locate_conda_exe(conda_env, name):
                                'Scripts', name)
     else:
         out = os.path.join(conda_prefix, conda_env, 'bin', name)
-    assert(os.path.isfile(out))
+    try:
+        assert(os.path.isfile(out))
+    except AssertionError:
+        out = os.path.expanduser(os.path.join('~', '.conda', 'envs', name))
+        if not os.path.isfile(out):
+            raise
     return out
 
 
-def install_from_requirements(method, fname_in, conda_env=None):
+def install_from_requirements(method, fname_in, conda_env=None,
+                              user=False):
     r"""Install packages via pip or conda from one or more pip-style
     requirements file(s).
 
@@ -94,6 +98,8 @@ def install_from_requirements(method, fname_in, conda_env=None):
             should be read.
         conda_env (str, optional): Name of conda environment that requirements
             should be installed into. Defaults to None and is ignored.
+        user (bool, optional): If True, install in user mode. Defaults to
+            False.
 
     """
     if method not in ['pip', 'conda']:
@@ -109,12 +115,16 @@ def install_from_requirements(method, fname_in, conda_env=None):
             if conda_env:
                 args += ['--name', conda_env]
             args += ['--file', temp_file]
+            if user:
+                args.append('--user')
         elif method == 'pip':
             if conda_env:
                 pip_cmd = locate_conda_exe(conda_env, 'pip')
             else:
                 pip_cmd = 'pip'
             args = [pip_cmd, 'install', '-r', temp_file]
+            if user:
+                args.append('--user')
         print(subprocess.check_output(args).decode("utf-8"))
     finally:
         if os.path.isfile(temp_file):
@@ -133,5 +143,8 @@ if __name__ == "__main__":
     parser.add_argument('--conda-env', default=None,
                         help=('Conda environment that requirements should be '
                               'installed into.'))
+    parser.add_argument('--user', action='store_true',
+                        help=('Install in user mode.'))
     args = parser.parse_args()
-    install_from_requirements(args.method, args.files, conda_env=args.conda_env)
+    install_from_requirements(args.method, args.files, conda_env=args.conda_env,
+                              user=args.user)

@@ -48,6 +48,7 @@ class JSONBooleanMetaschemaType(JSONMetaschemaTypeBase):
     name = 'boolean'
     description = 'JSON boolean type.'
     python_types = (bool, )
+    example_data = True
 
     @classmethod
     def normalize(cls, obj):
@@ -76,6 +77,7 @@ class JSONIntegerMetaschemaType(JSONMetaschemaTypeBase):
     python_types = int_types
     # TODO: Find a better way to signify this for creating the table
     cross_language_support = False
+    example_data = int(1)
     
     @classmethod
     def normalize(cls, obj):
@@ -101,6 +103,7 @@ class JSONNullMetaschemaType(JSONMetaschemaTypeBase):
     name = 'null'
     description = 'JSON null type.'
     python_types = (type(None), )
+    example_data = None
     
 
 class JSONNumberMetaschemaType(JSONMetaschemaTypeBase):
@@ -114,6 +117,7 @@ class JSONNumberMetaschemaType(JSONMetaschemaTypeBase):
     name = 'number'
     description = 'JSON number type.'
     python_types = (numbers.Number, )
+    example_data = 1.0
 
     @classmethod
     def normalize(cls, obj):
@@ -144,6 +148,7 @@ class JSONStringMetaschemaType(JSONMetaschemaTypeBase):
     name = 'string'
     description = 'JSON string type.'
     python_types = str_types
+    example_data = 'hello'
 
     @classmethod
     def normalize(cls, obj):

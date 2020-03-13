@@ -1,6 +1,5 @@
 import os
-from yggdrasil import tools, serialize
-from yggdrasil.config import ygg_cfg, locate_file
+from yggdrasil import tools
 from yggdrasil.drivers.ModelDriver import ModelDriver
 
 
@@ -76,8 +75,13 @@ class InterpretedModelDriver(ModelDriver):
     comm_atexit = None
     comm_linger = False
     decode_format = None
-    recv_converters = {'pandas': 'pandas'}
-    send_converters = {'pandas': serialize.pandas2list}
+    recv_converters = {}
+    send_converters = {}
+    _config_attr_map = [{'attr': 'default_interpreter',
+                         'key': 'interpreter'},
+                        {'attr': 'default_interpreter_flags',
+                         'key': 'interpreter_flags',
+                         'type': list}]
 
     def __init__(self, name, args, **kwargs):
         super(InterpretedModelDriver, self).__init__(name, args, **kwargs)
@@ -89,25 +93,17 @@ class InterpretedModelDriver(ModelDriver):
                     setattr(self, k, getattr(self, 'default_%s' % k))
 
     @staticmethod
-    def after_registration(cls):
+    def after_registration(cls, **kwargs):
         r"""Operations that should be performed to modify class attributes after
         registration. For compiled languages this includes selecting the
         default compiler. The order of precedence is the config file 'compiler'
         option for the language, followed by the environment variable set by
         _compiler_env, followed by the existing class attribute.
         """
-        ModelDriver.after_registration(cls)
+        ModelDriver.after_registration(cls, **kwargs)
+        if kwargs.get('second_pass', False):
+            return
         if cls.language is not None:
-            for k in ['interpreter']:
-                # Set attribute defaults based on config options
-                for k0 in [k, '%s_flags' % k]:
-                    ka = 'default_%s' % k0
-                    if k0.endswith('_flags'):
-                        old_val = getattr(cls, ka)
-                        old_val += ygg_cfg.get(cls.language, k0, '').split()
-                    else:
-                        setattr(cls, ka, ygg_cfg.get(cls.language, k0,
-                                                     getattr(cls, ka)))
             # Set default interpreter based on language
             if cls.default_interpreter is None:
                 cls.default_interpreter = cls.language
@@ -136,10 +132,6 @@ class InterpretedModelDriver(ModelDriver):
 
         """
         out = getattr(cls, 'interpreter', getattr(cls, 'default_interpreter'))
-        # out = None
-        # if cls.language is not None:
-        #     out = ygg_cfg.get(cls.language, 'interpreter',
-        #                       getattr(cls, '_interpreter', cls.language))
         if out is None:
             raise NotImplementedError("Interpreter not set for language '%s'."
                                       % cls.language)
@@ -231,27 +223,6 @@ class InterpretedModelDriver(ModelDriver):
                and (not any([cmd.endswith(e) for e in cls.language_ext])))
         return out
 
-    @classmethod
-    def configure(cls, cfg):
-        r"""Add configuration options for this language. This includes locating
-        any required external libraries and setting option defaults.
-
-        Args:
-            cfg (YggConfigParser): Config class that options should be set for.
-
-        Returns:
-            list: Section, option, description tuples for options that could not
-                be set.
-
-        """
-        out = ModelDriver.configure.__func__(cls, cfg)
-        # Locate executable
-        if not cls.is_language_installed():  # pragma: debug
-            fpath = locate_file(cls.language_executable())
-            if fpath:
-                cfg.set(cls.language, 'interpreter', fpath)
-        return out
-    
     def set_env(self):
         r"""Get environment variables that should be set for the model process.
 

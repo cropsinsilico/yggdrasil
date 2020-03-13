@@ -1,0 +1,28 @@
+models:
+  - name: source
+    language: python
+    args: ./src/src.py
+    function: src
+
+  - name: {{TEST_LANGUAGE}}_model
+    language: {{TEST_LANGUAGE}}
+    args: ./src/model{{TEST_LANGUAGE_EXT}}
+    function: model
+    {{{TEST_MODEL_IO}}}
+
+  - name: destination
+    language: python
+    args: ./src/dst.py
+    function: dst
+
+connections:
+  - input: source:output
+    output:
+      name: {{TEST_LANGUAGE}}_model:input
+      transform: {{TEST_TRANSFORM}}
+  - input:
+      name: {{TEST_LANGUAGE}}_model:output
+      transform: {{TEST_TRANSFORM}}
+    output:
+      name: destination:input
+      transform: {{TEST_TRANSFORM}}

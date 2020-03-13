@@ -21,6 +21,7 @@ connections:
   - input: ./Input/input.txt  # Connection between file and model A input
     output: inputA
     filetype: pandas
+    str_as_bytes: true
   - input: outputB  # Connection between model B output and file
     output: ./output.txt
     filetype: pandas

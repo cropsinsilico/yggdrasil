@@ -1,6 +1,5 @@
-from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import (
-    indent_char2int, encode_json, decode_json, _use_rapidjson,
+    indent_char2int, encode_json, decode_json,
     JSONReadableEncoder)
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
@@ -36,8 +35,6 @@ class JSONSerialize(SerializeBase):
             bytes, str: Serialized message.
 
         """
-        # Convert bytes to str because JSON cannot serialize bytes by default
-        args = backwards.as_str(args, recurse=True, allow_pass=True)
         return encode_json(args, indent=self.indent, cls=JSONReadableEncoder)
 
     def func_deserialize(self, msg):
@@ -50,10 +47,7 @@ class JSONSerialize(SerializeBase):
             obj: Deserialized Python object.
 
         """
-        out = decode_json(msg)
-        if backwards.PY2:  # pragma: Python 2
-            out = backwards.as_str(out, recurse=True, allow_pass=True)
-        return out
+        return decode_json(msg)
 
     @classmethod
     def concatenate(cls, objects, **kwargs):
@@ -114,9 +108,6 @@ class JSONSerialize(SerializeBase):
         #                    b'\n\t\t"c": {\n\t\t\t"z": "hello"\n\t\t},'
         #                    b'\n\t\t"d": "new field"\n\t},'
         #                    b'\n\t2,\n\t2.0\n]')
-        if backwards.PY2 or _use_rapidjson:  # pragma: Python 2
-            tab_rep = indent_char2int('\t') * b' '
-            out['contents'] = out['contents'].replace(b'\t', tab_rep)
-        if backwards.PY2:  # pragma: Python 2
-            out['contents'] = out['contents'].replace(b',', b', ')
+        tab_rep = indent_char2int('\t') * b' '
+        out['contents'] = out['contents'].replace(b'\t', tab_rep)
         return out

@@ -1,6 +1,6 @@
 import json
-from yggdrasil import backwards
-from yggdrasil.serialize import _default_delimiter
+from yggdrasil import tools
+from yggdrasil.serialize import _default_delimiter_str
 from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.metaschema.encoder import JSONReadableEncoder
 
@@ -21,7 +21,7 @@ class AsciiMapSerialize(SerializeBase):
                                    'values.')
     _schema_properties = {
         'delimiter': {'type': 'string',
-                      'default': backwards.as_str(_default_delimiter)}}
+                      'default': _default_delimiter_str}}
     _attr_conv = SerializeBase._attr_conv  # + ['delimiter']
     default_datatype = {'type': 'object'}
     concats_as_str = False
@@ -38,33 +38,33 @@ class AsciiMapSerialize(SerializeBase):
         """
         out = ''
         order = sorted([k for k in args.keys()])
+        newline_str = tools.bytes2str(self.newline)
         for k in order:
             v = args[k]
-            if not isinstance(k, backwards.string_types):
+            if not isinstance(k, (str, bytes)):
                 raise ValueError("Serialization of non-string keys not supported.")
-            out += backwards.as_str(k) + self.delimiter
-            if isinstance(v, backwards.string_types):
-                v = backwards.as_str(v)
+            out += tools.bytes2str(k)
+            out += self.delimiter
             out += json.dumps(v, cls=JSONReadableEncoder)
-            out += backwards.as_str(self.newline)
-        return backwards.as_bytes(out)
+            out += newline_str
+        return tools.str2bytes(out)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
 
         Args:
-            msg (str, bytes): Message to be deserialized.
+            msg (bytes): Message to be deserialized.
 
         Returns:
             dict: Deserialized Python dictionary.
 
         """
         out = dict()
-        lines = (backwards.as_str(msg)).split(
-            backwards.as_str(self.newline))
+        lines = tools.bytes2str(msg.split(self.newline), recurse=True)
         for l in lines:
-            kv = l.split(self.delimiter)
+            kv = [x for x in l.split(self.delimiter) if x]
             if len(kv) <= 1:
+                # TODO: Allow empty?
                 continue
             elif len(kv) == 2:
                 if kv[1].startswith("'") and kv[1].endswith("'"):

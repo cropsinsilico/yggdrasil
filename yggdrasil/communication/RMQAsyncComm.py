@@ -1,5 +1,5 @@
 import threading
-from yggdrasil import backwards, tools
+from yggdrasil import tools
 from yggdrasil.communication import RMQComm
 if RMQComm._rmq_installed:
     import pika
@@ -274,10 +274,11 @@ class RMQAsyncComm(RMQComm.RMQComm):
 
     def on_message(self, ch, method, props, body):
         r"""Buffer received messages."""
+        body = tools.str2bytes(body)
         if self.direction == 'send':  # pragma: debug
             raise Exception("Send comm received a message.")
         with self.rmq_lock:
-            self._buffered_messages.append(backwards.as_bytes(body))
+            self._buffered_messages.append(body)
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     # CONNECTION

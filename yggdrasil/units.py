@@ -1,30 +1,17 @@
 import re
 import numpy as np
-import logging
-from yggdrasil import backwards
-if backwards.PY2:  # pragma: Python 2
-    import pint
-    unyt = None
-    _use_unyt = False
-    _ureg_unyt = None
-    _ureg_pint = pint.UnitRegistry()
-    # _ureg_pint.define('micro_mole = 1e-6 * mole = uMol = umol')
-    # Don't print warning about day redefinition
-    logging.getLogger("pint").propagate = False
-    _ureg_pint.define('day = 24 * hour = d')
-    logging.getLogger("pint").propagate = True
-else:  # pragma: Python 3
-    import unyt
-    pint = None
-    _use_unyt = True
-    _ureg_unyt = unyt.UnitRegistry()
-    _ureg_pint = None
-if _use_unyt:
-    _unit_quantity = unyt.array.unyt_quantity
-    _unit_array = unyt.array.unyt_array
-else:
-    _unit_quantity = _ureg_pint.Quantity
-    _unit_array = _ureg_pint.Quantity
+import unyt
+from yggdrasil import tools
+_ureg_unyt = unyt.UnitRegistry('mks')
+_unit_quantity = unyt.array.unyt_quantity
+_unit_array = unyt.array.unyt_array
+_ureg_unyt.add("ac", 4046.86, dimensions=unyt.dimensions.area,
+               tex_repr=r"\rm{ac}", offset=0.0, prefixable=False)
+_ureg_unyt.add("a", 100.0, dimensions=unyt.dimensions.area,
+               tex_repr=r"\rm{a}", offset=0.0, prefixable=True)
+unyt._unit_lookup_table.inv_name_alternatives["acre"] = "ac"
+unyt._unit_lookup_table.inv_name_alternatives["are"] = "a"
+unyt._unit_lookup_table.inv_name_alternatives["hectare"] = "ha"
 
 
 def convert_R_unit_string(r_str):
@@ -39,14 +26,15 @@ def convert_R_unit_string(r_str):
 
     """
     out = []
-    regex = r'(?P<name>[A-Za-z]+)(?P<exp>-?[0-9]*)(?: |$)'
+    regex_mu = tools.bytes2str(b'\xc2\xb5')
+    regex = r'(?P<name>[A-Za-z%s]+)(?P<exp>-?[0-9]*)(?: |$)' % regex_mu
     for x in re.finditer(regex, r_str):
         xdict = x.groupdict()
         if xdict['exp']:
-            out.append('{name}**{exp}'.format(**xdict))
+            out.append('({name}**{exp})'.format(**xdict))
         else:
             out.append(xdict['name'])
-    return ' '.join(out)
+    return '*'.join(out)
 
 
 def has_units(obj):
@@ -60,7 +48,7 @@ def has_units(obj):
 
     """
     out = hasattr(obj, 'units')
-    if out and _use_unyt and (obj.units == as_unit('dimensionless')):
+    if out and (obj.units == as_unit('dimensionless')):
         out = False
     return out
 
@@ -93,12 +81,9 @@ def get_data(obj):
 
     """
     if has_units(obj):
-        if _use_unyt:
-            out = obj.to_ndarray()
-            if out.ndim == 0:
-                out = out.reshape((1, ))[0]
-        else:
-            out = obj.magnitude
+        out = obj.to_ndarray()
+        if out.ndim == 0:
+            out = out.reshape((1, ))[0]
     else:
         out = obj
     return out
@@ -118,8 +103,7 @@ def add_units(arr, unit_str, dtype=None):
         unyt.unyt_array: Array with units.
 
     """
-    if isinstance(unit_str, backwards.bytes_type):
-        unit_str = backwards.as_str(unit_str)
+    unit_str = tools.bytes2str(unit_str)
     if is_null_unit(unit_str):
         return arr
     if has_units(arr):
@@ -129,13 +113,12 @@ def add_units(arr, unit_str, dtype=None):
             dtype = arr.dtype
         else:
             dtype = np.array([arr]).dtype
-    if _use_unyt:
-        if isinstance(arr, np.ndarray) and (arr.ndim > 0):
-            out = unyt.unyt_array(arr, unit_str, dtype=dtype)
-        else:
-            out = unyt.unyt_quantity(arr, unit_str, dtype=dtype)
+    if isinstance(arr, np.ndarray) and (arr.ndim > 0):
+        out = unyt.unyt_array(arr, unit_str, dtype=dtype,
+                              registry=_ureg_unyt)
     else:
-        out = _ureg_pint.Quantity(arr, unit_str)
+        out = unyt.unyt_quantity(arr, unit_str, dtype=dtype,
+                                 registry=_ureg_unyt)
     return out
 
 
@@ -185,22 +168,16 @@ def as_unit(ustr):
         ustr (str): Unit string.
 
     Returns:
-        unyt.Unit or pint.quantity.Quantity: Unit object.
+        unyt.Unit: Unit object.
 
     Raises:
         ValueError: If the string is not a recognized unit.
 
     """
-    if _use_unyt:
-        try:
-            out = unyt.Unit(ustr)
-        except unyt.exceptions.UnitParseError as e:
-            raise ValueError(str(e))
-    else:
-        try:
-            out = _ureg_pint(ustr)
-        except pint.errors.UndefinedUnitError as e:
-            raise ValueError(str(e))
+    try:
+        out = unyt.Unit(ustr, registry=_ureg_unyt)
+    except unyt.exceptions.UnitParseError as e:
+        raise ValueError(str(e))
     return out
 
 
@@ -214,7 +191,7 @@ def is_unit(ustr):
         bool: True if the string is a valid unit. False otherwise.
 
     """
-    ustr = backwards.as_str(ustr)
+    ustr = tools.bytes2str(ustr)
     if is_null_unit(ustr):
         return True
     try:
@@ -241,11 +218,8 @@ def convert_to(arr, new_units):
         return arr
     if not has_units(arr):
         return add_units(arr, new_units)
-    if _use_unyt:
-        try:
-            out = arr.to(new_units)
-        except unyt.exceptions.UnitConversionError as e:
-            raise ValueError(str(e))
-    else:
+    try:
         out = arr.to(new_units)
+    except unyt.exceptions.UnitConversionError as e:
+        raise ValueError(str(e))
     return out

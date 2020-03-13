@@ -5,6 +5,7 @@ import copy
 import logging
 import subprocess
 import argparse
+import pprint
 
 
 logger = logging.getLogger(__name__)
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def ygginfo():
     r"""Print information about yggdrasil installation."""
-    from yggdrasil import __version__, tools, config, backwards, platform
+    from yggdrasil import __version__, tools, config, platform
     from yggdrasil.components import import_component
     lang_list = tools.get_installed_lang()
     prefix = '    '
@@ -64,6 +65,13 @@ def ygginfo():
                 curr_prefix += prefix
                 vardict.append((curr_prefix + "Language Installed",
                                 drv.is_language_installed()))
+                vardict.append((curr_prefix + "Base Languages Installed",
+                                drv.are_base_languages_installed()))
+                if not drv.are_base_languages_installed():
+                    vardict.append(
+                        (curr_prefix + "Base Languages Not Installed",
+                         [b for b in drv.base_languages if
+                          (not import_component('model', b).is_installed())]))
                 vardict.append((curr_prefix + "Dependencies Installed",
                                 drv.are_dependencies_installed()))
                 vardict.append((curr_prefix + "Interface Installed",
@@ -72,13 +80,15 @@ def ygginfo():
                                 drv.is_comm_installed()))
                 vardict.append((curr_prefix + "Configured",
                                 drv.is_configured()))
+                vardict.append((curr_prefix + "Disabled",
+                                drv.is_disabled()))
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
         # Add verbose information
         if args.verbose:
             # Conda info
             if os.environ.get('CONDA_PREFIX', ''):
-                out = backwards.as_str(subprocess.check_output(
+                out = tools.bytes2str(subprocess.check_output(
                     ['conda', 'info'])).strip()
                 curr_prefix += prefix
                 vardict.append((curr_prefix + 'Conda Info:', "\n%s%s"
@@ -102,7 +112,7 @@ def ygginfo():
                 vardict.append((curr_prefix + "R C Compiler:", ""))
                 curr_prefix += prefix
                 for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS']:
-                    out = backwards.as_str(subprocess.check_output(
+                    out = tools.bytes2str(subprocess.check_output(
                         [interp, 'CMD', 'config', x])).strip()
                     vardict.append((curr_prefix + x, "%s"
                                     % ("\n" + curr_prefix + prefix).join(
@@ -212,7 +222,7 @@ def cc_flags():
 
     """
     from yggdrasil.drivers import CModelDriver
-    print(' '.join(CModelDriver.CModelDriver.get_compiler_flags()))
+    print(' '.join(CModelDriver.CModelDriver.get_compiler_flags(for_model=True)))
 
 
 def ld_flags():
@@ -224,7 +234,7 @@ def ld_flags():
 
     """
     from yggdrasil.drivers import CModelDriver
-    print(' '.join(CModelDriver.CModelDriver.get_linker_flags()))
+    print(' '.join(CModelDriver.CModelDriver.get_linker_flags(for_model=True)))
 
 
 def rebuild_c_api():
@@ -272,8 +282,7 @@ def validate_yaml():
 
 def update_config():
     r"""Update the user config file for yggdrasil."""
-    from yggdrasil import config, tools
-    from yggdrasil.components import import_component
+    from yggdrasil import config, tools, platform
     parser = argparse.ArgumentParser(
         description='Update the user config file.')
     parser.add_argument('--show-file', action='store_true',
@@ -296,24 +305,31 @@ def update_config():
     else:
         prelang = parser.parse_known_args()[0].languages
     lang_args = {}
-    old_args = set([x.dest for x in parser._actions])
+    lang_args2kwargs = {}
+    if platform._is_mac:
+        lang_args.setdefault('c', [])
+        lang_args['c'].append(
+            (('--macos-sdkroot', '--sdkroot'),
+             {'help': (
+                 'The full path to the MacOS SDK '
+                 'that should be used.')}))
     for l in prelang:
-        drv = import_component('model', l)
-        drv.update_config_argparser(parser)
-        new_args = set([x.dest for x in parser._actions])
-        lang_args[drv.language] = list(new_args - old_args)
-        old_args = new_args
+        if l in lang_args:
+            lang_args2kwargs[l] = []
+            for args, kwargs in lang_args.get(l, []):
+                parser.add_argument(*args, **kwargs)
+                lang_args2kwargs[l].append(parser._actions[-1].dest)
     args = parser.parse_args()
     lang_kwargs = {l: {k: getattr(args, k) for k in alist}
-                   for l, alist in lang_args.items()}
+                   for l, alist in lang_args2kwargs.items()}
     if args.show_file:
         print('Config file located here: %s' % config.usr_config_file)
     if args.remove_file and os.path.isfile(config.usr_config_file):
         os.remove(config.usr_config_file)
     if args.show_file or args.remove_file:
         return
-    drv = [import_component('model', l) for l in args.languages]
-    config.update_language_config(drv, overwrite=args.overwrite, verbose=True,
+    config.update_language_config(args.languages, overwrite=args.overwrite,
+                                  verbose=True,
                                   disable_languages=args.disable_languages,
                                   enable_languages=args.enable_languages,
                                   lang_kwargs=lang_kwargs)
@@ -370,6 +386,21 @@ def ygginstall():
     else:
         for x in args.language:
             install_languages.install_language(x, args=args)
+
+
+def yggmodelform():
+    r"""Save/print a JSON schema that can be used for generating a
+    form for composing a model specification files."""
+    from yggdrasil.schema import get_model_form_schema
+    parser = argparse.ArgumentParser(
+        description=('Save/print the JSON schema for generating the '
+                     'model specification form.'))
+    parser.add_argument('--file',
+                        help='Path to file where the schema should be saved.')
+    args = parser.parse_args()
+    out = get_model_form_schema(fname_dst=args.file)
+    if not args.file:
+        pprint.pprint(out)
 
 
 if __name__ == '__main__':

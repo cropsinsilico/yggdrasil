@@ -1,5 +1,4 @@
-from yggdrasil import backwards
-from yggdrasil.serialize import _default_newline
+from yggdrasil.serialize import _default_newline_str
 from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.metaschema.datatypes.PlyMetaschemaType import PlyDict
 
@@ -26,7 +25,7 @@ class PlySerialize(SerializeBase):
     _schema_subtype_description = ('Serialize 3D structures using Ply format.')
     _schema_properties = {
         'newline': {'type': 'string',
-                    'default': backwards.as_str(_default_newline)}}
+                    'default': _default_newline_str}}
     default_datatype = {'type': 'ply'}
     concats_as_str = False
 
@@ -43,23 +42,22 @@ class PlySerialize(SerializeBase):
                 serialized.
 
         Returns:
-            bytes, str: Serialized message.
+            bytes: Serialized message.
 
         """
-        return backwards.as_bytes(self.datatype.encode_data(args, self.typedef))
+        return self.datatype.encode_data(args, self.typedef).encode("utf-8")
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
 
         Args:
-            msg: Message to be deserialized.
+            msg (bytes): Message to be deserialized.
 
         Returns:
             obj: Deserialized message.
 
         """
-        return PlyDict(self.datatype.decode_data(backwards.as_str(msg),
-                                                 self.typedef))
+        return PlyDict(self.datatype.decode_data(msg, self.typedef))
 
     @classmethod
     def concatenate(cls, objects, **kwargs):

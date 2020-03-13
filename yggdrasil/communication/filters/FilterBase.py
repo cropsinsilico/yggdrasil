@@ -1,5 +1,4 @@
 import numpy as np
-from yggdrasil import units, backwards
 from yggdrasil.components import ComponentBase
 
 
@@ -45,13 +44,7 @@ class FilterBase(ComponentBase):
             bool: True if the message will pass through the filter, False otherwise.
 
         """
-        try:
-            out = self.evaluate_filter(x)
-        except ValueError:
-            if backwards.PY2 and units.has_units(x):
-                out = self.evaluate_filter(units.get_data(x))
-            else:
-                raise  # pragma: debug
+        out = self.evaluate_filter(x)
         if isinstance(out, np.ndarray):
             assert(out.dtype == bool)
             out = bool(out.all())

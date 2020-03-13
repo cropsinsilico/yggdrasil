@@ -1,5 +1,6 @@
 import sys
-from yggdrasil import backwards
+import pickle
+import io as sio
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
@@ -23,8 +24,7 @@ class PickleSerialize(DefaultSerialize):
             bytes, str: Serialized message.
 
         """
-        out = backwards.pickle.dumps(args)
-        return backwards.as_bytes(out)
+        return pickle.dumps(args)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -36,8 +36,7 @@ class PickleSerialize(DefaultSerialize):
             obj: Deserialized Python object.
 
         """
-        out = backwards.pickle.loads(msg)
-        return out
+        return pickle.loads(msg)
 
     @classmethod
     def get_first_frame(cls, msg):
@@ -52,9 +51,9 @@ class PickleSerialize(DefaultSerialize):
                 are found, an empty string will be returned.
 
         """
-        fd = backwards.BytesIO(msg)
+        fd = sio.BytesIO(msg)
         try:
-            backwards.pickle.load(fd)
+            pickle.load(fd)
             used = fd.tell()
         except BaseException:
             used = 0
@@ -85,18 +84,14 @@ class PickleSerialize(DefaultSerialize):
 
         """
         out = super(PickleSerialize, cls).get_testing_options()
-        if backwards.PY2:  # pragma: Python 2
-            out['contents'] = ("S'Test message\\n'\np1\n."
-                               + "S'Test message 2\\n'\np1\n.")
-        else:  # pragma: Python 3
-            if sys.version_info[1] < 8:
-                out['contents'] = (
-                    b'\x80\x03C\rTest message\nq\x00.'
-                    + b'\x80\x03C\x0fTest message 2\nq\x00.')
-            else:
-                out['contents'] = (
-                    b'\x80\x04\x95\x11\x00\x00\x00\x00\x00\x00\x00C\r'
-                    + b'Test message\n\x94.\x80\x04\x95\x13'
-                    + b'\x00\x00\x00\x00\x00\x00\x00C\x0f'
-                    + b'Test message 2\n\x94.')
+        if sys.version_info[1] < 8:
+            out['contents'] = (
+                b'\x80\x03C\rTest message\nq\x00.'
+                + b'\x80\x03C\x0fTest message 2\nq\x00.')
+        else:  # pragma: Python 3.8
+            out['contents'] = (
+                b'\x80\x04\x95\x11\x00\x00\x00\x00\x00\x00\x00C\r'
+                + b'Test message\n\x94.\x80\x04\x95\x13'
+                + b'\x00\x00\x00\x00\x00\x00\x00C\x0f'
+                + b'Test message 2\n\x94.')
         return out

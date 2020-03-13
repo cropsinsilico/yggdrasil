@@ -1,6 +1,5 @@
 import copy
 from collections import OrderedDict
-from yggdrasil import backwards
 from yggdrasil.metaschema.datatypes import (
     get_type_class, MetaschemaTypeError)
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
@@ -49,7 +48,7 @@ class MultiMetaschemaType(MetaschemaType):
 
         """
         if (typedef is not None) and isinstance(typedef['type'],
-                                                backwards.string_types):
+                                                (str, bytes)):
             type_name = typedef['type']
         else:
             type_name = TypeMetaschemaProperty.encode(obj)
@@ -271,3 +270,24 @@ class MultiMetaschemaType(MetaschemaType):
                    {'type': 'array',
                     'items': {'enum': types}}]}}}
         return out
+
+    @classmethod
+    def _generate_data(cls, typedef):
+        r"""Generate mock data for the specified type.
+
+        Args:
+            typedef (dict): Type definition.
+
+        Returns:
+            object: Python object of the specified type.
+
+        """
+        typedef = copy.deepcopy(typedef)
+        types = typedef.pop('type', [])
+        for t in types:
+            try:
+                return cls.type_classes[t].generate_data(
+                    dict(typedef, type=t))
+            except BaseException:
+                pass
+        raise NotImplementedError  # pragma: debug

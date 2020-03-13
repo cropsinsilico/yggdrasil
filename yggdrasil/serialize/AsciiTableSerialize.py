@@ -1,5 +1,5 @@
-from yggdrasil import backwards, units, serialize
-from yggdrasil.serialize import _default_delimiter
+from yggdrasil import units, serialize, tools
+from yggdrasil.serialize import _default_delimiter_str
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
@@ -52,11 +52,12 @@ class AsciiTableSerialize(DefaultSerialize):
         'field_units': {'type': 'array', 'items': {'type': 'string'}},
         'as_array': {'type': 'boolean', 'default': False},
         'delimiter': {'type': 'string',
-                      'default': backwards.as_str(_default_delimiter)},
+                      'default': _default_delimiter_str},
         'use_astropy': {'type': 'boolean', 'default': False}}
     _attr_conv = DefaultSerialize._attr_conv + ['format_str', 'delimiter']
     has_header = True
     default_read_meth = 'readline'  # because default for as_array is False
+    default_datatype = {'type': 'array'}
 
     def update_serializer(self, *args, **kwargs):
         # Transform scalar into array for table
@@ -66,9 +67,20 @@ class AsciiTableSerialize(DefaultSerialize):
             for k in _metaschema['properties'].keys():
                 if k in kwargs:
                     old_typedef[k] = kwargs.pop(k)
-            new_typedef = {'type': 'array', 'items': [old_typedef]}
+            if old_typedef['type'] == 'object':
+                names = self.get_field_names()
+                if not names:
+                    names = list(old_typedef['properties'].keys())
+                assert(len(old_typedef['properties']) == len(names))
+                new_typedef = {'type': 'array', 'items': []}
+                for n in names:
+                    new_typedef['items'].append(dict(
+                        old_typedef['properties'][n], title=n))
+            else:
+                new_typedef = {'type': 'array', 'items': [old_typedef]}
             kwargs.update(new_typedef)
         out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
+        self.initialized = (self.typedef != self.default_datatype)
         self.update_format_str()
         self.update_field_names()
         self.update_field_units()
@@ -127,7 +139,7 @@ class AsciiTableSerialize(DefaultSerialize):
                                            use_astropy=self.use_astropy)
         else:
             out = serialize.format_message(args, self.format_str)
-        return backwards.as_bytes(out)
+        return tools.str2bytes(out)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.

@@ -78,7 +78,11 @@ function x_py = matlab2python(x_ml)
       [x_ml_data, x_ml_unit] = separateUnits(x_ml);
       x_py_data = matlab2python(double(subs(x_ml_data)));
       x_py_unit = matlab2python(symunit2str(x_ml_unit));
-      x_py = py.yggdrasil.units.add_units(x_py_data, x_py_unit);
+      if (x_ml_unit == 1)
+        x_py = x_py_data;
+      else
+        x_py = py.yggdrasil.units.add_units(x_py_data, x_py_unit);
+      end
     else;
       disp('Could not convert scalar matlab type to python type');
       disp(x_ml);
@@ -86,15 +90,12 @@ function x_py = matlab2python(x_ml)
       x_py = x_ml;
     end;
   elseif isvector(x_ml);
-    if isa(x_ml, 'string');
-      x_py = py.str(x_ml);
-    elseif isa(x_ml, 'string');
-      try
-	x_py = py.str(x_ml);
-      catch
-	x_py = py.unicode(x_ml);
+    if (isa(x_ml, 'string') || isa(x_ml, 'double'));
+      x_py = py.list();  
+      for i = 1:length(x_ml)
+	x_py.append(matlab2python(x_ml(i)));
       end
-      x_py = x_py.encode('utf-8');
+      x_py = py.numpy.array(x_py);
     elseif isa(x_ml, 'char');
       try
         x_py = py.str(x_ml);
@@ -113,6 +114,36 @@ function x_py = matlab2python(x_ml)
 	end;
       end;
       x_py = py.list(x_ml);
+    elseif isa(x_ml, 'single');
+      if isreal(x_ml)
+        x_py = py.numpy.array(x_ml, 'float32');
+      else
+        x_py = py.numpy.array(x_ml, 'complex64');
+      end
+    elseif isa(x_ml, 'double');
+      if isreal(x_ml)
+        x_py = py.numpy.array(x_ml, 'float64');
+      else
+        x_py = py.numpy.array(x_ml, 'complex128');
+      end;
+    elseif isa(x_ml, 'float');
+      if isreal(x_ml)
+        x_py = py.numpy.array(x_ml, 'float');
+      else
+        x_py = py.numpy.array(x_ml, 'complex');
+      end
+    elseif isa(x_ml, 'uint8');
+      x_py = py.numpy.array(x_ml, 'uint8');
+    elseif isa(x_ml, 'uint32');
+      x_py = py.numpy.array(x_ml, 'uint32');
+    elseif isa(x_ml, 'uint64');
+      x_py = py.numpy.array(x_ml, 'uint64');
+    elseif isa(x_ml, 'int32');
+      x_py = py.numpy.array(x_ml, 'int32');
+    elseif isa(x_ml, 'int64');
+      x_py = py.numpy.array(x_ml, 'int64');
+    elseif isa(x_ml, 'integer');
+      x_py = py.numpy.array(x_ml, 'int');
     else
       x_py = py.numpy.array(x_ml);
     end;
@@ -135,6 +166,17 @@ function x_py = matlab2python(x_ml)
       else
 	x_py = matlab2python(reduce_dim(x_ml));
       end;
+    elseif isa(x_ml, 'table')
+      arr_dict = py.dict();
+      order = py.list();
+      names = x_ml.Properties.VariableNames;
+      for i = 1:length(names)
+	iname = names{i};
+        iarr = matlab2python(x_ml{:, iname});
+        arr_dict{py.str(iname)} = iarr;
+        order.append(py.str(iname));
+      end
+      x_py = py.yggdrasil.serialize.dict2numpy(arr_dict, order);
     else
       data_size = int16(size(x_ml));
       transpose = x_ml';

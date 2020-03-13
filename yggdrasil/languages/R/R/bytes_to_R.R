@@ -1,7 +1,7 @@
 ygg_bytes <- function(robj) {
-  if (is(robj, "character")) {
-    robj <- structure(robj, class="ygg_bytes")
-  }
+  # if (is(robj, "character")) {
+  robj <- structure(robj, class="ygg_bytes")
+  # }
   return(robj)
 }
 

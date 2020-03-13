@@ -13,7 +13,8 @@ import itertools
 import numpy as np
 import pandas as pd
 import logging
-from yggdrasil import tools, runner, examples, backwards, platform
+import pickle
+from yggdrasil import tools, runner, examples, platform
 from yggdrasil import platform as ygg_platform
 from yggdrasil.tests import YggTestBase
 from yggdrasil.drivers import MatlabModelDriver
@@ -28,6 +29,7 @@ _linewidth = 2
 _legend_fontsize = 14
 mpl.rc('font', size=18)
 _pyperf_warmups = 0
+_python_version = '%d.%d' % (sys.version_info[0], sys.version_info[1])
 
 
 # TODO:
@@ -237,7 +239,7 @@ class TimedRun(YggTestBase, tools.YggClass):
         if platform is None:
             platform = ygg_platform._platform
         if python_ver is None:
-            python_ver = backwards._python_version
+            python_ver = _python_version
         suffix = '%s_%s_py%s' % (test_name, platform, python_ver.replace('.', ''))
         self.dont_use_pyperf = dont_use_pyperf
         if filename is None:
@@ -284,7 +286,7 @@ class TimedRun(YggTestBase, tools.YggClass):
 
         """
         out = ((self.platform.lower() == ygg_platform._platform.lower())
-               and (self.python_ver == backwards._python_version)
+               and (self.python_ver == _python_version)
                and (self.matlab_running == MatlabModelDriver.is_matlab_running())
                and (self.lang_src in self._lang_list)
                and (self.lang_dst in self._lang_list)
@@ -299,7 +301,7 @@ class TimedRun(YggTestBase, tools.YggClass):
                    '\tCommunication Method: %s' % self.comm_type,
                    'Because one or more platform properties are incompatible:',
                    '\tOperating System: %s' % ygg_platform._platform,
-                   '\tPython Version: %s' % backwards._python_version,
+                   '\tPython Version: %s' % _python_version,
                    '\tMatlab Running: %s' % MatlabModelDriver.is_matlab_running(),
                    '\tSupported Languages: %s' % ', '.join(self._lang_list),
                    '\tSupported Communication: %s' % ', '.join(self._comm_list)]
@@ -1107,10 +1109,7 @@ class TimedRun(YggTestBase, tools.YggClass):
             return None
         if self.dont_use_pyperf:
             with open(self.filename, 'rb') as fd:
-                if backwards.PY2:  # pragma: Python 2
-                    out = backwards.pickle.load(fd)
-                else:  # pragma: Python 3
-                    out = backwards.pickle.load(fd, encoding='latin1')
+                out = pickle.load(fd, encoding='latin1')
         else:
             assert(self.filename.endswith('.json'))
             if as_json:
@@ -1139,7 +1138,7 @@ class TimedRun(YggTestBase, tools.YggClass):
         if data is not None:
             if self.dont_use_pyperf:
                 with open(self.filename, 'wb') as fd:
-                    backwards.pickle.dump(data, fd)
+                    pickle.dump(data, fd)
             else:
                 if isinstance(data, pyperf.BenchmarkSuite):
                     data.dump(self.filename, replace=overwrite)
@@ -1197,7 +1196,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
                         'lang_src': 'python',
                         'lang_dst': 'python',
                         'platform': ygg_platform._platform,
-                        'python_ver': backwards._python_version}
+                        'python_ver': _python_version}
         default_vals = {'comm_type': _comm_list,
                         'language': _lang_list,
                         'platform': ['Linux', 'MacOS', 'Windows'],

@@ -28,7 +28,7 @@ typedef struct dtype_t {
 
 /*! @brief C-friendly defintion of YggGeneric. */
 typedef struct generic_t {
-  char prefix; //!< Prefix character for verification.
+  char prefix; //!< Prefix character for limited verification.
   void *obj; //!< Pointer to YggGeneric class.
 } generic_t;
 

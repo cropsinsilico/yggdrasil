@@ -1,0 +1,40 @@
+models:
+  - name: matlab_modelA
+    language: matlab
+    args: ./src/transformed_io_modelA.m
+    function: transformed_io_modelA
+
+  - name: matlab_modelB
+    language: matlab
+    args: ./src/transformed_io_modelB.m
+    function: transformed_io_modelB
+
+  - name: matlab_modelC
+    language: matlab
+    args: ./src/transformed_io_modelC.m
+    function: transformed_io_modelC
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: matlab_modelA:input
+    filetype: table
+  - input: matlab_modelA:output  # Connection between model A output & model B input
+    outputs:
+      - name: matlab_modelB:input
+        transform:
+          statement: "%x%*5"
+      - name: matlab_modelC:input
+        transform:
+          function: ./src/transformed_io_modelC.py:transform_function
+  - input: matlab_modelB:output  # Connection between model B, function 1 output and file
+    output: ./outputB.txt
+    filetype: table
+    field_names: InputMassRate,OuputMassRate
+    field_units: g/s,g/s
+    format_str: "%.1lf\t%.1lf\n"
+  - input: matlab_modelC:output  # Connection between model C, function 1 output and file
+    output: ./outputC.txt
+    filetype: table
+    field_names: InputMassRate,OuputMassRateDensity
+    field_units: g/s,g/(s*(cm**2))
+    format_str: "%.1lf\t%.1lf\n"

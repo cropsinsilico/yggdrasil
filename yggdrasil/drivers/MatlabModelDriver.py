@@ -3,10 +3,12 @@ import uuid as uuid_gen
 import logging
 from datetime import datetime
 import os
+import glob
 import psutil
 import warnings
 import weakref
-from yggdrasil import backwards, tools, platform, serialize
+import io as sio
+from yggdrasil import tools, platform, serialize
 from yggdrasil.languages import get_language_dir
 from yggdrasil.config import ygg_cfg
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
@@ -163,7 +165,7 @@ def connect_matlab_engine(matlab_session, first_connect=False):  # pragma: matla
     """
     matlab_engine = matlab.engine.connect_matlab(matlab_session)
     matlab_engine.eval('clear classes;', nargout=0)
-    err = backwards.StringIO()
+    err = sio.StringIO()
     try:
         matlab_engine.eval("YggInterface('YGG_MSG_MAX');", nargout=0,
                            stderr=err)
@@ -171,12 +173,6 @@ def connect_matlab_engine(matlab_session, first_connect=False):  # pragma: matla
         for x in MatlabModelDriver.paths_to_add:
             matlab_engine.addpath(x, nargout=0)
     matlab_engine.eval("os = py.importlib.import_module('os');", nargout=0)
-    if not first_connect:
-        if backwards.PY2:
-            matlab_engine.eval("py.reload(os);", nargout=0)
-        else:
-            # matlab_engine.eval("py.importlib.reload(os);", nargout=0)
-            pass
     return matlab_engine
 
 
@@ -273,8 +269,8 @@ class MatlabProcess(tools.YggClass):  # pragma: matlab
             raise RuntimeError("Matlab engine is not installed.")
         if kwargs is None:
             kwargs = {}
-        self.stdout = backwards.sio.StringIO()
-        self.stderr = backwards.sio.StringIO()
+        self.stdout = sio.StringIO()
+        self.stderr = sio.StringIO()
         self._stdout_line = None
         self._stderr_line = None
         self.target = target
@@ -432,7 +428,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     language_ext = '.m'
     base_languages = ['python']
     default_interpreter_flags = ['-nodisplay', '-nosplash', '-nodesktop',
-                                 '-nojvm', '-batch']
+                                 '-nojvm', '-r']
     version_flags = ["fprintf('R%s', version('-release')); exit();"]
     path_env_variable = 'MATLABPATH'
     comm_linger = (os.environ.get('YGG_MATLAB_ENGINE', '').lower() == 'true')
@@ -461,6 +457,12 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'len': 'length({variable})',
         'index': '{variable}{{{index}}}',
         'first_index': 1,
+        'python_interface': ('{channel} = YggInterface(\'{python_interface}\', '
+                             '\'{channel_name}\');'),
+        'python_interface_format': ('{channel} = YggInterface('
+                                    '\'{python_interface}\', '
+                                    '\'{channel_name}\', '
+                                    '\'{format_str}\');'),
         'input': '{channel} = YggInterface(\'YggInput\', \'{channel_name}\');',
         'output': '{channel} = YggInterface(\'YggOutput\', \'{channel_name}\');',
         'recv_function': '{channel}.recv',
@@ -489,11 +491,12 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'try_begin': 'try',
         'try_except': 'catch {error_var}',
         'assign': '{name} = {value};',
+        'expand_mult': '{name} = {value}{{:}};',
         'functions_defined_last': True,
         'function_def_begin': 'function {output_var} = {function_name}({input_var})',
         'function_def_regex': (
             r'function *(\[ *)?(?P<outputs>.*?)(?(1)\]) *'
-            r'= {function_name} *\((?P<inputs>(?:.|\n)*?)\)\n'
+            r'= *{function_name} *\((?P<inputs>(?:.|\n)*?)\)\n'
             r'(?:(?P<body>'
             r'(?:\s*if(?:.*?\n?)*?end;?)|'
             r'(?:\s*for(?:.*?\n?)*?end;?)|'
@@ -515,6 +518,12 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         if self.using_matlab_engine:
             kwargs['skip_interpreter'] = True
         self.model_wrapper = None
+        # -batch command line option introduced in 2019
+        if (self.is_installed()):
+            if (((self.language_version().lower() >= 'r2019')
+                 and ('-r' in self.default_interpreter_flags))):
+                self.default_interpreter_flags[
+                    self.default_interpreter_flags.index('-r')] = '-batch'
         super(MatlabModelDriver, self).__init__(name, args, **kwargs)
         self.started_matlab = False
         self.screen_session = None
@@ -522,6 +531,20 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         self.mlsession = None
         self.mlprocess = None
 
+    @staticmethod
+    def after_registration(cls, **kwargs):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
+        default compiler. The order of precedence is the config file 'compiler'
+        option for the language, followed by the environment variable set by
+        _compiler_env, followed by the existing class attribute.
+        """
+        if platform._is_mac:
+            cls._executable_search_dirs = [
+                os.path.join(x, 'bin') for x in
+                glob.glob('/Applications/MATLAB*')]
+        InterpretedModelDriver.after_registration(cls, **kwargs)
+        
     def parse_arguments(self, args):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.
@@ -691,13 +714,20 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         return out
         
     @classmethod
-    def language_version(cls):
+    def language_version(cls, skip_config=False):
         r"""Determine the version of this language.
+
+        Args:
+            skip_config (bool, optional): If True, the config option
+                for the version (if it exists) will be ignored and
+                the version will be determined fresh.
 
         Returns:
             str: Version of compiler/interpreter for this language.
 
         """
+        if cls.cfg.has_option(cls.language, 'version') and (not skip_config):
+            return cls.cfg.get(cls.language, 'version')
         return cls.get_matlab_info()[1]
         
     @classmethod
@@ -773,7 +803,6 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         cmd = ("fprintf('" + mtl_id + "%s" + mtl_id + "R%s" + mtl_id + "'"
                + ",matlabroot,version('-release'));")
         mtl_proc = cls.run_executable([cmd])
-        mtl_id = backwards.match_stype(mtl_proc, mtl_id)
         if mtl_id not in mtl_proc:  # pragma: debug
             raise RuntimeError(("Could not locate ID string (%s) in "
                                 "output (%s).") % (mtl_id, mtl_proc))
@@ -781,8 +810,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         if len(parts) < 3:  # pragma: debug
             raise RuntimeError(("Could not get matlabroot/version from "
                                 "output (%s).") % (mtl_proc))
-        matlabroot = backwards.as_str(parts[-3])
-        release = backwards.as_str(parts[-2])
+        matlabroot = parts[-3]
+        release = parts[-2]
         return matlabroot, release
 
     def start_matlab_engine(self):
@@ -957,4 +986,12 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
             str: Decoded format string.
 
         """
-        return backwards.decode_escape(format_str)
+        as_str = False
+        format_str_bytes = format_str
+        if isinstance(format_str, str):
+            as_str = True
+            format_str_bytes = format_str.encode("utf-8")
+        out = format_str_bytes.decode('unicode-escape')
+        if not as_str:
+            out = out.encode("utf-8")
+        return out

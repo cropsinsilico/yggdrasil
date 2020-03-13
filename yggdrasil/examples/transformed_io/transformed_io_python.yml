@@ -1,0 +1,40 @@
+models:
+  - name: python_modelA
+    language: python
+    args: ./src/transformed_io_modelA.py
+    function: modelA_function
+
+  - name: python_modelB
+    language: python
+    args: ./src/transformed_io_modelB.py
+    function: modelB_function
+
+  - name: python_modelC
+    language: python
+    args: ./src/transformed_io_modelC.py
+    function: modelC_function
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: python_modelA:input
+    filetype: table
+  - input: python_modelA:output  # Connection between model A output & model B input
+    outputs:
+      - name: python_modelB:input
+        transform:
+          statement: "%x%*5"
+      - name: python_modelC:input
+        transform:
+          function: ./src/transformed_io_modelC.py:transform_function
+  - input: python_modelB:output  # Connection between model B, function 1 output and file
+    output: ./outputB.txt
+    filetype: table
+    field_names: InputMassRate,OuputMassRate
+    field_units: g/s,g/s
+    format_str: "%.1lf\t%.1lf\n"
+  - input: python_modelC:output  # Connection between model C, function 1 output and file
+    output: ./outputC.txt
+    filetype: table
+    field_names: InputMassRate,OuputMassRateDensity
+    field_units: g/s,g/(s*(cm**2))
+    format_str: "%.1lf\t%.1lf\n"
