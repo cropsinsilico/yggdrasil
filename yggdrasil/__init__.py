@@ -312,9 +312,9 @@ def run_tsts(**kwargs):  # pragma: no cover
             old_env[k] = os.environ.get(k, None)
             os.environ[k] = v
         for k, v in new_config.items():
-            old_config[k] = config.ygg_cfg.get(k[0], k[1], None)
-            config.ygg_cfg.set(k[0], k[1], v)
-        config.ygg_cfg.update_file()
+            old_config[k] = config.ygg_cfg_usr.get(k[0], k[1], None)
+            config.ygg_cfg_usr.set(k[0], k[1], v)
+        config.ygg_cfg_usr.update_file()
         # Perform CI specific pretest operations
         if args.ci:
             top_dir = os.path.dirname(os.getcwd())
@@ -355,10 +355,10 @@ def run_tsts(**kwargs):  # pragma: no cover
                 os.environ[k] = v
         for k, v in old_config.items():
             if v is None:
-                config.ygg_cfg.pop(k[0], k[1])
+                config.ygg_cfg_usr.pop(k[0], k[1])
             else:
-                config.ygg_cfg.set(k[0], k[1], v)
-        config.ygg_cfg.update_file()
+                config.ygg_cfg_usr.set(k[0], k[1], v)
+        config.ygg_cfg_usr.update_file()
         if os.path.isfile(pth_file):
             os.remove(pth_file)
     return error_code
