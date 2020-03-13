@@ -1,6 +1,8 @@
 % Initialize input/output channels
 
+disp('matlab_model:input_IN')
 disp(getenv('matlab_model:input_IN'))
+disp('matlab_model:output_OUT')
 disp(getenv('matlab_model:output_OUT'))
   
 
