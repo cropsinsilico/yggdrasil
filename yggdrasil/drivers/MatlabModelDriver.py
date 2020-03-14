@@ -562,7 +562,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         self.wrapper_products.append(self.model_wrapper)
         
     @classmethod
-    def write_error_wrapper(cls, fname, try_lines, matlab_engine=None):
+    def write_error_wrapper(cls, fname, try_lines, env=None,
+                            matlab_engine=None):
         r"""Write a wrapper for the model that encloses it in a try except so
         that the error can be propagated appropriately.
 
@@ -570,14 +571,23 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
             fname (str): File where the wrapper should be written.
             try_lines (list): List of lines to go in the try block.
             model_file (str): Path to model that should be wrapped.
+            env (dict, optional): Dictionary of environment variables
+                that should be set before calling the model. Defaults
+                to None and is ignored.
             matlab_engine (MatlabEngine, optional): Matlab engine that will be
-               used to call the wrapper. If not provided, it is assumed the
-               error will be called using the Matlab interpreter on the command
-               line. Defautls to None.
+                used to call the wrapper. If not provided, it is assumed the
+                error will be called using the Matlab interpreter on the command
+                line. Defautls to None.
 
         Raises:
 
         """
+        # Add environment variables explicitly
+        lines = []
+        if env is not None:
+            for k, v in env.items():
+                lines.append('setenv(\'%s\', \'%s\')' % (
+                    k, v.encode("unicode_escape").decode('utf-8')))
         # Create lines based on use of engine or not
         if matlab_engine is not None:
             catch_block = ["error(e.message);"]
@@ -587,11 +597,11 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
             #                "disp(e.identifier);",
             #                "disp(e.stack);",
             #                "exit(0);"]
-        lines = cls.write_try_except(try_lines, catch_block)
+        lines += cls.write_try_except(try_lines, catch_block)
         if matlab_engine is None:
             lines.append("exit(0);")
         # Write lines
-        logger.debug('Wrapper:\n\t%s', '\n\t'.join(lines))
+        logger.info('Wrapper:\n\t%s', '\n\t'.join(lines))
         if fname is None:
             return lines
         else:
@@ -615,7 +625,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         kwargs.setdefault('process_kwargs', {})
         if not kwargs['process_kwargs'].get('dont_wrap_error', False):
             lines = cls.write_error_wrapper(
-                None, lines,
+                None, lines, env=kwargs.get('env', None),
                 matlab_engine=kwargs.get('matlab_engine', None))
             kwargs['process_kwargs']['dont_wrap_error'] = True
         return super(MatlabModelDriver, cls).run_code(lines, **kwargs)
@@ -677,6 +687,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 if working_dir is not None:
                     fname_wrapper = os.path.join(working_dir, fname_wrapper)
             cls.write_error_wrapper(fname_wrapper, try_block,
+                                    env=kwargs.get('env', None),
                                     matlab_engine=matlab_engine)
             assert(os.path.isfile(fname_wrapper))
             args = [os.path.splitext(os.path.basename(fname_wrapper))[0]]
