@@ -1080,7 +1080,7 @@ def generate_component_tests(comptype, base_class, target_globals,
         if os.path.isfile(new_cls_file):
             continue
         cls_attr = {class_attr: subtype_cls}
-        new_cls = type('Test%s' % subtype_cls, (base_class, ), cls_attr)
+        new_cls = type(new_cls_name, (base_class, ), cls_attr)
         target_globals[new_cls.__name__] = new_cls
         del new_cls
 

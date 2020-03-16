@@ -11,6 +11,7 @@ _is_linux = ('linux' in sys.platform)
 _is_win = (sys.platform in ['win32', 'cygwin'])
 INSTALLLPY = (os.environ.get('INSTALLLPY', '0') == '1')
 INSTALLR = (os.environ.get('INSTALLR', '0') == '1')
+INSTALLFORTRAN = (os.environ.get('INSTALLFORTRAN', '0') == '1')
 INSTALLAPY = (os.environ.get('INSTALLAPY', '0') == '1')
 INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
 INSTALLRMQ = (os.environ.get('INSTALLRMQ', '0') == '1')
@@ -224,7 +225,17 @@ def deploy_package_on_ci(method):
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
-            
+        if INSTALLFORTRAN:
+            cmds.append("echo Installing Fortran...")
+            if _in_conda:
+                cmds.append("%s install -c conda-forge fortran-compiler" % conda_cmd)
+            elif _is_linux:
+                cmds += ["sudo apt-get install gfortran"]
+            elif _is_osx:
+                cmds += ["brew install gfortran"]
+            else:
+                raise NotImplementedError("Could not determine "
+                                          "Fortran installation method.")
         if INSTALLAPY:
             cmds += [
                 "echo Installing AstroPy...",
