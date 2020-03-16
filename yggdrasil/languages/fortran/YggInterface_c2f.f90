@@ -38,7 +38,7 @@ function yggptr_c2f(x, realloc) result(flag)
      write(log_msg, '("array_len = ",i7)') array_len
      call ygglog_debug(log_msg)
   end if
-  if (x%type.eq."character") then
+  if ((x%type.eq."character").or.(x%type.eq."unicode")) then
      deallocate(precision)
      call c_f_pointer(x%prec_ptr, precision)
      write(log_msg, '("precision = ",i7)') precision
@@ -211,6 +211,8 @@ function yggptr_c2f(x, realloc) result(flag)
         call yggptr_c2f_scalar_character(x)
      type is (character(*))
         call yggptr_c2f_scalar_character(x)
+     type is (character(kind=selected_char_kind('ISO_10646'), len=*))
+        call yggptr_c2f_scalar_character(x)
      class default
         if ((x%type.eq."ply").or.(x%type.eq."obj").or. &
              (x%type.eq."generic").or.(x%type.eq."object").or. &
@@ -240,7 +242,7 @@ function yggptr_c2f(x, realloc) result(flag)
         deallocate(array_shape)
      end if
   end if
-  if (.not.(x%type.eq."character")) then
+  if (.not.((x%type.eq."character").or.(x%type.eq."unicode"))) then
      deallocate(precision)
   else
      nullify(precision)
@@ -252,6 +254,8 @@ end function yggptr_c2f
 subroutine yggptr_c2f_scalar_character(x)
   implicit none
   type(yggptr) :: x
+  character(kind=selected_char_kind('ISO_10646'), len=:), &
+       pointer :: x_unicode
   character(len=:), pointer :: x_character
   type(yggchar_r), pointer :: x_character_realloc
   integer(kind=8) :: i
@@ -273,6 +277,15 @@ subroutine yggptr_c2f_scalar_character(x)
         x_character(i:i) = ' '
      end do
      deallocate(x%data_character_unit)
+  type is (character(kind=selected_char_kind('ISO_10646'), len=*))
+     x_unicode => item
+     do i = 1, (x%prec / sizeof(selected_char_kind('ISO_10646')))
+        x_unicode(i:i) = x%data_unicode_unit(i)
+     end do
+     do i = ((x%prec / sizeof(selected_char_kind('ISO_10646'))) + 1), len(x_unicode)
+        x_unicode(i:i) = ' '
+     end do
+     deallocate(x%data_unicode_unit)
   class default
      call ygglog_error("yggptr_c2f_scalar_character: Unexpected type.")
      stop "ERROR"

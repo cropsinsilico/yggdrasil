@@ -150,7 +150,8 @@ class FortranModelDriver(CompiledModelDriver):
         # 'uint': 'integer(kind = X)',  # Fortran has no unsigned int
         'complex': 'complex(kind = X)',
         'bytes': 'character(len = X)',
-        'unicode': 'character(len = X)',
+        'unicode': ('character(kind = selected_char_kind(\'ISO_10646\'), '
+                    'len = X)'),
         '1darray': '*',
         'ndarray': '*',
         '1darray_pointer': '{type}{precision}_1d',
@@ -296,7 +297,8 @@ class FortranModelDriver(CompiledModelDriver):
         'type_regex': (
             r'(type\()?(?P<type>[^,\(]+)(?(1)(?:\)))'
             r'(?:\s*\(\s*'
-            r'(?:kind\s*=\s*(?P<precision>\d*))?,?'
+            r'(?:kind\s*=\s*(?:(?P<precision>\d*)|'
+            r'(?P<precision_var>.+?)))?\s*,?\s*'
             r'(?:len\s*=\s*(?:(?P<length>(?:\d+))|'
             r'(?P<length_var>.+?)))?'
             r'\))?'
@@ -449,6 +451,8 @@ class FortranModelDriver(CompiledModelDriver):
                     precision = json_type.get('precision', 8)
                 elif out.startswith('complex'):
                     precision = json_type['precision'] / 2
+                elif json_type.get('subtype', json_type['type']) == 'unicode':
+                    precision = json_type['precision'] / 4
                 else:
                     precision = json_type['precision']
                 out = out.replace('X', str(int(precision / 8)))
@@ -482,18 +486,22 @@ class FortranModelDriver(CompiledModelDriver):
         if grp.get('precision', False) or (grp['type'] == 'logical'):
             grp['type'] += '(kind = X)'
         if grp['type'] == 'character':
-            out['type'] = 'bytes'
             if grp.get('length', None):
                 out['precision'] = int(grp.get('length', 0)) * 8
-        else:
+            if grp.get('precision_var', None) == 'selected_char_kind(\'ISO_10646\')':
+                grp['type'] += '(kind = selected_char_kind(\'ISO_10646\'), len = X)'
+                if grp.get('length', None):
+                    out['precision'] *= 4
+            else:
+                grp['type'] += '(len = X)'
+        try:
+            out['type'] = super(FortranModelDriver, cls).get_json_type(grp['type'])
+        except KeyError as e:
             try:
-                out['type'] = super(FortranModelDriver, cls).get_json_type(grp['type'])
-            except KeyError as e:
-                try:
-                    out['type'] = super(FortranModelDriver, cls).get_json_type(
-                        grp['type'] + '(kind = X)')
-                except KeyError:  # pragma: debug
-                    raise e
+                out['type'] = super(FortranModelDriver, cls).get_json_type(
+                    grp['type'] + '(kind = X)')
+            except KeyError:  # pragma: debug
+                raise e
         if grp.get('shape', False):
             shape = grp['shape'].split(',')
             ndim = len(shape)

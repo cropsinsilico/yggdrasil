@@ -160,6 +160,25 @@ function yggarg_scalar_character(x) result (y)
   y%ptr = c_loc(y%data_character_unit(1))
   y%nbytes = sizeof(x)
 end function yggarg_scalar_character
+function yggarg_scalar_unicode(x) result (y)
+  type(yggptr) :: y
+  character(kind=selected_char_kind('ISO_10646'), len=*), target :: x
+  character(kind=selected_char_kind('ISO_10646'), len=len(x)), pointer :: xp
+  integer :: i
+  y = yggarg_scalar_init(x)
+  xp => x
+  y%type = "unicode"
+  y%prec = len(x) * sizeof(selected_char_kind('ISO_10646'))
+  allocate(y%data_unicode_unit(len(x)))
+  do i = 1, len(x)
+     y%data_unicode_unit(i) = x(i:i)
+  end do
+  if (len_trim(x).lt.len(x)) then
+     y%data_unicode_unit(len_trim(x) + 1) = c_null_char
+  end if
+  y%ptr = c_loc(y%data_unicode_unit(1))
+  y%nbytes = sizeof(x)
+end function yggarg_scalar_unicode
 function yggarg_scalar_yggchar_r(x) result (y)
   type(yggchar_r), target :: x
   type(yggchar_r), pointer :: xp
@@ -819,6 +838,32 @@ function yggarg_1darray_character(x, x_shape) result (y)
   y%data_character_unit = transfer(x, y%data_character_unit)
   y%ptr = c_loc(y%data_character_unit(1))
 end function yggarg_1darray_character
+function yggarg_1darray_unicode(x, x_shape) result (y)
+  character(kind=selected_char_kind('ISO_10646'), len=*), &
+       dimension(:), target :: x
+  character(kind=selected_char_kind('ISO_10646'), len=len(x(1))), &
+       dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
+  type(yggptr) :: y
+  integer :: i, ilength
+  xp => x
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
+  y%type = "unicode"
+  y%prec = len(xp(1)) * sizeof(selected_char_kind('ISO_10646'))
+  do i = 1, size(xp)
+     ilength = len_trim(xp(i))
+     if (ilength.lt.len(xp(1))) then
+        xp(i)((ilength+1):(ilength+1)) = c_null_char
+     end if
+  end do
+  allocate(y%data_unicode_unit(y%len * len(xp(1))))
+  y%data_unicode_unit = transfer(x, y%data_unicode_unit)
+  y%ptr = c_loc(y%data_unicode_unit(1))
+end function yggarg_1darray_unicode
 function yggarg_1darray_yggchar_r(x, x_shape) result (y)
   type(yggchar_r), dimension(:), target :: x
   type(yggchar_r), dimension(:), pointer :: xp

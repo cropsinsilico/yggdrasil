@@ -23,6 +23,7 @@ module fygg
      module procedure yggarg_scalar_logical4
      module procedure yggarg_scalar_logical8
      module procedure yggarg_scalar_character
+     module procedure yggarg_scalar_unicode
      module procedure yggarg_scalar_yggchar_r
      module procedure yggarg_scalar_ply
      module procedure yggarg_scalar_obj
@@ -70,6 +71,7 @@ module fygg
      module procedure yggarg_1darray_logical4
      module procedure yggarg_1darray_logical8
      module procedure yggarg_1darray_character
+     module procedure yggarg_1darray_unicode
      module procedure yggarg_1darray_yggchar_r
      module procedure yggarg_realloc_ndarray_c_long
      module procedure yggarg_realloc_ndarray_integer
@@ -396,6 +398,8 @@ module fygg
      class(*), dimension(:, :), pointer :: item_array_2d => null()
      class(*), dimension(:, :, :), pointer :: item_array_3d => null()
      character, dimension(:), contiguous, pointer :: data_character_unit => null()
+     character(kind=selected_char_kind('ISO_10646')), dimension(:), &
+          contiguous, pointer :: data_unicode_unit => null()
      integer(kind=c_size_t), pointer :: len_c => null()
      integer(kind=c_size_t), pointer :: prec_c => null()
      integer(kind=c_size_t), pointer :: ndim_c => null()
@@ -1279,7 +1283,8 @@ contains
                 end if
              end if
           end if
-       else if (args(i)%type.eq."character") then
+       else if ((args(i)%type.eq."character").or. &
+            (args(i)%type.eq."unicode")) then
           if (.not.is_next_size_t(args, i)) then
              nargs = nargs + 1  ! For the string size
              c_nargs = c_nargs + 1
@@ -1334,7 +1339,8 @@ contains
                 j = j + 1
              end if
           end if
-       else if (args(i)%type.eq."character") then
+       else if ((args(i)%type.eq."character").or. &
+            (args(i)%type.eq."unicode")) then
           if (is_next_size_t(args, i)) then
              args(i)%prec_ptr = args(i+1)%ptr
           else
@@ -1402,10 +1408,12 @@ contains
                 end if
              end if
           end if
-          if (args(i)%type.eq."character") then
+          if ((args(i)%type.eq."character").or. &
+               (args(i)%type.eq."unicode")) then
              nargs = nargs + 1  ! For the string length
           end if
-       else if (args(i)%type.eq."character") then
+       else if ((args(i)%type.eq."character").or. &
+            (args(i)%type.eq."unicode")) then
           if (.not.is_next_size_t(args, i)) then
              nargs = nargs + 1  ! For the string size
              c_nargs = c_nargs + 1
@@ -1464,13 +1472,15 @@ contains
                 j = j + 1
              end if
           end if
-          if (args(i)%type.eq."character") then
+          if ((args(i)%type.eq."character").or. &
+               (args(i)%type.eq."unicode")) then
              args(i)%prec_c = args(i)%prec
              args(i)%prec_ptr = c_loc(args(i)%prec_c)
              c_args(j) = args(i)%prec_ptr
              j = j + 1
           end if
-       else if (args(i)%type.eq."character") then
+       else if ((args(i)%type.eq."character").or. &
+            (args(i)%type.eq."unicode")) then
           if (is_next_size_t(args, i)) then
              args(i)%prec_ptr = args(i+1)%ptr
           else
@@ -1524,10 +1534,12 @@ contains
                    j = j + 1
                 end if
              end if
-             if (args(i)%type.eq."character") then
+             if ((args(i)%type.eq."character").or. &
+                  (args(i)%type.eq."unicode")) then
                 j = j + 1
              end if
-          else if (args(i)%type.eq."character") then
+          else if ((args(i)%type.eq."character").or. &
+               (args(i)%type.eq."unicode")) then
              if (.not.is_next_size_t(args, i)) then
                 j = j + 1
              end if
@@ -1680,7 +1692,8 @@ contains
     iis_format = is_comm_format_array_type(ygg_q, iargs)
     flag = .true.
     do i = 1, size(iargs)
-       if ((iargs(i)%array.or.(iargs(i)%type.eq."character")).and. &
+       if ((iargs(i)%array.or.(iargs(i)%type.eq."character").or. &
+            (iargs(i)%type.eq."unicode")).and. &
             (.not.(iargs(i)%alloc))) then
           call ygglog_error("Provided array/string is not allocatable.")
           flag = .false.
@@ -1764,7 +1777,8 @@ contains
     c_ygg_q = ygg_q%comm
     flag = .true.
     do i = 1, size(args)
-       if ((args(i)%array.or.(args(i)%type.eq."character")).and. &
+       if ((args(i)%array.or.(args(i)%type.eq."character").or. &
+            (args(i)%type.eq."unicode")).and. &
             (.not.(args(i)%alloc))) then
           call ygglog_error("Provided array/string is not allocatable.")
           flag = .false.
