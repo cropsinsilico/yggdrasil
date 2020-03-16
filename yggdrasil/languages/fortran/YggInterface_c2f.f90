@@ -48,6 +48,14 @@ function yggptr_c2f(x, realloc) result(flag)
   if (x%array) then
      if (x%alloc) then
         select type(item=>x%item)
+        type is (unsigned1_1d)
+           call yggptr_c2f_1darray_realloc_unsigned(x)
+        type is (unsigned2_1d)
+           call yggptr_c2f_1darray_realloc_unsigned(x)
+        type is (unsigned4_1d)
+           call yggptr_c2f_1darray_realloc_unsigned(x)
+        type is (unsigned8_1d)
+           call yggptr_c2f_1darray_realloc_unsigned(x)
         type is (c_long_1d)
            call yggptr_c2f_1darray_realloc_integer(x)
         type is (integer_1d)
@@ -86,6 +94,14 @@ function yggptr_c2f(x, realloc) result(flag)
            call yggptr_c2f_1darray_realloc_logical(x)
         type is (character_1d)
            call yggptr_c2f_1darray_realloc_character(x)
+        type is (unsigned1_nd)
+           call yggptr_c2f_ndarray_realloc_unsigned(x)
+        type is (unsigned2_nd)
+           call yggptr_c2f_ndarray_realloc_unsigned(x)
+        type is (unsigned4_nd)
+           call yggptr_c2f_ndarray_realloc_unsigned(x)
+        type is (unsigned8_nd)
+           call yggptr_c2f_ndarray_realloc_unsigned(x)
         type is (c_long_nd)
            call yggptr_c2f_ndarray_realloc_integer(x)
         type is (integer_nd)
@@ -132,6 +148,14 @@ function yggptr_c2f(x, realloc) result(flag)
      else
         if (x%ndim.gt.1) then
            select type(item=>x%item_array)
+           type is (ygguint1)
+              call yggptr_c2f_ndarray_unsigned(x)
+           type is (ygguint2)
+              call yggptr_c2f_ndarray_unsigned(x)
+           type is (ygguint4)
+              call yggptr_c2f_ndarray_unsigned(x)
+           type is (ygguint8)
+              call yggptr_c2f_ndarray_unsigned(x)
            type is (integer(kind=2))
               call yggptr_c2f_ndarray_integer(x)
            type is (integer(kind=4))
@@ -167,6 +191,10 @@ function yggptr_c2f(x, realloc) result(flag)
            end select
         else
            select type(item=>x%item_array)
+           type is (ygguint1)
+           type is (ygguint2)
+           type is (ygguint4)
+           type is (ygguint8)
            type is (integer(kind=2))
            type is (integer(kind=4))
            type is (integer(kind=8))
@@ -193,6 +221,10 @@ function yggptr_c2f(x, realloc) result(flag)
      end if
   else
      select type(item=>x%item)
+     type is (ygguint1)
+     type is (ygguint2)
+     type is (ygguint4)
+     type is (ygguint8)
      type is (integer(kind=2))
      type is (integer(kind=4))
      type is (integer(kind=8))
@@ -320,6 +352,71 @@ end subroutine yggptr_c2f_array_character
 
 
 ! ND not reallocatable
+subroutine yggptr_c2f_ndarray_unsigned(x)
+  implicit none
+  type(yggptr) :: x
+  type(ygguint1), dimension(:), pointer :: x1
+  type(ygguint2), dimension(:), pointer :: x2
+  type(ygguint4), dimension(:), pointer :: x4
+  type(ygguint8), dimension(:), pointer :: x8
+  type(ygguint1), dimension(:, :), pointer :: x1_2d
+  type(ygguint2), dimension(:, :), pointer :: x2_2d
+  type(ygguint4), dimension(:, :), pointer :: x4_2d
+  type(ygguint8), dimension(:, :), pointer :: x8_2d
+  select type(item_2d=>x%item_array_2d)
+  type is (ygguint1)
+     x1_2d => item_2d
+     select type(item_1d=>x%item_array)
+     type is (ygguint1)
+        x1 => item_1d
+        x1_2d = reshape(x1, [x%shape(1), x%shape(2)])
+        nullify(x%item_array)
+        deallocate(x1)
+     class default
+        call ygglog_error("yggptr_c2f_ndarray_unsigned: types do not match")
+        stop "ERROR"
+     end select
+  type is (ygguint2)
+     x2_2d => item_2d
+     select type(item_1d=>x%item_array)
+     type is (ygguint2)
+        x2 => item_1d
+        x2_2d = reshape(x2, [x%shape(1), x%shape(2)])
+        nullify(x%item_array)
+        deallocate(x2)
+     class default
+        call ygglog_error("yggptr_c2f_ndarray_unsigned: types do not match")
+        stop "ERROR"
+     end select
+  type is (ygguint4)
+     x4_2d => item_2d
+     select type(item_1d=>x%item_array)
+     type is (ygguint4)
+        x4 => item_1d
+        x4_2d = reshape(x4, [x%shape(1), x%shape(2)])
+        nullify(x%item_array)
+        deallocate(x4)
+     class default
+        call ygglog_error("yggptr_c2f_ndarray_unsigned: types do not match")
+        stop "ERROR"
+     end select
+  type is (ygguint8)
+     x8_2d => item_2d
+     select type(item_1d=>x%item_array)
+     type is (ygguint8)
+        x8 => item_1d
+        x8_2d = reshape(x8, [x%shape(1), x%shape(2)])
+        nullify(x%item_array)
+        deallocate(x8)
+     class default
+        call ygglog_error("yggptr_c2f_ndarray_unsigned: types do not match")
+        stop "ERROR"
+     end select
+  class default
+     call ygglog_error("yggptr_c2f_ndarray_unsigned: Unexpected type.")
+     stop "ERROR"
+  end select
+end subroutine yggptr_c2f_ndarray_unsigned
 subroutine yggptr_c2f_ndarray_integer(x)
   implicit none
   type(yggptr) :: x
@@ -564,6 +661,39 @@ end subroutine yggptr_c2f_ndarray_character
 
 
 ! 1D reallocatable
+subroutine yggptr_c2f_1darray_realloc_unsigned(x)
+  implicit none
+  type(yggptr) :: x
+  type(unsigned1_1d), pointer :: x_unsigned1_1d
+  type(unsigned2_1d), pointer :: x_unsigned2_1d
+  type(unsigned4_1d), pointer :: x_unsigned4_1d
+  type(unsigned8_1d), pointer :: x_unsigned8_1d
+  select type(item=>x%item)
+  type is (unsigned1_1d)
+     x_unsigned1_1d => item
+     if (.not.associated(x_unsigned1_1d%x)) then
+        call c_f_pointer(x%ptr, x_unsigned1_1d%x, [x%len])
+     end if
+  type is (unsigned2_1d)
+     x_unsigned2_1d => item
+     if (.not.associated(x_unsigned2_1d%x)) then
+        call c_f_pointer(x%ptr, x_unsigned2_1d%x, [x%len])
+     end if
+  type is (unsigned4_1d)
+     x_unsigned4_1d => item
+     if (.not.associated(x_unsigned4_1d%x)) then
+        call c_f_pointer(x%ptr, x_unsigned4_1d%x, [x%len])
+     end if
+  type is (unsigned8_1d)
+     x_unsigned8_1d => item
+     if (.not.associated(x_unsigned8_1d%x)) then
+        call c_f_pointer(x%ptr, x_unsigned8_1d%x, [x%len])
+     end if
+  class default
+     call ygglog_error("yggptr_c2f_1darray_realloc_unsigned: Unexpected type.")
+     stop "ERROR"
+  end select
+end subroutine yggptr_c2f_1darray_realloc_unsigned
 subroutine yggptr_c2f_1darray_realloc_integer(x)
   implicit none
   type(yggptr) :: x
@@ -732,6 +862,51 @@ end subroutine yggptr_c2f_1darray_realloc_character
 
 
 ! ND reallocatable
+subroutine yggptr_c2f_ndarray_realloc_unsigned(x)
+  implicit none
+  type(yggptr) :: x
+  type(unsigned1_nd), pointer :: x_unsigned1_nd
+  type(unsigned2_nd), pointer :: x_unsigned2_nd
+  type(unsigned4_nd), pointer :: x_unsigned4_nd
+  type(unsigned8_nd), pointer :: x_unsigned8_nd
+  select type(item=>x%item)
+  type is (unsigned1_nd)
+     x_unsigned1_nd => item
+     if (.not.associated(x_unsigned1_nd%x)) then
+        call c_f_pointer(x%ptr, x_unsigned1_nd%x, [x%len])
+     end if
+     if (.not.associated(x_unsigned1_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_unsigned1_nd%shape, [x%ndim])
+     end if
+  type is (unsigned2_nd)
+     x_unsigned2_nd => item
+     if (.not.associated(x_unsigned2_nd%x)) then
+        call c_f_pointer(x%ptr, x_unsigned2_nd%x, [x%len])
+     end if
+     if (.not.associated(x_unsigned2_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_unsigned2_nd%shape, [x%ndim])
+     end if
+  type is (unsigned4_nd)
+     x_unsigned4_nd => item
+     if (.not.associated(x_unsigned4_nd%x)) then
+        call c_f_pointer(x%ptr, x_unsigned4_nd%x, [x%len])
+     end if
+     if (.not.associated(x_unsigned4_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_unsigned4_nd%shape, [x%ndim])
+     end if
+  type is (unsigned8_nd)
+     x_unsigned8_nd => item
+     if (.not.associated(x_unsigned8_nd%x)) then
+        call c_f_pointer(x%ptr, x_unsigned8_nd%x, [x%len])
+     end if
+     if (.not.associated(x_unsigned8_nd%shape)) then
+        call c_f_pointer(x%shape_ptr, x_unsigned8_nd%shape, [x%ndim])
+     end if
+  class default
+     call ygglog_error("yggptr_c2f_ndarray_realloc_unsigned: Unexpected type.")
+     stop "ERROR"
+  end select
+end subroutine yggptr_c2f_ndarray_realloc_unsigned
 subroutine yggptr_c2f_ndarray_realloc_integer(x)
   implicit none
   type(yggptr) :: x

@@ -9,6 +9,10 @@ module fygg
   integer(kind=c_int), bind(c, name="YGG_MSG_MAX_F") :: YGG_MSG_MAX
 
   interface yggarg
+     module procedure yggarg_scalar_unsigned1
+     module procedure yggarg_scalar_unsigned2
+     module procedure yggarg_scalar_unsigned4
+     module procedure yggarg_scalar_unsigned8
      module procedure yggarg_scalar_integer2
      module procedure yggarg_scalar_integer4
      module procedure yggarg_scalar_integer8
@@ -38,6 +42,10 @@ module fygg
      module procedure yggarg_scalar_yggptr
      ! module procedure yggarg_scalar_yggptr_arr
      ! module procedure yggarg_scalar_yggptr_map
+     module procedure yggarg_realloc_1darray_unsigned1
+     module procedure yggarg_realloc_1darray_unsigned2
+     module procedure yggarg_realloc_1darray_unsigned4
+     module procedure yggarg_realloc_1darray_unsigned8
      module procedure yggarg_realloc_1darray_c_long
      module procedure yggarg_realloc_1darray_integer
      module procedure yggarg_realloc_1darray_integer2
@@ -57,6 +65,10 @@ module fygg
      module procedure yggarg_realloc_1darray_logical4
      module procedure yggarg_realloc_1darray_logical8
      module procedure yggarg_realloc_1darray_character
+     module procedure yggarg_1darray_unsigned1
+     module procedure yggarg_1darray_unsigned2
+     module procedure yggarg_1darray_unsigned4
+     module procedure yggarg_1darray_unsigned8
      module procedure yggarg_1darray_integer2
      module procedure yggarg_1darray_integer4
      module procedure yggarg_1darray_integer8
@@ -73,6 +85,10 @@ module fygg
      module procedure yggarg_1darray_character
      module procedure yggarg_1darray_unicode
      module procedure yggarg_1darray_yggchar_r
+     module procedure yggarg_realloc_ndarray_unsigned1
+     module procedure yggarg_realloc_ndarray_unsigned2
+     module procedure yggarg_realloc_ndarray_unsigned4
+     module procedure yggarg_realloc_ndarray_unsigned8
      module procedure yggarg_realloc_ndarray_c_long
      module procedure yggarg_realloc_ndarray_integer
      module procedure yggarg_realloc_ndarray_integer2
@@ -92,6 +108,10 @@ module fygg
      module procedure yggarg_realloc_ndarray_logical4
      module procedure yggarg_realloc_ndarray_logical8
      module procedure yggarg_realloc_ndarray_character
+     module procedure yggarg_2darray_unsigned1
+     module procedure yggarg_2darray_unsigned2
+     module procedure yggarg_2darray_unsigned4
+     module procedure yggarg_2darray_unsigned8
      module procedure yggarg_2darray_integer2
      module procedure yggarg_2darray_integer4
      module procedure yggarg_2darray_integer8
@@ -161,6 +181,12 @@ module fygg
      module procedure ygg_rpc_call_realloc_mv1
      module procedure ygg_rpc_call_realloc_mult
   end interface ygg_rpc_call_realloc
+  interface ygguint
+     module procedure init_ygguint1
+     module procedure init_ygguint2
+     module procedure init_ygguint4
+     module procedure init_ygguint8
+  end interface ygguint
   type :: yggcomm
      type(c_ptr) :: comm
   end type yggcomm
@@ -173,6 +199,18 @@ module fygg
   type :: c_long_1d
      integer(kind=c_long), dimension(:), contiguous, pointer :: x => null()
   end type c_long_1d
+  type :: unsigned1_1d
+     integer(kind=1), dimension(:), contiguous, pointer :: x => null()
+  end type unsigned1_1d
+  type :: unsigned2_1d
+     integer(kind=2), dimension(:), contiguous, pointer :: x => null()
+  end type unsigned2_1d
+  type :: unsigned4_1d
+     integer(kind=4), dimension(:), contiguous, pointer :: x => null()
+  end type unsigned4_1d
+  type :: unsigned8_1d
+     integer(kind=8), dimension(:), contiguous, pointer :: x => null()
+  end type unsigned8_1d
   type :: integer_1d
      integer, dimension(:), contiguous, pointer :: x => null()
   end type integer_1d
@@ -227,6 +265,22 @@ module fygg
   type :: character_1d
      type(yggchar_r), dimension(:), contiguous, pointer :: x => null()
   end type character_1d
+  type :: unsigned1_nd
+     integer(kind=1), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type unsigned1_nd
+  type :: unsigned2_nd
+     integer(kind=2), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type unsigned2_nd
+  type :: unsigned4_nd
+     integer(kind=4), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type unsigned4_nd
+  type :: unsigned8_nd
+     integer(kind=8), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type unsigned8_nd
   type :: c_long_nd
      integer(kind=c_long), dimension(:), contiguous, pointer :: x => null()
      integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
@@ -306,6 +360,22 @@ module fygg
      type(yggchar_r), dimension(:), contiguous, pointer :: x => null()
      integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
   end type character_nd
+  type :: unsigned1_2d
+     integer(kind=1), dimension(:, :), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type unsigned1_2d
+  type :: unsigned2_2d
+     integer(kind=2), dimension(:, :), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type unsigned2_2d
+  type :: unsigned4_2d
+     integer(kind=4), dimension(:, :), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type unsigned4_2d
+  type :: unsigned8_2d
+     integer(kind=8), dimension(:, :), contiguous, pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+  end type unsigned8_2d
   type :: c_long_2d
      integer(kind=c_long), dimension(:, :), contiguous, pointer :: x => null()
      integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
@@ -504,6 +574,18 @@ module fygg
      type(c_ptr) :: c_surface_texcoords
      type(c_ptr) :: c_surface_normals
   end type yggobj
+  type ygguint1
+     integer(kind=1) :: x
+  end type ygguint1
+  type ygguint2
+     integer(kind=2) :: x
+  end type ygguint2
+  type ygguint4
+     integer(kind=4) :: x
+  end type ygguint4
+  type ygguint8
+     integer(kind=8) :: x
+  end type ygguint8
 
   public :: yggarg, yggchar_r, yggcomm, ygggeneric, &
        yggptr, yggnull, yggarr, yggmap, &
@@ -522,6 +604,30 @@ contains
   include "YggInterface_assign.f90"
   
   ! Utilities
+  function init_ygguint1(x) result(y)
+    integer(kind=1) :: x
+    type(ygguint1) :: y
+    y%x = x
+    if (y%x.lt.0) stop "Unsigned int cannot be less than 0."
+  end function init_ygguint1
+  function init_ygguint2(x) result(y)
+    integer(kind=2) :: x
+    type(ygguint2) :: y
+    y%x = x
+    if (y%x.lt.0) stop "Unsigned int cannot be less than 0."
+  end function init_ygguint2
+  function init_ygguint4(x) result(y)
+    integer(kind=4) :: x
+    type(ygguint4) :: y
+    y%x = x
+    if (y%x.lt.0) stop "Unsigned int cannot be less than 0."
+  end function init_ygguint4
+  function init_ygguint8(x) result(y)
+    integer(kind=8) :: x
+    type(ygguint8) :: y
+    y%x = x
+    if (y%x.lt.0) stop "Unsigned int cannot be less than 0."
+  end function init_ygguint8
   subroutine write_null(dtv, unit, iotype, v_list, iostat, iomsg)
     ! Argument names here from the std, but you can name them differently.
     class(yggnull), intent(in) :: dtv   ! Object to write.

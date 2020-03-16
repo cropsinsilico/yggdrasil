@@ -11,6 +11,46 @@ function yggarg_scalar_init(x) result (y)
   allocate(y%shape(1))
   y%shape(1) = 1
 end function yggarg_scalar_init
+function yggarg_scalar_unsigned1(x) result (y)
+  type(yggptr) :: y
+  type(ygguint1), target :: x
+  type(ygguint1), pointer :: xp
+  y = yggarg_scalar_init(x)
+  xp => x
+  y%type = "unsigned"
+  y%ptr = c_loc(xp%x)
+  y%nbytes = sizeof(x)
+end function yggarg_scalar_unsigned1
+function yggarg_scalar_unsigned2(x) result (y)
+  type(yggptr) :: y
+  type(ygguint2), target :: x
+  type(ygguint2), pointer :: xp
+  y = yggarg_scalar_init(x)
+  xp => x
+  y%type = "unsigned"
+  y%ptr = c_loc(xp%x)
+  y%nbytes = sizeof(x)
+end function yggarg_scalar_unsigned2
+function yggarg_scalar_unsigned4(x) result (y)
+  type(yggptr) :: y
+  type(ygguint4), target :: x
+  type(ygguint4), pointer :: xp
+  y = yggarg_scalar_init(x)
+  xp => x
+  y%type = "unsigned"
+  y%ptr = c_loc(xp%x)
+  y%nbytes = sizeof(x)
+end function yggarg_scalar_unsigned4
+function yggarg_scalar_unsigned8(x) result (y)
+  type(yggptr) :: y
+  type(ygguint8), target :: x
+  type(ygguint8), pointer :: xp
+  y = yggarg_scalar_init(x)
+  xp => x
+  y%type = "unsigned"
+  y%ptr = c_loc(xp%x)
+  y%nbytes = sizeof(x)
+end function yggarg_scalar_unsigned8
 function yggarg_scalar_integer2(x) result (y)
   type(yggptr) :: y
   integer(kind=2), target :: x
@@ -341,6 +381,58 @@ function yggarg_realloc_1darray_init(x) &
   y%shape(1) = 1
   y%ptr = c_null_ptr
 end function yggarg_realloc_1darray_init
+function yggarg_realloc_1darray_unsigned1(x) result (y)
+  type(unsigned1_1d), target :: x
+  type(unsigned1_1d), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_1darray_init(x)
+  xp => x
+  y%type = "unsigned"
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
+  end if
+end function yggarg_realloc_1darray_unsigned1
+function yggarg_realloc_1darray_unsigned2(x) result (y)
+  type(unsigned2_1d), target :: x
+  type(unsigned2_1d), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_1darray_init(x)
+  xp => x
+  y%type = "unsigned"
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
+  end if
+end function yggarg_realloc_1darray_unsigned2
+function yggarg_realloc_1darray_unsigned4(x) result (y)
+  type(unsigned4_1d), target :: x
+  type(unsigned4_1d), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_1darray_init(x)
+  xp => x
+  y%type = "unsigned"
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
+  end if
+end function yggarg_realloc_1darray_unsigned4
+function yggarg_realloc_1darray_unsigned8(x) result (y)
+  type(unsigned8_1d), target :: x
+  type(unsigned8_1d), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_1darray_init(x)
+  xp => x
+  y%type = "unsigned"
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape(1) = size(xp%x)
+  end if
+end function yggarg_realloc_1darray_unsigned8
 function yggarg_realloc_1darray_c_long(x) result (y)
   type(c_long_1d), target :: x
   type(c_long_1d), pointer :: xp
@@ -632,6 +724,62 @@ function yggarg_ndarray_init(x, x_shape) result (y)
   end if
   y%ptr = c_null_ptr
 end function yggarg_ndarray_init
+function yggarg_1darray_unsigned1(x, x_shape) result (y)
+  type(ygguint1), dimension(:), target :: x
+  type(ygguint1), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
+  type(yggptr) :: y
+  xp => x
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
+  y%type = "unsigned"
+  y%ptr = c_loc(xp(1))
+end function yggarg_1darray_unsigned1
+function yggarg_1darray_unsigned2(x, x_shape) result (y)
+  type(ygguint2), dimension(:), target :: x
+  type(ygguint2), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
+  type(yggptr) :: y
+  xp => x
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
+  y%type = "unsigned"
+  y%ptr = c_loc(xp(1))
+end function yggarg_1darray_unsigned2
+function yggarg_1darray_unsigned4(x, x_shape) result (y)
+  type(ygguint4), dimension(:), target :: x
+  type(ygguint4), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
+  type(yggptr) :: y
+  xp => x
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
+  y%type = "unsigned"
+  y%ptr = c_loc(xp(1))
+end function yggarg_1darray_unsigned4
+function yggarg_1darray_unsigned8(x, x_shape) result (y)
+  type(ygguint8), dimension(:), target :: x
+  type(ygguint8), dimension(:), pointer :: xp
+  integer, dimension(:), optional :: x_shape
+  type(yggptr) :: y
+  xp => x
+  if (present(x_shape)) then
+     y = yggarg_ndarray_init(x, x_shape)
+  else
+     y = yggarg_ndarray_init(x)
+  end if
+  y%type = "unsigned"
+  y%ptr = c_loc(xp(1))
+end function yggarg_1darray_unsigned8
 function yggarg_1darray_integer2(x, x_shape) result (y)
   integer(kind=2), dimension(:), target :: x
   integer(kind=2), dimension(:), pointer :: xp
@@ -917,6 +1065,42 @@ end subroutine yggarg_2darray_init
 !   allocate(xp(size(x)), mold=x(:,1))
 !   xp = reshape(x, [size(x)])
 ! end subroutine yggarg_2darray_shape
+function yggarg_2darray_unsigned1(x) result (y)
+  type(ygguint1), dimension(:, :), target :: x
+  type(ygguint1), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_unsigned1
+function yggarg_2darray_unsigned2(x) result (y)
+  type(ygguint2), dimension(:, :), target :: x
+  type(ygguint2), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_unsigned2
+function yggarg_2darray_unsigned4(x) result (y)
+  type(ygguint4), dimension(:, :), target :: x
+  type(ygguint4), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_unsigned4
+function yggarg_2darray_unsigned8(x) result (y)
+  type(ygguint8), dimension(:, :), target :: x
+  type(ygguint8), dimension(:), pointer :: xp
+  type(yggptr) :: y
+  allocate(xp(size(x)), mold=x(:,1))
+  xp = reshape(x, [size(x)])
+  y = yggarg(xp, shape(x))
+  call yggarg_2darray_init(y, x)
+end function yggarg_2darray_unsigned8
 function yggarg_2darray_integer2(x) result (y)
   integer(kind=2), dimension(:, :), target :: x
   integer(kind=2), dimension(:), pointer :: xp
@@ -1068,6 +1252,62 @@ function yggarg_realloc_ndarray_init(x) &
   y%shape => null()
   y%ptr = c_null_ptr
 end function yggarg_realloc_ndarray_init
+function yggarg_realloc_ndarray_unsigned1(x) result (y)
+  type(unsigned1_nd), target :: x
+  type(unsigned1_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "unsigned"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_unsigned1
+function yggarg_realloc_ndarray_unsigned2(x) result (y)
+  type(unsigned2_nd), target :: x
+  type(unsigned2_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "unsigned"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_unsigned2
+function yggarg_realloc_ndarray_unsigned4(x) result (y)
+  type(unsigned4_nd), target :: x
+  type(unsigned4_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "unsigned"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_unsigned4
+function yggarg_realloc_ndarray_unsigned8(x) result (y)
+  type(unsigned8_nd), target :: x
+  type(unsigned8_nd), pointer :: xp
+  type(yggptr) :: y
+  y = yggarg_realloc_ndarray_init(x)
+  xp => x
+  y%type = "unsigned"
+  y%ndim = size(x%shape)
+  if (associated(xp%x)) then
+     y%ptr = c_loc(xp%x(1))
+     y%len = size(xp%x)
+     y%shape => x%shape
+  end if
+end function yggarg_realloc_ndarray_unsigned8
 function yggarg_realloc_ndarray_c_long(x) result (y)
   type(c_long_nd), target :: x
   type(c_long_nd), pointer :: xp

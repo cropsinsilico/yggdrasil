@@ -147,7 +147,7 @@ class FortranModelDriver(CompiledModelDriver):
         'integer': 'integer',
         'boolean': 'logical(kind = X)',
         'null': 'yggnull',
-        # 'uint': 'integer(kind = X)',  # Fortran has no unsigned int
+        'uint': 'ygguintX',  # Fortran has no unsigned int
         'complex': 'complex(kind = X)',
         'bytes': 'character(len = X)',
         'unicode': ('character(kind = selected_char_kind(\'ISO_10646\'), '
@@ -447,6 +447,8 @@ class FortranModelDriver(CompiledModelDriver):
             if cls.allows_realloc(kwargs):
                 out = 'type(yggchar_r)'
             else:
+                if out.startswith('ygguint'):
+                    out = 'type(%s)' % out
                 if out.startswith('logical'):
                     precision = json_type.get('precision', 8)
                 elif out.startswith('complex'):
@@ -479,11 +481,15 @@ class FortranModelDriver(CompiledModelDriver):
                 grp['shape'] = ':'
             else:
                 grp['shape'] = ':,:'
+        if grp['type'].startswith('ygguint'):
+            grp = {'type': 'ygguintX',
+                   'precision': grp['type'].split('ygguint')[-1]}
         if grp.get('precision', False):
             out['precision'] = 8 * int(grp['precision'])
             if grp['type'] == 'complex':
                 out['precision'] *= 2
-        if grp.get('precision', False) or (grp['type'] == 'logical'):
+        if (((grp.get('precision', False) or (grp['type'] == 'logical'))
+             and (grp['type'] != 'ygguintX'))):
             grp['type'] += '(kind = X)'
         if grp['type'] == 'character':
             if grp.get('length', None):
