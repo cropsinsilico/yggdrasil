@@ -9,6 +9,14 @@ _ureg_unyt.add("ac", 4046.86, dimensions=unyt.dimensions.area,
                tex_repr=r"\rm{ac}", offset=0.0, prefixable=False)
 _ureg_unyt.add("a", 100.0, dimensions=unyt.dimensions.area,
                tex_repr=r"\rm{a}", offset=0.0, prefixable=True)
+_ureg_unyt.add("j", 1.0, dimensions=unyt.dimensions.energy,
+               tex_repr=r"\rm{J}", offset=0.0, prefixable=True)
+# _ureg_unyt.add("cel", 1.0, dimensions=unyt.dimensions.temperature,
+#                tex_repr=r"^\circ\rm{C}", offset=-273.15, prefixable=True)
+# _ureg_unyt.add("j", 1.0, dimensions=unyt.dimensions.specific_flux,
+#                tex_repr=r"\rm{Jy}", prefixable=True)
+# _ureg_unyt.add("CH2O", 1.0, dimensions=unyt.dimensions.dimensionless,
+#                tex_repr=r"\rm{CH2O}", offset=0.0, prefixable=False)
 unyt._unit_lookup_table.inv_name_alternatives["acre"] = "ac"
 unyt._unit_lookup_table.inv_name_alternatives["are"] = "a"
 unyt._unit_lookup_table.inv_name_alternatives["hectare"] = "ha"
