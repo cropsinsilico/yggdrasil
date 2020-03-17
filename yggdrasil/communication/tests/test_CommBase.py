@@ -638,8 +638,10 @@ class TestCommBase(YggTestClassInfo):
     def test_send_recv_dict(self):
         r"""Test send/recv message as dict."""
         msg_send = self.testing_options['dict']
-        self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',
-                          msg_send=msg_send)
+        if msg_send:
+            self.do_send_recv(send_meth='send_dict',
+                              recv_meth='recv_dict',
+                              msg_send=msg_send)
         
     def test_send_recv_dict_names(self):
         r"""Test send/recv message as dict with names."""
