@@ -121,7 +121,9 @@ program main
         print *, "End of array input (F)"
      end if
   end do
-  
-  call exit(error_code)
+
+  if (error_code.lt.0) then
+     stop 1
+  end if
 
 end program main

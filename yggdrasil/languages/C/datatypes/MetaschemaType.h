@@ -421,6 +421,16 @@ public:
     ygglog_throw_error("MetaschemaType::set_variable_length: Cannot set variable_length for type '%s'.", type_);
   }
   /*!
+    @brief Set the _in_table private variable.
+    @param[in] new_in_table bool New value.
+   */
+  virtual void set_in_table(bool new_in_table) {
+#ifdef _WIN32
+    new_in_table;
+#endif 
+    ygglog_throw_error("MetaschemaType::set_in_table: Cannot set in_table for type '%s'.", type_);
+  }
+  /*!
     @brief Get the number of elements in the type.
     @returns size_t Number of elements (1 for scalar).
    */

@@ -45,6 +45,7 @@ public:
       _variable_precision = false;
     update_subtype(subtype, true);
     update_units(units, true);
+    _in_table = false;
   }
   /*!
     @brief Constructor for ScalarMetaschemaType from a JSON type defintion.
@@ -103,6 +104,7 @@ public:
       _variable_precision = true;
     else
       _variable_precision = false;
+    _in_table = false;
   }
   /*!
     @brief Constructor for ScalarMetaschemaType from Python dictionary.
@@ -136,6 +138,7 @@ public:
       _variable_precision = true;
     else
       _variable_precision = false;
+    _in_table = false;
   }
   /*!
     @brief Copy constructor.
@@ -411,6 +414,11 @@ public:
     @returns size_t Type precision in bytes.
    */
   const size_t precision() const { return precision_; }
+  /*!
+    @brief Get the in_table flag.
+    @return bool true if in table, false otherwise.
+   */
+  const bool in_table() const { return _in_table; }
   /*!
     @brief Get the type units.
     @returns const char* Type units string.
@@ -721,6 +729,13 @@ public:
     // }
     // size_t *precision_modifier = const_cast<size_t*>(&precision_);
     // *precision_modifier = new_precision;
+  }
+  /*!
+    @brief Set the _in_table private variable.
+    @param[in] new_in_table bool New value.
+   */
+  void set_in_table(bool new_in_table) override {
+    _in_table = new_in_table;
   }
   /*!
     @brief Get the number of arguments expected to be filled/used by the type.
@@ -1482,6 +1497,7 @@ private:
   const char *units_;
   bool _variable_precision;
   size_t cast_precision_;
+  bool _in_table;
 };
 
 
@@ -1851,7 +1867,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
 	va_list_t_skip(&ap, sizeof(unsigned char**));
 	out = out + 1;
       }
-      if (!(_variable_length)) {
+      if (!(_variable_length) && (!(in_table()))) {
 	ap.nptrs++;
 	size_t * const new_length = (size_t* const)get_va_list_ptr_cpp(&ap);
 	new_length[0] = length_;
@@ -1938,7 +1954,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
 						 nargs, ap);
     if (out) {
       if ((ap.for_fortran) && (ap.using_ptrs)) {
-	if (!(_variable_length)) {
+	if ((!(_variable_length)) && (!(in_table()))) {
 	  ap.nptrs++;
 	  va_list_t_skip(&ap, sizeof(size_t*));
 	}

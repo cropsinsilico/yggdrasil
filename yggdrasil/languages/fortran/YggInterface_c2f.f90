@@ -311,10 +311,10 @@ subroutine yggptr_c2f_scalar_character(x)
      deallocate(x%data_character_unit)
   type is (character(kind=selected_char_kind('ISO_10646'), len=*))
      x_unicode => item
-     do i = 1, (x%prec / sizeof(selected_char_kind('ISO_10646')))
+     do i = 1, (x%prec / 4)
         x_unicode(i:i) = x%data_unicode_unit(i)
      end do
-     do i = ((x%prec / sizeof(selected_char_kind('ISO_10646'))) + 1), len(x_unicode)
+     do i = ((x%prec / 4) + 1), len(x_unicode)
         x_unicode(i:i) = ' '
      end do
      deallocate(x%data_unicode_unit)

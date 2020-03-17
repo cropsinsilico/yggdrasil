@@ -194,263 +194,260 @@ module fygg
      type(c_ptr) :: ptr
   end type yggdtype
   type :: yggchar_r
-     character, dimension(:), contiguous, pointer :: x => null()
+     character, dimension(:), pointer :: x => null()
   end type yggchar_r
   type :: c_long_1d
-     integer(kind=c_long), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=c_long), dimension(:), pointer :: x => null()
   end type c_long_1d
   type :: unsigned1_1d
-     integer(kind=1), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=1), dimension(:), pointer :: x => null()
   end type unsigned1_1d
   type :: unsigned2_1d
-     integer(kind=2), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=2), dimension(:), pointer :: x => null()
   end type unsigned2_1d
   type :: unsigned4_1d
-     integer(kind=4), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=4), dimension(:), pointer :: x => null()
   end type unsigned4_1d
   type :: unsigned8_1d
-     integer(kind=8), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=8), dimension(:), pointer :: x => null()
   end type unsigned8_1d
   type :: integer_1d
-     integer, dimension(:), contiguous, pointer :: x => null()
+     integer, dimension(:), pointer :: x => null()
   end type integer_1d
   type :: integer2_1d
-     integer(kind=2), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=2), dimension(:), pointer :: x => null()
   end type integer2_1d
   type :: integer4_1d
-     integer(kind=4), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=4), dimension(:), pointer :: x => null()
   end type integer4_1d
   type :: integer8_1d
-     integer(kind=8), dimension(:), contiguous, pointer :: x => null()
+     integer(kind=8), dimension(:), pointer :: x => null()
   end type integer8_1d
   type :: real_1d
-     real, dimension(:), contiguous, pointer :: x => null()
+     real, dimension(:), pointer :: x => null()
   end type real_1d
   type :: real4_1d
-     real(kind=4), dimension(:), contiguous, pointer :: x => null()
+     real(kind=4), dimension(:), pointer :: x => null()
   end type real4_1d
   type :: real8_1d
-     real(kind=8), dimension(:), contiguous, pointer :: x => null()
+     real(kind=8), dimension(:), pointer :: x => null()
   end type real8_1d
   type :: real16_1d
-     real(kind=16), dimension(:), contiguous, pointer :: x => null()
+     real(kind=16), dimension(:), pointer :: x => null()
   end type real16_1d
   type :: complex_1d
-     complex, dimension(:), contiguous, pointer :: x => null()
+     complex, dimension(:), pointer :: x => null()
   end type complex_1d
   type :: complex4_1d
-     complex(kind=4), dimension(:), contiguous, pointer :: x => null()
+     complex(kind=4), dimension(:), pointer :: x => null()
   end type complex4_1d
   type :: complex8_1d
-     complex(kind=8), dimension(:), contiguous, pointer :: x => null()
+     complex(kind=8), dimension(:), pointer :: x => null()
   end type complex8_1d
   type :: complex16_1d
-     complex(kind=16), dimension(:), contiguous, pointer :: x => null()
+     complex(kind=16), dimension(:), pointer :: x => null()
   end type complex16_1d
   type :: logical_1d
-     logical, dimension(:), contiguous, pointer :: x => null()
+     logical, dimension(:), pointer :: x => null()
   end type logical_1d
   type :: logical1_1d
-     logical(kind=1), dimension(:), contiguous, pointer :: x => null()
+     logical(kind=1), dimension(:), pointer :: x => null()
   end type logical1_1d
   type :: logical2_1d
-     logical(kind=2), dimension(:), contiguous, pointer :: x => null()
+     logical(kind=2), dimension(:), pointer :: x => null()
   end type logical2_1d
   type :: logical4_1d
-     logical(kind=4), dimension(:), contiguous, pointer :: x => null()
+     logical(kind=4), dimension(:), pointer :: x => null()
   end type logical4_1d
   type :: logical8_1d
-     logical(kind=8), dimension(:), contiguous, pointer :: x => null()
+     logical(kind=8), dimension(:), pointer :: x => null()
   end type logical8_1d
   type :: character_1d
-     type(yggchar_r), dimension(:), contiguous, pointer :: x => null()
+     type(yggchar_r), dimension(:), pointer :: x => null()
   end type character_1d
   type :: unsigned1_nd
-     integer(kind=1), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=1), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type unsigned1_nd
   type :: unsigned2_nd
-     integer(kind=2), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=2), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type unsigned2_nd
   type :: unsigned4_nd
-     integer(kind=4), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=4), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type unsigned4_nd
   type :: unsigned8_nd
-     integer(kind=8), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=8), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type unsigned8_nd
   type :: c_long_nd
-     integer(kind=c_long), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_long), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type c_long_nd
   type :: integer_nd
-     integer, dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer, dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type integer_nd
   type :: integer2_nd
-     integer(kind=2), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=2), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type integer2_nd
   type :: integer4_nd
-     integer(kind=4), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=4), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type integer4_nd
   type :: integer8_nd
-     integer(kind=8), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=8), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type integer8_nd
   type :: real_nd
-     real, dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     real, dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type real_nd
   type :: real4_nd
-     real(kind=4), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
-   ! contains
-   !   procedure :: copy_real4_nd
-   !   generic :: assignment(=) => copy_real4_nd
+     real(kind=4), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type real4_nd
   type :: real8_nd
-     real(kind=8), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     real(kind=8), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type real8_nd
   type :: real16_nd
-     real(kind=16), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     real(kind=16), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type real16_nd
   type :: complex_nd
-     complex, dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     complex, dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type complex_nd
   type :: complex4_nd
-     complex(kind=4), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     complex(kind=4), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type complex4_nd
   type :: complex8_nd
-     complex(kind=8), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     complex(kind=8), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type complex8_nd
   type :: complex16_nd
-     complex(kind=16), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     complex(kind=16), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type complex16_nd
   type :: logical_nd
-     logical, dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     logical, dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type logical_nd
   type :: logical1_nd
-     logical(kind=1), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     logical(kind=1), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type logical1_nd
   type :: logical2_nd
-     logical(kind=2), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     logical(kind=2), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type logical2_nd
   type :: logical4_nd
-     logical(kind=4), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     logical(kind=4), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type logical4_nd
   type :: logical8_nd
-     logical(kind=8), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     logical(kind=8), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type logical8_nd
   type :: character_nd
-     type(yggchar_r), dimension(:), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     type(yggchar_r), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type character_nd
   type :: unsigned1_2d
-     integer(kind=1), dimension(:, :), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=1), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type unsigned1_2d
   type :: unsigned2_2d
-     integer(kind=2), dimension(:, :), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=2), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type unsigned2_2d
   type :: unsigned4_2d
-     integer(kind=4), dimension(:, :), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=4), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type unsigned4_2d
   type :: unsigned8_2d
-     integer(kind=8), dimension(:, :), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=8), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type unsigned8_2d
   type :: c_long_2d
-     integer(kind=c_long), dimension(:, :), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_long), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type c_long_2d
   type :: integer_2d
-     integer, dimension(:, :), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer, dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type integer_2d
   type :: integer2_2d
-     integer(kind=2), dimension(:, :), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=2), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type integer2_2d
   type :: integer4_2d
-     integer(kind=4), dimension(:, :), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=4), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type integer4_2d
   type :: integer8_2d
-     integer(kind=8), dimension(:, :), contiguous, pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=8), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type integer8_2d
   type :: real_2d
      real, dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type real_2d
   type :: real4_2d
      real(kind=4), dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type real4_2d
   type :: real8_2d
      real(kind=8), dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type real8_2d
   type :: real16_2d
      real(kind=16), dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type real16_2d
   type :: complex_2d
      complex, dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type complex_2d
   type :: complex4_2d
      complex(kind=4), dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type complex4_2d
   type :: complex8_2d
      complex(kind=8), dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type complex8_2d
   type :: complex16_2d
      complex(kind=16), dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type complex16_2d
   type :: logical_2d
      logical, dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type logical_2d
   type :: logical1_2d
      logical(kind=1), dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type logical1_2d
   type :: logical2_2d
      logical(kind=2), dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type logical2_2d
   type :: logical4_2d
      logical(kind=4), dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type logical4_2d
   type :: logical8_2d
      logical(kind=8), dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type logical8_2d
   type :: character_2d
      type(yggchar_r), dimension(:, :), pointer :: x => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type character_2d
   type :: yggptr
      character(len=15) :: type = "none"
@@ -461,19 +458,19 @@ module fygg
      integer(kind=8) :: prec = 0
      integer(kind=8) :: ndim = 0
      integer(kind=8) :: nbytes = 0
-     integer(kind=8), dimension(:), contiguous, pointer :: shape => null()
+     integer(kind=8), dimension(:), pointer :: shape => null()
      type(c_ptr) :: ptr = c_null_ptr
      class(*), pointer :: item => null()
      class(*), dimension(:), pointer :: item_array => null()
      class(*), dimension(:, :), pointer :: item_array_2d => null()
      class(*), dimension(:, :, :), pointer :: item_array_3d => null()
-     character, dimension(:), contiguous, pointer :: data_character_unit => null()
+     character, dimension(:), pointer :: data_character_unit => null()
      character(kind=selected_char_kind('ISO_10646')), dimension(:), &
-          contiguous, pointer :: data_unicode_unit => null()
+          pointer :: data_unicode_unit => null()
      integer(kind=c_size_t), pointer :: len_c => null()
      integer(kind=c_size_t), pointer :: prec_c => null()
      integer(kind=c_size_t), pointer :: ndim_c => null()
-     integer(kind=c_size_t), dimension(:), contiguous, pointer :: shape_c => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape_c => null()
      type(c_ptr) :: len_ptr = c_null_ptr
      type(c_ptr) :: prec_ptr = c_null_ptr
      type(c_ptr) :: ndim_ptr = c_null_ptr
@@ -492,9 +489,9 @@ module fygg
   end type ygggeneric
   type :: yggnull
      type(c_ptr) :: ptr = c_null_ptr
-   contains
-     procedure :: write_null
-     generic :: write(formatted) => write_null
+   ! contains
+   !   procedure :: write_null
+   !   generic :: write(formatted) => write_null
   end type yggnull
   type, bind(c) :: yggarr
      character(kind=c_char) :: prefix
@@ -628,6 +625,10 @@ contains
     y%x = x
     if (y%x.lt.0) stop "Unsigned int cannot be less than 0."
   end function init_ygguint8
+  subroutine display_null(x)
+    class(yggnull), intent(in) :: x
+    write (*, '("NULL")')
+  end subroutine display_null
   subroutine write_null(dtv, unit, iotype, v_list, iostat, iomsg)
     ! Argument names here from the std, but you can name them differently.
     class(yggnull), intent(in) :: dtv   ! Object to write.

@@ -14,14 +14,17 @@ from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
 _top_lang_dir = get_language_dir('fortran')
 _incl_interface = _top_lang_dir
 _c_internal_libs = copy.deepcopy(CModelDriver.CModelDriver.internal_libraries)
-    
 
+
+# TODO: Add support for f77: e.g.
+# https://people.sc.fsu.edu/~jburkardt/f77_src/f77_calls_c/f77_calls_c.html
 class FortranCompilerBase(CompilerBase):
     r"""Base class for Fortran compilers."""
     languages = ['fortran']
     default_executable_env = 'FF'
     default_flags_env = 'FFLAGS'
-    default_flags = ['-g', '-Wall', '-x', 'f95-cpp-input', '-cpp']  # , '-std=f2008']
+    default_flags = ['-g', '-Wall', '-x', 'f95-cpp-input', '-cpp',
+                     '-pedantic-errors']
     linker_attributes = {'default_flags_env': 'LFLAGS',
                          'search_path_env': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
     search_path_env = []
@@ -83,7 +86,8 @@ class GFortranCompiler(FortranCompilerBase):
     default_archiver = 'ar'
     flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
                                + [('module-dir', '-J%s'),
-                                  ('module-search-path', '-I%s')])
+                                  ('module-search-path', '-I%s'),
+                                  ('standard', '-std=%s')])
 
 
 # class IFortCompiler(FortranCompilerBase):
@@ -93,13 +97,24 @@ class GFortranCompiler(FortranCompilerBase):
 #     default_archiver = 'ar'
 #     flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
 #                                + [('module-dir', '-module'),
-#                                   ('module-search-path', '-module')])
+#                                   ('module-search-path', '-module'),
+#                                   ('standard', '-stand')])
 
 
 class FortranModelDriver(CompiledModelDriver):
-    r"""Class for running Fortran models."""
+    r"""Class for running Fortran models.
+
+    Args:
+        standard (str, optional): Fortran standard that should be used.
+            Defaults to 'f2003'.
+        **kwargs: Additional keyword arguments are passed to parent class.
+
+    """
                 
     _schema_subtype_description = ('Model is written in Fortran.')
+    _schema_properties = {'standard': {'type': 'string',
+                                       'default': 'f2003',
+                                       'enum': ['f2003']}}
     language = 'fortran'
     language_ext = ['.f90', '.f77', '.f', '.h']
     base_languages = ['c']
@@ -243,6 +258,7 @@ class FortranModelDriver(CompiledModelDriver):
         'print_function': 'call display_python(yggpython({object}))',
         'print_instance': 'call display_generic(ygggeneric({object}))',
         'print_any': 'call display_generic({object})',
+        'print_null': 'call display_null({object})',
         'assign': '{name} = {value}',
         'comment': '!',
         'true': '.true.',
@@ -254,7 +270,7 @@ class FortranModelDriver(CompiledModelDriver):
         'indent': 3 * ' ',
         'quote': "'",
         'error': ("write(*, \'(\"{error_msg}\")\')\n"
-                  "call exit(-1)"),
+                  "stop 1"),
         'continuation_before': '&',
         'continuation_after': '     &',
         'block_end': 'END',
@@ -268,7 +284,7 @@ class FortranModelDriver(CompiledModelDriver):
         'while_end': 'END DO',
         'break': 'EXIT',
         'exec_begin': 'PROGRAM main\n   use iso_c_binding',
-        'exec_end': '   call exit(0)\nEND PROGRAM main',
+        'exec_end': '   stop\nEND PROGRAM main',
         'free': 'DEALLOCATE({variable})',
         'function_def_begin': (
             'FUNCTION {function_name}({input_var}) '
@@ -332,6 +348,7 @@ class FortranModelDriver(CompiledModelDriver):
         """
         out = super(FortranModelDriver, self).set_env(**kwargs)
         out = CModelDriver.CModelDriver.update_ld_library_path(out)
+        out = CModelDriver.CCompilerBase.set_env(out)
         conda_prefix = tools.get_conda_prefix()
         if conda_prefix and platform._is_mac:
             out.setdefault('DYLD_FALLBACK_LIBRARY_PATH',
@@ -349,6 +366,7 @@ class FortranModelDriver(CompiledModelDriver):
             str: Compiled model file path.
 
         """
+        kwargs.setdefault('standard', self.standard)
         kwargs.setdefault('libraries', [])
         kwargs['libraries'].append('c++')
         return super(FortranModelDriver, self).compile_model(**kwargs)

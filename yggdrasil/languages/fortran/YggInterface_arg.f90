@@ -19,7 +19,7 @@ function yggarg_scalar_unsigned1(x) result (y)
   xp => x
   y%type = "unsigned"
   y%ptr = c_loc(xp%x)
-  y%nbytes = sizeof(x)
+  y%nbytes = 1
 end function yggarg_scalar_unsigned1
 function yggarg_scalar_unsigned2(x) result (y)
   type(yggptr) :: y
@@ -29,7 +29,7 @@ function yggarg_scalar_unsigned2(x) result (y)
   xp => x
   y%type = "unsigned"
   y%ptr = c_loc(xp%x)
-  y%nbytes = sizeof(x)
+  y%nbytes = 2
 end function yggarg_scalar_unsigned2
 function yggarg_scalar_unsigned4(x) result (y)
   type(yggptr) :: y
@@ -39,7 +39,7 @@ function yggarg_scalar_unsigned4(x) result (y)
   xp => x
   y%type = "unsigned"
   y%ptr = c_loc(xp%x)
-  y%nbytes = sizeof(x)
+  y%nbytes = 4
 end function yggarg_scalar_unsigned4
 function yggarg_scalar_unsigned8(x) result (y)
   type(yggptr) :: y
@@ -49,7 +49,7 @@ function yggarg_scalar_unsigned8(x) result (y)
   xp => x
   y%type = "unsigned"
   y%ptr = c_loc(xp%x)
-  y%nbytes = sizeof(x)
+  y%nbytes = 8
 end function yggarg_scalar_unsigned8
 function yggarg_scalar_integer2(x) result (y)
   type(yggptr) :: y
@@ -59,7 +59,7 @@ function yggarg_scalar_integer2(x) result (y)
   xp => x
   y%type = "integer"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 2
 end function yggarg_scalar_integer2
 function yggarg_scalar_integer4(x) result (y)
   type(yggptr) :: y
@@ -69,7 +69,7 @@ function yggarg_scalar_integer4(x) result (y)
   xp => x
   y%type = "integer"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 4
 end function yggarg_scalar_integer4
 function yggarg_scalar_integer8(x) result (y)
   type(yggptr) :: y
@@ -79,7 +79,7 @@ function yggarg_scalar_integer8(x) result (y)
   xp => x
   y%type = "integer"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 8
 end function yggarg_scalar_integer8
 function yggarg_scalar_real4(x) result (y)
   type(yggptr) :: y
@@ -89,7 +89,7 @@ function yggarg_scalar_real4(x) result (y)
   xp => x
   y%type = "real"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 4
 end function yggarg_scalar_real4
 function yggarg_scalar_real8(x) result (y)
   type(yggptr) :: y
@@ -99,7 +99,7 @@ function yggarg_scalar_real8(x) result (y)
   xp => x
   y%type = "real"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 8
 end function yggarg_scalar_real8
 function yggarg_scalar_real16(x) result (y)
   type(yggptr) :: y
@@ -109,7 +109,7 @@ function yggarg_scalar_real16(x) result (y)
   xp => x
   y%type = "real"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 16
 end function yggarg_scalar_real16
 function yggarg_scalar_complex4(x) result (y)
   type(yggptr) :: y
@@ -119,7 +119,7 @@ function yggarg_scalar_complex4(x) result (y)
   xp => x
   y%type = "complex"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 4 * 2
 end function yggarg_scalar_complex4
 function yggarg_scalar_complex8(x) result (y)
   type(yggptr) :: y
@@ -129,7 +129,7 @@ function yggarg_scalar_complex8(x) result (y)
   xp => x
   y%type = "complex"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 8 * 2
 end function yggarg_scalar_complex8
 function yggarg_scalar_complex16(x) result (y)
   type(yggptr) :: y
@@ -139,7 +139,7 @@ function yggarg_scalar_complex16(x) result (y)
   xp => x
   y%type = "complex"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 16 * 2
 end function yggarg_scalar_complex16
 function yggarg_scalar_logical1(x) result (y)
   type(yggptr) :: y
@@ -149,7 +149,7 @@ function yggarg_scalar_logical1(x) result (y)
   xp => x
   y%type = "logical"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 1
 end function yggarg_scalar_logical1
 function yggarg_scalar_logical2(x) result (y)
   type(yggptr) :: y
@@ -159,7 +159,7 @@ function yggarg_scalar_logical2(x) result (y)
   xp => x
   y%type = "logical"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 2
 end function yggarg_scalar_logical2
 function yggarg_scalar_logical4(x) result (y)
   type(yggptr) :: y
@@ -169,7 +169,7 @@ function yggarg_scalar_logical4(x) result (y)
   xp => x
   y%type = "logical"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 4
 end function yggarg_scalar_logical4
 function yggarg_scalar_logical8(x) result (y)
   type(yggptr) :: y
@@ -179,7 +179,7 @@ function yggarg_scalar_logical8(x) result (y)
   xp => x
   y%type = "logical"
   y%ptr = c_loc(xp)
-  y%nbytes = sizeof(x)
+  y%nbytes = 8
 end function yggarg_scalar_logical8
 function yggarg_scalar_character(x) result (y)
   type(yggptr) :: y
@@ -198,7 +198,7 @@ function yggarg_scalar_character(x) result (y)
      y%data_character_unit(len_trim(x) + 1) = c_null_char
   end if
   y%ptr = c_loc(y%data_character_unit(1))
-  y%nbytes = sizeof(x)
+  y%nbytes = len(x)
 end function yggarg_scalar_character
 function yggarg_scalar_unicode(x) result (y)
   type(yggptr) :: y
@@ -208,7 +208,7 @@ function yggarg_scalar_unicode(x) result (y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "unicode"
-  y%prec = len(x) * sizeof(selected_char_kind('ISO_10646'))
+  y%prec = len(x) * 4  ! sizeof(selected_char_kind('ISO_10646'))
   allocate(y%data_unicode_unit(len(x)))
   do i = 1, len(x)
      y%data_unicode_unit(i) = x(i:i)
@@ -217,7 +217,7 @@ function yggarg_scalar_unicode(x) result (y)
      y%data_unicode_unit(len_trim(x) + 1) = c_null_char
   end if
   y%ptr = c_loc(y%data_unicode_unit(1))
-  y%nbytes = sizeof(x)
+  y%nbytes = len(x) * 4
 end function yggarg_scalar_unicode
 function yggarg_scalar_yggchar_r(x) result (y)
   type(yggchar_r), target :: x
@@ -230,10 +230,11 @@ function yggarg_scalar_yggchar_r(x) result (y)
   if (associated(xp%x)) then
      y%ptr = c_loc(xp%x(1))
      y%prec = size(xp%x)
+     y%nbytes = y%prec
   else
      y%ptr = c_null_ptr
+     y%nbytes = 0
   end if
-  y%nbytes = sizeof(x%x)
 end function yggarg_scalar_yggchar_r
 function yggarg_scalar_ply(x) result(y)
   type(yggply), target :: x
@@ -243,7 +244,7 @@ function yggarg_scalar_ply(x) result(y)
   xp => x
   y%type = "ply"
   y%ptr = c_loc(xp%material(1))
-  y%nbytes = sizeof(x)
+  y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_ply
 function yggarg_scalar_obj(x) result(y)
   type(yggobj), target :: x
@@ -253,7 +254,7 @@ function yggarg_scalar_obj(x) result(y)
   xp => x
   y%type = "obj"
   y%ptr = c_loc(xp%material(1))
-  y%nbytes = sizeof(x)
+  y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_obj
 function yggarg_scalar_null(x) result(y)
   type(yggnull), target :: x
@@ -263,7 +264,7 @@ function yggarg_scalar_null(x) result(y)
   xp => x
   y%type = "null"
   y%ptr = c_loc(xp%ptr)
-  y%nbytes = sizeof(x)
+  y%nbytes = 8  ! sizeof(x)
 end function yggarg_scalar_null
 function yggarg_scalar_generic(x) result(y)
   type(ygggeneric), target :: x
@@ -273,7 +274,7 @@ function yggarg_scalar_generic(x) result(y)
   xp => x
   y%type = "generic"
   y%ptr = c_loc(xp%prefix)
-  y%nbytes = sizeof(x)
+  y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_generic
 function yggarg_scalar_yggarr(x) result(y)
   type(yggarr), target :: x
@@ -283,7 +284,7 @@ function yggarg_scalar_yggarr(x) result(y)
   xp => x
   y%type = "array"
   y%ptr = c_loc(xp%prefix)
-  y%nbytes = sizeof(x)
+  y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggarr
 function yggarg_scalar_yggmap(x) result(y)
   type(yggmap), target :: x
@@ -293,7 +294,7 @@ function yggarg_scalar_yggmap(x) result(y)
   xp => x
   y%type = "object"
   y%ptr = c_loc(xp%prefix)
-  y%nbytes = sizeof(x)
+  y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggmap
 function yggarg_scalar_yggschema(x) result(y)
   type(yggschema), target :: x
@@ -303,7 +304,7 @@ function yggarg_scalar_yggschema(x) result(y)
   xp => x
   y%type = "schema"
   y%ptr = c_loc(xp%prefix)
-  y%nbytes = sizeof(x)
+  y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggschema
 function yggarg_scalar_yggpyinst(x) result(y)
   type(yggpyinst), target :: x
@@ -313,7 +314,7 @@ function yggarg_scalar_yggpyinst(x) result(y)
   xp => x
   y%type = "instance"
   y%ptr = c_loc(xp%prefix)
-  y%nbytes = sizeof(x)
+  y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggpyinst
 function yggarg_scalar_yggpython(x) result(y)
   type(yggpython), target :: x
@@ -323,7 +324,7 @@ function yggarg_scalar_yggpython(x) result(y)
   xp => x
   y%type = "python"
   y%ptr = c_loc(xp%name)
-  y%nbytes = sizeof(x)
+  y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggpython
 function yggarg_scalar_yggpyfunc(x) result(y)
   type(yggpyfunc), target :: x
@@ -333,37 +334,13 @@ function yggarg_scalar_yggpyfunc(x) result(y)
   xp => x
   y%type = "class"
   y%ptr = c_loc(xp%name)
-  y%nbytes = sizeof(x)
+  y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggpyfunc
 function yggarg_scalar_yggptr(x) result(y)
   type(yggptr), target :: x
   type(yggptr) :: y
   y = x
 end function yggarg_scalar_yggptr
-! function yggarg_scalar_yggptr_arr(x) result(y)
-!   ! TODO
-!   type(yggptr_arr), target :: x
-!   type(yggptr_arr), pointer :: xp
-!   type(yggptr) :: y
-!   y = yggarg_scalar_init(x)
-!   xp => x
-!   y%type = "array"
-!   y%ptr = c_loc(xp%ptr)
-!   y%nbytes = sizeof(x)
-!   stop "yggarg_scalar_yggptr_arr: WIP"
-! end function yggarg_scalar_yggptr_arr
-! function yggarg_scalar_yggptr_map(x) result(y)
-!   ! TODO
-!   type(yggptr_map), target :: x
-!   type(yggptr_map), pointer :: xp
-!   type(yggptr) :: y
-!   y = yggarg_scalar_init(x)
-!   xp => x
-!   y%type = "object"
-!   y%ptr = c_loc(xp%ptr)
-!   y%nbytes = sizeof(x)
-!   stop "yggarg_scalar_yggptr_map: WIP"
-! end function yggarg_scalar_yggptr_map
 
   
 ! 1D Reallocatable array versions
@@ -1001,7 +978,7 @@ function yggarg_1darray_unicode(x, x_shape) result (y)
      y = yggarg_ndarray_init(x)
   end if
   y%type = "unicode"
-  y%prec = len(xp(1)) * sizeof(selected_char_kind('ISO_10646'))
+  y%prec = len(xp(1)) * 4  ! sizeof(selected_char_kind('ISO_10646'))
   do i = 1, size(xp)
      ilength = len_trim(xp(i))
      if (ilength.lt.len(xp(1))) then
@@ -1048,28 +1025,16 @@ function yggarg_1darray_yggchar_r(x, x_shape) result (y)
 end function yggarg_1darray_yggchar_r
 
 ! ND array versions
-! #define myint INTEGER*8
-! #define call yggarg_2darray_shape(x, xp) print *, x, xp
-! allocate(xp(size(x)), mold=x(:,1)); xp = reshape(x, [size(x)]);
-
 subroutine yggarg_2darray_init(y, x)
   type(yggptr) :: y
   class(*), dimension(:, :), intent(in), target :: x
   y%item_array_2d => x
-  ! allocate(y%item_array(size(x)), mold=x(:,1))
-  ! y%item_array = reshape(x, [size(x)])
 end subroutine yggarg_2darray_init
-! subroutine yggarg_2darray_shape(x, xp)
-!   class(*), dimension(:, :), intent(in), target :: x
-!   class(*), dimension(:), intent(out), pointer :: xp
-!   allocate(xp(size(x)), mold=x(:,1))
-!   xp = reshape(x, [size(x)])
-! end subroutine yggarg_2darray_shape
 function yggarg_2darray_unsigned1(x) result (y)
   type(ygguint1), dimension(:, :), target :: x
   type(ygguint1), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1078,7 +1043,7 @@ function yggarg_2darray_unsigned2(x) result (y)
   type(ygguint2), dimension(:, :), target :: x
   type(ygguint2), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1087,7 +1052,7 @@ function yggarg_2darray_unsigned4(x) result (y)
   type(ygguint4), dimension(:, :), target :: x
   type(ygguint4), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1096,7 +1061,7 @@ function yggarg_2darray_unsigned8(x) result (y)
   type(ygguint8), dimension(:, :), target :: x
   type(ygguint8), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1105,7 +1070,7 @@ function yggarg_2darray_integer2(x) result (y)
   integer(kind=2), dimension(:, :), target :: x
   integer(kind=2), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1114,7 +1079,7 @@ function yggarg_2darray_integer4(x) result (y)
   integer(kind=4), dimension(:, :), target :: x
   integer(kind=4), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1123,7 +1088,7 @@ function yggarg_2darray_integer8(x) result (y)
   integer(kind=8), dimension(:, :), target :: x
   integer(kind=8), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1132,7 +1097,7 @@ function yggarg_2darray_real4(x) result (y)
   real(kind=4), dimension(:, :), target :: x
   real(kind=4), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1141,7 +1106,7 @@ function yggarg_2darray_real8(x) result (y)
   real(kind=8), dimension(:, :), target :: x
   real(kind=8), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1150,7 +1115,7 @@ function yggarg_2darray_real16(x) result (y)
   real(kind=16), dimension(:, :), target :: x
   real(kind=16), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1159,7 +1124,7 @@ function yggarg_2darray_complex4(x) result (y)
   complex(kind=4), dimension(:, :), target :: x
   complex(kind=4), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1168,7 +1133,7 @@ function yggarg_2darray_complex8(x) result (y)
   complex(kind=8), dimension(:, :), target :: x
   complex(kind=8), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1177,7 +1142,7 @@ function yggarg_2darray_complex16(x) result (y)
   complex(kind=16), dimension(:, :), target :: x
   complex(kind=16), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1186,7 +1151,7 @@ function yggarg_2darray_logical1(x) result (y)
   logical(kind=1), dimension(:, :), target :: x
   logical(kind=1), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1195,7 +1160,7 @@ function yggarg_2darray_logical2(x) result (y)
   logical(kind=2), dimension(:, :), target :: x
   logical(kind=2), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1204,7 +1169,7 @@ function yggarg_2darray_logical4(x) result (y)
   logical(kind=4), dimension(:, :), target :: x
   logical(kind=4), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1213,7 +1178,7 @@ function yggarg_2darray_logical8(x) result (y)
   logical(kind=8), dimension(:, :), target :: x
   logical(kind=8), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
@@ -1231,7 +1196,7 @@ function yggarg_2darray_yggchar_r(x) result (y)
   type(yggchar_r), dimension(:, :), target :: x
   type(yggchar_r), dimension(:), pointer :: xp
   type(yggptr) :: y
-  allocate(xp(size(x)), mold=x(:,1))
+  allocate(xp(size(x)))
   xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)

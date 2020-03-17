@@ -33,7 +33,7 @@ public:
 			  const char *format_str = "",
 			  const bool use_generic=true) :
     MetaschemaType("array", use_generic) {
-    if (items.size() == 0) {
+    if ((items.size() == 0) && (strlen(format_str) == 0)){
       update_use_generic(true);
     }
     strncpy(format_str_, format_str, 1000);
@@ -363,6 +363,11 @@ public:
 	} else {
 	  items_.push_back(new_items[i]->copy());
 	}
+      }
+    }
+    if ((strlen(format_str_) > 0) and (all_arrays())) {
+      for (i = 0; i < items_.size(); i++) {
+	items_[i]->set_in_table(true);
       }
     }
     // Force children to follow parent use_generic
