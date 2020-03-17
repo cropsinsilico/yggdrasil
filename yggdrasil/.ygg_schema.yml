@@ -125,9 +125,9 @@ definitions:
             type: string
           type: array
       required:
-      - commtype
-      - datatype
       - name
+      - datatype
+      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -265,8 +265,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -469,6 +469,7 @@ definitions:
           - pickle
           - ply
           - table
+          - wofost
           - yaml
           type: string
         filter:
@@ -608,8 +609,8 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - name
+      - working_dir
       - filetype
       title: file_base
       type: object
@@ -705,6 +706,38 @@ definitions:
               '\n'.
             type: string
         title: PlyFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['wofost'] subtype.
+        properties:
+          comment:
+            default: '# '
+            description: One or more characters indicating a comment. Defaults to
+              '# '.
+            type: string
+          datatype:
+            description: JSON schema defining the type of object that the serializer
+              will be used to serialize/deserialize. Defaults to default_datatype.
+            type: schema
+          delimiter:
+            default: ' = '
+            description: Delimiter that should be used to separate name/value pairs
+              in the map. Defaults to \t.
+            type: string
+          filetype:
+            default: binary
+            description: The file is a WOFOST parameter file.
+            enum:
+            - wofost
+            type: string
+          newline:
+            default: '
+
+              '
+            description: One or more characters indicating a newline. Defaults to
+              '\n'.
+            type: string
+        title: WOFOSTParamFileComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['table'] subtype.
@@ -1344,10 +1377,10 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - name
-      - args
       - language
+      - working_dir
+      - args
       title: model_base
       type: object
     - anyOf:

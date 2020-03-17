@@ -181,20 +181,21 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
 
         """
         out = super(WOFOSTParamSerialize, cls).get_testing_options()
+        out['exact_contents'] = False
         out['objects'] = [{'CRPNAM': 'Grain maize CSA practicals',
-                           'TBASEM': units.add_units(4.0, 'cel'),
-                           'TEFFMX': units.add_units(30.0, 'cel'),
-                           'TSUMEM': units.add_units(110.0, 'cel*d'),
+                           'TBASEM': units.add_units(4.0, 'degC'),
+                           'TEFFMX': units.add_units(30.0, 'degC'),
+                           'TSUMEM': units.add_units(110.0, 'degC*d'),
                            'IDSL': 0,
                            'DLO': units.add_units(-99.0, 'hr'),
                            'DLC': units.add_units(-99.0, 'hr'),
-                           'TSUM1': units.add_units(900.0, 'cel*d'),
-                           'TSUM2': units.add_units(800.0, 'cel*d'),
+                           'TSUM1': units.add_units(900.0, 'degC*d'),
+                           'TSUM2': units.add_units(800.0, 'degC*d'),
                            'DTSMTB': [
                                units.add_units(
-                                   np.array([0.0, 10.0, 30.0, 35.0]), 'cel'),
+                                   np.array([0.0, 10.0, 30.0, 35.0]), 'degC'),
                                units.add_units(
-                                   np.array([0.0, 0.0, 24.0, 24.0]), 'cel*d')],
+                                   np.array([0.0, 0.0, 24.0, 24.0]), 'degC*d')],
                            'DVSI': 0.0,
                            'DVSEND': 2.0}]
         out['empty'] = dict()
