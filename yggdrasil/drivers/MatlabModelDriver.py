@@ -601,7 +601,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         if matlab_engine is None:
             lines.append("exit(0);")
         # Write lines
-        logger.info('Wrapper:\n\t%s', '\n\t'.join(lines))
+        logger.debug('Wrapper:\n\t%s', '\n\t'.join(lines))
         if fname is None:
             return lines
         else:
