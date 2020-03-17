@@ -114,7 +114,7 @@ class FortranModelDriver(CompiledModelDriver):
     _schema_subtype_description = ('Model is written in Fortran.')
     _schema_properties = {'standard': {'type': 'string',
                                        'default': 'f2003',
-                                       'enum': ['f2003']}}
+                                       'enum': ['f2003', 'f2008']}}
     language = 'fortran'
     language_ext = ['.f90', '.f77', '.f', '.h']
     base_languages = ['c']
