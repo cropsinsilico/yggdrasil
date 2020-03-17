@@ -114,7 +114,7 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                             u1 = self.parse_units(u1)
                             u2 = self.parse_units(u2)
                             out[k][0] = units.add_units(out[k][0], u1)
-                            out[k][1] = units.add_units(out[k][1], u1)
+                            out[k][1] = units.add_units(out[k][1], u2)
                         else:
                             out[k][1] = units.add_units(
                                 out[k][1], self.parse_units(k_units))
