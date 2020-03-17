@@ -28,6 +28,9 @@ include yggdrasil/languages/LPy/lpy_model.py
 include yggdrasil/languages/R/DESCRIPTION
 include yggdrasil/languages/R/NAMESPACE
 include yggdrasil/languages/R/R/*.R
+include yggdrasil/languages/fortran/*.f90
+include yggdrasil/languages/fortran/*.c
+include yggdrasil/languages/fortran/*.h
 include yggdrasil/regex/CMakeLists.txt
 include yggdrasil/tests/scripts/CMakeLists.txt
 include yggdrasil/tests/scripts/Makefile_linux
