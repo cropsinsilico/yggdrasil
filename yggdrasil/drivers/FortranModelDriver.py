@@ -21,7 +21,7 @@ class FortranCompilerBase(CompilerBase):
     languages = ['fortran']
     default_executable_env = 'FF'
     default_flags_env = 'FFLAGS'
-    default_flags = ['-g', '-Wall']
+    default_flags = ['-g', '-Wall', '-x', 'f95-cpp-input', '-cpp']  # , '-std=f2008']
     linker_attributes = {'default_flags_env': 'LFLAGS',
                          'search_path_env': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
     search_path_env = []
@@ -43,8 +43,7 @@ class FortranCompilerBase(CompilerBase):
         """
         kwargs.setdefault('module-dir', _top_lang_dir)
         kwargs.setdefault('module-search-path', _top_lang_dir)
-        out = ['-x', 'f95-cpp-input', '-cpp']
-        out += super(FortranCompilerBase, cls).get_flags(**kwargs)
+        out = super(FortranCompilerBase, cls).get_flags(**kwargs)
         for x in ['-O', '-O2', '-O3', 'Os', 'Ofast']:
             if x in out:
                 out.remove(x)

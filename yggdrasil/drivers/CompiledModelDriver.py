@@ -2767,9 +2767,7 @@ class CompiledModelDriver(ModelDriver):
         out = True
         if lib in cls.internal_libraries:
             src = cls.get_dependency_source(lib)
-            print("is_library_installed", lib, src, os.path.isfile(src))
             return os.path.isfile(src)
-        print("is_library_installed: lib not in internal_libraries", lib)
         dep_lang = cls.external_libraries[lib].get('language', cls.language)
         for lib_typ in cls.external_libraries[lib].keys():
             if lib_typ in ['libtype', 'language']:

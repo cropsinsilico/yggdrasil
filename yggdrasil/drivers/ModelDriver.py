@@ -1643,7 +1643,7 @@ class ModelDriver(Driver):
     @classmethod
     def write_model_wrapper(cls, model_file, model_function,
                             inputs=[], outputs=[],
-                            outputs_in_inputs=None):
+                            outputs_in_inputs=None, verbose=False):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -1658,6 +1658,8 @@ class ModelDriver(Driver):
             outputs_in_inputs (bool, optional): If True, the outputs are
                 presented in the function definition as inputs. Defaults
                 to the class attribute outputs_in_inputs.
+            verbose (bool, optional): If True, the contents of the created file
+                are displayed. Defaults to False.
 
         Returns:
             list: Lines of code wrapping the provided model with the necessary
@@ -1789,7 +1791,10 @@ class ModelDriver(Driver):
         out = cls.write_executable(lines, prefix=prefix,
                                    imports={'filename': model_file,
                                             'function': model_function})
-        logger.info('\n' + '\n'.join(out))
+        if verbose:  # pragma: debug
+            logger.info('\n' + '\n'.join(out))
+        else:
+            logger.debug('\n' + '\n'.join(out))
         return out
 
     @classmethod
@@ -2411,7 +2416,7 @@ checking if the model flag indicates
                            opening_msg=None, closing_msg=None,
                            print_inputs=False, print_outputs=False,
                            skip_interface=False, function_keys=None,
-                           **kwargs):
+                           verbose=False, **kwargs):
         r"""Write a function definition.
 
         Args:
@@ -2451,6 +2456,8 @@ checking if the model flag indicates
                 specifies the keys for the function_param entries that
                 should be used to begin & end a function definition.
                 Defaults to ('function_def_begin', function_def_end').
+            verbose (bool, optional): If True, the contents of the created file
+                are displayed. Defaults to False.
             **kwargs: Additional keyword arguments are passed to
                 cls.format_function_param.
 
@@ -2567,8 +2574,10 @@ checking if the model flag indicates
                 function_keys[1], function_name=function_name))
         else:
             out.append(cls.function_param.get('block_end', ''))
-        import pprint
-        pprint.pprint(out)
+        if verbose:  # pragma: debug
+            logger.info('\n' + '\n'.join(out))
+        else:
+            logger.debug('\n' + '\n'.join(out))
         return out
 
     @classmethod

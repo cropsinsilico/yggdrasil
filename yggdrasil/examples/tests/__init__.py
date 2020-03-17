@@ -241,7 +241,6 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                                         (self.name, self.language))
         else:
             # Check that language is installed
-            print(self, self.languages_tested)
             for x in self.languages_tested:
                 if not tools.is_lang_installed(x):
                     raise unittest.SkipTest("%s not installed." % x)
