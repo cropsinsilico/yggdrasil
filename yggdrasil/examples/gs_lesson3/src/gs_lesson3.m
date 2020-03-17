@@ -1,4 +1,4 @@
-% Initialize input/output channels 
+% Initialize input/output channels
 in_channel = YggInterface('YggInput', 'input');
 out_channel = YggInterface('YggOutput', 'output');
 
