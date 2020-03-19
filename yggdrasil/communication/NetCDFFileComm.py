@@ -1,4 +1,6 @@
 import os
+import sys
+import copy
 import numpy as np
 from scipy.io import netcdf
 from yggdrasil import units
@@ -66,7 +68,40 @@ class NetCDFFileComm(FileComm):
                'objects': [data, data_add],
                'send': [data, data_add],
                'recv': [dict(data, **data_add)],
-               'recv_partial': [[data], [dict(data, **data_add)]]}
+               'recv_partial': [[data], [dict(data, **data_add)]],
+               'contents': (
+                   b'CDF\x01\x00\x00\x00\x00\x00\x00\x00\n\x00\x00'
+                   b'\x00\x05\x00\x00\x00\x04time\x00\x00\x00\n\x00'
+                   b'\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x05\x00'
+                   b'\x00\x00\x02x1\x00\x00\x00\x00\x00\x03\x00\x00'
+                   b'\x00\x05space\x00\x00\x00\x00\x00\x00\x05\x00'
+                   b'\x00\x00\x06space1\x00\x00\x00\x00\x00\x05\x00'
+                   b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0b\x00'
+                   b'\x00\x00\x03\x00\x00\x00\x04time\x00\x00\x00\x01'
+                   b'\x00\x00\x00\x00\x00\x00\x00\x0c\x00\x00\x00\x01'
+                   b'\x00\x00\x00\x05units\x00\x00\x00\x00\x00\x00'
+                   b'\x02\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x00'
+                   b'\x05\x00\x00\x00(\x00\x00\x01\x0c\x00\x00\x00'
+                   b'\x05space\x00\x00\x00\x00\x00\x00\x02\x00\x00'
+                   b'\x00\x03\x00\x00\x00\x04\x00\x00\x00\x0c\x00\x00'
+                   b'\x00\x01\x00\x00\x00\x05units\x00\x00\x00\x00'
+                   b'\x00\x00\x02\x00\x00\x00\x03mol\x00\x00\x00\x00'
+                   b'\x04\x00\x00\x00d\x00\x00\x014\x00\x00\x00\x01x'
+                   b'\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00'
+                   b'\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+                   b'\x00\x00\x02\x00\x00\x00\x10\x00\x00\x01\x98\x00'
+                   b'\x00\x00\x00?\x80\x00\x00@\x00\x00\x00@@\x00\x00'
+                   b'@\x80\x00\x00@\xa0\x00\x00@\xc0\x00\x00@\xe0\x00'
+                   b'\x00A\x00\x00\x00A\x10\x00\x00\x00\x00\x00\x01'
+                   b'\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01'
+                   b'\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01'
+                   b'\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01'
+                   b'\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01'
+                   b'\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01'
+                   b'\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01'
+                   b'\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01'
+                   b'\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01'
+                   b'ahc\x00e\x00\x00l\x00\x00l\x00\x00o\x00\x00')}
         return out
 
     @property
@@ -96,6 +131,11 @@ class NetCDFFileComm(FileComm):
                 for i in range(size):
                     x_str[index] += x[tuple([i, *index])]
             x = x_str
+        else:
+            x = x.copy()
+            if ((((sys.byteorder == 'little') and (x.dtype.byteorder == '>'))
+                 or ((sys.byteorder == 'big') and (x.dtype.byteorder == '<')))):
+                x = x.astype(x.dtype.name)
         return x
 
     def transform_type_send(self, x):
@@ -225,10 +265,10 @@ class NetCDFFileComm(FileComm):
                 variables = list(self._fd_netcdf.variables.keys())
             for v in variables:
                 out[v] = self.transform_type_recv(
-                    self._fd_netcdf.variables[v][:].copy())
+                    self._fd_netcdf.variables[v][:])
                 if hasattr(self._fd_netcdf.variables[v], 'units'):
                     out[v] = units.add_units(
                         out[v], self._fd_netcdf.variables[v].units)
             self._last_size = self.file_size
             self.fd.seek(self._last_size)
-        return out
+        return copy.deepcopy(out)
