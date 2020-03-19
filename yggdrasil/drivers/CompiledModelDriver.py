@@ -430,17 +430,18 @@ class CompilationToolBase(object):
                     raise ValueError("Flag for key %s already exists: '%s'"
                                      % (key, o))
         # Check for exact matches
-        idx = 0
-        nnew = len(new_flags)
-        nout = len(out)
-        while idx < nout:
-            if new_flags[0] not in out[idx:]:
-                break
-            ibeg = idx + out[idx:].index(new_flags[0])
-            iend = ibeg + nnew
-            if (iend < nout) and (out[ibeg:iend] == new_flags):
-                return
-            idx = iend
+        if new_flags:
+            idx = 0
+            nnew = len(new_flags)
+            nout = len(out)
+            while idx < nout:
+                if new_flags[0] not in out[idx:]:
+                    break
+                ibeg = idx + out[idx:].index(new_flags[0])
+                iend = ibeg + nnew
+                if (iend < nout) and (out[ibeg:iend] == new_flags):
+                    return
+                idx = iend
         # Determine location where flags should be added & add them
         if position is None:
             if prepend:
