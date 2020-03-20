@@ -1009,10 +1009,10 @@ class ModelDriver(Driver):
                     cfg.set(cls.language, cls.executable_type, fpath)
             except NotImplementedError:
                 pass
+        # Configure libraries
+        out += cls.configure_libraries(cfg)
         # Only do additional configuration if no base languages
         if not cls.base_languages:
-            # Configure libraries
-            out += cls.configure_libraries(cfg)
             # Installed comms
             comms = []
             for c in cls.supported_comms:

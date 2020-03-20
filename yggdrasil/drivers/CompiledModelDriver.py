@@ -396,6 +396,10 @@ class CompilationToolBase(object):
                 will be checked against the existing ones to ensure that there
                 are not duplicates. If False, the new flags are added
                 reguardless of the existing flags. Defaults to False.
+            allow_duplicate_values (bool, optional): If True, the same
+                key can be added with the same value more than once.
+                Otherwise, only the first instance of the value is added.
+                Defaults to False.
 
         Raises:
             ValueError: If there are unexpected keyword arguments.
@@ -404,7 +408,7 @@ class CompilationToolBase(object):
 
         """
         # Access class level flag option definitions
-        if key in cls.flag_options:
+        if isinstance(key, str) and (key in cls.flag_options):
             key = cls.flag_options[key]
         if isinstance(key, dict):
             for k, v in key.items():
@@ -413,13 +417,20 @@ class CompilationToolBase(object):
             key = key['key']
         # Loop over list
         if isinstance(value, list):
-            for i, v in enumerate(set(value)):
+            if not kwargs.get('allow_duplicate_values', False):
+                new_value = []
+                for v in value:
+                    if v not in new_value:
+                        new_value.append(v)
+                value = new_value
+            for i, v in enumerate(value):
                 cls.append_flags(out, key, v, **kwargs)
             return
         # Unpack keyword arguments
         prepend = kwargs.pop('prepend', False)
         position = kwargs.pop('position', None)
         no_duplicates = kwargs.pop('no_duplicates', None)
+        allow_duplicate_values = kwargs.pop('allow_duplicate_values', None)
         if kwargs:  # pragma: debug
             raise ValueError("Unexpected keyword arguments: %s" % kwargs)
         # Create flags and check for duplicates
@@ -430,7 +441,7 @@ class CompilationToolBase(object):
                     raise ValueError("Flag for key %s already exists: '%s'"
                                      % (key, o))
         # Check for exact matches
-        if new_flags:
+        if new_flags and (not allow_duplicate_values):
             idx = 0
             nnew = len(new_flags)
             nout = len(out)
@@ -897,7 +908,7 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
-            logger.debug('Command: "%s"' % ' '.join(cmd))
+            logger.info('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = output.decode("utf-8")
@@ -1350,8 +1361,11 @@ class LinkerBase(CompilationToolBase):
     """
 
     tooltype = 'linker'
-    flag_options = OrderedDict([('library_libs', '-l%s'),
-                                ('library_dirs', '-L%s')])
+    flag_options = OrderedDict(
+        [('library_libs', {
+            'key': '-l%s',
+            'allow_duplicate_values': True}),
+         ('library_dirs', '-L%s')])
     shared_library_flag = '-shared'
     library_prefix = 'lib'
     library_ext = None  # depends on the OS
@@ -1520,8 +1534,7 @@ class LinkerBase(CompilationToolBase):
                 if x_d and (x_d not in library_dirs):
                     library_dirs.append(x_d)
                 x_l = cls.libpath2libname(x_f)
-                if x_l not in library_libs:
-                    library_libs.append(x_l)
+                library_libs.append(x_l)
                 if (((cls.tooltype == 'linker') and x_f.endswith(cls.library_ext)
                      and ('library_rpath' in cls.flag_options))):
                     if x_d not in library_rpath:
@@ -2429,7 +2442,7 @@ class CompiledModelDriver(ModelDriver):
                 dpos = out.index(d)
                 assert(dpos < min_dep)
                 min_dep = dpos
-            else:
+            elif d not in new_deps:
                 new_deps.insert(0, d)
             out = out[:min_dep] + new_deps + out[min_dep:]
         return out
@@ -2634,16 +2647,17 @@ class CompiledModelDriver(ModelDriver):
             for k in cls.get_external_libraries(no_comm_libs=True):
                 if (k not in external_dependencies) and cls.is_library_installed(k):
                     external_dependencies.append(k)
-        # TODO: Expand library flags to include subdependencies?
         # Add flags for internal/external depenencies
-        for dep in internal_dependencies + external_dependencies:
+        all_dep = internal_dependencies + external_dependencies
+        for dep in cls.get_dependency_order(all_dep):
             dep_lib = cls.get_dependency_library(
                 dep, commtype=commtype)
-            if dep_lib and (dep_lib not in libraries):
-                if not kwargs.get('dry_run', False):
-                    if not os.path.isfile(dep_lib):  # pragma: debug
-                        print('dep_lib', dep, dep_lib)
-                    assert(os.path.isfile(dep_lib))
+            if dep_lib:
+                if (((not kwargs.get('dry_run', False))
+                     and (not os.path.isfile(dep_lib)))):  # pragma: debug
+                    raise RuntimeError(
+                        ("Library for %s dependency does not "
+                         "exist: '%s'.") % (dep, dep_lib))
                 if use_library_path_internal and (dep in internal_dependencies):
                     if kwargs.get('skip_library_libs', False):
                         if isinstance(use_library_path_internal, bool):
@@ -2852,6 +2866,76 @@ class CompiledModelDriver(ModelDriver):
         return out
 
     @classmethod
+    def configure_library(cls, cfg, k):
+        r"""Add configuration options for an external library.
+
+        Args:
+            cfg (CisConfigParser): Config class that options should be set for.
+        
+        Returns:
+            list: Section, option, description tuples for options that could not
+                be set.
+
+        """
+        v = cls.external_libraries[k]
+        out = []
+        k_lang = v.get('language', cls.language)
+        for t in v.keys():
+            fname = v[t]
+            assert(isinstance(fname, str))
+            opt = '%s_%s' % (k, t)
+            if t in ['libtype', 'language']:
+                continue
+            elif t in ['include']:
+                desc_end = '%s headers' % k
+            elif t in ['static', 'shared']:
+                desc_end = '%s %s library' % (k, t)
+            else:  # pragma: no cover
+                desc_end = '%s %s' % (k, t)
+            desc = 'The full path to the directory containing %s.' % desc_end
+            if cfg.has_option(k_lang, opt):
+                continue
+            if os.path.isabs(fname):
+                fpath = fname
+            else:
+                fpath = os.path.join(os.getcwd(), fname)
+            fname = os.path.basename(fpath)
+            search_list = []
+            if not os.path.isfile(fpath):
+                # Search the compiler/linker's search path, then the
+                # PATH environment variable.
+                tool = None
+                try:
+                    if t in ['include']:
+                        tool = cls.get_tool('compiler', default=None)
+                    else:
+                        tool = cls.get_tool('linker', default=None)
+                except NotImplementedError:  # pragma: debug
+                    pass
+                fpath = None
+                if tool is not None:
+                    search_list = tool.get_search_path()
+                    if ((platform._is_win and fname.endswith('.lib')
+                         and (not fname.startswith('lib')))):  # pragma: windows
+                        fname = [fname, 'lib' + fname]
+                    fpath = tools.locate_file(
+                        fname, directory_list=search_list)
+            if fpath:
+                logger.info('Located %s: %s' % (fname, fpath))
+                # if (t in ['static']) and platform._is_mac:
+                #     fpath_orig = fpath
+                #     fpath = '_s'.join(os.path.splitext(fpath))
+                #     logger.info('Using symbolic link: %s' % fpath)
+                #     if not os.path.isfile(fpath):
+                #         os.symlink(fpath_orig, fpath)
+                cfg.set(k_lang, opt, fpath)
+            else:
+                logger.info('Could not locate %s (search_list = %s)'
+                            % (fname, '\n\t'.join(search_list)))
+                out.append((k_lang, opt, desc))
+        return out
+
+    @classmethod
     def configure_libraries(cls, cfg):
         r"""Add configuration options for external libraries in this language.
 
@@ -2864,62 +2948,15 @@ class CompiledModelDriver(ModelDriver):
 
         """
         out = ModelDriver.configure_libraries.__func__(cls, cfg)
+        base_language_libraries = []
+        for x in cls.base_languages:
+            base_cls = import_component('model', x)
+            base_language_libraries += list(base_cls.external_libraries.keys())
         # Search for external libraries
         for k, v in cls.external_libraries.items():
-            k_lang = v.get('language', cls.language)
-            for t in v.keys():
-                fname = v[t]
-                assert(isinstance(fname, str))
-                opt = '%s_%s' % (k, t)
-                if t in ['libtype', 'language']:
-                    continue
-                elif t in ['include']:
-                    desc_end = '%s headers' % k
-                elif t in ['static', 'shared']:
-                    desc_end = '%s %s library' % (k, t)
-                else:  # pragma: no cover
-                    desc_end = '%s %s' % (k, t)
-                desc = 'The full path to the directory containing %s.' % desc_end
-                if cfg.has_option(k_lang, opt):
-                    continue
-                if os.path.isabs(fname):
-                    fpath = fname
-                else:
-                    fpath = os.path.join(os.getcwd(), fname)
-                fname = os.path.basename(fpath)
-                search_list = []
-                if not os.path.isfile(fpath):
-                    # Search the compiler/linker's search path, then the
-                    # PATH environment variable.
-                    tool = None
-                    try:
-                        if t in ['include']:
-                            tool = cls.get_tool('compiler', default=None)
-                        else:
-                            tool = cls.get_tool('linker', default=None)
-                    except NotImplementedError:  # pragma: debug
-                        pass
-                    fpath = None
-                    if tool is not None:
-                        search_list = tool.get_search_path()
-                        if ((platform._is_win and fname.endswith('.lib')
-                             and (not fname.startswith('lib')))):  # pragma: windows
-                            fname = [fname, 'lib' + fname]
-                        fpath = tools.locate_file(
-                            fname, directory_list=search_list)
-                if fpath:
-                    logger.info('Located %s: %s' % (fname, fpath))
-                    # if (t in ['static']) and platform._is_mac:
-                    #     fpath_orig = fpath
-                    #     fpath = '_s'.join(os.path.splitext(fpath))
-                    #     logger.info('Using symbolic link: %s' % fpath)
-                    #     if not os.path.isfile(fpath):
-                    #         os.symlink(fpath_orig, fpath)
-                    cfg.set(k_lang, opt, fpath)
-                else:
-                    logger.info('Could not locate %s (search_list = %s)'
-                                % (fname, '\n\t'.join(search_list)))
-                    out.append((k_lang, opt, desc))
+            if k in base_language_libraries:
+                continue
+            out += cls.configure_library(cfg, k)
         return out
 
     @classmethod

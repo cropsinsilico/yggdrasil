@@ -127,7 +127,9 @@ class FortranModelDriver(CompiledModelDriver):
         zmq={'libraries': [('c', x) for x in
                            CModelDriver.CModelDriver.supported_comm_options[
                                'zmq']['libraries']]})
-    external_libraries = {'c++': {}, 'stdc++': {}}
+    external_libraries = {'cxx': {'include': 'stdlib.h',
+                                  'libtype': 'shared',
+                                  'language': 'c'}}
     internal_libraries = dict(
         fygg={'source': os.path.join(_incl_interface,
                                      'YggInterface.f90'),
@@ -335,6 +337,21 @@ class FortranModelDriver(CompiledModelDriver):
     zero_based = False
     max_line_width = 72
     
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        CompiledModelDriver.before_registration(cls)
+        if platform._is_mac:
+            cxx_lib = 'c++'
+        else:
+            cxx_lib = 'stdc++'
+        if cxx_lib not in cls.external_libraries:
+            cls.external_libraries[cxx_lib] = cls.external_libraries.pop('cxx')
+            cls.internal_libraries['fygg']['external_dependencies'].append(cxx_lib)
+        
     def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
@@ -367,11 +384,6 @@ class FortranModelDriver(CompiledModelDriver):
 
         """
         kwargs.setdefault('standard', self.standard)
-        kwargs.setdefault('libraries', [])
-        if platform._is_mac:
-            kwargs['libraries'].append('c++')
-        else:
-            kwargs['libraries'].append('stdc++')
         return super(FortranModelDriver, self).compile_model(**kwargs)
 
     @classmethod
