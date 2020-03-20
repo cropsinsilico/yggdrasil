@@ -127,7 +127,7 @@ class FortranModelDriver(CompiledModelDriver):
         zmq={'libraries': [('c', x) for x in
                            CModelDriver.CModelDriver.supported_comm_options[
                                'zmq']['libraries']]})
-    external_libraries = {'c++': {}}
+    external_libraries = {'c++': {}, 'stdc++': {}}
     internal_libraries = dict(
         fygg={'source': os.path.join(_incl_interface,
                                      'YggInterface.f90'),
@@ -368,7 +368,10 @@ class FortranModelDriver(CompiledModelDriver):
         """
         kwargs.setdefault('standard', self.standard)
         kwargs.setdefault('libraries', [])
-        kwargs['libraries'].append('c++')
+        if platform._is_mac:
+            kwargs['libraries'].append('c++')
+        else:
+            kwargs['libraries'].append('stdc++')
         return super(FortranModelDriver, self).compile_model(**kwargs)
 
     @classmethod
