@@ -1,0 +1,17 @@
+model:
+  name: feedback
+  language: sbml
+  args: ./src/sbml3.xml
+  only_output_final_step: true
+  inputs:
+    - name: input
+      vars: time,S1,S2
+      default_file:
+        name: ./Input/input.txt
+        filetype: table
+  outputs:
+    - name: output
+      vars: time,S1,S2
+      default_file:
+        name: ./output.txt
+        filetype: table

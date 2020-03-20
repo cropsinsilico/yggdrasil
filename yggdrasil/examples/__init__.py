@@ -59,6 +59,8 @@ def register_example(example_dir):
         lang_avail += tools.get_supported_lang()
         for k in ['cmake', 'make', 'lpy', 'executable']:
             lang_avail.remove(k)
+    elif example_base.startswith('sbml'):
+        lang_avail = ['sbml']
     else:
         lang_search = example_base + '_%s.yml'
     if lang_search is not None:
@@ -140,6 +142,9 @@ def register_example(example_dir):
         elif example_base in ['types', 'transforms']:
             yml_names = ['%s.yml' % example_base]
             src_names = ['src.py', 'dst.py']
+        elif example_base.startswith('sbml'):
+            yml_names = ['%s.yml' % example_base]
+            src_names = ['%s.xml' % example_base]
         else:
             src_is_abs = True
             yml_names = ['%s_%s.yml' % (example_base, lang)]
