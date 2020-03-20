@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "0.10.0" %}
+{% set version = "1.1.1" %}
 
 package:
   name: {{ name|lower }}
@@ -9,9 +9,9 @@ source:
   path: ../
 
 build:
-  number: 1
+  number: 0
   script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv "
-  skip: true  # [win and vc<14]
+  skip: true  # [(win and vc<14) or py<35]
   entry_points:
     - ygginfo = yggdrasil.command_line:ygginfo
     - yggrun = yggdrasil.command_line:yggrun
@@ -33,9 +33,6 @@ build:
     - ygginstall = yggdrasil.command_line:ygginstall
 
 requirements:
-  # build:
-  #   - {{ compiler('c') }}
-  #   - {{ compiler('cxx') }}
   host:
     - czmq
     - pip
@@ -46,9 +43,10 @@ requirements:
     - cmake
     - czmq
     - flaky
+    - git
     - GitPython
     - jsonschema
-    - matplotlib
+    - matplotlib-base
     - numpy
     - pandas
     - pyperf
