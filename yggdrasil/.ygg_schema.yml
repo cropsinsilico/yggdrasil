@@ -125,8 +125,8 @@ definitions:
             type: string
           type: array
       required:
-      - name
       - commtype
+      - name
       - datatype
       title: comm_base
       type: object
@@ -228,8 +228,9 @@ definitions:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
         inputs:
-          description: One or more name(s) of model output(s) and/or new comm/file
-            objects that the connection should receive messages from.
+          description: One or more name(s) of model output channel(s) and/or new channel/file
+            objects that the connection should receive messages from. A full description
+            of file entries and the available options can be found :ref:`here<yaml_file_options>`.
           items:
             anyOf:
             - $ref: '#/definitions/comm'
@@ -242,8 +243,9 @@ definitions:
             to None.
           type: string
         outputs:
-          description: One or more name(s) of model input(s) and/or new comm/file
-            objects that the connection should send messages to.
+          description: One or more name(s) of model input channel(s) and/or new channel/file
+            objects that the connection should send messages to. A full description
+            of file entries and the available options can be found :ref:`here<yaml_file_options>`.
           items:
             anyOf:
             - $ref: '#/definitions/comm'
@@ -251,9 +253,9 @@ definitions:
           minItems: 1
           type: array
         translator:
-          description: Function or string specifying function that should be used
-            to translate messages from the input communicator before passing them
-            to the output communicator. If a string, the format should be "<package.module>:<function>"
+          description: Function or string specifying a function that should be used
+            to translate messages from the input communicator(s) before passing them
+            to the output communicator(s). If a string, the format should be "<package.module>:<function>"
             so that <function> can be imported from <package>. Defaults to None and
             messages are passed directly. This can also be a list of functions/strings
             that will be called on the messages in the order they are provided.
@@ -606,8 +608,8 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - working_dir
+      - name
       - filetype
       title: file_base
       type: object
@@ -1078,9 +1080,9 @@ definitions:
       description: Base schema for all subtypes of model components.
       properties:
         args:
-          description: Argument(s) for running the model on the command line. This
-            should be a complete command including the necessary executable and command
-            line arguments to that executable.
+          description: The full path to the file containing the model program that
+            will be run by the driver or a list starting with the program file and
+            including any arguments that should be passed as input to the program.
           items:
             type: string
           type: array
@@ -1090,9 +1092,14 @@ definitions:
           type: string
         client_of:
           default: []
-          description: The names of one or more servers that this model is a client
-            of. Defaults to empty list. Use of client_of with function is not currently
-            supported.
+          description: The names of one or more models that this model will call as
+            a server. If there are more than one, this should be specified as a sequence
+            collection (list). The corresponding channel(s) that should be passed
+            to the yggdrasil API will be the name of the server model joined with
+            the name of the client model with an underscore `<server_model>_<client_model>`.
+            There will be one channel created for each server the model is a client
+            of. Defaults to empty list. Use of `client_of` with `function` is not
+            currently supported.
           items:
             type: string
           type: array
@@ -1150,10 +1157,27 @@ definitions:
         inputs:
           default:
           - name: default
-          description: Model inputs described as comm objects.
+          description: A mapping object containing the entry for a model input channel
+            or a list of input channel entries. If the model does not get input from
+            another model, this may be ommitted. A full description of channel entries
+            and the options available for channels can be found :ref:`here<yaml_comm_options>`.
           items:
             $ref: '#/definitions/comm'
           type: array
+        integrator:
+          default: cvode
+          description: Name of integrator that should be used. Valid options include
+            ['cvode', 'gillespie', 'rk4', 'rk45']. Defaults to 'cvode'.
+          enum:
+          - cvode
+          - gillespie
+          - rk4
+          - rk45
+          type: string
+        integrator_settings:
+          default: {}
+          description: Settings for the integrator. Defaults to empty dict.
+          type: object
         interpreter:
           description: Name or path of interpreter executable that should be used
             to run the model. If not provided, the interpreter will be determined
@@ -1171,13 +1195,16 @@ definitions:
           type: array
         is_server:
           default: false
-          description: If True, the model is assumed to be a server and an instance
-            of :class:`yggdrasil.drivers.ServerDriver` is started. Defaults to False.
-            Use of is_server with function is not currently supported.
+          description: If `True`, the model is assumed to be a server for one or more
+            client models and an instance of :class:`yggdrasil.drivers.ServerDriver`
+            is started. The corresponding channel that should be passed to the yggdrasil
+            API will be the name of the model. Defaults to False. Use of `is_server`
+            with `function` is not currently supported.
           type: boolean
         language:
           default: executable
-          description: The programming language that the model is written in.
+          description: The programming language that the model is written in. A list
+            of available languages can be found :ref:`here <schema_table_model_subtype_rst>`.
           enum:
           - R
           - c
@@ -1190,6 +1217,7 @@ definitions:
           - matlab
           - python
           - r
+          - sbml
           type: string
         linker:
           description: Command or path to executable that should be used to link the
@@ -1222,7 +1250,10 @@ definitions:
         outputs:
           default:
           - name: default
-          description: Model outputs described as comm objects.
+          description: A mapping object containing the entry for a model output channel
+            or a list of output channel entries. If the model does not output to another
+            model, this may be ommitted. A full description of channel entries and
+            the options available for channels can be found :ref:`here<yaml_comm_options>`.
           items:
             $ref: '#/definitions/comm'
           type: array
@@ -1257,6 +1288,18 @@ definitions:
           items:
             type: string
           type: array
+        reset:
+          default: false
+          description: If True, the simulation will be reset to it's initial values
+            before each call (including the start time). Defaults to False.
+          type: boolean
+        selections:
+          default: []
+          description: Variables to include in the output. Defaults to None and the
+            time/floating selections will be returned.
+          items:
+            type: string
+          type: array
         skip_interpreter:
           default: false
           description: If True, no interpreter will be added to the arguments. This
@@ -1285,6 +1328,17 @@ definitions:
             to working_dir. This should be the directory containing the CMakeLists.txt
             file. It can be relative to working_dir or absolute.
           type: string
+        start:
+          default: 0.0
+          description: Time that simulation should be started from. If 'reset' is
+            True, the start time will always be the provided value, otherwise, the
+            start time will be the end of the previous call after the first call.
+            Defaults to 0.0.
+          type: number
+        steps:
+          default: 1
+          description: Number of steps that should be output. Defaults to None.
+          type: integer
         strace_flags:
           default:
           - -e
@@ -1314,6 +1368,11 @@ definitions:
           items:
             type: string
           type: array
+        variable_step:
+          default: false
+          description: If True, the output steps will have a variable spacing. Defaults
+            to False.
+          type: boolean
         with_strace:
           default: false
           description: If True, the command is run with strace (on Linux) or dtrace
@@ -1328,10 +1387,10 @@ definitions:
             is used.
           type: string
       required:
-      - language
-      - name
-      - args
       - working_dir
+      - language
+      - args
+      - name
       title: model_base
       type: object
     - anyOf:
@@ -1656,6 +1715,80 @@ definitions:
               via the command line. Defaults to False.
             type: boolean
         title: RModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['sbml'] subtype.
+        properties:
+          integrator:
+            default: cvode
+            description: Name of integrator that should be used. Valid options include
+              ['cvode', 'gillespie', 'rk4', 'rk45']. Defaults to 'cvode'.
+            enum:
+            - cvode
+            - gillespie
+            - rk4
+            - rk45
+            type: string
+          integrator_settings:
+            default: {}
+            description: Settings for the integrator. Defaults to empty dict.
+            type: object
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is an SBML model.
+            enum:
+            - sbml
+            type: string
+          reset:
+            default: false
+            description: If True, the simulation will be reset to it's initial values
+              before each call (including the start time). Defaults to False.
+            type: boolean
+          selections:
+            default: []
+            description: Variables to include in the output. Defaults to None and
+              the time/floating selections will be returned.
+            items:
+              type: string
+            type: array
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+          start:
+            default: 0.0
+            description: Time that simulation should be started from. If 'reset' is
+              True, the start time will always be the provided value, otherwise, the
+              start time will be the end of the previous call after the first call.
+              Defaults to 0.0.
+            type: number
+          steps:
+            default: 1
+            description: Number of steps that should be output. Defaults to None.
+            type: integer
+          variable_step:
+            default: false
+            description: If True, the output steps will have a variable spacing. Defaults
+              to False.
+            type: boolean
+        title: SBMLModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['cmake'] subtype.

@@ -1,6 +1,7 @@
 """This modules offers various tools."""
 from __future__ import print_function
 import threading
+import multiprocessing
 import logging
 import pprint
 import os
@@ -1391,20 +1392,11 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
                 self.error("Timeout for %s at %5.2f/%5.2f s" % (
                     key, t.elapsed, t.max_time))
         del self._timeouts[key]
-        
 
-class YggThread(threading.Thread, YggClass):
-    r"""Thread for Ygg that tracks when the thread is started and joined.
 
-    Attributes:
-        lock (threading.RLock): Lock for accessing the sockets from multiple
-            threads.
-        start_event (threading.Event): Event indicating that the thread was
-            started.
-        terminate_event (threading.Event): Event indicating that the thread
-            should be terminated. The target must exit when this is set.
+class YggProcBase(YggClass):
+    r"""Base class for Ygg thread/processes."""
 
-    """
     def __init__(self, name=None, target=None, args=(), kwargs=None,
                  daemon=False, group=None, **ygg_kwargs):
         global _lock_registry
@@ -1413,33 +1405,149 @@ class YggThread(threading.Thread, YggClass):
         if (target is not None) and ('target' in self._schema_properties):
             ygg_kwargs['target'] = target
             target = None
-        thread_kwargs = dict(name=name, target=target, group=group,
-                             args=args, kwargs=kwargs)
-        super(YggThread, self).__init__(**thread_kwargs)
-        YggClass.__init__(self, self.name, **ygg_kwargs)
+        super(YggProcBase, self).__init__(name, **ygg_kwargs)
+        self.proc_kwargs = dict(name=name, group=group, daemon=daemon,
+                                target=target, args=args, kwargs=kwargs)
+        self.as_process = isinstance(self, multiprocessing.Process)
+        if self.as_process:
+            self._proc_class = multiprocessing.Process
+        else:
+            self._proc_class = threading.Thread
+        self._proc_class.__init__(self, **self.proc_kwargs)
         self._ygg_target = target
         self._ygg_args = args
         self._ygg_kwargs = kwargs
         self.debug('')
-        self.lock = threading.RLock()
-        self.start_event = threading.Event()
-        self.terminate_event = threading.Event()
+        self.lock = self.get_lock()
+        self.start_event = self.get_event()
+        self.terminate_event = self.get_event()
         self.start_flag = False
         self.terminate_flag = False
         self._cleanup_called = False
         self._calling_thread = None
-        if daemon:  # pragma: debug
-            self.setDaemon(True)
-            self.daemon = True
         _thread_registry[self.name] = self
         _lock_registry[self.name] = self.lock
         atexit.register(self.atexit)
 
+    def run(self, *args, **kwargs):
+        r"""Continue running until terminate event set."""
+        self.debug("Starting method")
+        try:
+            super(YggProcBase, self).run(*args, **kwargs)
+        except BaseException:  # pragma: debug
+            self.exception("THREAD ERROR")
+        finally:
+            for k in ['_ygg_target', '_ygg_args', '_ygg_kwargs']:
+                if hasattr(self, k):
+                    delattr(self, k)
+
+    def start(self, *args, **kwargs):
+        r"""Start thread and print info."""
+        self.debug('')
+        if not self.was_terminated:
+            self.set_started_flag()
+            self.before_start()
+        super(YggProcBase, self).start(*args, **kwargs)
+        self._calling_thread = self.get_current_proc()
+
+    def join(self, *args, **kwargs):
+        r"""Join the process/thread."""
+        return super(YggProcBase, self).join(*args, **kwargs)
+
+    def is_alive(self, *args, **kwargs):
+        r"""Determine if the process/thread is alive."""
+        return super(YggProcBase, self).is_alive(*args, **kwargs)
+
     @property
-    def main_terminated(self):
-        r"""bool: True if the main thread has terminated."""
-        return (not _main_thread.is_alive())
-        # return (not self._calling_thread.is_alive())
+    def pid(self):
+        r"""Process ID."""
+        if self.as_process:
+            return super(YggProcBase, self).pid
+        else:
+            return super(YggProcBase, self).ident
+
+    @property
+    def ident(self):
+        r"""Process ID."""
+        return self.pid
+        
+    @property
+    def exitcode(self):
+        r"""Exit code."""
+        if self.as_process:
+            return super(YggProcBase, self).exitcode
+        else:
+            return 0
+
+    @property
+    def returncode(self):
+        r"""Return code."""
+        return self.exitcode
+
+    def terminate(self, no_wait=False):
+        r"""Set the terminate event and wait for the thread to stop.
+
+        Args:
+            no_wait (bool, optional): If True, terminate will not block until
+                the thread stops. Defaults to False and blocks.
+
+        Raises:
+            AssertionError: If no_wait is False and the thread has not stopped
+                after the timeout.
+
+        """
+        self.debug('')
+        with self.lock:
+            if self.was_terminated:  # pragma: debug
+                self.debug('Driver already terminated.')
+                return
+            self.set_terminated_flag()
+        if not no_wait:
+            # if self.is_alive():
+            #     self.join(self.timeout)
+            self.wait(timeout=self.timeout)
+            assert(not self.is_alive())
+        if self.as_process:
+            super(YggProcBase, self).terminate()
+
+    def poll(self):
+        r"""Check if the process is finished and return the return
+        code if it is."""
+        out = None
+        if not self.is_alive():
+            out = self.returncode
+        return out
+
+    def get_lock(self):
+        r"""Get a new lock object."""
+        if self.as_process:
+            return multiprocessing.RLock()
+        else:
+            return threading.RLock()
+
+    def get_event(self):
+        r"""Get a new event object."""
+        if self.as_process:
+            return multiprocessing.Event()
+        else:
+            return threading.Event()
+
+    def get_current_proc(self):
+        r"""Get the current process/thread."""
+        if self.as_process:
+            return multiprocessing.current_process()
+        else:
+            return threading.current_thread()
+
+    def get_main_proc(self):
+        r"""Get the main process/thread."""
+        if self.as_process:
+            out = multiprocessing.parent_process()
+            if out is None:
+                out = self.get_current_proc()
+            return out
+        else:
+            return _main_thread
 
     def set_started_flag(self):
         r"""Set the started flag for the thread to True."""
@@ -1473,27 +1581,10 @@ class YggThread(threading.Thread, YggClass):
         # return self.terminate_event.is_set()
         return self.terminate_flag
 
-    def start(self, *args, **kwargs):
-        r"""Start thread and print info."""
-        self.debug('')
-        if not self.was_terminated:
-            self.set_started_flag()
-            self.before_start()
-        super(YggThread, self).start(*args, **kwargs)
-        self._calling_thread = threading.current_thread()
-        # print("Thread = %s, Called by %s" % (self.name, self._calling_thread.name))
-
-    def run(self, *args, **kwargs):
-        r"""Continue running until terminate event set."""
-        self.debug("Starting method")
-        try:
-            super(YggThread, self).run(*args, **kwargs)
-        except BaseException:  # pragma: debug
-            self.exception("THREAD ERROR")
-        finally:
-            for k in ['_ygg_target', '_ygg_args', '_ygg_kwargs']:
-                if hasattr(self, k):
-                    delattr(self, k)
+    @property
+    def main_terminated(self):
+        r"""bool: True if the main thread has terminated."""
+        return (not self.get_main_proc().is_alive())
 
     def before_start(self):
         r"""Actions to perform on the main thread before starting the thread."""
@@ -1520,30 +1611,6 @@ class YggThread(threading.Thread, YggClass):
             self.sleep()
         self.stop_timeout(key_level=1, key=key)
 
-    def terminate(self, no_wait=False):
-        r"""Set the terminate event and wait for the thread to stop.
-
-        Args:
-            no_wait (bool, optional): If True, terminate will not block until
-                the thread stops. Defaults to False and blocks.
-
-        Raises:
-            AssertionError: If no_wait is False and the thread has not stopped
-                after the timeout.
-
-        """
-        self.debug('')
-        with self.lock:
-            if self.was_terminated:  # pragma: debug
-                self.debug('Driver already terminated.')
-                return
-            self.set_terminated_flag()
-        if not no_wait:
-            # if self.is_alive():
-            #     self.join(self.timeout)
-            self.wait(timeout=self.timeout)
-            assert(not self.is_alive())
-
     def atexit(self):  # pragma: debug
         r"""Actions performed when python exits."""
         # self.debug('is_alive = %s', self.is_alive())
@@ -1553,14 +1620,65 @@ class YggThread(threading.Thread, YggClass):
                 self.cleanup()
 
 
+class YggProcess(YggProcBase, multiprocessing.Process):
+    r"""Process for Ygg that tracks when the process is started and joined.
+
+    Attributes:
+        lock (multiprocessing.Lock): Lock for accessing the sockets from multiple
+            processes.
+        start_event (multiprocessing.Event): Event indicating that the process was
+            started.
+        terminate_event (multiprocessing.Event): Event indicating that the process
+            should be terminated. The target must exit when this is set.
+
+    """
+    
+    def __init__(self, *args, **kwargs):
+        self.stdout = None
+        super(YggProcess, self).__init__(*args, **kwargs)
+
+    def start(self, *args, **kwargs):
+        r"""Start thread and print info."""
+        self.stdout_file = str(os.getpid()) + ".out"
+        self.stdout_w = open(self.stdout_file, "w")
+        self.stdout = open(self.stdout_file, "r+")
+        return super(YggProcess, self).start(*args, **kwargs)
+
+    def run(self, *args, **kwargs):
+        r"""Continue running until terminate event set."""
+        # sys.stdout = self.stdout_w
+        try:
+            return super(YggProcess, self).run(*args, **kwargs)
+        finally:
+            print(self.stdout.read())
+            os.remove(self.stdout_file)
+
+    # TODO: Print output
+
+
+class YggThread(YggProcBase, threading.Thread):
+    r"""Thread for Ygg that tracks when the thread is started and joined.
+
+    Attributes:
+        lock (threading.RLock): Lock for accessing the sockets from multiple
+            threads.
+        start_event (threading.Event): Event indicating that the thread was
+            started.
+        terminate_event (threading.Event): Event indicating that the thread
+            should be terminated. The target must exit when this is set.
+
+    """
+    pass
+
+    
 class YggThreadLoop(YggThread):
     r"""Thread that will run a loop until the terminate event is called."""
     def __init__(self, *args, **kwargs):
-        super(YggThreadLoop, self).__init__(*args, **kwargs)
         self._1st_main_terminated = False
         self.break_flag = False
-        self.loop_event = threading.Event()
+        self.loop_event = threading.Event()  # self.get_event()
         self.loop_flag = False
+        super(YggThreadLoop, self).__init__(*args, **kwargs)
 
     def on_main_terminated(self, dont_break=False):  # pragma: debug
         r"""Actions performed when 1st main terminated.
@@ -1589,19 +1707,19 @@ class YggThreadLoop(YggThread):
 
     def set_loop_flag(self):
         r"""Set the loop flag for the thread to True."""
-        # self.loop_event.set()
+        self.loop_event.set()
         self.loop_flag = True
 
     def unset_loop_flag(self):  # pragma: debug
         r"""Set the loop flag for the thread to False."""
-        # self.loop_event.clear()
+        self.loop_event.clear()
         self.loop_flag = False
 
     @property
     def was_loop(self):
         r"""bool: True if the thread was loop. False otherwise."""
-        # return self.loop_event.is_set()
-        return self.loop_flag
+        return self.loop_event.is_set()
+        # return self.loop_flag
 
     def wait_for_loop(self, timeout=None, key=None):
         r"""Wait until thread enters loop to return using sleeps rather than
