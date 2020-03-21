@@ -998,9 +998,15 @@ extern "C" {
     }
   }
   dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
-				    const size_t ndim, const size_t shape[],
+				    const size_t ndim, const int64_t shape[],
 				    const char* units, const bool use_generic=false) {
-    const size_t* shape_ptr = shape;
+    size_t shape_size_t[ndim];
+    int i;
+    for (i = 0; i < ndim; i++) {
+      shape_size_t[i] = (size_t)shape[i];
+    }
+    size_t* shape_ptr = shape_size_t;
+    // const size_t* shape_ptr = shape;
     return create_dtype_ndarray(subtype, precision, ndim, shape_ptr, units, use_generic);
   }
   dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items,

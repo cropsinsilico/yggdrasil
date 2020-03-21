@@ -436,7 +436,7 @@ dtype_t* create_dtype_ndarray(const char* subtype, const size_t precision,
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
-				  const size_t ndim, const size_t shape[],
+				  const size_t ndim, const int64_t shape[],
 				  const char* units, const bool use_generic);
 
   
