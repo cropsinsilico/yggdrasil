@@ -1123,12 +1123,13 @@ class CModelDriver(CompiledModelDriver):
             var = dict(var, native_type=type_name)
         if (((type_name.endswith('*')
               or (type_name in ['bytes_t', 'string_t', 'unicode_t']))
-             and (not type_name.startswith(('comm_t', 'dtype_t'))))):
+             and (not type_name.startswith(('comm_t', 'dtype_t')))
+             and (not (('length' in var.get('datatype', var))
+                       or ('shape' in var.get('datatype', var)))))):
             kwargs.get('requires_freeing', []).append(var)
             kwargs.setdefault('value', 'NULL')
         elif var.get('is_length_var', False):
             kwargs.setdefault('value', '0')
-        var = dict(var, name=cls.get_name_declare(var))
         out = super(CModelDriver, cls).write_declaration(var, **kwargs)
         for k in ['length', 'ndim', 'shape']:
             if ((isinstance(var.get(k + '_var', None), dict)

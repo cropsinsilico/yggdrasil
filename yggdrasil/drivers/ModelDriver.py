@@ -2914,7 +2914,7 @@ checking if the model flag indicates
         type_name = cls.get_native_type(**var)
         out = [cls.format_function_param('declare',
                                          type_name=type_name,
-                                         variable=var['name'])]
+                                         variable=cls.get_name_declare(var))]
         if dont_define:
             return out
         if definitions is None:
@@ -2932,6 +2932,23 @@ checking if the model flag indicates
                 'assign', name=var['name'], value=value))
         return out
 
+    @classmethod
+    def get_name_declare(cls, var):
+        r"""Determine the name that should be used for declaration.
+
+        Args:
+            var (str, dict): Name of variable or dictionary of information.
+
+        Returns:
+            str: Modified name for declaration.
+
+        """
+        if isinstance(var, str):  # pragma: no cover
+            return var
+        assert(isinstance(var, dict))
+        out = var['name']
+        return out
+    
     @classmethod
     def write_free(cls, var, **kwargs):
         r"""Return the lines required to free a variable with a certain type.
