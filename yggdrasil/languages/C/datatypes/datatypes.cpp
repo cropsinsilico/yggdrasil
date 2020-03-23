@@ -1000,14 +1000,18 @@ extern "C" {
   dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
 				    const size_t ndim, const int64_t shape[],
 				    const char* units, const bool use_generic=false) {
-    size_t shape_size_t[ndim];
+    size_t *shape_ptr = (size_t*)malloc(ndim*sizeof(size_t));
+    // size_t shape_size_t[ndim];
     int i;
     for (i = 0; i < ndim; i++) {
-      shape_size_t[i] = (size_t)shape[i];
+      shape_ptr[i] = (size_t)shape[i];
+      // shape_size_t[i] = (size_t)shape[i];
     }
-    size_t* shape_ptr = shape_size_t;
+    // size_t* shape_ptr = shape_size_t;
     // const size_t* shape_ptr = shape;
-    return create_dtype_ndarray(subtype, precision, ndim, shape_ptr, units, use_generic);
+    dtype_t* out = create_dtype_ndarray(subtype, precision, ndim, shape_ptr, units, use_generic);
+    free(shape_ptr);
+    return out;
   }
   dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items,
 				   const bool use_generic=true){

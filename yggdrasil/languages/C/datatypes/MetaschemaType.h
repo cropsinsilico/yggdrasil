@@ -375,6 +375,8 @@ public:
     @param[in] x MetaschemaType* Type to insert at index i.
   */
   virtual void update_type_element(size_t i, const MetaschemaType* x) {
+    UNUSED(i);
+    UNUSED(x);
     ygglog_throw_error("MetaschemaType::update_type_element: This method is only valid for array types.");
   }
   /*!
@@ -383,6 +385,9 @@ public:
     @param[in] x MetaschemaType* Type to insert at key k.
   */
   virtual void update_type_element(const char* k, const MetaschemaType* x) {
+    // Prevent C4100 warning on windows by referencing param
+    UNUSED(k);
+    UNUSED(x);
     ygglog_throw_error("MetaschemaType::update_type_element: This method is only valid for object types.");
   }
   /*!

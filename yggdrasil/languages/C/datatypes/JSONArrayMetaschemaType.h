@@ -365,7 +365,7 @@ public:
 	}
       }
     }
-    if ((strlen(format_str_) > 0) and (all_arrays())) {
+    if ((strlen(format_str_) > 0) && (all_arrays())) {
       for (i = 0; i < items_.size(); i++) {
 	items_[i]->set_in_table(true);
       }
