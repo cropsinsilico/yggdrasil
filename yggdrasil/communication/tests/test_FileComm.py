@@ -61,6 +61,10 @@ class TestFileComm(parent.TestCommBase):
         out['in_temp'] = True
         return out
 
+    def test_file_size(self):
+        r"""Test file_size method."""
+        self.recv_instance.file_size
+
     def test_send_recv_filter_send_filter(self, **kwargs):
         r"""Test send/recv with filter that blocks send."""
         kwargs.setdefault('msg_recv', self.recv_instance.eof_msg)

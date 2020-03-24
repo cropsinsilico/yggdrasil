@@ -34,7 +34,7 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
         lines = []
         for k in args.keys():
             v = args[k]
-            if not isinstance(k, (str, bytes)):
+            if not isinstance(k, (str, bytes)):  # pragma: debug
                 raise ValueError("Serialization of non-string keys not supported.")
             iline = tools.bytes2str(k) + self.delimiter
             if isinstance(v, list):
@@ -96,6 +96,26 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
         desc = ''
         k_units = ''
         is_arr = False
+
+        def finalize_element():
+            if is_arr:
+                out[k][0] = np.array(out[k][0])
+                out[k][1] = np.array(out[k][1])
+            if k_units:
+                if is_arr:
+                    if ';' in k_units:
+                        u1, u2 = k_units.split(';')
+                        u1 = self.parse_units(u1)
+                        u2 = self.parse_units(u2)
+                        out[k][0] = units.add_units(out[k][0], u1)
+                        out[k][1] = units.add_units(out[k][1], u2)
+                    else:
+                        out[k][1] = units.add_units(
+                            out[k][1], self.parse_units(k_units))
+                else:
+                    out[k] = units.add_units(
+                        out[k], self.parse_units(k_units))
+        
         for l in lines:
             if (not l.strip()) or l.startswith('**'):
                 continue
@@ -104,29 +124,13 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                 raise Exception("Failed to parse line: '%s'" % l)
             match = match.groupdict()
             if match.get('name', None):
-                if is_arr:
-                    out[k][0] = np.array(out[k][0])
-                    out[k][1] = np.array(out[k][1])
-                if k_units:
-                    if is_arr:
-                        if ';' in k_units:
-                            u1, u2 = k_units.split(';')
-                            u1 = self.parse_units(u1)
-                            u2 = self.parse_units(u2)
-                            out[k][0] = units.add_units(out[k][0], u1)
-                            out[k][1] = units.add_units(out[k][1], u2)
-                        else:
-                            out[k][1] = units.add_units(
-                                out[k][1], self.parse_units(k_units))
-                    else:
-                        out[k] = units.add_units(
-                            out[k], self.parse_units(k_units))
+                finalize_element()
+                k = match['name']
                 if isinstance(match.get('value1', None), str):
                     match['value1'] = match['value1'].strip()
                 if isinstance(match.get('value2', None), str):
                     match['value2'] = match['value2'].strip()
                 is_arr = bool(match.get('value2', None))
-                k = match['name']
                 desc = ''
                 k_units = ''
                 if is_arr:
@@ -152,6 +156,8 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                     out[k][1].append(v2)
                 else:
                     out[k] = v1
+        if out:
+            finalize_element()
         return out
 
     @classmethod
@@ -197,7 +203,12 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                                units.add_units(
                                    np.array([0.0, 0.0, 24.0, 24.0]), 'degC*d')],
                            'DVSI': 0.0,
-                           'DVSEND': 2.0}]
+                           'DVSEND': 2.0,
+                           'SSATB': [
+                               units.add_units(
+                                   np.array([0.0, 2.0]), 'ha/kg'),
+                               units.add_units(
+                                   np.array([0.0, 0.0]), 'ha/kg')]}]
         out['empty'] = dict()
         out['contents'] = (
             b'CRPNAM=\'Grain maize CSA practicals\'\n\n'
@@ -219,5 +230,7 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
             b'            35.00,   24.00\n'
             b'DVSI = 0.           ! initial DVS\n'
             b'DVSEND   =   2.00   ! development stage at harvest (= 2.0 at '
-            b'maturity [-]))\n')
+            b'maturity [-]))\n'
+            b'SSATB =  0.0, 0.0,  ! specific stem area [ha kg-1]\n'
+            b'         2.0, 0.0   ! as function of DVS\n')
         return out

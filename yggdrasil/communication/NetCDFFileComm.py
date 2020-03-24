@@ -1,6 +1,7 @@
 import os
 import sys
 import copy
+import pprint
 import numpy as np
 from scipy.io import netcdf
 from yggdrasil import units
@@ -42,8 +43,6 @@ class NetCDFFileComm(FileComm):
     @classmethod
     def get_testing_options(cls):
         r"""Method to return a dictionary of testing options for this class.
-
-        Args:
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
@@ -141,8 +140,7 @@ class NetCDFFileComm(FileComm):
     def transform_type_send(self, x):
         x_dtype = np.dtype(x.dtype)
         typecode, size = x_dtype.char, x_dtype.itemsize
-        print(typecode, size)
-        print('netcdf.REVERSE', netcdf.REVERSE)
+        typecode_map = {'l': 'i', 'q': 'i'}
         if (typecode, size) not in netcdf.REVERSE:
             REVERSE_keys = list(netcdf.REVERSE.keys())
             REVERSE_typecode = [k[0] for k in REVERSE_keys]
@@ -155,12 +153,15 @@ class NetCDFFileComm(FileComm):
                         elif i < len(x[index]):
                             x_str[tuple([i, *index])] = x[index][i:(i + 1)]
                 x = x_str
-            elif typecode == 'l':
-                x = x.astype('%s%d' % REVERSE_keys[
-                    REVERSE_typecode.index('i')])
             elif typecode in REVERSE_typecode:
-                x = x.astype('%s%d' % REVERSE_keys[
-                    REVERSE_typecode.index(typecode)])
+                typecode = typecode_map.get(typecode, typecode)
+                x = x.astype(np.dtype(*REVERSE_keys[
+                    REVERSE_typecode.index(typecode)]))
+            else:  # pragma: debug
+                raise RuntimeError(
+                    ("Type (%s, %d) is not in set accepted by "
+                     "netCDF %s.")
+                    % (typecode, size, pprint.pformat(netcdf.REVERSE)))
         return x
     
     # Methods related to position in the file/series
@@ -190,7 +191,7 @@ class NetCDFFileComm(FileComm):
         super(NetCDFFileComm, self).file_seek(pos, whence)
         if whence == 0:
             self._last_size = pos
-        elif whence == 1:
+        elif whence == 1:  # pragma: no cover
             self._last_size = min(self.file_size, self._last_size + pos)
         elif whence == 2:
             self._last_size = self.file_size
@@ -262,7 +263,7 @@ class NetCDFFileComm(FileComm):
             self._file_refresh()
         if self.file_size > self._last_size:
             if self.variables:
-                variables = []
+                variables = self.variables
             else:
                 variables = list(self._fd_netcdf.variables.keys())
             for v in variables:
