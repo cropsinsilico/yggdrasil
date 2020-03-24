@@ -317,6 +317,7 @@ class ModelDriver(Driver):
     include_arg_count = False
     include_channel_obj = False
     is_typed = False
+    is_dsl = False
     brackets = None
     python_interface = {'table_input': 'YggAsciiTableInput',
                         'table_output': 'YggAsciiTableOutput',

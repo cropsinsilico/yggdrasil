@@ -1,9 +1,8 @@
 import os
-from yggdrasil import tools
-from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
+from yggdrasil.drivers.DSLModelDriver import DSLModelDriver
 
 
-class SBMLModelDriver(PythonModelDriver):  # pragma: sbml
+class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
     r"""Class for running SBML models.
 
     Args:
@@ -50,7 +49,6 @@ class SBMLModelDriver(PythonModelDriver):  # pragma: sbml
     language = 'sbml'
     language_ext = '.xml'
     interface_dependencies = ['roadrunner']
-    function_param = None
 
     @classmethod
     def language_version(cls, **kwargs):
@@ -69,46 +67,27 @@ class SBMLModelDriver(PythonModelDriver):  # pragma: sbml
         except ImportError:  # pragma: debug
             raise RuntimeError("roadrunner not installed.")
 
-    @classmethod
-    def setup_model(cls, model_file, inputs=[], outputs=[],
-                    integrator=None, integrator_settings={}):
-        r"""Set up model class instance."""
-        import roadrunner
-        from yggdrasil.languages.Python.YggInterface import (
-            YggInput, YggOutput)
-        model = roadrunner.RoadRunner(model_file)
-        if integrator is not None:
-            model.setIntegrator(integrator)
-        for k, v in integrator_settings.items():
-            model.getIntegrator().setValue(k, v)
-        input_map = {}
-        output_map = {}
-        for x in inputs:
-            input_map[x['name']] = {
-                'vars': x.get('vars', []),
-                'comm': YggInput(x['name'], new_process=True)}
-        for x in outputs:
-            output_map[x['name']] = {
-                'as_array': x.get('as_array', False),
-                'vars': x.get('vars', []),
-                'comm': YggOutput(x['name'], new_process=True)}
-        return model, input_map, output_map
+    @property
+    def model_wrapper_args(self):
+        r"""tuple: Positional arguments for the model wrapper."""
+        return (self.model_file, self.start_time, self.steps)
 
-    @classmethod
-    def call_model(cls, model, curr_time, end_time, steps,
-                   reset=False, start_time=None, selections=None,
-                   variable_step=False):
-        r"""Call the model."""
-        if reset:
-            model.reset()
-            curr_time = start_time
-        out = model.simulate(float(curr_time), float(end_time),
-                             selections=selections,
-                             steps=int(steps))
-        # Unsupported?
-        # variableStep=variable_step)
-        return end_time, out
-
+    @property
+    def model_wrapper_kwargs(self):
+        r"""dict: Keyword arguments for the model wrapper."""
+        out = super(SBMLModelDriver, self).model_wrapper_kwargs
+        out.update(
+            {'inputs': self.inputs,
+             'outputs': self.outputs,
+             'integrator': self.integrator,
+             'integrator_settings': self.integrator_settings,
+             'working_dir': self.working_dir,
+             'reset': self.reset, 'selections': self.selections,
+             # 'variable_step': self.variable_step,
+             'skip_start_time': self.skip_start_time,
+             'only_output_final_step': self.only_output_final_step})
+        return out
+    
     @classmethod
     def model_wrapper(cls, model_file, start_time, steps,
                       inputs=[], outputs=[],
@@ -176,57 +155,42 @@ class SBMLModelDriver(PythonModelDriver):  # pragma: sbml
                     if not flag:
                         raise RuntimeError("Error sending to %s" % k)
 
-    def queue_recv(self):
-        r"""Receive a message from the model process."""
-        while not (self.model_process.pipe[0].poll()
-                   or self.model_process.pipe[0].closed
-                   or self.model_process.pipe[1].closed
-                   or (not self.model_process.is_alive())
-                   or self.queue_thread.was_break):
-            self.sleep()
-        if not self.model_process.pipe[0].poll():
-            raise RuntimeError("No more messages from model process.")
-        out = self.model_process.pipe[0].recv()
-        if isinstance(out, str):
-            out = out.encode('utf-8')
-        return out
-        
-    def queue_close(self):
-        r"""Close the queue for messages from the model process."""
-        self.model_process.pipe[0].close()
-        self.model_process.pipe[1].close()
-        
-    def run_model(self, return_process=True, **kwargs):
-        r"""Run the model. Unless overridden, the model will be run using
-        run_executable.
+    @classmethod
+    def setup_model(cls, model_file, inputs=[], outputs=[],
+                    integrator=None, integrator_settings={}):
+        r"""Set up model class instance."""
+        import roadrunner
+        from yggdrasil.languages.Python.YggInterface import (
+            YggInput, YggOutput)
+        model = roadrunner.RoadRunner(model_file)
+        if integrator is not None:
+            model.setIntegrator(integrator)
+        for k, v in integrator_settings.items():
+            model.getIntegrator().setValue(k, v)
+        input_map = {}
+        output_map = {}
+        for x in inputs:
+            input_map[x['name']] = {
+                'vars': x.get('vars', []),
+                'comm': YggInput(x['name'], new_process=True)}
+        for x in outputs:
+            output_map[x['name']] = {
+                'as_array': x.get('as_array', False),
+                'vars': x.get('vars', []),
+                'comm': YggOutput(x['name'], new_process=True)}
+        return model, input_map, output_map
 
-        Args:
-            return_process (bool, optional): If True, the process running
-                the model is returned. If False, the process will block until
-                the model finishes running. Defaults to True.
-            **kwargs: Keyword arguments are passed to run_executable.
-
-        """
-        env = self.set_env()
-        self.debug('Working directory: %s', self.working_dir)
-        self.debug('Model file: %s', self.model_file)
-        self.debug('Environment Variables:\n%s', self.pprint(env, block_indent=1))
-        args = (self.model_file, self.start_time, self.steps)
-        kwargs = {'inputs': self.inputs,
-                  'outputs': self.outputs,
-                  'integrator': self.integrator,
-                  'integrator_settings': self.integrator_settings,
-                  'env': env, 'working_dir': self.working_dir,
-                  'reset': self.reset, 'selections': self.selections,
-                  # 'variable_step': self.variable_step,
-                  'skip_start_time': self.skip_start_time,
-                  'only_output_final_step': self.only_output_final_step}
-        p = tools.YggProcess(target=self.model_wrapper,
-                             args=args, kwargs=kwargs)
-        p.start()
-        if return_process:
-            return p
-        p.join()
-        if p.returncode != 0:
-            raise RuntimeError("Model failed.")
-        return ''
+    @classmethod
+    def call_model(cls, model, curr_time, end_time, steps,
+                   reset=False, start_time=None, selections=None,
+                   variable_step=False):
+        r"""Call the model."""
+        if reset:
+            model.reset()
+            curr_time = start_time
+        out = model.simulate(float(curr_time), float(end_time),
+                             selections=selections,
+                             steps=int(steps))
+        # Unsupported?
+        # variableStep=variable_step)
+        return end_time, out

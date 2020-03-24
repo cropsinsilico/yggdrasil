@@ -13,8 +13,17 @@ from yggdrasil.metaschema.datatypes import encode_type
 
 
 _all_lang = tools.get_supported_lang()
-_typed_lang = tuple([x for x in _all_lang if
-                     import_component('model', x).is_typed])
+_full_lang = []
+_typed_lang = []
+for x in _all_lang:
+    xdrv = import_component('model', x)
+    if xdrv.is_dsl:
+        continue
+    _full_lang.append(x)
+    if xdrv.is_typed:
+        _typed_lang.append(x)
+_full_lang = tuple(_full_lang)
+_typed_lang = tuple(_typed_lang)
 
 
 @long_running
@@ -31,7 +40,7 @@ class TestExampleTypes(ExampleTstBase):
                  ('c', set(['1darray', 'ndarray']), 'run_example_c_prefixes'),
                  ('*', set(['array']), 'run_example_split_array')]
     iter_flaky = [('c', 'instance', '*'), ('cpp', 'instance', '*')]
-    iter_list_language = _all_lang
+    iter_list_language = _full_lang
     iter_list_method = ['run_example', 'run_example_generic',
                         'run_example_pointers', 'run_example_c_nolengths',
                         'run_example_c_prefixes', 'run_example_split_array']
