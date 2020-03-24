@@ -689,7 +689,7 @@ class CompilationToolBase(object):
         else:
             suffix = 'lib'
         for base in base_paths:
-            paths.append(os.path.join(base_paths, suffix))
+            paths.append(os.path.join(base, suffix))
         return paths
 
     @classmethod
