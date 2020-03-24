@@ -20,7 +20,7 @@ PROGRAM hello
   ret = ygg_recv(inf, buf, bufsiz)
   IF (.not.ret) THEN
      PRINT *, "hello(Fortran): ERROR FILE RECV"
-     CALL EXIT(-1)
+     STOP 1
   END IF
   PRINT *, "hello(Fortran): Received ", bufsiz, &
        "bytes from file: ", buf
@@ -29,7 +29,7 @@ PROGRAM hello
   ret = ygg_send(outq, buf, bufsiz)
   IF (.not.ret) THEN
      PRINT *, "hello(Fortran): ERROR QUEUE SEND"
-     CALL EXIT(-1)
+     STOP 1
   END IF
   PRINT *, "hello(Fortran): Sent to outq"
   
@@ -38,7 +38,7 @@ PROGRAM hello
   ret = ygg_recv(inq, buf, bufsiz)
   IF (.not.ret) THEN
      PRINT *, "hello(Fortran): ERROR QUEUE RECV"
-     CALL EXIT(-1)
+     STOP 1
   END IF
   PRINT *, "hello(Fortran): Received ", bufsiz, &
        "bytes from queue: ", buf
@@ -47,11 +47,10 @@ PROGRAM hello
   ret = ygg_send(outf, buf, bufsiz)
   IF (.not.ret) THEN
      PRINT *, "hello(Fortran): ERROR FILE SEND"
-     CALL EXIT(-1)
+     STOP 1
   END IF
   PRINT *, "hello(Fortran): Sent to outf"
 
   PRINT *, "Goodbye from Fortran"
-  CALL EXIT(0)
   
 END PROGRAM hello

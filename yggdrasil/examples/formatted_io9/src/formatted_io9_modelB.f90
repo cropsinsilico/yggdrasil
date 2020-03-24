@@ -38,6 +38,4 @@ program main
 
   end do
 
-  call exit(0)
-
 end program main

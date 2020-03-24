@@ -38,6 +38,4 @@ PROGRAM main
 
   END DO
 
-  CALL EXIT(0)
-
 END PROGRAM main

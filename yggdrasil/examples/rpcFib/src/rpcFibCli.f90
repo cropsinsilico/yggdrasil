@@ -29,7 +29,7 @@ program main
   ret = ygg_recv(ymlfile, ycontent, ycontent_siz)
   if (.not.ret) then
      write(*, '("rpcFibCli(F): RECV ERROR")')
-     call exit(-1)
+     stop 1
   end if
   nlines = count_lines(ycontent, new_line('A'))
   write(*, '("rpcFibCli: yaml has ",i4," lines")'), nlines + 1
@@ -44,7 +44,7 @@ program main
      ret = ygg_rpc_call(rpc, yggarg(i), [yggarg(fibNo), yggarg(fib)])
      if (.not.ret) then
         write(*, '("rpcFibCli(F): RPC CALL ERROR")')
-        call exit(-1)
+        stop 1
      end if
 
      ! Log result by sending it to the log connection
@@ -56,13 +56,12 @@ program main
      ret = ygg_send(log, logmsg, logmsg_siz)
      if (.not.ret) then
         write(*, '("rpcFibCli(F): SEND ERROR")')
-        call exit(-1)
+        stop 1
      end if
 
   end do
 
   write(*, '("Goodbye from Fortran rpcFibCli")')
-  call exit(0)
 
 end program main
 

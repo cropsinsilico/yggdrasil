@@ -17,7 +17,7 @@ PROGRAM SaM
   ret = ygg_recv(in1, adata, bufsiz)
   IF (.not.ret) THEN
      PRINT *, "SaM(Fortran): ERROR RECV from input1"
-     CALL EXIT(-1)
+     STOP 1
   END IF
   READ(adata, '(I4)') a
   PRINT *, "SaM(Fortran): Received ", a, " from input1"
@@ -27,7 +27,7 @@ PROGRAM SaM
   ret = ygg_recv(in2, bdata, bufsiz)
   IF (.not.ret) THEN
      PRINT *, "SaM(Fortran): ERROR RECV from static"
-     CALL EXIT(-1)
+     STOP 1
   END IF
   READ(bdata, '(I4)') b
   PRINT *, "SaM(Fortran): Received ", b, " from static"
@@ -39,10 +39,8 @@ PROGRAM SaM
   ret = ygg_send(out1, outbuf, LEN_TRIM(outbuf))
   IF (.not.ret) THEN
      PRINT *, "SaM(Fortran): ERROR SEND to output"
-     CALL EXIT(-1)
+     STOP 1
   END IF
   PRINT *, "SaM(Fortran): Sent to output"
   
-  CALL EXIT(0)
-
 END PROGRAM SaM

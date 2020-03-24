@@ -12,7 +12,7 @@ program main
   if (command_argument_count().ne.2) then
      write(*, '("Error in Fortran pipe_src: The message count and size &
           &must be provided as input arguments.")')
-     call exit(-1)
+     stop 1
   end if
 
   call get_command_argument(1, arg)
@@ -47,6 +47,8 @@ program main
   
   write(*, '("Goodbye from Fortran source. Sent ",i5.1," messages.")'), count
   if (allocated(test_msg)) deallocate(test_msg)
-  call exit(exit_code)
+  if (exit_code.lt.0) then
+     stop 1
+  end if
 
 end program main

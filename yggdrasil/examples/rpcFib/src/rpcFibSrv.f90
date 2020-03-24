@@ -51,6 +51,5 @@ program main
   end do
 
   write(*, '("Goodbye from Fortran rpcFibSrv")')
-  call exit(0)
 
 end program main

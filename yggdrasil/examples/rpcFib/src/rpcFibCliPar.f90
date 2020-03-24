@@ -22,7 +22,7 @@ program main
      ret = ygg_send_var(rpc, yggarg(i))
      if (.not.ret) then
         write(*, '("rpcFibCliPar(F): SEND FAILED")')
-        call exit(-1)
+        stop 1
      end if
   end do
 
@@ -33,13 +33,12 @@ program main
      ret = ygg_recv_var(rpc, [yggarg(fibNo), yggarg(fib)])
      if (.not.ret) then
         write(*, '("rpcFibCliPar(F): RECV FAILED")')
-        call exit(-1)
+        stop 1
      end if
      write(*, '("rpcFibCliPar(F):  fib(",i2,"<-) = ",i2,"<-")'), &
           fibNo, fib
   end do
 
   write(*, '("Goodbye from Fortran rpcFibCliPar")')
-  call exit(0)
 
 end program main

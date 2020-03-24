@@ -26,6 +26,5 @@ program main
   end do
 
   print *, "maxMsgSrv(F): Goodbye!"
-  call exit(0)
 
 end program main

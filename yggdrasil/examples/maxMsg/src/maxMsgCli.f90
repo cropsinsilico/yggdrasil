@@ -24,7 +24,7 @@ program main
        [yggarg(input), yggarg(msg_size_input)])
   if (.not.ret) then
      print *, "maxMsgCli(F): RPC ERROR"
-     call exit(-1)
+     stop 1
   end if
   print *, "maxMsgCli(F): received ", msg_size_input, " bytes: ", &
        input%x(1:10), "..."
@@ -32,14 +32,13 @@ program main
   ! Check to see if response matches
   if (.not.all(output.eq.(input%x))) then
      print *, "maxMsgCli(F): ERROR: input/output do not match"
-     call exit(-1)
+     stop 1
   else
      print *, "maxMsgCli(F): CONFIRM"
   end if
 
   ! All done, free and say goodbye
   print *, "maxMsgCli(F): Goodbye!"
-  call exit(0)
 
 end program main
 

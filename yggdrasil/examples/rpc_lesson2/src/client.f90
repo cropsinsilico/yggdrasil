@@ -55,6 +55,8 @@ program main
   end do
 
   write(*, '("Goodbye from Fortran client",i1)'), client_index
-  call exit(exit_code)
+  if (exit_code.lt.0) then
+     stop 1
+  end if
 
 end program main

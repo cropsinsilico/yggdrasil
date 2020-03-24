@@ -42,6 +42,8 @@ program main
 
   write(*, '("Goodbye from Fortran destination. Received ",&
        &i5.1," messages.")'), count
-  call exit(exit_code)
+  if (exit_code.lt.0) then
+     stop 1
+  end if
 
 end program main
