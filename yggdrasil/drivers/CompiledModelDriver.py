@@ -681,7 +681,7 @@ class CompilationToolBase(object):
         if platform._is_win:  # pragma: windows
             base_paths = []
         else:
-            base_paths = ['usr', os.path.join('usr', 'local')]
+            base_paths = ['/usr', os.path.join('/usr', 'local')]
         if platform._is_mac:
             base_paths.append('/Library/Developer/CommandLineTools/usr')
         if libtype == 'include':
