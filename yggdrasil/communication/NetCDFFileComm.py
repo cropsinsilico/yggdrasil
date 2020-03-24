@@ -141,6 +141,8 @@ class NetCDFFileComm(FileComm):
     def transform_type_send(self, x):
         x_dtype = np.dtype(x.dtype)
         typecode, size = x_dtype.char, x_dtype.itemsize
+        print(typecode, size)
+        print('netcdf.REVERSE', netcdf.REVERSE)
         if (typecode, size) not in netcdf.REVERSE:
             REVERSE_keys = list(netcdf.REVERSE.keys())
             REVERSE_typecode = [k[0] for k in REVERSE_keys]
