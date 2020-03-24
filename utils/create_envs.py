@@ -73,7 +73,10 @@ def create_devenv(env_type, python='3.6', name=None, **kwargs):
     req_suffixes = ['', '_testing', '_development']
     if env_type == 'conda':
         req_suffixes.append('_condaonly')
+        # TODO: Find a way to install pip-only packages into conda
+        # environment
     elif env_type == 'pip':
+        req_suffixes.append('_piponly')
         print(subprocess.check_output(['conda', 'install', '-y', '--name', name,
                                        'czmq', 'zeromq']).decode("utf-8"))
     req = [os.path.join(_pkg_dir, 'requirements%s.txt' % x)

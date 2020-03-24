@@ -103,6 +103,8 @@ class BuildModelDriver(CompiledModelDriver):
     base_languages = ['c', 'c++']
     built_where_called = False
     sourcedir_as_sourcefile = False
+    full_language = False
+    is_build_tool = True
 
     def __init__(self, *args, **kwargs):
         self.target_language_driver = None

@@ -157,6 +157,8 @@ def deploy_package_on_ci(method):
             cmds.append(
                 "python %s conda requirements_documentation.txt" % (
                     install_req))
+        if INSTALLSBML:
+            cmds += ['pip install libroadrunner']
         if INSTALLAPY:
             cmds += [
                 "echo Installing AstroPy...",

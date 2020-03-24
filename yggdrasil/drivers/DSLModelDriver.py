@@ -10,6 +10,7 @@ class DSLModelDriver(InterpretedModelDriver):  # pragma: no cover
     base_languages = ['python']  # Defaults to Python but can be modified
     executable_type = 'dsl'
     function_param = None
+    full_language = False
 
     @classmethod
     def is_language_installed(self):

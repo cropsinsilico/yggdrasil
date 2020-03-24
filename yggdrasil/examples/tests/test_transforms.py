@@ -15,7 +15,7 @@ _all_lang = tools.get_supported_lang()
 _untyped_lang = []
 for x in _all_lang:
     xdrv = import_component('model', x)
-    if not (xdrv.is_typed or xdrv.is_dsl):
+    if xdrv.full_language and (not xdrv.is_typed):
         _untyped_lang.append(x)
 _untyped_lang = tuple(_untyped_lang)
 

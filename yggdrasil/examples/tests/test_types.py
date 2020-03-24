@@ -17,11 +17,10 @@ _full_lang = []
 _typed_lang = []
 for x in _all_lang:
     xdrv = import_component('model', x)
-    if xdrv.is_dsl:
-        continue
-    _full_lang.append(x)
-    if xdrv.is_typed:
-        _typed_lang.append(x)
+    if xdrv.full_language:
+        _full_lang.append(x)
+        if xdrv.is_typed:
+            _typed_lang.append(x)
 _full_lang = tuple(_full_lang)
 _typed_lang = tuple(_typed_lang)
 

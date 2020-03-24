@@ -313,11 +313,13 @@ class ModelDriver(Driver):
     inverse_type_map = None
     function_param = None
     version_flags = ['--version']
+    full_language = True
     outputs_in_inputs = False
     include_arg_count = False
     include_channel_obj = False
     is_typed = False
     is_dsl = False
+    is_build_tool = False
     brackets = None
     python_interface = {'table_input': 'YggAsciiTableInput',
                         'table_output': 'YggAsciiTableOutput',
