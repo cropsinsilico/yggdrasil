@@ -145,7 +145,7 @@ def deploy_package_on_ci(method):
     install_req = os.path.join("utils", "install_from_requirements.py")
     if method == 'conda':
         cmds += [
-            "%s install -q conda-build conda-verify %s %s %s" % (
+            "%s install -q conda-build conda-verify scipy %s %s %s" % (
                 conda_cmd,
                 os.environ.get('NUMPY', 'numpy'),
                 os.environ.get('MATPLOTLIB', 'matplotlib'),
@@ -158,7 +158,9 @@ def deploy_package_on_ci(method):
                 "python %s conda requirements_documentation.txt" % (
                     install_req))
         if INSTALLSBML:
-            cmds += ['pip install libroadrunner']
+            cmds += [
+                "echo Installing roadrunner for running SBML models..."
+                "pip install libroadrunner"]
         if INSTALLAPY:
             cmds += [
                 "echo Installing AstroPy...",
