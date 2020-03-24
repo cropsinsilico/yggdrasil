@@ -11,6 +11,7 @@ _is_linux = ('linux' in sys.platform)
 _is_win = (sys.platform in ['win32', 'cygwin'])
 INSTALLLPY = (os.environ.get('INSTALLLPY', '0') == '1')
 INSTALLR = (os.environ.get('INSTALLR', '0') == '1')
+INSTALLSBML = (os.environ.get('INSTALLSBML', '0') == '1')
 INSTALLAPY = (os.environ.get('INSTALLAPY', '0') == '1')
 INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
 INSTALLRMQ = (os.environ.get('INSTALLRMQ', '0') == '1')
@@ -224,7 +225,8 @@ def deploy_package_on_ci(method):
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
-            
+        if INSTALLSBML:
+            cmds += ['pip install libroadrunner']
         if INSTALLAPY:
             cmds += [
                 "echo Installing AstroPy...",
