@@ -128,6 +128,29 @@ class CCompilerBase(CompilerBase):
             kwargs.setdefault('linker_language', 'c++')
         return super(CCompilerBase, cls).call(args, **kwargs)
     
+    @classmethod
+    def get_search_path(cls, *args, **kwargs):
+        r"""Determine the paths searched by the tool for external library files.
+
+        Args:
+            *args: Additional arguments are passed to the parent
+                class's method.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: List of paths that the tools will search.
+
+        """
+        out = super(CompilerBase, cls).get_search_path(*args, **kwargs)
+        if platform._is_mac and (_osx_sysroot is not None):
+            base_path = os.path.join(_osx_sysroot, 'usr')
+            if kwargs.get('libtype', None) == 'include':
+                out.append(os.path.join(base_path, 'include'))
+            else:
+                out.append(os.path.join(base_path, 'lib'))
+        return out
+        
 
 class GCCCompiler(CCompilerBase):
     r"""Interface class for gcc compiler/linker."""
@@ -140,6 +163,7 @@ class GCCCompiler(CCompilerBase):
             list(LinkerBase.flag_options.items())
             + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
             + [('library_rpath', '-Wl,-rpath')]))
+    cxx_lib = 'stdc++'
 
 
 class ClangCompiler(CCompilerBase):
@@ -159,6 +183,7 @@ class ClangCompiler(CCompilerBase):
             list(LinkerBase.flag_options.items())
             + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
             + [('library_rpath', '-rpath')]))
+    cxx_lib = 'c++'
 
 
 class MSVCCompiler(CCompilerBase):
@@ -201,6 +226,7 @@ class MSVCCompiler(CCompilerBase):
                              shared_library_flag='/DLL',
                              search_path_env='LIB',
                              search_path_flags=None)
+    cxx_lib = None  # 'CP'
     
     @classmethod
     def language_version(cls, **kwargs):  # pragma: windows

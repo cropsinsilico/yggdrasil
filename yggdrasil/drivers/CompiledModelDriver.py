@@ -627,12 +627,14 @@ class CompilationToolBase(object):
         return tools.get_conda_prefix()
             
     @classmethod
-    def get_search_path(cls, conda_only=False):
+    def get_search_path(cls, conda_only=False, libtype=None):
         r"""Determine the paths searched by the tool for external library files.
 
         Args:
             conda_only (bool, optional): If True, only the search paths as
                 indicated by a conda environment are returned. Defaults to False.
+            libtype (str, optional): Library type being searched for.
+                Defaults to None.
 
         Returns:
             list: List of paths that the tools will search.
@@ -675,6 +677,19 @@ class CompilationToolBase(object):
                     ienv_path = os.path.join(conda_prefix, ienv)
                     if (ienv_path not in paths) and os.path.isdir(ienv_path):
                         paths.append(ienv_path)
+        # Get libtype specific search paths
+        if platform._is_win:  # pragma: windows
+            base_paths = []
+        else:
+            base_paths = ['usr', os.path.join('usr', 'local')]
+        if platform._is_mac:
+            base_paths.append('/Library/Developer/CommandLineTools/usr')
+        if libtype == 'include':
+            suffix = 'include'
+        else:
+            suffix = 'lib'
+        for base in base_paths:
+            paths.append(os.path.join(base_paths, suffix))
         return paths
 
     @classmethod
@@ -2914,7 +2929,7 @@ class CompiledModelDriver(ModelDriver):
                     pass
                 fpath = None
                 if tool is not None:
-                    search_list = tool.get_search_path()
+                    search_list = tool.get_search_path(libtype=t)
                     if ((platform._is_win and fname.endswith('.lib')
                          and (not fname.startswith('lib')))):  # pragma: windows
                         fname = [fname, 'lib' + fname]

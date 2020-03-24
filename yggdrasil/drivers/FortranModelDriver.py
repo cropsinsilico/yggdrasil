@@ -344,11 +344,8 @@ class FortranModelDriver(CompiledModelDriver):
         checking environment variables for default settings.
         """
         CompiledModelDriver.before_registration(cls)
-        if platform._is_mac:
-            cxx_lib = 'c++'
-        else:
-            cxx_lib = 'stdc++'
-        if cxx_lib not in cls.external_libraries:
+        cxx_lib = CModelDriver.CModelDriver.get_tool('compiler').cxx_lib
+        if (cxx_lib is not None) and (cxx_lib not in cls.external_libraries):
             cls.external_libraries[cxx_lib] = cls.external_libraries.pop('cxx')
             cls.internal_libraries['fygg']['external_dependencies'].append(cxx_lib)
         
