@@ -35,7 +35,7 @@ program main
 
   ! Read lines from ASCII text file until end of file is reached.
   ! As each line is received, it is then sent to the output ASCII file.
-  print *, "ascii_io(F): Receiving/sending ASCII file."
+  write(*, '("ascii_io(F): Receiving/sending ASCII file.")')
   ret = .true.
   do while (ret)
      line_size = size(line%x)  ! Reset to size of buffer
@@ -45,24 +45,24 @@ program main
           [yggarg(line), yggarg(line_size)])
      if (ret) then
         ! If the receive was succesful, send the line to output
-        print *, "File: ", line%x
+        write(*, '("File: ",80A)', advance="no") line%x
         ret = ygg_send_var(file_output, &
              [yggarg(line), yggarg(line_size)])
         if (.not.ret) then
-           print *, "ascii_io(F): ERROR SENDING LINE"
+           write(*, '("ascii_io(F): ERROR SENDING LINE")')
            error_code = -1
            exit
         end if
      else
         ! If the receive was not succesful, send the end-of-file message to
         ! close the output file.
-        print *, "End of file input (F)"
+        write(*, '("End of file input (F)")')
      end if
   end do
 
   ! Read rows from ASCII table until end of file is reached.
   ! As each row is received, it is then sent to the output ASCII table
-  print *, "ascii_io(F): Receiving/sending ASCII table."
+  write(*, '("ascii_io(F): Receiving/sending ASCII table.")')
   ret = .true.
   do while (ret)
      name_siz = BSIZE  ! Reset to size of the buffer
@@ -75,37 +75,39 @@ program main
      if (ret) then
         ! If the receive was succesful, send the values to output. Formatting
         ! is taken care of on the output driver side.
-        print *, "Table: ", trim(name), number, value, comp
+        write (*, '("Table: ",A,", ",I7,", ",F10.5,", ",2F10.5)') &
+             trim(name), number, value, comp
         ret = ygg_send_var(table_output, &
              [yggarg(name), yggarg(name_siz), yggarg(number), &
              yggarg(value), yggarg(comp)])
         if (.not.ret) then
-           print *, "ascii_io(F): ERROR SENDING ROW"
+           write(*, '("ascii_io(F): ERROR SENDING ROW")')
            error_code = -1
            exit
         end if
      else
         ! If the receive was not succesful, send the end-of-file message to
         ! close the output file.
-        print *, "End of table input (F)"
+        write(*, '("End of table input (F)")')
      end if
   end do
 
   ! Read entire array from ASCII table into columns that are dynamically
   ! allocated. The returned values tells us the number of elements in the
   ! columns.
-  print *, "Receiving/sending ASCII table as array."
+  write(*, '("Receiving/sending ASCII table as array.")')
   ret = .true.
   do while (ret)
      ret = ygg_recv_var_realloc(array_input, [yggarg(nrows), &
           yggarg(name_arr), yggarg(number_arr), &
           yggarg(value_arr), yggarg(comp_arr)])
      if (ret) then
-        print *, "Array: (", nrows, " rows)"
+        write(*, '("Array: (",I7," rows)")') nrows
         ! Print each line in the array
         do i = 1, nrows
-           print *, name_arr%x(i)%x, number_arr%x(i), value_arr%x(i), &
-                comp_arr%x(i)
+           write(*, '(5A)', advance="no") name_arr%x(i)%x
+           write(*, '(", ",I7,", ",F10.5,", ",2F10.5)') &
+                number_arr%x(i), value_arr%x(i), comp_arr%x(i)
         end do
         ! Send the columns in the array to output. Formatting is handled on the
         ! output driver side.
@@ -113,12 +115,12 @@ program main
              yggarg(name_arr), yggarg(number_arr), &
              yggarg(value_arr), yggarg(comp_arr)])
         if (.not.ret) then
-           print *, "ascii_io(F): ERROR SENDING ARRAY"
+           write(*, '("ascii_io(F): ERROR SENDING ARRAY")')
            error_code = -1
            exit
         end if
      else
-        print *, "End of array input (F)"
+        write(*, '("End of array input (F)")')
      end if
   end do
 

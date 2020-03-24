@@ -53,7 +53,7 @@ void* get_va_list_ptr_cpp(va_list_t *ap, int allow_null = 0) {
       out = ap->ptrs[ap->iptr];
       ap->iptr++;
       if ((out == NULL) && (allow_null == 0)) {
-	ygglog_throw_error("get_va_list_ptr: Argument is NULL.");
+	ygglog_throw_error("get_va_list_ptr: Argument %d is NULL.", ap->iptr - 1);
       }
     }
   } else {
