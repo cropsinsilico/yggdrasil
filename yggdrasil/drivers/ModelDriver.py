@@ -2766,7 +2766,7 @@ checking if the model flag indicates
         return out
 
     @classmethod
-    def split_line(cls, line, length=None):
+    def split_line(cls, line, length=None, force_split=False):
         r"""Split a line as close to (or before) a given character as
         possible.
 
@@ -2774,6 +2774,8 @@ checking if the model flag indicates
             line (str): Line to split.
             length (int, optional): Maximum length of split lines. Defaults
                 to cls.max_line_width if not provided.
+            force_split (bool, optional): If True, force a split to
+                occur at the specified length. Defauts to False.
 
         Returns:
             list: Set of lines resulting from spliting the provided line.
@@ -2792,13 +2794,19 @@ checking if the model flag indicates
                 out[i] = (nindent * ' ') + out[i]
             new_out = []
             for x in out:
-                new_out += cls.split_line(x)
+                new_out += cls.split_line(x, length=length,
+                                          force_split=force_split)
             return new_out
         if length is None:
             length = cls.max_line_width
         if (length is None) or (len(line) < length):
             return [line]
-        isplit = line[:length].rindex(' ') + 1
+        length_allow = (length - len(cls.function_param.get(
+            'continuation_before', '')))
+        if force_split:
+            isplit = length_allow
+        else:
+            isplit = line[:length_allow].rindex(' ') + 1
         if isplit < nindent + 1:
             out = [line]
         else:
@@ -2806,7 +2814,8 @@ checking if the model flag indicates
                 'continuation_before', ''))
             out += cls.split_line(
                 ((nindent * ' ') + cls.function_param.get(
-                    'continuation_after', '') + line[isplit:]), length)
+                    'continuation_after', '') + line[isplit:]),
+                length=length, force_split=force_split)
         return out
 
     @classmethod

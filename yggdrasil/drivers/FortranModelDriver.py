@@ -665,6 +665,8 @@ class FortranModelDriver(CompiledModelDriver):
             list: Lines required to complete the import.
  
         """
+        if 'filename' in kwargs:
+            kwargs['filename'] = os.path.basename(kwargs['filename'])
         out = super(FortranModelDriver, cls).write_executable_import(
             **kwargs)
         if module:
@@ -756,7 +758,7 @@ class FortranModelDriver(CompiledModelDriver):
         return out
 
     @classmethod
-    def split_line(cls, line, length=None):
+    def split_line(cls, line, length=None, force_split=False):
         r"""Split a line as close to (or before) a given character as
         possible.
 
@@ -764,15 +766,17 @@ class FortranModelDriver(CompiledModelDriver):
             line (str): Line to split.
             length (int, optional): Maximum length of split lines. Defaults
                 to cls.max_line_width if not provided.
+            force_split (bool, optional): If True, force a split to
+                occur at the specified length. Defauts to False.
 
         Returns:
             list: Set of lines resulting from spliting the provided line.
 
         """
         if line.lstrip().lower().startswith("include"):
-            return [line]
+            force_split = True
         return super(FortranModelDriver, cls).split_line(
-            line, length=length)
+            line, length=length, force_split=force_split)
 
     @classmethod
     def allows_realloc(cls, var, from_native_type=False):
