@@ -450,9 +450,13 @@ class FileComm(CommBase.CommBase):
     def _close(self, *args, **kwargs):
         r"""Close the file."""
         self._file_close()
-        if ((os.path.isfile(self.current_address)
+        if ((self.is_series
+             and os.path.isfile(self.current_address)
              and (os.path.getsize(self.current_address) == 0))):
-            os.remove(self.current_address)
+            try:
+                os.remove(self.current_address)
+            except PermissionError:  # pragma: no cover
+                pass
         self.unregister_comm(self.registry_key)
         super(FileComm, self)._close(*args, **kwargs)
 
