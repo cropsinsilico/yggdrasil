@@ -144,6 +144,7 @@ class NetCDFFileComm(FileComm):
         if (typecode, size) not in netcdf.REVERSE:
             REVERSE_keys = list(netcdf.REVERSE.keys())
             REVERSE_typecode = [k[0] for k in REVERSE_keys]
+            typecode = typecode_map.get(typecode, typecode)
             if typecode == 'S':
                 x_str = np.zeros(tuple([size] + list(x.shape)), 'S1')
                 for index in np.ndindex(*x.shape):
@@ -154,7 +155,6 @@ class NetCDFFileComm(FileComm):
                             x_str[tuple([i, *index])] = x[index][i:(i + 1)]
                 x = x_str
             elif typecode in REVERSE_typecode:
-                typecode = typecode_map.get(typecode, typecode)
                 x = x.astype(np.dtype(*REVERSE_keys[
                     REVERSE_typecode.index(typecode)]))
             else:  # pragma: debug
