@@ -309,8 +309,8 @@ class AsyncComm(CommBase.CommBase):
             self._close_backlog()
             return
         self.periodic_debug('run_backlog_send', period=1000)(
-            "Sleeping (is_confirmed_send=%s)",
-            str(self.is_confirmed_send))
+            "Sleeping (is_confirmed_send=%s, n_msg_send=%d)",
+            str(self.is_confirmed_send), self.n_msg_backlog_send)
         self.sleep()
 
     def run_backlog_recv(self):

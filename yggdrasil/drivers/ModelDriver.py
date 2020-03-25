@@ -295,7 +295,6 @@ class ModelDriver(Driver):
                            'items': {'type': 'string'}},
         'outputs_in_inputs': {'type': 'boolean'}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
-    # 'inputs', 'outputs', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
     language = None
@@ -314,10 +313,13 @@ class ModelDriver(Driver):
     inverse_type_map = None
     function_param = None
     version_flags = ['--version']
+    full_language = True
     outputs_in_inputs = False
     include_arg_count = False
     include_channel_obj = False
     is_typed = False
+    is_dsl = False
+    is_build_tool = False
     brackets = None
     python_interface = {'table_input': 'YggAsciiTableInput',
                         'table_output': 'YggAsciiTableOutput',
@@ -1071,10 +1073,18 @@ class ModelDriver(Driver):
                 name=self.name + '.EnqueueLoop')
             self.queue_thread.start()
 
+    def queue_close(self):
+        r"""Close the queue for messages from the model process."""
+        self.model_process.stdout.close()
+
+    def queue_recv(self):
+        r"""Receive a message from the model process."""
+        return self.model_process.stdout.readline()
+
     def enqueue_output_loop(self):
         r"""Keep passing lines to queue."""
         try:
-            line = self.model_process.stdout.readline()
+            line = self.queue_recv()
         except BaseException as e:  # pragma: debug
             print(e)
             line = ""
@@ -1084,7 +1094,7 @@ class ModelDriver(Driver):
             self.queue.put(self._exit_line)
             self.debug("End of model output")
             try:
-                self.model_process.stdout.close()
+                self.queue_close()
             except BaseException:  # pragma: debug
                 pass
         else:
@@ -1197,7 +1207,7 @@ class ModelDriver(Driver):
                     self.queue_thread.set_break_flag()
                     self.queue_thread.wait(self.timeout)
                     try:
-                        self.model_process.stdout.close()
+                        self.queue_close()
                         self.queue_thread.wait(self.timeout)
                     except BaseException:  # pragma: debug
                         self.exception("Closed during concurrent action")

@@ -223,7 +223,7 @@ class ZMQProxy(CommBase.CommServer):
         self.reply_socket = None
         # Set name
         super(ZMQProxy, self).__init__(self.srv_address, self.cli_address, **kwargs)
-        self.name = 'ZMQProxy.%s' % srv_address
+        self._name = 'ZMQProxy.%s' % srv_address
 
     def client_recv(self):
         r"""Receive single message from the client."""
@@ -348,7 +348,7 @@ class ZMQComm(AsyncComm.AsyncComm):
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',
-                          dealer_identity=None,
+                          dealer_identity=None, new_process=False,
                           reply_socket_address=None, **kwargs):
         r"""Initialize defaults for socket type/action based on direction."""
         self.reply_socket_lock = threading.RLock()
@@ -388,7 +388,10 @@ class ZMQComm(AsyncComm.AsyncComm):
                 socket_action = 'bind'
             else:
                 socket_action = 'connect'
-        self.context = context or _global_context
+        if new_process:
+            self.context = zmq.Context()
+        else:
+            self.context = context or _global_context
         self.socket_type_name = socket_type
         self.socket_type = getattr(zmq, socket_type)
         self.socket_action = socket_action

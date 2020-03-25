@@ -125,9 +125,9 @@ definitions:
             type: string
           type: array
       required:
-      - name
-      - datatype
       - commtype
+      - datatype
+      - name
       title: comm_base
       type: object
     - anyOf:
@@ -265,8 +265,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -608,9 +608,9 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - working_dir
       - filetype
+      - name
       title: file_base
       type: object
     - anyOf:
@@ -1164,6 +1164,20 @@ definitions:
           items:
             $ref: '#/definitions/comm'
           type: array
+        integrator:
+          default: cvode
+          description: Name of integrator that should be used. Valid options include
+            ['cvode', 'gillespie', 'rk4', 'rk45']. Defaults to 'cvode'.
+          enum:
+          - cvode
+          - gillespie
+          - rk4
+          - rk45
+          type: string
+        integrator_settings:
+          default: {}
+          description: Settings for the integrator. Defaults to empty dict.
+          type: object
         interpreter:
           description: Name or path of interpreter executable that should be used
             to run the model. If not provided, the interpreter will be determined
@@ -1204,6 +1218,7 @@ definitions:
           - matlab
           - python
           - r
+          - sbml
           type: string
         linker:
           description: Command or path to executable that should be used to link the
@@ -1233,6 +1248,10 @@ definitions:
         name:
           description: Name used for component in log messages.
           type: string
+        only_output_final_step:
+          default: false
+          description: If True, only the final timestep is output. Defaults to False.
+          type: boolean
         outputs:
           default:
           - name: default
@@ -1274,11 +1293,29 @@ definitions:
           items:
             type: string
           type: array
+        reset:
+          default: false
+          description: If True, the simulation will be reset to it's initial values
+            before each call (including the start time). Defaults to False.
+          type: boolean
+        selections:
+          default: []
+          description: Variables to include in the output. Defaults to None and the
+            time/floating selections will be returned.
+          items:
+            type: string
+          type: array
         skip_interpreter:
           default: false
           description: If True, no interpreter will be added to the arguments. This
             should only be used for subclasses that will not be invoking the model
             via the command line. Defaults to False.
+          type: boolean
+        skip_start_time:
+          default: false
+          description: If True, the results for the initial time step will not be
+            output. Defaults to False. This option is ignored if only_output_final_step
+            is True.
           type: boolean
         source_files:
           default: []
@@ -1302,6 +1339,17 @@ definitions:
             to working_dir. This should be the directory containing the CMakeLists.txt
             file. It can be relative to working_dir or absolute.
           type: string
+        start_time:
+          default: 0.0
+          description: Time that simulation should be started from. If 'reset' is
+            True, the start time will always be the provided value, otherwise, the
+            start time will be the end of the previous call after the first call.
+            Defaults to 0.0.
+          type: number
+        steps:
+          default: 1
+          description: Number of steps that should be output. Defaults to None.
+          type: integer
         strace_flags:
           default:
           - -e
@@ -1345,16 +1393,31 @@ definitions:
             is used.
           type: string
       required:
-      - name
-      - args
-      - language
       - working_dir
+      - language
+      - args
+      - name
       title: model_base
       type: object
     - anyOf:
       - additionalProperties: true
         description: Schema for model component ['function'] subtype.
         properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
           language:
             default: executable
             description: The programming language that the model is written in. A
@@ -1362,6 +1425,12 @@ definitions:
             enum:
             - function
             type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
         title: FunctionModelDriver
         type: object
       - additionalProperties: true
@@ -1685,6 +1754,85 @@ definitions:
               via the command line. Defaults to False.
             type: boolean
         title: RModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['sbml'] subtype.
+        properties:
+          integrator:
+            default: cvode
+            description: Name of integrator that should be used. Valid options include
+              ['cvode', 'gillespie', 'rk4', 'rk45']. Defaults to 'cvode'.
+            enum:
+            - cvode
+            - gillespie
+            - rk4
+            - rk45
+            type: string
+          integrator_settings:
+            default: {}
+            description: Settings for the integrator. Defaults to empty dict.
+            type: object
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is an SBML model.
+            enum:
+            - sbml
+            type: string
+          only_output_final_step:
+            default: false
+            description: If True, only the final timestep is output. Defaults to False.
+            type: boolean
+          reset:
+            default: false
+            description: If True, the simulation will be reset to it's initial values
+              before each call (including the start time). Defaults to False.
+            type: boolean
+          selections:
+            default: []
+            description: Variables to include in the output. Defaults to None and
+              the time/floating selections will be returned.
+            items:
+              type: string
+            type: array
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+          skip_start_time:
+            default: false
+            description: If True, the results for the initial time step will not be
+              output. Defaults to False. This option is ignored if only_output_final_step
+              is True.
+            type: boolean
+          start_time:
+            default: 0.0
+            description: Time that simulation should be started from. If 'reset' is
+              True, the start time will always be the provided value, otherwise, the
+              start time will be the end of the previous call after the first call.
+              Defaults to 0.0.
+            type: number
+          steps:
+            default: 1
+            description: Number of steps that should be output. Defaults to None.
+            type: integer
+        title: SBMLModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['cmake'] subtype.
