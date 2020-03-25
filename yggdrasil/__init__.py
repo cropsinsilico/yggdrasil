@@ -11,6 +11,7 @@ import subprocess
 import importlib
 from ._version import get_versions
 from yggdrasil import config
+from yggdrasil.runner import YggFunction
 _test_package_name = None
 _test_package = None
 logging.basicConfig()
@@ -39,6 +40,22 @@ if not os.path.isfile(config.usr_config_file):  # pragma: no cover
     shutil.copy(config.def_config_file, config.usr_config_file)
     install_languages.install_all_languages(from_setup=True)
     config.update_language_config()
+
+
+def import_as_function(model_yaml, **kwargs):
+    r"""Import a model as a function from a yaml specification file.
+
+    Args:
+        model_yaml (str, list): Full path to model yaml describing
+            the model(s) and an inputs or outputs.
+        **kwargs: Additional keyword arguments are passed to the
+            YggFunction constructor.
+
+    Returns:
+        YggFunction: Callable wrapper for model.
+
+    """
+    return YggFunction(model_yaml, **kwargs)
 
 
 def expand_and_add(path, path_list, dir_list):  # pragma: no cover

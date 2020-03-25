@@ -2,7 +2,7 @@ import os
 import unittest
 import signal
 import uuid
-from yggdrasil import runner, tools, platform
+from yggdrasil import runner, tools, platform, import_as_function
 from yggdrasil.tests import YggTestBase, assert_raises
 # from yggdrasil.tests import yamls as sc_yamls
 from yggdrasil.examples import yamls as ex_yamls
@@ -65,8 +65,22 @@ def test_runner_error():
     r"""Test error on missing yaml."""
     assert_raises(IOError, runner.YggRunner,
                   ['fake_yaml.yml'], 'test_ygg_run')
-    
 
+
+def test_import_as_function():
+    r"""Test import_as_function."""
+    yamlfile = ex_yamls['fakeplant']['python']
+    fmodel = import_as_function(yamlfile)
+    input_args = {}
+    for x in fmodel.arguments:
+        input_args[x] = 1.0
+    result = fmodel(**input_args)
+    for x in fmodel.returns:
+        assert(x in result)
+    fmodel.stop()
+    fmodel.stop()
+            
+            
 class TestYggRunner(YggTestBase):
     r"""Tests of the YggRunner class."""
     def setup(self, *args, **kwargs):

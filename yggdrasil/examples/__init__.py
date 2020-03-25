@@ -12,6 +12,7 @@ ext_map = {'python': '.py',
            'c': '.c',
            'cpp': '.cpp',
            'executable': '',
+           'function': '',
            'make': '.cpp',
            'cmake': '.cpp'}
 for lang in tools.get_supported_lang():
@@ -42,7 +43,8 @@ def register_example(example_dir):
     if not os.path.isfile(testfile):  # pragma: no cover
         # TODO: Automate test creation
         logging.error("Missing test file: %s" % testfile)
-    assert(os.path.isdir(srcdir))
+    if not os.path.isdir(srcdir):
+        return {}
     # Determine which languages are present in the example
     lang_avail = []
     lang_search = None
@@ -189,8 +191,9 @@ def discover_examples(parent_dir=None):
             continue
         match_base = os.path.basename(match)
         iout = register_example(match)
-        for i, k in enumerate(['lang', 'yml', 'src']):
-            out[k][match_base] = iout[i]
+        if iout:
+            for i, k in enumerate(['lang', 'yml', 'src']):
+                out[k][match_base] = iout[i]
     return out['lang'], out['yml'], out['src']
 
 

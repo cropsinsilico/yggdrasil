@@ -133,12 +133,14 @@ def prep_yaml(files):
     return yml_all
 
 
-def parse_yaml(files):
+def parse_yaml(files, as_function=False):
     r"""Parse list of yaml files.
 
     Args:
         files (str, list): Either the path to a single yaml file or a list of
             yaml files.
+        as_function (bool, optional): If True, the missing input/output channels
+            will be created for using model(s) as a function. Defaults to False.
 
     Raises:
         ValueError: If the yml dictionary is missing a required keyword or has
@@ -163,6 +165,9 @@ def parse_yaml(files):
     for k in ['models', 'connections']:
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
+
+    if as_function:
+        existing = add_model_function(existing)
     # Make sure that I/O channels initialized
     opp_map = {'input': 'output', 'output': 'input'}
     for io in ['input', 'output']:
@@ -192,6 +197,50 @@ def parse_yaml(files):
     existing = link_model_io(existing)
     # print('drivers')
     # pprint.pprint(existing)
+    return existing
+
+
+def add_model_function(existing):
+    r"""Patch input/output channels that are not connected to a function model.
+
+    Args:
+        existing (dict): Dictionary of existing components.
+
+    Returns:
+        dict: Updated dictionary of components.
+
+    """
+    new_model = {'name': 'function_model',
+                 'language': 'function',
+                 'args': 'function',
+                 'working_dir': os.getcwd(),
+                 'inputs': [],
+                 'outputs': []}
+    new_connections = []
+    # Locate unmatched channels
+    miss = {}
+    dir2opp = {'input': 'output', 'output': 'input'}
+    for io in dir2opp.keys():
+        miss[io] = [k for k in existing[io].keys()]
+    for conn in existing['connection'].values():
+        for io1, io2 in dir2opp.items():
+            if (io1 in conn):
+                for x in conn[io1]:
+                    if x in miss[io2]:
+                        miss[io2].remove(x)
+    # Create connections to function model
+    for io1, io2 in dir2opp.items():
+        for i in miss[io1]:
+            function_channel = 'function_%s' % i
+            function_comm = copy.deepcopy(existing[io1][i])
+            function_comm['name'] = function_channel
+            new_model[io2 + 's'].append(function_comm)
+            new_connections.append({io1 + 's': [{'name': function_channel}],
+                                    io2 + 's': [{'name': i}]})
+    # Parse new components
+    existing = parse_component(new_model, 'model', existing=existing)
+    for new_conn in new_connections:
+        existing = parse_component(new_conn, 'connection', existing=existing)
     return existing
 
 
