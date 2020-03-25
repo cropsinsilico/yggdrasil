@@ -50,21 +50,25 @@ class YggFunction(YggClass):
             os.environ.update(**drv['instance'].env)
             var_name = drv['name'].split('function_')[-1]
             self.outputs[var_name] = drv.copy()
-            self.outputs[var_name]['comm'] = YggInput(drv['name'])
+            self.outputs[var_name]['vars'] = [
+                iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
+            self.outputs[var_name]['comm'] = YggInput(drv['name'], is_interface=True)
         for drv in self.model_driver['output_drivers']:
             var_name = drv['name'].split('function_')[-1]
             os.environ.update(**drv['instance'].env)
             self.inputs[var_name] = drv.copy()
-            self.inputs[var_name]['comm'] = YggOutput(drv['name'])
+            self.inputs[var_name]['vars'] = [
+                iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
+            self.inputs[var_name]['comm'] = YggOutput(drv['name'], is_interface=True)
         self._stop_called = False
         atexit.register(self.stop)
         # Get arguments
         self.arguments = []
         for k, v in self.inputs.items():
-            self.arguments += v.get('vars', [k])
+            self.arguments += v['vars']
         self.returns = []
         for k, v in self.outputs.items():
-            self.returns += v.get('vars', [k])
+            self.returns += v['vars']
         
     def __call__(self, **kwargs):
         r"""Call the model as a function by sending variables.
@@ -88,17 +92,16 @@ class YggFunction(YggClass):
                 raise RuntimeError("Required argument %s not provided." % a)
         # Send
         for k, v in self.inputs.items():
-            ivars = v.get('vars', [k])
-            flag = v['comm'].send([kwargs[a] for a in ivars])
+            flag = v['comm'].send([kwargs[a] for a in v['vars']])
             if not flag:
                 raise RuntimeError("Failed to send %s" % k)
         # Receive
         out = {}
         for k, v in self.outputs.items():
-            ivars = v.get('vars', [k])
             flag, data = v['comm'].recv()
             if not flag:
                 raise RuntimeError("Failed to receive variable %s" % v)
+            ivars = v['vars']
             if isinstance(data, (list, tuple)):
                 assert(len(data) == len(ivars))
                 for a, d in zip(ivars, data):
