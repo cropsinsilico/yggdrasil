@@ -621,7 +621,8 @@ class CModelDriver(CompiledModelDriver):
                                                     **kwargs)
         
     @classmethod
-    def update_ld_library_path(cls, env, paths_to_add=None, add_to_front=False):
+    def update_ld_library_path(cls, env, paths_to_add=None,
+                               add_to_front=False, add_libpython_dir=False):
         r"""Update provided dictionary of environment variables so that
         LD_LIBRARY_PATH includes the interface directory containing the interface
         libraries.
@@ -632,13 +633,20 @@ class CModelDriver(CompiledModelDriver):
                 provided, defaults to [cls.get_language_dir()].
             add_to_front (bool, optional): If True, new paths are added to the
                 front, rather than the end. Defaults to False.
+            add_libpython_dir (bool, optional): If True, the directory
+                containing the Python C library will be added. Defaults
+                to False.
 
         Returns:
             dict: Updated dictionary of environment variables.
 
         """
         if paths_to_add is None:
-            paths_to_add = [cls.get_language_dir()]
+            paths_to_add = []
+        paths_to_add = paths_to_add + [cls.get_language_dir()]
+        if add_libpython_dir:
+            paths_to_add = paths_to_add + [os.path.dirname(
+                cls.get_dependency_library('python'))]
         if platform._is_linux:
             path_list = []
             prev_path = env.pop('LD_LIBRARY_PATH', '')
