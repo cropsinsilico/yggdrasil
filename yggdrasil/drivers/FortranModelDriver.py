@@ -23,13 +23,13 @@ class FortranCompilerBase(CompilerBase):
     languages = ['fortran']
     default_executable_env = 'FF'
     default_flags_env = 'FFLAGS'
-    default_flags = ['-g', '-Wall', '-x', 'f95-cpp-input', '-cpp',
-                     '-pedantic-errors']
+    default_flags = ['-g', '-Wall', '-x', 'f95-cpp-input']
     linker_attributes = {'default_flags_env': 'LFLAGS',
                          'search_path_env': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
     search_path_env = []
     default_linker = None
     default_executable = None
+    default_archiver = 'ar'
     product_exts = ['mod']
 
     @classmethod
@@ -44,8 +44,10 @@ class FortranCompilerBase(CompilerBase):
             list: Flags for the tool.
 
         """
-        kwargs.setdefault('module-dir', _top_lang_dir)
-        kwargs.setdefault('module-search-path', _top_lang_dir)
+        if 'module-dir' in cls.flag_options:
+            kwargs.setdefault('module-dir', _top_lang_dir)
+        if 'module-search-path' in cls.flag_options:
+            kwargs.setdefault('module-search-path', _top_lang_dir)
         out = super(FortranCompilerBase, cls).get_flags(**kwargs)
         for x in ['-O', '-O2', '-O3', 'Os', 'Ofast']:
             if x in out:
@@ -79,11 +81,22 @@ class FortranCompilerBase(CompilerBase):
                                          'fygg.mod'))
 
 
+class FlangCompiler(FortranCompilerBase):
+    r"""Interface class for flang compiler/linker."""
+    toolname = 'flang'
+    platforms = ['MacOS', 'Linux', 'Windows']
+    flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
+                               + [('module-dir', '-I%s'),
+                                  ('module-search-path', '-I%s'),
+                                  ('standard', '-std=%s')])
+
+
 class GFortranCompiler(FortranCompilerBase):
     r"""Interface class for gfortran compiler/linker."""
     toolname = 'gfortran'
     platforms = ['MacOS', 'Linux', 'Windows']
-    default_archiver = 'ar'
+    default_flags = (FortranCompilerBase.default_flags
+                     + ['-cpp', '-pedantic-errors'])
     flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
                                + [('module-dir', '-J%s'),
                                   ('module-search-path', '-I%s'),
@@ -94,7 +107,6 @@ class GFortranCompiler(FortranCompilerBase):
 #     r"""Interface class for ifort compiler/linker."""
 #     toolname = 'ifort'
 #     platforms = ['MacOS', 'Linux', 'Windows']
-#     default_archiver = 'ar'
 #     flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
 #                                + [('module-dir', '-module'),
 #                                   ('module-search-path', '-module'),
@@ -343,8 +355,16 @@ class FortranModelDriver(CompiledModelDriver):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
+        if cls.default_compiler is None:
+            if platform._is_linux or platform._is_mac:
+                cls.default_compiler = 'gfortran'
+            elif platform._is_win:  # pragma: windows
+                cls.default_compiler = 'flang'
         CompiledModelDriver.before_registration(cls)
-        cxx_lib = CModelDriver.CModelDriver.get_tool('compiler').cxx_lib
+        try:
+            cxx_lib = CModelDriver.CModelDriver.get_tool('compiler').cxx_lib
+        except NotImplementedError:
+            cxx_lib = None
         if (cxx_lib is not None) and (cxx_lib not in cls.external_libraries):
             cls.external_libraries[cxx_lib] = cls.external_libraries.pop('cxx')
             cls.internal_libraries['fygg']['external_dependencies'].append(cxx_lib)
