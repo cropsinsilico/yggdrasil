@@ -11,12 +11,21 @@ class LockedBuffer(list):
         return super(LockedBuffer, self).__init__(*args, **kwargs)
 
     def __getattribute__(self, name):
-        if name == 'lock':
+        if name in ['lock', '__getstate__', '__setstate__']:
             return list.__getattribute__(self, name)
         else:
             with self.lock:
                 return list.__getattribute__(self, name)
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['lock']
+        return state
+
+    def __setstate__(self, state):
+        self.lock = threading.RLock()
+        self.__dict__.update(state)
+        
 
 class BufferComm(CommBase.CommBase):
     r"""Class for handling I/O to an in-memory buffer.

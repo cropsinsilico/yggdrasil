@@ -419,6 +419,20 @@ class ZMQComm(AsyncComm.AsyncComm):
                                    nretry=4, retry_timeout=2.0 * self.sleeptime)
         super(ZMQComm, self)._init_before_open(**kwargs)
 
+    def __getstate__(self):
+        state = super(ZMQComm, self).__getstate__()
+        del state['context']
+        del state['_server_kwargs']['context']
+        del state['socket']
+        return state
+
+    def __setstate__(self, state):
+        state['context'] = zmq.Context()
+        state['_server_kwargs']['context'] = state['context']
+        super(ZMQComm, self).__setstate__(state)
+        self.socket = self.context.socket(self.socket_type)
+        self.socket.setsockopt(zmq.LINGER, 0)
+
     def get_status_message(self, nindent=0):
         r"""Return lines composing a status message.
         

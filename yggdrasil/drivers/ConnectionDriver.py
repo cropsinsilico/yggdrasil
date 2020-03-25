@@ -4,7 +4,8 @@ import copy
 import numpy as np
 import threading
 from yggdrasil.communication import new_comm
-from yggdrasil.drivers.Driver import Driver
+# from yggdrasil.drivers.Driver import Driver
+from yggdrasil.drivers.Driver import DriverProcess as Driver
 from yggdrasil.components import (
     import_component, create_component, isinstance_component)
 from yggdrasil.schema import get_schema

@@ -46,20 +46,23 @@ class YggFunction(YggClass):
         # Create input/output channels
         self.inputs = {}
         self.outputs = {}
+        import zmq; ctx = zmq.Context()
         for drv in self.model_driver['input_drivers']:
             os.environ.update(**drv['instance'].env)
             var_name = drv['name'].split('function_')[-1]
             self.outputs[var_name] = drv.copy()
             self.outputs[var_name]['vars'] = [
                 iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
-            self.outputs[var_name]['comm'] = YggInput(drv['name'], is_interface=True)
+            self.outputs[var_name]['comm'] = YggInput(drv['name'], is_interface=True,
+                                                      context=ctx)
         for drv in self.model_driver['output_drivers']:
             var_name = drv['name'].split('function_')[-1]
             os.environ.update(**drv['instance'].env)
             self.inputs[var_name] = drv.copy()
             self.inputs[var_name]['vars'] = [
                 iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
-            self.inputs[var_name]['comm'] = YggOutput(drv['name'], is_interface=True)
+            self.inputs[var_name]['comm'] = YggOutput(drv['name'], is_interface=True,
+                                                      context=ctx)
         self._stop_called = False
         atexit.register(self.stop)
         # Get arguments
@@ -91,14 +94,18 @@ class YggFunction(YggClass):
             if a not in kwargs:
                 raise RuntimeError("Required argument %s not provided." % a)
         # Send
+        print('sending')
         for k, v in self.inputs.items():
+            print(k, v['comm'].address)
             flag = v['comm'].send([kwargs[a] for a in v['vars']])
             if not flag:
                 raise RuntimeError("Failed to send %s" % k)
         # Receive
+        print('receiving')
         out = {}
         for k, v in self.outputs.items():
-            flag, data = v['comm'].recv()
+            print(k, v['comm'].address)
+            flag, data = v['comm'].recv(timeout=60.0)
             if not flag:
                 raise RuntimeError("Failed to receive variable %s" % v)
             ivars = v['vars']

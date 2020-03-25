@@ -23,7 +23,8 @@ import subprocess
 import importlib
 from yggdrasil import platform
 from yggdrasil.components import import_component, ComponentBase
-multiprocessing_ctx = multiprocessing.get_context("spawn")
+mp_ctx = multiprocessing.get_context()
+mp_ctx_spawn = multiprocessing.get_context("spawn")
 
 
 logger = logging.getLogger(__name__)
@@ -1059,11 +1060,50 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
     def __getstate__(self):
         state = self.__dict__.copy()
         del state['logger']
+        thread_attr = {}
+        for k, v in list(state.items()):
+            if isinstance(v, (threading._CRLock, threading._RLock)):
+                thread_attr.setdefault('threading.RLock', [])
+                thread_attr['threading.RLock'].append((k, (), {}))
+            elif isinstance(v, threading.Event):
+                thread_attr.setdefault('threading.Event', [])
+                thread_attr['threading.Event'].append((k, (), {}))
+            # elif isinstance(v, multiprocessing.synchronize.RLock):
+            #     thread_attr.setdefault('multiprocessing.RLock', [])
+            #     thread_attr['multiprocessing.RLock'].append((k, (), {}))
+            # elif isinstance(v, multiprocessing.synchronize.Event):
+            #     thread_attr.setdefault('multiprocessing.Event', [])
+            #     thread_attr['multiprocessing.Event'].append((k, (), {}))
+            elif isinstance(v, YggThreadLoop):
+                assert(not v.is_alive())
+                thread_attr.setdefault('YggThreadLoop', [])
+                thread_attr['YggThreadLoop'].append(
+                    (k, v._input_args, v._input_kwargs))
+            elif isinstance(v, YggThread):
+                assert(not v.is_alive())
+                thread_attr.setdefault('YggThread', [])
+                thread_attr['YggThread'].append(
+                    (k, v._input_args, v._input_kwargs))
+            elif isinstance(v, threading.Thread):
+                assert(not v.is_alive())
+                attr = {'name': v._name, 'group': None,
+                        'daemon': v.daemon, 'target': v._target,
+                        'args': v._args, 'kwargs': v._kwargs}
+                thread_attr.setdefault('threading.Thread', [])
+                thread_attr['threading.Thread'].append((k, (), attr))
+        for attr_list in thread_attr.values():
+            for k in attr_list:
+                state.pop(k[0])
+        state['thread_attr'] = thread_attr
         return state
 
     def __setstate__(self, state):
-        self.__dict__.update(state)
+        thread_attr = state.pop('thread_attr')
         self.logger = logging.getLogger(self.__module__)
+        for cls, items in thread_attr.items():
+            for k, args, kwargs in items:
+                state[k] = eval(cls)(*args, **kwargs)
+        self.__dict__.update(state)
 
     def __deepcopy__(self, memo):
         r"""Don't deep copy since threads cannot be copied."""
@@ -1422,15 +1462,26 @@ class YggProcBase(YggClass):
             ygg_kwargs['target'] = target
             target = None
         super(YggProcBase, self).__init__(name, **ygg_kwargs)
-        self.proc_kwargs = dict(name=name, group=group, daemon=daemon,
-                                target=target, args=args, kwargs=kwargs)
-        self.as_process = isinstance(self, multiprocessing_ctx.Process)
+        self.as_process = isinstance(self, (mp_ctx.Process,
+                                            mp_ctx_spawn.Process))
         if self.as_process:
             self._proc_type = 'process'
-            self._proc_class = multiprocessing_ctx.Process
+            if isinstance(self, mp_ctx_spawn.Process):
+                self._proc_type += '_spawn'
+                self._proc_context = mp_ctx_spawn
+            else:
+                self._proc_context = mp_ctx
+            self._proc_class = self._proc_context.Process
+            self.old_stdout = None
+            self.pipe = self._proc_context.Pipe()
+            self.send_pipe = None
+            self.stdout = None
+            kwargs['send_pipe'] = self.pipe[1]
         else:
             self._proc_type = 'thread'
             self._proc_class = threading.Thread
+        self.proc_kwargs = dict(name=name, group=group, daemon=daemon,
+                                target=target, args=args, kwargs=kwargs)
         self._proc_class.__init__(self, **self.proc_kwargs)
         self._ygg_target = target
         self._ygg_args = args
@@ -1443,13 +1494,19 @@ class YggProcBase(YggClass):
         self.terminate_flag = False
         self._cleanup_called = False
         self._calling_thread = None
-        _thread_registry[self.name] = self
-        _lock_registry[self.name] = self.lock
-        atexit.register(self.atexit)
+        if not self.as_process:
+            _thread_registry[self.name] = self
+            _lock_registry[self.name] = self.lock
+            atexit.register(self.atexit)
 
     def run(self, *args, **kwargs):
         r"""Continue running until terminate event set."""
         self.debug("Starting method")
+        atexit.register(self.atexit)
+        if self.as_process:
+            self.old_stdout = sys.stdout
+            self.send_pipe = self._kwargs.pop('send_pipe')
+            # sys.stdout = os.fdopen(self.send_pipe.fileno(), 'w')
         try:
             super(YggProcBase, self).run(*args, **kwargs)
         except BaseException:  # pragma: debug
@@ -1460,6 +1517,12 @@ class YggProcBase(YggClass):
     def run_finally(self):
         r"""Actions to perform in finally clause of try/except wrapping
         run."""
+        if self.as_process:
+            if self.send_pipe is not None:
+                self.send_pipe.close()
+            if self.old_stdout is not None:
+                sys.stdout = self.old_stdout
+            self.old_stdout = None
         for k in ['_ygg_target', '_ygg_args', '_ygg_kwargs']:
             if hasattr(self, k):
                 delattr(self, k)
@@ -1507,6 +1570,13 @@ class YggProcBase(YggClass):
         r"""Return code."""
         return self.exitcode
 
+    def kill(self, *args, **kwargs):
+        r"""Kill the process."""
+        if self.as_process:
+            return self.terminate(*args, **kwargs)
+        else:
+            return super(YggProcBase, self).kill(*args, **kwargs)
+
     def terminate(self, no_wait=False):
         r"""Set the terminate event and wait for the thread/process to stop.
 
@@ -1544,28 +1614,30 @@ class YggProcBase(YggClass):
     def get_lock(self):
         r"""Get a new lock object."""
         if self.as_process:
-            return multiprocessing_ctx.RLock()
+            return self._proc_context.RLock()
         else:
             return threading.RLock()
 
     def get_event(self):
         r"""Get a new event object."""
         if self.as_process:
-            return multiprocessing_ctx.Event()
+            return self._proc_context.Event()
         else:
             return threading.Event()
 
     def get_current_proc(self):
         r"""Get the current process/thread."""
         if self.as_process:
-            return multiprocessing_ctx.current_process()
+            return self._proc_context.current_process()
         else:
             return threading.current_thread()
 
     def get_main_proc(self):
         r"""Get the main process/thread."""
         if self.as_process:
-            out = multiprocessing_ctx.parent_process()
+            out = None
+            if hasattr(self._proc_context, 'parent_process'):
+                out = self._proc_context.parent_process()
             if out is None:
                 out = self.get_current_proc()
             return out
@@ -1758,46 +1830,35 @@ class YggProcLoopBase(YggProcBase):
         super(YggProcLoopBase, self).terminate(*args, **kwargs)
 
 
-class YggProcess(YggProcBase, multiprocessing_ctx.Process):
+class YggProcess(YggProcBase, mp_ctx.Process):
     r"""Process for Ygg that tracks when the process is started and joined.
 
     Attributes:
-        lock (multiprocessing_ctx.Lock): Lock for accessing the sockets from multiple
+        lock (multiprocessing.Lock): Lock for accessing the sockets from multiple
             processes.
-        start_event (multiprocessing_ctx.Event): Event indicating that the process was
+        start_event (multiprocessing.Event): Event indicating that the process was
             started.
-        terminate_event (multiprocessing_ctx.Event): Event indicating that the process
+        terminate_event (multiprocessing.Event): Event indicating that the process
             should be terminated. The target must exit when this is set.
 
     """
-    
-    def __init__(self, *args, **kwargs):
-        self.old_stdout = None
-        self.pipe = multiprocessing_ctx.Pipe()
-        self.send_pipe = None
-        self.stdout = None
-        kwargs.setdefault('kwargs', {})
-        kwargs['kwargs']['send_pipe'] = self.pipe[1]
-        super(YggProcess, self).__init__(*args, **kwargs)
+    pass
 
-    def run(self, *args, **kwargs):
-        r"""Continue running until terminate event set."""
-        self.old_stdout = sys.stdout
-        self.send_pipe = self._kwargs.pop('send_pipe')
-        # sys.stdout = os.fdopen(self.send_pipe.fileno(), 'w')
-        return super(YggProcess, self).run(*args, **kwargs)
 
-    def run_finally(self):
-        r"""Actions to perform in finally clause of try/except wrapping
-        run."""
-        self.send_pipe.close()
-        sys.stdout = self.old_stdout
-        self.old_stdout = None
-        super(YggProcess, self).run_finally()
+class YggProcessSpawn(YggProcBase, mp_ctx_spawn.Process):
+    r"""Process for Ygg that tracks when the process is started and joined
+    on a newly spawned process.
 
-    def kill(self, *args, **kwargs):
-        r"""Kill the process."""
-        return self.terminate(*args, **kwargs)
+    Attributes:
+        lock (multiprocessing.Lock): Lock for accessing the sockets from multiple
+            processes.
+        start_event (multiprocessing.Event): Event indicating that the process was
+            started.
+        terminate_event (multiprocessing.Event): Event indicating that the process
+            should be terminated. The target must exit when this is set.
+
+    """
+    pass
 
 
 class YggThread(YggProcBase, threading.Thread):

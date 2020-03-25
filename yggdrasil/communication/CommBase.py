@@ -501,6 +501,11 @@ class CommBase(tools.YggClass):
         else:
             self.open()
 
+    def __getstate__(self):
+        if self.is_open:
+            raise RuntimeError("Cannot pickle an open comm.")
+        return super(CommBase, self).__getstate__()
+        
     def _init_before_open(self, **kwargs):
         r"""Initialization steps that should be performed after base class, but
         before the comm is opened."""
