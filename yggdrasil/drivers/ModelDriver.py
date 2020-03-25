@@ -1182,7 +1182,8 @@ class ModelDriver(Driver):
                 except BaseException:  # pragma: debug
                     self.exception("Error killing model process")
             assert(self.model_process_complete)
-            if self.model_process.returncode != 0:
+            if (((self.model_process is not None)
+                 and (self.model_process.returncode != 0))):
                 self.error("return code of %s indicates model error.",
                            str(self.model_process.returncode))
             self.event_process_kill_complete.set()

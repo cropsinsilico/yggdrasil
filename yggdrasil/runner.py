@@ -29,8 +29,8 @@ class YggFunction(YggClass):
             constructor.
 
     Attributes:
-        input_channels (dict): Input channels providing access to model output.
-        output_channels (dict): Output channels providing access to model input.
+        outputs (dict): Input channels providing access to model output.
+        inputs (dict): Output channels providing access to model input.
         runner (YggRunner): Runner for model.
 
     """
@@ -44,21 +44,27 @@ class YggFunction(YggClass):
         self.runner.run()
         self.model_driver = self.runner.modeldrivers['function_model']
         # Create input/output channels
-        self.input_channels = {}
-        self.output_channels = {}
+        self.inputs = {}
+        self.outputs = {}
         for drv in self.model_driver['input_drivers']:
             os.environ.update(**drv['instance'].env)
             var_name = drv['name'].split('function_')[-1]
-            self.input_channels[var_name] = YggInput(drv['name'])
+            self.outputs[var_name] = drv.copy()
+            self.outputs[var_name]['comm'] = YggInput(drv['name'])
         for drv in self.model_driver['output_drivers']:
             var_name = drv['name'].split('function_')[-1]
             os.environ.update(**drv['instance'].env)
-        # TODO: Use proper data type or pass format string via
-        # environment variable
-        self.output_channels[var_name] = YggOutput(
-            drv['name'], format_str=drv.get('format_str', None))
+            self.inputs[var_name] = drv.copy()
+            self.inputs[var_name]['comm'] = YggOutput(drv['name'])
         self._stop_called = False
         atexit.register(self.stop)
+        # Get arguments
+        self.arguments = []
+        for k, v in self.inputs.items():
+            self.arguments += v.get('vars', [k])
+        self.returns = []
+        for k, v in self.outputs.items():
+            self.returns += v.get('vars', [k])
         
     def __call__(self, **kwargs):
         r"""Call the model as a function by sending variables.
@@ -81,42 +87,40 @@ class YggFunction(YggClass):
             if a not in kwargs:
                 raise RuntimeError("Required argument %s not provided." % a)
         # Send
-        for a in self.arguments:
-            flag = self.output_channels[a].send(kwargs[a])
+        for k, v in self.inputs.items():
+            ivars = v.get('vars', [k])
+            flag = v['comm'].send([kwargs[a] for a in ivars])
             if not flag:
-                raise RuntimeError("Failed to send variable %s" % a)
+                raise RuntimeError("Failed to send %s" % k)
         # Receive
         out = {}
-        for v in self.returns:
-            flag, data = self.input_channels[v].recv()
+        for k, v in self.outputs.items():
+            ivars = v.get('vars', [k])
+            flag, data = v['comm'].recv()
             if not flag:
                 raise RuntimeError("Failed to receive variable %s" % v)
-            out[v] = data
+            if isinstance(data, (list, tuple)):
+                assert(len(data) == len(ivars))
+                for a, d in zip(ivars, data):
+                    out[a] = d
+            else:
+                assert(len(ivars) == 1)
+                out[ivars[0]] = data
         return out
 
-    @property
-    def arguments(self):
-        r"""list: Names of arguments to the model."""
-        return sorted([x for x in self.output_channels.keys()])
-    
-    @property
-    def returns(self):
-        r"""list: Names of variables the model returns."""
-        return sorted([x for x in self.input_channels.keys()])
-    
     def stop(self):
         r"""Stop the model(s) from running."""
         if self._stop_called:
             return
         self._stop_called = True
-        for x in self.output_channels.values():
-            x.send_eof()
-        for x in self.input_channels.values():
-            x.close()
+        for x in self.inputs.values():
+            x['comm'].send_eof()
+        for x in self.outputs.values():
+            x['comm'].close()
         self.model_driver['instance'].terminate()
         self.runner.waitModels()
-        for x in self.output_channels.values():
-            x.close()
+        for x in self.inputs.values():
+            x['comm'].close()
         self.runner.atexit()
         # self.runner.terminate()
         # self.runner.atexit()

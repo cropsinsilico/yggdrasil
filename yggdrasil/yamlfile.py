@@ -165,7 +165,6 @@ def parse_yaml(files, as_function=False):
     for k in ['models', 'connections']:
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
-
     if as_function:
         existing = add_model_function(existing)
     # Make sure that I/O channels initialized
@@ -224,8 +223,8 @@ def add_model_function(existing):
         miss[io] = [k for k in existing[io].keys()]
     for conn in existing['connection'].values():
         for io1, io2 in dir2opp.items():
-            if (io1 in conn):
-                for x in conn[io1]:
+            if ((io1 + 's') in conn):
+                for x in conn[io1 + 's']:
                     if x in miss[io2]:
                         miss[io2].remove(x)
     # Create connections to function model
