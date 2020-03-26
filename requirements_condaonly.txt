@@ -1,5 +1,6 @@
 cmake
 czmq
+r-rcpp<=1.0.3
 r-base
 r-bit64
 r-r6
