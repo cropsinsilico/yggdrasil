@@ -127,7 +127,7 @@ class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
                         model.setValue(iv, value[iv])
             if not flag:
                 break
-            if time is None:
+            if time is None:  # pragma: debug
                 raise RuntimeError("No time variable recovered.")
             curr_time, out_value = cls.call_model(
                 model, curr_time, time, steps,
@@ -148,11 +148,11 @@ class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
                     for i in range(nele):
                         iiout = {ik: iv[i] for ik, iv in iout.items()}
                         flag = v['comm'].send_dict(iiout, key_order=v['vars'])
-                        if not flag:
+                        if not flag:  # pragma: debug
                             raise RuntimeError("Error sending step %d to %s" % (i, k))
                 else:
                     flag = v['comm'].send_dict(iout, key_order=v['vars'])
-                    if not flag:
+                    if not flag:  # pragma: debug
                         raise RuntimeError("Error sending to %s" % k)
 
     @classmethod
