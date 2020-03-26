@@ -23,7 +23,7 @@ class FortranCompilerBase(CompilerBase):
     languages = ['fortran']
     default_executable_env = 'FF'
     default_flags_env = 'FFLAGS'
-    default_flags = ['-g', '-Wall', '-x', 'f95-cpp-input']
+    default_flags = ['-g', '-Wall']
     linker_attributes = {'default_flags_env': 'LFLAGS',
                          'search_path_env': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
     search_path_env = []
@@ -96,7 +96,7 @@ class GFortranCompiler(FortranCompilerBase):
     toolname = 'gfortran'
     platforms = ['MacOS', 'Linux', 'Windows']
     default_flags = (FortranCompilerBase.default_flags
-                     + ['-cpp', '-pedantic-errors'])
+                     + ['-x', 'f95-cpp-input', '-cpp', '-pedantic-errors'])
     flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
                                + [('module-dir', '-J%s'),
                                   ('module-search-path', '-I%s'),

@@ -45,13 +45,15 @@ end program main
 subroutine rand_str(x, x_siz)
   use fygg
   character, dimension(*) :: x
+  real :: x_rand
   integer(kind=c_size_t) :: x_siz, i, index
   character(len=62) :: charset
   charset = "0123456789&
        &abcdefghijklmnopqrstuvwxyz&
        &ABCDEFGHIJKLMNOPQRSTUVWXYZ"
   do i = 1, x_siz
-     index = int(rand(0) * (len(charset) - 1), c_size_t) + 1
+     call random_number(x_rand)
+     index = int(x_rand * (len(charset) - 1), c_size_t) + 1
      x(i) = charset(index:index)
   end do
   ! do i = (x_siz+1), size(x)
