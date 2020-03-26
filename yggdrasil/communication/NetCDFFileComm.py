@@ -262,9 +262,8 @@ class NetCDFFileComm(FileComm):
         if self.is_open and ((self._fd_netcdf is None) or self.append):
             self._file_refresh()
         if self.file_size > self._last_size:
-            if self.variables:
-                variables = self.variables
-            else:
+            variables = self.variables
+            if not variables:
                 variables = list(self._fd_netcdf.variables.keys())
             for v in variables:
                 out[v] = self.transform_type_recv(
