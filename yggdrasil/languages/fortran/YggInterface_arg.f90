@@ -101,16 +101,6 @@ function yggarg_scalar_real8(x) result (y)
   y%ptr = c_loc(xp)
   y%nbytes = 8
 end function yggarg_scalar_real8
-function yggarg_scalar_real16(x) result (y)
-  type(yggptr) :: y
-  real(kind=16), target :: x
-  real(kind=16), pointer :: xp
-  y = yggarg_scalar_init(x)
-  xp => x
-  y%type = "real"
-  y%ptr = c_loc(xp)
-  y%nbytes = 16
-end function yggarg_scalar_real16
 function yggarg_scalar_complex4(x) result (y)
   type(yggptr) :: y
   complex(kind=4), target :: x
@@ -131,16 +121,6 @@ function yggarg_scalar_complex8(x) result (y)
   y%ptr = c_loc(xp)
   y%nbytes = 8 * 2
 end function yggarg_scalar_complex8
-function yggarg_scalar_complex16(x) result (y)
-  type(yggptr) :: y
-  complex(kind=16), target :: x
-  complex(kind=16), pointer :: xp
-  y = yggarg_scalar_init(x)
-  xp => x
-  y%type = "complex"
-  y%ptr = c_loc(xp)
-  y%nbytes = 16 * 2
-end function yggarg_scalar_complex16
 function yggarg_scalar_logical1(x) result (y)
   type(yggptr) :: y
   logical(kind=1), target :: x
@@ -202,13 +182,13 @@ function yggarg_scalar_character(x) result (y)
 end function yggarg_scalar_character
 function yggarg_scalar_unicode(x) result (y)
   type(yggptr) :: y
-  character(kind=selected_char_kind('ISO_10646'), len=*), target :: x
-  character(kind=selected_char_kind('ISO_10646'), len=len(x)), pointer :: xp
+  character(kind=ucs4, len=*), target :: x
+  character(kind=ucs4, len=len(x)), pointer :: xp
   integer :: i
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "unicode"
-  y%prec = len(x) * 4  ! sizeof(selected_char_kind('ISO_10646'))
+  y%prec = len(x) * 4  ! sizeof(ucs4)
   allocate(y%data_unicode_unit(len(x)))
   do i = 1, len(x)
      y%data_unicode_unit(i) = x(i:i)
@@ -827,20 +807,6 @@ function yggarg_1darray_real8(x, x_shape) result (y)
   y%type = "real"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_real8
-function yggarg_1darray_real16(x, x_shape) result (y)
-  real(kind=16), dimension(:), target :: x
-  real(kind=16), dimension(:), pointer :: xp
-  integer, dimension(:), optional :: x_shape
-  type(yggptr) :: y
-  xp => x
-  if (present(x_shape)) then
-     y = yggarg_ndarray_init(x, x_shape)
-  else
-     y = yggarg_ndarray_init(x)
-  end if
-  y%type = "real"
-  y%ptr = c_loc(xp(1))
-end function yggarg_1darray_real16
 function yggarg_1darray_complex4(x, x_shape) result (y)
   complex(kind=4), dimension(:), target :: x
   complex(kind=4), dimension(:), pointer :: xp
@@ -869,20 +835,6 @@ function yggarg_1darray_complex8(x, x_shape) result (y)
   y%type = "complex"
   y%ptr = c_loc(xp(1))
 end function yggarg_1darray_complex8
-function yggarg_1darray_complex16(x, x_shape) result (y)
-  complex(kind=16), dimension(:), target :: x
-  complex(kind=16), dimension(:), pointer :: xp
-  integer, dimension(:), optional :: x_shape
-  type(yggptr) :: y
-  xp => x
-  if (present(x_shape)) then
-     y = yggarg_ndarray_init(x, x_shape)
-  else
-     y = yggarg_ndarray_init(x)
-  end if
-  y%type = "complex"
-  y%ptr = c_loc(xp(1))
-end function yggarg_1darray_complex16
 function yggarg_1darray_logical1(x, x_shape) result (y)
   logical(kind=1), dimension(:), target :: x
   logical(kind=1), dimension(:), pointer :: xp
@@ -964,9 +916,9 @@ function yggarg_1darray_character(x, x_shape) result (y)
   y%ptr = c_loc(y%data_character_unit(1))
 end function yggarg_1darray_character
 function yggarg_1darray_unicode(x, x_shape) result (y)
-  character(kind=selected_char_kind('ISO_10646'), len=*), &
+  character(kind=ucs4, len=*), &
        dimension(:), target :: x
-  character(kind=selected_char_kind('ISO_10646'), len=len(x(1))), &
+  character(kind=ucs4, len=len(x(1))), &
        dimension(:), pointer :: xp
   integer, dimension(:), optional :: x_shape
   type(yggptr) :: y
@@ -978,7 +930,7 @@ function yggarg_1darray_unicode(x, x_shape) result (y)
      y = yggarg_ndarray_init(x)
   end if
   y%type = "unicode"
-  y%prec = len(xp(1)) * 4  ! sizeof(selected_char_kind('ISO_10646'))
+  y%prec = len(xp(1)) * 4  ! sizeof(ucs4)
   do i = 1, size(xp)
      ilength = len_trim(xp(i))
      if (ilength.lt.len(xp(1))) then
@@ -1111,15 +1063,6 @@ function yggarg_2darray_real8(x) result (y)
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
 end function yggarg_2darray_real8
-function yggarg_2darray_real16(x) result (y)
-  real(kind=16), dimension(:, :), target :: x
-  real(kind=16), dimension(:), pointer :: xp
-  type(yggptr) :: y
-  allocate(xp(size(x)))
-  xp = reshape(x, [size(x)])
-  y = yggarg(xp, shape(x))
-  call yggarg_2darray_init(y, x)
-end function yggarg_2darray_real16
 function yggarg_2darray_complex4(x) result (y)
   complex(kind=4), dimension(:, :), target :: x
   complex(kind=4), dimension(:), pointer :: xp
@@ -1138,15 +1081,6 @@ function yggarg_2darray_complex8(x) result (y)
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
 end function yggarg_2darray_complex8
-function yggarg_2darray_complex16(x) result (y)
-  complex(kind=16), dimension(:, :), target :: x
-  complex(kind=16), dimension(:), pointer :: xp
-  type(yggptr) :: y
-  allocate(xp(size(x)))
-  xp = reshape(x, [size(x)])
-  y = yggarg(xp, shape(x))
-  call yggarg_2darray_init(y, x)
-end function yggarg_2darray_complex16
 function yggarg_2darray_logical1(x) result (y)
   logical(kind=1), dimension(:, :), target :: x
   logical(kind=1), dimension(:), pointer :: xp

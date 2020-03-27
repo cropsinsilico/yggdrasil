@@ -6,6 +6,12 @@ module fygg
 
   integer, parameter :: LINE_SIZE_MAX = 2048
   integer, parameter :: YGG_MSG_BUF = 2048
+  integer, parameter :: ascii = selected_char_kind ("ascii")
+#ifdef _WIN32
+  integer, parameter :: ucs4  = 1
+#else
+  integer, parameter :: ucs4  = selected_char_kind ('ISO_10646')
+#endif
   integer(kind=c_int), bind(c, name="YGG_MSG_MAX_F") :: YGG_MSG_MAX
 
   interface yggarg
@@ -18,16 +24,22 @@ module fygg
      module procedure yggarg_scalar_integer8
      module procedure yggarg_scalar_real4
      module procedure yggarg_scalar_real8
+#ifndef _WIN32
      module procedure yggarg_scalar_real16
+#endif
      module procedure yggarg_scalar_complex4
      module procedure yggarg_scalar_complex8
+#ifndef _WIN32
      module procedure yggarg_scalar_complex16
+#endif
      module procedure yggarg_scalar_logical1
      module procedure yggarg_scalar_logical2
      module procedure yggarg_scalar_logical4
      module procedure yggarg_scalar_logical8
      module procedure yggarg_scalar_character
+#ifndef _WIN32
      module procedure yggarg_scalar_unicode
+#endif
      module procedure yggarg_scalar_yggchar_r
      module procedure yggarg_scalar_ply
      module procedure yggarg_scalar_obj
@@ -74,16 +86,22 @@ module fygg
      module procedure yggarg_1darray_integer8
      module procedure yggarg_1darray_real4
      module procedure yggarg_1darray_real8
+#ifndef _WIN32
      module procedure yggarg_1darray_real16
+#endif
      module procedure yggarg_1darray_complex4
      module procedure yggarg_1darray_complex8
+#ifndef _WIN32
      module procedure yggarg_1darray_complex16
+#endif
      module procedure yggarg_1darray_logical1
      module procedure yggarg_1darray_logical2
      module procedure yggarg_1darray_logical4
      module procedure yggarg_1darray_logical8
      module procedure yggarg_1darray_character
+#ifndef _WIN32
      module procedure yggarg_1darray_unicode
+#endif
      module procedure yggarg_1darray_yggchar_r
      module procedure yggarg_realloc_ndarray_unsigned1
      module procedure yggarg_realloc_ndarray_unsigned2
@@ -117,10 +135,14 @@ module fygg
      module procedure yggarg_2darray_integer8
      module procedure yggarg_2darray_real4
      module procedure yggarg_2darray_real8
+#ifndef _WIN32
      module procedure yggarg_2darray_real16
+#endif
      module procedure yggarg_2darray_complex4
      module procedure yggarg_2darray_complex8
+#ifndef _WIN32
      module procedure yggarg_2darray_complex16
+#endif
      module procedure yggarg_2darray_logical1
      module procedure yggarg_2darray_logical2
      module procedure yggarg_2darray_logical4
@@ -232,9 +254,15 @@ module fygg
   type :: real8_1d
      real(kind=8), dimension(:), pointer :: x => null()
   end type real8_1d
+#ifdef _WIN32
+  type :: real16_1d
+     real(kind=8), dimension(:), pointer :: x => null()
+  end type real16_1d
+#else
   type :: real16_1d
      real(kind=16), dimension(:), pointer :: x => null()
   end type real16_1d
+#endif
   type :: complex_1d
      complex, dimension(:), pointer :: x => null()
   end type complex_1d
@@ -244,9 +272,15 @@ module fygg
   type :: complex8_1d
      complex(kind=8), dimension(:), pointer :: x => null()
   end type complex8_1d
+#ifdef _WIN32
+  type :: complex16_1d
+     complex(kind=8), dimension(:), pointer :: x => null()
+  end type complex16_1d
+#else
   type :: complex16_1d
      complex(kind=16), dimension(:), pointer :: x => null()
   end type complex16_1d
+#endif
   type :: logical_1d
      logical, dimension(:), pointer :: x => null()
   end type logical_1d
@@ -313,10 +347,17 @@ module fygg
      real(kind=8), dimension(:), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type real8_nd
+#ifdef _WIN32
+  type :: real16_nd
+     real(kind=8), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
+  end type real16_nd
+#else
   type :: real16_nd
      real(kind=16), dimension(:), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type real16_nd
+#endif
   type :: complex_nd
      complex, dimension(:), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
@@ -329,10 +370,17 @@ module fygg
      complex(kind=8), dimension(:), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type complex8_nd
+#ifdef _WIN32
+  type :: complex16_nd
+     complex(kind=8), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
+  end type complex16_nd
+#else
   type :: complex16_nd
      complex(kind=16), dimension(:), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type complex16_nd
+#endif
   type :: logical_nd
      logical, dimension(:), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
@@ -405,10 +453,17 @@ module fygg
      real(kind=8), dimension(:, :), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type real8_2d
+#ifdef _WIN32
+  type :: real16_2d
+     real(kind=8), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
+  end type real16_2d
+#else
   type :: real16_2d
      real(kind=16), dimension(:, :), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type real16_2d
+#endif
   type :: complex_2d
      complex, dimension(:, :), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
@@ -421,10 +476,17 @@ module fygg
      complex(kind=8), dimension(:, :), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type complex8_2d
+#ifdef _WIN32
+  type :: complex16_2d
+     complex(kind=8), dimension(:, :), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
+  end type complex16_2d
+#else
   type :: complex16_2d
      complex(kind=16), dimension(:, :), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type complex16_2d
+#endif
   type :: logical_2d
      logical, dimension(:, :), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
@@ -465,7 +527,7 @@ module fygg
      class(*), dimension(:, :), pointer :: item_array_2d => null()
      class(*), dimension(:, :, :), pointer :: item_array_3d => null()
      character, dimension(:), pointer :: data_character_unit => null()
-     character(kind=selected_char_kind('ISO_10646')), dimension(:), &
+     character(kind=ucs4), dimension(:), &
           pointer :: data_unicode_unit => null()
      integer(kind=c_size_t), pointer :: len_c => null()
      integer(kind=c_size_t), pointer :: prec_c => null()
@@ -599,6 +661,76 @@ contains
   include "YggInterface_arg.f90"
   include "YggInterface_conv.f90"
   include "YggInterface_assign.f90"
+
+
+#ifndef _WIN32
+  function yggarg_scalar_real16(x) result (y)
+    type(yggptr) :: y
+    real(kind=16), target :: x
+    real(kind=16), pointer :: xp
+    y = yggarg_scalar_init(x)
+    xp => x
+    y%type = "real"
+    y%ptr = c_loc(xp)
+    y%nbytes = 16
+  end function yggarg_scalar_real16
+  function yggarg_scalar_complex16(x) result (y)
+    type(yggptr) :: y
+    complex(kind=16), target :: x
+    complex(kind=16), pointer :: xp
+    y = yggarg_scalar_init(x)
+    xp => x
+    y%type = "complex"
+    y%ptr = c_loc(xp)
+    y%nbytes = 16 * 2
+  end function yggarg_scalar_complex16
+  function yggarg_1darray_real16(x, x_shape) result (y)
+    real(kind=16), dimension(:), target :: x
+    real(kind=16), dimension(:), pointer :: xp
+    integer, dimension(:), optional :: x_shape
+    type(yggptr) :: y
+    xp => x
+    if (present(x_shape)) then
+       y = yggarg_ndarray_init(x, x_shape)
+    else
+       y = yggarg_ndarray_init(x)
+    end if
+    y%type = "real"
+    y%ptr = c_loc(xp(1))
+  end function yggarg_1darray_real16
+  function yggarg_1darray_complex16(x, x_shape) result (y)
+    complex(kind=16), dimension(:), target :: x
+    complex(kind=16), dimension(:), pointer :: xp
+    integer, dimension(:), optional :: x_shape
+    type(yggptr) :: y
+    xp => x
+    if (present(x_shape)) then
+       y = yggarg_ndarray_init(x, x_shape)
+    else
+       y = yggarg_ndarray_init(x)
+    end if
+    y%type = "complex"
+    y%ptr = c_loc(xp(1))
+  end function yggarg_1darray_complex16
+  function yggarg_2darray_real16(x) result (y)
+    real(kind=16), dimension(:, :), target :: x
+    real(kind=16), dimension(:), pointer :: xp
+    type(yggptr) :: y
+    allocate(xp(size(x)))
+    xp = reshape(x, [size(x)])
+    y = yggarg(xp, shape(x))
+    call yggarg_2darray_init(y, x)
+  end function yggarg_2darray_real16
+  function yggarg_2darray_complex16(x) result (y)
+    complex(kind=16), dimension(:, :), target :: x
+    complex(kind=16), dimension(:), pointer :: xp
+    type(yggptr) :: y
+    allocate(xp(size(x)))
+    xp = reshape(x, [size(x)])
+    y = yggarg(xp, shape(x))
+    call yggarg_2darray_init(y, x)
+  end function yggarg_2darray_complex16
+#endif
   
   ! Utilities
   function init_ygguint1(x) result(y)

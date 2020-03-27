@@ -85,6 +85,8 @@ class FlangCompiler(FortranCompilerBase):
     r"""Interface class for flang compiler/linker."""
     toolname = 'flang'
     platforms = ['MacOS', 'Linux', 'Windows']
+    default_flags = (FortranCompilerBase.default_flags
+                     + ['-cpp'])
     flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
                                + [('module-dir', '-I%s'),
                                   ('module-search-path', '-I%s'),
@@ -132,7 +134,7 @@ class FortranModelDriver(CompiledModelDriver):
     base_languages = ['c']
     interface_library = 'fygg'
     # To prevent inheritance
-    default_compiler = 'gfortran'
+    default_compiler = None
     default_linker = None
     supported_comm_options = dict(
         CModelDriver.CModelDriver.supported_comm_options,
@@ -368,6 +370,8 @@ class FortranModelDriver(CompiledModelDriver):
         if (cxx_lib is not None) and (cxx_lib not in cls.external_libraries):
             cls.external_libraries[cxx_lib] = cls.external_libraries.pop('cxx')
             cls.internal_libraries['fygg']['external_dependencies'].append(cxx_lib)
+        else:
+            cls.external_libraries.pop('cxx', None)
         
     def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.

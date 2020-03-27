@@ -285,8 +285,12 @@ if (_python_inc is None) or (not os.path.isfile(_python_inc)):  # pragma: no cov
 else:
     _python_inc = os.path.dirname(_python_inc)
 try:
-    _python_lib = ygg_cfg.get('c', 'python_shared',
-                              ygg_cfg.get('c', 'python_static', None))
+    if platform._is_win:  # pragma: windows
+        libtype_order = ['static', 'shared']
+    else:
+        libtype_order = ['shared', 'static']
+    _python_lib = ygg_cfg.get('c', 'python_%s' % libtype_order[0],
+                              ygg_cfg.get('c', 'python_%s' % libtype_order[1], None))
     if (_python_lib is None) or (not os.path.isfile(_python_lib)):  # pragma: no cover
         _python_lib = tools.get_python_c_library(allow_failure=False)
 except BaseException:  # pragma: debug

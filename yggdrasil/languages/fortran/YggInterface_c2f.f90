@@ -166,14 +166,14 @@ function yggptr_c2f(x, realloc) result(flag)
               call yggptr_c2f_ndarray_real(x)
            type is (real(kind=8))
               call yggptr_c2f_ndarray_real(x)
-           type is (real(kind=16))
-              call yggptr_c2f_ndarray_real(x)
+           ! type is (real(kind=16))
+           !    call yggptr_c2f_ndarray_real(x)
            type is (complex(kind=4))
               call yggptr_c2f_ndarray_complex(x)
            type is (complex(kind=8))
               call yggptr_c2f_ndarray_complex(x)
-           type is (complex(kind=16))
-              call yggptr_c2f_ndarray_complex(x)
+           ! type is (complex(kind=16))
+           !    call yggptr_c2f_ndarray_complex(x)
            type is (logical(kind=1))
               call yggptr_c2f_ndarray_logical(x)
            type is (logical(kind=2))
@@ -200,10 +200,10 @@ function yggptr_c2f(x, realloc) result(flag)
            type is (integer(kind=8))
            type is (real(kind=4))
            type is (real(kind=8))
-           type is (real(kind=16))
+           ! type is (real(kind=16))
            type is (complex(kind=4))
            type is (complex(kind=8))
-           type is (complex(kind=16))
+           ! type is (complex(kind=16))
            type is (logical(kind=1))
            type is (logical(kind=2))
            type is (logical(kind=4))
@@ -230,10 +230,10 @@ function yggptr_c2f(x, realloc) result(flag)
      type is (integer(kind=8))
      type is (real(kind=4))
      type is (real(kind=8))
-     type is (real(kind=16))
+     ! type is (real(kind=16))
      type is (complex(kind=4))
      type is (complex(kind=8))
-     type is (complex(kind=16))
+     ! type is (complex(kind=16))
      type is (logical(kind=1))
      type is (logical(kind=2))
      type is (logical(kind=4))
@@ -243,19 +243,22 @@ function yggptr_c2f(x, realloc) result(flag)
         call yggptr_c2f_scalar_character(x)
      type is (character(*))
         call yggptr_c2f_scalar_character(x)
-     type is (character(kind=selected_char_kind('ISO_10646'), len=*))
-        call yggptr_c2f_scalar_character(x)
      class default
         if ((x%type.eq."ply").or.(x%type.eq."obj").or. &
              (x%type.eq."generic").or.(x%type.eq."object").or. &
              (x%type.eq."array").or.(x%type.eq."schema").or. &
              (x%type.eq."python").or.(x%type.eq."class").or. &
              (x%type.eq."instance").or.(x%type.eq."function")) then
-           ! Use pointer
+           ! Use pointer        
         else
-           write(log_msg, '("yggptr_c2f (scalar transfer): Unexpected type: ",A)') x%type
-           call ygglog_error(log_msg)
-           stop "ERROR"
+           select type(item=>x%item)
+           type is (character(kind=ucs4, len=*))
+              call yggptr_c2f_scalar_character(x)
+           class default
+              write(log_msg, '("yggptr_c2f (scalar transfer): Unexpected type: ",A)') x%type
+              call ygglog_error(log_msg)
+              stop "ERROR"
+           end select
         end if
      end select
   end if
@@ -286,7 +289,7 @@ end function yggptr_c2f
 subroutine yggptr_c2f_scalar_character(x)
   implicit none
   type(yggptr) :: x
-  character(kind=selected_char_kind('ISO_10646'), len=:), &
+  character(kind=ucs4, len=:), &
        pointer :: x_unicode
   character(len=:), pointer :: x_character
   type(yggchar_r), pointer :: x_character_realloc
@@ -309,18 +312,21 @@ subroutine yggptr_c2f_scalar_character(x)
         x_character(i:i) = ' '
      end do
      deallocate(x%data_character_unit)
-  type is (character(kind=selected_char_kind('ISO_10646'), len=*))
-     x_unicode => item
-     do i = 1, (x%prec / 4)
-        x_unicode(i:i) = x%data_unicode_unit(i)
-     end do
-     do i = ((x%prec / 4) + 1), len(x_unicode)
-        x_unicode(i:i) = ' '
-     end do
-     deallocate(x%data_unicode_unit)
   class default
-     call ygglog_error("yggptr_c2f_scalar_character: Unexpected type.")
-     stop "ERROR"
+     select type(item=>x%item)
+     type is (character(kind=ucs4, len=*))
+        x_unicode => item
+        do i = 1, (x%prec / 4)
+           x_unicode(i:i) = x%data_unicode_unit(i)
+        end do
+        do i = ((x%prec / 4) + 1), len(x_unicode)
+           x_unicode(i:i) = ' '
+        end do
+        deallocate(x%data_unicode_unit)
+     class default
+        call ygglog_error("yggptr_c2f_scalar_character: Unexpected type.")
+        stop "ERROR"
+     end select
   end select
 end subroutine yggptr_c2f_scalar_character
 
@@ -473,10 +479,10 @@ subroutine yggptr_c2f_ndarray_real(x)
   type(yggptr) :: x
   real(kind=4), dimension(:), pointer :: x4
   real(kind=8), dimension(:), pointer :: x8
-  real(kind=16), dimension(:), pointer :: x16
+  ! real(kind=16), dimension(:), pointer :: x16
   real(kind=4), dimension(:, :), pointer :: x4_2d
   real(kind=8), dimension(:, :), pointer :: x8_2d
-  real(kind=16), dimension(:, :), pointer :: x16_2d
+  ! real(kind=16), dimension(:, :), pointer :: x16_2d
   select type(item_2d=>x%item_array_2d)
   type is (real(kind=4))
      x4_2d => item_2d
@@ -502,18 +508,18 @@ subroutine yggptr_c2f_ndarray_real(x)
         call ygglog_error("yggptr_c2f_ndarray_real: types do not match")
         stop "ERROR"
      end select
-  type is (real(kind=16))
-     x16_2d => item_2d
-     select type(item_1d=>x%item_array)
-     type is (real(kind=16))
-        x16 => item_1d
-        x16_2d = reshape(x16, [x%shape(1), x%shape(2)])
-        nullify(x%item_array)
-        deallocate(x16)
-     class default
-        call ygglog_error("yggptr_c2f_ndarray_real: types do not match")
-        stop "ERROR"
-     end select
+  ! type is (real(kind=16))
+  !    x16_2d => item_2d
+  !    select type(item_1d=>x%item_array)
+  !    type is (real(kind=16))
+  !       x16 => item_1d
+  !       x16_2d = reshape(x16, [x%shape(1), x%shape(2)])
+  !       nullify(x%item_array)
+  !       deallocate(x16)
+  !    class default
+  !       call ygglog_error("yggptr_c2f_ndarray_real: types do not match")
+  !       stop "ERROR"
+  !    end select
   class default
      call ygglog_error("yggptr_c2f_ndarray_real: Unexpected type.")
      stop "ERROR"
@@ -524,10 +530,10 @@ subroutine yggptr_c2f_ndarray_complex(x)
   type(yggptr) :: x
   complex(kind=4), dimension(:), pointer :: x4
   complex(kind=8), dimension(:), pointer :: x8
-  complex(kind=16), dimension(:), pointer :: x16
+  ! complex(kind=16), dimension(:), pointer :: x16
   complex(kind=4), dimension(:, :), pointer :: x4_2d
   complex(kind=8), dimension(:, :), pointer :: x8_2d
-  complex(kind=16), dimension(:, :), pointer :: x16_2d
+  ! complex(kind=16), dimension(:, :), pointer :: x16_2d
   select type(item_2d=>x%item_array_2d)
   type is (complex(kind=4))
      x4_2d => item_2d
@@ -553,18 +559,18 @@ subroutine yggptr_c2f_ndarray_complex(x)
         call ygglog_error("yggptr_c2f_ndarray_complex: types do not match")
         stop "ERROR"
      end select
-  type is (complex(kind=16))
-     x16_2d => item_2d
-     select type(item_1d=>x%item_array)
-     type is (complex(kind=16))
-        x16 => item_1d
-        x16_2d = reshape(x16, [x%shape(1), x%shape(2)])
-        nullify(x%item_array)
-        deallocate(x16)
-     class default
-        call ygglog_error("yggptr_c2f_ndarray_complex: types do not match")
-        stop "ERROR"
-     end select
+  ! type is (complex(kind=16))
+  !    x16_2d => item_2d
+  !    select type(item_1d=>x%item_array)
+  !    type is (complex(kind=16))
+  !       x16 => item_1d
+  !       x16_2d = reshape(x16, [x%shape(1), x%shape(2)])
+  !       nullify(x%item_array)
+  !       deallocate(x16)
+  !    class default
+  !       call ygglog_error("yggptr_c2f_ndarray_complex: types do not match")
+  !       stop "ERROR"
+  !    end select
   class default
      call ygglog_error("yggptr_c2f_ndarray_complex: Unexpected type.")
      stop "ERROR"
@@ -640,13 +646,20 @@ subroutine yggptr_c2f_ndarray_character(x)
   type(yggptr) :: x
   character(len=:), dimension(:), pointer :: xc
   character(len=:), dimension(:, :), pointer :: xc_2d
+  integer :: i, j
   select type(item_2d=>x%item_array_2d)
   type is (character(*))
      xc_2d => item_2d
      select type(item_1d=>x%item_array)
      type is (character(*))
         xc => item_1d
-        xc_2d = reshape(xc, [x%shape(1), x%shape(2)])
+        allocate(character(len=x%prec) :: xc_2d(x%shape(1), x%shape(2)))
+        do i = 1, x%shape(1)
+           do j = 1, x%shape(2)
+              xc_2d(i, j) = xc(i + (j-1)*(x%shape(1)))
+           enddo
+        enddo
+        ! xc_2d = reshape(xc, [x%shape(1), x%shape(2)])
         nullify(x%item_array)
         deallocate(xc)
      class default
