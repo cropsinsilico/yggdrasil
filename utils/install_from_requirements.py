@@ -126,6 +126,11 @@ def install_from_requirements(method, fname_in, conda_env=None,
             if user:
                 args.append('--user')
         print(subprocess.check_output(args).decode("utf-8"))
+    except BaseException:
+        if os.path.isfile(temp_file):
+            with open(temp_file, 'r') as fd:
+                print(fd.read())
+        raise
     finally:
         if os.path.isfile(temp_file):
             os.remove(temp_file)
