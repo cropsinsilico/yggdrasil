@@ -324,6 +324,9 @@ PyObject* import_python_module(const char* module_name,
   initialize_python(error_prefix);
   PyObject* out = PyImport_ImportModule(module_name);
   if (out == NULL) {
+    if (PyErr_Occurred()) {
+      PyErr_Print();
+    }
     ygglog_throw_error("%simport_python_module: Failed to import Python module '%s'.",
 		       error_prefix, module_name);
   }
@@ -345,6 +348,9 @@ PyObject* import_python_class(const char* module_name, const char* class_name,
   PyObject *out = PyObject_GetAttrString(py_module, class_name);
   Py_DECREF(py_module);
   if (out == NULL) {
+    if (PyErr_Occurred()) {
+      PyErr_Print();
+    }
     ygglog_throw_error("import_python_class: Failed to import Python class '%s'.", class_name);
   }
   return out;
@@ -416,6 +422,7 @@ void check_python_object(PyObject *pyobj, int type_code=-1,
     ygglog_throw_error("%scheck_python_object: Python object is not %s.", prefix, type_name);
   }
   if (PyErr_Occurred() != NULL) {
+    PyErr_Print();
     ygglog_throw_error("%scheck_python_object: Python error.", prefix);
   }
 };
