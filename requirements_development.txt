@@ -1,2 +1,2 @@
 black
-git
+git  # conda
