@@ -207,6 +207,9 @@ def get_python_c_library(allow_failure=False, libtype=None):
                             "sysconfig.get_config_vars():\n%s\n")
                            % (pprint.pformat(paths),
                               pprint.pformat(cvars)))
+    print(("sysconfig.get_paths():\n%s\n"
+           "sysconfig.get_config_vars():\n%s\n")
+          % (pprint.pformat(paths), pprint.pformat(cvars)))
     dir_try = []
     if cvars['prefix']:
         dir_try.append(cvars['prefix'])
