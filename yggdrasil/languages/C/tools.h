@@ -92,6 +92,7 @@ typedef struct complex_long_double_t {
 // Platform specific
 #ifdef _WIN32
 #include "regex/regex_win32.h"
+#include "getline_win32.h"
 #else
 #include "regex_posix.h"
 #endif
@@ -102,7 +103,6 @@ typedef struct complex_long_double_t {
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
-#include "getline_win32.h"
 #include <process.h>
 #define ygg_getpid _getpid
 #define sleep(tsec) Sleep(1000*tsec)
