@@ -1,7 +1,7 @@
 #ifndef YGGTOOLS_H_
 #define YGGTOOLS_H_
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS 1
 #endif
@@ -15,7 +15,7 @@
 #include <time.h>
 
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #ifdef __cplusplus
 #include <complex>
 typedef std::complex<float> complex_float;
@@ -92,6 +92,10 @@ typedef struct complex_long_double_t {
 // Platform specific
 #ifdef _WIN32
 #include "regex/regex_win32.h"
+#else
+#include "regex_posix.h"
+#endif
+#ifdef _MSC_VER
 #include "windows_stdint.h"  // Use local copy for MSVC support
 // Prevent windows.h from including winsock.h
 #ifndef WIN32_LEAN_AND_MEAN
@@ -104,7 +108,6 @@ typedef struct complex_long_double_t {
 #define sleep(tsec) Sleep(1000*tsec)
 #define usleep(usec) Sleep(usec/1000)
 #else
-#include "regex_posix.h"
 #include <stdint.h>
 #include <unistd.h>
 #define ygg_getpid getpid
@@ -138,7 +141,7 @@ static int _ygg_error_flag = 0;
 
 /*! @brief Define macros to allow counts of variables. */
 // https://codecraft.co/2014/11/25/variadic-macros-tricks/
-#ifdef _WIN32
+#ifdef _MSC_VER
 // https://stackoverflow.com/questions/48710758/how-to-fix-variadic-macro-related-issues-with-macro-overloading-in-msvc-mic
 #define MSVC_BUG(MACRO, ARGS) MACRO ARGS  // name to remind that bug fix is due to MSVC :-)
 #define _GET_NTH_ARG_2(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, N, ...) N
