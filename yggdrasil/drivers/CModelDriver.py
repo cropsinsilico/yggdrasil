@@ -532,7 +532,8 @@ class CModelDriver(CompiledModelDriver):
         if kwargs.get('second_pass', False):
             return
         if _python_lib:
-            if _python_lib.endswith(('.lib', '.a')):
+            if ((_python_lib.endswith(('.lib', '.a'))
+                 and not _python_lib.endswith('.dll.a'))):
                 cls.external_libraries['python']['libtype'] = 'static'
                 cls.external_libraries['python']['static'] = _python_lib
             else:
