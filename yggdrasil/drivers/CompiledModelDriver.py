@@ -287,21 +287,28 @@ class CompilationToolBase(object):
             raise ValueError("Registering unnamed compilation tool.")
         cls._schema_type = cls.tooltype
         attr_list = ['default_executable', 'default_flags']
-        # Set attributes based on environment variables
         for k in attr_list:
             # Copy so that list modification is not propagated to subclasses
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
-            env = getattr(cls, '%s_env' % k, None)
-            if env is not None:
-                if k in ['default_flags']:
-                    if not isinstance(env, list):
-                        env = [env]
-                    old_val = getattr(cls, k, [])
-                    for ienv in env:
-                        new_val = os.environ.get(ienv, '').split()
-                        old_val += [v for v in new_val if v not in old_val]
-                else:
-                    setattr(cls, k, os.environ.get(env, getattr(cls, k)))
+        # Set attributes based on environment variables
+        exec_env = ''
+        if cls.default_executable_env is not None:
+            exec_env = os.environ.get(cls.default_executable_env, '')
+        if os.path.splitext(os.path.basename(exec_env))[0] == cls.toolname:
+            cls.default_executable = exec_env
+            if cls.default_flags_env is not None:
+                flags_env = cls.default_flags_env
+                if not isinstance(flags_env, list):
+                    flags_env = [flags_env]
+                for ienv in flags_env:
+                    new_val = os.environ.get(ienv, '').split()
+                    cls.default_flags += [v for v in new_val if v
+                                          not in cls.default_flags]
+        else:
+            # Don't use environment variables if they don't match the tool
+            # associated with this class
+            cls.default_executable_env = None
+            cls.default_flags_env = None
         # Set default_executable to name
         if cls.default_executable is None:
             cls.default_executable = cls.toolname
@@ -602,8 +609,12 @@ class CompilationToolBase(object):
         return out
 
     @classmethod
-    def get_executable(cls):
+    def get_executable(cls, full_path=False):
         r"""Determine the executable that should be used to call this tool.
+
+        Args:
+            full_path (bool, optional): If True the full path to the executable
+                file will be returned. Defaults to False.
 
         Returns:
             str: Name of (or path to) the tool executable.
@@ -613,6 +624,8 @@ class CompilationToolBase(object):
         if out is None:
             raise NotImplementedError("Executable not set for %s '%s'."
                                       % (cls.tooltype, cls.toolname))
+        if full_path:
+            out = tools.which(out)
         return out
 
     @classmethod
@@ -644,6 +657,15 @@ class CompilationToolBase(object):
             raise NotImplementedError("get_search_path method not implemented for "
                                       "%s tool '%s'" % (cls.tooltype, cls.toolname))
         paths = []
+        # Add path based on executable
+        exec_file = cls.get_executable(full_path=True)
+        prefix, exec_dir = os.path.split(os.path.dirname(exec_file))
+        if exec_dir == 'bin':
+            if libtype == 'include':
+                suffix = 'include'
+            else:
+                suffix = 'lib'
+            paths.append(os.path.join(prefix, suffix))
         # Get search paths from environment variable
         if (cls.search_path_env is not None) and (not conda_only):
             if not isinstance(cls.search_path_env, list):
@@ -1022,7 +1044,7 @@ class CompilerBase(CompilationToolBase):
     linker_attributes = {}
     linker_base_classes = None
     combine_with_linker = None
-    search_path_conda = 'include'
+    search_path_conda = ['include']
 
     def __init__(self, **kwargs):
         for k in ['linker', 'archiver', 'linker_flags', 'archiver_flags']:
@@ -1040,6 +1062,7 @@ class CompilerBase(CompilationToolBase):
         CompilationToolBase.before_registration(cls)
         if platform._is_win:  # pragma: windows
             cls.object_ext = '.obj'
+            cls.search_path_conda.append(os.path.join('Library', 'include'))
         if cls.no_separate_linking:
             cls.is_linker = True
             cls.compile_only_flag = None
@@ -1401,6 +1424,8 @@ class LinkerBase(CompilationToolBase):
             cls.library_ext = '.dll'
             cls.executable_ext = '.exe'
             cls.search_path_conda = 'DLLs'
+            if cls.toolname in ['gcc', 'g++', 'gfortran']:
+                cls.library_ext += '.a'
         elif platform._is_mac:
             # TODO: Dynamic library by default on windows?
             # cls.shared_library_flag = '-dynamiclib'
@@ -2930,7 +2955,7 @@ class CompiledModelDriver(ModelDriver):
                 fpath = None
                 if tool is not None:
                     search_list = tool.get_search_path(libtype=t)
-                    if ((platform._is_win and fname.endswith('.lib')
+                    if ((platform._is_win and fname.endswith(('.lib', '.dll.a', '.dll'))
                          and (not fname.startswith('lib')))):  # pragma: windows
                         fname = [fname, 'lib' + fname]
                     fpath = tools.locate_file(

@@ -23,7 +23,7 @@ class FortranCompilerBase(CompilerBase):
     languages = ['fortran']
     default_executable_env = 'FF'
     default_flags_env = 'FFLAGS'
-    default_flags = ['-g', '-Wall']
+    default_flags = ['-g', '-Wall', '-cpp', '-pedantic-errors']
     linker_attributes = {'default_flags_env': 'LFLAGS',
                          'search_path_env': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
     search_path_env = []
@@ -48,6 +48,7 @@ class FortranCompilerBase(CompilerBase):
             kwargs.setdefault('module-dir', _top_lang_dir)
         if 'module-search-path' in cls.flag_options:
             kwargs.setdefault('module-search-path', _top_lang_dir)
+        kwargs.setdefault('include_dirs', cls.get_search_path())
         out = super(FortranCompilerBase, cls).get_flags(**kwargs)
         for x in ['-O', '-O2', '-O3', 'Os', 'Ofast']:
             if x in out:
@@ -86,7 +87,7 @@ class FlangCompiler(FortranCompilerBase):
     toolname = 'flang'
     platforms = ['MacOS', 'Linux', 'Windows']
     default_flags = (FortranCompilerBase.default_flags
-                     + ['-cpp'])
+                     + ['-Werror', '-w', '-Weverything'])
     flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
                                + [('module-dir', '-I%s'),
                                   ('module-search-path', '-I%s'),
@@ -98,7 +99,7 @@ class GFortranCompiler(FortranCompilerBase):
     toolname = 'gfortran'
     platforms = ['MacOS', 'Linux', 'Windows']
     default_flags = (FortranCompilerBase.default_flags
-                     + ['-x', 'f95-cpp-input', '-cpp', '-pedantic-errors'])
+                     + ['-x', 'f95-cpp-input'])
     flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
                                + [('module-dir', '-J%s'),
                                   ('module-search-path', '-I%s'),
@@ -134,7 +135,7 @@ class FortranModelDriver(CompiledModelDriver):
     base_languages = ['c']
     interface_library = 'fygg'
     # To prevent inheritance
-    default_compiler = None
+    default_compiler = 'gfortran'
     default_linker = None
     supported_comm_options = dict(
         CModelDriver.CModelDriver.supported_comm_options,
