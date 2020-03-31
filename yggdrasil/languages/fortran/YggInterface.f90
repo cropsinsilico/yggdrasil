@@ -761,16 +761,16 @@ contains
     class(yggnull), intent(in) :: x
     write (*, '("NULL")')
   end subroutine display_null
-  subroutine write_null(dtv, unit, iotype, v_list, iostat, iomsg)
-    ! Argument names here from the std, but you can name them differently.
-    class(yggnull), intent(in) :: dtv   ! Object to write.
-    integer, intent(in) :: unit         ! Internal unit to write to.
-    character(*), intent(in) :: iotype  ! LISTDIRECTED or DTxxx
-    integer, intent(in) :: v_list(:)    ! parameters from fmt spec.
-    integer, intent(out) :: iostat      ! non zero on error, etc.
-    character(*), intent(inout) :: iomsg  ! define if iostat non zero.
-    write (unit, '("NULL")', IOSTAT=iostat, IOMSG=iomsg)
-  end subroutine write_null
+  ! subroutine write_null(dtv, unit, iotype, v_list, iostat, iomsg)
+  !   ! Argument names here from the std, but you can name them differently.
+  !   class(yggnull), intent(in) :: dtv   ! Object to write.
+  !   integer, intent(in) :: unit         ! Internal unit to write to.
+  !   character(*), intent(in) :: iotype  ! LISTDIRECTED or DTxxx
+  !   integer, intent(in) :: v_list(:)    ! parameters from fmt spec.
+  !   integer, intent(out) :: iostat      ! non zero on error, etc.
+  !   character(*), intent(inout) :: iomsg  ! define if iostat non zero.
+  !   write (unit, '("NULL")', IOSTAT=iostat, IOMSG=iomsg)
+  ! end subroutine write_null
   subroutine fix_format_str(x)
     implicit none
     character(len=*) :: x
@@ -799,7 +799,6 @@ contains
     implicit none
     character(len=*), intent(in) :: fmt
     character(len=len_trim(fmt)+1) :: c_fmt
-    type(yggcomm) :: channel
     c_fmt = trim(fmt)//c_null_char
     call ygglog_info_c(c_fmt)
   end subroutine ygglog_info
@@ -807,7 +806,6 @@ contains
     implicit none
     character(len=*), intent(in) :: fmt
     character(len=len_trim(fmt)+1) :: c_fmt
-    type(yggcomm) :: channel
     c_fmt = trim(fmt)//c_null_char
     call ygglog_debug_c(c_fmt)
   end subroutine ygglog_debug
@@ -815,7 +813,6 @@ contains
     implicit none
     character(len=*), intent(in) :: fmt
     character(len=len_trim(fmt)+1) :: c_fmt
-    type(yggcomm) :: channel
     c_fmt = trim(fmt)//c_null_char
     call ygglog_error_c(c_fmt)
   end subroutine ygglog_error
@@ -1417,7 +1414,6 @@ contains
     type(yggptr) :: args(:)
     type(c_ptr), allocatable, target :: c_args(:)
     integer :: c_nargs
-    integer :: i
     logical :: flag, is_format
     integer(kind=c_int) :: c_flag
     is_format = is_comm_format_array_type(ygg_q, args)

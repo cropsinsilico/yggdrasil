@@ -163,8 +163,6 @@ subroutine yggptr_realloc_character(x, array_len, precision)
   integer(kind=c_size_t), pointer :: array_len
   integer(kind=c_size_t), pointer :: precision
   type(yggchar_r), pointer :: x_character_realloc
-  type(yggchar_r), dimension(:), pointer :: xarr_character_realloc
-  integer(kind=8) :: i
   if (x%array) then
      stop 'yggptr_realloc_character (array): Unexpected type.'
   else

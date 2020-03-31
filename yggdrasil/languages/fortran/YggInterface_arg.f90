@@ -1120,9 +1120,15 @@ end function yggarg_2darray_logical8
 function yggarg_2darray_character(x) result (y)
   character(len=*), dimension(:, :), target :: x
   character(len=:), dimension(:), pointer :: xp
+  integer(kind=8) :: i, j
   type(yggptr) :: y
   allocate(character(len=len(x(1,1))) :: xp(size(x)))
-  xp = reshape(x, [size(x)])
+  do i = 1, size(x, 1)
+     do j = 1, size(x, 2)
+        xp(i + (j-1)*size(x, 1)) = x(i, j)
+     enddo
+  enddo
+  ! xp = reshape(x, [size(x)])
   y = yggarg(xp, shape(x))
   call yggarg_2darray_init(y, x)
 end function yggarg_2darray_character

@@ -6,7 +6,7 @@ function yggptr_c2f(x, realloc) result(flag)
   integer(kind=c_size_t), pointer :: array_ndim
   integer(kind=c_size_t), dimension(:), pointer :: array_shape
   integer(kind=c_size_t), pointer :: precision
-  integer(kind=8) :: i, j
+  integer(kind=8) :: i
   logical :: flag
   character(len=500) :: log_msg
   flag = .true.
@@ -334,9 +334,7 @@ end subroutine yggptr_c2f_scalar_character
 subroutine yggptr_c2f_array_character(x)
   implicit none
   type(yggptr) :: x
-  type(yggchar_r), pointer :: x_character_realloc
-  type(yggchar_r), dimension(:), pointer :: xarr_character_realloc
-  character, dimension(:), pointer :: xarr_character, xarr_character0
+  character, dimension(:), pointer :: xarr_character
   integer(kind=8) :: i, j
   select type(item=>x%item_array)
   type is (character(*))
@@ -646,7 +644,7 @@ subroutine yggptr_c2f_ndarray_character(x)
   type(yggptr) :: x
   character(len=:), dimension(:), pointer :: xc
   character(len=:), dimension(:, :), pointer :: xc_2d
-  integer :: i, j
+  integer(kind=c_size_t) :: i, j
   select type(item_2d=>x%item_array_2d)
   type is (character(*))
      xc_2d => item_2d
@@ -854,7 +852,7 @@ end subroutine yggptr_c2f_1darray_realloc_logical
 subroutine yggptr_c2f_1darray_realloc_character(x)
   implicit none
   type(yggptr) :: x
-  integer(kind=8) :: i, j
+  integer(kind=8) :: i
   type(character_1d), pointer :: x_character_1d
   select type(item=>x%item)
   type is (character_1d)
@@ -1121,7 +1119,7 @@ end subroutine yggptr_c2f_ndarray_realloc_logical
 subroutine yggptr_c2f_ndarray_realloc_character(x)
   implicit none
   type(yggptr) :: x
-  integer(kind=8) :: i, j
+  integer(kind=8) :: i
   type(character_nd), pointer :: x_character_nd
   select type(item=>x%item)
   type is (character_nd)
