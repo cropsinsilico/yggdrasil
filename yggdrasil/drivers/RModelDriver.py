@@ -125,7 +125,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         """
         if lib not in cls._library_cache:
             try:
-                cls.run_executable(['-e', 'library(%s)' % lib])
+                cls.run_executable(['-e', 'library(%s)' % lib.split()[0]])
                 cls._library_cache[lib] = True
             except RuntimeError:
                 cls._library_cache[lib] = False
