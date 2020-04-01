@@ -661,13 +661,14 @@ class CompilationToolBase(object):
         paths = []
         # Add path based on executable
         exec_file = cls.get_executable(full_path=True)
-        prefix, exec_dir = os.path.split(os.path.dirname(exec_file))
-        if exec_dir == 'bin':
-            if libtype == 'include':
-                suffix = 'include'
-            else:
-                suffix = 'lib'
-            paths.append(os.path.join(prefix, suffix))
+        if exec_file is not None:
+            prefix, exec_dir = os.path.split(os.path.dirname(exec_file))
+            if exec_dir == 'bin':
+                if libtype == 'include':
+                    suffix = 'include'
+                else:
+                    suffix = 'lib'
+                paths.append(os.path.join(prefix, suffix))
         # Get search paths from environment variable
         if (cls.search_path_env is not None) and (not conda_only):
             if not isinstance(cls.search_path_env, list):
