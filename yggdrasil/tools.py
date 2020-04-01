@@ -239,12 +239,51 @@ def get_python_c_library(allow_failure=False, libtype=None):
                           pprint.pformat(cvars)))  # pragma: debug
 
 
+def get_env_prefix():
+    r"""Determine the environment path prefix (virtualenv or conda) for
+    the current environment.
+
+    Returns:
+        str: Full path to the directory prefix used for the current
+            environment if one exist. If neither a virtualenv or conda
+            prefix can be located, None is returned.
+
+    Raises:
+        RuntimeError: If both virtualenv and conda environments are
+            located.
+
+    """
+    venv = get_venv_prefix()
+    cenv = get_conda_prefix()
+    if venv and cenv:  # pragma: debug
+        raise RuntimeError(("Both virtualenv (%s) and conda (%s) "
+                            "environments were located.") %
+                           (venv, cenv))
+    if venv:
+        out = venv
+    else:
+        out = cenv
+    return out
+
+
+def get_venv_prefix():
+    r"""Determine the virtualenv path prefix for the current environment.
+
+    Returns:
+        str: Full path to the directory prefix used for the current
+            virtualenv environment if one exists. If virtualenv cannot
+            be located, None is returned.
+
+    """
+    return os.environ.get('VIRTUAL_ENV', None)
+
+
 def get_conda_prefix():
     r"""Determine the conda path prefix for the current environment.
 
     Returns:
         str: Full path to the directory prefix used for the current conda
-            environment if one exits. If conda cannot be located, None is
+            environment if one exists. If conda cannot be located, None is
             returned.
 
     """

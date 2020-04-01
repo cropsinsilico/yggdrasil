@@ -16,10 +16,10 @@ _compiler_registry = OrderedDict()
 _linker_registry = OrderedDict()
 _archiver_registry = OrderedDict()
 _default_libtype = 'static'
-_conda_prefix = tools.get_conda_prefix()
+_env_prefix = tools.get_env_prefix()
 _system_suffix = ""
-if _conda_prefix is not None:
-    _system_suffix = '_' + os.path.basename(_conda_prefix)
+if _env_prefix is not None:
+    _system_suffix = '_' + os.path.basename(_env_prefix)
 
 
 def get_compilation_tool_registry(tooltype):
@@ -206,8 +206,9 @@ class CompilationToolBase(object):
         search_path_env (str): Environment variables containing a list of paths
             to search for library files. Either search_path_env or
             search_path_flags must be set. [REQUIRED]
-        search_path_conda (str): Path relative to the conda prefix that should
-            be searched if the CONDA_PREFIX environment variable is set.
+        search_path_conda (str): Path relative to the env prefix that should
+            be searched if the VIRTUAL_ENV or CONDA_PREFIX environment
+            variable is set.
         search_path_flags (list): Flags that should be passed to the tool
             executable in order to locate the search path. Either search_path_env
             or search_path_flags must be set. [REQUIRED]
@@ -592,14 +593,14 @@ class CompilationToolBase(object):
 
     @classmethod
     def get_conda_prefix(cls):
-        r"""Determine the conda path prefix.
+        r"""Determine the virtualenv/conda path prefix.
 
         Returns:
-            str: Conda path prefix. None will be returned if conda is not
-                installed.
+            str: Virtualenv/conda path prefix. None will be returned
+                if virtualenv/conda are not active.
 
         """
-        return tools.get_conda_prefix()
+        return tools.get_env_prefix()
             
     @classmethod
     def get_search_path(cls, conda_only=False):
