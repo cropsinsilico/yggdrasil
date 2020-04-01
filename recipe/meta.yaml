@@ -70,7 +70,7 @@ requirements:
     - zeromq
     - {{ compiler('c') }}  # [win]
     - {{ compiler('cxx') }}  # [win]
-    - {{ compiler('fortran') }}  # [win]
+    - m2w64-gcc-fortran  # [win]
 
 test:
   imports:
