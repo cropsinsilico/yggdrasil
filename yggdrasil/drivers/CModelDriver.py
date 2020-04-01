@@ -292,12 +292,12 @@ try:
     _python_lib = ygg_cfg.get('c', 'python_%s' % libtype_order[0],
                               ygg_cfg.get('c', 'python_%s' % libtype_order[1], None))
     if (_python_lib is None) or (not os.path.isfile(_python_lib)):  # pragma: no cover
-        _python_lib = tools.get_python_c_library(allow_failure=False)
+        _python_lib = tools.get_python_c_library(allow_failure=False, is_gnu=True)
 except BaseException:  # pragma: debug
     warnings.warn("ERROR LOCATING PYTHON LIBRARY")
     _python_lib = None
 _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
-_numpy_lib = None
+_numpy_lib = None  # os.path.join(os.path.dirname(_numpy_inc[0]), 'lib', 'npymath.lib')
 
 
 class CModelDriver(CompiledModelDriver):

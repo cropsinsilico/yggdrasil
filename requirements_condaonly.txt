@@ -10,4 +10,4 @@ r-units
 zeromq
 c-compiler; platform_system == 'Windows'
 cxx-compiler; platform_system == 'Windows'
-fortran-compiler; platform_system == 'Windows'
+m2w64-gcc-fortran; platform_system == 'Windows'

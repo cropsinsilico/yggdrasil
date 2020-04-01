@@ -123,7 +123,7 @@ void clean_comms(void) {
   }
   ncomms2clean = 0;
 #if defined(ZMQINSTALLED)
-  // #if defined(_WIN32) && defined(ZMQINSTALLED)
+  // #if defined(_MSC_VER) && defined(ZMQINSTALLED)
   zsys_shutdown();
 #endif
   if (Py_IsInitialized()) {
@@ -281,7 +281,7 @@ static
 comm_t* init_comm(const char *name, const char *direction,
 		  const comm_type t, dtype_t *datatype) {
   ygglog_debug("init_comm: Initializing comm.");
-#ifdef _WIN32
+#ifdef _MSC_VER
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
   _set_abort_behavior(0,_WRITE_ABORT_MSG);
 #endif

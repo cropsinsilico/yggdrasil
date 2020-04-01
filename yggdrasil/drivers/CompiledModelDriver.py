@@ -265,6 +265,7 @@ class CompilationToolBase(object):
     product_files = []
     source_product_exts = []
     remove_product_exts = []
+    is_gnu = False
 
     _language_ext = None  # only update once per class
     
@@ -285,6 +286,7 @@ class CompilationToolBase(object):
         """
         if cls.toolname is None:  # pragma: debug
             raise ValueError("Registering unnamed compilation tool.")
+        cls.is_gnu = (cls.toolname in ['gcc', 'g++', 'gfortran', 'ar'])
         cls._schema_type = cls.tooltype
         attr_list = ['default_executable', 'default_flags']
         for k in attr_list:
@@ -1061,7 +1063,8 @@ class CompilerBase(CompilationToolBase):
         """
         CompilationToolBase.before_registration(cls)
         if platform._is_win:  # pragma: windows
-            cls.object_ext = '.obj'
+            if not cls.is_gnu:
+                cls.object_ext = '.obj'
             cls.search_path_conda.append(os.path.join('Library', 'include'))
         if cls.no_separate_linking:
             cls.is_linker = True
@@ -1424,8 +1427,10 @@ class LinkerBase(CompilationToolBase):
             cls.library_ext = '.dll'
             cls.executable_ext = '.exe'
             cls.search_path_conda = 'DLLs'
-            if cls.toolname in ['gcc', 'g++', 'gfortran']:
+            if cls.is_gnu:
                 cls.library_ext += '.a'
+                cls.search_path_conda = ['DLLs', 'lib']
+                cls.library_prefix = 'lib'
         elif platform._is_mac:
             # TODO: Dynamic library by default on windows?
             # cls.shared_library_flag = '-dynamiclib'
@@ -1446,13 +1451,19 @@ class LinkerBase(CompilationToolBase):
             str: Library name.
 
         """
+        dont_split = False
         if platform._is_win:  # pragma: windows
             # Extension must remain or else the MSVC linker assumes the name
             # refers to a .obj file
-            libname = os.path.basename(libpath)
+            if cls.is_gnu:
+                libname = cls.file2base(libpath)
+                if libname.startswith('lib') and libpath.endswith('.lib'):
+                    dont_split = True
+            else:
+                libname = os.path.basename(libpath)
         else:
             libname = cls.file2base(libpath)
-        if cls.library_prefix:
+        if cls.library_prefix and (not dont_split):
             libname = libname.split(cls.library_prefix)[-1]
         return libname
 
@@ -1672,7 +1683,10 @@ class ArchiverBase(LinkerBase):
         for k in ['shared_library_flag']:
             setattr(cls, k, None)
         if platform._is_win:  # pragma: windows
-            cls.library_ext = '.lib'
+            if cls.is_gnu:
+                cls.library_ext = '.a'
+            else:
+                cls.library_ext = '.lib'
             cls.search_path_conda = os.path.join('Library', 'lib')
         else:
             cls.library_ext = '.a'
@@ -2955,9 +2969,12 @@ class CompiledModelDriver(ModelDriver):
                 fpath = None
                 if tool is not None:
                     search_list = tool.get_search_path(libtype=t)
-                    if ((platform._is_win and fname.endswith(('.lib', '.dll.a', '.dll'))
-                         and (not fname.startswith('lib')))):  # pragma: windows
-                        fname = [fname, 'lib' + fname]
+                    if ((fname.endswith(('.lib', '.dll.a', '.dll'))
+                         and platform._is_win)):  # pragma: windows
+                        if fname.startswith('lib'):
+                            fname = [fname, fname.split('lib', 1)[-1]]
+                        else:
+                            fname = [fname, 'lib' + fname]
                     fpath = tools.locate_file(
                         fname, directory_list=search_list)
             if fpath:
