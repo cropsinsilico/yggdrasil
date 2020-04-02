@@ -407,7 +407,7 @@ class CommBase(tools.YggClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 comm=None, **kwargs):
+                 comm=None, touches_model=False, **kwargs):
         self._comm_class = None
         if comm is not None:
             assert(comm == self.comm_class)
@@ -461,6 +461,7 @@ class CommBase(tools.YggClass):
         self._last_header = None
         self._work_comms = {}
         self.single_use = single_use
+        self.touches_model = touches_model
         self._used = False
         self._multiple_first_send = True
         self._n_sent = 0
@@ -505,6 +506,11 @@ class CommBase(tools.YggClass):
         if self.is_open and (self._commtype != 'buffer'):
             raise RuntimeError("Cannot pickle an open comm.")
         return super(CommBase, self).__getstate__()
+
+    def __setstate__(self, state):
+        super(CommBase, self).__setstate__(state)
+        if self.is_interface:
+            atexit.register(self.atexit)
         
     def _init_before_open(self, **kwargs):
         r"""Initialization steps that should be performed after base class, but
@@ -919,6 +925,8 @@ class CommBase(tools.YggClass):
         r"""Wait for messages to drain."""
         self.debug('')
         if self.direction == 'recv':
+            while self.is_open and (self.n_msg_recv_drain > 0):
+                self.recv(timeout=0)
             self.wait_for_confirm(timeout=self._timeout_drain)
         else:
             self.drain_messages(variable='n_msg_send')
@@ -935,7 +943,7 @@ class CommBase(tools.YggClass):
         self.debug('atexit begins')
         self.language_atexit()
         self.debug('atexit after language_atexit, but before close')
-        self.close()
+        self.close(linger=True)
         self.debug(
             'atexit finished: closed=%s, n_msg=%d, close_alive=%s',
             self.is_closed, self.n_msg,

@@ -589,6 +589,9 @@ class YggRunner(YggClass):
         for driver in self.all_drivers:
             if 'instance' in driver:
                 driver['instance'].cleanup()
+        self.inputdrivers = {}
+        self.outputdrivers = {}
+        self.modeldrivers = {}
 
     def printStatus(self):
         r"""Print the status of all drivers, starting with the IO drivers."""

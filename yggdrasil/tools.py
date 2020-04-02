@@ -1110,16 +1110,16 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
             # elif isinstance(v, multiprocessing.synchronize.Event):
             #     thread_attr.setdefault('multiprocessing.Event', [])
             #     thread_attr['multiprocessing.Event'].append((k, (), {}))
-            elif isinstance(v, YggThreadLoop):
-                assert(not v.is_alive())
-                thread_attr.setdefault('YggThreadLoop', [])
-                thread_attr['YggThreadLoop'].append(
-                    (k, v._input_args, v._input_kwargs))
-            elif isinstance(v, YggThread):
-                assert(not v.is_alive())
-                thread_attr.setdefault('YggThread', [])
-                thread_attr['YggThread'].append(
-                    (k, v._input_args, v._input_kwargs))
+            # elif isinstance(v, YggThreadLoop):
+            #     assert(not v.is_alive())
+            #     thread_attr.setdefault('YggThreadLoop', [])
+            #     thread_attr['YggThreadLoop'].append(
+            #         (k, v._input_args, v._input_kwargs))
+            # elif isinstance(v, YggThread):
+            #     assert(not v.is_alive())
+            #     thread_attr.setdefault('YggThread', [])
+            #     thread_attr['YggThread'].append(
+            #         (k, v._input_args, v._input_kwargs))
             elif isinstance(v, threading.Thread):
                 assert(not v.is_alive())
                 attr = {'name': v._name, 'group': None,
@@ -1493,7 +1493,7 @@ class YggThread(YggClass):
                  daemon=False, group=None, method='thread',
                  context=None, **ygg_kwargs):
         global _lock_registry
-        self.bool_flags = True
+        self.bool_flags = False  # True
         if kwargs is None:
             kwargs = {}
         if (target is not None) and ('target' in self._schema_properties):
@@ -1594,7 +1594,7 @@ class YggThread(YggClass):
 
     def run_init(self):
         r"""Actions to perform at beginning of run."""
-        atexit.register(self.atexit)
+        # atexit.register(self.atexit)
         if self.as_process:
             self.old_stdout = sys.stdout
             self.send_pipe = self._ygg_kwargs.pop('send_pipe')

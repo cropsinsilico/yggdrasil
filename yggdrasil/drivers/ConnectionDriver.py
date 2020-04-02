@@ -3,7 +3,6 @@ import os
 import copy
 import numpy as np
 import threading
-from yggdrasil import tools
 from yggdrasil.communication import new_comm
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.components import (
@@ -111,7 +110,7 @@ class ConnectionDriver(Driver):
         return (self._direction == 'output')
 
     def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
-        # kwargs['method'] = 'process'
+        kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Translator
         if translator is None:
@@ -144,8 +143,6 @@ class ConnectionDriver(Driver):
         self.state = 'started'
         self.close_state = ''
         # Add comms and print debug info
-        # import zmq
-        # self.zmq_context = zmq.Context()
         self._init_comms(name, **kwargs)
         # self.debug('    env: %s', str(self.env))
         self.debug(('\n' + 80 * '=' + '\n'
@@ -211,7 +208,7 @@ class ConnectionDriver(Driver):
         if any_files and (io == 'input'):
             kwargs.setdefault('timeout_send_1st', 60)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
-        # comm_kws['context'] = self.zmq_context
+        comm_kws['touches_model'] = touches_model
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
         if touches_model:
@@ -433,7 +430,8 @@ class ConnectionDriver(Driver):
         T = self.start_timeout(timeout)
         while not T.is_out:
             with self.lock:
-                if (not self.icomm.is_open):
+                if (not (self.icomm.is_open
+                         or self.was_terminated)):
                     break
                 elif ((self.icomm.n_msg_recv_drain == 0)
                       and self.icomm.is_confirmed_recv):
@@ -441,14 +439,18 @@ class ConnectionDriver(Driver):
             self.sleep()
         self.stop_timeout()
 
-    def drain_output(self, timeout=None):
+    def drain_output(self, timeout=None, dont_confirm_eof=False):
         r"""Drain messages from output comm."""
+        nwait = 0
+        if dont_confirm_eof:
+            nwait += 1
         T = self.start_timeout(timeout)
         while not T.is_out:
             with self.lock:
-                if (not self.ocomm.is_open):  # pragma: no cover
+                if (not (self.ocomm.is_open
+                         or self.was_terminated)):  # pragma: no cover
                     break
-                elif ((self.ocomm.n_msg_send_drain == 0)
+                elif ((self.ocomm.n_msg_send_drain <= nwait)
                       and self.ocomm.is_confirmed_send):
                     break
             self.sleep()  # pragma: no cover
@@ -486,6 +488,8 @@ class ConnectionDriver(Driver):
         if not self.single_use:
             self.send_eof()
         # Do not close output comm in case model/connection still receiving
+        if self.as_process and self.ocomm.touches_model:
+            self.drain_output(timeout=False, dont_confirm_eof=True)
         self.debug('Finished')
 
     def recv_message(self, **kwargs):
