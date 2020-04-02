@@ -69,8 +69,8 @@ class CCompilerBase(CompilerBase):
     default_flags = ['-g', '-Wall']
     # GCC & CLANG have similar call patterns
     linker_attributes = {'default_flags_env': 'LDFLAGS',
-                         'search_path_env': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
-    search_path_env = ['C_INCLUDE_PATH']
+                         'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
+    search_path_envvar = ['C_INCLUDE_PATH']
     search_path_flags = ['-E', '-v', '-xc', '/dev/null']
     search_regex_begin = '#include "..." search starts here:'
     search_regex_end = 'End of search list.'
@@ -171,7 +171,7 @@ class MSVCCompiler(CCompilerBase):
     default_linker = 'LINK'
     default_archiver = 'LIB'
     linker_switch = '/link'
-    search_path_env = 'INCLUDE'
+    search_path_envvar = 'INCLUDE'
     search_path_flags = None
     version_flags = []
     product_exts = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj', '.vcxproj.filters']
@@ -187,7 +187,7 @@ class MSVCCompiler(CCompilerBase):
                                  [('library_libs', ''),
                                   ('library_dirs', '/LIBPATH:%s')]),
                              shared_library_flag='/DLL',
-                             search_path_env='LIB',
+                             search_path_envvar='LIB',
                              search_path_flags=None)
     
     @classmethod
