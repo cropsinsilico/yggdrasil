@@ -1,21 +1,35 @@
 import threading
+import multiprocessing
+from multiprocessing import queues
 from yggdrasil.communication import CommBase
 
 
-class LockedBuffer(list):
+class LockedBuffer(multiprocessing.queues.SimpleQueue):
     r"""Buffer intended to be shared between threads/processes."""
 
     def __init__(self, *args, **kwargs):
         self.lock = threading.RLock()
-        self.closed = False
+        self._closed = False
+        kwargs.setdefault('ctx', multiprocessing.get_context('spawn'))
         return super(LockedBuffer, self).__init__(*args, **kwargs)
 
-    def __getattribute__(self, name):
-        if name in ['lock', '__getstate__', '__setstate__']:
-            return list.__getattribute__(self, name)
-        else:
-            with self.lock:
-                return list.__getattribute__(self, name)
+    @property
+    def closed(self):
+        r"""bool: True if the queue is closed, False otherwise."""
+        with self.lock:
+            return self._closed
+
+    def close(self):
+        r"""Close the buffer."""
+        with self.lock:
+            self._closed = True
+        
+    # def __getattribute__(self, name):
+    #     if name in ['lock', '__getstate__', '__setstate__']:
+    #         return multiprocessing.queues.Queue.__getattribute__(self, name)
+    #     else:
+    #         with self.lock:
+    #             return multiprocessing.queues.Queue.__getattribute__(self, name)
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -25,6 +39,55 @@ class LockedBuffer(list):
     def __setstate__(self, state):
         self.lock = threading.RLock()
         self.__dict__.update(state)
+        
+    def __len__(self):
+        try:
+            return self.qsize()
+        except (AttributeError, NotImplementedError):
+            return int(not self.empty())
+
+    def append(self, x):
+        r"""Add an element to the queue."""
+        self.put(x)
+
+    def pop(self, index=None):
+        r"""Remove the first element from the queue."""
+        assert(index == 0)
+        return self.get()
+
+    def clear(self):
+        r"""Remove all elements from the queue."""
+        while not self.empty():
+            self.get()
+
+
+# class LockedBuffer(list):
+#     r"""Buffer intended to be shared between threads/processes."""
+
+#     def __init__(self, *args, **kwargs):
+#         self.lock = threading.RLock()
+#         self.closed = False
+#         return super(LockedBuffer, self).__init__(*args, **kwargs)
+
+#     def __getattribute__(self, name):
+#         if name in ['lock', '__getstate__', '__setstate__']:
+#             return list.__getattribute__(self, name)
+#         else:
+#             with self.lock:
+#                 return list.__getattribute__(self, name)
+
+#     def __getstate__(self):
+#         state = self.__dict__.copy()
+#         del state['lock']
+#         return state
+
+#     def __setstate__(self, state):
+#         self.lock = threading.RLock()
+#         self.__dict__.update(state)
+
+#     def close(self):
+#         r"""Close the buffer."""
+#         self.closed = True
         
 
 class BufferComm(CommBase.CommBase):
@@ -88,7 +151,7 @@ class BufferComm(CommBase.CommBase):
         
     def _close(self, *args, **kwargs):
         r"""Close the connection."""
-        self.address.closed = True
+        self.address.close()
         
     @property
     def n_msg_recv(self):

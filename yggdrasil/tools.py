@@ -1486,69 +1486,128 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         del self._timeouts[key]
 
 
-class YggProcBase(YggClass):
-    r"""Base class for Ygg thread/processes."""
-
+class YggThread(YggClass):
+    r"""Class for managing Ygg thread/process."""
+    
     def __init__(self, name=None, target=None, args=(), kwargs=None,
-                 daemon=False, group=None, **ygg_kwargs):
+                 daemon=False, group=None, method='thread',
+                 context=None, **ygg_kwargs):
         global _lock_registry
+        self.bool_flags = True
         if kwargs is None:
             kwargs = {}
         if (target is not None) and ('target' in self._schema_properties):
             ygg_kwargs['target'] = target
             target = None
-        super(YggProcBase, self).__init__(name, **ygg_kwargs)
-        self.as_process = isinstance(self, (mp_ctx.Process,
-                                            mp_ctx_spawn.Process))
-        if self.as_process:
-            self._proc_type = 'process'
-            if isinstance(self, mp_ctx_spawn.Process):
-                self._proc_type += '_spawn'
-                self._proc_context = mp_ctx_spawn
-            else:
-                self._proc_context = mp_ctx
-            self._proc_class = self._proc_context.Process
+        super(YggThread, self).__init__(name, **ygg_kwargs)
+        self.method = method
+        if method == 'thread':
+            self.process_class = threading.Thread
+            self.lock_class = threading.RLock
+            self.event_class = threading.Event
+        elif method == 'process':
+            if context is None:
+                context = mp_ctx_spawn
+            self.context = context
             self.old_stdout = None
-            self.pipe = self._proc_context.Pipe()
+            self.pipe = self.context.Pipe()
             self.send_pipe = None
             self.stdout = None
             kwargs['send_pipe'] = self.pipe[1]
-        else:
-            self._proc_type = 'thread'
-            self._proc_class = threading.Thread
-        self.proc_kwargs = dict(name=name, group=group, daemon=daemon,
-                                target=target, args=args, kwargs=kwargs)
-        self._proc_class.__init__(self, **self.proc_kwargs)
+            self.process_class = self.context.Process
+            self.lock_class = self.context.RLock
+            self.event_class = self.context.Event
+        else:  # pragma: debug
+            raise ValueError("Method '%s' not supported." % method)
+        self.process_kwargs = dict(
+            name=name, group=group, daemon=daemon, target=self.run)
+        # target=target, args=args, kwargs=kwargs)
+        # TODO: Modify target
+        self.process_instance = self.process_class(**self.process_kwargs)
         self._ygg_target = target
         self._ygg_args = args
         self._ygg_kwargs = kwargs
         self.debug('')
-        self.lock = self.get_lock()
-        self.start_event = self.get_event()
-        self.terminate_event = self.get_event()
-        self.start_flag = False
-        self.terminate_flag = False
-        self._cleanup_called = False
+        self.lock = self.lock_class()
+        self.create_flag_attr('start_flag')
+        self.create_flag_attr('terminate_flag')
+        self.create_flag_attr('_cleanup_called')
         self._calling_thread = None
+        self.as_process = (self.method != 'thread')
         if not self.as_process:
             _thread_registry[self.name] = self
             _lock_registry[self.name] = self.lock
             atexit.register(self.atexit)
 
+    def create_flag_attr(self, attr):
+        r"""Create a flag."""
+        if self.bool_flags:
+            setattr(self, attr, False)
+        else:
+            setattr(self, attr, self.event_class())
+
+    def set_flag_attr(self, attr):
+        r"""Set a flag."""
+        if self.bool_flags:
+            setattr(self, attr, True)
+        else:
+            getattr(self, attr).set()
+
+    def unset_flag_attr(self, attr):
+        r"""Unset a flag."""
+        if self.bool_flags:
+            setattr(self, attr, False)
+        else:
+            getattr(self, attr).unset()
+
+    def check_flag_attr(self, attr):
+        r"""Determine if a flag is set."""
+        if self.bool_flags:
+            return getattr(self, attr)
+        else:
+            return getattr(self, attr).is_set()
+
+    def start(self, *args, **kwargs):
+        r"""Start thread/process and print info."""
+        self.debug('')
+        if not self.was_terminated:
+            self.set_started_flag()
+            self.before_start()
+        self.process_instance.start(*args, **kwargs)
+        self._calling_thread = self.get_current_proc()
+
+    def before_start(self):
+        r"""Actions to perform on the main thread/process before
+        starting the thread/process."""
+        self.debug('')
+
     def run(self, *args, **kwargs):
         r"""Continue running until terminate event set."""
         self.debug("Starting method")
+        try:
+            self.run_init()
+            self.call_target()
+        except BaseException:  # pragma: debug
+            self.run_error()
+        finally:
+            self.run_finally()
+
+    def run_init(self):
+        r"""Actions to perform at beginning of run."""
         atexit.register(self.atexit)
         if self.as_process:
             self.old_stdout = sys.stdout
-            self.send_pipe = self._kwargs.pop('send_pipe')
+            self.send_pipe = self._ygg_kwargs.pop('send_pipe')
             # sys.stdout = os.fdopen(self.send_pipe.fileno(), 'w')
-        try:
-            super(YggProcBase, self).run(*args, **kwargs)
-        except BaseException:  # pragma: debug
-            self.exception("%s ERROR", self._proc_type.upper())
-        finally:
-            self.run_finally()
+
+    def call_target(self):
+        r"""Call target."""
+        if self._ygg_target:
+            self._ygg_target(*self._ygg_args, **self._ygg_kwargs)
+
+    def run_error(self):
+        r"""Actions to perform on error in try/except wrapping run."""
+        self.exception("%s ERROR", self.method.upper())
 
     def run_finally(self):
         r"""Actions to perform in finally clause of try/except wrapping
@@ -1563,30 +1622,21 @@ class YggProcBase(YggClass):
             if hasattr(self, k):
                 delattr(self, k)
 
-    def start(self, *args, **kwargs):
-        r"""Start thread/process and print info."""
-        self.debug('')
-        if not self.was_terminated:
-            self.set_started_flag()
-            self.before_start()
-        super(YggProcBase, self).start(*args, **kwargs)
-        self._calling_thread = self.get_current_proc()
-
     def join(self, *args, **kwargs):
         r"""Join the process/thread."""
-        return super(YggProcBase, self).join(*args, **kwargs)
+        return self.process_instance.join(*args, **kwargs)
 
     def is_alive(self, *args, **kwargs):
         r"""Determine if the process/thread is alive."""
-        return super(YggProcBase, self).is_alive(*args, **kwargs)
+        return self.process_instance.is_alive(*args, **kwargs)
 
     @property
     def pid(self):
         r"""Process ID."""
         if self.as_process:
-            return super(YggProcBase, self).pid
+            return self.process_instance.pid
         else:
-            return super(YggProcBase, self).ident
+            return self.process_instance.ident
 
     @property
     def ident(self):
@@ -1597,7 +1647,7 @@ class YggProcBase(YggClass):
     def exitcode(self):
         r"""Exit code."""
         if self.as_process:
-            return super(YggProcBase, self).exitcode
+            return self.process_instance.exitcode
         else:
             return 0
 
@@ -1611,7 +1661,7 @@ class YggProcBase(YggClass):
         if self.as_process:
             return self.terminate(*args, **kwargs)
         else:
-            return super(YggProcBase, self).kill(*args, **kwargs)
+            return self.process_instance.kill(*args, **kwargs)
 
     def terminate(self, no_wait=False):
         r"""Set the terminate event and wait for the thread/process to stop.
@@ -1637,7 +1687,7 @@ class YggProcBase(YggClass):
             self.wait(timeout=self.timeout)
             assert(not self.is_alive())
         if self.as_process:
-            super(YggProcBase, self).terminate()
+            self.process_instance.terminate()
 
     def poll(self):
         r"""Check if the process is finished and return the return
@@ -1647,24 +1697,10 @@ class YggProcBase(YggClass):
             out = self.returncode
         return out
 
-    def get_lock(self):
-        r"""Get a new lock object."""
-        if self.as_process:
-            return self._proc_context.RLock()
-        else:
-            return threading.RLock()
-
-    def get_event(self):
-        r"""Get a new event object."""
-        if self.as_process:
-            return self._proc_context.Event()
-        else:
-            return threading.Event()
-
     def get_current_proc(self):
         r"""Get the current process/thread."""
         if self.as_process:
-            return self._proc_context.current_process()
+            return self.context.current_process()
         else:
             return threading.current_thread()
 
@@ -1672,8 +1708,8 @@ class YggProcBase(YggClass):
         r"""Get the main process/thread."""
         if self.as_process:
             out = None
-            if hasattr(self._proc_context, 'parent_process'):
-                out = self._proc_context.parent_process()
+            if hasattr(self.context, 'parent_process'):
+                out = self.context.parent_process()
             if out is None:
                 out = self.get_current_proc()
             return out
@@ -1682,49 +1718,34 @@ class YggProcBase(YggClass):
 
     def set_started_flag(self):
         r"""Set the started flag for the thread/process to True."""
-        # self.start_event.set()
-        self.start_flag = True
+        self.set_flag_attr('start_flag')
 
     def set_terminated_flag(self):
         r"""Set the terminated flag for the thread/process to True."""
-        # self.terminate_event.set()
-        self.terminate_flag = True
+        self.set_flag_attr('terminate_flag')
 
     def unset_started_flag(self):  # pragma: debug
         r"""Set the started flag for the thread/process to False."""
-        # self.start_event.clear()
-        self.start_flag = False
+        self.unset_flag_attr('start_flag')
 
     def unset_terminated_flag(self):  # pragma: debug
         r"""Set the terminated flag for the thread/process to False."""
-        # self.terminate_event.clear()
-        self.terminated_flag = False
+        self.unset_flag_attr('terminated_flag')
 
     @property
     def was_started(self):
         r"""bool: True if the thread/process was started. False otherwise."""
-        # return self.start_event.is_set()
-        return self.start_flag
+        return self.check_flag_attr('start_flag')
 
     @property
     def was_terminated(self):
         r"""bool: True if the thread/process was terminated. False otherwise."""
-        # return self.terminate_event.is_set()
-        return self.terminate_flag
+        return self.check_flag_attr('terminate_flag')
 
     @property
     def main_terminated(self):
         r"""bool: True if the main thread/process has terminated."""
         return (not self.get_main_proc().is_alive())
-
-    def before_start(self):
-        r"""Actions to perform on the main thread/process before
-        starting the thread/process."""
-        self.debug('')
-
-    def cleanup(self):
-        r"""Actions to perform to clean up the thread/process after it has stopped."""
-        self._cleanup_called = True
 
     def wait(self, timeout=None, key=None):
         r"""Wait until thread/process finish to return using sleeps rather than
@@ -1739,8 +1760,7 @@ class YggProcBase(YggClass):
         """
         T = self.start_timeout(timeout, key_level=1, key=key)
         while self.is_alive() and not T.is_out:
-            self.verbose_debug('Waiting for %s to finish...',
-                               self._proc_type)
+            self.verbose_debug('Waiting for %s to finish...', self.method)
             self.sleep()
         self.stop_timeout(key_level=1, key=key)
 
@@ -1748,19 +1768,23 @@ class YggProcBase(YggClass):
         r"""Actions performed when python exits."""
         # self.debug('is_alive = %s', self.is_alive())
         if self.is_alive():
-            self.info('%s alive at exit', self._proc_type.title())
-            if not self._cleanup_called:
+            self.info('%s alive at exit', self.method.title())
+            if not self.check_flag_attr('_cleanup_called'):
                 self.cleanup()
 
+    def cleanup(self):
+        r"""Actions to perform to clean up the thread/process after it has stopped."""
+        self.set_flag_attr('_cleanup_called')
 
-class YggProcLoopBase(YggProcBase):
-    r"""Thread that will run a loop until the terminate event is called."""
+
+class YggThreadLoop(YggThread):
+    r"""Class to run a loop inside a thread/process."""
+
     def __init__(self, *args, **kwargs):
+        super(YggThreadLoop, self).__init__(*args, **kwargs)
         self._1st_main_terminated = False
-        self.break_flag = False
-        self.loop_flag = False
-        super(YggProcLoopBase, self).__init__(*args, **kwargs)
-        self.loop_event = self.get_event()
+        self.create_flag_attr('break_flag')
+        self.create_flag_attr('loop_flag')
 
     def on_main_terminated(self, dont_break=False):  # pragma: debug
         r"""Actions performed when 1st main terminated.
@@ -1776,32 +1800,29 @@ class YggProcLoopBase(YggProcBase):
 
     def set_break_flag(self):
         r"""Set the break flag for the thread/process to True."""
-        self.break_flag = True
+        self.set_flag_attr('break_flag')
 
     def unset_break_flag(self):  # pragma: debug
         r"""Set the break flag for the thread/process to False."""
-        self.break_flag = False
+        self.unset_flag_attr('break_flag')
 
     @property
     def was_break(self):
         r"""bool: True if the break flag was set."""
-        return self.break_flag
+        return self.check_flag_attr('break_flag')
 
     def set_loop_flag(self):
         r"""Set the loop flag for the thread/process to True."""
-        self.loop_event.set()
-        self.loop_flag = True
+        self.set_flag_attr('loop_flag')
 
     def unset_loop_flag(self):  # pragma: debug
         r"""Set the loop flag for the thread/process to False."""
-        self.loop_event.clear()
-        self.loop_flag = False
+        self.unset_flag_attr('loop_flag')
 
     @property
     def was_loop(self):
         r"""bool: True if the thread/process was loop. False otherwise."""
-        return self.loop_event.is_set()
-        # return self.loop_flag
+        return self.check_flag_attr('loop_flag')
 
     def wait_for_loop(self, timeout=None, key=None):
         r"""Wait until thread/process enters loop to return using sleeps rather than
@@ -1825,6 +1846,24 @@ class YggProcLoopBase(YggProcBase):
         r"""Actions performed before the loop."""
         self.debug('')
 
+    def after_loop(self):
+        r"""Actions performed after the loop."""
+        self.debug('')
+
+    def call_target(self):
+        r"""Call target."""
+        self.debug("Starting loop")
+        self.before_loop()
+        if (not self.was_break):
+            self.set_loop_flag()
+        while (not self.was_break):
+            if ((self.main_terminated
+                 and (not self._1st_main_terminated))):  # pragma: debug
+                self.on_main_terminated()
+            else:
+                self.run_loop()
+        self.set_break_flag()
+        
     def run_loop(self, *args, **kwargs):
         r"""Actions performed on each loop iteration."""
         if self._ygg_target:
@@ -1832,29 +1871,14 @@ class YggProcLoopBase(YggProcBase):
         else:
             self.set_break_flag()
 
-    def after_loop(self):
-        r"""Actions performed after the loop."""
-        self.debug('')
-
+    def run_error(self):
+        r"""Actions to perform on error in try/except wrapping run."""
+        super(YggThreadLoop, self).run_error()
+        self.set_break_flag()
+        
     def run(self, *args, **kwargs):
         r"""Continue running until terminate event set."""
-        self.debug("Starting loop")
-        try:
-            self.before_loop()
-            if (not self.was_break):
-                self.set_loop_flag()
-            while (not self.was_break):
-                if ((self.main_terminated
-                     and (not self._1st_main_terminated))):  # pragma: debug
-                    self.on_main_terminated()
-                else:
-                    self.run_loop()
-            self.set_break_flag()
-        except BaseException:  # pragma: debug
-            self.exception("%s ERROR", self._proc_type.upper())
-            self.set_break_flag()
-        finally:
-            self.run_finally()
+        super(YggThreadLoop, self).run(*args, **kwargs)
         try:
             self.after_loop()
         except BaseException:  # pragma: debug
@@ -1863,60 +1887,4 @@ class YggProcLoopBase(YggProcBase):
     def terminate(self, *args, **kwargs):
         r"""Also set break flag."""
         self.set_break_flag()
-        super(YggProcLoopBase, self).terminate(*args, **kwargs)
-
-
-class YggProcess(YggProcBase, mp_ctx.Process):
-    r"""Process for Ygg that tracks when the process is started and joined.
-
-    Attributes:
-        lock (multiprocessing.Lock): Lock for accessing the sockets from multiple
-            processes.
-        start_event (multiprocessing.Event): Event indicating that the process was
-            started.
-        terminate_event (multiprocessing.Event): Event indicating that the process
-            should be terminated. The target must exit when this is set.
-
-    """
-    pass
-
-
-class YggProcessSpawn(YggProcBase, mp_ctx_spawn.Process):
-    r"""Process for Ygg that tracks when the process is started and joined
-    on a newly spawned process.
-
-    Attributes:
-        lock (multiprocessing.Lock): Lock for accessing the sockets from multiple
-            processes.
-        start_event (multiprocessing.Event): Event indicating that the process was
-            started.
-        terminate_event (multiprocessing.Event): Event indicating that the process
-            should be terminated. The target must exit when this is set.
-
-    """
-    pass
-
-
-class YggThread(YggProcBase, threading.Thread):
-    r"""Thread for Ygg that tracks when the thread is started and joined.
-
-    Attributes:
-        lock (threading.RLock): Lock for accessing the sockets from multiple
-            threads.
-        start_event (threading.Event): Event indicating that the thread was
-            started.
-        terminate_event (threading.Event): Event indicating that the thread
-            should be terminated. The target must exit when this is set.
-
-    """
-    pass
-
-    
-class YggThreadLoop(YggProcLoopBase, YggThread):
-    r"""Thread that will run a loop until the terminate event is called."""
-    pass
-
-
-class YggProcessLoop(YggProcLoopBase, YggProcess):
-    r"""Process that will run a loop until the terminate event is called."""
-    pass
+        super(YggThreadLoop, self).terminate(*args, **kwargs)

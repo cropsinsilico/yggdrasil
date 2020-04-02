@@ -3,9 +3,9 @@ import os
 import copy
 import numpy as np
 import threading
+from yggdrasil import tools
 from yggdrasil.communication import new_comm
-# from yggdrasil.drivers.Driver import Driver
-from yggdrasil.drivers.Driver import DriverProcess as Driver
+from yggdrasil.drivers.Driver import Driver
 from yggdrasil.components import (
     import_component, create_component, isinstance_component)
 from yggdrasil.schema import get_schema
@@ -111,6 +111,7 @@ class ConnectionDriver(Driver):
         return (self._direction == 'output')
 
     def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
+        # kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Translator
         if translator is None:
@@ -143,6 +144,8 @@ class ConnectionDriver(Driver):
         self.state = 'started'
         self.close_state = ''
         # Add comms and print debug info
+        # import zmq
+        # self.zmq_context = zmq.Context()
         self._init_comms(name, **kwargs)
         # self.debug('    env: %s', str(self.env))
         self.debug(('\n' + 80 * '=' + '\n'
@@ -208,6 +211,7 @@ class ConnectionDriver(Driver):
         if any_files and (io == 'input'):
             kwargs.setdefault('timeout_send_1st', 60)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
+        # comm_kws['context'] = self.zmq_context
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
         if touches_model:
@@ -307,14 +311,18 @@ class ConnectionDriver(Driver):
 
     def start(self):
         r"""Open connection before running."""
-        self.open_comm()
-        Tout = self.start_timeout()
-        while (not self.is_comm_open) and (not Tout.is_out):
-            self.sleep()
-        self.stop_timeout()
-        if not self.is_comm_open:
-            raise Exception("Connection never finished opening.")
+        if not self.as_process:
+            self.open_comm()
+            Tout = self.start_timeout()
+            while (not self.is_comm_open) and (not Tout.is_out):
+                self.sleep()
+            self.stop_timeout()
+            if not self.is_comm_open:
+                raise Exception("Connection never finished opening.")
         super(ConnectionDriver, self).start()
+        self.info('started')
+        if self.as_process:
+            self.sleep(1.0)
 
     def graceful_stop(self, timeout=None, **kwargs):
         r"""Stop the driver, first waiting for the input comm to be empty.

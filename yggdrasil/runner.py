@@ -46,23 +46,23 @@ class YggFunction(YggClass):
         # Create input/output channels
         self.inputs = {}
         self.outputs = {}
-        import zmq; ctx = zmq.Context()
+        # import zmq; ctx = zmq.Context()
         for drv in self.model_driver['input_drivers']:
             os.environ.update(**drv['instance'].env)
             var_name = drv['name'].split('function_')[-1]
             self.outputs[var_name] = drv.copy()
             self.outputs[var_name]['vars'] = [
                 iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
-            self.outputs[var_name]['comm'] = YggInput(drv['name'], is_interface=True,
-                                                      context=ctx)
+            self.outputs[var_name]['comm'] = YggInput(drv['name'])  # , is_interface=True)
+            # context=ctx)
         for drv in self.model_driver['output_drivers']:
             var_name = drv['name'].split('function_')[-1]
             os.environ.update(**drv['instance'].env)
             self.inputs[var_name] = drv.copy()
             self.inputs[var_name]['vars'] = [
                 iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
-            self.inputs[var_name]['comm'] = YggOutput(drv['name'], is_interface=True,
-                                                      context=ctx)
+            self.inputs[var_name]['comm'] = YggOutput(drv['name'])  # , is_interface=True)
+            # context=ctx)
         self._stop_called = False
         atexit.register(self.stop)
         # Get arguments

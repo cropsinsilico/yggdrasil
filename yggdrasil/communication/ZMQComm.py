@@ -420,6 +420,9 @@ class ZMQComm(AsyncComm.AsyncComm):
         super(ZMQComm, self)._init_before_open(**kwargs)
 
     def __getstate__(self):
+        if self._bound:
+            self.unbind()
+            self._bound = True
         state = super(ZMQComm, self).__getstate__()
         del state['context']
         del state['_server_kwargs']['context']
@@ -432,7 +435,10 @@ class ZMQComm(AsyncComm.AsyncComm):
         super(ZMQComm, self).__setstate__(state)
         self.socket = self.context.socket(self.socket_type)
         self.socket.setsockopt(zmq.LINGER, 0)
-
+        if self._bound:
+            self._bound = False
+            self.bind()
+        
     def get_status_message(self, nindent=0):
         r"""Return lines composing a status message.
         
