@@ -110,7 +110,7 @@ class ConnectionDriver(Driver):
         return (self._direction == 'output')
 
     def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
-        kwargs['method'] = 'process'
+        # kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Translator
         if translator is None:

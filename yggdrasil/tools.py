@@ -1510,10 +1510,10 @@ class YggThread(YggClass):
                 context = mp_ctx_spawn
             self.context = context
             self.old_stdout = None
-            self.pipe = self.context.Pipe()
+            # self.pipe = self.context.Pipe()
             self.send_pipe = None
             self.stdout = None
-            kwargs['send_pipe'] = self.pipe[1]
+            # kwargs['send_pipe'] = self.pipe[1]
             self.process_class = self.context.Process
             self.lock_class = self.context.RLock
             self.event_class = self.context.Event
@@ -1595,7 +1595,7 @@ class YggThread(YggClass):
     def run_init(self):
         r"""Actions to perform at beginning of run."""
         # atexit.register(self.atexit)
-        if self.as_process:
+        if self.as_process and ('send_pipe' in self._ygg_kwargs):
             self.old_stdout = sys.stdout
             self.send_pipe = self._ygg_kwargs.pop('send_pipe')
             # sys.stdout = os.fdopen(self.send_pipe.fileno(), 'w')
