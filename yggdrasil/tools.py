@@ -1531,6 +1531,7 @@ class YggThread(YggClass):
         self._ygg_kwargs = kwargs
         self.debug('')
         self.lock = self.lock_class()
+        self.create_flag_attr('error_flag')
         self.create_flag_attr('start_flag')
         self.create_flag_attr('terminate_flag')
         self.create_flag_attr('_cleanup_called')
@@ -1610,6 +1611,7 @@ class YggThread(YggClass):
     def run_error(self):
         r"""Actions to perform on error in try/except wrapping run."""
         self.exception("%s ERROR", self.method.upper())
+        self.set_flag_attr('error_flag')
 
     def run_finally(self):
         r"""Actions to perform in finally clause of try/except wrapping
@@ -1651,7 +1653,7 @@ class YggThread(YggClass):
         if self.as_process:
             return self.process_instance.exitcode
         else:
-            return 0
+            return int(self.check_flag_attr('error_flag'))
 
     @property
     def returncode(self):
@@ -1710,7 +1712,7 @@ class YggThread(YggClass):
         r"""Get the main process/thread."""
         if self.as_process:
             out = None
-            if hasattr(self.context, 'parent_process'):
+            if hasattr(self.context, 'parent_process'):  # pragma: no cover
                 out = self.context.parent_process()
             if out is None:
                 out = self.get_current_proc()
@@ -1885,6 +1887,7 @@ class YggThreadLoop(YggThread):
             self.after_loop()
         except BaseException:  # pragma: debug
             self.exception("AFTER LOOP ERROR")
+            self.set_flag_attr('error_flag')
 
     def terminate(self, *args, **kwargs):
         r"""Also set break flag."""
