@@ -17,10 +17,9 @@ from yggdrasil import tools
 env_prefixes = tools.get_env_prefixes()
 config_file = '.yggdrasil.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
+usr_dir = os.path.expanduser('~')
 if env_prefixes:
     usr_dir = env_prefixes[-1]
-else:
-    usr_dir = os.path.expanduser('~')
 usr_config_file = os.path.join(usr_dir, config_file)
 loc_config_file = os.path.join(os.getcwd(), config_file)
 logger = logging.getLogger(__name__)
