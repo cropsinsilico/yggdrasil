@@ -16,10 +16,13 @@ _compiler_registry = OrderedDict()
 _linker_registry = OrderedDict()
 _archiver_registry = OrderedDict()
 _default_libtype = 'static'
-_env_prefix = tools.get_env_prefix()
+_conda_prefix = tools.get_conda_prefix()
+_venv_prefix = tools.get_venv_prefix()
 _system_suffix = ""
-if _env_prefix is not None:
-    _system_suffix = '_' + os.path.basename(_env_prefix)
+if _conda_prefix is not None:
+    _system_suffix += '_' + os.path.basename(_conda_prefix)
+if _venv_prefix is not None:
+    _system_suffix += '_' + os.path.basename(_venv_prefix)
 
 
 def get_compilation_tool_registry(tooltype):
@@ -203,14 +206,14 @@ class CompilationToolBase(object):
             it is True, only the flag will be added to the list of flags. The
             order of entries indicates the order the flags should be added to
             the list.
-        search_path_env (str): Environment variables containing a list of paths
-            to search for library files. Either search_path_env or
+        search_path_envvar (str): Environment variables containing a list of paths
+            to search for library files. Either search_path_envvar or
             search_path_flags must be set. [REQUIRED]
-        search_path_conda (str): Path relative to the env prefix that should
+        search_path_env (str): Path relative to the env prefix that should
             be searched if the VIRTUAL_ENV or CONDA_PREFIX environment
             variable is set.
         search_path_flags (list): Flags that should be passed to the tool
-            executable in order to locate the search path. Either search_path_env
+            executable in order to locate the search path. Either search_path_envvar
             or search_path_flags must be set. [REQUIRED]
         search_regex_begin (str): Search string indicating where the set of
             paths begins in the output from running the tool executable with the
@@ -254,8 +257,8 @@ class CompilationToolBase(object):
     output_key = '-o'
     output_first = False
     flag_options = OrderedDict()
+    search_path_envvar = None
     search_path_env = None
-    search_path_conda = None
     search_path_flags = None
     search_regex_begin = None
     search_regex_end = None
@@ -592,43 +595,44 @@ class CompilationToolBase(object):
         return out
 
     @classmethod
-    def get_conda_prefix(cls):
-        r"""Determine the virtualenv/conda path prefix.
+    def get_env_prefixes(cls):
+        r"""Determine the virtualenv/conda path prefixes.
 
         Returns:
-            str: Virtualenv/conda path prefix. None will be returned
-                if virtualenv/conda are not active.
+            list: Virtualenv/conda path prefixes. Empty list will be
+                returned if virtualenv/conda are not active.
 
         """
-        return tools.get_env_prefix()
+        return tools.get_env_prefixes()
             
     @classmethod
-    def get_search_path(cls, conda_only=False):
+    def get_search_path(cls, env_only=False):
         r"""Determine the paths searched by the tool for external library files.
 
         Args:
-            conda_only (bool, optional): If True, only the search paths as
-                indicated by a conda environment are returned. Defaults to False.
+            env_only (bool, optional): If True, only the search paths as
+                indicated by a virtualenv/conda environment are returned.
+                Defaults to False.
 
         Returns:
             list: List of paths that the tools will search.
 
         """
-        if (cls.search_path_flags is None) and (cls.search_path_env is None):
+        if (cls.search_path_flags is None) and (cls.search_path_envvar is None):
             raise NotImplementedError("get_search_path method not implemented for "
                                       "%s tool '%s'" % (cls.tooltype, cls.toolname))
         paths = []
         # Get search paths from environment variable
-        if (cls.search_path_env is not None) and (not conda_only):
-            if not isinstance(cls.search_path_env, list):
-                cls.search_path_env = [cls.search_path_env]
-            for ienv in cls.search_path_env:
+        if (cls.search_path_envvar is not None) and (not env_only):
+            if not isinstance(cls.search_path_envvar, list):
+                cls.search_path_envvar = [cls.search_path_envvar]
+            for ienv in cls.search_path_envvar:
                 ienv_paths = os.environ.get(ienv, '').split(os.pathsep)
                 for x in ienv_paths:
                     if x:
                         paths.append(x)
         # Get flags based on path
-        if (cls.search_path_flags is not None) and (not conda_only):
+        if (cls.search_path_flags is not None) and (not env_only):
             output = cls.call(cls.search_path_flags, skip_flags=True,
                               allow_error=True)
             # Split on beginning & ending regexes if they exist
@@ -641,14 +645,13 @@ class CompilationToolBase(object):
                 for x in re.findall(r, output):
                     if os.path.isdir(x):
                         paths.append(x)
-        # Get search paths from the conda environment
-        if (cls.search_path_conda is not None):
-            conda_prefix = cls.get_conda_prefix()
-            if conda_prefix:
-                if not isinstance(cls.search_path_conda, list):
-                    cls.search_path_conda = [cls.search_path_conda]
-                for ienv in cls.search_path_conda:
-                    ienv_path = os.path.join(conda_prefix, ienv)
+        # Get search paths from the virtualenv/conda environment
+        if (cls.search_path_env is not None):
+            for iprefix in cls.get_env_prefixes():
+                if not isinstance(cls.search_path_env, list):
+                    cls.search_path_env = [cls.search_path_env]
+                for ienv in cls.search_path_env:
+                    ienv_path = os.path.join(iprefix, ienv)
                     if (ienv_path not in paths) and os.path.isdir(ienv_path):
                         paths.append(ienv_path)
         return paths
@@ -983,7 +986,7 @@ class CompilerBase(CompilationToolBase):
     linker_attributes = {}
     linker_base_classes = None
     combine_with_linker = None
-    search_path_conda = 'include'
+    search_path_env = 'include'
 
     def __init__(self, **kwargs):
         for k in ['linker', 'archiver', 'linker_flags', 'archiver_flags']:
@@ -1344,7 +1347,7 @@ class LinkerBase(CompilationToolBase):
     library_ext = None  # depends on the OS
     executable_ext = '.out'
     output_first_library = None
-    search_path_conda = 'lib'
+    search_path_env = 'lib'
 
     @staticmethod
     def before_registration(cls):
@@ -1358,7 +1361,7 @@ class LinkerBase(CompilationToolBase):
             cls.library_prefix = ''
             cls.library_ext = '.dll'
             cls.executable_ext = '.exe'
-            cls.search_path_conda = 'DLLs'
+            cls.search_path_env = 'DLLs'
         elif platform._is_mac:
             # TODO: Dynamic library by default on windows?
             # cls.shared_library_flag = '-dynamiclib'
@@ -1607,7 +1610,7 @@ class ArchiverBase(LinkerBase):
             setattr(cls, k, None)
         if platform._is_win:  # pragma: windows
             cls.library_ext = '.lib'
-            cls.search_path_conda = os.path.join('Library', 'lib')
+            cls.search_path_env = os.path.join('Library', 'lib')
         else:
             cls.library_ext = '.a'
 

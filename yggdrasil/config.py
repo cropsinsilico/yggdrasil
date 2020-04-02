@@ -14,11 +14,11 @@ import warnings
 import configparser
 from collections import OrderedDict
 from yggdrasil import tools
-env_prefix = tools.get_env_prefix()
+env_prefixes = tools.get_env_prefixes()
 config_file = '.yggdrasil.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
-if env_prefix:
-    usr_dir = env_prefix
+if env_prefixes:
+    usr_dir = env_prefixes[-1]
 else:
     usr_dir = os.path.expanduser('~')
 usr_config_file = os.path.join(usr_dir, config_file)

@@ -262,14 +262,13 @@ class CMakeConfigure(BuildToolBase):
         # Pop target (used for build stage file name, but not for any other
         # part of the build stage)
         kwargs.pop('target', None)
-        # Add conda prefix
-        # conda_prefix = cls.get_conda_prefix()
-        # if conda_prefix:
+        # Add env prefix
+        # for iprefix in cls.get_env_prefixes():
         #     kwargs.setdefault('definitions', [])
         #     kwargs['definitions'].append('CMAKE_PREFIX_PATH=%s'
-        #                                  % os.path.join(conda_prefix, 'lib'))
+        #                                  % os.path.join(iprefix, 'lib'))
         #     kwargs['definitions'].append('CMAKE_LIBRARY_PATH=%s'
-        #                                  % os.path.join(conda_prefix, 'lib'))
+        #                                  % os.path.join(iprefix, 'lib'))
         out = super(CMakeConfigure, cls).get_flags(sourcedir=sourcedir,
                                                    builddir=builddir, **kwargs)
         if platform._is_win and ('platform' not in kwargs):  # pragma: windows
@@ -771,15 +770,14 @@ class CMakeModelDriver(BuildModelDriver):
             # Prevent error when cross compiling by building static lib as test
             newlines_before.append(
                 'set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")')
-            # Add conda prefix as first line so that conda installed C libraries are
+            # Add env prefix as first line so that env installed C libraries are
             # used
-            conda_prefix = self.get_tool_instance('compiler').get_conda_prefix()
-            if conda_prefix:
+            for iprefix in self.get_tool_instance('compiler').get_env_prefixes():
                 if platform._is_win:  # pragma: windows
-                    conda_lib = os.path.join(conda_prefix, 'libs').replace('\\', '\\\\')
+                    env_lib = os.path.join(iprefix, 'libs').replace('\\', '\\\\')
                 else:
-                    conda_lib = os.path.join(conda_prefix, 'lib')
-                newlines_before.append('LINK_DIRECTORIES(%s)' % conda_lib)
+                    env_lib = os.path.join(iprefix, 'lib')
+                newlines_before.append('LINK_DIRECTORIES(%s)' % env_lib)
             # Explicitly set Release/Debug directories to builddir on windows
             if platform._is_win:  # pragma: windows
                 for artifact in ['runtime', 'library', 'archive']:
