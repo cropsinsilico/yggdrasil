@@ -25,8 +25,8 @@ class FortranCompilerBase(CompilerBase):
     default_flags_env = 'FFLAGS'
     default_flags = ['-g', '-Wall', '-cpp', '-pedantic-errors']
     linker_attributes = {'default_flags_env': 'LFLAGS',
-                         'search_path_env': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
-    search_path_env = []
+                         'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
+    search_path_envvar = []
     default_linker = None
     default_executable = None
     default_archiver = 'ar'
