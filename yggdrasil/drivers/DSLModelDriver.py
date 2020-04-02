@@ -92,8 +92,9 @@ class DSLModelDriver(InterpretedModelDriver):  # pragma: no cover
         self.debug('Model file: %s', self.model_file)
         self.debug('Environment Variables:\n%s',
                    self.pprint(kwargs['env'], block_indent=1))
-        p = tools.YggProcess(target=self.model_wrapper,
-                             args=args, kwargs=kwargs)
+        p = tools.YggThread(method='process', with_pipe=True,
+                            target=self.model_wrapper,
+                            args=args, kwargs=kwargs)
         p.start()
         if return_process:
             return p
