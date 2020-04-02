@@ -127,7 +127,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         """
         if lib not in cls._library_cache:
             try:
-                cls.run_executable(['-e', 'library(%s)' % lib])
+                cls.run_executable(['-e', 'library(%s)' % lib.split()[0]])
                 cls._library_cache[lib] = True
             except RuntimeError:
                 cls._library_cache[lib] = False
@@ -169,7 +169,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         out['RETICULATE_PYTHON'] = PythonModelDriver.get_interpreter()
         if CModelDriver.is_language_installed():
             c_linker = CModelDriver.get_tool('linker')
-            search_dirs = c_linker.get_search_path(conda_only=True)
+            search_dirs = c_linker.get_search_path(env_only=True)
             out = CModelDriver.update_ld_library_path(out, paths_to_add=search_dirs,
                                                       add_to_front=True)
         return out

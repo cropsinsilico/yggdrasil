@@ -212,6 +212,7 @@ static inline
 int init_numpy_API() {
   if (PyArray_API == NULL) {
     if (_import_array() < 0) {
+      PyErr_Print();
       return -2;
     }
   }
@@ -226,6 +227,16 @@ int init_numpy_API() {
 static inline
 int init_python_API() {
   if (!(Py_IsInitialized())) {
+    char *name = getenv("YGG_PYTHON_EXEC");
+    if (name != NULL) {
+      wchar_t *wname = Py_DecodeLocale(name, NULL);
+      if (wname == NULL) {
+	printf("Error decoding YGG_PYTHON_EXEC\n");
+	return -1;
+      }
+      Py_SetProgramName(wname);
+      PyMem_RawFree(wname);
+    }
     Py_Initialize();
     if (!(Py_IsInitialized()))
       return -1;
