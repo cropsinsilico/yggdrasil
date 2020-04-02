@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import uuid
 import tempfile
@@ -122,27 +123,59 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
     """
     if not isinstance(package_list, list):
         package_list = [package_list]
-    req_list = 'c(%s)' % ', '.join(['\"%s\"' % x for x in package_list])
+    regex_ver = (r'(?P<name>.+?)\s*(?:\(\s*(?P<comparison>[=<>]+?)\s*'
+                 r'(?P<ver>[^\s=<>]+?)\s*\))?')
+    req_ver = []
+    req_nover = []
+    for x in package_list:
+        out = re.fullmatch(regex_ver, x).groupdict()
+        print(x, out)
+        if out['ver'] and ('=' in out['comparison']):
+            req_ver.append((out['name'], out['ver']))
+        else:
+            req_nover.append(out['name'])
+    print(req_ver, req_nover)
     if repos is None:
         repos = 'http://cloud.r-project.org'
-    if update:
-        # R_cmd = ['install.packages(%s, repos="%s")' % (req_list, repos)]
-        R_cmd = ['req <- %s' % req_list,
-                 'for (x in req) {',
-                 '  if (is.element(x, installed.packages()[,1])) {',
-                 '    remove.packages(x)',
-                 '  }',
-                 '  install.packages(x, dep=TRUE, repos="%s")' % repos,
-                 '}']
-    else:
-        R_cmd = ['req <- %s' % req_list,
-                 'for (x in req) {',
-                 '  if (!is.element(x, installed.packages()[,1])) {',
-                 '    install.packages(x, dep=TRUE, repos="%s")' % repos,
-                 '  } else {',
-                 '    print(sprintf("%s already installed.", x))',
-                 '  }',
-                 '}']
+    R_cmd = []
+    if req_nover:
+        req_list = 'c(%s)' % ', '.join(['\"%s\"' % x for x in req_nover])
+        if update:
+            # R_cmd = ['install.packages(%s, repos="%s")' % (req_list, repos)]
+            R_cmd = ['req <- %s' % req_list,
+                     'for (x in req) {',
+                     '  if (is.element(x, installed.packages()[,1])) {',
+                     '    remove.packages(x)',
+                     '  }',
+                     '  install.packages(x, dep=TRUE, repos="%s")' % repos,
+                     '}']
+        else:
+            R_cmd = ['req <- %s' % req_list,
+                     'for (x in req) {',
+                     '  if (!is.element(x, installed.packages()[,1])) {',
+                     '    install.packages(x, dep=TRUE, repos="%s")' % repos,
+                     '  } else {',
+                     '    print(sprintf("%s already installed.", x))',
+                     '  }',
+                     '}']
+    if req_ver:
+        for x in req_ver:
+            R_cmd.append(
+                ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
+                 '%s_%s.tar.gz\"') % (x[0], x[0], x[1]))
+            if update:
+                R_cmd += [
+                    'if (is.element(\"%s\", installed.packages()[,1])) {' % x[0],
+                    '  remove.packages(\"%s\")' % x[0],
+                    '}'
+                    'install.packages(packageurl, repos=NULL, type=\"source\")']
+            else:
+                R_cmd += [
+                    'if (!is.element(\"%s\", installed.packages()[,1])) {' % x[0],
+                    '  install.packages(packageurl, repos=NULL, type=\"source\")',
+                    '} else {',
+                    '  print("%s already installed.")' % x[0],
+                    '}']
     if not call_R(R_cmd, **kwargs):
         logger.error("Error installing dependencies: %s" % ', '.join(package_list))
         return False
