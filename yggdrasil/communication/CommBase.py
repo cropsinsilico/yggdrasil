@@ -407,7 +407,7 @@ class CommBase(tools.YggClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 comm=None, **kwargs):
+                 comm=None, touches_model=False, **kwargs):
         self._comm_class = None
         if comm is not None:
             assert(comm == self.comm_class)
@@ -461,6 +461,7 @@ class CommBase(tools.YggClass):
         self._last_header = None
         self._work_comms = {}
         self.single_use = single_use
+        self.touches_model = touches_model
         self._used = False
         self._multiple_first_send = True
         self._n_sent = 0
@@ -501,6 +502,16 @@ class CommBase(tools.YggClass):
         else:
             self.open()
 
+    def __getstate__(self):
+        if self.is_open and (self._commtype != 'buffer'):
+            raise RuntimeError("Cannot pickle an open comm.")
+        return super(CommBase, self).__getstate__()
+
+    def __setstate__(self, state):
+        super(CommBase, self).__setstate__(state)
+        if self.is_interface:
+            atexit.register(self.atexit)
+        
     def _init_before_open(self, **kwargs):
         r"""Initialization steps that should be performed after base class, but
         before the comm is opened."""
@@ -842,6 +853,7 @@ class CommBase(tools.YggClass):
 
     def open(self):
         r"""Open the connection."""
+        self.debug("Openning %s", self.address)
         self.bind()
 
     def _close(self, *args, **kwargs):
@@ -856,7 +868,7 @@ class CommBase(tools.YggClass):
                 comm. Defaults to False.
 
         """
-        self.debug('')
+        self.debug("Closing %s", self.address)
         if linger and self.is_open:
             self.linger()
         else:
@@ -913,6 +925,8 @@ class CommBase(tools.YggClass):
         r"""Wait for messages to drain."""
         self.debug('')
         if self.direction == 'recv':
+            while self.is_open and (self.n_msg_recv_drain > 0):
+                self.recv(timeout=0)
             self.wait_for_confirm(timeout=self._timeout_drain)
         else:
             self.drain_messages(variable='n_msg_send')
@@ -1605,7 +1619,7 @@ class CommBase(tools.YggClass):
             else:  # pragma: debug
                 self.special_debug("Sending message header failed.")
         if flag:
-            self.debug('Sent %d bytes', msg_len)
+            self.debug('Sent %d bytes to %s', msg_len, self.address)
         else:  # pragma: debug
             self.special_debug('Failed to send %d bytes', msg_len)
         return flag
@@ -1816,7 +1830,7 @@ class CommBase(tools.YggClass):
         else:
             msg_len = 1
         if flag and (msg_len > 0):
-            self.debug('%d bytes received', msg_len)
+            self.debug('%d bytes received from %s', msg_len, self.address)
         return flag, msg
         
     def recv_nolimit(self, *args, **kwargs):
