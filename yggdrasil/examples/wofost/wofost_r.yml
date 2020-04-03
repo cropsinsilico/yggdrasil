@@ -1,0 +1,12 @@
+models:
+  - name: r_model
+    language: r
+    args: ./src/wofost.R
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model input
+    output: r_model:input
+    filetype: wofost
+  - input: r_model:output  # Connection between model output and file
+    output: ./output.txt
+    filetype: wofost

@@ -1,0 +1,12 @@
+models:
+  - name: cpp_model
+    language: cpp
+    args: ./src/wofost.cpp
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model input
+    output: cpp_model:input
+    filetype: wofost
+  - input: cpp_model:output  # Connection between model output and file
+    output: ./output.txt
+    filetype: wofost

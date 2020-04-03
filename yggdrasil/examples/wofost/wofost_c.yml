@@ -1,0 +1,12 @@
+models:
+  - name: c_model
+    language: c
+    args: ./src/wofost.c
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model input
+    output: c_model:input
+    filetype: wofost
+  - input: c_model:output  # Connection between model output and file
+    output: ./output.txt
+    filetype: wofost

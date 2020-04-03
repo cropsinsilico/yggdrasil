@@ -34,10 +34,13 @@ def convert_R_unit_string(r_str):
 
     """
     out = []
+    replacements = {'h': 'hr'}
     regex_mu = tools.bytes2str(b'\xc2\xb5')
     regex = r'(?P<name>[A-Za-z%s]+)(?P<exp>-?[0-9]*)(?: |$)' % regex_mu
     for x in re.finditer(regex, r_str):
         xdict = x.groupdict()
+        if xdict['name'] in replacements:
+            xdict['name'] = replacements[xdict['name']]
         if xdict['exp']:
             out.append('({name}**{exp})'.format(**xdict))
         else:

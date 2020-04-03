@@ -499,7 +499,7 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
   }
   // Try to send body in header
   if (len < (x->maxMsgSize - x->msgBufSize)) {
-    headlen = format_comm_header(head, headbuf, headbuf_len);
+    headlen = format_comm_header(head, &headbuf, headbuf_len);
     if (headlen < 0) {
       ygglog_error("comm_send_multipart: Failed to format header.");
       free(headbuf);
@@ -545,7 +545,7 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
       ygglog_debug("comm_send_multipart: zmq worker reply address is '%s'",
 		   head.zmq_reply_worker);
     }
-    headlen = format_comm_header(head, headbuf, headbuf_len);
+    headlen = format_comm_header(head, &headbuf, headbuf_len);
     if (headlen < 0) {
       ygglog_error("comm_send_multipart: Failed to format header.");
       free(headbuf);
