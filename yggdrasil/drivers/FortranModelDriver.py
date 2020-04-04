@@ -82,16 +82,16 @@ class FortranCompilerBase(CompilerBase):
                                          'fygg.mod'))
 
 
-class FlangCompiler(FortranCompilerBase):
-    r"""Interface class for flang compiler/linker."""
-    toolname = 'flang'
-    platforms = ['MacOS', 'Linux', 'Windows']
-    default_flags = (FortranCompilerBase.default_flags
-                     + ['-Werror', '-w', '-Weverything'])
-    flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
-                               + [('module-dir', '-I%s'),
-                                  ('module-search-path', '-I%s'),
-                                  ('standard', '-std=%s')])
+# class FlangCompiler(FortranCompilerBase):
+#     r"""Interface class for flang compiler/linker."""
+#     toolname = 'flang'
+#     platforms = ['MacOS', 'Linux', 'Windows']
+#     default_flags = (FortranCompilerBase.default_flags
+#                      + ['-Werror', '-w', '-Weverything'])
+#     flag_options = OrderedDict(list(FortranCompilerBase.flag_options.items())
+#                                + [('module-dir', '-I%s'),
+#                                   ('module-search-path', '-I%s'),
+#                                   ('standard', '-std=%s')])
 
 
 class GFortranCompiler(FortranCompilerBase):
@@ -358,11 +358,11 @@ class FortranModelDriver(CompiledModelDriver):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
-        if cls.default_compiler is None:
-            if platform._is_linux or platform._is_mac:
-                cls.default_compiler = 'gfortran'
-            elif platform._is_win:  # pragma: windows
-                cls.default_compiler = 'flang'
+        # if cls.default_compiler is None:
+        #     if platform._is_linux or platform._is_mac:
+        #         cls.default_compiler = 'gfortran'
+        #     elif platform._is_win:  # pragma: windows
+        #         cls.default_compiler = 'flang'
         CompiledModelDriver.before_registration(cls)
         try:
             cxx_lib = CModelDriver.CModelDriver.get_tool('compiler').cxx_lib
