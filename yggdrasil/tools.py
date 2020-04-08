@@ -1,6 +1,7 @@
 """This modules offers various tools."""
 from __future__ import print_function
 import threading
+import queue
 import multiprocessing
 import logging
 import pprint
@@ -115,6 +116,25 @@ def str2bytes(x, recurse=False):
     return out
 
 
+def get_fds():  # pragma: debug
+    r"""Get a list of open file descriptors."""
+    out = subprocess.check_output(
+        'lsof -p {} | grep -v txt'.format(os.getpid()), shell=True)
+    return out.splitlines()[1:]
+
+
+def check_processes():  # pragma: debug
+    r"""Check for processes that are still running."""
+    import psutil
+    current_process = psutil.Process()
+    children = current_process.children(recursive=True)
+    if len(children) > 0:
+        logging.info("Process %s has %d children" % (
+            current_process.pid, len(children)))
+        for child in children:
+            logger.info("    %s process running" % child.pid)
+
+
 def check_threads():  # pragma: debug
     r"""Check for threads that are still running."""
     global _thread_registry
@@ -125,7 +145,7 @@ def check_threads():  # pragma: debug
     if threading.active_count() > 1:
         logger.info("%d threads running" % threading.active_count())
         for t in threading.enumerate():
-            logger.info("%s thread running" % t.name)
+            logger.info("    %s thread running" % t.name)
 
 
 def check_locks():  # pragma: debug
@@ -1022,7 +1042,48 @@ class TimeOut(object):
 #     return wrapper
 
 
-class YggClass(ComponentBase, logging.LoggerAdapter):
+class YggLoggerAdapter(logging.LoggerAdapter):
+    r"""Logger adapter for use with YggClass."""
+
+    def __init__(self, ygg_class, *args, **kwargs):
+        self._ygg_class = ygg_class
+        super(YggLoggerAdapter, self).__init__(*args, **kwargs)
+    
+    def process(self, msg, kwargs):
+        r"""Process logging message."""
+        if _stack_in_log:  # pragma: no cover
+            stack = inspect.stack()
+            the_class = os.path.splitext(os.path.basename(
+                stack[2][0].f_globals["__file__"]))[0]
+            the_line = stack[2][2]
+            the_func = stack[2][3]
+            prefix = '%s(%s).%s[%d]' % (the_class,
+                                        self._ygg_class.print_name,
+                                        the_func, the_line)
+        else:
+            prefix = '%s(%s)' % (self._ygg_class.ygg_class,
+                                 self._ygg_class.print_name)
+        new_msg = '%s: %s' % (prefix, self.as_str(msg))
+        return new_msg, kwargs
+
+    def as_str(self, obj):
+        r"""Return str version of object if it is not already a string.
+
+        Args:
+            obj (object): Object that should be turned into a string.
+
+        Returns:
+            str: String version of provided object.
+
+        """
+        if not isinstance(obj, str):
+            obj_str = str(obj)
+        else:
+            obj_str = obj
+        return obj_str
+
+
+class YggClass(ComponentBase):
     r"""Base class for Ygg classes.
 
     Args:
@@ -1077,11 +1138,7 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         self.sched_out = None
         self.suppress_special_debug = False
         self._periodic_logs = {}
-        # self.logger = logging.getLogger(self.__module__)
-        # self.logger.basicConfig(
-        #     format=("%(levelname)s:%(module)s" +
-        #             # "(%s)" % self.name +
-        #             ".%(funcName)s[%(lineno)d]:%(message)s"))
+        self.logger = YggLoggerAdapter(self, logging.getLogger(self.__module__), {})
         self._old_loglevel = None
         self._old_encoding = None
         self.debug_flag = False
@@ -1091,7 +1148,6 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
             if k in self._schema_properties:
                 kwargs[k] = getattr(self, k)
         super(YggClass, self).__init__(**kwargs)
-        logging.LoggerAdapter.__init__(self, logging.getLogger(self.__module__), {})
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -1104,22 +1160,6 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
             elif isinstance(v, threading.Event):
                 thread_attr.setdefault('threading.Event', [])
                 thread_attr['threading.Event'].append((k, (), {}))
-            # elif isinstance(v, multiprocessing.synchronize.RLock):
-            #     thread_attr.setdefault('multiprocessing.RLock', [])
-            #     thread_attr['multiprocessing.RLock'].append((k, (), {}))
-            # elif isinstance(v, multiprocessing.synchronize.Event):
-            #     thread_attr.setdefault('multiprocessing.Event', [])
-            #     thread_attr['multiprocessing.Event'].append((k, (), {}))
-            # elif isinstance(v, YggThreadLoop):
-            #     assert(not v.is_alive())
-            #     thread_attr.setdefault('YggThreadLoop', [])
-            #     thread_attr['YggThreadLoop'].append(
-            #         (k, v._input_args, v._input_kwargs))
-            # elif isinstance(v, YggThread):
-            #     assert(not v.is_alive())
-            #     thread_attr.setdefault('YggThread', [])
-            #     thread_attr['YggThread'].append(
-            #         (k, v._input_args, v._input_kwargs))
             elif isinstance(v, threading.Thread):
                 assert(not v.is_alive())
                 attr = {'name': v._name, 'group': None,
@@ -1135,11 +1175,11 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
 
     def __setstate__(self, state):
         thread_attr = state.pop('thread_attr')
-        self.logger = logging.getLogger(self.__module__)
         for cls, items in thread_attr.items():
             for k, args, kwargs in items:
                 state[k] = eval(cls)(*args, **kwargs)
         self.__dict__.update(state)
+        self.logger = YggLoggerAdapter(self, logging.getLogger(self.__module__), {})
 
     def __deepcopy__(self, memo):
         r"""Don't deep copy since threads cannot be copied."""
@@ -1166,7 +1206,7 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
             languages = [languages]
         languages = [l.lower() for l in languages]
         if get_subprocess_language().lower() in languages:  # pragma: debug
-            return self.info
+            return self.logger.info
         else:
             return self.dummy_log
 
@@ -1174,7 +1214,7 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
     def interface_info(self):
         r"""Only do info debug message if is interface."""
         if is_subprocess():  # pragma: debug
-            return self.info
+            return self.logger.info
         else:
             return self.dummy_log
 
@@ -1210,45 +1250,14 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         out = sblock + pprint.pformat(obj, **kwargs).replace('\n', '\n' + sblock)
         return out
 
-    def as_str(self, obj):
-        r"""Return str version of object if it is not already a string.
-
-        Args:
-            obj (object): Object that should be turned into a string.
-
-        Returns:
-            str: String version of provided object.
-
-        """
-        if not isinstance(obj, str):
-            obj_str = str(obj)
-        else:
-            obj_str = obj
-        return obj_str
-
-    def process(self, msg, kwargs):
-        r"""Process logging message."""
-        if _stack_in_log:  # pragma: no cover
-            stack = inspect.stack()
-            the_class = os.path.splitext(os.path.basename(
-                stack[2][0].f_globals["__file__"]))[0]
-            the_line = stack[2][2]
-            the_func = stack[2][3]
-            prefix = '%s(%s).%s[%d]' % (the_class, self.print_name,
-                                        the_func, the_line)
-        else:
-            prefix = '%s(%s)' % (self.ygg_class, self.print_name)
-        new_msg = '%s: %s' % (prefix, self.as_str(msg))
-        return new_msg, kwargs
-
     def display(self, msg='', *args, **kwargs):
         r"""Print a message, no log."""
-        msg, kwargs = self.process(msg, kwargs)
+        msg, kwargs = self.logger.process(msg, kwargs)
         print(msg % args)
 
     def verbose_debug(self, *args, **kwargs):
         r"""Log a verbose debug level message."""
-        return self.log(9, *args, **kwargs)
+        return self.logger.log(9, *args, **kwargs)
         
     def dummy_log(self, *args, **kwargs):
         r"""Dummy log function that dosn't do anything."""
@@ -1271,7 +1280,7 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         else:
             self._periodic_logs[key] = 0
         if (self._periodic_logs[key] % period) == 0:
-            return self.debug
+            return self.logger.debug
         else:
             return self.dummy_log
 
@@ -1279,15 +1288,46 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
     def special_debug(self):
         r"""Log debug level message contingent of supression flag."""
         if not self.suppress_special_debug:
-            return self.debug
+            return self.logger.debug
         else:
             return self.dummy_log
+
+    @property
+    def info(self):
+        r"""Log an info level message."""
+        return self.logger.info
+
+    @property
+    def debug(self):
+        r"""Log a debug level message."""
+        return self.logger.debug
+
+    @property
+    def critical(self):
+        r"""Log a critical level message."""
+        return self.logger.critical
+
+    @property
+    def warn(self):
+        r"""Log a warning level message."""
+        return self.logger.warn
+
+    @property
+    def warning(self):
+        r"""Log a warning level message."""
+        return self.logger.warning
+
+    @property
+    def fatal(self):
+        r"""Log a fatal level message."""
+        return self.logger.fatal
 
     @property
     def error(self):
         r"""Log an error level message."""
         self.errors.append('ERROR')
-        return super(YggClass, self).error
+        return self.logger.error
+        # return super(YggClass, self).error
 
     @property
     def exception(self):
@@ -1295,7 +1335,8 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         exc_info = sys.exc_info()
         if exc_info is not None and exc_info != (None, None, None):
             self.errors.append('ERROR')
-            return super(YggClass, self).exception
+            return self.logger.exception
+            # return super(YggClass, self).exception
         else:
             return self.error
 
@@ -1313,7 +1354,7 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
 
     def printStatus(self):
         r"""Print the class status."""
-        self.info('%s(%s): state:', self.__module__, self.print_name)
+        self.logger.info('%s(%s): state:', self.__module__, self.print_name)
 
     def _task_with_output(self, func, *args, **kwargs):
         self.sched_out = func(*args, **kwargs)
@@ -1486,14 +1527,107 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         del self._timeouts[key]
 
 
+# class YggLockedList(list):
+#     r"""List intended to be shared between threads."""
+
+#     def __init__(self, *args, **kwargs):
+#         self.lock = multiprocessing.RLock()
+#         return super(LockedBuffer, self).__init__(*args, **kwargs)
+
+#     def __getattribute__(self, name):
+#         if (((name not in ['lock', '__getstate__', '__setstate__'])
+#              and hasattr(self, 'lock'))):
+#             with self.lock:
+#                 return list.__getattribute__(self, name)
+#         else:
+#             return list.__getattribute__(self, name)
+
+
+class YggLockedDict(dict):
+    r"""Dictionary that can be shared between threads."""
+
+    def __init__(self, *args, **kwargs):
+        self.lock = multiprocessing.RLock()
+        return super(YggLockedDict, self).__init__(*args, **kwargs)
+
+    def __getattribute__(self, name):
+        if name not in ['lock', '__getstate__', '__setstate__'] and hasattr(self, 'lock'):
+            with self.lock:
+                return dict.__getattribute__(self, name)
+        else:
+            return dict.__getattribute__(self, name)
+
+
+# class DummyProcess(object):
+#     r"""Class to serve as standing for process."""
+
+#     def __init__(self, target_class, *args, **kwargs):
+#         self._class = target_class
+#         self._args = args
+#         self._kwargs = kwargs
+#         super(DummyProcess, self).__init__(*args, **kwargs)
+
+#     def create_process(self):
+#         r"""Create the non-dummy version of the class this instance
+#         is standing in for."""
+#         return self._class(*self._args, **self._kwargs)
+
+#     def join(self, *args, **kwargs):
+#         r"""Join the process/thread."""
+#         return None
+
+#     def is_alive(self, *args, **kwargs):
+#         r"""Determine if the process/thread is alive."""
+#         return False
+
+#     @property
+#     def pid(self):
+#         r"""Process ID."""
+#         return 0
+
+#     @property
+#     def ident(self):
+#         r"""Process ID."""
+#         return self.pid
+    
+#     @property
+#     def daemon(self):
+#         r"""bool: Indicates whether the thread/process is daemonic or not."""
+#         return False
+
+#     @property
+#     def exitcode(self):
+#         r"""Exit code."""
+#         return 0
+    
+#     @property
+#     def returncode(self):
+#         r"""Return code."""
+#         return self.exitcode
+
+#     def kill(self, *args, **kwargs):
+#         r"""Kill the process."""
+#         pass
+
+#     def terminate(self, no_wait=False):
+#         r"""Terminate the process."""
+#         pass
+
+#     def poll(self):
+#         r"""Check if the process is finished and return the return
+#         code if it is."""
+#         return self.returncode
+
+
 class YggThread(YggClass):
     r"""Class for managing Ygg thread/process."""
     
     def __init__(self, name=None, target=None, args=(), kwargs=None,
                  daemon=False, group=None, method='thread',
-                 context=None, with_pipe=False, **ygg_kwargs):
+                 context=None, manager=None, with_pipe=False, **ygg_kwargs):
         global _lock_registry
         self.bool_flags = False  # True
+        self._flag_attr = []
         if kwargs is None:
             kwargs = {}
         if (target is not None) and ('target' in self._schema_properties):
@@ -1501,14 +1635,22 @@ class YggThread(YggClass):
             target = None
         super(YggThread, self).__init__(name, **ygg_kwargs)
         self.method = method
+        self.in_process = False
+        self.process_manager = None
         if method == 'thread':
             self.process_class = threading.Thread
             self.lock_class = threading.RLock
             self.event_class = threading.Event
+            self.queue_class = queue.Queue
+            self.in_process = True
+            self.shared = YggLockedDict()
         elif method == 'process':
             if context is None:
                 context = mp_ctx_spawn
             self.context = context
+            if manager is None:
+                manager = self.context.Manager()
+            self.shared = manager.dict()
             self.old_stdout = None
             self.pipe = None
             self.send_pipe = None
@@ -1519,13 +1661,12 @@ class YggThread(YggClass):
             self.process_class = self.context.Process
             self.lock_class = self.context.RLock
             self.event_class = self.context.Event
+            self.queue_class = self.context.Queue
         else:  # pragma: debug
             raise ValueError("Method '%s' not supported." % method)
-        self.process_kwargs = dict(
+        process_kwargs = dict(
             name=name, group=group, daemon=daemon, target=self.run)
-        # target=target, args=args, kwargs=kwargs)
-        # TODO: Modify target
-        self.process_instance = self.process_class(**self.process_kwargs)
+        self.process_instance = self.process_class(**process_kwargs)
         self._ygg_target = target
         self._ygg_args = args
         self._ygg_kwargs = kwargs
@@ -1537,10 +1678,28 @@ class YggThread(YggClass):
         self.create_flag_attr('_cleanup_called')
         self._calling_thread = None
         self.as_process = (self.method != 'thread')
-        if not self.as_process:
-            _thread_registry[self.name] = self
-            _lock_registry[self.name] = self.lock
-            atexit.register(self.atexit)
+        # if not self.as_process:
+        #     _thread_registry[self.name] = self
+        #     _lock_registry[self.name] = self.lock
+        #     atexit.register(self.atexit)
+
+    def __del__(self):
+        if not self.check_flag_attr('start_flag'):
+            self.run_finally()
+        rm_attr = (['process_instance', 'context', 'shared']
+                   + getattr(self, '_flag_attr', []))
+        for k in rm_attr:
+            if hasattr(self, k):
+                delattr(self, k)
+        # print(dir(self))
+
+    def close_shared(self):
+        if self.as_process:
+            old = self.shared
+            self.shared = self.shared.copy()
+            if old._manager is not None:
+                old._manager.shutdown()
+            old._close()
 
     def create_flag_attr(self, attr):
         r"""Create a flag."""
@@ -1548,6 +1707,7 @@ class YggThread(YggClass):
             setattr(self, attr, False)
         else:
             setattr(self, attr, self.event_class())
+        self._flag_attr.append(attr)
 
     def set_flag_attr(self, attr):
         r"""Set a flag."""
@@ -1570,9 +1730,18 @@ class YggThread(YggClass):
         else:
             return getattr(self, attr).is_set()
 
+    def wait_flag_attr(self, attr, timeout=None):
+        r"""Wait until a flag is True."""
+        if self.bool_flags:
+            T = self.start_timeout(timeout, key=attr)
+            while (not self.check_flag_attr(attr)) and not T.is_out:
+                self.sleep()
+            self.stop_timeout(key=attr)
+        else:
+            return getattr(self, attr).wait(timeout=timeout)
+
     def start(self, *args, **kwargs):
         r"""Start thread/process and print info."""
-        self.debug('')
         if not self.was_terminated:
             self.set_started_flag()
             self.before_start()
@@ -1598,6 +1767,8 @@ class YggThread(YggClass):
     def run_init(self):
         r"""Actions to perform at beginning of run."""
         # atexit.register(self.atexit)
+        self.debug('pid = %s, ident = %s', self.pid, self.ident)
+        self.in_process = True
         if self.as_process and ('send_pipe' in self._ygg_kwargs):
             self.old_stdout = sys.stdout
             self.send_pipe = self._ygg_kwargs.pop('send_pipe')
@@ -1622,6 +1793,7 @@ class YggThread(YggClass):
             if self.old_stdout is not None:
                 sys.stdout = self.old_stdout
             self.old_stdout = None
+            self.close_shared()
         for k in ['_ygg_target', '_ygg_args', '_ygg_kwargs']:
             if hasattr(self, k):
                 delattr(self, k)
@@ -1640,12 +1812,20 @@ class YggThread(YggClass):
         if self.as_process:
             return self.process_instance.pid
         else:
-            return self.process_instance.ident
+            return os.getpid()
 
     @property
     def ident(self):
         r"""Process ID."""
-        return self.pid
+        if self.as_process:
+            return self.process_instance.pid
+        else:
+            return self.process_instance.ident
+
+    @property
+    def daemon(self):
+        r"""bool: Indicates whether the thread/process is daemonic or not."""
+        return self.process_instance.daemon
         
     @property
     def exitcode(self):

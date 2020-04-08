@@ -255,8 +255,9 @@ class TestYggThread(YggTestClass):
         self.debug_flag = False
 
     def test_id(self):
-        r"""Test process ID."""
+        r"""Test process ID and ident."""
         self.instance.pid
+        self.instance.ident
 
     def test_exitcode(self):
         r"""Test process exitcode."""

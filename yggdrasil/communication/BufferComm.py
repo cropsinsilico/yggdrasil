@@ -1,21 +1,124 @@
-import threading
+import gc
+from yggdrasil import tools
 from yggdrasil.communication import CommBase
 
 
-class LockedBuffer(list):
+class BufferClosed(RuntimeError):
+    pass
+
+
+class LockedBuffer(object):
     r"""Buffer intended to be shared between threads/processes."""
 
     def __init__(self, *args, **kwargs):
-        self.lock = threading.RLock()
-        self.closed = False
-        return super(LockedBuffer, self).__init__(*args, **kwargs)
+        self.cleanup_context = None
+        context = kwargs.get('process_context', None)
+        if context is None:
+            context = tools.mp_ctx_spawn
+            self.cleanup_context = context
+        self.lock = context.RLock()
+        self._closed = context.Event()
+        self._queue = context.Queue(*args, **kwargs)
+        super(LockedBuffer, self).__init__()
 
-    def __getattribute__(self, name):
-        if name == 'lock':
-            return list.__getattribute__(self, name)
-        else:
+    @property
+    def closed(self):
+        r"""bool: True if the queue is closed, False otherwise."""
+        if not hasattr(self, '_closed'):
+            return True
+        return self._closed.is_set()
+
+    def close(self, join=False):
+        r"""Close the buffer."""
+        if hasattr(self, 'lock'):
             with self.lock:
-                return list.__getattribute__(self, name)
+                self._closed.set()
+                if hasattr(self._queue, 'close'):
+                    self._queue.close()
+                if hasattr(self._queue, 'join_thread'):
+                    self._queue.join_thread()
+                del self._queue
+                self._queue = None
+                del self._closed
+            del self.lock
+            if self.cleanup_context is None:
+                del self.cleanup_context
+                self.cleanup_context = None
+            gc.collect()
+        
+    def __len__(self):
+        if self.closed:  # pragma: debug
+            return 0
+        return int(not self._queue.empty())
+
+    def empty(self, *args, **kwargs):
+        try:
+            return self._queue.empty(*args, **kwargs)
+        except AttributeError:  # pragma: debug
+            if self.closed:
+                raise BufferClosed("Queue closed.")
+            raise
+
+    def put(self, *args, **kwargs):
+        r"""Put a message in the queue."""
+        try:
+            self._queue.put(*args, **kwargs)
+        except AttributeError:  # pragma: debug
+            if self.closed:
+                raise BufferClosed("Queue closed.")
+            raise
+
+    def get(self, *args, **kwargs):
+        r"""Get a message from the queue."""
+        try:
+            return self._queue.get(*args, **kwargs)
+        except AttributeError:  # pragma: debug
+            if self.closed:
+                raise BufferClosed("Queue closed.")
+            raise
+
+    def put_nowait(self, *args, **kwargs):
+        r"""Put a message in the queue w/o wait."""
+        try:
+            self._queue.put_nowait(*args, **kwargs)
+            # return self.put(*args, **kwargs)
+        except AttributeError:  # pragma: debug
+            if self.closed:
+                raise BufferClosed("Queue closed.")
+            raise
+            
+    def get_nowait(self, *args, **kwargs):
+        r"""Get a message from the queue."""
+        if self.closed:  # pragma: debug
+            raise BufferClosed("Queue closed.")
+        return self._queue.get_nowait(*args, **kwargs)
+        # return self.get(*args, **kwargs)
+
+    def append(self, x):
+        r"""Add an element to the queue."""
+        self.put(x)
+
+    def pop(self, index=None, default=None):
+        r"""Remove the first element from the queue."""
+        assert(index == 0)
+        try:
+            with self.lock:
+                if (len(self) == 0) and (default is not None):
+                    return default
+                return self.get()
+        except AttributeError:  # pragma: debug
+            raise BufferClosed("Queue closed.")
+
+    def clear(self):
+        r"""Remove all elements from the queue."""
+        try:
+            with self.lock:
+                if self.closed:  # pragma: debug
+                    raise BufferClosed("Queue closed.")
+                while not self._queue.empty():
+                    self._queue.get()
+        except AttributeError:  # pragma: debug
+            pass
 
 
 class BufferComm(CommBase.CommBase):
@@ -33,7 +136,7 @@ class BufferComm(CommBase.CommBase):
     """
     _commtype = 'buffer'
     no_serialization = True
-    
+
     @classmethod
     def is_installed(cls, language=None):
         r"""Determine if the necessary libraries are installed for this
@@ -79,7 +182,7 @@ class BufferComm(CommBase.CommBase):
         
     def _close(self, *args, **kwargs):
         r"""Close the connection."""
-        self.address.closed = True
+        self.address.close()
         
     @property
     def n_msg_recv(self):
@@ -139,11 +242,7 @@ class BufferComm(CommBase.CommBase):
         while (not T.is_out) and (not len(self.address)):
             self.sleep()
         self.stop_timeout(key_suffix='_recv')
-        with self.address.lock:
-            if len(self.address):
-                return (True, self.address.pop(0))
-            else:
-                return (True, self.empty_bytes_msg)
+        return (True, self.address.pop(0, self.empty_bytes_msg))
 
     def purge(self):
         r"""Purge all messages from the comm."""
