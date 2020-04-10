@@ -2,7 +2,8 @@
 import os
 import copy
 import numpy as np
-from yggdrasil import tools
+import functools
+from yggdrasil import multitasking
 from yggdrasil.communication import new_comm, BufferComm
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.components import (
@@ -22,6 +23,7 @@ class TaskThreadError(RuntimeError):
 
 def run_remotely(method):
     r"""Decorator for methods that should be run remotely."""
+    @functools.wraps(method)
     def modified_method(self, *args, **kwargs):
         method_name = method.__name__
         if self.can_run_remotely:
@@ -115,6 +117,9 @@ class ConnectionDriver(Driver):
                            {'$ref': '#/definitions/transform'}]}},
         'onexit': {'type': 'string'}}
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
+    _cleanup_attr = Driver._cleanup_attr + [
+        '_comm_opened', '_comm_closed', '_skip_after_loop',
+        'tasks', 'tasks_return', 'task_thread', 'task_break_flag']
 
     @property
     def _is_input(self):
@@ -127,7 +132,6 @@ class ConnectionDriver(Driver):
         return (self._direction == 'output')
 
     def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
-        # kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Translator
         if translator is None:
@@ -149,7 +153,6 @@ class ConnectionDriver(Driver):
         self.create_flag_attr('_comm_opened')
         self.create_flag_attr('_comm_closed')
         self.create_flag_attr('_skip_after_loop')
-        # self.create_flag_attr('_model_exited')
         self.shared.update(nrecv=0, nproc=0, nsent=0, nskip=0,
                            state='started', close_state='')
         # Attributes used by process
@@ -170,16 +173,9 @@ class ConnectionDriver(Driver):
         if self.as_process:
             self.tasks = BufferComm.LockedBuffer()  # ctx=self.context)
             self.tasks_return = BufferComm.LockedBuffer()  # ctx=self.context)
-            self.task_thread = tools.YggThreadLoop(
+            self.task_thread = multitasking.YggTaskLoop(
                 '%s.TaskThread' % self.name, target=self.complete_tasks)
             self.create_flag_attr('task_break_flag')
-
-    def __del__(self):
-        self.icomm.close()
-        del self.icomm
-        self.ocomm.close()
-        del self.ocomm
-        super(ConnectionDriver, self).__del__()
 
     def _init_single_comm(self, name, io, comm_kws, **kwargs):
         r"""Parse keyword arguments for input/output comm."""
@@ -355,6 +351,7 @@ class ConnectionDriver(Driver):
     def can_run_remotely(self):
         r"""bool: True if process should be run remotely."""
         return (self.as_process and (not self.in_process)
+                and self.is_alive()
                 and (not self.check_flag_attr('task_break_flag')))
 
     @run_remotely
@@ -518,7 +515,6 @@ class ConnectionDriver(Driver):
 
     def cleanup(self):
         r"""Ensure that the communicators are closed."""
-        self.debug('')
         self.close_comm()
         self.close_task_queues()
         super(ConnectionDriver, self).cleanup()

@@ -2,9 +2,9 @@ import os
 import tempfile
 import uuid
 import zmq
-import threading
 import logging
 from yggdrasil import tools
+from yggdrasil import multitasking
 from yggdrasil.communication import CommBase, AsyncComm
 
 
@@ -190,19 +190,19 @@ class ZMQProxy(CommBase.CommServer):
         cli_count (int): Number of clients that have connected to this proxy.
 
     """
-    def __init__(self, srv_address, context=None, retry_timeout=-1,
+    def __init__(self, srv_address, zmq_context=None, retry_timeout=-1,
                  nretry=1, **kwargs):
         # Get parameters
         srv_param = parse_address(srv_address)
         cli_param = dict()
         for k in ['protocol', 'host', 'port']:
             cli_param[k] = kwargs.pop(k, srv_param[k])
-        context = context or _global_context
+        zmq_context = zmq_context or _global_context
         # Create new address for the frontend
         if cli_param['protocol'] in ['inproc', 'ipc']:
             cli_param['host'] = get_ipc_host()
         cli_address = format_address(cli_param['protocol'], cli_param['host'])
-        self.cli_socket = context.socket(zmq.ROUTER)
+        self.cli_socket = zmq_context.socket(zmq.ROUTER)
         self.cli_address = bind_socket(self.cli_socket, cli_address,
                                        nretry=nretry,
                                        retry_timeout=retry_timeout)
@@ -210,7 +210,7 @@ class ZMQProxy(CommBase.CommServer):
         CommBase.register_comm('ZMQComm', 'ROUTER_server_' + self.cli_address,
                                self.cli_socket)
         # Bind backend
-        self.srv_socket = context.socket(zmq.DEALER)
+        self.srv_socket = zmq_context.socket(zmq.DEALER)
         self.srv_socket.setsockopt(zmq.LINGER, 0)
         self.srv_address = bind_socket(self.srv_socket, srv_address,
                                        nretry=nretry,
@@ -265,12 +265,17 @@ class ZMQProxy(CommBase.CommServer):
 
     def after_loop(self):
         r"""Close sockets after the loop finishes."""
-        self.cleanup()
+        self.after_loop_cleanup()
         super(ZMQProxy, self).after_loop()
+
+    def after_loop_cleanup(self):
+        r"""Clean up sockets on exit."""
+        self.close_sockets()
 
     def cleanup(self):
         r"""Clean up sockets on exit."""
         self.close_sockets()
+        super(ZMQProxy, self).cleanup()
 
     def close_sockets(self):
         r"""Close the sockets."""
@@ -345,14 +350,16 @@ class ZMQComm(AsyncComm.AsyncComm):
                            "address depends on the transport. "
                            "Additional information can be found "
                            "`here <http://api.zeromq.org/3-2:zmq-bind>`_.")
+    _cleanup_attr = (AsyncComm.AsyncComm._cleanup_attr
+                     + ['reply_socket_lock', 'socket_lock'])
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',
                           dealer_identity=None, new_process=False,
                           reply_socket_address=None, **kwargs):
         r"""Initialize defaults for socket type/action based on direction."""
-        self.reply_socket_lock = threading.RLock()
-        self.socket_lock = threading.RLock()
+        self.reply_socket_lock = multitasking.RLock()
+        self.socket_lock = multitasking.RLock()
         # Client/Server things
         if self.is_client:
             socket_type = 'DEALER'
@@ -415,7 +422,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         self._n_reply_sent = 0
         self._n_reply_recv = {}
         self._server_class = ZMQProxy
-        self._server_kwargs = dict(context=self.context,
+        self._server_kwargs = dict(zmq_context=self.context,
                                    nretry=4, retry_timeout=2.0 * self.sleeptime)
         super(ZMQComm, self)._init_before_open(**kwargs)
 
@@ -425,13 +432,13 @@ class ZMQComm(AsyncComm.AsyncComm):
             self._bound = True
         state = super(ZMQComm, self).__getstate__()
         del state['context']
-        del state['_server_kwargs']['context']
+        del state['_server_kwargs']['zmq_context']
         del state['socket']
         return state
 
     def __setstate__(self, state):
         state['context'] = zmq.Context()
-        state['_server_kwargs']['context'] = state['context']
+        state['_server_kwargs']['zmq_context'] = state['context']
         super(ZMQComm, self).__setstate__(state)
         self.socket = self.context.socket(self.socket_type)
         self.socket.setsockopt(zmq.LINGER, 0)
@@ -796,8 +803,8 @@ class ZMQComm(AsyncComm.AsyncComm):
             # Ensure socket not still open
             self._openned = False
             if not self.socket.closed:
-                # if self._bound:
-                #     self.unbind()
+                if self._bound:
+                    self.unbind()
                 # elif self._connected:
                 #     self.disconnect()
                 self.socket.close(linger=0)

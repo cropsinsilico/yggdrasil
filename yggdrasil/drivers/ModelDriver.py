@@ -10,15 +10,11 @@ import uuid
 import tempfile
 from collections import OrderedDict
 from pprint import pformat
-from yggdrasil import platform, tools, languages
+from yggdrasil import platform, tools, languages, multitasking
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.metaschema.datatypes import is_default_typedef
-from threading import Event
-try:
-    from Queue import Queue, Empty
-except ImportError:
-    from queue import Queue, Empty  # python 3.x
+from queue import Empty
 logger = logging.getLogger(__name__)
 
 
@@ -337,10 +333,10 @@ class ModelDriver(Driver):
         super(ModelDriver, self).__init__(name, **kwargs)
         # Setup process things
         self.model_process = None
-        self.queue = Queue()
+        self.queue = multitasking.Queue()
         self.queue_thread = None
-        self.event_process_kill_called = Event()
-        self.event_process_kill_complete = Event()
+        self.event_process_kill_called = multitasking.Event()
+        self.event_process_kill_complete = multitasking.Event()
         # Strace/valgrind
         if self.with_strace and self.with_valgrind:
             raise RuntimeError("Trying to run with strace and valgrind.")
@@ -1069,7 +1065,7 @@ class ModelDriver(Driver):
         self.model_process = self.run_model(**kwargs)
         # Start thread to queue output
         if not no_queue_thread:
-            self.queue_thread = tools.YggThreadLoop(
+            self.queue_thread = tools.YggTaskLoop(
                 target=self.enqueue_output_loop,
                 name=self.name + '.EnqueueLoop')
             self.queue_thread.start()

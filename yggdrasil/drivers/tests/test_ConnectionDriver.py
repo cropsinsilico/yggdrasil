@@ -436,7 +436,7 @@ class TestConnectionDriverProcess(TestConnectionDriver):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionDriverProcess, self).inst_kwargs
-        out['method'] = 'process'
+        out['task_method'] = 'process'
         return out
 
 

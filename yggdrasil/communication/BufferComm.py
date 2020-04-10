@@ -1,5 +1,5 @@
 import gc
-from yggdrasil import tools
+from yggdrasil import multitasking
 from yggdrasil.communication import CommBase
 
 
@@ -14,7 +14,7 @@ class LockedBuffer(object):
         self.cleanup_context = None
         context = kwargs.get('process_context', None)
         if context is None:
-            context = tools.mp_ctx_spawn
+            context = multitasking.Context(task_method='parallel')
             self.cleanup_context = context
         self.lock = context.RLock()
         self._closed = context.Event()
@@ -33,18 +33,15 @@ class LockedBuffer(object):
         if hasattr(self, 'lock'):
             with self.lock:
                 self._closed.set()
-                if hasattr(self._queue, 'close'):
-                    self._queue.close()
-                if hasattr(self._queue, 'join_thread'):
-                    self._queue.join_thread()
-                del self._queue
-                self._queue = None
-                del self._closed
-            del self.lock
-            if self.cleanup_context is None:
-                del self.cleanup_context
-                self.cleanup_context = None
+                self._queue.cleanup()
+                self._closed.cleanup()
+            self.lock.cleanup()
+            if self.cleanup_context is not None:
+                self.cleanup_context.cleanup()
             gc.collect()
+
+    def cleanup(self):
+        self.close()
         
     def __len__(self):
         if self.closed:  # pragma: debug

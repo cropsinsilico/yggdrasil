@@ -2,35 +2,50 @@ import threading
 import multiprocessing
 from multiprocessing import synchronize
 import logging
-from yggdrasil import tools
+from yggdrasil import tools, multitasking
 from yggdrasil.communication.ZMQComm import ZMQComm
 # from yggdrasil.communication.BufferComm import BufferComm
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
-from multiprocessing import reduction
+from multiprocessing import reduction, freeze_support, get_context
+context = get_context("spawn")
 
 
-z = ZMQComm.new_comm('test')
-# z = ConnectionDriver('test')
-# z = BufferComm.new_comm('test')
+def test_method(x):
+    # print(x)
+    return
 
-def test_object(z):
+
+def test_object(z, key=None, index=''):
     try:
-        reduction.ForkingPickler.dumps(z)
+        proc = context.Process(target=test_method, args=(z,))
+        proc.start()
+        proc.join()
     except BaseException as e:
-        print(e)
-        for k, v in z.__dict__.items():
-            if k in ['_config', 'context']:
-                continue
-            if isinstance(v, (threading._RLock, threading._CRLock,
-                              threading.Event, threading.Thread,
-                              logging.Logger,
-                              multiprocessing.synchronize.RLock,
-                              multiprocessing.synchronize.Event)):
+        if key is not None:
+            print(index + str(key))
+        print(index + str(e))
+        if isinstance(z, dict):
+            items = z.items()
+        elif hasattr(z, '__getstate__'):
+            items = z.__getstate__().items()
+        else:
+            items = z.__dict__.items()
+        for k, v in items:
+            if k in ['_config']:
                 continue
             try:
                 reduction.ForkingPickler.dumps(v)
             except BaseException:
-                print(k, type(v))
-                raise
+                test_object(v, key=(k, type(v), v), index=(index + '  '))
 
-test_object(z)
+
+if __name__ == '__main__':
+    freeze_support()
+    # z = multitasking.Task()
+    # z = multitasking.YggTask()
+    # z = ZMQComm.new_comm('test', dont_open=True)
+    z = ConnectionDriver('test', method='thread')
+    # z = BufferComm.new_comm('test')
+
+
+    test_object(z)

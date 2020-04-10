@@ -519,6 +519,7 @@ class ComponentBase(object):
     _schema_excluded_from_class_validation = []
     _schema_inherit = True
     _dont_register = False
+    _cleanup_attr = []
 
     def __new__(cls, *args, **kwargs):
         obj = object.__new__(cls)
@@ -593,6 +594,21 @@ class ComponentBase(object):
             #                    "with the value %s.")
             #                   % (k, v, getattr(self, k)))
         self.extra_kwargs = kwargs
+
+    def __del__(self):
+        self.cleanup()
+
+    def atexit(self):
+        r"""Actions performed at exit."""
+        self.cleanup()
+
+    def cleanup(self):
+        r"""Actions to be performed to cleanup the class at exit
+        or on deletion. After execution of cleanup, the class is not
+        guaranteed to function."""
+        for k in self._cleanup_attr:
+            if hasattr(getattr(self, k, None), 'cleanup'):
+                getattr(self, k).cleanup()
 
     @staticmethod
     def before_registration(cls):
