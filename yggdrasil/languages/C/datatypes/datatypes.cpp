@@ -1889,8 +1889,8 @@ extern "C" {
 	ret = snprintf(*buf, buf_siz, "%s%s%s",
 		       MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
 	if ((size_t)ret > buf_siz) {
-	  ygglog_error("format_comm_header: Header exceeds buffer size: '%s%s%s'.",
-		       MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
+	  ygglog_error("format_comm_header: Header size (%d) exceeds buffer size (%lu): '%s%s%s'.",
+		       ret, buf_siz, MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
 	  return -1;
 	}
       }
