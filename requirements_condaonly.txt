@@ -1,6 +1,6 @@
 cmake
 czmq
-r-rcpp<=1.0.3
+r-rcpp<=1.0.3; platform_system == 'Darwin'
 r-base
 r-bit64
 r-r6
