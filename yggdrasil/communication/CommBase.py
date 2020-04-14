@@ -20,8 +20,8 @@ from yggdrasil.communication.transforms.TransformBase import TransformBase
 
 
 logger = logging.getLogger(__name__)
-_registered_servers = multitasking.LockedDict()
-_registered_comms = multitasking.LockedDict()
+_registered_servers = multitasking.LockedDict(task_method='thread')
+_registered_comms = multitasking.LockedDict(task_method='thread')
 
 
 def is_registered(comm_class, key):

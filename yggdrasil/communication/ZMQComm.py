@@ -432,7 +432,8 @@ class ZMQComm(AsyncComm.AsyncComm):
             self._bound = True
         state = super(ZMQComm, self).__getstate__()
         del state['context']
-        del state['_server_kwargs']['zmq_context']
+        state['_server_kwargs'].pop('zmq_context', None)
+        # del state['_server_kwargs']['zmq_context']
         del state['socket']
         return state
 

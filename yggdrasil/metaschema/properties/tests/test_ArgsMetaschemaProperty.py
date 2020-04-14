@@ -1,18 +1,27 @@
+import weakref
 from yggdrasil.metaschema.properties.tests import (
     test_MetaschemaProperty as parent)
 
 
-class ValidArgsClass1(object):
-    test_args = tuple([int(0), int(1)])
-    test_kwargs = dict(c=int(1))
-    valid_args = [{'type': 'int'}, {'type': 'int'}]
-    valid_kwargs = {'c': {'type': 'int'}}
-    invalid_args = [{'type': 'int'}, {'type': 'float'}]
-    invalid_kwargs = {'c': {'type': 'float'}}
+class Dummy(object):  # pragma: debug
+    pass
 
-    def __init__(self, a, b, c=0):
-        self._input_args = tuple([a, b])
-        self._input_kwargs = {'c': c}
+
+class ValidArgsClass1(object):
+    test_args = tuple([int(0), Dummy])
+    test_kwargs = dict(c=int(1), d=Dummy)
+    valid_args = [{'type': 'int'}, {'type': 'class'}]
+    valid_kwargs = {'c': {'type': 'int'},
+                    'd': {'type': 'class'}}
+    invalid_args = [{'type': 'int'}, {'type': 'float'}]
+    invalid_kwargs = {'c': {'type': 'float'},
+                      'd': {'type': 'float'}}
+
+    def __init__(self, a, b, c=0, d=Dummy):
+        self.b = b
+        self.d = d
+        self._input_args = tuple([a, weakref.ref(b)])
+        self._input_kwargs = {'c': c, 'd': weakref.ref(d)}
         
     def __eq__(self, solf):
         if not isinstance(solf, self.__class__):  # pragma: debug

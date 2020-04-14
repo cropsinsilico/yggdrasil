@@ -118,7 +118,7 @@ class ConnectionDriver(Driver):
         'onexit': {'type': 'string'}}
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     _cleanup_attr = Driver._cleanup_attr + [
-        '_comm_opened', '_comm_closed', '_skip_after_loop',
+        '_comm_opened', '_comm_closed', '_skip_after_loop', 'shared',
         'tasks', 'tasks_return', 'task_thread', 'task_break_flag']
 
     @property
@@ -133,6 +133,26 @@ class ConnectionDriver(Driver):
 
     def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
         super(ConnectionDriver, self).__init__(name, **kwargs)
+        # Shared attributes (set once or synced using events)
+        self.single_use = single_use
+        self.create_flag_attr('_comm_opened')
+        self.create_flag_attr('_comm_closed')
+        self.create_flag_attr('_skip_after_loop')
+        self.shared = self.context.Dict()
+        self.shared.update(nrecv=0, nproc=0, nsent=0, nskip=0,
+                           state='started', close_state='')
+        # Attributes used by process
+        self._eof_sent = False
+        self._first_send_done = False
+        self._used = False
+        self.onexit = None
+        self.task_thread = None
+        if self.as_process:
+            self.tasks = BufferComm.LockedBuffer()  # ctx=self.context)
+            self.tasks_return = BufferComm.LockedBuffer()  # ctx=self.context)
+            self.task_thread = multitasking.YggTaskLoop(
+                '%s.TaskThread' % self.name, target=self.complete_tasks)
+            self.create_flag_attr('task_break_flag')
         # Translator
         if translator is None:
             translator = []
@@ -148,17 +168,6 @@ class ConnectionDriver(Driver):
         if (onexit is not None) and (not hasattr(self, onexit)):
             raise ValueError("onexit '%s' is not a class method." % onexit)
         self.onexit = onexit
-        # Shared attributes (set once or synced using events)
-        self.single_use = single_use
-        self.create_flag_attr('_comm_opened')
-        self.create_flag_attr('_comm_closed')
-        self.create_flag_attr('_skip_after_loop')
-        self.shared.update(nrecv=0, nproc=0, nsent=0, nskip=0,
-                           state='started', close_state='')
-        # Attributes used by process
-        self._eof_sent = False
-        self._first_send_done = False
-        self._used = False
         # Add comms and print debug info
         self._init_comms(name, **kwargs)
         # self.debug('    env: %s', str(self.env))
@@ -169,13 +178,6 @@ class ConnectionDriver(Driver):
                     + (80 * '=')), self.__class__,
                    self.icomm.name, self.icomm.address,
                    self.ocomm.name, self.ocomm.address)
-        self.task_thread = None
-        if self.as_process:
-            self.tasks = BufferComm.LockedBuffer()  # ctx=self.context)
-            self.tasks_return = BufferComm.LockedBuffer()  # ctx=self.context)
-            self.task_thread = multitasking.YggTaskLoop(
-                '%s.TaskThread' % self.name, target=self.complete_tasks)
-            self.create_flag_attr('task_break_flag')
 
     def _init_single_comm(self, name, io, comm_kws, **kwargs):
         r"""Parse keyword arguments for input/output comm."""

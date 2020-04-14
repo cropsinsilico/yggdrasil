@@ -1,3 +1,4 @@
+import weakref
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.properties.MetaschemaProperty import (
     MetaschemaProperty)
@@ -24,14 +25,34 @@ class ArgsMetaschemaProperty(MetaschemaProperty):
             dict: Input arguments for re-creating the instance.
 
         """
+        out = None
         for k in cls._instance_dict_attr:
+            if out is not None:
+                break
             if hasattr(instance, k):
-                return getattr(instance, k)
+                out = getattr(instance, k)
             elif hasattr(instance, 'get_' + k):
-                return getattr(instance, 'get_' + k)()
+                out = getattr(instance, 'get_' + k)()
             elif hasattr(instance, '_' + k):
-                return getattr(instance, '_' + k)
-        raise MetaschemaTypeError('Could not locate dictionary of arguments.')
+                out = getattr(instance, '_' + k)
+        if isinstance(out, (list, tuple)):
+            out_real = []
+            for x in out:
+                if isinstance(x, weakref.ReferenceType):
+                    out_real.append(x())
+                else:
+                    out_real.append(x)
+            return out_real
+        elif isinstance(out, dict):
+            out_real = {}
+            for k, v in out.items():
+                if isinstance(v, weakref.ReferenceType):
+                    out_real[k] = v()
+                else:
+                    out_real[k] = v
+            return out_real
+        else:
+            raise MetaschemaTypeError('Could not locate dictionary of arguments.')
 
     @classmethod
     def encode(cls, instance, typedef=None):

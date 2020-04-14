@@ -1145,14 +1145,14 @@ class YggClass(ComponentBase):
         super(YggClass, self).__init__(**kwargs)
 
     def __getstate__(self):
-        state = self.__dict__.copy()
+        state = super(YggClass, self).__getstate__()
         del state['logger']
         return state
 
     def __setstate__(self, state):
         state['logger'] = YggLoggerAdapter(
             self, logging.getLogger(self.__module__), {})
-        self.__dict__.update(state)
+        super(YggClass, self).__setstate__(state)
 
     def __deepcopy__(self, memo):
         r"""Don't deep copy since threads cannot be copied."""

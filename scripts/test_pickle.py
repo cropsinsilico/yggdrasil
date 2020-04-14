@@ -23,7 +23,7 @@ def test_object(z, key=None, index=''):
     except BaseException as e:
         if key is not None:
             print(index + str(key))
-        print(index + str(e))
+        print(index + 'Error: ' + str(e))
         if isinstance(z, dict):
             items = z.items()
         elif hasattr(z, '__getstate__'):

@@ -4,6 +4,7 @@ import copy
 import six
 import importlib
 # import warnings
+import weakref
 from collections import OrderedDict
 from yggdrasil.doctools import docs2args
 
@@ -523,8 +524,18 @@ class ComponentBase(object):
 
     def __new__(cls, *args, **kwargs):
         obj = object.__new__(cls)
-        obj._input_args = args
-        obj._input_kwargs = kwargs
+        obj._input_args = []
+        for x in args:
+            try:
+                obj._input_args.append(weakref.ref(x))
+            except TypeError:
+                obj._input_args.append(x)
+        obj._input_kwargs = {}
+        for k, v in kwargs.items():
+            try:
+                obj._input_kwargs[k] = weakref.ref(v)
+            except TypeError:
+                obj._input_kwargs[k] = v
         return obj
     
     def __init__(self, skip_component_schema_normalization=None, **kwargs):
@@ -594,6 +605,12 @@ class ComponentBase(object):
             #                    "with the value %s.")
             #                   % (k, v, getattr(self, k)))
         self.extra_kwargs = kwargs
+
+    def __getstate__(self):
+        return self.__dict__.copy()
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
 
     def __del__(self):
         self.cleanup()

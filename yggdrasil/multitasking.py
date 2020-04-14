@@ -171,85 +171,6 @@ class AliasObject(object):
             self._base = final_value
 
         
-class LockedObject(AliasObject):
-    r"""Container that provides a lock that is acquired before accessing
-    the object."""
-
-    _base_locked = True
-    
-    def __init__(self, *args, **kwargs):
-        self.lock = mp_ctx_spawn.RLock()
-        # self.lock = threading.RLock()
-        super(LockedObject, self).__init__(*args, **kwargs)
-
-    def _getattr_base(self, name):
-        lock_acquired = False
-        if hasattr(self, 'lock'):
-            self.lock.acquire()
-            lock_acquired = True
-        out = None
-        try:
-            out = super(LockedObject, self)._getattr_base(name)
-        finally:
-            if lock_acquired:
-                self.lock.release()
-        return out
-    
-    # def __getstate__(self):
-    #     state = super(LockedObject, self).__getstate__()
-    #     state.pop('lock', None)
-    #     return state
-
-    # def __setstate__(self, state):
-    #     state['lock'] = threading.RLock()
-    #     super(LockedObject, self).__setstate__(state)
-
-    def cleanup(self):
-        r"""Cleanup the class."""
-        super(LockedObject, self).cleanup()
-        if hasattr(self, 'lock'):
-            del self.lock
-
-
-# class LockedList(LockedObject):
-#     r"""List intended to be shared between threads."""
-
-#     def __init__(self, *args, **kwargs):
-#         base = list(*args, **kwargs)
-#         super(LockedList, self).__init__(base)
-
-
-class LockedDict(LockedObject):
-    r"""Dictionary that can be shared between threads."""
-
-    _base_class = dict
-    _base_meth = ['clear', 'copy', 'get', 'items', 'keys',
-                  'pop', 'popitem', 'setdefault', 'update', 'values',
-                  '__contains__', '__delitem__', '__getitem__',
-                  '__iter__', '__len__', '__setitem__']
-    
-    def add_subdict(self, key):
-        r"""Add a subdictionary."""
-        self[key] = {}
-
-
-class LockedWeakValueDict(LockedDict):
-    r"""Dictionary of weakrefs that can be shared between threads."""
-
-    _base_class = weakref.WeakValueDictionary
-    _base_attr = ['data']
-    _base_meth = ['itervaluerefs', 'valuerefs']
-    
-    def __init__(self, *args, **kwargs):
-        self._dict_refs = {}
-        super(LockedWeakValueDict, self).__init__(*args, **kwargs)
-
-    def add_subdict(self, key):
-        r"""Add a subdictionary."""
-        self._dict_refs[key] = weakref.WeakValueDictionary()
-        self[key] = self._dict_refs[key]
-
-
 class MultiObject(AliasObject):
     r"""Concurrent/parallel processing object using either threads
     or processes."""
@@ -324,6 +245,25 @@ class Context(MultiObject):
         r"""Get a shared dictionary in this context."""
         kwargs['task_context'] = self
         return Dict(*args, **kwargs)
+
+    def current_task(self):
+        r"""Current task (process/thread)."""
+        if self.parallel:
+            return self._base.current_process()
+        else:
+            return self._base.current_thread()
+
+    def main_task(self):
+        r"""Main task (process/thread)."""
+        if self.parallel:
+            out = None
+            if hasattr(self._base, 'parent_process'):  # pragma: no cover
+                out = self._base.parent_process()
+            if out is None:
+                out = self.current_task()
+            return out
+        else:
+            return _main_thread
 
 
 class ContextObject(MultiObject):
@@ -560,16 +500,6 @@ class Queue(ContextObject):
         super(Queue, self).cleanup()
 
 
-class LockedQueue(LockedObject):
-    r"""Locked queue."""
-
-    _base_class = Queue
-    _base_meth = Queue._base_meth + ['join']
-    _base_attr = Queue._base_attr
-    _unlocked_attr = ['empty', 'full', 'put', 'put_nowait',
-                      'get', 'get_nowait']
-
-
 class Dict(ContextObject):
     r"""Multiprocessing/threading shared dictionary."""
 
@@ -600,6 +530,8 @@ class Dict(ContextObject):
             final_value = self._base.copy()
         except BaseException:
             final_value = {}
+        if isinstance(self._base, LockedDict):
+            self._base.cleanup()
         if getattr(self._base, '_manager', None) is not None:
             self._base._manager.shutdown()
         if hasattr(self._base, '_close'):
@@ -608,11 +540,89 @@ class Dict(ContextObject):
         self._base = final_value
 
 
+class LockedObject(AliasObject):
+    r"""Container that provides a lock that is acquired before accessing
+    the object."""
+
+    _base_locked = True
+    
+    def __init__(self, *args, task_method='process', **kwargs):
+        self.lock = RLock(task_method=task_method)
+        super(LockedObject, self).__init__(*args, **kwargs)
+
+    def cleanup(self):
+        r"""Cleanup the class."""
+        super(LockedObject, self).cleanup()
+        if hasattr(self, 'lock'):
+            out = self.lock
+            del self.lock
+            out.cleanup()
+            del out
+
+
+# class LockedList(LockedObject):
+#     r"""List intended to be shared between threads."""
+
+#     def __init__(self, *args, **kwargs):
+#         base = list(*args, **kwargs)
+#         super(LockedList, self).__init__(base)
+
+
+class LockedDict(LockedObject):
+    r"""Dictionary that can be shared between threads."""
+
+    _base_class = dict
+    _base_meth = ['clear', 'copy', 'get', 'items', 'keys',
+                  'pop', 'popitem', 'setdefault', 'update', 'values',
+                  '__contains__', '__delitem__', '__getitem__',
+                  '__iter__', '__len__', '__setitem__']
+    
+    def add_subdict(self, key):
+        r"""Add a subdictionary."""
+        self[key] = {}
+
+    @property
+    def dummy_copy(self):
+        r"""Dummy copy of base."""
+        try:
+            out = self._base.copy()
+        except BaseException:
+            out = {}
+        return out
+
+
+class LockedWeakValueDict(LockedDict):
+    r"""Dictionary of weakrefs that can be shared between threads."""
+
+    _base_class = weakref.WeakValueDictionary
+    _base_attr = ['data']
+    _base_meth = ['itervaluerefs', 'valuerefs']
+    
+    def __init__(self, *args, **kwargs):
+        self._dict_refs = {}
+        super(LockedWeakValueDict, self).__init__(*args, **kwargs)
+
+    def add_subdict(self, key):
+        r"""Add a subdictionary."""
+        self._dict_refs[key] = weakref.WeakValueDictionary()
+        self[key] = self._dict_refs[key]
+
+
+class LockedQueue(LockedObject):
+    r"""Locked queue."""
+
+    _base_class = Queue
+    _base_meth = Queue._base_meth + ['join']
+    _base_attr = Queue._base_attr
+    _unlocked_attr = ['empty', 'full', 'put', 'put_nowait',
+                      'get', 'get_nowait']
+
+
 class YggTask(YggClass):
     r"""Class for managing Ygg thread/process."""
 
     _cleanup_attr = (YggClass._cleanup_attr
-                     + ['shared', 'context', 'lock', 'process_instance',
+                     + ['context', 'lock', 'process_instance',
                         'error_flag', 'start_flag', 'terminate_flag'])
     
     def __init__(self, name=None, target=None, args=(), kwargs=None,
@@ -638,14 +648,14 @@ class YggTask(YggClass):
         else:
             self.in_process = True
         process_kwargs = dict(
-            name=name, group=group, daemon=daemon, target=self.run)
+            name=name, group=group, daemon=daemon,
+            target=self.run)
         self.process_instance = self.context.Task(**process_kwargs)
         self._ygg_target = target
         self._ygg_args = args
         self._ygg_kwargs = kwargs
         self.debug('')
         self.lock = self.context.RLock()
-        self.shared = self.context.Dict()
         self.create_flag_attr('error_flag')
         self.create_flag_attr('start_flag')
         self.create_flag_attr('terminate_flag')
@@ -655,6 +665,12 @@ class YggTask(YggClass):
         #     _lock_registry[self.name] = self.lock
         #     atexit.register(self.atexit)
 
+    def __getstate__(self):
+        out = super(YggTask, self).__getstate__()
+        out.pop('_input_args', None)
+        out.pop('_input_kwargs', None)
+        return out
+        
     def create_flag_attr(self, attr):
         r"""Create a flag."""
         setattr(self, attr, self.context.Event())
@@ -797,8 +813,8 @@ class YggTask(YggClass):
             #     self.join(self.timeout)
             self.wait(timeout=self.timeout)
             assert(not self.is_alive())
-        if self.as_process:
-            self.process_instance.terminate()
+        # if self.as_process:
+        #     self.process_instance.terminate()
 
     def poll(self):
         r"""Check if the process is finished and return the return
@@ -810,22 +826,11 @@ class YggTask(YggClass):
 
     def get_current_task(self):
         r"""Get the current process/thread."""
-        if self.as_process:
-            return self.context.current_process()
-        else:
-            return threading.current_thread()
+        return self.context.current_task()
 
     def get_main_proc(self):
         r"""Get the main process/thread."""
-        if self.as_process:
-            out = None
-            if hasattr(self.context, 'parent_process'):  # pragma: no cover
-                out = self.context.parent_process()
-            if out is None:
-                out = self.get_current_task()
-            return out
-        else:
-            return _main_thread
+        return self.context.main_task()
 
     def set_started_flag(self):
         r"""Set the started flag for the thread/process to True."""
