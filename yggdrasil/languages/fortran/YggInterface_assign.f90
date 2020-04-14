@@ -4,7 +4,7 @@ subroutine yggassign_yggchar2character(in, out)
   integer :: i
   print *, "yggassign_yggchar2character"
   print *, "len = ", size(in%x)
-  allocate(character(len=size(in%x)) :: out)
+  ! allocate(character(len=size(in%x)) :: out)
   print *, "allocated"
   do i = 1, size(in%x)
      out(i:i) = in%x(i)
