@@ -317,11 +317,11 @@ def install(args=None, with_sudo=None, skip_requirements=None,
         # Install requirements
         if not skip_requirements:
             # TEMP FIX FOR RCPP
-            if not install_packages(['Rcpp'], update=update_requirements,
-                                    repos="https://rcppcore.github.io/drat", **kwargs):
-                logger.error("Failed to install Rcpp dependency")
-                restore_makevars(makevars, old_makevars)
-                return False
+            # if not install_packages(['Rcpp'], update=update_requirements,
+            #                         repos="https://rcppcore.github.io/drat", **kwargs):
+            #     logger.error("Failed to install Rcpp dependency")
+            #     restore_makevars(makevars, old_makevars)
+            #     return False
             requirements = requirements_from_description()
             if not install_packages(requirements, update=update_requirements, **kwargs):
                 logger.error("Failed to install dependencies")
