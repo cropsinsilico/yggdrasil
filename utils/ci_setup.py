@@ -228,7 +228,10 @@ def deploy_package_on_ci(method):
         if INSTALLFORTRAN:
             cmds.append("echo Installing Fortran...")
             if _in_conda:
-                cmds.append("%s install -c conda-forge fortran-compiler" % conda_cmd)
+                if _is_win:
+                    cmds.append("%s install -c conda-forge m2w64-gcc-fortran" % conda_cmd)
+                else:
+                    cmds.append("%s install -c conda-forge fortran-compiler" % conda_cmd)
             elif _is_linux:
                 cmds += ["sudo apt-get install gfortran"]
             elif _is_osx:
