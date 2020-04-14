@@ -454,7 +454,10 @@ class AsyncComm(CommBase.CommBase):
                     return out
             except AsyncTryAgain:
                 if no_backlog:  # pragma: debug
-                    raise
+                    if (not self._used) and self._multiple_first_send:
+                        return False
+                    else:
+                        raise
         self.add_backlog_send(payload, **kwargs)
         self.debug('%d bytes backlogged', len(payload))
         return True

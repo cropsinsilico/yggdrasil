@@ -1620,6 +1620,7 @@ class CommBase(tools.YggClass):
         if (msg_len < self.maxMsgSize) or (self.maxMsgSize == 0):
             flag = self._safe_send(msg_s, **kwargs)
         else:
+            self.special_debug('Message will be split.')
             flag = self._safe_send(msg_s[:self.maxMsgSize])
             if flag:
                 # Send remainder of message using work comm

@@ -221,7 +221,12 @@ def deploy_package_on_ci(method):
             if _in_conda:
                 cmds.append("%s install r-base" % conda_cmd)
             elif _is_linux:
-                cmds += ["sudo apt-get install r-base",
+                cmds += [("sudo add-apt-repository 'deb https://cloud"
+                          ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
+                         ("sudo apt-key adv --keyserver keyserver.ubuntu.com "
+                          "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9"),
+                         "sudo apt update",
+                         "sudo apt-get install r-base r-base-dev",
                          "sudo apt-get install libudunits2-dev"]
             elif _is_osx:
                 cmds += ["brew install r",
