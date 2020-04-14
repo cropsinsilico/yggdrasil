@@ -1,6 +1,6 @@
 subroutine yggassign_yggchar2character(in, out)
   type(yggchar_r), intent(in) :: in
-  character(len=:), allocatable :: out
+  character(len=:), pointer :: out
   integer :: i
   print *, "yggassign_yggchar2character"
   print *, "len = ", size(in%x)

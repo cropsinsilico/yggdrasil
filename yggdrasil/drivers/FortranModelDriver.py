@@ -460,7 +460,7 @@ class FortranModelDriver(CompiledModelDriver):
             elif type_match.get('length_var', None):
                 if ((('pointer' not in out) and ('allocatable' not in out)
                      and (type_match['length_var'] != 'X'))):
-                    out += ', allocatable'
+                    out += ', pointer'
                 if type_match['length_var'] == '*':
                     out = out.replace('*', ':')
         if not ((out == '*') or ('X' in out)):
