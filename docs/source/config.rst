@@ -3,26 +3,17 @@
 Configuration Files
 ###################
 
-Many components of the |yggdrasil| framework's behavior can be controlled
-by options in the configuration file. When installed |yggdrasil| creates
-a user config file called '.yggdrasil.cfg' in your home directory. By
-editting the options in the user config file, you can customize the behavior
-of your framework runs.
+Many components of the |yggdrasil| framework's behavior can be controlled by options in the configuration file. When installed |yggdrasil| creates a user config file called '.yggdrasil.cfg' in your home directory or the direcotry associated with your conda or virtual environment (if you are using a conda or virtual environment). By editting the options in the user config file, you can customize the behavior of your framework runs. The exact location of your config file can be found by running::
 
-Further customization for specific runs can be
-achieved by creating a local config file called '.yggdrasil.cfg' in the 
-directory where the interface will be run. Any options not found in the local
-will be filled in with values from the user config file. Any options not
-found in the user config file will be filled in with default package values.
+  $ yggconfig --show-file
+
+Further customization for specific runs can be achieved by creating a local config file called '.yggdrasil.cfg' in the directory where the interface will be run. Any options not found in the local will be filled in with values from the user config file. Any options not found in the user config file will be filled in with default package values.
 
 Debug Options
 =============
 
-Options for controlling the level of information printed during a run can be
-controlled by options in the '[debug]' section of the config files. Each one
-can have any of the valid
-`logging levels <https://docs.python.org/2/library/logging.html#levels>`_.
-These include:
+Options for controlling the level of information printed during a run can be controlled by options in the '[debug]' section of the config files. Each one can have any of the valid
+`logging levels <https://docs.python.org/2/library/logging.html#levels>`_. These include:
 
 * **NOTSET:** Do not print any messages.
 * **CRITICAL:** Print only messages logged as critical.
@@ -48,9 +39,7 @@ client    INFO       Controls the level of messages printed by
 Language Options
 ================
 
-Each supported language has a dedicated section in the config file with
-options that control how models of that language will be handled. The
-following options are available to all languages:
+Each supported language has a dedicated section in the config file with options that control how models of that language will be handled. The following options are available to all languages:
 
 ==============    ====================================================
 Option            Description
@@ -104,7 +93,7 @@ If they are not installed in a standard location or you would like to
 use an alternate version than the one identified by |yggdrasil|, it may 
 be necessary for you to manually specify the location of dependency 
 headers and/or libraries. These can be set using the following config 
-options.
+options (with are also used to configure C++ model compilations).
 
 =================    ====================================================
 Option               Description
@@ -112,9 +101,23 @@ Option               Description
 rapidjson_include    Full path to the directory containing the rapidjson
                      headers.
 zmq_include          Full path to the zmq.h header.
-zmq_static           Full path to the zmq.lib static library.
+zmq_static           Full path to the zmq.lib/libzmq.a static library.
+zmq_shared           Full path to the zmq.dll/libzmq.so/libzmq.dylib
+                     dynamic/shared object library.
 czmq_include         Full path to the czmq.h header.
 czmq_static          Full path to the czmq.lib static library.
+czmq_shared          Full path to the czmq.dll/libczmq.so/libczmq.dylib
+                     dynamic/shared object library.
+python_include       Full path to the Python.h header.
+python_static        Full path to the pythonX.X.lib/libpythonX.X.a
+                     static library.
+python_shared        Full path to the pythonX.X.dll/libpythonX.X.so/
+                     libpythonX.X.dylib dynamic/shared object library.
+c++_include          Full path to the stdlib.h C++ header.
+c++_static           Full path to the libc++.a static library.
+c++_shared           Full path to the libc++.so/libc++.dylib C++
+                     dynamic/shared object library.
+macos_sdkroot        Full path to the Mac SDK that should be used.
 =================    ====================================================
 
 Matlab Options
