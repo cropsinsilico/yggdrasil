@@ -181,7 +181,12 @@ jobs:
       dist: xenial
       sudo: true
     - os: linux
-      env: YGG_TEST_FLAGS="--test-suite=types --languages R c fortran"
+      env: YGG_TEST_FLAGS="--test-suite=types --languages R c"
+      python: 3.7
+      dist: xenial
+      sudo: true
+    - os: linux
+      env: YGG_TEST_FLAGS="--test-suite=types --languages fortran"
       python: 3.7
       dist: xenial
       sudo: true
