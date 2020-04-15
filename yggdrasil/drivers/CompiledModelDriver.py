@@ -2056,7 +2056,8 @@ class CompiledModelDriver(ModelDriver):
         return copy.deepcopy(reg.get(cls.language, {}))
 
     @staticmethod
-    def get_tool_static(cls, tooltype, return_prop='tool', default=False):
+    def get_tool_static(cls, tooltype, return_prop='tool', default=False,
+                        language=None):
         r"""Get the class associated with the specified compilation tool for
         this language.
 
@@ -2069,6 +2070,8 @@ class CompiledModelDriver(ModelDriver):
             default (object, optiona): Tool that should be returned if one cannot
                 be identified. If False, an error will be raised when a tool
                 cannot be located. Defaults to False.
+            language (str, optional): Language of tools that should be
+                returned. Defaults to None if not provided.
 
         Returns:
             CompilationToolBase: Class providing an interface to the specified
@@ -2079,6 +2082,10 @@ class CompiledModelDriver(ModelDriver):
             ValueError: If return_prop is not 'tool', 'name', or 'flags'.
 
         """
+        if (language is not None) and (language != cls.language):
+            drv = import_component('model', language)
+            return drv.get_tool(tooltype, return_prop=return_prop,
+                                default=default)
         out = getattr(cls, '%s_tool' % tooltype, None)
         if out is None:
             # Associate linker & archiver with compiler so that it can be
@@ -2296,9 +2303,10 @@ class CompiledModelDriver(ModelDriver):
                     dep, default=default, commtype=commtype)
         out = None
         if dep in cls.internal_libraries:
-            tool = cls.get_tool('compiler')
             src = cls.get_dependency_source(dep)
             suffix = cls.get_internal_suffix(commtype=commtype)
+            dep_lang = cls.internal_libraries[dep].get('language', cls.language)
+            tool = cls.get_tool('compiler', language=dep_lang)
             out = tool.get_output_file(
                 src, dont_link=True, suffix=suffix)
         elif os.path.isfile(dep):
@@ -2389,9 +2397,10 @@ class CompiledModelDriver(ModelDriver):
                                       "libraries of types %s were found.")
                                      % (libtype, dep, libtype_found))
         elif libclass == 'internal':
-            tool = cls.get_tool('compiler')
             src = cls.get_dependency_source(dep)
             suffix = cls.get_internal_suffix(commtype=commtype)
+            dep_lang = cls.internal_libraries[dep].get('language', cls.language)
+            tool = cls.get_tool('compiler', language=dep_lang)
             out = tool.get_output_file(dep, libtype=libtype, no_src_ext=True,
                                        build_library=True,
                                        suffix=suffix,
