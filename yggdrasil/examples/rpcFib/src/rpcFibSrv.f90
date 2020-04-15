@@ -10,7 +10,7 @@ program main
 
   call get_command_argument(1, arg)
   read(arg, *) time_sleep
-  write(*, '("Hello from Fortran rpcFibSrv: sleeptime = ",f10.4)'), time_sleep
+  write(*, '("Hello from Fortran rpcFibSrv: sleeptime = ",f10.4)') time_sleep
 
   ! Create server-side rpc conneciton using model name
   rpc = ygg_rpc_server("rpcFibSrv", "%d", "%d %d")
@@ -37,11 +37,11 @@ program main
         prevResult = result0
         idx = idx + 1
      end do
-     write(*, '("rpcFibSrv(F): <- input ",i2," ::: ->(",i2," ",i2,")")'), &
+     write(*, '("rpcFibSrv(F): <- input ",i2," ::: ->(",i2," ",i2,")")') &
           input, input, result0
 
      ! Sleep and then send response back
-     if (time_sleep.gt.0) call sleep(int(time_sleep))
+     if (time_sleep.gt.0) call fsleep(int(time_sleep))
      ret = ygg_send_var(rpc, [yggarg(input), yggarg(result0)])
      if (.not.ret) then
         write(*, '("rpcFibSrv(F): ERROR sending")')

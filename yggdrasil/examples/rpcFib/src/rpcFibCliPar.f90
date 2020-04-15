@@ -9,7 +9,7 @@ program main
 
   call get_command_argument(1, arg)
   read(arg, *) iterations
-  write(*, '("Hello from Fortran rpcFibCliPar: iterations = ",i2)'), &
+  write(*, '("Hello from Fortran rpcFibCliPar: iterations = ",i2)') &
        iterations
 
   ! Create RPC connection with server
@@ -18,7 +18,7 @@ program main
 
   ! Send all of the requests to the server
   do i = 1, iterations
-     write(*, '("rpcFibCliPar(F): fib(->",i2,") ::: ")'), i
+     write(*, '("rpcFibCliPar(F): fib(->",i2,") ::: ")') i
      ret = ygg_send_var(rpc, yggarg(i))
      if (.not.ret) then
         write(*, '("rpcFibCliPar(F): SEND FAILED")')
@@ -35,7 +35,7 @@ program main
         write(*, '("rpcFibCliPar(F): RECV FAILED")')
         stop 1
      end if
-     write(*, '("rpcFibCliPar(F):  fib(",i2,"<-) = ",i2,"<-")'), &
+     write(*, '("rpcFibCliPar(F):  fib(",i2,"<-) = ",i2,"<-")') &
           fibNo, fib
   end do
 

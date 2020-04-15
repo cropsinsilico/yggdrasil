@@ -11,7 +11,7 @@ program main
 
   call get_command_argument(1, arg)
   read(arg, *) iterations
-  write(*, '("Hello from Fortran client: iterations ",i2)'), iterations
+  write(*, '("Hello from Fortran client: iterations ",i2)') iterations
 
   ! Set up connections matching yaml
   ! RPC client-side connection will be $(server_name)_$(client_name)
@@ -26,14 +26,14 @@ program main
   do i = 1, iterations
 
      ! Call the server and receive response
-     write(*, '("client(F): Calling fib(",i2,")")'), i
+     write(*, '("client(F): Calling fib(",i2,")")') i
      ret = ygg_rpc_call(rpc, yggarg(i), yggarg(fib))
      if (.not.ret) then
         write(*, '("client(F): RPC CALL ERROR")')
         exit_code = -1;
         exit
      end if
-     write(*, '("client(F): Response fib(",i2,") = ",i2)'), i, fib
+     write(*, '("client(F): Response fib(",i2,") = ",i2)') i, fib
 
      ! Log result by sending it to the log connection
      ret = ygg_send_var(log, [yggarg(i), yggarg(fib)])

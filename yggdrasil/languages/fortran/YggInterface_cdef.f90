@@ -21,6 +21,10 @@
        implicit none
        character(kind=c_char), dimension(*), intent(in) :: fmt
      end subroutine ygglog_error_c
+     subroutine fsleep(seconds) bind(c, name="sleep")
+       use, intrinsic :: iso_c_binding, only: c_int
+       integer(kind=c_int), intent(in), value :: seconds
+     end subroutine fsleep
   
      ! Methods for initializing channels
      function is_comm_format_array_type_c(x) result(out) &
