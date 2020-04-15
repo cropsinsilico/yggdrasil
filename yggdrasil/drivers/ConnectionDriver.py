@@ -208,20 +208,23 @@ class ConnectionDriver(Driver):
         comm_kws['reverse_names'] = True
         comm_kws['name'] = self.name
         if not comm_list:
-            comm_list.append({'comm': comm_type})
+            comm_list.append({'commtype': comm_type})
         for i, x in enumerate(comm_list):
             if x is None:
                 comm_list[i] = dict()
             elif not isinstance(x, dict):
-                comm_list[i] = dict(comm=x)
-            comm_list[i].setdefault('comm', comm_type)
+                if not isinstance(x, str):  # pragma: debug
+                    self.info('%s, %s', x, type(x))
+                    assert(isinstance(x, str))
+                comm_list[i] = dict(commtype=x)
+            comm_list[i].setdefault('commtype', comm_type)
         any_files = False
         all_files = True
         if not touches_model:
             comm_kws['no_suffix'] = True
             ikws = []
             for x in comm_list:
-                icomm_cls = import_component('comm', x['comm'])
+                icomm_cls = import_component('comm', x['commtype'])
                 if icomm_cls.is_file:
                     any_files = True
                     ikws += s['file'].get_subtype_properties(icomm_cls._filetype)

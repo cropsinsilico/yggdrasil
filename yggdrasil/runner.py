@@ -94,17 +94,13 @@ class YggFunction(YggClass):
             if a not in kwargs:
                 raise RuntimeError("Required argument %s not provided." % a)
         # Send
-        print('sending')
         for k, v in self.inputs.items():
-            print(k, v['comm'].address)
             flag = v['comm'].send([kwargs[a] for a in v['vars']])
             if not flag:
                 raise RuntimeError("Failed to send %s" % k)
         # Receive
-        print('receiving')
         out = {}
         for k, v in self.outputs.items():
-            print(k, v['comm'].address)
             flag, data = v['comm'].recv(timeout=60.0)
             if not flag:
                 raise RuntimeError("Failed to receive variable %s" % v)
@@ -589,9 +585,9 @@ class YggRunner(YggClass):
         for driver in self.all_drivers:
             if 'instance' in driver:
                 driver['instance'].cleanup()
-        self.inputdrivers = {}
-        self.outputdrivers = {}
-        self.modeldrivers = {}
+        # self.inputdrivers = {}
+        # self.outputdrivers = {}
+        # self.modeldrivers = {}
 
     def printStatus(self):
         r"""Print the status of all drivers, starting with the IO drivers."""
