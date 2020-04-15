@@ -234,7 +234,7 @@ Linux
 On Linux this can be done via apt. Installing R >= 3.5 (recommended) requires first adding a source entry and key for your OS as shown below for for Xenial distribution of Ubuntu (Details on `ubuntu <https://cloud.r-project.org/bin/linux/ubuntu/README.html>`_, `debian <https://cloud.r-project.org/bin/linux/debian/>`_, `redhat <https://cloud.r-project.org/bin/linux/redhat/README>`_ installation)::
 
   $ sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu xenial-cran35/'
-  $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
+  $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
   $ sudo apt update
   $ sudo apt-get install r-base r-base-dev
   $ sudo apt-get install libudunits2-dev
