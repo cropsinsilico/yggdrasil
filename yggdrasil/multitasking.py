@@ -128,10 +128,9 @@ class AliasObject(object):
     _unlocked_attr = []
 
     def __init__(self, *args, dont_initialize_base=False, **kwargs):
+        self._base = None
         if (not dont_initialize_base) and (self._base_class is not None):
             self._base = self._base_class(*args, **kwargs)
-        else:
-            self._base = None
 
     @classmethod
     def from_base(cls, base, *args, **kwargs):
@@ -168,9 +167,7 @@ class AliasObject(object):
     def cleanup(self):
         r"""Cleanup the class."""
         if self._base is not None:
-            final_value = self.dummy_copy
-            del self._base
-            self._base = final_value
+            self._base = self.dummy_copy
 
         
 class MultiObject(AliasObject):
@@ -283,7 +280,6 @@ class ContextObject(MultiObject):
 
     def __init__(self, *args, task_method='threading',
                  task_context=None, **kwargs):
-        self._final_value = None
         self._cleanup_context = None
         if task_context is None:
             task_context = Context(task_method=task_method)

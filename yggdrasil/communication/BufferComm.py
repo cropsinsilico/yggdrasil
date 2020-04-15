@@ -17,14 +17,12 @@ class LockedBuffer(multitasking.LockedQueue):
     @property
     def closed(self):
         r"""bool: True if the queue is closed, False otherwise."""
-        if not hasattr(self, '_closed'):
-            return True
         return self._closed.is_set()
 
     def close(self, join=False):
         r"""Close the buffer."""
-        with self.lock:
-            self.cleanup()
+        # with self.lock:
+        self.cleanup()
 
     def cleanup(self):
         self._closed.set()
@@ -38,21 +36,21 @@ class LockedBuffer(multitasking.LockedQueue):
 
     def append(self, x):
         r"""Add an element to the queue."""
-        self.put(x)
+        self.put_nowait(x)
 
     def pop(self, index=None, default=None):
         r"""Remove the first element from the queue."""
         assert(index == 0)
-        with self.lock:
-            if (len(self) == 0) and (default is not None):
-                return default
-            return self.get()
+        # with self.lock:
+        if (len(self) == 0) and (default is not None):
+            return default
+        return self.get()
 
     def clear(self):
         r"""Remove all elements from the queue."""
-        with self.lock:
-            while not self.empty():
-                self.get()
+        # with self.lock:
+        while not self.empty():
+            self.get()
 
 
 class BufferComm(CommBase.CommBase):
