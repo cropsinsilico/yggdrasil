@@ -1220,7 +1220,8 @@ class ModelDriver(Driver):
         r"""Remove compile executable."""
         if self.overwrite:
             self.remove_products()
-        if self.function and os.path.isfile(self.model_src):
+        if ((self.function and isinstance(self.model_src, str)
+             and os.path.isfile(self.model_src))):
             assert(os.path.basename(self.model_src).startswith('ygg_'))
             os.remove(self.model_src)
         self.restore_files()

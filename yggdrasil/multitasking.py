@@ -421,7 +421,7 @@ class Task(ContextObject):
 
     _base_attr = ['name', 'daemon', 'authkey', 'sentinel', 'exitcode',
                   'pid']
-    _base_meth = ['start', 'run', 'join', 'is_alive',
+    _base_meth = ['start', 'run', 'join',
                   # Thread only
                   'getName', 'setName', 'isDaemon', 'setDaemon',
                   # Process only
@@ -457,6 +457,13 @@ class Task(ContextObject):
         if isinstance(state['_base'], dict):
             state['_base'] = SafeThread(**state['_base'])
         super(Task, self).__setstate__(state)
+
+    def is_alive(self):
+        r"""Determine if the process/thread is alive."""
+        out = self._base.is_alive()
+        if out is None:
+            out = False
+        return out
 
     # Called before cleanup called
     @property
@@ -692,7 +699,7 @@ class YggTask(YggClass):
             self.pipe = None
             self.send_pipe = None
             if with_pipe:
-                self.pipe = self.context.Pipe()
+                self.pipe = self.context._base.Pipe()
                 kwargs['send_pipe'] = self.pipe[1]
         else:
             self.in_process = True
