@@ -159,7 +159,6 @@ script:
 
 after_success:
   - |
-    coveralls
     codecov
 
 
