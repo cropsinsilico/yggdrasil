@@ -110,10 +110,9 @@ class LockedBuffer(object):
         r"""Remove all elements from the queue."""
         try:
             with self.lock:
-                if self.closed:  # pragma: debug
-                    raise BufferClosed("Queue closed.")
-                while not self._queue.empty():
-                    self._queue.get()
+                if not self.closed:
+                    while not self._queue.empty():
+                        self._queue.get()
         except AttributeError:  # pragma: debug
             pass
 

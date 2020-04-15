@@ -1065,7 +1065,7 @@ class ModelDriver(Driver):
         self.model_process = self.run_model(**kwargs)
         # Start thread to queue output
         if not no_queue_thread:
-            self.queue_thread = tools.YggTaskLoop(
+            self.queue_thread = multitasking.YggTaskLoop(
                 target=self.enqueue_output_loop,
                 name=self.name + '.EnqueueLoop')
             self.queue_thread.start()
