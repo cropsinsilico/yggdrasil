@@ -938,11 +938,12 @@ class CommBase(tools.YggClass):
         r"""Actions to be performed to cleanup the class at exit
         or on deletion. After execution of cleanup, the class is not
         guaranteed to function."""
-        self.close()
-        self.debug(
-            'atexit finished: closed=%s, n_msg=%d, close_alive=%s',
-            self.is_closed, self.n_msg,
-            self._closing_thread.is_alive())
+        if hasattr(self, 'address'):
+            self.close()
+            self.debug(
+                'atexit finished: closed=%s, n_msg=%d, close_alive=%s',
+                self.is_closed, self.n_msg,
+                self._closing_thread.is_alive())
         super(CommBase, self).cleanup()
 
     def language_atexit(self):  # pragma: debug

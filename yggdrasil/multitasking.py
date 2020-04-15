@@ -106,6 +106,8 @@ class AliasMeta(type):
         for k in cls._base_attr:
             assert(not hasattr(cls, k))
             add_aliased_attribute(cls, k, with_lock=cls._base_locked)
+        cls._base_meth = []
+        cls._base_attr = []
         return cls
 
 
@@ -266,26 +268,62 @@ class Context(MultiObject):
             return _main_thread
 
 
+class DummyContextObject(object):
+
+    @property
+    def context(self):
+        return None
+
+    def cleanup(self):
+        pass
+
+
 class ContextObject(MultiObject):
     r"""Base class for object intialized in a context."""
 
     def __init__(self, *args, task_method='threading',
                  task_context=None, **kwargs):
         self._final_value = None
+        self._cleanup_context = None
         if task_context is None:
             task_context = Context(task_method=task_method)
+            self._cleanup_context = task_context
         task_method = task_context.task_method
+        self._context = weakref.ref(task_context)
         self._base_class = self.get_base_class(task_context)
         super(ContextObject, self).__init__(
             *args, task_method=task_method, **kwargs)
 
+    def __getstate__(self):
+        state = super(ContextObject, self).__getstate__()
+        state['_context'] = None
+        return state
+
+    def __setstate__(self, state):
+        if state['_cleanup_context'] is None:
+            state['_cleanup_context'] = Context(task_method=state['task_method'])
+        state['_context'] = weakref.ref(state['_cleanup_context'])
+        super(ContextObject, self).__setstate__(state)
+        
     @classmethod
     def get_base_class(cls, context):
         r"""Get instance of base class that will be represented."""
         name = cls.__name__
         context.check_for_base(name)
         return getattr(context._base, name)
-        
+
+    def cleanup(self):
+        r"""Cleanup the class."""
+        super(ContextObject, self).cleanup()
+        if self._cleanup_context is not None:
+            self._cleanup_context.cleanup()
+            self._cleanup_context = None
+
+    @property
+    def context(self):
+        r"""Context: Context used to create this object."""
+        return self._context()
+
 
 class RLock(ContextObject):
     r"""Recursive lock. Acquiring the lock after cleanup is called
@@ -318,7 +356,7 @@ class RLock(ContextObject):
             return self._base.__exit__(*args, **kwargs)
 
 
-class DummyEvent(object):  # pragma: no cover
+class DummyEvent(DummyContextObject):  # pragma: no cover
 
     def __init__(self, value):
         self._value = value
@@ -364,7 +402,7 @@ class Event(ContextObject):
         super(Event, self).__setstate__(state)
 
 
-class DummyTask(object):  # pragma: no cover
+class DummyTask(DummyContextObject):  # pragma: no cover
 
     def __init__(self, name, exitcode, daemon):
         self.name = name
@@ -434,7 +472,7 @@ class Task(ContextObject):
             return self._base.ident
 
 
-class DummyQueue(object):  # pragma: no cover
+class DummyQueue(DummyContextObject):  # pragma: no cover
 
     def empty(self):
         return True
@@ -546,18 +584,19 @@ class LockedObject(AliasObject):
 
     _base_locked = True
     
-    def __init__(self, *args, task_method='process', **kwargs):
-        self.lock = RLock(task_method=task_method)
+    def __init__(self, *args, task_method='process',
+                 task_context=None, **kwargs):
+        self.lock = RLock(task_method=task_method,
+                          task_context=task_context)
+        if issubclass(self._base_class, ContextObject):
+            kwargs['task_method'] = task_method
+            kwargs['task_context'] = task_context
         super(LockedObject, self).__init__(*args, **kwargs)
 
     def cleanup(self):
         r"""Cleanup the class."""
         super(LockedObject, self).cleanup()
-        if hasattr(self, 'lock'):
-            out = self.lock
-            del self.lock
-            out.cleanup()
-            del out
+        self.lock.cleanup()
 
 
 # class LockedList(LockedObject):
@@ -612,10 +651,25 @@ class LockedQueue(LockedObject):
     r"""Locked queue."""
 
     _base_class = Queue
-    _base_meth = Queue._base_meth + ['join']
-    _base_attr = Queue._base_attr
-    _unlocked_attr = ['empty', 'full', 'put', 'put_nowait',
-                      'get', 'get_nowait']
+    _base_meth = ['empty', 'full', 'get', 'get_nowait', 'join_thread',
+                  'put', 'put_nowait', 'qsize', 'join']
+    _unlocked_attr = ['empty', 'full', 'get', 'get_nowait',
+                      'join_thread', 'put', 'put_nowait', 'join']
+
+    @property
+    def context(self):
+        r"""Context: Context used to create this object."""
+        return self._base.context
+
+    @property
+    def dummy_copy(self):
+        r"""Dummy copy of base."""
+        return DummyQueue()
+        
+    def cleanup(self):
+        r"""Cleanup the class."""
+        self._base.cleanup()
+        super(LockedQueue, self).cleanup()
 
 
 class YggTask(YggClass):
@@ -634,7 +688,6 @@ class YggTask(YggClass):
         if (target is not None) and ('target' in self._schema_properties):
             ygg_kwargs['target'] = target
             target = None
-        super(YggTask, self).__init__(name, **ygg_kwargs)
         self.context = Context.from_base(task_method=task_method,
                                          base=context)
         self.as_process = self.context.parallel
@@ -654,12 +707,12 @@ class YggTask(YggClass):
         self._ygg_target = target
         self._ygg_args = args
         self._ygg_kwargs = kwargs
-        self.debug('')
         self.lock = self.context.RLock()
         self.create_flag_attr('error_flag')
         self.create_flag_attr('start_flag')
         self.create_flag_attr('terminate_flag')
         self._calling_thread = None
+        super(YggTask, self).__init__(name, **ygg_kwargs)
         # if not self.as_process:
         #     _thread_registry[self.name] = self
         #     _lock_registry[self.name] = self.lock
