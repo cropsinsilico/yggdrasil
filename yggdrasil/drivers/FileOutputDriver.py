@@ -16,7 +16,7 @@ class FileOutputDriver(OutputDriver):
     _schema_subtype_description = ('Connection between a model and a file.')
 
     def __init__(self, name, args, **kwargs):
-        kwargs.setdefault('ocomm_kws', {})
-        kwargs['ocomm_kws']['address'] = args
+        kwargs.setdefault('outputs', [{}])
+        kwargs['outputs'][0]['address'] = args
         super(FileOutputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)

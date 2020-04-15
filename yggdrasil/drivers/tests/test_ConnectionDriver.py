@@ -121,19 +121,15 @@ class TestConnectionParam(parent.TestParam):
         return comms
 
     @property
-    def icomm_kws(self):
-        r"""dict: Keyword arguments for connection input comm."""
-        out = {'name': self.icomm_name, 'comm': self.icomm_name}
-        if self.is_input:
-            out.update(self.testing_options['kwargs'])
+    def inputs(self):
+        r"""list: List of keyword arguments for connection input comms."""
+        out = [{'name': self.icomm_name, 'comm': self.icomm_name}]
         return out
 
     @property
-    def ocomm_kws(self):
-        r"""dict: Keyword arguments for connection output comm."""
-        out = {'name': self.ocomm_name, 'comm': self.ocomm_name}
-        if self.is_output:
-            out.update(self.testing_options['kwargs'])
+    def outputs(self):
+        r"""list: List of keyword arguments for connection output comms."""
+        out = [{'name': self.ocomm_name, 'comm': self.ocomm_name}]
         return out
 
     @property
@@ -160,8 +156,9 @@ class TestConnectionParam(parent.TestParam):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionParam, self).inst_kwargs
-        out['icomm_kws'] = self.icomm_kws
-        out['ocomm_kws'] = self.ocomm_kws
+        out.update(self.testing_options['kwargs'])
+        out['inputs'] = self.inputs
+        out['outputs'] = self.outputs
         return out
 
     @property
@@ -217,13 +214,15 @@ class TestConnectionParam(parent.TestParam):
         if 'comm_address' in kwargs:
             del kwargs['comm_address']
         if comm in ['ocomm', 'both']:
-            kwargs['ocomm_kws'].update(
-                base_comm=self.ocomm_name, new_comm_class='ErrorComm',
-                error_on_init=error_on_init)
+            for x in kwargs['outputs']:
+                x.update(base_comm=self.ocomm_name,
+                         new_comm_class='ErrorComm',
+                         error_on_init=error_on_init)
         if comm in ['icomm', 'both']:
-            kwargs['icomm_kws'].update(
-                base_comm=self.icomm_name, new_comm_class='ErrorComm',
-                error_on_init=error_on_init)
+            for x in kwargs['inputs']:
+                x.update(base_comm=self.icomm_name,
+                         new_comm_class='ErrorComm',
+                         error_on_init=error_on_init)
         # Get error class
         if (error_class is None) and (comm in ['ocomm', 'icomm', 'both']):
             error_class = inst_class
@@ -395,7 +394,7 @@ class TestConnectionDriverFork(TestConnectionDriver):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionDriverFork, self).inst_kwargs
-        out['icomm_kws']['comm'] = [None for i in range(self.ncomm_input)]
+        out['inputs'] = [None for i in range(self.ncomm_input)]
         return out
 
 

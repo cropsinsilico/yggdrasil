@@ -47,7 +47,7 @@ class TestServerParam(parent.TestConnectionParam):
         # out['request_name'] = self.cli_drv.request_name
         out['comm'] = self.cli_drv.comm
         out['comm_address'] = self.cli_drv.ocomm.opp_address
-        out['ocomm_kws']['comm'] = self.comm_name
+        out['outputs'][0]['comm'] = self.comm_name
         return out
     
     def setup(self, *args, **kwargs):

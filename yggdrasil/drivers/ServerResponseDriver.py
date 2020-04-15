@@ -33,18 +33,18 @@ class ServerResponseDriver(ConnectionDriver):
         if request_name is not None:
             response_name = request_name + '.' + response_name
         # Input communicator from client model
-        icomm_kws = kwargs.get('icomm_kws', {})
-        icomm_kws['comm'] = None
-        icomm_kws['name'] = 'server_model_response.' + msg_id
-        icomm_kws['is_response_server'] = True
-        kwargs['icomm_kws'] = icomm_kws
+        inputs = kwargs.get('inputs', [{}])
+        inputs[0]['comm'] = None
+        inputs[0]['name'] = 'server_model_response.' + msg_id
+        inputs[0]['is_response_server'] = True
+        kwargs['inputs'] = inputs
         # Output communicator to client response driver
-        ocomm_kws = kwargs.get('ocomm_kws', {})
-        ocomm_kws['comm'] = comm
-        ocomm_kws['name'] = response_name
+        outputs = kwargs.get('outputs', [{}])
+        outputs[0]['comm'] = comm
+        outputs[0]['name'] = response_name
         if response_address is not None:
-            ocomm_kws['address'] = response_address
-        kwargs['ocomm_kws'] = ocomm_kws
+            outputs[0]['address'] = response_address
+        kwargs['outputs'] = outputs
         # Overall keywords
         kwargs['single_use'] = True
         super(ServerResponseDriver, self).__init__(response_name, **kwargs)

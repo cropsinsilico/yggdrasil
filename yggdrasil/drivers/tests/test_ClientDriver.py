@@ -42,7 +42,7 @@ class TestClientParam(parent.TestConnectionParam):
         # out['request_name'] = self.srv_drv.request_name
         out['comm'] = self.srv_drv.comm
         out['comm_address'] = self.srv_drv.comm_address
-        out['icomm_kws']['comm'] = self.comm_name
+        out['inputs'][0]['comm'] = self.comm_name
         return out
     
     def setup(self, *args, **kwargs):

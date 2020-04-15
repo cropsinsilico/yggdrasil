@@ -179,7 +179,7 @@ class TestBase(YggTestClassInfo):
             filecomm_kwargs = self.testing_options['kwargs']
             filecomm_kwargs['comm'] = self.filecomm
             return ([self.name, self.filename],
-                    {'ocomm_kws': filecomm_kwargs})
+                    {'outputs': [filecomm_kwargs]})
         elif (self.direction == 'input') and self.is_file:
             return None, None  # pragma: no cover
         elif (self.direction == 'output'):
@@ -197,7 +197,7 @@ class TestBase(YggTestClassInfo):
             filecomm_kwargs = self.testing_options['kwargs']
             filecomm_kwargs['comm'] = self.filecomm
             return ([self.name, self.filename],
-                    {'icomm_kws': filecomm_kwargs})
+                    {'inputs': [filecomm_kwargs]})
         elif (self.direction == 'output'):
             return [self.name + '_idriver', self.name + '_link'], {}
         elif (self.direction == 'input'):

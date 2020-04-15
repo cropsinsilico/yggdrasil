@@ -403,7 +403,7 @@ class YggRunner(YggClass):
         """
         yml['models'] = []
         if yml['args'] not in self._outputchannels:
-            for x in yml['icomm_kws']['comm']:
+            for x in yml['inputs']:
                 if 'filetype' not in x:
                     raise ValueError(
                         ("Input driver %s could not locate a "
@@ -427,7 +427,7 @@ class YggRunner(YggClass):
             yml.setdefault('comm_env', {})
             yml['comm_env'] = self._inputchannels[yml['args']]['instance'].comm_env
         if yml['args'] not in self._inputchannels:
-            for x in yml['ocomm_kws']['comm']:
+            for x in yml['outputs']:
                 if 'filetype' not in x:
                     raise ValueError(
                         ("Output driver %s could not locate a "

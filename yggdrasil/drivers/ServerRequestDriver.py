@@ -36,20 +36,20 @@ class ServerRequestDriver(ConnectionDriver):
         if request_name is None:
             request_name = model_request_name + '_SERVER'
         # Input communicator
-        icomm_kws = kwargs.get('icomm_kws', {})
-        icomm_kws['comm'] = comm
-        icomm_kws['name'] = request_name
-        icomm_kws['no_suffix'] = True
-        icomm_kws['is_server'] = True
+        inputs = kwargs.get('inputs', [{}])
+        inputs[0]['comm'] = comm
+        inputs[0]['name'] = request_name
+        inputs[0]['no_suffix'] = True
+        inputs[0]['is_server'] = True
         if comm_address is not None:
-            icomm_kws['address'] = comm_address
-        icomm_kws['close_on_eof_recv'] = False
-        kwargs['icomm_kws'] = icomm_kws
+            inputs[0]['address'] = comm_address
+        inputs[0]['close_on_eof_recv'] = False
+        kwargs['inputs'] = inputs
         # Output communicator
-        ocomm_kws = kwargs.get('ocomm_kws', {})
-        ocomm_kws['comm'] = None
-        ocomm_kws['name'] = model_request_name
-        kwargs['ocomm_kws'] = ocomm_kws
+        outputs = kwargs.get('outputs', [{}])
+        outputs[0]['comm'] = None
+        outputs[0]['name'] = model_request_name
+        kwargs['outputs'] = outputs
         # Parent and attributes
         super(ServerRequestDriver, self).__init__(model_request_name, **kwargs)
         self.env[self.ocomm.name] = self.ocomm.address

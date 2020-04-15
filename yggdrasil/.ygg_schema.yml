@@ -217,6 +217,7 @@ definitions:
           - file_input
           - file_output
           - input
+          - io
           - output
           - rmq_async_client
           - rmq_async_server
@@ -228,6 +229,8 @@ definitions:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
         inputs:
+          default:
+          - {}
           description: One or more name(s) of model output channel(s) and/or new channel/file
             objects that the connection should receive messages from. A full description
             of file entries and the available options can be found :ref:`here<yaml_file_options>`.
@@ -243,6 +246,8 @@ definitions:
             to None.
           type: string
         outputs:
+          default:
+          - {}
           description: One or more name(s) of model input channel(s) and/or new channel/file
             objects that the connection should send messages to. A full description
             of file entries and the available options can be found :ref:`here<yaml_file_options>`.
@@ -253,9 +258,9 @@ definitions:
           minItems: 1
           type: array
         translator:
-          description: Function or string specifying a function that should be used
-            to translate messages from the input communicator(s) before passing them
-            to the output communicator(s). If a string, the format should be "<package.module>:<function>"
+          description: Function or string specifying function that should be used
+            to translate messages from the input communicator before passing them
+            to the output communicator. If a string, the format should be "<package.module>:<function>"
             so that <function> can be imported from <package>. Defaults to None and
             messages are passed directly. This can also be a list of functions/strings
             that will be called on the messages in the order they are provided.
@@ -265,8 +270,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -375,6 +380,16 @@ definitions:
             - rmq_server
             type: string
         title: RMQServerDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['io'] subtype.
+        properties:
+          connection_type:
+            description: Connection between two models.
+            enum:
+            - io
+            type: string
+        title: IODriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['rmq_async_client'] subtype.
@@ -608,9 +623,9 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - filetype
       - name
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1394,9 +1409,9 @@ definitions:
           type: string
       required:
       - working_dir
-      - language
       - args
       - name
+      - language
       title: model_base
       type: object
     - anyOf:
