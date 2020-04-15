@@ -39,7 +39,8 @@ class TestModelParam(parent.TestParam):
     
     def __init__(self, *args, **kwargs):
         super(TestModelParam, self).__init__(*args, **kwargs)
-        self.attr_list += ['args', 'process', 'queue', 'queue_thread',
+        self.attr_list += ['args', 'model_process', 'queue',
+                           'queue_thread',
                            'is_server', 'client_of',
                            'event_process_kill_called',
                            'event_process_kill_complete',
