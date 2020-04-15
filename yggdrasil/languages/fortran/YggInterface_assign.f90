@@ -1,15 +1,12 @@
 subroutine yggassign_yggchar2character(in, out)
   type(yggchar_r), intent(in) :: in
-  character(len=:), pointer :: out
-  integer :: i
-  print *, "yggassign_yggchar2character"
-  print *, "len = ", size(in%x)
-  ! allocate(character(len=size(in%x)) :: out)
-  print *, "allocated"
-  do i = 1, size(in%x)
+  character(len=:), allocatable :: out
+  integer :: i, in_size
+  in_size = size(in%x)
+  allocate(character(len=in_size) :: out)
+  do i = 1, in_size
      out(i:i) = in%x(i)
   end do
-  print *, "yggassign_yggchar2character returns"
 end subroutine yggassign_yggchar2character
 ! subroutine yggassign_character2yggchar(in, out)
 ! end subroutine yggassign_character2yggchar

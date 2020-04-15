@@ -460,7 +460,7 @@ class FortranModelDriver(CompiledModelDriver):
             elif type_match.get('length_var', None):
                 if ((('pointer' not in out) and ('allocatable' not in out)
                      and (type_match['length_var'] != 'X'))):
-                    out += ', pointer'
+                    out += ', allocatable'
                 if type_match['length_var'] == '*':
                     out = out.replace('*', ':')
         if not ((out == '*') or ('X' in out)):
@@ -891,13 +891,8 @@ class FortranModelDriver(CompiledModelDriver):
                 new_recv_var_par = []
                 for v in recv_var_par:
                     if not cls.allows_realloc(v, from_native_type=True):
-                        out_after += [
-                            ('allocate(character(len=size(%s_realloc%%x)) :: %s)'
-                             % (v['name'], v['name'])),
-                            ('call yggassign(%s_realloc, %s)'
-                             % (v['name'], v['name']))]
-                        # out_after.append('call yggassign(%s_realloc, %s)'
-                        #                  % (v['name'], v['name']))
+                        out_after.append('call yggassign(%s_realloc, %s)'
+                                         % (v['name'], v['name']))
                         v = dict(v, name=('%s_realloc' % v['name']))
                     new_recv_var_par.append(v)
                 recv_var_par = new_recv_var_par
