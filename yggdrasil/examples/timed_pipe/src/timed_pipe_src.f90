@@ -20,7 +20,7 @@ program main
   call get_command_argument(2, arg)
   read(arg, *) msg_size
   write(*, '("Hello from Fortran pipe_src: msg_count = ",i5.1,", &
-       &msg_size = ",i5.1)'), msg_count, msg_size
+       &msg_size = ",i5.1)') msg_count, msg_size
 
   ! Ins/outs matching with the the model yaml
   outq = ygg_output("output_pipe")
@@ -38,14 +38,14 @@ program main
   do i = 1, msg_count
      ret = ygg_send(outq, test_msg, msg_size)
      if (.not.ret) then
-        write(*, '("pipe_src(F): SEND ERROR ON MSG ",i5.1)'), i
+        write(*, '("pipe_src(F): SEND ERROR ON MSG ",i5.1)') i
         exit_code = -1
         exit
      end if
      count = count + 1
   end do
   
-  write(*, '("Goodbye from Fortran source. Sent ",i5.1," messages.")'), count
+  write(*, '("Goodbye from Fortran source. Sent ",i5.1," messages.")') count
   if (allocated(test_msg)) deallocate(test_msg)
   if (exit_code.lt.0) then
      stop 1

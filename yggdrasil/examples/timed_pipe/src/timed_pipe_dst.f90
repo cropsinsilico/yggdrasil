@@ -29,11 +29,11 @@ program main
      end if
      if (bufsiz.gt.old_bufsiz) then
         write(*, '("pipe_dst(F): Buffer increased from ",&
-             &i5.1," to ",i5.1," bytes")'), old_bufsiz, bufsiz
+             &i5.1," to ",i5.1," bytes")') old_bufsiz, bufsiz
      end if
      ret = ygg_send_nolimit(outf, buf, bufsiz)
      if (.not.ret) then
-        write(*, '("pipe_dst(F): SEND ERROR ON MSG ",i5.1)'), count
+        write(*, '("pipe_dst(F): SEND ERROR ON MSG ",i5.1)') count
         exit_code = -1
         exit
      end if
@@ -41,7 +41,7 @@ program main
   end do
 
   write(*, '("Goodbye from Fortran destination. Received ",&
-       &i5.1," messages.")'), count
+       &i5.1," messages.")') count
   if (exit_code.lt.0) then
      stop 1
   end if
