@@ -1,0 +1,21 @@
+model:
+  name: feedback
+  language: sbml
+  args: /Users/langmm/miniconda3/envs/conda36/lib/python3.6/site-packages/roadrunner/testing/feedback.xml
+  steps: 1
+  inputs:
+    - name: input
+      vars: time,S1,S2
+      default_file:
+        name: feedback_in.txt
+        filetype: table
+  outputs:
+    - name: output
+      as_array: true
+      default_file:
+        # as_array: true
+        # name: feedback_out%d.txt
+        name: feedback_out.txt
+        filetype: table
+        # append: true
+        # is_series: true

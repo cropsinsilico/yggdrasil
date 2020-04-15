@@ -8,7 +8,7 @@ class TestExampleSBML1(ExampleTstBase):
     example_name = 'sbml1'
 
     @property
-    def input_files(self):
+    def input_files(self):  # pragma: no cover
         r"""Input file."""
         return [os.path.join(self.yamldir, 'Input', 'input.txt')]
 

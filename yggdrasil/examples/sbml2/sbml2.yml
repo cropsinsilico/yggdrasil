@@ -2,8 +2,11 @@ model:
   name: feedback
   language: sbml
   args: ./src/sbml2.xml
+  reset: true
   steps: 5
   skip_start_time: true
+  integrator_settings:
+    relative_tolerance: 1.0e-10
   inputs:
     - name: input
       vars: time,S1,S2

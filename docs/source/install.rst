@@ -22,11 +22,7 @@ Installation
 Conda Installation (recommended)
 --------------------------------
 
-Download and install Miniconda (or Anaconda) from 
-`here <https://www.anaconda.com/download/>`_. 
-There are conda distributions available for |yggdrasil| from 
-`conda-forge <https://github.com/conda-forge/yggdrasil-feedstock>`_. 
-You can install |yggdrasil| from conda-forge by calling::
+Download and install Miniconda from `here <https://docs.conda.io/en/latest/miniconda.html>`_ (or Anaconda from `here <https://www.anaconda.com/download/>`_ if you would like additional Python libraries installed by default). There are conda distributions available for |yggdrasil| from `conda-forge <https://github.com/conda-forge/yggdrasil-feedstock>`_. You can install |yggdrasil| from conda-forge by calling::
 
   $ conda install -c conda-forge yggdrasil
 
@@ -51,6 +47,16 @@ the terminal (or Anaconda Prompt on Windows).::
 
    Then run ``yggconfig`` to finish the installation process for C and C++.
 
+.. warning::
+   If conda takes a very long time to install |yggdrasil| (>5 min spent solving the environment) or fails with an error about conflicts and you are using a version of conda older than 4.7.2, try either updating conda and/or adding the conda-forge channel (if you havn't already)::
+
+     conda config --add channels conda-forge
+
+   and setting the channel priority to strict::
+
+     conda config --set channel_priority strict
+
+   See discussion `here <https://github.com/conda/conda/issues/7690>`_ for additional ideas on why conda might be hanging.
 
 Development Installation
 ------------------------
@@ -189,12 +195,7 @@ package, you can re-configure |yggdrasil| by calling ``yggconfig`` from the comm
 line.
 
 .. note::
-   The version of Matlab that you are using will determine the versions of 
-   Python that you can use with |yggdrasil|. The chart below shows the 
-   versions of Python that are compatible with several versions of Matlab. 
-   If you are using an incompatible version, the instructions above for manually 
-   installing the Matlab engine as a Python package will fail with an error 
-   message indicating which versions of Python you can use.
+   The version of Matlab that you are using will determine the versions of Python that you can use with |yggdrasil|. The chart below shows the versions of Python that are compatible with several versions of Matlab. If you are using an incompatible version, the instructions above for manually installing the Matlab engine as a Python package will fail with an error message indicating which versions of Python you can use.
 
 ==============    =======================
 Matlab Version    Max Python Version
@@ -205,11 +206,48 @@ R2017b            2.7, 3.3, 3.4, 3.5, 3.6
 ==============    =======================
 
 
+.. note::
+   |yggdrasil| cannot currently run Matlab models if Matlab is installed via a Citrix environment as |yggdrasil| needs command line access to the Matlab executable and access to the environment in which Matlab models are run.
+
+.. _install_r_rst:
+
 Additional Steps for R Models
 -----------------------------
 
+R Interpreter
+~~~~~~~~~~~~~
+
 To run R models, you will need to install the 
-`R interpreter <https://www.r-project.org/>`_. If you installed |yggdrasil| using conda, this will be installed for you, but if you are not using conda, you will need to install this yourself.
+`R interpreter <https://www.r-project.org/>`_ (we recommend R >= 3.5). If you installed |yggdrasil| using conda, this will be installed for you, but if you are not using conda, you will need to install R yourself along with the `udunits <https://www.unidata.ucar.edu/software/udunits/>`_ package.
+
+Mac
++++
+
+On Mac, this can be done via Homebrew::
+
+  $ brew install r
+  $ brew install udunits
+
+Linux
++++++
+
+On Linux this can be done via apt. Installing R >= 3.5 (recommended) requires first adding a source entry and key for your OS as shown below for for Xenial distribution of Ubuntu (Details on `ubuntu <https://cloud.r-project.org/bin/linux/ubuntu/README.html>`_, `debian <https://cloud.r-project.org/bin/linux/debian/>`_, `redhat <https://cloud.r-project.org/bin/linux/redhat/README>`_ installation)::
+
+  $ sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu xenial-cran35/'
+  $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+  $ sudo apt update
+  $ sudo apt-get install r-base r-base-dev
+  $ sudo apt-get install libudunits2-dev
+
+If you don't want the latest version, you can install the default using the last two lines on Ubuntu and Debian.
+
+Windows
++++++++
+  
+On Windows, you will need to download and run the installer. Links to the R 3.6 installer and additoinal information about the installation process on Windows can be found `here <https://cran.r-project.org/bin/windows/base/>`_.
+
+R Dependencies
+~~~~~~~~~~~~~~
 
 Even if you install the R interpreter yourself, |yggdrasil| will attempt to install the R dependencies it needs via `CRAN <https://cran.r-project.org/>`_ when it is installed. If this fails, you may need to install these yourself from within the R interpreter. |yggdrasil|'s R dependencies include `reticulate <https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/>`_ for calling Python from R, `zeallot <https://cran.r-project.org/web/packages/zeallot/index.html>`_ for allowing assignment of output to multiple variables, `units <https://cran.r-project.org/web/packages/units/index.html>`_ for tracking physical units in R, `bit64 <https://cran.r-project.org/web/packages/bit64/index.html>`_ for 64bit integers, and `R6 <https://cran.r-project.org/web/packages/R6/index.html>`_ for creating interface classes with teardown methods.
 
@@ -222,9 +260,19 @@ These packages can by installed from CRAN from the R interpreter.::
   > install.packages("R6")
 
 .. note::
-   If you have issues installing R packages on MacOS, check to make sure that ``which ar`` returns
-   the system default (``/usr/bin/ar``). If you have another version of ``ar``
-   installed (e.g. through homebrew's binutils), it may cause conflicts.
+   [MAC ONLY] If you have compilation issues when installing R packages on MacOS, check to make sure that ``which ar`` returns the system default (``/usr/bin/ar``). If you have another version of ``ar`` installed (e.g. through homebrew's binutils), it may cause conflicts.
+
+.. note::
+   [MAC ONLY] If ``install.packages("units")`` fails with messages about the ``udunits`` library being missing and you installed ``udunits`` using homebrew as described above, then you can install the R ``units`` and point to the library by running::
+
+     > install.packages('units', configure.args = c('--with-udunits2-include=/usr/local/opt/udunits/include/', '--with-udunits2-lib=/usr/local/opt/udunits/lib/‘))
+
+
+If you install R and/or the R dependencies after installing |yggdrasil|, you can complete |yggdrasil|'s R installation by running::
+
+  $ ygginstall R
+
+from your terminal (Linux/Mac) or Anaconda prompt (Windows).
    
 Additional Steps for RabbitMQ Message Passing
 ---------------------------------------------

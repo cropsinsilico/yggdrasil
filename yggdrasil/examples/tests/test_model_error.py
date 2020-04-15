@@ -16,9 +16,9 @@ class TestExampleModelError(ExampleTstBase):
             return None
         return os.path.join(self.yamldir, 'core.*')
 
-    def cleanup(self):
+    def example_cleanup(self):
         r"""Cleanup files created during the test."""
-        super(TestExampleModelError, self).cleanup()
+        super(TestExampleModelError, self).example_cleanup()
         if self.core_dump is not None:
             fcore = glob.glob(self.core_dump)
             for f in fcore:  # pragma: debug

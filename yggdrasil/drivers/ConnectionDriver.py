@@ -2,8 +2,9 @@
 import os
 import copy
 import numpy as np
-import threading
-from yggdrasil.communication import new_comm
+import functools
+from yggdrasil import multitasking
+from yggdrasil.communication import new_comm, BufferComm
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.components import (
     import_component, create_component, isinstance_component)
@@ -14,6 +15,24 @@ def _translate_list2element(arr):
     if isinstance(arr, (list, tuple)):
         arr = arr[0]
     return arr
+
+
+class TaskThreadError(RuntimeError):
+    pass
+
+
+def run_remotely(method):
+    r"""Decorator for methods that should be run remotely."""
+    @functools.wraps(method)
+    def modified_method(self, *args, **kwargs):
+        method_name = method.__name__
+        if self.can_run_remotely:
+            try:
+                return self.run_task(method_name, *args, **kwargs)
+            except (TaskThreadError, BufferComm.BufferClosed):
+                pass
+        return method(self, *args, **kwargs)
+    return modified_method
 
 
 class ConnectionDriver(Driver):
@@ -98,6 +117,9 @@ class ConnectionDriver(Driver):
                            {'$ref': '#/definitions/transform'}]}},
         'onexit': {'type': 'string'}}
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
+    _cleanup_attr = Driver._cleanup_attr + [
+        '_comm_opened', '_comm_closed', '_skip_after_loop', 'shared',
+        'tasks', 'tasks_return', 'task_thread', 'task_break_flag']
 
     @property
     def _is_input(self):
@@ -112,6 +134,26 @@ class ConnectionDriver(Driver):
     def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
         # kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)
+        # Shared attributes (set once or synced using events)
+        self.single_use = single_use
+        self.create_flag_attr('_comm_opened')
+        self.create_flag_attr('_comm_closed')
+        self.create_flag_attr('_skip_after_loop')
+        self.shared = self.context.Dict()
+        self.shared.update(nrecv=0, nproc=0, nsent=0, nskip=0,
+                           state='started', close_state='')
+        # Attributes used by process
+        self._eof_sent = False
+        self._first_send_done = False
+        self._used = False
+        self.onexit = None
+        self.task_thread = None
+        if self.as_process:
+            self.tasks = BufferComm.LockedBuffer()  # ctx=self.context)
+            self.tasks_return = BufferComm.LockedBuffer()  # ctx=self.context)
+            self.task_thread = multitasking.YggTaskLoop(
+                '%s.TaskThread' % self.name, target=self.complete_tasks)
+            self.create_flag_attr('task_break_flag')
         # Translator
         if translator is None:
             translator = []
@@ -127,21 +169,6 @@ class ConnectionDriver(Driver):
         if (onexit is not None) and (not hasattr(self, onexit)):
             raise ValueError("onexit '%s' is not a class method." % onexit)
         self.onexit = onexit
-        # Attributes
-        self._eof_sent = False
-        self.single_use = single_use
-        self._first_send_done = False
-        self._comm_opened = threading.Event()
-        self._comm_closed = False
-        self._used = False
-        self._skip_after_loop = False
-        self._model_exited = False
-        self.nrecv = 0
-        self.nproc = 0
-        self.nsent = 0
-        self.nskip = 0
-        self.state = 'started'
-        self.close_state = ''
         # Add comms and print debug info
         self._init_comms(name, **kwargs)
         # self.debug('    env: %s', str(self.env))
@@ -228,7 +255,109 @@ class ConnectionDriver(Driver):
         # Apply keywords dependent on comms
         self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
         self.debug('Final env:\n%s', self.pprint(self.env, 1))
-        
+
+    def call_task(self, task, args, kwargs):
+        r"""Call a task."""
+        f_task = getattr(self, task)
+        if hasattr(f_task, '__call__'):
+            out = f_task(*args, **kwargs)
+        else:
+            out = f_task
+        return out
+
+    def run_task(self, task, *args, **kwargs):
+        r"""Run a task on the running process."""
+        assert(self.as_process and (not self.in_process)
+               and self.is_alive())
+        if self.check_flag_attr('task_break_flag'):
+            raise TaskThreadError("Task thread will be stopped.")
+        self.tasks.put_nowait((task, args, kwargs))
+        out = self.tasks_return.get()
+        if out == 'TERMINATED':
+            raise TaskThreadError("Task thread was stopped.")
+        return out
+
+    def complete_tasks(self):
+        r"""Complete all pending tasks."""
+        try:
+            while not self.tasks.empty():
+                self.debug("Task waiting")
+                args = self.tasks.get_nowait()
+                self.debug("Task received: %s", args)
+                out = self.call_task(*args)
+                self.debug("Task complete: %s = %s", args, out)
+                self.tasks_return.put(out)
+                self.debug("Task returned: %s", args)
+        except BufferComm.BufferClosed:
+            self.set_flag_attr('task_break_flag')
+        if self.check_flag_attr('task_break_flag'):
+            self.debug("Task thread break")
+            self.task_thread.set_break_flag()
+            self.close_task_queues()
+        self.sleep()
+
+    @property
+    def nrecv(self):
+        r"""int: Number of messages received."""
+        return self.shared['nrecv']
+
+    @nrecv.setter
+    def nrecv(self, x):
+        self.shared['nrecv'] = x
+
+    @property
+    def nsent(self):
+        r"""int: Number of messages sent."""
+        return self.shared['nsent']
+
+    @nsent.setter
+    def nsent(self, x):
+        self.shared['nsent'] = x
+
+    @property
+    def nskip(self):
+        r"""int: Number of messages skipped."""
+        return self.shared['nskip']
+
+    @nskip.setter
+    def nskip(self, x):
+        self.shared['nskip'] = x
+
+    @property
+    def nproc(self):
+        r"""int: Number of messages processed."""
+        return self.shared['nproc']
+
+    @nproc.setter
+    def nproc(self, x):
+        self.shared['nproc'] = x
+
+    @property
+    def state(self):
+        r"""str: Current state of the connection."""
+        return self.shared['state']
+
+    @state.setter
+    def state(self, x):
+        self.shared['state'] = x
+
+    @property
+    def close_state(self):
+        r"""str: State of the connection at close."""
+        return self.shared['close_state']
+
+    @close_state.setter
+    def close_state(self, x):
+        self.shared['close_state'] = x
+
+    @property
+    def can_run_remotely(self):
+        r"""bool: True if process should be run remotely."""
+        return (self.as_process and (not self.in_process)
+                and self.is_alive()
+                and (not self.check_flag_attr('task_break_flag')))
+
+    @run_remotely
     def wait_for_route(self, timeout=None):
         r"""Wait until messages have been routed."""
         T = self.start_timeout(timeout)
@@ -239,6 +368,7 @@ class ConnectionDriver(Driver):
         return (self.nrecv == (self.nsent + self.nskip))
 
     @property
+    @run_remotely
     def is_valid(self):
         r"""bool: Returns True if the connection is open and the parent class
         is valid."""
@@ -247,19 +377,22 @@ class ConnectionDriver(Driver):
                     and self.is_comm_open and not (self.single_use and self._used))
 
     @property
+    @run_remotely
     def is_comm_open(self):
         r"""bool: Returns True if both communicators are open."""
         with self.lock:
             return (self.icomm.is_open and self.ocomm.is_open
-                    and not self._comm_closed)
+                    and not self.check_flag_attr('_comm_closed'))
 
     @property
+    @run_remotely
     def is_comm_closed(self):
         r"""bool: Returns True if both communicators are closed."""
         with self.lock:
             return self.icomm.is_closed and self.ocomm.is_closed
 
     @property
+    @run_remotely
     def n_msg(self):
         r"""int: Number of messages waiting in input communicator."""
         with self.lock:
@@ -269,7 +402,7 @@ class ConnectionDriver(Driver):
         r"""Open the communicators."""
         self.debug('')
         with self.lock:
-            if self._comm_closed:
+            if self.check_flag_attr('_comm_closed'):
                 self.debug('Aborted as comm closed')
                 return
             try:
@@ -278,15 +411,16 @@ class ConnectionDriver(Driver):
             except BaseException:
                 self.close_comm()
                 raise
-            self._comm_opened.set()
+            self.set_flag_attr('_comm_opened')
         self.debug('Returning')
 
+    @run_remotely
     def close_comm(self):
         r"""Close the communicators."""
         self.debug('')
         with self.lock:
-            self._comm_closed = True
-            self._skip_after_loop = True
+            self.set_flag_attr('_comm_closed')
+            self.set_flag_attr('_skip_after_loop')
             # Capture errors for both comms
             ie = None
             oe = None
@@ -317,9 +451,9 @@ class ConnectionDriver(Driver):
             if not self.is_comm_open:
                 raise Exception("Connection never finished opening.")
         super(ConnectionDriver, self).start()
-        self.info('started')
+        self.debug('Started connection process')
         if self.as_process:
-            self.sleep(1.0)
+            self.wait_flag_attr('loop_flag', timeout=60.0)
 
     def graceful_stop(self, timeout=None, **kwargs):
         r"""Stop the driver, first waiting for the input comm to be empty.
@@ -334,13 +468,14 @@ class ConnectionDriver(Driver):
         self.debug('')
         with self.lock:
             self.set_close_state('stop')
-            self._skip_after_loop = True
+            self.set_flag_attr('_skip_after_loop')
         self.drain_input(timeout=timeout)
         self.wait_for_route(timeout=timeout)
         self.drain_output(timeout=timeout)
         super(ConnectionDriver, self).graceful_stop()
         self.debug('Returning')
 
+    @run_remotely
     def on_model_exit(self):
         r"""Drain input and then close it."""
         self.debug('')
@@ -363,19 +498,31 @@ class ConnectionDriver(Driver):
         self.debug('Finished')
         super(ConnectionDriver, self).on_model_exit()
 
+    def close_task_queues(self):
+        r"""Close the task queues."""
+        if self.as_process:
+            join = False
+            self.set_flag_attr('task_break_flag')
+            self.tasks.close(join=join)
+            self.tasks_return.close(join=join)
+            # if self.in_process:
+            #     self.task_thread.set_break_flag()
+
     def do_terminate(self):
         r"""Stop the driver by closing the communicators."""
         self.debug('')
         self.set_close_state('terminate')
         self.close_comm()
+        self.close_task_queues()
         super(ConnectionDriver, self).do_terminate()
 
     def cleanup(self):
         r"""Ensure that the communicators are closed."""
-        self.debug('')
         self.close_comm()
+        self.close_task_queues()
         super(ConnectionDriver, self).cleanup()
 
+    @run_remotely
     def printStatus(self, beg_msg='', end_msg=''):
         r"""Print information on the status of the ConnectionDriver.
 
@@ -401,6 +548,7 @@ class ConnectionDriver(Driver):
         msg += end_msg
         print(msg)
 
+    @run_remotely
     def confirm_input(self, timeout=None):
         r"""Confirm receipt of messages from input comm."""
         T = self.start_timeout(timeout)
@@ -413,6 +561,7 @@ class ConnectionDriver(Driver):
             self.sleep(10 * self.sleeptime)
         self.stop_timeout()
 
+    @run_remotely
     def confirm_output(self, timeout=None):
         r"""Confirm receipt of messages from output comm."""
         T = self.start_timeout(timeout)
@@ -425,6 +574,7 @@ class ConnectionDriver(Driver):
             self.sleep(10 * self.sleeptime)
         self.stop_timeout()
 
+    @run_remotely
     def drain_input(self, timeout=None):
         r"""Drain messages from input comm."""
         T = self.start_timeout(timeout)
@@ -439,6 +589,7 @@ class ConnectionDriver(Driver):
             self.sleep()
         self.stop_timeout()
 
+    @run_remotely
     def drain_output(self, timeout=None, dont_confirm_eof=False):
         r"""Drain messages from output comm."""
         nwait = 0
@@ -460,6 +611,8 @@ class ConnectionDriver(Driver):
         r"""Actions to perform prior to sending messages."""
         self.state = 'before loop'
         try:
+            if self.as_process:
+                self.task_thread.start()
             self.open_comm()
             self.sleep()  # Help ensure senders/receivers connected before messages
             self.debug('Running in %s, is_valid = %s', os.getcwd(), str(self.is_valid))
@@ -471,6 +624,12 @@ class ConnectionDriver(Driver):
             self.close_comm()
             self.set_break_flag()
 
+    def after_loop_process(self):
+        r"""Actions to preform after loop for process."""
+        self.debug("After loop process")
+        self.set_flag_attr('task_break_flag')
+        self.task_thread.wait()
+
     def after_loop(self):
         r"""Actions to perform after sending messages."""
         self.state = 'after loop'
@@ -478,9 +637,11 @@ class ConnectionDriver(Driver):
         # Close input comm in case loop did not
         self.confirm_input(timeout=False)
         self.debug('Confirmed input')
+        if self.check_flag_attr('_skip_after_loop') and self.as_process:
+            self.after_loop_process()
         with self.lock:
             self.debug('Acquired lock')
-            if self._skip_after_loop:
+            if self.check_flag_attr('_skip_after_loop'):
                 self.debug("After loop skipped.")
                 return
             self.icomm.close()
@@ -491,6 +652,8 @@ class ConnectionDriver(Driver):
         if self.as_process and self.ocomm.touches_model:
             self.drain_output(timeout=False, dont_confirm_eof=True)
         self.debug('Finished')
+        if self.as_process:
+            self.after_loop_process()
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.
@@ -503,6 +666,7 @@ class ConnectionDriver(Driver):
             str, bool: False if no more messages, message otherwise.
 
         """
+        assert(self.in_process)
         kwargs.setdefault('timeout', 0)
         with self.lock:
             if self.icomm.is_closed:
@@ -661,6 +825,7 @@ class ConnectionDriver(Driver):
             bool: Success or failure of send.
 
         """
+        assert(self.in_process)
         self.debug('')
         kwargs.pop('is_eof', False)
         with self.lock:

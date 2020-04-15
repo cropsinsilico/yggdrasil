@@ -429,6 +429,17 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
         return obj['a']
     
 
+class TestConnectionDriverProcess(TestConnectionDriver):
+    r"""Test class for the TestConnectionDriver using process."""
+    
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for tested class."""
+        out = super(TestConnectionDriverProcess, self).inst_kwargs
+        out['task_method'] = 'process'
+        return out
+
+
 def test_ConnectionDriverOnexit_errors():
     r"""Test that errors are raised for invalid onexit."""
     assert_raises(ValueError, ConnectionDriver, 'test',

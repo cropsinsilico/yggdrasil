@@ -1,8 +1,8 @@
 import os
-from yggdrasil import tools
+from yggdrasil import multitasking
 
 
-class Driver(tools.YggThreadLoop):
+class Driver(multitasking.YggTaskLoop):
     r"""Base class for all drivers.
 
     Args:

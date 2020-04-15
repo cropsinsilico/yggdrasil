@@ -1,5 +1,5 @@
 import uuid
-import threading
+from yggdrasil import multitasking
 from yggdrasil.communication import CommBase
 
 
@@ -21,12 +21,17 @@ class AsyncComm(CommBase.CommBase):
     Attributes:
         dont_backlog (bool): If True, the backlog will not be started and all
             messages will be sent/received directly to/from the comm.
-        backlog_send_ready (threading.Event): Event set when there is a
+        backlog_send_ready (multitasking.Event): Event set when there is a
             message in the send backlog.
-        backlog_recv_ready (threading.Event): Event set when there is a
+        backlog_recv_ready (multitasking.Event): Event set when there is a
             message in the recv backlog.
         
     """
+    
+    _cleanup_attr = (CommBase.CommBase._cleanup_attr
+                     + ['backlog_send_ready', 'backlog_recv_ready',
+                        '_backlog_thread'])
+
     def __init__(self, name, dont_backlog=False, **kwargs):
         # TODO: Fix the cleanup of Python threads in languages that call the
         # Python API underneath
@@ -34,8 +39,8 @@ class AsyncComm(CommBase.CommBase):
         self._backlog_recv = []
         self._backlog_send = []
         self._backlog_thread = None
-        self.backlog_send_ready = threading.Event()
-        self.backlog_recv_ready = threading.Event()
+        self.backlog_send_ready = multitasking.Event()
+        self.backlog_recv_ready = multitasking.Event()
         self.backlog_open = False
         self._used_direct = False
         super(AsyncComm, self).__init__(name, **kwargs)
@@ -67,14 +72,14 @@ class AsyncComm(CommBase.CommBase):
         
     @property
     def backlog_thread(self):
-        r"""tools.YggThread: Thread that will handle sinding or receiving
+        r"""tools.YggTask: Task that will handle sinding or receiving
         backlogged messages."""
         if self._backlog_thread is None:
             if self.direction == 'send':
-                self._backlog_thread = CommBase.CommThreadLoop(
+                self._backlog_thread = CommBase.CommTaskLoop(
                     self, target=self.run_backlog_send, suffix='SendBacklog')
             else:
-                self._backlog_thread = CommBase.CommThreadLoop(
+                self._backlog_thread = CommBase.CommTaskLoop(
                     self, target=self.run_backlog_recv, suffix='RecvBacklog')
         return self._backlog_thread
 
@@ -104,10 +109,12 @@ class AsyncComm(CommBase.CommBase):
         r"""Close the backlog thread."""
         self.debug('')
         self.backlog_open = False
-        self.backlog_thread.set_break_flag()
+        if self._backlog_thread is not None:
+            self.backlog_thread.set_break_flag()
         self.backlog_send_ready.set()
         self.backlog_recv_ready.set()
-        if wait and not self.dont_backlog:
+        if ((wait and (not self.dont_backlog)
+             and (self._backlog_thread is not None))):
             self.backlog_thread.wait(key=str(uuid.uuid4()))
 
     def _close(self, linger=False):
@@ -447,7 +454,10 @@ class AsyncComm(CommBase.CommBase):
                     return out
             except AsyncTryAgain:
                 if no_backlog:  # pragma: debug
-                    raise
+                    if (not self._used) and self._multiple_first_send:
+                        return False
+                    else:
+                        raise
         self.add_backlog_send(payload, **kwargs)
         self.debug('%d bytes backlogged', len(payload))
         return True
