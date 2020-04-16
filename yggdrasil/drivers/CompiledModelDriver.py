@@ -2056,13 +2056,19 @@ class CompiledModelDriver(ModelDriver):
         return copy.deepcopy(reg.get(cls.language, {}))
 
     @staticmethod
-    def get_tool_static(cls, tooltype, return_prop='tool', default=False,
+    def get_tool_static(cls, tooltype, toolname=None,
+                        return_prop='tool', default=False,
                         language=None):
         r"""Get the class associated with the specified compilation tool for
         this language.
 
         Args:
+            cls (class, instance): Compiled driver class or instance of
+                compiled driver class to get tool for.
             tooltype (str): Type of compilation tool that should be returned.
+            toolname (str, optional): Name of the tool that should be
+                returned. Defaults to None and the tool name associated
+                with the provided class/instance will be used.
             return_prop (str, optional): Value that should be returned. If
                 'tool', the tool is returned. If 'name', the tool name is
                 returned. If 'flags', the tool flags are returned. Defaults to
@@ -2084,15 +2090,20 @@ class CompiledModelDriver(ModelDriver):
         """
         if (language is not None) and (language != cls.language):
             drv = import_component('model', language)
-            return drv.get_tool(tooltype, return_prop=return_prop,
+            return drv.get_tool(tooltype, toolname=toolname,
+                                return_prop=return_prop,
                                 default=default)
         out = getattr(cls, '%s_tool' % tooltype, None)
-        if out is None:
+        if (out is None) or ((toolname is not None) and (toolname != out.name)):
             # Associate linker & archiver with compiler so that it can be
             # used to retrieve them
             if (tooltype == 'compiler') or (return_prop in ['name', 'flags']):
-                # Get tool name
-                toolname = getattr(cls, tooltype, None)
+                # Get tool name by checking:
+                #   1. The tooltype attribute
+                #   2. The default tooltype attribute
+                #   3. The default argument (if one is provided).
+                if toolname is None:
+                    toolname = getattr(cls, tooltype, None)
                 if toolname is None:
                     toolname = getattr(cls, 'default_%s' % tooltype, None)
                 if toolname is None:
@@ -2122,13 +2133,16 @@ class CompiledModelDriver(ModelDriver):
                             'archiver', return_prop='flags', default=None))
                 out = get_compilation_tool(tooltype, toolname)(**kwargs)
             else:
-                out_tool = cls.get_tool('compiler', default=None)
-                if out_tool is None:  # pragma: debug
-                    if default is False:
-                        raise NotImplementedError("%s not set for language '%s'."
-                                                  % (tooltype.title(), cls.language))
-                    return default
-                out = getattr(out_tool, tooltype)()
+                if toolname is None:
+                    out_tool = cls.get_tool('compiler', default=None)
+                    if out_tool is None:  # pragma: debug
+                        if default is False:
+                            raise NotImplementedError("%s not set for language '%s'."
+                                                      % (tooltype.title(), cls.language))
+                        return default
+                    out = getattr(out_tool, tooltype)()
+                else:
+                    out = get_compilation_tool(tooltype, toolname)(**kwargs)
         # Returns correct property given the tool
         if return_prop == 'tool':
             return out

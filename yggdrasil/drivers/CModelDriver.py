@@ -226,7 +226,7 @@ class MSVCCompiler(CCompilerBase):
                              shared_library_flag='/DLL',
                              search_path_envvar='LIB',
                              search_path_flags=None)
-    cxx_lib = None  # 'CP'
+    cxx_lib = None  # 'ucrt'
     
     @classmethod
     def language_version(cls, **kwargs):  # pragma: windows
@@ -527,7 +527,7 @@ class CModelDriver(CompiledModelDriver):
             elif platform._is_mac:
                 cls.default_compiler = 'clang'
             elif platform._is_win:  # pragma: windows
-                cls.default_compiler = 'cl'
+                cls.default_compiler = 'gcc'
         CompiledModelDriver.after_registration(cls, **kwargs)
         if kwargs.get('second_pass', False):
             return
