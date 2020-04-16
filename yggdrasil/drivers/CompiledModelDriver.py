@@ -2997,12 +2997,21 @@ class CompiledModelDriver(ModelDriver):
                 fpath = None
                 if tool is not None:
                     search_list = tool.get_search_path(libtype=t)
-                    if ((fname.endswith(('.lib', '.dll.a', '.dll'))
-                         and platform._is_win)):  # pragma: windows
-                        if fname.startswith('lib'):
-                            fname = [fname, fname.split('lib', 1)[-1]]
-                        else:
-                            fname = [fname, 'lib' + fname]
+                    # On windows search for both gnu and msvc library
+                    # naming conventions
+                    if platform._is_win:  # pragma: windows
+                        ext_sets = (('.lib', '.a'),
+                                    ('.dll.a', '.dll', '.so'))
+                        for exts in ext_sets:
+                            if fname.endswith(exts):
+                                base = fname.split('.', 1)[0]
+                                if base.startswith('lib'):
+                                    base = base.split('lib', 1)[-1]
+                                fname = []
+                                for ext in exts:
+                                    fname += ['lib' + base + ext,
+                                              base + ext]
+                                break
                     fpath = tools.locate_file(
                         fname, directory_list=search_list)
             if fpath:
