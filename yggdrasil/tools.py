@@ -1153,7 +1153,8 @@ class YggClass(ComponentBase):
 
     def __setstate__(self, state):
         state['logger'] = YggLoggerAdapter(
-            self, logging.getLogger(self.__module__), {})
+            self.__class__.__name__, self.print_name,
+            logging.getLogger(self.__module__), {})
         super(YggClass, self).__setstate__(state)
 
     def __deepcopy__(self, memo):
