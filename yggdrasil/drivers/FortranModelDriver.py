@@ -368,11 +368,14 @@ class FortranModelDriver(CompiledModelDriver):
             cxx_lib = CModelDriver.CModelDriver.get_tool('compiler').cxx_lib
         except NotImplementedError:
             cxx_lib = None
-        if (cxx_lib is not None) and (cxx_lib not in cls.external_libraries):
-            cls.external_libraries[cxx_lib] = cls.external_libraries.pop('cxx')
-            cls.internal_libraries['fygg']['external_dependencies'].append(cxx_lib)
-        else:
-            cls.external_libraries.pop('cxx', None)
+        cxx_orig = cls.external_libraries.pop('cxx', None)
+        if not isinstance(cxx_lib, (list, tuple)):
+            cxx_lib = [cxx_lib]
+        if cxx_orig is not None:
+            for icxx in cxx_lib:
+                if (icxx is not None) and (icxx not in cls.external_libraries):
+                    cls.external_libraries[icxx] = cxx_orig.copy()
+                    cls.internal_libraries['fygg']['external_dependencies'].append(icxx)
         
     def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.

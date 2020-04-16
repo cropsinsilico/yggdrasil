@@ -226,7 +226,7 @@ class MSVCCompiler(CCompilerBase):
                              shared_library_flag='/DLL',
                              search_path_envvar='LIB',
                              search_path_flags=None)
-    cxx_lib = 'ucrt'
+    cxx_lib = ('ucrtbase', 'msvcrt')
     
     @classmethod
     def language_version(cls, **kwargs):  # pragma: windows

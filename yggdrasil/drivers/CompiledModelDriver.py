@@ -3000,8 +3000,8 @@ class CompiledModelDriver(ModelDriver):
                     # On windows search for both gnu and msvc library
                     # naming conventions
                     if platform._is_win:  # pragma: windows
-                        ext_sets = (('.lib', '.a'),
-                                    ('.dll.a', '.dll', '.so'))
+                        ext_sets = (('.dll.a', '.dll', '.so'),
+                                    ('.lib', '.a'))
                         for exts in ext_sets:
                             if fname.endswith(exts):
                                 base = fname.split('.', 1)[0]
