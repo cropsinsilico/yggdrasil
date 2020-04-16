@@ -279,6 +279,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                     makefile = os.path.join(self.yamldir, 'src', 'Makefile')
                     if os.path.isfile(makefile):
                         os.remove(makefile)
+                self.runner = None
 
     def example_cleanup(self):
         r"""Cleanup files created during the test."""
