@@ -565,7 +565,8 @@ class ComponentBase(object):
                 if isinstance(kwargs.get(k, None), (bytes, str)):
                     kwargs[k] = kwargs[k].split()
         # Parse keyword arguments using schema
-        if (comptype is not None) and (subtype is not None):
+        if (((comptype is not None) and (subtype is not None)
+             and (not skip_component_schema_normalization))):
             from yggdrasil.schema import get_schema
             s = get_schema().get_component_schema(
                 comptype, subtype, relaxed=True,

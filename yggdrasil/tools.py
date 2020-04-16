@@ -1040,8 +1040,9 @@ class TimeOut(object):
 class YggLoggerAdapter(logging.LoggerAdapter):
     r"""Logger adapter for use with YggClass."""
 
-    def __init__(self, ygg_class, *args, **kwargs):
-        self._ygg_class = ygg_class
+    def __init__(self, class_name, instance_name, *args, **kwargs):
+        self._class_name = class_name
+        self._instance_name = instance_name
         super(YggLoggerAdapter, self).__init__(*args, **kwargs)
     
     def process(self, msg, kwargs):
@@ -1053,11 +1054,11 @@ class YggLoggerAdapter(logging.LoggerAdapter):
             the_line = stack[2][2]
             the_func = stack[2][3]
             prefix = '%s(%s).%s[%d]' % (the_class,
-                                        self._ygg_class.print_name,
+                                        self._instance_name,
                                         the_func, the_line)
         else:
-            prefix = '%s(%s)' % (self._ygg_class.ygg_class,
-                                 self._ygg_class.print_name)
+            prefix = '%s(%s)' % (self._class_name,
+                                 self._instance_name)
         new_msg = '%s: %s' % (prefix, self.as_str(msg))
         return new_msg, kwargs
 
@@ -1133,16 +1134,17 @@ class YggClass(ComponentBase):
         self.sched_out = None
         self.suppress_special_debug = False
         self._periodic_logs = {}
-        self.logger = YggLoggerAdapter(self, logging.getLogger(self.__module__), {})
         self._old_loglevel = None
         self._old_encoding = None
         self.debug_flag = False
-        self._ygg_class = str(self.__class__).split("'")[1].split('.')[-1]
         # Call super class, adding in schema properties
         for k in self._base_defaults:
             if k in self._schema_properties:
                 kwargs[k] = getattr(self, k)
         super(YggClass, self).__init__(**kwargs)
+        self.logger = YggLoggerAdapter(
+            self.__class__.__name__, self.print_name,
+            logging.getLogger(self.__module__), {})
 
     def __getstate__(self):
         state = super(YggClass, self).__getstate__()
@@ -1167,11 +1169,6 @@ class YggClass(ComponentBase):
     def print_name(self):
         r"""str: Name of the class object."""
         return self._name.replace('%', '%%')
-
-    @property
-    def ygg_class(self):
-        r"""str: Name of the class."""
-        return self._ygg_class
 
     def language_info(self, languages):
         r"""Only do info debug message if the language is one of those specified."""
