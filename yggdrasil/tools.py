@@ -640,13 +640,13 @@ def get_installed_comm(language=None):
 
 def get_default_comm():
     r"""Get the default comm that should be used for message passing."""
-    comm_list = get_installed_comm()
     if 'YGG_DEFAULT_COMM' in os.environ:
         _default_comm = os.environ['YGG_DEFAULT_COMM']
-        if not is_comm_installed(_default_comm, language='any'):  # pragma: debug
-            raise Exception('Unsupported default comm %s set by YGG_DEFAULT_COMM' % (
-                            _default_comm))
+        # if not is_comm_installed(_default_comm, language='any'):  # pragma: debug
+        #     raise Exception('Unsupported default comm %s set by YGG_DEFAULT_COMM' % (
+        #                     _default_comm))
     else:
+        comm_list = get_installed_comm()
         if len(comm_list) > 0:
             _default_comm = comm_list[0]
         else:  # pragma: windows
