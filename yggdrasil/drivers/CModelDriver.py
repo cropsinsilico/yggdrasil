@@ -528,7 +528,7 @@ class CModelDriver(CompiledModelDriver):
             elif platform._is_mac:
                 cls.default_compiler = 'clang'
             elif platform._is_win:  # pragma: windows
-                cls.default_compiler = 'cl'
+                cls.default_compiler = 'gcc'
         CompiledModelDriver.after_registration(cls, **kwargs)
         if kwargs.get('second_pass', False):
             return
