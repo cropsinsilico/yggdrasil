@@ -16,7 +16,6 @@ import shutil
 import inspect
 import time
 import signal
-import atexit
 import uuid as uuid_gen
 import subprocess
 import importlib
@@ -35,8 +34,6 @@ if ((logging.getLogger("yggdrasil").getEffectiveLevel()
      <= logging.DEBUG)):  # pragma: debug
     _stack_in_log = False
     _stack_in_timeout = True
-_thread_registry = {}
-_lock_registry = {}
 
 
 def apply_recurse(x, func, **kwargs):
@@ -116,51 +113,6 @@ def get_fds():  # pragma: debug
     out = subprocess.check_output(
         'lsof -p {} | grep -v txt'.format(os.getpid()), shell=True)
     return out.splitlines()[1:]
-
-
-def check_processes():  # pragma: debug
-    r"""Check for processes that are still running."""
-    import psutil
-    current_process = psutil.Process()
-    children = current_process.children(recursive=True)
-    if len(children) > 0:
-        logging.info("Process %s has %d children" % (
-            current_process.pid, len(children)))
-        for child in children:
-            logger.info("    %s process running" % child.pid)
-
-
-def check_threads():  # pragma: debug
-    r"""Check for threads that are still running."""
-    global _thread_registry
-    # logger.info("Checking %d threads" % len(_thread_registry))
-    for k, v in _thread_registry.items():
-        if v.is_alive():
-            logger.error("Thread is alive: %s" % k)
-    if threading.active_count() > 1:
-        logger.info("%d threads running" % threading.active_count())
-        for t in threading.enumerate():
-            logger.info("    %s thread running" % t.name)
-
-
-def check_locks():  # pragma: debug
-    r"""Check for locks in lock registry that are locked."""
-    global _lock_registry
-    # logger.info("Checking %d locks" % len(_lock_registry))
-    for k, v in _lock_registry.items():
-        res = v.acquire(False)
-        if res:
-            v.release()
-        else:
-            logger.error("Lock could not be acquired: %s" % k)
-
-
-def check_sockets():  # pragma: debug
-    r"""Check registered sockets."""
-    from yggdrasil.communication import cleanup_comms
-    count = cleanup_comms('ZMQComm')
-    if count > 0:
-        logger.info("%d sockets closed." % count)
 
 
 def check_environ_bool(name, valid_values=['true', '1', True, 1]):
@@ -353,25 +305,6 @@ def is_subprocess():
 
     """
     return check_environ_bool('YGG_SUBPROCESS')
-
-
-def ygg_atexit():  # pragma: debug
-    r"""Things to do at exit."""
-    check_locks()
-    check_threads()
-    # # This causes a segfault in a C dependency
-    # if not is_subprocess():
-    #     check_sockets()
-    # Python 3.4 no longer supported if using pip 9.0.0, but this
-    # allows the code to work if somehow installed using an older
-    # version of pip
-    if sys.version_info[0:2] == (3, 4):  # pragma: no cover
-        # Print empty line to ensure close
-        print('', end='')
-        sys.stdout.flush()
-
-
-atexit.register(ygg_atexit)
 
 
 def which(program):
@@ -1152,10 +1085,10 @@ class YggClass(ComponentBase):
         return state
 
     def __setstate__(self, state):
-        state['logger'] = YggLoggerAdapter(
+        super(YggClass, self).__setstate__(state)
+        self.logger = YggLoggerAdapter(
             self.__class__.__name__, self.print_name,
             logging.getLogger(self.__module__), {})
-        super(YggClass, self).__setstate__(state)
 
     def __deepcopy__(self, memo):
         r"""Don't deep copy since threads cannot be copied."""

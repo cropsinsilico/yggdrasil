@@ -22,12 +22,12 @@ class LockedBuffer(multitasking.LockedQueue):
     def close(self, join=False):
         r"""Close the buffer."""
         # with self.lock:
-        self.cleanup()
+        self.disconnect()
 
-    def cleanup(self):
+    def disconnect(self):
         self._closed.set()
-        self._closed.cleanup()
-        super(LockedBuffer, self).cleanup()
+        self._closed.disconnect()
+        super(LockedBuffer, self).disconnect()
         
     def __len__(self):
         if self.closed:  # pragma: debug

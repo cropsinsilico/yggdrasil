@@ -117,7 +117,7 @@ class ConnectionDriver(Driver):
                            {'$ref': '#/definitions/transform'}]}},
         'onexit': {'type': 'string'}}
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
-    _cleanup_attr = Driver._cleanup_attr + [
+    _disconnect_attr = Driver._disconnect_attr + [
         '_comm_opened', '_comm_closed', '_skip_after_loop', 'shared',
         'tasks', 'tasks_return', 'task_thread', 'task_break_flag']
 
@@ -148,8 +148,8 @@ class ConnectionDriver(Driver):
         self.onexit = None
         self.task_thread = None
         if self.as_process:
-            self.tasks = BufferComm.LockedBuffer()  # ctx=self.context)
-            self.tasks_return = BufferComm.LockedBuffer()  # ctx=self.context)
+            self.tasks = BufferComm.LockedBuffer()
+            self.tasks_return = BufferComm.LockedBuffer()
             self.task_thread = multitasking.YggTaskLoop(
                 '%s.TaskThread' % self.name, target=self.complete_tasks)
             self.create_flag_attr('task_break_flag')
