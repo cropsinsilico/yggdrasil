@@ -194,9 +194,10 @@ def get_python_c_library(allow_failure=False, libtype=None, is_gnu=False):
         prefix = ''
         if is_gnu:
             libtype2ext['shared'] += '.a'
+            libtype2ext['static'] = '.a'
         if libtype is None:
             libtype = 'static'
-        if is_gnu and (libtype == 'shared'):
+        if is_gnu:  # and (libtype == 'shared'):
             prefix = 'lib'
         base = '%spython%s%s' % (prefix,
                                  cvars['py_version_nodot'],
