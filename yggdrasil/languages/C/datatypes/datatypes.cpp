@@ -1883,12 +1883,16 @@ extern "C" {
       // Combine
       int ret = snprintf(*buf, buf_siz, "%s%s%s",
 			 MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
-      if ((size_t)ret > buf_siz) {
+      if ((ret < 0) || ((size_t)ret > buf_siz)) {
 	printf("format_comm_header (first): Header size (%d) exceeds buffer size (%lu).\n",
 	       ret, buf_siz);
 	ygglog_info("format_comm_header: Header size (%d) exceeds buffer size (%lu).",
 		    ret, buf_siz);
-	buf_siz = (size_t)(ret+1);
+	if (ret < 0) {
+	  buf_siz = 2 * buf_siz;
+	} else {
+	  buf_siz = (size_t)(ret+1);
+	}
 	buf[0] = (char*)realloc(buf[0], buf_siz);
 	ret = snprintf(*buf, buf_siz, "%s%s%s",
 		       MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
