@@ -327,6 +327,10 @@ class ModelDriver(Driver):
     _config_keys = []
     _config_attr_map = []
     _executable_search_dirs = None
+    _disconnect_attr = (Driver._disconnect_attr
+                        + ['queue', 'queue_thread',
+                           'event_process_kill_called',
+                           'event_process_kill_complete'])
 
     def __init__(self, name, args, model_index=0, **kwargs):
         self.model_outputs_in_inputs = kwargs.pop('outputs_in_inputs', None)

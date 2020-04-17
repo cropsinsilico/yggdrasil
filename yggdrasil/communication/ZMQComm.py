@@ -265,12 +265,8 @@ class ZMQProxy(CommBase.CommServer):
 
     def after_loop(self):
         r"""Close sockets after the loop finishes."""
-        self.after_loop_cleanup()
+        self.cleanup()
         super(ZMQProxy, self).after_loop()
-
-    def after_loop_cleanup(self):
-        r"""Clean up sockets on exit."""
-        self.close_sockets()
 
     def cleanup(self):
         r"""Clean up sockets on exit."""
@@ -350,8 +346,8 @@ class ZMQComm(AsyncComm.AsyncComm):
                            "address depends on the transport. "
                            "Additional information can be found "
                            "`here <http://api.zeromq.org/3-2:zmq-bind>`_.")
-    _cleanup_attr = (AsyncComm.AsyncComm._cleanup_attr
-                     + ['reply_socket_lock', 'socket_lock'])
+    _disconnect_attr = (AsyncComm.AsyncComm._disconnect_attr
+                        + ['reply_socket_lock', 'socket_lock'])
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',

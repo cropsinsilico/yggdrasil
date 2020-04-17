@@ -667,7 +667,8 @@ class SchemaRegistry(object):
         r"""Return a component schema from the registry."""
         return self._storage.get(k, *args, **kwargs)
 
-    def get_definitions(self, relaxed=False, allow_instance=False, for_form=False):
+    def get_definitions(self, relaxed=False, allow_instance=False,
+                        for_form=False, dont_copy=False):
         r"""Get schema definitions for the registered components.
 
         Args:
@@ -681,6 +682,8 @@ class SchemaRegistry(object):
             for_form (bool, optional): If True, the returned schema will be
                 formatted for easy parsing by form generation tools. Defaults
                 to False. Causes relaxed and allow_instance to be ignored.
+            dont_copy (bool, optional): If True, a the cached definitions
+                are returned without copying. Defaults to False.
 
         Returns:
             dict: Schema defintiions for each of the registered components.
@@ -702,7 +705,10 @@ class SchemaRegistry(object):
             for k in self.required_components:
                 out.setdefault(k, {'type': 'string'})
             self._cache[cache_key] = out
-        return copy.deepcopy(self._cache[cache_key])
+        out = self._cache[cache_key]
+        if not dont_copy:
+            out = copy.deepcopy(out)
+        return out
 
     def get_schema(self, relaxed=False, allow_instance=False, for_form=False):
         r"""Get the schema defining this component.
@@ -738,7 +744,7 @@ class SchemaRegistry(object):
                    'type': 'object',
                    'definitions': self.get_definitions(
                        relaxed=relaxed, allow_instance=allow_instance,
-                       for_form=for_form),
+                       for_form=for_form, dont_copy=True),
                    'required': ['models'],
                    'additionalProperties': False,
                    'properties': SchemaDict(

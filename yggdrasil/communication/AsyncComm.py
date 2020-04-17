@@ -28,13 +28,11 @@ class AsyncComm(CommBase.CommBase):
         
     """
     
-    _cleanup_attr = (CommBase.CommBase._cleanup_attr
-                     + ['backlog_send_ready', 'backlog_recv_ready',
-                        '_backlog_thread'])
+    _disconnect_attr = (CommBase.CommBase._disconnect_attr
+                        + ['backlog_send_ready', 'backlog_recv_ready',
+                           '_backlog_thread'])
 
     def __init__(self, name, dont_backlog=False, **kwargs):
-        # TODO: Fix the cleanup of Python threads in languages that call the
-        # Python API underneath
         self.dont_backlog = (dont_backlog or kwargs.get('is_interface', False))
         self._backlog_recv = []
         self._backlog_send = []

@@ -520,7 +520,7 @@ class ComponentBase(object):
     _schema_excluded_from_class_validation = []
     _schema_inherit = True
     _dont_register = False
-    _cleanup_attr = []
+    _disconnect_attr = []
 
     def __new__(cls, *args, **kwargs):
         obj = object.__new__(cls)
@@ -565,7 +565,8 @@ class ComponentBase(object):
                 if isinstance(kwargs.get(k, None), (bytes, str)):
                     kwargs[k] = kwargs[k].split()
         # Parse keyword arguments using schema
-        if (comptype is not None) and (subtype is not None):
+        if (((comptype is not None) and (subtype is not None)
+             and (not skip_component_schema_normalization))):
             from yggdrasil.schema import get_schema
             s = get_schema().get_component_schema(
                 comptype, subtype, relaxed=True,
@@ -613,19 +614,13 @@ class ComponentBase(object):
         self.__dict__.update(state)
 
     def __del__(self):
-        self.cleanup()
+        self.disconnect()
 
-    def atexit(self):
-        r"""Actions performed at exit."""
-        self.cleanup()
-
-    def cleanup(self):
-        r"""Actions to be performed to cleanup the class at exit
-        or on deletion. After execution of cleanup, the class is not
-        guaranteed to function."""
-        for k in self._cleanup_attr:
-            if hasattr(getattr(self, k, None), 'cleanup'):
-                getattr(self, k).cleanup()
+    def disconnect(self):
+        r"""Disconnect attributes that are aliases."""
+        for k in self._disconnect_attr:
+            if hasattr(getattr(self, k, None), 'disconnect'):
+                getattr(self, k).disconnect()
 
     @staticmethod
     def before_registration(cls):

@@ -1,13 +1,83 @@
 import os
+import sys
 import six
+import atexit
 import weakref
+import logging
 import threading
 import queue
 import multiprocessing
 from yggdrasil.tools import YggClass
+
+
 mp_ctx = multiprocessing.get_context()
 mp_ctx_spawn = multiprocessing.get_context("spawn")
 _main_thread = threading.main_thread()
+_thread_registry = weakref.WeakValueDictionary()
+_lock_registry = weakref.WeakValueDictionary()
+logger = logging.getLogger(__name__)
+
+
+def check_processes():  # pragma: debug
+    r"""Check for processes that are still running."""
+    import psutil
+    current_process = psutil.Process()
+    children = current_process.children(recursive=True)
+    if len(children) > 0:
+        logging.info("Process %s has %d children" % (
+            current_process.pid, len(children)))
+        for child in children:
+            logger.info("    %s process running" % child.pid)
+
+
+def check_threads():  # pragma: debug
+    r"""Check for threads that are still running."""
+    # logger.info("Checking %d threads" % len(_thread_registry))
+    for k, v in _thread_registry.items():
+        if v.is_alive():
+            logger.error("Thread is alive: %s" % k)
+    if threading.active_count() > 1:
+        logger.info("%d threads running" % threading.active_count())
+        for t in threading.enumerate():
+            logger.info("    %s thread running" % t.name)
+
+
+def check_locks():  # pragma: debug
+    r"""Check for locks in lock registry that are locked."""
+    # logger.info("Checking %d locks" % len(_lock_registry))
+    for k, v in _lock_registry.items():
+        res = v.acquire(False)
+        if res:
+            v.release()
+        else:
+            logger.error("Lock could not be acquired: %s" % k)
+
+
+def check_sockets():  # pragma: debug
+    r"""Check registered sockets."""
+    from yggdrasil.communication import cleanup_comms
+    count = cleanup_comms('ZMQComm')
+    if count > 0:
+        logger.info("%d sockets closed." % count)
+
+
+def ygg_atexit():  # pragma: debug
+    r"""Things to do at exit."""
+    check_locks()
+    check_threads()
+    # # This causes a segfault in a C dependency
+    # if not is_subprocess():
+    #     check_sockets()
+    # Python 3.4 no longer supported if using pip 9.0.0, but this
+    # allows the code to work if somehow installed using an older
+    # version of pip
+    if sys.version_info[0:2] == (3, 4):  # pragma: no cover
+        # Print empty line to ensure close
+        print('', end='')
+        sys.stdout.flush()
+
+
+atexit.register(ygg_atexit)
 
 
 class SafeThread(threading.Thread):
@@ -37,7 +107,7 @@ class SafeThread(threading.Thread):
         return os.getpid()
 
 
-class AliasCleanupError(RuntimeError):
+class AliasDisconnectError(RuntimeError):
     pass
 
 
@@ -153,10 +223,10 @@ class AliasObject(object):
         self.__dict__.update(state)
 
     def check_for_base(self, attr):
-        r"""Raise an error if the aliased object has been cleaned up."""
+        r"""Raise an error if the aliased object has been disconnected."""
         if self._base is None:
-            raise AliasCleanupError(
-                ("Aliased object has been cleaned up so "
+            raise AliasDisconnectError(
+                ("Aliased object has been disconnected so "
                  "'%s' is no longer available.") % attr)
 
     @property
@@ -164,10 +234,14 @@ class AliasObject(object):
         r"""Dummy copy of base."""
         return None
 
-    def cleanup(self):
-        r"""Cleanup the class."""
+    def disconnect(self):
+        r"""Disconnect from the aliased object by replacing it with
+        a dummy object."""
         if self._base is not None:
             self._base = self.dummy_copy
+
+    def __del__(self):
+        self.disconnect()
 
         
 class MultiObject(AliasObject):
@@ -184,11 +258,6 @@ class MultiObject(AliasObject):
             raise ValueError(("Unsupported method for concurrency/"
                               "parallelism: '%s'") % task_method)
         super(MultiObject, self).__init__(*args, **kwargs)
-
-    def disconnect(self):
-        r"""Disconnect by ending any synchronization between threads
-        or processes."""
-        self.cleanup()
 
 
 class Context(MultiObject):
@@ -271,7 +340,7 @@ class DummyContextObject(object):
     def context(self):
         return None
 
-    def cleanup(self):
+    def disconnect(self):
         pass
 
 
@@ -280,10 +349,10 @@ class ContextObject(MultiObject):
 
     def __init__(self, *args, task_method='threading',
                  task_context=None, **kwargs):
-        self._cleanup_context = None
+        self._managed_context = None
         if task_context is None:
             task_context = Context(task_method=task_method)
-            self._cleanup_context = task_context
+            self._managed_context = task_context
         task_method = task_context.task_method
         self._context = weakref.ref(task_context)
         self._base_class = self.get_base_class(task_context)
@@ -296,9 +365,9 @@ class ContextObject(MultiObject):
         return state
 
     def __setstate__(self, state):
-        if state['_cleanup_context'] is None:
-            state['_cleanup_context'] = Context(task_method=state['task_method'])
-        state['_context'] = weakref.ref(state['_cleanup_context'])
+        if state['_managed_context'] is None:
+            state['_managed_context'] = Context(task_method=state['task_method'])
+        state['_context'] = weakref.ref(state['_managed_context'])
         super(ContextObject, self).__setstate__(state)
         
     @classmethod
@@ -308,12 +377,14 @@ class ContextObject(MultiObject):
         context.check_for_base(name)
         return getattr(context._base, name)
 
-    def cleanup(self):
-        r"""Cleanup the class."""
-        super(ContextObject, self).cleanup()
-        if self._cleanup_context is not None:
-            self._cleanup_context.cleanup()
-            self._cleanup_context = None
+    def disconnect(self):
+        r"""Disconnect from the aliased object by replacing it with
+        a dummy object."""
+        if ContextObject is not None:
+            super(ContextObject, self).disconnect()
+        if self._managed_context is not None:
+            self._managed_context.disconnect()
+            self._managed_context = None
 
     @property
     def context(self):
@@ -321,16 +392,31 @@ class ContextObject(MultiObject):
         return self._context()
 
 
+class DummyRLock(DummyContextObject):  # pragma: no cover
+
+    def acquire(self, *args, **kwargs):
+        pass
+
+    def release(self, *args, **kwargs):
+        pass
+
+    def __enter__(self, *args, **kwargs):
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        pass
+    
+
 class RLock(ContextObject):
-    r"""Recursive lock. Acquiring the lock after cleanup is called
+    r"""Recursive lock. Acquiring the lock after disconnect is called
     through use as a context will not raise an error, but will not
     do anything."""
 
-    _base_meth = ['acquire', 'release']
+    _base_meth = ['acquire', 'release', '__enter__', '__exit__']
 
     def __getstate__(self):
         state = super(RLock, self).__getstate__()
-        if not self.parallel:
+        if (not self.parallel) and (not isinstance(state['_base'], DummyRLock)):
             state['_base'] = None
         return state
 
@@ -338,18 +424,11 @@ class RLock(ContextObject):
         if state['_base'] is None:
             state['_base'] = threading.RLock()
         super(RLock, self).__setstate__(state)
-        
-    def __enter__(self, *args, **kwargs):
-        if self._base is None:
-            return self
-        else:
-            return self._base.__enter__(*args, **kwargs)
 
-    def __exit__(self, *args, **kwargs):
-        if self._base is None:
-            return
-        else:
-            return self._base.__exit__(*args, **kwargs)
+    @property
+    def dummy_copy(self):
+        r"""Dummy copy of base."""
+        return DummyRLock()
 
 
 class DummyEvent(DummyContextObject):  # pragma: no cover
@@ -400,7 +479,7 @@ class Event(ContextObject):
 
 class DummyTask(DummyContextObject):  # pragma: no cover
 
-    def __init__(self, name, exitcode, daemon):
+    def __init__(self, name='', exitcode=0, daemon=False):
         self.name = name
         self.exitcode = exitcode
         self.daemon = daemon
@@ -446,7 +525,7 @@ class Task(ContextObject):
         state = super(Task, self).__getstate__()
         if not self.parallel:
             state['_base'] = {
-                'name': state['_base']._name, 'group': None,
+                'name': state['_base'].name, 'group': None,
                 'daemon': state['_base'].daemon,
                 'target': state['_base']._target,
                 'args': state['_base']._args,
@@ -465,7 +544,6 @@ class Task(ContextObject):
             out = False
         return out
 
-    # Called before cleanup called
     @property
     def ident(self):
         r"""Process ID."""
@@ -535,10 +613,13 @@ class Queue(ContextObject):
         else:
             return self._base.join(*args, **kwargs)
 
-    def cleanup(self):
-        r"""Cleanup the class."""
-        self.join()
-        super(Queue, self).cleanup()
+    def disconnect(self):
+        r"""Disconnect from the aliased object by replacing it with
+        a dummy object."""
+        if self.parallel:
+            self.join()
+        if Queue is not None:
+            super(Queue, self).disconnect()
 
 
 class Dict(ContextObject):
@@ -565,19 +646,21 @@ class Dict(ContextObject):
     #     r"""Dummy copy of base."""
     #     return self._base.copy()
         
-    def cleanup(self):
-        r"""Cleanup the class."""
+    def disconnect(self):
+        r"""Disconnect from the aliased object by replacing it with
+        a dummy object."""
         try:
             final_value = self._base.copy()
         except BaseException:
             final_value = {}
         if isinstance(self._base, LockedDict):
-            self._base.cleanup()
+            self._base.disconnect()
         if getattr(self._base, '_manager', None) is not None:
             self._base._manager.shutdown()
         if hasattr(self._base, '_close'):
             self._base._close()
-        super(Dict, self).cleanup()
+        if Dict is not None:
+            super(Dict, self).disconnect()
         self._base = final_value
 
 
@@ -596,10 +679,12 @@ class LockedObject(AliasObject):
             kwargs['task_context'] = task_context
         super(LockedObject, self).__init__(*args, **kwargs)
 
-    def cleanup(self):
-        r"""Cleanup the class."""
-        super(LockedObject, self).cleanup()
-        self.lock.cleanup()
+    def disconnect(self):
+        r"""Disconnect from the aliased object by replacing it with
+        a dummy object."""
+        if LockedObject is not None:
+            super(LockedObject, self).disconnect()
+        self.lock.disconnect()
 
 
 # class LockedList(LockedObject):
@@ -669,23 +754,24 @@ class LockedQueue(LockedObject):
         r"""Dummy copy of base."""
         return DummyQueue()
         
-    def cleanup(self):
-        r"""Cleanup the class."""
-        self._base.cleanup()
-        super(LockedQueue, self).cleanup()
+    def disconnect(self):
+        r"""Disconnect from the aliased object by replacing it with
+        a dummy object."""
+        self._base.disconnect()
+        if LockedQueue is not None:
+            super(LockedQueue, self).disconnect()
 
 
 class YggTask(YggClass):
     r"""Class for managing Ygg thread/process."""
 
-    _cleanup_attr = (YggClass._cleanup_attr
-                     + ['context', 'lock', 'process_instance',
-                        'error_flag', 'start_flag', 'terminate_flag'])
+    _disconnect_attr = (YggClass._disconnect_attr
+                        + ['context', 'lock', 'process_instance',
+                           'error_flag', 'start_flag', 'terminate_flag'])
     
     def __init__(self, name=None, target=None, args=(), kwargs=None,
                  daemon=False, group=None, task_method='thread',
                  context=None, with_pipe=False, **ygg_kwargs):
-        global _lock_registry
         if kwargs is None:
             kwargs = {}
         if (target is not None) and ('target' in self._schema_properties):
@@ -716,16 +802,28 @@ class YggTask(YggClass):
         self.create_flag_attr('terminate_flag')
         self._calling_thread = None
         super(YggTask, self).__init__(name, **ygg_kwargs)
-        # if not self.as_process:
-        #     _thread_registry[self.name] = self
-        #     _lock_registry[self.name] = self.lock
-        #     atexit.register(self.atexit)
+        if not self.as_process:
+            global _thread_registry
+            global _lock_registry
+            _thread_registry[self.name] = self.process_instance._base
+            _lock_registry[self.name] = self.lock._base
+            atexit.register(self.atexit)
 
     def __getstate__(self):
         out = super(YggTask, self).__getstate__()
         out.pop('_input_args', None)
         out.pop('_input_kwargs', None)
         return out
+
+    def atexit(self):  # pragma: debug
+        r"""Actions performed when python exits."""
+        if self.is_alive():
+            self.info('Thread alive at exit')
+            self.cleanup()
+
+    def cleanup(self):
+        r"""Actions to perform to clean up the thread after it has stopped."""
+        self.disconnect()
         
     def create_flag_attr(self, attr):
         r"""Create a flag."""
@@ -936,19 +1034,13 @@ class YggTask(YggClass):
                                self.context.task_method)
             self.sleep()
         self.stop_timeout(key_level=1, key=key)
-
-    def atexit(self):  # pragma: debug
-        r"""Actions performed when python exits."""
-        if self.is_alive():
-            self.info('%s alive at exit', self.context.task_method.title())
-        super(YggTask, self).atexit()
         
 
 class YggTaskLoop(YggTask):
     r"""Class to run a loop inside a thread/process."""
 
-    _cleanup_attr = (YggTask._cleanup_attr
-                     + ['break_flag', 'loop_flag'])
+    _disconnect_attr = (YggTask._disconnect_attr
+                        + ['break_flag', 'loop_flag'])
 
     def __init__(self, *args, **kwargs):
         super(YggTaskLoop, self).__init__(*args, **kwargs)

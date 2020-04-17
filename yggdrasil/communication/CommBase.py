@@ -397,8 +397,9 @@ class CommBase(tools.YggClass):
     address_description = None
     no_serialization = False
     _model_schema_prop = ['is_default', 'outside_loop', 'default_file']
-    _cleanup_attr = (tools.YggClass._cleanup_attr
-                     + ['_closing_event', '_closing_thread'])
+    _disconnect_attr = (tools.YggClass._disconnect_attr
+                        + ['_closing_event', '_closing_thread',
+                           '_eof_recv', '_eof_sent'])
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
                  is_interface=None, language=None, partner_language='python',
@@ -934,18 +935,6 @@ class CommBase(tools.YggClass):
             self.wait_for_confirm(timeout=self._timeout_drain)
         self.debug("Finished (timeout_drain = %s)", str(self._timeout_drain))
 
-    def cleanup(self):
-        r"""Actions to be performed to cleanup the class at exit
-        or on deletion. After execution of cleanup, the class is not
-        guaranteed to function."""
-        if hasattr(self, 'address'):
-            self.close()
-            self.debug(
-                'atexit finished: closed=%s, n_msg=%d, close_alive=%s',
-                self.is_closed, self.n_msg,
-                self._closing_thread.is_alive())
-        super(CommBase, self).cleanup()
-
     def language_atexit(self):  # pragma: debug
         r"""Close operations specific to the language."""
         if self.language_driver.comm_atexit is not None:
@@ -956,7 +945,11 @@ class CommBase(tools.YggClass):
         self.debug('atexit begins')
         self.language_atexit()
         self.debug('atexit after language_atexit, but before close')
-        super(CommBase, self).atexit()
+        self.close()
+        self.debug(
+            'atexit finished: closed=%s, n_msg=%d, close_alive=%s',
+            self.is_closed, self.n_msg,
+            self._closing_thread.is_alive())
 
     @property
     def is_open(self):
