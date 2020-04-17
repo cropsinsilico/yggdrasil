@@ -267,8 +267,9 @@ def deploy_package_on_ci(method):
             elif _is_osx:
                 cmds.append("bash ci/install-czmq-osx.sh")
             elif _is_win:
-                cmds += ["call ci\\install-czmq-windows.bat",
-                         "echo \"%PATH%\""]
+                cmds.append("%s install czmq zeromq" % conda_cmd)
+                # cmds += ["call ci\\install-czmq-windows.bat",
+                #          "echo \"%PATH%\""]
             else:
                 raise NotImplementedError("Could not determine "
                                           "ZeroMQ installation method.")
