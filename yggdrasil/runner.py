@@ -43,6 +43,10 @@ class YggFunction(YggClass):
         # Start the drivers
         self.runner.run()
         self.model_driver = self.runner.modeldrivers['function_model']
+        for k in self.runner.modeldrivers.keys():
+            if k != 'function_model':
+                self.__name__ = k
+                break
         # Create input/output channels
         self.inputs = {}
         self.outputs = {}
@@ -72,6 +76,18 @@ class YggFunction(YggClass):
         self.returns = []
         for k, v in self.outputs.items():
             self.returns += v['vars']
+
+    def widget_function(self, *args, **kwargs):
+        # import matplotlib.pyplot as plt
+        # ncols = min(3, len(arguments))
+        # nrows = int(ceil(float(len(arguments))/float(ncols)))
+        # plt.show()
+        out = self(*args, **kwargs)
+        return out
+
+    def widget(self, *args, **kwargs):
+        from ipywidgets import interact_manual
+        return interact_manual(self.widget_function, *args, **kwargs)
         
     def __call__(self, **kwargs):
         r"""Call the model as a function by sending variables.
