@@ -2,14 +2,12 @@ import os
 import glob
 import jsonschema
 import copy
-import importlib
 import numpy as np
-from collections import OrderedDict
+from yggdrasil.components import ClassRegistry
 from yggdrasil.metaschema.encoder import decode_json
 from yggdrasil.metaschema.properties import get_metaschema_property
 
 
-_type_registry = OrderedDict()
 _schema_dir = os.path.join(os.path.dirname(__file__), 'schemas')
 _base_validator = jsonschema.validators.validator_for({"$schema": ""})
 YGG_MSG_HEAD = b'YGG_MSG_HEAD'
@@ -17,12 +15,36 @@ _property_attributes = ['properties', 'definition_properties',
                         'metadata_properties', 'extract_properties']
 
 
+def import_schema_types():
+    r"""Import all types to ensure they are registered."""
+    # Load types from schema
+    schema_files = glob.glob(os.path.join(_schema_dir, '*.json'))
+    names = []
+    for f in schema_files:
+        names.append(add_type_from_schema(f))
+    # TODO: Need to make sure metaschema updated if it was already loaded
+    from yggdrasil.metaschema import _metaschema
+    if _metaschema is not None:
+        reload_ygg = False
+        curr = _metaschema
+        new_names = []
+        for n in names:
+            if n not in curr['definitions']['simpleTypes']['enum']:  # pragma: debug
+                reload_ygg = True
+                new_names.append(n)
+        if reload_ygg:  # pragma: debug
+            raise Exception("The metaschema needs to be regenerated to include the "
+                            + "following new schemas found in schema files: %s"
+                            % new_names)
+    
+
 class MetaschemaTypeError(TypeError):
     r"""Error that should be raised when a class encounters a type it cannot handle."""
     pass
 
 
 _default_typedef = {'type': 'bytes'}
+_type_registry = ClassRegistry(import_function=import_schema_types)
 
 
 def is_default_typedef(typedef):
@@ -52,7 +74,7 @@ def register_type(type_class):
     """
     global _type_registry
     type_name = type_class.name
-    if type_name in _type_registry:
+    if _type_registry.has_entry(type_name):
         raise ValueError("Type '%s' already registered." % type_name)
     if (not type_class._replaces_existing):  # pragma: debug
         exist_flag = (type_name in _base_validator.TYPE_CHECKER._type_checkers)
@@ -159,8 +181,11 @@ def add_type_from_schema(path_to_schema, **kwargs):
     jsonschema.validate(out, {'type': 'object',
                               'required': ['title', 'description', 'type']})
     name = out['title']
-    if name in _type_registry:
-        return name
+    if _type_registry.has_entry(name):
+        if kwargs['target_globals'] is None:
+            return _type_registry[name]
+        else:
+            return name
     description = out['description']
     base = get_type_class(out['type'])
     fixed_properties = out
@@ -201,33 +226,6 @@ def get_registered_types():
     return _type_registry
 
 
-def import_all_types():
-    r"""Import all types to ensure they are registered."""
-    for x in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
-        type_mod = os.path.basename(x)[:-3]
-        if not type_mod.startswith('__'):
-            importlib.import_module('yggdrasil.metaschema.datatypes.%s' % type_mod)
-    # Load types from schema
-    schema_files = glob.glob(os.path.join(_schema_dir, '*.json'))
-    names = []
-    for f in schema_files:
-        names.append(add_type_from_schema(f))
-    # TODO: Need to make sure metaschema updated if it was already loaded
-    from yggdrasil.metaschema import _metaschema
-    if _metaschema is not None:
-        reload_ygg = False
-        curr = _metaschema
-        new_names = []
-        for n in names:
-            if n not in curr['definitions']['simpleTypes']['enum']:  # pragma: debug
-                reload_ygg = True
-                new_names.append(n)
-        if reload_ygg:  # pragma: debug
-            raise Exception("The metaschema needs to be regenerated to include the "
-                            + "following new schemas found in schema files: %s"
-                            % new_names)
-    
-
 def complete_typedef(typedef):
     r"""Complete the type definition by converting it into the standard format.
 
@@ -264,9 +262,10 @@ def get_type_class(type_name):
         create_multitype_class)
     if isinstance(type_name, list):
         return create_multitype_class(type_name)
-    if type_name not in _type_registry:
+    out = _type_registry.get(type_name, None)
+    if out is None:
         raise ValueError("Class for type '%s' could not be found." % type_name)
-    return _type_registry[type_name]
+    return out
 
 
 def get_type_from_def(typedef, dont_complete=False):

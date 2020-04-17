@@ -5,17 +5,12 @@ import atexit
 import logging
 import types
 import time
-from yggdrasil.tests import assert_equal
 from yggdrasil import tools, multitasking
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
 from yggdrasil.components import import_component, create_component
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
-from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
-    JSONArrayMetaschemaType)
-from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
-    JSONObjectMetaschemaType)
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 
 
@@ -1132,6 +1127,7 @@ class CommBase(tools.YggClass):
             bool: True if the object is empty, False otherwise.
 
         """
+        from yggdrasil.tests import assert_equal
         try:
             assert_equal(msg, emsg)
         except AssertionError:
@@ -1886,6 +1882,8 @@ class CommBase(tools.YggClass):
             RuntimeError: If the field order can not be determined.
 
         """
+        from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
+            JSONArrayMetaschemaType)
         metadata = kwargs.get('header_kwargs', {})
         if 'field_order' in kwargs:
             kwargs.setdefault('key_order', kwargs.pop('field_order'))
@@ -1919,6 +1917,8 @@ class CommBase(tools.YggClass):
         Raises:
 
         """
+        from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
+            JSONObjectMetaschemaType)
         if 'field_order' in kwargs:
             kwargs.setdefault('key_order', kwargs.pop('field_order'))
         key_order = kwargs.pop('key_order', None)

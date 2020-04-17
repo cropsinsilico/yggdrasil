@@ -417,7 +417,7 @@ class ComponentSchema(object):
         subt_schema = schema['allOf'][1]['anyOf']
         # Determine subtype key
         subt_overlap = set(list(subt_schema[0]['properties'].keys()))
-        subt_props = copy.deepcopy(subt_overlap)
+        subt_props = subt_overlap.copy()
         for v in subt_schema[1:]:
             ikeys = set(list(v['properties'].keys()))
             subt_props |= ikeys
@@ -463,7 +463,7 @@ class ComponentSchema(object):
         for x in schema_classes.values():
             if out is None:
                 out = cls(schema_type, x._schema_subtype_key, **kwargs)
-            out.append(x)
+            out.append(x, verify=True)
         return out
 
     @property
@@ -526,16 +526,19 @@ class ComponentSchema(object):
         r"""list: All available classes for this schema."""
         return sorted([k for k in self.schema_subtypes.keys()])
 
-    def append(self, comp_cls):
+    def append(self, comp_cls, verify=False):
         r"""Append component class to the schema.
 
         Args:
             comp_cls (class): Component class that should be added.
+            verify (bool, optional): If True, verify the schema after
+                adding the component class. Defaults to False.
 
         """
         assert(comp_cls._schema_type == self.schema_type)
         assert(comp_cls._schema_subtype_key == self.subtype_key)
         name = comp_cls.__name__
+        # name = '%s.%s' % (comp_cls.__module__, comp_cls.__name__)
         # Append subtype
         subtype_list = getattr(comp_cls, '_%s' % self.subtype_key, None)
         if not isinstance(subtype_list, list):
@@ -620,7 +623,8 @@ class ComponentSchema(object):
             self._base_schema['properties'] = new_base_prop
         self._storage[name] = copy.deepcopy(new_schema)
         # Verify that the schema is valid
-        metaschema.validate_schema(self.schema)
+        if verify:
+            metaschema.validate_schema(self.schema)
 
 
 class SchemaRegistry(object):
@@ -655,13 +659,14 @@ class SchemaRegistry(object):
             # Create schemas for each component
             for k, v in registry.items():
                 icomp = ComponentSchema.from_registry(k, v, schema_registry=self)
-                self.add(k, icomp)
+                self.add(k, icomp, verify=True)
 
-    def add(self, k, v):
+    def add(self, k, v, verify=False):
         r"""Add a new component schema to the registry."""
         self._cache = {}
         self._storage[k] = v
-        metaschema.validate_schema(self.schema)
+        if verify:
+            metaschema.validate_schema(self.schema)
 
     def get(self, k, *args, **kwargs):
         r"""Return a component schema from the registry."""
