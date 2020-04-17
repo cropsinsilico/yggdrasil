@@ -196,6 +196,7 @@ class MSVCCompiler(CCompilerBase):
     # of complex types. Use '/TC' instead of '/TP' for strictly C
     default_flags = ['/W4',      # Display all errors
                      '/Zi',      # Symbolic debug in .pdb (implies debug)
+                     '/MD',
                      # '/MTd',     # Use LIBCMTD.lib to create multithreaded .exe
                      # '/Z7',      # Symbolic debug in .obj (implies debug)
                      "/EHsc",    # Catch C++ exceptions only (C don't throw C++)
@@ -226,7 +227,7 @@ class MSVCCompiler(CCompilerBase):
                              shared_library_flag='/DLL',
                              search_path_envvar='LIB',
                              search_path_flags=None)
-    cxx_lib = ('ucrtbase', 'msvcrt')
+    cxx_lib = ('ucrtbase', 'msvcrt', 'msvcp140', 'vcruntime140')
     
     @classmethod
     def language_version(cls, **kwargs):  # pragma: windows
