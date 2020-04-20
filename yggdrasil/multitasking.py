@@ -334,7 +334,7 @@ class Context(MultiObject):
             return _main_thread
 
 
-class DummyContextObject(object):
+class DummyContextObject(object):  # pragma: no cover
 
     @property
     def context(self):
@@ -493,6 +493,9 @@ class DummyTask(DummyContextObject):  # pragma: no cover
 
     def terminate(self):
         pass
+
+    def kill(self):
+        pass
     
 
 class Task(ContextObject):
@@ -540,7 +543,7 @@ class Task(ContextObject):
     def is_alive(self):
         r"""Determine if the process/thread is alive."""
         out = self._base.is_alive()
-        if out is None:
+        if out is None:  # pragma: debug
             out = False
         return out
 
@@ -551,6 +554,11 @@ class Task(ContextObject):
             return self._base.pid
         else:
             return self._base.ident
+
+    def kill(self, *args, **kwargs):
+        r"""Kill the task."""
+        if self.parallel:
+            self._base.kill(*args, **kwargs)
 
 
 class DummyQueue(DummyContextObject):  # pragma: no cover
@@ -599,6 +607,17 @@ class Queue(ContextObject):
             return context._base.Queue
         else:
             return queue.Queue
+
+    def __getstate__(self):
+        state = super(Queue, self).__getstate__()
+        if (not self.parallel) and (not isinstance(state['_base'], DummyQueue)):
+            state['_base'] = None
+        return state
+
+    def __setstate__(self, state):
+        if state['_base'] is None:
+            state['_base'] = queue.Queue
+        super(Queue, self).__setstate__(state)
 
     @property
     def dummy_copy(self):
@@ -651,7 +670,7 @@ class Dict(ContextObject):
         a dummy object."""
         try:
             final_value = self._base.copy()
-        except BaseException:
+        except BaseException:  # pragma: debug
             final_value = {}
         if isinstance(self._base, LockedDict):
             self._base.disconnect()
@@ -713,26 +732,26 @@ class LockedDict(LockedObject):
         r"""Dummy copy of base."""
         try:
             out = self._base.copy()
-        except BaseException:
+        except BaseException:  # pragma: debug
             out = {}
         return out
 
 
-class LockedWeakValueDict(LockedDict):
-    r"""Dictionary of weakrefs that can be shared between threads."""
+# class LockedWeakValueDict(LockedDict):
+#     r"""Dictionary of weakrefs that can be shared between threads."""
 
-    _base_class = weakref.WeakValueDictionary
-    _base_attr = ['data']
-    _base_meth = ['itervaluerefs', 'valuerefs']
+#     _base_class = weakref.WeakValueDictionary
+#     _base_attr = ['data']
+#     _base_meth = ['itervaluerefs', 'valuerefs']
     
-    def __init__(self, *args, **kwargs):
-        self._dict_refs = {}
-        super(LockedWeakValueDict, self).__init__(*args, **kwargs)
+#     def __init__(self, *args, **kwargs):
+#         self._dict_refs = {}
+#         super(LockedWeakValueDict, self).__init__(*args, **kwargs)
 
-    def add_subdict(self, key):
-        r"""Add a subdictionary."""
-        self._dict_refs[key] = weakref.WeakValueDictionary()
-        self[key] = self._dict_refs[key]
+#     def add_subdict(self, key):
+#         r"""Add a subdictionary."""
+#         self._dict_refs[key] = weakref.WeakValueDictionary()
+#         self[key] = self._dict_refs[key]
 
 
 class LockedQueue(LockedObject):
@@ -839,11 +858,7 @@ class YggTask(YggClass):
 
     def check_flag_attr(self, attr):
         r"""Determine if a flag is set."""
-        flag = getattr(self, attr, None)
-        if flag is None:
-            return False
-        else:
-            return flag.is_set()
+        return getattr(self, attr).is_set()
 
     def wait_flag_attr(self, attr, timeout=None):
         r"""Wait until a flag is True."""
@@ -939,10 +954,8 @@ class YggTask(YggClass):
 
     def kill(self, *args, **kwargs):
         r"""Kill the process."""
-        if self.as_process:
-            return self.terminate(*args, **kwargs)
-        else:
-            return self.process_instance.kill(*args, **kwargs)
+        self.process_instance.kill(*args, **kwargs)
+        return self.terminate(*args, **kwargs)
 
     def terminate(self, no_wait=False):
         r"""Set the terminate event and wait for the thread/process to stop.
