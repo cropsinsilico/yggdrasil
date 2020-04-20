@@ -1884,12 +1884,12 @@ extern "C" {
       int ret = snprintf(*buf, buf_siz, "%s%s%s",
 			 MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
       if ((ret < 0) || ((size_t)ret > buf_siz)) {
-	printf("format_comm_header (first): Header size (%d) exceeds buffer size (%lu).\n",
-	       ret, buf_siz);
-	ygglog_info("format_comm_header: Header size (%d) exceeds buffer size (%lu).",
-		    ret, buf_siz);
 	if (ret < 0) {
-	  buf_siz = 2 * buf_siz;
+#ifdef _WIN32
+    buf_siz = _scprintf("%s%s%s", MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
+#else
+	  buf_siz = 10 * buf_siz;
+#endif
 	} else {
 	  buf_siz = (size_t)(ret+1);
 	}
