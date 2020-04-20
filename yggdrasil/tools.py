@@ -1214,17 +1214,12 @@ class YggClass(ComponentBase):
     @property
     def warn(self):
         r"""Log a warning level message."""
-        return self.logger.warn
+        return self.logger.warning
 
     @property
     def warning(self):
         r"""Log a warning level message."""
         return self.logger.warning
-
-    @property
-    def fatal(self):
-        r"""Log a fatal level message."""
-        return self.logger.fatal
 
     @property
     def error(self):
