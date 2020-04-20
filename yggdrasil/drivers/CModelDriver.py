@@ -196,7 +196,7 @@ class MSVCCompiler(CCompilerBase):
     # of complex types. Use '/TC' instead of '/TP' for strictly C
     default_flags = ['/W4',      # Display all errors
                      '/Zi',      # Symbolic debug in .pdb (implies debug)
-                     '/MD',
+                     # '/MD',
                      # '/MTd',     # Use LIBCMTD.lib to create multithreaded .exe
                      # '/Z7',      # Symbolic debug in .obj (implies debug)
                      "/EHsc",    # Catch C++ exceptions only (C don't throw C++)
@@ -227,7 +227,7 @@ class MSVCCompiler(CCompilerBase):
                              shared_library_flag='/DLL',
                              search_path_envvar='LIB',
                              search_path_flags=None)
-    cxx_lib = ('ucrtbase', 'msvcrt', 'msvcp140', 'vcruntime140')
+    cxx_lib = None  # ('ucrtbase', 'msvcrt', 'msvcp140', 'vcruntime140')
     
     @classmethod
     def language_version(cls, **kwargs):  # pragma: windows
@@ -293,7 +293,7 @@ try:
     _python_lib = ygg_cfg.get('c', 'python_%s' % libtype_order[0],
                               ygg_cfg.get('c', 'python_%s' % libtype_order[1], None))
     if (_python_lib is None) or (not os.path.isfile(_python_lib)):  # pragma: no cover
-        _python_lib = tools.get_python_c_library(allow_failure=False, is_gnu=True)
+        _python_lib = tools.get_python_c_library(allow_failure=False)
 except BaseException:  # pragma: debug
     warnings.warn("ERROR LOCATING PYTHON LIBRARY")
     _python_lib = None
@@ -540,10 +540,10 @@ class CModelDriver(CompiledModelDriver):
             else:
                 cls.external_libraries['python']['libtype'] = 'shared'
                 cls.external_libraries['python']['shared'] = _python_lib
-        for x in ['zmq', 'czmq']:
-            if x in cls.external_libraries:
-                if platform._is_win:  # pragma: windows
-                    cls.external_libraries[x]['libtype'] = 'static'
+        # for x in ['zmq', 'czmq']:
+        #     if x in cls.external_libraries:
+        #         if platform._is_win:  # pragma: windows
+        #             cls.external_libraries[x]['libtype'] = 'static'
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']

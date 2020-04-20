@@ -163,7 +163,7 @@ def check_environ_bool(name, valid_values=['true', '1', True, 1]):
     return (os.environ.get(name, '').lower() in valid_values)
 
 
-def get_python_c_library(allow_failure=False, libtype=None, is_gnu=False):
+def get_python_c_library(allow_failure=False, libtype=None):
     r"""Determine the location of the Python C API library.
 
     Args:
@@ -172,8 +172,6 @@ def get_python_c_library(allow_failure=False, libtype=None, is_gnu=False):
         libtype (str, optional): Type of library that should be located.
             Valid values include 'static' and 'shared'. Defaults to 'shared'
             on Unix OSs and 'static' on Windows.
-        is_gnu (bool, optional): If True, the GNU extension should be used.
-            Defaults to False.
 
     Returns:
         str: Full path to the library.
@@ -192,13 +190,8 @@ def get_python_c_library(allow_failure=False, libtype=None, is_gnu=False):
     if platform._is_win:  # pragma: windows
         libtype2ext = {'shared': '.dll', 'static': '.lib'}
         prefix = ''
-        if is_gnu:
-            libtype2ext['shared'] += '.a'
-            libtype2ext['static'] = '.a'
         if libtype is None:
             libtype = 'static'
-        if is_gnu:  # and (libtype == 'shared'):
-            prefix = 'lib'
         base = '%spython%s%s' % (prefix,
                                  cvars['py_version_nodot'],
                                  libtype2ext[libtype])

@@ -3009,8 +3009,8 @@ class CompiledModelDriver(ModelDriver):
                                     base = base.split('lib', 1)[-1]
                                 fname = []
                                 for ext in exts:
-                                    fname += ['lib' + base + ext,
-                                              base + ext]
+                                    fname += [base + ext,
+                                              'lib' + base + ext]
                                 break
                     fpath = tools.locate_file(
                         fname, directory_list=search_list)
