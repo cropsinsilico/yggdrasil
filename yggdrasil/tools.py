@@ -191,7 +191,7 @@ def get_python_c_library(allow_failure=False, libtype=None):
         libtype2ext = {'shared': '.dll', 'static': '.lib'}
         prefix = ''
         if libtype is None:
-            libtype = 'static'
+            libtype = 'shared'
         base = '%spython%s%s' % (prefix,
                                  cvars['py_version_nodot'],
                                  libtype2ext[libtype])
