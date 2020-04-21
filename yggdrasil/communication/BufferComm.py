@@ -6,7 +6,7 @@ class BufferClosed(RuntimeError):
     pass
 
 
-class LockedBuffer(multitasking.LockedQueue):
+class LockedBuffer(multitasking.Queue):
     r"""Buffer intended to be shared between threads/processes."""
 
     def __init__(self, *args, **kwargs):
@@ -17,7 +17,9 @@ class LockedBuffer(multitasking.LockedQueue):
     @property
     def closed(self):
         r"""bool: True if the queue is closed, False otherwise."""
-        return self._closed.is_set()
+        if hasattr(self, '_closed'):
+            return self._closed.is_set()
+        return True  # pragma: debug
 
     def close(self, join=False):
         r"""Close the buffer."""
@@ -25,8 +27,9 @@ class LockedBuffer(multitasking.LockedQueue):
         self.disconnect()
 
     def disconnect(self):
-        self._closed.set()
-        self._closed.disconnect()
+        if hasattr(self, '_closed'):
+            self._closed.set()
+            self._closed.disconnect()
         super(LockedBuffer, self).disconnect()
         
     def __len__(self):

@@ -73,6 +73,12 @@ class ForkComm(CommBase.CommBase):
         assert(not self.is_server)
         assert(not self.is_client)
 
+    def disconnect(self):
+        r"""Disconnect attributes that are aliases."""
+        for x in self.comm_list:
+            x.disconnect()
+        super(ForkComm, self).disconnect()
+        
     def printStatus(self, nindent=0):
         r"""Print status of the communicator."""
         super(ForkComm, self).printStatus(nindent=nindent)

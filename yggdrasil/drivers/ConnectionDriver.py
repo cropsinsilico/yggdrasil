@@ -29,7 +29,7 @@ def run_remotely(method):
         if self.can_run_remotely:
             try:
                 return self.run_task(method_name, *args, **kwargs)
-            except (TaskThreadError, BufferComm.BufferClosed):
+            except (TaskThreadError, BufferComm.BufferClosed):  # pragma: debug
                 pass
         return method(self, *args, **kwargs)
     return modified_method
@@ -118,8 +118,8 @@ class ConnectionDriver(Driver):
         'onexit': {'type': 'string'}}
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     _disconnect_attr = Driver._disconnect_attr + [
-        '_comm_opened', '_comm_closed', '_skip_after_loop', 'shared',
-        'tasks', 'tasks_return', 'task_thread', 'task_break_flag']
+        '_comm_closed', '_skip_after_loop', 'shared',
+        'tasks', 'tasks_return', 'task_thread']
 
     @property
     def _is_input(self):
@@ -135,9 +135,10 @@ class ConnectionDriver(Driver):
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Shared attributes (set once or synced using events)
         self.single_use = single_use
-        self.create_flag_attr('_comm_opened')
-        self.create_flag_attr('_comm_closed')
-        self.create_flag_attr('_skip_after_loop')
+        # self.create_flag_attr('_comm_closed')
+        # self.create_flag_attr('_skip_after_loop')
+        self._comm_closed = multitasking.Event()
+        self._skip_after_loop = multitasking.Event()
         self.shared = self.context.Dict()
         self.shared.update(nrecv=0, nproc=0, nsent=0, nskip=0,
                            state='started', close_state='')
@@ -152,7 +153,7 @@ class ConnectionDriver(Driver):
             self.tasks_return = BufferComm.LockedBuffer()
             self.task_thread = multitasking.YggTaskLoop(
                 '%s.TaskThread' % self.name, target=self.complete_tasks)
-            self.create_flag_attr('task_break_flag')
+            self.shared['task_break_flag'] = False
         # Translator
         if translator is None:
             translator = []
@@ -255,6 +256,26 @@ class ConnectionDriver(Driver):
         self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
         self.debug('Final env:\n%s', self.pprint(self.env, 1))
 
+    def set_flag_attr(self, attr):
+        r"""Set a flag."""
+        if attr in self.shared:
+            self.shared[attr] = True
+            return
+        super(ConnectionDriver, self).set_flag_attr(attr)
+
+    def unset_flag_attr(self, attr):  # pragma: debug
+        r"""Unset a flag."""
+        if attr in self.shared:
+            self.shared[attr] = False
+            return
+        super(ConnectionDriver, self).unset_flag_attr(attr)
+
+    def check_flag_attr(self, attr):
+        r"""Determine if a flag is set."""
+        if attr in self.shared:
+            return self.shared[attr]
+        return super(ConnectionDriver, self).check_flag_attr(attr)
+
     def call_task(self, task, args, kwargs):
         r"""Call a task."""
         f_task = getattr(self, task)
@@ -268,11 +289,11 @@ class ConnectionDriver(Driver):
         r"""Run a task on the running process."""
         assert(self.as_process and (not self.in_process)
                and self.is_alive())
-        if self.check_flag_attr('task_break_flag'):
+        if self.check_flag_attr('task_break_flag'):  # pragma: debug
             raise TaskThreadError("Task thread will be stopped.")
         self.tasks.put_nowait((task, args, kwargs))
         out = self.tasks_return.get()
-        if out == 'TERMINATED':
+        if out == 'TERMINATED':  # pragma: debug
             raise TaskThreadError("Task thread was stopped.")
         return out
 
@@ -287,10 +308,10 @@ class ConnectionDriver(Driver):
                 self.debug("Task complete: %s = %s", args, out)
                 self.tasks_return.put(out)
                 self.debug("Task returned: %s", args)
-        except BufferComm.BufferClosed:
+        except BufferComm.BufferClosed:  # pragma: debug
             self.set_flag_attr('task_break_flag')
         if self.check_flag_attr('task_break_flag'):
-            self.debug("Task thread break")
+            self.info("Task thread break")
             self.task_thread.set_break_flag()
             self.close_task_queues()
         self.sleep()
@@ -410,7 +431,6 @@ class ConnectionDriver(Driver):
             except BaseException:
                 self.close_comm()
                 raise
-            self.set_flag_attr('_comm_opened')
         self.debug('Returning')
 
     @run_remotely
@@ -453,6 +473,8 @@ class ConnectionDriver(Driver):
         self.debug('Started connection process')
         if self.as_process:
             self.wait_flag_attr('loop_flag', timeout=60.0)
+        self.icomm.disconnect()
+        self.ocomm.disconnect()
 
     def graceful_stop(self, timeout=None, **kwargs):
         r"""Stop the driver, first waiting for the input comm to be empty.
@@ -475,9 +497,8 @@ class ConnectionDriver(Driver):
         self.debug('Returning')
 
     @run_remotely
-    def on_model_exit(self):
-        r"""Drain input and then close it."""
-        self.debug('')
+    def on_model_exit_remote(self):
+        r"""Drain input and then close it (on the remote process)."""
         if (self.onexit not in [None, 'on_model_exit', 'pass']):
             self.debug("Calling onexit = '%s'" % self.onexit)
             getattr(self, self.onexit)()
@@ -493,6 +514,11 @@ class ConnectionDriver(Driver):
             with self.lock:
                 self.icomm.close()
         self.set_break_flag()
+
+    def on_model_exit(self):
+        r"""Drain input and then close it."""
+        self.debug('')
+        self.on_model_exit_remote()
         self.wait()
         self.debug('Finished')
         super(ConnectionDriver, self).on_model_exit()

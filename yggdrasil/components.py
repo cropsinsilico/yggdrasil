@@ -670,9 +670,13 @@ class ComponentBase(object):
         self.extra_kwargs = kwargs
 
     def __getstate__(self):
-        return self.__dict__.copy()
+        out = self.__dict__.copy()
+        del out['_input_args'], out['_input_kwargs']
+        return out
 
     def __setstate__(self, state):
+        state['_input_args'] = []
+        state['_input_kwargs'] = {}
         self.__dict__.update(state)
 
     def __del__(self):
