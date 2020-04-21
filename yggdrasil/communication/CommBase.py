@@ -499,13 +499,13 @@ class CommBase(tools.YggClass):
             self.open()
 
     def __getstate__(self):
-        if self.is_open and (self._commtype != 'buffer'):
+        if self.is_open and (self._commtype != 'buffer'):  # pragma: debug
             raise RuntimeError("Cannot pickle an open comm.")
         return super(CommBase, self).__getstate__()
 
     def __setstate__(self, state):
         super(CommBase, self).__setstate__(state)
-        if self.is_interface:
+        if self.is_interface:  # pragma: debug
             atexit.register(self.atexit)
 
     def _init_before_open(self, **kwargs):
@@ -922,7 +922,7 @@ class CommBase(tools.YggClass):
         r"""Wait for messages to drain."""
         self.debug('')
         if self.direction == 'recv':
-            while self.is_open and (self.n_msg_recv_drain > 0):
+            while self.is_open and (self.n_msg_recv_drain > 0):  # pragma: debug
                 self.recv(timeout=0)
             self.wait_for_confirm(timeout=self._timeout_drain)
         else:
