@@ -2,10 +2,6 @@ from yggdrasil import multitasking
 from yggdrasil.communication import CommBase
 
 
-class BufferClosed(RuntimeError):
-    pass
-
-
 class LockedBuffer(multitasking.Queue):
     r"""Buffer intended to be shared between threads/processes."""
 

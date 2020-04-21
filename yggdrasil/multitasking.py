@@ -448,7 +448,7 @@ class DummyEvent(DummyContextObject):  # pragma: no cover
     def wait(self, *args, **kwargs):
         if self._value:
             return
-        raise RuntimeError("DummyEvent will never change to True.")
+        raise AliasDisconnectError("DummyEvent will never change to True.")
 
 
 class Event(ContextObject):
@@ -570,16 +570,16 @@ class DummyQueue(DummyContextObject):  # pragma: no cover
         return False
 
     def get(self, *args, **kwargs):
-        raise RuntimeError("There are no messages in a DummyQueue.")
+        raise AliasDisconnectError("There are no messages in a DummyQueue.")
 
     def get_nowait(self, *args, **kwargs):
-        raise RuntimeError("There are no messages in a DummyQueue.")
+        raise AliasDisconnectError("There are no messages in a DummyQueue.")
 
     def put(self, *args, **kwargs):
-        raise RuntimeError("Cannot put messages in a DummyQueue.")
+        raise AliasDisconnectError("Cannot put messages in a DummyQueue.")
 
     def put_nowait(self, *args, **kwargs):
-        raise RuntimeError("Cannot put messages in a DummyQueue.")
+        raise AliasDisconnectError("Cannot put messages in a DummyQueue.")
 
     def qsize(self):
         return 0
@@ -597,8 +597,7 @@ class DummyQueue(DummyContextObject):  # pragma: no cover
 class Queue(ContextObject):
     r"""Multiprocessing/threading queue."""
 
-    _base_meth = ['empty', 'full', 'get', 'get_nowait', 'join_thread',
-                  'put', 'put_nowait', 'qsize']
+    _base_meth = ['full', 'get', 'get_nowait', 'join_thread', 'qsize']
     
     @classmethod
     def get_base_class(cls, context):
@@ -627,7 +626,10 @@ class Queue(ContextObject):
     def join(self, *args, **kwargs):
         self.check_for_base('join')
         if self.parallel:
-            self._base.close()
+            try:
+                self._base.close()
+            except OSError:  # pragma: debug
+                pass
             return self._base.join_thread(*args, **kwargs)
         else:
             return self._base.join(*args, **kwargs)
@@ -639,6 +641,29 @@ class Queue(ContextObject):
             self.join()
         if Queue is not None:
             super(Queue, self).disconnect()
+
+    def empty(self):
+        try:
+            return self._base.empty()
+        except OSError:  # pragma: debug
+            self.disconnect()
+            return True
+
+    def put(self, *args, **kwargs):
+        try:
+            self._base.put(*args, **kwargs)
+        except AttributeError:  # pragma: debug
+            # Multiprocessing queue asserts it is not closed
+            self.disconnect()
+            raise AliasDisconnectError("Queue was closed.")
+
+    def put_nowait(self, *args, **kwargs):
+        try:
+            self._base.put_nowait(*args, **kwargs)
+        except AttributeError:  # pragma: debug
+            # Multiprocessing queue asserts it is not closed
+            self.disconnect()
+            raise AliasDisconnectError("Queue was closed.")
 
 
 class Dict(ContextObject):
