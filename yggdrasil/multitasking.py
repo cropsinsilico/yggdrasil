@@ -433,7 +433,7 @@ class RLock(ContextObject):
 
 class DummyEvent(DummyContextObject):  # pragma: no cover
 
-    def __init__(self, value):
+    def __init__(self, value=False):
         self._value = value
 
     def is_set(self):
@@ -873,21 +873,25 @@ class YggTask(YggClass):
         r"""Create a flag."""
         setattr(self, attr, self.context.Event())
 
+    def get_flag_attr(self, attr):
+        r"""Return the flag attribute."""
+        return getattr(self, attr)
+
     def set_flag_attr(self, attr):
         r"""Set a flag."""
-        getattr(self, attr).set()
+        self.get_flag_attr(attr).set()
 
     def unset_flag_attr(self, attr):
         r"""Unset a flag."""
-        getattr(self, attr).unset()
+        self.get_flag_attr(attr).unset()
 
     def check_flag_attr(self, attr):
         r"""Determine if a flag is set."""
-        return getattr(self, attr).is_set()
+        return self.get_flag_attr(attr).is_set()
 
     def wait_flag_attr(self, attr, timeout=None):
         r"""Wait until a flag is True."""
-        return getattr(self, attr).wait(timeout=timeout)
+        return self.get_flag_attr(attr).wait(timeout=timeout)
 
     def start(self, *args, **kwargs):
         r"""Start thread/process and print info."""

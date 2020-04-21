@@ -3,6 +3,7 @@ import os
 import copy
 import numpy as np
 import functools
+import queue
 from yggdrasil import multitasking
 from yggdrasil.communication import new_comm
 from yggdrasil.drivers.Driver import Driver
@@ -82,7 +83,10 @@ class RemoteTaskLoop(multitasking.YggTaskLoop):
         if self.break_flag.is_set():  # pragma: debug
             raise TaskThreadError("Task thread was stopped.")
         self.q_tasks.put_nowait((task, args, kwargs))
-        out = self.q_results.get(timeout=180.0)
+        try:
+            out = self.q_results.get(timeout=180.0)
+        except queue.Empty:  # pragma: debug
+            raise TaskThreadError("Task thread was stopped.")
         if out == 'TERMINATED':  # pragma: debug
             raise TaskThreadError("Task thread was stopped.")
         return out
@@ -214,13 +218,11 @@ class ConnectionDriver(Driver):
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Shared attributes (set once or synced using events)
         self.single_use = single_use
-        # self.create_flag_attr('_comm_closed')
-        # self.create_flag_attr('_skip_after_loop')
-        self._comm_closed = multitasking.Event()
-        self._skip_after_loop = multitasking.Event()
         self.shared = self.context.Dict()
         self.shared.update(nrecv=0, nproc=0, nsent=0, nskip=0,
-                           state='started', close_state='')
+                           state='started', close_state='',
+                           _comm_closed=multitasking.DummyEvent(),
+                           _skip_after_loop=multitasking.DummyEvent())
         # Attributes used by process
         self._eof_sent = False
         self._first_send_done = False
@@ -331,6 +333,30 @@ class ConnectionDriver(Driver):
         # Apply keywords dependent on comms
         self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
         self.debug('Final env:\n%s', self.pprint(self.env, 1))
+
+    def get_flag_attr(self, attr):
+        r"""Return the flag attribute."""
+        if attr in self.shared:
+            return self.shared[attr]
+        return super(ConnectionDriver, self).get_flag_attr(attr)
+
+    def set_flag_attr(self, attr):
+        r"""Set a flag."""
+        if attr in self.shared:
+            exist = self.shared[attr]
+            exist.set()
+            self.shared[attr] = exist
+            return
+        super(ConnectionDriver, self).set_flag_attr(attr)
+
+    def unset_flag_attr(self, attr):  # pragma: debug
+        r"""Unset a flag."""
+        if attr in self.shared:
+            exist = self.shared[attr]
+            exist.unset()
+            self.shared[attr] = exist
+            return
+        super(ConnectionDriver, self).unset_flag_attr(attr)
 
     @property
     def nrecv(self):
