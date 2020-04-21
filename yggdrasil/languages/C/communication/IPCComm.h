@@ -395,7 +395,7 @@ static inline
 int free_ipc_comm(comm_t *x) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  x;
+  UNUSED(x);
 #endif
   ipc_install_error();
   return 1;
@@ -410,7 +410,7 @@ static inline
 int new_ipc_address(comm_t *comm) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  comm;
+  UNUSED(comm);
 #endif
   ipc_install_error();
   return -1;
@@ -425,7 +425,7 @@ static inline
 int init_ipc_comm(comm_t *comm) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  comm;
+  UNUSED(comm);
 #endif
   ipc_install_error();
   return -1;
@@ -440,7 +440,7 @@ static inline
 int ipc_comm_nmsg(const comm_t *x) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  x;
+  UNUSED(x);
 #endif
   ipc_install_error();
   return -1;
@@ -459,9 +459,9 @@ static inline
 int ipc_comm_send(const comm_t *x, const char *data, const size_t len) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  x;
-  data;
-  len;
+  UNUSED(x);
+  UNUSED(data);
+  UNUSED(len);
 #endif
   ipc_install_error();
   return -1;
@@ -484,10 +484,10 @@ int ipc_comm_recv(const comm_t *x, char **data, const size_t len,
 		  const int allow_realloc) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  x;
-  data;
-  len;
-  allow_realloc;
+  UNUSED(x);
+  UNUSED(data);
+  UNUSED(len);
+  UNUSED(allow_realloc);
 #endif
   ipc_install_error();
   return -1;
