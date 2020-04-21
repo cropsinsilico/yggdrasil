@@ -473,8 +473,8 @@ class ConnectionDriver(Driver):
         self.debug('Started connection process')
         if self.as_process:
             self.wait_flag_attr('loop_flag', timeout=60.0)
-        self.icomm.disconnect()
-        self.ocomm.disconnect()
+            self.icomm.disconnect()
+            self.ocomm.disconnect()
 
     def graceful_stop(self, timeout=None, **kwargs):
         r"""Stop the driver, first waiting for the input comm to be empty.
