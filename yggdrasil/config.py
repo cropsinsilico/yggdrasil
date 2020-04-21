@@ -34,6 +34,8 @@ class YggConfigParser(configparser.ConfigParser, object):
 
     def reload(self):
         r"""Reload parameters from the original files."""
+        for s in self.sections():
+            self.remove_section(s)
         self._sections = self._dict()
         if self.files is not None:
             self.read(self.files)
@@ -219,7 +221,7 @@ def update_language_config(languages=None, skip_warnings=False,
         logger.info("Updating user configuration file for yggdrasil at:\n\t%s"
                     % usr_config_file)
     miss = []
-    if languages is None:
+    if (languages is None) or overwrite:
         all_languages = tools.get_supported_lang()
         languages = ['c', 'c++', 'make', 'cmake', 'python', 'lpy', 'r', 'matlab']
         for l in all_languages:
@@ -227,9 +229,6 @@ def update_language_config(languages=None, skip_warnings=False,
                 languages.append(l)
     elif not isinstance(languages, list):
         languages = [languages]
-    drivers = OrderedDict([(l, import_component('model', l))
-                           for l in languages])
-    drv = list(get_language_order(drivers).values())
     if disable_languages is None:
         disable_languages = []
     if enable_languages is None:
@@ -239,6 +238,9 @@ def update_language_config(languages=None, skip_warnings=False,
     if overwrite:
         shutil.copy(def_config_file, usr_config_file)
         ygg_cfg_usr.reload()
+    drivers = OrderedDict([(l, import_component('model', l))
+                           for l in languages])
+    drv = list(get_language_order(drivers).values())
     for idrv in drv:
         if (((idrv.language in disable_languages)
              and (idrv.language in enable_languages))):
