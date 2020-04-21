@@ -85,6 +85,10 @@ class TestSerializeBase(YggTestClassInfo):
             iout, ihead = self.instance.deserialize(msg)
             self.assert_result_equal(iout, iobj)
             # self.assert_equal(ihead, self.empty_head(msg))
+        if ((('contents' in self.testing_options)
+             and (self._cls not in ['SerializeBase', 'DefaultSerialize']))):
+            print(self.testing_options['contents'])
+            self.instance.deserialize(self.testing_options['contents'])
 
     def test_serialize_no_metadata(self):
         r"""Test serializing without metadata."""

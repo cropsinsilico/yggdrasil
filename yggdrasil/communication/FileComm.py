@@ -88,6 +88,8 @@ class FileComm(CommBase.CommBase):
     _default_extension = '.txt'
     is_file = True
     _maxMsgSize = 0
+    _mode_as_bytes = True
+    _synchronous_read = False
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)
@@ -116,12 +118,18 @@ class FileComm(CommBase.CommBase):
         if self.append:
             if self.direction == 'recv':
                 self.close_on_eof_recv = False
-            elif (not self.serializer.concats_as_str):
+            elif (not self.concats_as_str):
                 self.append = 'ow'
         # Assert that keyword args match serialization parameters
-        if not self.serializer.concats_as_str:
+        if not self.concats_as_str:
             assert(self.read_meth == 'read')
             assert(not self.serializer.is_framed)
+
+    @property
+    def concats_as_str(self):
+        r"""bool: True if concatenating file contents result in a
+        valid file."""
+        return self.serializer.concats_as_str
             
     @staticmethod
     def before_registration(cls):
@@ -219,7 +227,7 @@ class FileComm(CommBase.CommBase):
     @classmethod
     def new_comm_kwargs(cls, *args, **kwargs):
         r"""Initialize communication with new queue."""
-        kwargs.setdefault('address', 'file.txt')
+        kwargs.setdefault('address', 'file%s' % cls._default_extension)
         return args, kwargs
 
     @property
@@ -228,12 +236,16 @@ class FileComm(CommBase.CommBase):
         if self.direction == 'recv':
             io_mode = 'r'
         elif self.append == 'ow':
-            io_mode = 'r+'
+            if self._synchronous_read:
+                io_mode = 'a'
+            else:
+                io_mode = 'r+'
         elif self.append:
             io_mode = 'a'
         else:
             io_mode = 'w'
-        io_mode += 'b'
+        if self._mode_as_bytes:
+            io_mode += 'b'
         return io_mode
 
     def opp_comm_kwargs(self):
@@ -290,9 +302,39 @@ class FileComm(CommBase.CommBase):
         self.header_was_written = True
 
     # Methods related to position in the file/series
+    @property
+    def file_size(self):
+        r"""int: Current size of file."""
+        prev_pos = self.file_tell()
+        self.file_seek(0, os.SEEK_END)
+        out = self.file_tell() - prev_pos
+        self.file_seek(prev_pos)
+        return out
+
+    def file_tell(self):
+        r"""int: Current position in the file."""
+        return self.fd.tell()
+
+    def file_seek(self, pos, whence=os.SEEK_SET):
+        r"""Move in the file to the specified position.
+
+        Args:
+            pos (int): Position (in bytes) to move file to.
+            whence (int, optional): Flag indicating position that pos
+                is relative to. 0 for the beginning of the file, 1 for
+                from the current location, and 2 from the end of the
+                file.
+
+        """
+        self.fd.seek(pos, whence)
+
+    def file_flush(self):
+        r"""Flush the file."""
+        self.fd.flush()
+
     def record_position(self):
         r"""Record the current position in the file/series."""
-        _rec_pos = self.fd.tell()
+        _rec_pos = self.file_tell()
         _rec_ind = self._series_index
         return _rec_pos, _rec_ind, self.header_was_read, self.header_was_written
 
@@ -348,7 +390,7 @@ class FileComm(CommBase.CommBase):
         """
         if self.is_open:
             try:
-                self.fd.seek(file_pos)
+                self.file_seek(file_pos)
             except (AttributeError, ValueError):  # pragma: debug
                 if self.is_open:
                     raise
@@ -407,6 +449,9 @@ class FileComm(CommBase.CommBase):
         return address
 
     # Methods related to opening/closing the file
+    def _file_open(self, address, mode):
+        return open(address, mode)
+    
     def _open(self):
         address = self.current_address
         if self.fd is None:
@@ -415,14 +460,14 @@ class FileComm(CommBase.CommBase):
                 while (not T.is_out) and (not os.path.isfile(address)):
                     self.sleep()
                 self.stop_timeout()
-            self._fd = open(address, self.open_mode)
+            self._fd = self._file_open(address, self.open_mode)
         T = self.start_timeout()
         while (not T.is_out) and (not self.is_open):  # pragma: debug
             self.sleep()
         self.stop_timeout()
         if self.append == 'ow':
             try:
-                self.fd.seek(0, os.SEEK_END)
+                self.file_seek(0, os.SEEK_END)
             except (AttributeError, ValueError):  # pragma: debug
                 if self.is_open:
                     raise
@@ -430,7 +475,7 @@ class FileComm(CommBase.CommBase):
     def _file_close(self):
         if self.is_open:
             try:
-                self.fd.flush()
+                self.file_flush()
                 os.fsync(self.fd.fileno())
             except OSError:  # pragma: debug
                 pass
@@ -486,18 +531,18 @@ class FileComm(CommBase.CommBase):
     @property
     def remaining_bytes(self):
         r"""int: Remaining bytes in the file."""
+        out = 0
         if self.is_closed or self.direction == 'send':
-            return 0
+            return out
         pos = self.record_position()
         try:
-            curpos = self.fd.tell()
-            self.fd.seek(0, os.SEEK_END)
-            endpos = self.fd.tell()
+            curpos = self.file_tell()
+            self.file_seek(0, os.SEEK_END)
+            endpos = self.file_tell()
             out = endpos - curpos
         except (ValueError, AttributeError, OSError):  # pragma: debug
             if self.is_open:
                 raise
-            out = 0
         if self.is_series:
             i = self._series_index + 1
             while True:
@@ -541,7 +586,7 @@ class FileComm(CommBase.CommBase):
         """
         flag, msg_s = super(FileComm, self).on_send_eof()
         try:
-            self.fd.flush()
+            self.file_flush()
         except (AttributeError, ValueError):  # pragma: debug
             if self.is_open:
                 raise
@@ -550,7 +595,7 @@ class FileComm(CommBase.CommBase):
 
     def serialize(self, obj, **kwargs):
         r"""Serialize a message using the associated serializer."""
-        if (not self.serializer.concats_as_str) and (self.fd.tell() != 0):
+        if (not self.concats_as_str) and (self.file_tell() != 0):
             new_obj = obj
             with open(self.current_address, 'rb') as fd:
                 old_obj = self.deserialize(fd.read())[0]
@@ -560,6 +605,11 @@ class FileComm(CommBase.CommBase):
             # Reset file so that header will be written
             self.reset_position(truncate=True)
         return super(FileComm, self).serialize(obj, **kwargs)
+
+    def _file_send(self, msg):
+        self.fd.write(msg)
+        if self.append == 'ow':
+            self.fd.truncate()
             
     def _send(self, msg):
         r"""Write message to a file.
@@ -577,10 +627,8 @@ class FileComm(CommBase.CommBase):
         # Write message
         try:
             if not self.is_eof(msg):
-                self.fd.write(msg)
-                if self.append == 'ow':
-                    self.fd.truncate()
-            self.fd.flush()
+                self._file_send(msg)
+            self.file_flush()
         except (AttributeError, ValueError):  # pragma: debug
             if self.is_open:
                 raise
@@ -589,6 +637,15 @@ class FileComm(CommBase.CommBase):
             self.advance_in_series()
             self.debug("Advanced to %d", self._series_index)
         return True
+
+    def _file_recv(self):
+        if self.read_meth == 'read':
+            out = self.fd.read()
+        elif self.read_meth == 'readline':
+            out = self.fd.readline()
+        else:  # pragma: debug
+            raise NotImplementedError("Invalid read_meth: '%s'" % self.read_meth)
+        return out
 
     def _recv(self, timeout=0):
         r"""Reads message from a file.
@@ -603,13 +660,11 @@ class FileComm(CommBase.CommBase):
 
         """
         flag = True
+        prev_pos = 0
         try:
             self.read_header()
-            prev_pos = self.fd.tell()
-            if self.read_meth == 'read':
-                out = self.fd.read()
-            elif self.read_meth == 'readline':
-                out = self.fd.readline()
+            prev_pos = self.file_tell()
+            out = self._file_recv()
         except BaseException:  # pragma: debug
             # Use this to catch case where close called during receive.
             # In the future this should be handled via a lock.
@@ -619,19 +674,20 @@ class FileComm(CommBase.CommBase):
                 self.debug("Advanced to %d", self._series_index)
                 flag, out = self._recv()
             elif self.append and self.is_open:
-                self.fd.seek(prev_pos)
+                self.file_seek(prev_pos)
                 out = self.empty_bytes_msg
             else:
                 out = self.eof_msg
         else:
-            out = out.replace(self.platform_newline, self.serializer.newline)
+            if isinstance(out, bytes):
+                out = out.replace(self.platform_newline, self.serializer.newline)
             if flag and (not self.is_eof(out)):
                 if (((self.read_meth == 'readline')
                      and out.startswith(self.serializer.comment))):
                     # Exclude comments
                     flag, out = self._recv()
                 elif (((self.read_meth == 'read') and (prev_pos > 0)
-                       and (not self.serializer.concats_as_str))):
+                       and (not self.concats_as_str))):
                     # Rewind file and read entire contents if data was added to
                     # the file type using a serialization method that dosn't
                     # concatenate
@@ -643,14 +699,14 @@ class FileComm(CommBase.CommBase):
                     out = self.serializer.get_first_frame(out)
                     len1 = len(out)
                     if (len1 > 0) and (len0 != len1):
-                        self.fd.seek(prev_pos + len1)
+                        self.file_seek(prev_pos + len1)
         return (flag, out)
 
     def purge(self):
         r"""Purge all messages from the comm."""
         if self.is_open and self.direction == 'recv':
             try:
-                self.fd.seek(0, os.SEEK_END)
+                self.file_seek(0, os.SEEK_END)
             except (AttributeError, ValueError):  # pragma: debug
                 if self.is_open:
                     raise

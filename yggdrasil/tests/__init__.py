@@ -1048,6 +1048,41 @@ def ErrorClass(base_class, *args, **kwargs):
     return ErrorClass(*args, **kwargs)
 
 
+def generate_component_tests(comptype, base_class, target_globals,
+                             directory, class_attr='_cls'):
+    r"""Function that generates tests for all component subtypes
+    based on the registered classes.
+
+    Args:
+        comptype (str): Component type.
+        base_class (class): Base python test class.
+        target_globals (dict): Globals dictionary that class should be
+            added to.
+        directory (str): Directory to check for tests or file in directory
+            that should be checked for tests.
+        class_attr (str, optional): Attribute that should be set to the
+            name of the class being tested.
+
+    """
+    from yggdrasil.schema import get_schema
+    _schema = get_schema()
+    if os.path.isfile(directory):
+        directory = os.path.dirname(directory)
+    if comptype not in _schema.keys():  # pragma: debug
+        raise NotImplementedError("%s is not a component type." % comptype)
+    for subtype in _schema[comptype].subtypes:
+        subtype_cls = _schema[comptype].subtype2class[subtype]
+        new_cls_name = 'Test%s' % subtype_cls
+        new_cls_file = os.path.join(directory,
+                                    'test_%s' % subtype_cls) + '.py'
+        if os.path.isfile(new_cls_file):
+            continue
+        cls_attr = {class_attr: subtype_cls}
+        new_cls = type(new_cls_name, (base_class, ), cls_attr)
+        target_globals[new_cls.__name__] = new_cls
+        del new_cls
+
+
 __all__ = ['data', 'scripts', 'yamls', 'IOInfo', 'ErrorClass',
            'YggTestBase', 'YggTestClass',
            'YggTestBaseInfo', 'YggTestClassInfo']
