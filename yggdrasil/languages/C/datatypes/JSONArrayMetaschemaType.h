@@ -370,6 +370,19 @@ public:
     }
   }
   /*!
+    @brief Get the type associated with an item.
+    @param[in] index const size_t Index of item to get type for.
+    @returns MetaschemaType* Pointer to type class for item.
+   */
+  const MetaschemaType* get_item_type(const size_t index) const override {
+    MetaschemaType* out = NULL;
+    if (index >= items_.size()) {
+      ygglog_throw_error("JSONArrayMetaschemaType::get_item_type: There are %lu items, but item %lu was requested.", items_.size(), index);
+    }
+    out = items_[index];
+    return out;
+  }
+  /*!
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.

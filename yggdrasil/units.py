@@ -16,6 +16,14 @@ def get_ureg():
                        tex_repr=r"\rm{ac}", offset=0.0, prefixable=False)
         _ureg_unyt.add("a", 100.0, dimensions=unyt.dimensions.area,
                        tex_repr=r"\rm{a}", offset=0.0, prefixable=True)
+        _ureg_unyt.add("j", 1.0, dimensions=unyt.dimensions.energy,
+                       tex_repr=r"\rm{J}", offset=0.0, prefixable=True)
+        # _ureg_unyt.add("cel", 1.0, dimensions=unyt.dimensions.temperature,
+        #                tex_repr=r"^\circ\rm{C}", offset=-273.15, prefixable=True)
+        # _ureg_unyt.add("j", 1.0, dimensions=unyt.dimensions.specific_flux,
+        #                tex_repr=r"\rm{Jy}", prefixable=True)
+        # _ureg_unyt.add("CH2O", 1.0, dimensions=unyt.dimensions.dimensionless,
+        #                tex_repr=r"\rm{CH2O}", offset=0.0, prefixable=False)
         unyt._unit_lookup_table.inv_name_alternatives["acre"] = "ac"
         unyt._unit_lookup_table.inv_name_alternatives["are"] = "a"
         unyt._unit_lookup_table.inv_name_alternatives["hectare"] = "ha"
@@ -34,10 +42,13 @@ def convert_R_unit_string(r_str):
 
     """
     out = []
+    replacements = {'h': 'hr'}
     regex_mu = tools.bytes2str(b'\xc2\xb5')
     regex = r'(?P<name>[A-Za-z%s]+)(?P<exp>-?[0-9]*)(?: |$)' % regex_mu
     for x in re.finditer(regex, r_str):
         xdict = x.groupdict()
+        if xdict['name'] in replacements:
+            xdict['name'] = replacements[xdict['name']]
         if xdict['exp']:
             out.append('({name}**{exp})'.format(**xdict))
         else:

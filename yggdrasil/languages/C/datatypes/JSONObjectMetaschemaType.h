@@ -348,6 +348,20 @@ public:
     }
   }
   /*!
+    @brief Get the type associated with a property.
+    @param[in] key const char* Property key to get type for.
+    @returns MetaschemaType* Pointer to type class for property.
+   */
+  const MetaschemaType* get_property_type(const char* key) const override {
+    MetaschemaType* out = NULL;
+    MetaschemaTypeMap::const_iterator it = properties_.find(key);
+    if (it == properties_.end()) {
+      ygglog_throw_error("JSONObjectMetaschemaType::get_property_type: Could not locate property for key '%s'", key);
+    }
+    out = it->second;
+    return out;
+  }
+  /*!
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.

@@ -589,6 +589,878 @@ extern "C" {
     return out;
   }
 
+  // Generic array methods
+  size_t generic_array_get_size(generic_t x) {
+    size_t out = 0;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_array_get_size: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_array_get_size: Object is NULL.");
+      }
+      out = x_obj->get_data_array_size();
+    } catch (...) {
+      ygglog_error("generic_array_get_size: C++ exception thrown.");
+    }
+    return out;
+  }
+
+  void* generic_array_get_item(generic_t x, const size_t index,
+			       const char *type) {
+    void* out = NULL;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_array_get_item: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_array_get_item: Object is NULL.");
+      }
+      bool use_generic = x_obj->get_type()->use_generic();
+      std::map<const char*, int, strcomp> type_map = get_type_map();
+      std::map<const char*, int, strcomp>::iterator it = type_map.find(type);
+      MetaschemaType* item_type = NULL;
+      bool return_generic = false;
+      if (it != type_map.end()) {
+	switch (it->second) {
+	case T_BOOLEAN:
+	case T_INTEGER:
+	case T_NULL:
+	case T_NUMBER:
+	case T_STRING: {
+	  item_type = new MetaschemaType(type, use_generic);
+	  break;
+	}
+	case T_ARRAY: {
+	  return_generic = true;
+	  use_generic = true;
+	  MetaschemaTypeVector new_items = MetaschemaTypeVector();
+	  char new_format_str[100] = "";
+	  const MetaschemaType* item_type0 = x_obj->get_type()->get_item_type(index);
+	  if (item_type0->type_code() == T_ARRAY) {
+	    const JSONArrayMetaschemaType* item_type0_cast = static_cast<const JSONArrayMetaschemaType*>(item_type0);
+	    new_items = item_type0_cast->items();
+	    strcpy(new_format_str, item_type0_cast->format_str());
+	  }
+	  item_type = new JSONArrayMetaschemaType(new_items,
+						  new_format_str,
+						  use_generic);
+	  break;
+	}
+	case T_OBJECT: {
+	  return_generic = true;
+	  use_generic = true;
+	  MetaschemaTypeMap new_props = MetaschemaTypeMap();
+	  const MetaschemaType* item_type0 = x_obj->get_type()->get_item_type(index);
+	  if (item_type0->type_code() == T_OBJECT) {
+	    const JSONObjectMetaschemaType* item_type0_cast = static_cast<const JSONObjectMetaschemaType*>(item_type0);
+	    new_props = item_type0_cast->properties();
+	  }
+	  item_type = new JSONObjectMetaschemaType(new_props,
+						   use_generic);
+	  break;
+	}
+	case T_PLY: {
+	  item_type = new PlyMetaschemaType(use_generic);
+	  break;
+	}
+	case T_OBJ: {
+	  item_type = new ObjMetaschemaType(use_generic);
+	  break;
+	}
+	case T_CLASS:
+	case T_FUNCTION: {
+	  item_type = new PyObjMetaschemaType(type, use_generic);
+	  break;
+	}
+	case T_SCHEMA: {
+	  return_generic = true;
+	  item_type = new SchemaMetaschemaType(use_generic);
+	  break;
+	}
+	case T_ANY: {
+	  return_generic = true;
+	  item_type = new AnyMetaschemaType(use_generic);
+	  break;
+	}
+	}
+      }
+      if (item_type == NULL) {
+	ygglog_throw_error("generic_array_get_item: No handler for type '%s'.", type);
+      }
+      out = x_obj->get_data_array_item(index, item_type, return_generic);
+      delete item_type;
+    } catch (...) {
+      ygglog_error("generic_array_get_item: C++ exception thrown.");
+    }
+    return out;
+  }
+  bool generic_array_get_bool(generic_t x, const size_t index) {
+    return ((bool*)generic_array_get_item(x, index, "boolean"))[0];
+  }
+  int generic_array_get_integer(generic_t x, const size_t index) {
+    return ((int*)generic_array_get_item(x, index, "integer"))[0];
+  }
+  void* generic_array_get_null(generic_t x, const size_t index) {
+    return ((void**)generic_array_get_item(x, index, "null"))[0];
+  }
+  double generic_array_get_number(generic_t x, const size_t index) {
+    return ((double*)generic_array_get_item(x, index, "number"))[0];
+  }
+  char* generic_array_get_string(generic_t x, const size_t index) {
+    return ((char**)generic_array_get_item(x, index, "string"))[0];
+  }
+  generic_t generic_array_get_object(generic_t x, const size_t index) {
+    YggGeneric* result = (YggGeneric*)generic_array_get_item(x, index, "object");
+    generic_t out = init_generic();
+    out.obj = (void*)(result->copy());
+    return out;
+  }
+  generic_t generic_array_get_array(generic_t x, const size_t index) {
+    YggGeneric* result = (YggGeneric*)generic_array_get_item(x, index, "array");
+    generic_t out = init_generic();
+    out.obj = (void*)(result->copy());
+    return out;
+  }
+  ply_t generic_array_get_ply(generic_t x, const size_t index) {
+    ply_t* old = (ply_t*)generic_array_get_item(x, index, "ply");
+    ply_t out = copy_ply(*old);
+    return out;
+  }
+  obj_t generic_array_get_obj(generic_t x, const size_t index) {
+    obj_t* old = (obj_t*)generic_array_get_item(x, index, "obj");
+    obj_t out = copy_obj(*old);
+    return out;
+  }
+  python_t generic_array_get_python_class(generic_t x, const size_t index) {
+    python_t* old = (python_t*)generic_array_get_item(x, index, "class");
+    python_t out = copy_python(*old);
+    return out;
+  }
+  python_t generic_array_get_python_function(generic_t x, const size_t index) {
+    python_t* old = (python_t*)generic_array_get_item(x, index, "function");
+    python_t out = copy_python(*old);
+    return out;
+  }
+  schema_t generic_array_get_schema(generic_t x, const size_t index) {
+    YggGeneric* result = (YggGeneric*)generic_array_get_item(x, index, "schema");
+    schema_t out = init_generic();
+    out.obj = (void*)(result->copy());
+    return out;
+  }
+  generic_t generic_array_get_any(generic_t x, const size_t index) {
+    YggGeneric* result = (YggGeneric*)generic_array_get_item(x, index, "array");
+    generic_t out = init_generic();
+    out.obj = (void*)(result->copy());
+    return out;
+  }
+  
+  void* generic_array_get_scalar(generic_t x, const size_t index,
+				 const char *subtype,
+				 const size_t precision) {
+    void* out = NULL;
+    char new_units[100] = "";
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_array_get_scalar: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_array_get_scalar: Object is NULL.");
+      }
+      const MetaschemaType* item_type0 = x_obj->get_type()->get_item_type(index);
+      if (item_type0->type_code() == T_SCALAR) {
+	const ScalarMetaschemaType* item_type0_scl = static_cast<const ScalarMetaschemaType*>(item_type0);
+	strcpy(new_units, item_type0_scl->units());
+      }
+      ScalarMetaschemaType* item_type = new ScalarMetaschemaType(subtype, precision, new_units, x_obj->get_type()->use_generic());
+      out = x_obj->get_data_array_item(index, item_type);
+      delete item_type;
+    } catch (...) {
+      ygglog_error("generic_array_get_scalar: C++ exception thrown.");
+    }
+    return out;
+  }
+  int8_t generic_array_get_int8(generic_t x, const size_t index) {
+    return ((int8_t*)generic_array_get_scalar(x, index, "int", 8*sizeof(int8_t)))[0];
+  }
+  int16_t generic_array_get_int16(generic_t x, const size_t index) {
+    return ((int16_t*)generic_array_get_scalar(x, index, "int", 8*sizeof(int16_t)))[0];
+  }
+  int32_t generic_array_get_int32(generic_t x, const size_t index) {
+    return ((int32_t*)generic_array_get_scalar(x, index, "int", 8*sizeof(int32_t)))[0];
+  }
+  int64_t generic_array_get_int64(generic_t x, const size_t index) {
+    return ((int64_t*)generic_array_get_scalar(x, index, "int", 8*sizeof(int64_t)))[0];
+  }
+  uint8_t generic_array_get_uint8(generic_t x, const size_t index) {
+    return ((uint8_t*)generic_array_get_scalar(x, index, "uint", 8*sizeof(uint8_t)))[0];
+  }
+  uint16_t generic_array_get_uint16(generic_t x, const size_t index) {
+    return ((uint16_t*)generic_array_get_scalar(x, index, "uint", 8*sizeof(uint16_t)))[0];
+  }
+  uint32_t generic_array_get_uint32(generic_t x, const size_t index) {
+    return ((uint32_t*)generic_array_get_scalar(x, index, "uint", 8*sizeof(uint32_t)))[0];
+  }
+  uint64_t generic_array_get_uint64(generic_t x, const size_t index) {
+    return ((uint64_t*)generic_array_get_scalar(x, index, "uint", 8*sizeof(uint64_t)))[0];
+  }
+  float generic_array_get_float(generic_t x, const size_t index) {
+    return ((float*)generic_array_get_scalar(x, index, "float", 8*sizeof(float)))[0];
+  }
+  double generic_array_get_double(generic_t x, const size_t index) {
+    return ((double*)generic_array_get_scalar(x, index, "float", 8*sizeof(double)))[0];
+  }
+  long double generic_array_get_long_double(generic_t x, const size_t index) {
+    return ((long double*)generic_array_get_scalar(x, index, "float", 8*sizeof(long double)))[0];
+  }
+  complex_float_t generic_array_get_complex_float(generic_t x, const size_t index) {
+    return ((complex_float_t*)generic_array_get_scalar(x, index, "complex", 8*sizeof(complex_float_t)))[0];
+  }
+  complex_double_t generic_array_get_complex_double(generic_t x, const size_t index) {
+    return ((complex_double_t*)generic_array_get_scalar(x, index, "complex", 8*sizeof(complex_double_t)))[0];
+  }
+  complex_long_double_t generic_array_get_complex_long_double(generic_t x, const size_t index) {
+    return ((complex_long_double_t*)generic_array_get_scalar(x, index, "complex", 8*sizeof(complex_long_double_t)))[0];
+  }
+  char* generic_array_get_bytes(generic_t x, const size_t index) {
+    return ((char**)generic_array_get_scalar(x, index, "bytes", 0))[0];
+  }
+  char* generic_array_get_unicode(generic_t x, const size_t index) {
+    return ((char**)generic_array_get_scalar(x, index, "unicode", 0))[0];
+  }
+  
+  size_t generic_array_get_1darray(generic_t x, const size_t index,
+				   const char *subtype, const size_t precision,
+				   void** data) {
+    size_t out = 0;
+    char new_units[100] = "";
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_array_get_1darray: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_array_get_1darray: Object is NULL.");
+      }
+      size_t new_length = 0;
+      const MetaschemaType* item_type0 = x_obj->get_type()->get_item_type(index);
+      if (item_type0->type_code() == T_1DARRAY) {
+	const OneDArrayMetaschemaType* item_type0_arr = static_cast<const OneDArrayMetaschemaType*>(item_type0);
+	strcpy(new_units, item_type0_arr->units());
+	new_length = item_type0_arr->length();
+      }
+      OneDArrayMetaschemaType* item_type = new OneDArrayMetaschemaType(subtype, precision, new_length, new_units, x_obj->get_type()->use_generic());
+      size_t nbytes = item_type->nbytes();
+      void* new_data = x_obj->get_data_array_item(index, item_type);
+      data[0] = (void*)realloc(data[0], nbytes);
+      if (data[0] == NULL) {
+	ygglog_throw_error("generic_array_get_1darray: Failed to reallocate array.");
+      }
+      memcpy(data[0], new_data, nbytes);
+      out = new_length;
+      delete item_type;
+    } catch (...) {
+      ygglog_error("generic_array_get_1darray: C++ exception thrown.");
+    }
+    return out;
+  }
+  size_t generic_array_get_1darray_int8(generic_t x, const size_t index, int8_t** data) {
+    return generic_array_get_1darray(x, index, "int", 8*sizeof(int8_t), (void**)data);
+  }
+  size_t generic_array_get_1darray_int16(generic_t x, const size_t index, int16_t** data) {
+    return generic_array_get_1darray(x, index, "int", 8*sizeof(int16_t), (void**)data);
+  }
+  size_t generic_array_get_1darray_int32(generic_t x, const size_t index, int32_t** data) {
+    return generic_array_get_1darray(x, index, "int", 8*sizeof(int32_t), (void**)data);
+  }
+  size_t generic_array_get_1darray_int64(generic_t x, const size_t index, int64_t** data) {
+    return generic_array_get_1darray(x, index, "int", 8*sizeof(int64_t), (void**)data);
+  }
+  size_t generic_array_get_1darray_uint8(generic_t x, const size_t index, uint8_t** data) {
+    return generic_array_get_1darray(x, index, "uint", 8*sizeof(uint8_t), (void**)data);
+  }
+  size_t generic_array_get_1darray_uint16(generic_t x, const size_t index, uint16_t** data) {
+    return generic_array_get_1darray(x, index, "uint", 8*sizeof(uint16_t), (void**)data);
+  }
+  size_t generic_array_get_1darray_uint32(generic_t x, const size_t index, uint32_t** data) {
+    return generic_array_get_1darray(x, index, "uint", 8*sizeof(uint32_t), (void**)data);
+  }
+  size_t generic_array_get_1darray_uint64(generic_t x, const size_t index, uint64_t** data) {
+    return generic_array_get_1darray(x, index, "uint", 8*sizeof(uint64_t), (void**)data);
+  }
+  size_t generic_array_get_1darray_float(generic_t x, const size_t index,
+					 float** data) {
+    return generic_array_get_1darray(x, index, "float", 8*sizeof(float), (void**)data);
+  }
+  size_t generic_array_get_1darray_double(generic_t x, const size_t index,
+					  double** data) {
+    return generic_array_get_1darray(x, index, "float", 8*sizeof(double), (void**)data);
+  }
+  size_t generic_array_get_1darray_long_double(generic_t x, const size_t index,
+					       long double** data) {
+    return generic_array_get_1darray(x, index, "float", 8*sizeof(long double), (void**)data);
+  }
+  size_t generic_array_get_1darray_complex_float(generic_t x, const size_t index, complex_float_t** data) {
+    return generic_array_get_1darray(x, index, "complex", 8*sizeof(complex_float_t), (void**)data);
+  }
+  size_t generic_array_get_1darray_complex_double(generic_t x, const size_t index, complex_double_t** data) {
+    return generic_array_get_1darray(x, index, "complex", 8*sizeof(complex_double_t), (void**)data);
+  }
+  size_t generic_array_get_1darray_complex_long_double(generic_t x, const size_t index, complex_long_double_t** data) {
+    return generic_array_get_1darray(x, index, "complex", 8*sizeof(complex_long_double_t), (void**)data);
+  }
+  size_t generic_array_get_1darray_bytes(generic_t x, const size_t index,  char** data) {
+    return generic_array_get_1darray(x, index, "bytes", 0, (void**)data);
+  }
+  size_t generic_array_get_1darray_unicode(generic_t x, const size_t index,  char** data) {
+    return generic_array_get_1darray(x, index, "unicode", 0, (void**)data);
+  }
+
+  size_t generic_array_get_ndarray(generic_t x, const size_t index,
+				 const char *subtype, const size_t precision,
+				 void** data, size_t** shape) {
+    size_t out = 0;
+    size_t i;
+    char new_units[100] = "";
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_array_get_ndarray: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_array_get_ndarray: Object is NULL.");
+      }
+      std::vector<size_t> new_shape;
+      const MetaschemaType* item_type0 = x_obj->get_type()->get_item_type(index);
+      if (item_type0->type_code() == T_NDARRAY) {
+	const NDArrayMetaschemaType* item_type0_arr = static_cast<const NDArrayMetaschemaType*>(item_type0);
+	strcpy(new_units, item_type0_arr->units());
+	new_shape = item_type0_arr->shape();
+      }
+      NDArrayMetaschemaType* item_type = new NDArrayMetaschemaType(subtype, precision, new_shape, new_units, x_obj->get_type()->use_generic());
+      size_t nbytes = item_type->nbytes();
+      void* new_data = x_obj->get_data_array_item(index, item_type);
+      data[0] = (void*)realloc(data[0], nbytes);
+      if (data[0] == NULL) {
+	ygglog_throw_error("generic_array_get_ndarray: Failed to reallocate array.");
+      }
+      memcpy(data[0], new_data, nbytes);
+      shape[0] = (size_t*)realloc(shape[0], new_shape.size());
+      if (shape[0] == NULL) {
+	ygglog_throw_error("generic_array_get_ndarray: Failed to realloc shape.");
+      }
+      for (i = 0; i < new_shape.size(); i++) {
+	shape[0][i] = new_shape[i];
+      }
+      out = new_shape.size();
+      delete item_type;
+    } catch (...) {
+      ygglog_error("generic_array_get_ndarray: C++ exception thrown.");
+    }
+    return out;
+  }
+  size_t generic_array_get_ndarray_int8(generic_t x, const size_t index, int8_t** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "int", 8*sizeof(int8_t), (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_int16(generic_t x, const size_t index, int16_t** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "int", 8*sizeof(int16_t), (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_int32(generic_t x, const size_t index, int32_t** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "int", 8*sizeof(int32_t), (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_int64(generic_t x, const size_t index, int64_t** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "int", 8*sizeof(int64_t), (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_uint8(generic_t x, const size_t index, uint8_t** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "uint", 8*sizeof(uint8_t), (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_uint16(generic_t x, const size_t index, uint16_t** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "uint", 8*sizeof(uint16_t), (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_uint32(generic_t x, const size_t index, uint32_t** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "uint", 8*sizeof(uint32_t), (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_uint64(generic_t x, const size_t index, uint64_t** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "uint", 8*sizeof(uint64_t), (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_float(generic_t x, const size_t index,
+				       float** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "float", 8*sizeof(float),
+				   (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_double(generic_t x, const size_t index,
+					double** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "float", 8*sizeof(double),
+				   (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_long_double(generic_t x, const size_t index,
+					     long double** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "float", 8*sizeof(long double),
+				   (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_complex_float(generic_t x, const size_t index, complex_float_t** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "complex", 8*sizeof(complex_float_t), (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_complex_double(generic_t x, const size_t index, complex_double_t** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "complex", 8*sizeof(complex_double_t), (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_complex_long_double(generic_t x, const size_t index, complex_long_double_t** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "complex", 8*sizeof(complex_long_double_t), (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_bytes(generic_t x, const size_t index, char** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "bytes", 0, (void**)data, shape);
+  }
+  size_t generic_array_get_ndarray_unicode(generic_t x, const size_t index, char** data, size_t** shape) {
+    return generic_array_get_ndarray(x, index, "unicode", 0, (void**)data, shape);
+  }
+  
+  // Generic map methods
+  size_t generic_map_get_size(generic_t x) {
+    size_t out = 0;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_map_get_size: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_map_get_size: Object is NULL.");
+      }
+      out = x_obj->get_data_map_size();
+    } catch (...) {
+      ygglog_error("generic_map_get_size: C++ exception thrown.");
+    }
+    return out;
+  }
+  size_t generic_map_get_keys(generic_t x, char*** keys) {
+    size_t out = 0;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_map_get_keys: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_map_get_keys: Object is NULL.");
+      }
+      out = x_obj->get_data_map_keys(keys);
+    } catch (...) {
+      ygglog_error("generic_map_get_keys: C++ exception thrown.");
+    }
+    return out;
+  }
+
+  void* generic_map_get_item(generic_t x, const char* key,
+			     const char *type) {
+    void* out = NULL;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_map_get_scalar: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_map_get_scalar: Object is NULL.");
+      }
+      bool use_generic = x_obj->get_type()->use_generic();
+      std::map<const char*, int, strcomp> type_map = get_type_map();
+      std::map<const char*, int, strcomp>::iterator it = type_map.find(type);
+      MetaschemaType* item_type = NULL;
+      bool return_generic = false;
+      if (it != type_map.end()) {
+	switch (it->second) {
+	case T_BOOLEAN:
+	case T_INTEGER:
+	case T_NULL:
+	case T_NUMBER:
+	case T_STRING: {
+	  item_type = new MetaschemaType(type, use_generic);
+	  break;
+	}
+	case T_ARRAY: {
+	  return_generic = true;
+	  use_generic = true;
+	  MetaschemaTypeVector new_items = MetaschemaTypeVector();
+	  char new_format_str[100] = "";
+	  const MetaschemaType* item_type0 = x_obj->get_type()->get_property_type(key);
+	  if (item_type0->type_code() == T_ARRAY) {
+	    const JSONArrayMetaschemaType* item_type0_cast = static_cast<const JSONArrayMetaschemaType*>(item_type0);
+	    new_items = item_type0_cast->items();
+	    strcpy(new_format_str, item_type0_cast->format_str());
+	  }
+	  item_type = new JSONArrayMetaschemaType(new_items,
+						  new_format_str,
+						  use_generic);
+	  break;
+	}
+	case T_OBJECT: {
+	  return_generic = true;
+	  use_generic = true;
+	  MetaschemaTypeMap new_props = MetaschemaTypeMap();
+	  const MetaschemaType* item_type0 = x_obj->get_type()->get_property_type(key);
+	  if (item_type0->type_code() == T_OBJECT) {
+	    const JSONObjectMetaschemaType* item_type0_cast = static_cast<const JSONObjectMetaschemaType*>(item_type0);
+	    new_props = item_type0_cast->properties();
+	  }
+	  item_type = new JSONObjectMetaschemaType(new_props,
+						   use_generic);
+	  break;
+	}
+	case T_PLY: {
+	  item_type = new PlyMetaschemaType(use_generic);
+	  break;
+	}
+	case T_OBJ: {
+	  item_type = new ObjMetaschemaType(use_generic);
+	  break;
+	}
+	case T_CLASS:
+	case T_FUNCTION: {
+	  item_type = new PyObjMetaschemaType(type, use_generic);
+	  break;
+	}
+	case T_SCHEMA: {
+	  return_generic = true;
+	  item_type = new SchemaMetaschemaType(use_generic);
+	  break;
+	}
+	case T_ANY: {
+	  return_generic = true;
+	  item_type = new AnyMetaschemaType(use_generic);
+	  break;
+	}
+	}
+      }
+      if (item_type == NULL) {
+	ygglog_throw_error("generic_map_get_item: No handler for type '%s'.", type);
+      }
+      out = x_obj->get_data_map_item(key, item_type, return_generic);
+      delete item_type;
+    } catch (...) {
+      ygglog_error("generic_map_get_item: C++ exception thrown.");
+    }
+    return out;
+  }
+  bool generic_map_get_bool(generic_t x, const char* key) {
+    return ((bool*)generic_map_get_item(x, key, "boolean"))[0];
+  }
+  int generic_map_get_integer(generic_t x, const char* key) {
+    return ((int*)generic_map_get_item(x, key, "integer"))[0];
+  }
+  void* generic_map_get_null(generic_t x, const char* key) {
+    return ((void**)generic_map_get_item(x, key, "null"))[0];
+  }
+  double generic_map_get_number(generic_t x, const char* key) {
+    return ((double*)generic_map_get_item(x, key, "number"))[0];
+  }
+  char* generic_map_get_string(generic_t x, const char* key) {
+    return ((char**)generic_map_get_item(x, key, "string"))[0];
+  }
+  generic_t generic_map_get_object(generic_t x, const char* key) {
+    YggGeneric* result = (YggGeneric*)generic_map_get_item(x, key, "object");
+    generic_t out = init_generic();
+    out.obj = (void*)(result->copy());
+    return out;
+  }
+  generic_t generic_map_get_array(generic_t x, const char* key) {
+    YggGeneric* result = (YggGeneric*)generic_map_get_item(x, key, "array");
+    generic_t out = init_generic();
+    out.obj = (void*)(result->copy());
+    return out;
+  }
+  ply_t generic_map_get_ply(generic_t x, const char* key) {
+    ply_t* old = (ply_t*)generic_map_get_item(x, key, "ply");
+    ply_t out = copy_ply(*old);
+    return out;
+  }
+  obj_t generic_map_get_obj(generic_t x, const char* key) {
+    obj_t* old = (obj_t*)generic_map_get_item(x, key, "obj");
+    obj_t out = copy_obj(*old);
+    return out;
+  }
+  python_t generic_map_get_python_class(generic_t x, const char* key) {
+    python_t* old = (python_t*)generic_map_get_item(x, key, "class");
+    python_t out = copy_python(*old);
+    return out;
+  }
+  python_t generic_map_get_python_function(generic_t x, const char* key) {
+    python_t* old = (python_t*)generic_map_get_item(x, key, "function");
+    python_t out = copy_python(*old);
+    return out;
+  }
+  schema_t generic_map_get_schema(generic_t x, const char* key) {
+    YggGeneric* result = (YggGeneric*)generic_map_get_item(x, key, "schema");
+    schema_t out = init_generic();
+    out.obj = (void*)(result->copy());
+    return out;
+  }
+  generic_t generic_map_get_any(generic_t x, const char* key) {
+    YggGeneric* result = (YggGeneric*)generic_map_get_item(x, key, "array");
+    generic_t out = init_generic();
+    out.obj = (void*)(result->copy());
+    return out;
+  }
+  
+  void* generic_map_get_scalar(generic_t x, const char* key,
+			       const char *subtype,
+			       const size_t precision) {
+    void* out = NULL;
+    char new_units[100] = "";
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_map_get_scalar: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_map_get_scalar: Object is NULL.");
+      }
+      const MetaschemaType* item_type0 = x_obj->get_type()->get_property_type(key);
+      if (item_type0->type_code() == T_SCALAR) {
+	const ScalarMetaschemaType* item_type0_scl = static_cast<const ScalarMetaschemaType*>(item_type0);
+	strcpy(new_units, item_type0_scl->units());
+      }
+      ScalarMetaschemaType* item_type = new ScalarMetaschemaType(subtype, precision, new_units, x_obj->get_type()->use_generic());
+      out = x_obj->get_data_map_item(key, item_type);
+      delete item_type;
+    } catch (...) {
+      ygglog_error("generic_map_get_scalar: C++ exception thrown.");
+    }
+    return out;
+  }
+  int8_t generic_map_get_int8(generic_t x, const char* key) {
+    return ((int8_t*)generic_map_get_scalar(x, key, "int", 8*sizeof(int8_t)))[0];
+  }
+  int16_t generic_map_get_int16(generic_t x, const char* key) {
+    return ((int16_t*)generic_map_get_scalar(x, key, "int", 8*sizeof(int16_t)))[0];
+  }
+  int32_t generic_map_get_int32(generic_t x, const char* key) {
+    return ((int32_t*)generic_map_get_scalar(x, key, "int", 8*sizeof(int32_t)))[0];
+  }
+  int64_t generic_map_get_int64(generic_t x, const char* key) {
+    return ((int64_t*)generic_map_get_scalar(x, key, "int", 8*sizeof(int64_t)))[0];
+  }
+  uint8_t generic_map_get_uint8(generic_t x, const char* key) {
+    return ((uint8_t*)generic_map_get_scalar(x, key, "uint", 8*sizeof(uint8_t)))[0];
+  }
+  uint16_t generic_map_get_uint16(generic_t x, const char* key) {
+    return ((uint16_t*)generic_map_get_scalar(x, key, "uint", 8*sizeof(uint16_t)))[0];
+  }
+  uint32_t generic_map_get_uint32(generic_t x, const char* key) {
+    return ((uint32_t*)generic_map_get_scalar(x, key, "uint", 8*sizeof(uint32_t)))[0];
+  }
+  uint64_t generic_map_get_uint64(generic_t x, const char* key) {
+    return ((uint64_t*)generic_map_get_scalar(x, key, "uint", 8*sizeof(uint64_t)))[0];
+  }
+  float generic_map_get_float(generic_t x, const char* key) {
+    return ((float*)generic_map_get_scalar(x, key, "float", 8*sizeof(float)))[0];
+  }
+  double generic_map_get_double(generic_t x, const char* key) {
+    return ((double*)generic_map_get_scalar(x, key, "float", 8*sizeof(double)))[0];
+  }
+  long double generic_map_get_long_double(generic_t x, const char* key) {
+    return ((long double*)generic_map_get_scalar(x, key, "float", 8*sizeof(long double)))[0];
+  }
+  complex_float_t generic_map_get_complex_float(generic_t x, const char* key) {
+    return ((complex_float_t*)generic_map_get_scalar(x, key, "complex", 8*sizeof(complex_float_t)))[0];
+  }
+  complex_double_t generic_map_get_complex_double(generic_t x, const char* key) {
+    return ((complex_double_t*)generic_map_get_scalar(x, key, "complex", 8*sizeof(complex_double_t)))[0];
+  }
+  complex_long_double_t generic_map_get_complex_long_double(generic_t x, const char* key) {
+    return ((complex_long_double_t*)generic_map_get_scalar(x, key, "complex", 8*sizeof(complex_long_double_t)))[0];
+  }
+  char* generic_map_get_bytes(generic_t x, const char* key) {
+    return ((char**)generic_map_get_scalar(x, key, "bytes", 0))[0];
+  }
+  char* generic_map_get_unicode(generic_t x, const char* key) {
+    return ((char**)generic_map_get_scalar(x, key, "unicode", 0))[0];
+  }
+  
+  size_t generic_map_get_1darray(generic_t x, const char* key,
+				 const char *subtype, const size_t precision,
+				 void** data) {
+    size_t out = 0;
+    char new_units[100] = "";
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_map_get_1darray: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_map_get_1darray: Object is NULL.");
+      }
+      size_t new_length = 0;
+      const MetaschemaType* item_type0 = x_obj->get_type()->get_property_type(key);
+      if (item_type0->type_code() == T_1DARRAY) {
+	const OneDArrayMetaschemaType* item_type0_arr = static_cast<const OneDArrayMetaschemaType*>(item_type0);
+	strcpy(new_units, item_type0_arr->units());
+	new_length = item_type0_arr->length();
+      }
+      OneDArrayMetaschemaType* item_type = new OneDArrayMetaschemaType(subtype, precision, new_length, new_units, x_obj->get_type()->use_generic());
+      size_t nbytes = item_type->nbytes();
+      void* new_data = x_obj->get_data_map_item(key, item_type);
+      data[0] = (void*)realloc(data[0], nbytes);
+      if (data[0] == NULL) {
+	ygglog_throw_error("generic_map_get_1darray: Failed to reallocate array.");
+      }
+      memcpy(data[0], new_data, nbytes);
+      out = new_length;
+      delete item_type;
+    } catch (...) {
+      ygglog_error("generic_map_get_1darray: C++ exception thrown.");
+    }
+    return out;
+  }
+  size_t generic_map_get_1darray_int8(generic_t x, const char* key, int8_t** data) {
+    return generic_map_get_1darray(x, key, "int", 8*sizeof(int8_t), (void**)data);
+  }
+  size_t generic_map_get_1darray_int16(generic_t x, const char* key, int16_t** data) {
+    return generic_map_get_1darray(x, key, "int", 8*sizeof(int16_t), (void**)data);
+  }
+  size_t generic_map_get_1darray_int32(generic_t x, const char* key, int32_t** data) {
+    return generic_map_get_1darray(x, key, "int", 8*sizeof(int32_t), (void**)data);
+  }
+  size_t generic_map_get_1darray_int64(generic_t x, const char* key, int64_t** data) {
+    return generic_map_get_1darray(x, key, "int", 8*sizeof(int64_t), (void**)data);
+  }
+  size_t generic_map_get_1darray_uint8(generic_t x, const char* key, uint8_t** data) {
+    return generic_map_get_1darray(x, key, "uint", 8*sizeof(uint8_t), (void**)data);
+  }
+  size_t generic_map_get_1darray_uint16(generic_t x, const char* key, uint16_t** data) {
+    return generic_map_get_1darray(x, key, "uint", 8*sizeof(uint16_t), (void**)data);
+  }
+  size_t generic_map_get_1darray_uint32(generic_t x, const char* key, uint32_t** data) {
+    return generic_map_get_1darray(x, key, "uint", 8*sizeof(uint32_t), (void**)data);
+  }
+  size_t generic_map_get_1darray_uint64(generic_t x, const char* key, uint64_t** data) {
+    return generic_map_get_1darray(x, key, "uint", 8*sizeof(uint64_t), (void**)data);
+  }
+  size_t generic_map_get_1darray_float(generic_t x, const char* key,
+				       float** data) {
+    return generic_map_get_1darray(x, key, "float", 8*sizeof(float), (void**)data);
+  }
+  size_t generic_map_get_1darray_double(generic_t x, const char* key,
+					double** data) {
+    return generic_map_get_1darray(x, key, "float", 8*sizeof(double), (void**)data);
+  }
+  size_t generic_map_get_1darray_long_double(generic_t x, const char* key,
+					     long double** data) {
+    return generic_map_get_1darray(x, key, "float", 8*sizeof(long double), (void**)data);
+  }
+  size_t generic_map_get_1darray_complex_float(generic_t x, const char* key, complex_float_t** data) {
+    return generic_map_get_1darray(x, key, "complex", 8*sizeof(complex_float_t), (void**)data);
+  }
+  size_t generic_map_get_1darray_complex_double(generic_t x, const char* key, complex_double_t** data) {
+    return generic_map_get_1darray(x, key, "complex", 8*sizeof(complex_double_t), (void**)data);
+  }
+  size_t generic_map_get_1darray_complex_long_double(generic_t x, const char* key, complex_long_double_t** data) {
+    return generic_map_get_1darray(x, key, "complex", 8*sizeof(complex_long_double_t), (void**)data);
+  }
+  size_t generic_map_get_1darray_bytes(generic_t x, const char* key,  char** data) {
+    return generic_map_get_1darray(x, key, "bytes", 0, (void**)data);
+  }
+  size_t generic_map_get_1darray_unicode(generic_t x, const char* key,  char** data) {
+    return generic_map_get_1darray(x, key, "unicode", 0, (void**)data);
+  }
+
+  size_t generic_map_get_ndarray(generic_t x, const char* key,
+				 const char *subtype, const size_t precision,
+				 void** data, size_t** shape) {
+    size_t out = 0;
+    size_t i;
+    char new_units[100] = "";
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_map_get_ndarray: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_map_get_ndarray: Object is NULL.");
+      }
+      std::vector<size_t> new_shape;
+      const MetaschemaType* item_type0 = x_obj->get_type()->get_property_type(key);
+      if (item_type0->type_code() == T_NDARRAY) {
+	const NDArrayMetaschemaType* item_type0_arr = static_cast<const NDArrayMetaschemaType*>(item_type0);
+	strcpy(new_units, item_type0_arr->units());
+	new_shape = item_type0_arr->shape();
+      }
+      NDArrayMetaschemaType* item_type = new NDArrayMetaschemaType(subtype, precision, new_shape, new_units, x_obj->get_type()->use_generic());
+      size_t nbytes = item_type->nbytes();
+      void* new_data = x_obj->get_data_map_item(key, item_type);
+      data[0] = (void*)realloc(data[0], nbytes);
+      if (data[0] == NULL) {
+	ygglog_throw_error("generic_map_get_ndarray: Failed to reallocate array.");
+      }
+      memcpy(data[0], new_data, nbytes);
+      shape[0] = (size_t*)realloc(shape[0], new_shape.size());
+      if (shape[0] == NULL) {
+	ygglog_throw_error("generic_map_get_ndarray: Failed to realloc shape.");
+      }
+      for (i = 0; i < new_shape.size(); i++) {
+	shape[0][i] = new_shape[i];
+      }
+      out = new_shape.size();
+      delete item_type;
+    } catch (...) {
+      ygglog_error("generic_map_get_ndarray: C++ exception thrown.");
+    }
+    return out;
+  }
+  size_t generic_map_get_ndarray_int8(generic_t x, const char* key, int8_t** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "int", 8*sizeof(int8_t), (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_int16(generic_t x, const char* key, int16_t** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "int", 8*sizeof(int16_t), (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_int32(generic_t x, const char* key, int32_t** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "int", 8*sizeof(int32_t), (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_int64(generic_t x, const char* key, int64_t** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "int", 8*sizeof(int64_t), (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_uint8(generic_t x, const char* key, uint8_t** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "uint", 8*sizeof(uint8_t), (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_uint16(generic_t x, const char* key, uint16_t** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "uint", 8*sizeof(uint16_t), (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_uint32(generic_t x, const char* key, uint32_t** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "uint", 8*sizeof(uint32_t), (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_uint64(generic_t x, const char* key, uint64_t** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "uint", 8*sizeof(uint64_t), (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_float(generic_t x, const char* key,
+				       float** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "float", 8*sizeof(float),
+				   (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_double(generic_t x, const char* key,
+					double** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "float", 8*sizeof(double),
+				   (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_long_double(generic_t x, const char* key,
+					     long double** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "float", 8*sizeof(long double),
+				   (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_complex_float(generic_t x, const char* key, complex_float_t** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "complex", 8*sizeof(complex_float_t), (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_complex_double(generic_t x, const char* key, complex_double_t** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "complex", 8*sizeof(complex_double_t), (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_complex_long_double(generic_t x, const char* key, complex_long_double_t** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "complex", 8*sizeof(complex_long_double_t), (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_bytes(generic_t x, const char* key, char** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "bytes", 0, (void**)data, shape);
+  }
+  size_t generic_map_get_ndarray_unicode(generic_t x, const char* key, char** data, size_t** shape) {
+    return generic_map_get_ndarray(x, key, "unicode", 0, (void**)data, shape);
+  }
+  
   void destroy_python(python_t *x) {
     try {
       PyObjMetaschemaType::free_python_t(x);
@@ -964,7 +1836,7 @@ extern "C" {
       return NULL;
     }
   }
-  int format_comm_header(const comm_head_t head, char *buf, const size_t buf_siz) {
+  int format_comm_header(const comm_head_t head, char **buf, size_t buf_siz) {
     try {
       // Header
       rapidjson::StringBuffer head_buf;
@@ -1009,14 +1881,28 @@ extern "C" {
       }
       head_writer.EndObject();
       // Combine
-      int ret = snprintf(buf, buf_siz, "%s%s%s",
+      int ret = snprintf(*buf, buf_siz, "%s%s%s",
 			 MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
-      if ((size_t)ret > buf_siz) {
-	ygglog_error("format_comm_header: Header exceeds buffer size: '%s%s%s'.",
-		     MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
-	return -1;
+      if ((ret < 0) || ((size_t)ret > buf_siz)) {
+	if (ret < 0) {
+#ifdef _WIN32
+    buf_siz = _scprintf("%s%s%s", MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
+#else
+	  buf_siz = 10 * buf_siz;
+#endif
+	} else {
+	  buf_siz = (size_t)(ret+1);
+	}
+	buf[0] = (char*)realloc(buf[0], buf_siz);
+	ret = snprintf(*buf, buf_siz, "%s%s%s",
+		       MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
+	if ((size_t)ret > buf_siz) {
+	  ygglog_error("format_comm_header: Header size (%d) exceeds buffer size (%lu): '%s%s%s'.",
+		       ret, buf_siz, MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
+	  return -1;
+	}
       }
-      ygglog_debug("format_comm_header: Header = '%s'", buf);
+      ygglog_debug("format_comm_header: Header = '%s'", *buf);
       return ret;
     } catch(...) {
       ygglog_error("format_comm_header: C++ exception thrown.");

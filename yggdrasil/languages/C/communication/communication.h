@@ -479,7 +479,7 @@ comm_head_t comm_send_multipart_header(const comm_t *x, const char * data,
 static
 int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
   //char headbuf[YGG_MSG_BUF];
-  int headbuf_len = YGG_MSG_BUF;
+  size_t headbuf_len = YGG_MSG_BUF;
   int headlen = 0, ret = -1;
   comm_t* xmulti = NULL;
   if ((x == NULL) || (x->valid == 0)) {
@@ -499,14 +499,14 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
   }
   // Try to send body in header
   if (len < (x->maxMsgSize - x->msgBufSize)) {
-    headlen = format_comm_header(head, headbuf, headbuf_len);
+    headlen = format_comm_header(head, &headbuf, headbuf_len);
     if (headlen < 0) {
       ygglog_error("comm_send_multipart: Failed to format header.");
       free(headbuf);
       return -1;
     }
     if (((size_t)headlen + len) < (x->maxMsgSize - x->msgBufSize)) {
-      if (((size_t)headlen + len + 1) > (size_t)headbuf_len) {
+      if (((size_t)headlen + len + 1) > headbuf_len) {
         char *t_headbuf = (char*)realloc(headbuf, (size_t)headlen + len + 1);
         if (t_headbuf == NULL) {
           ygglog_error("comm_send_multipart: Failed to realloc headbuf.");
@@ -514,7 +514,7 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
           return -1;          
         }
 	headbuf = t_headbuf;
-        headbuf_len = headlen + (int)len + 1;
+        headbuf_len = (size_t)headlen + len + 1;
       }
       head.multipart = 0;
       memcpy(headbuf + headlen, data, len);
@@ -545,7 +545,7 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
       ygglog_debug("comm_send_multipart: zmq worker reply address is '%s'",
 		   head.zmq_reply_worker);
     }
-    headlen = format_comm_header(head, headbuf, headbuf_len);
+    headlen = format_comm_header(head, &headbuf, headbuf_len);
     if (headlen < 0) {
       ygglog_error("comm_send_multipart: Failed to format header.");
       free(headbuf);

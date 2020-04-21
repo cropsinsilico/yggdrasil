@@ -1,5 +1,6 @@
 import os
 import uuid
+import unittest
 from yggdrasil.tests import YggTestClassInfo, assert_equal
 from yggdrasil.communication import new_comm, get_comm, CommBase
 from yggdrasil.communication.filters.StatementFilter import StatementFilter
@@ -476,12 +477,18 @@ class TestCommBase(YggTestClassInfo):
     @property
     def msg_filter_send(self):
         r"""object: Message to filter out on the send side."""
-        return self.get_options()['objects'][0]
+        objs = self.get_options()['objects']
+        if len(objs) < 1:  # pragma: debug
+            raise unittest.SkipTest("There arn't enough objects.")
+        return objs[0]
 
     @property
     def msg_filter_recv(self):
         r"""object: Message to filter out on the recv side."""
-        return self.get_options()['objects'][1]
+        objs = self.get_options()['objects']
+        if len(objs) < 2:  # pragma: debug
+            raise unittest.SkipTest("There arn't enough objects.")
+        return objs[1]
 
     @property
     def msg_filter_pass(self):
@@ -631,8 +638,10 @@ class TestCommBase(YggTestClassInfo):
     def test_send_recv_dict(self):
         r"""Test send/recv message as dict."""
         msg_send = self.testing_options['dict']
-        self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',
-                          msg_send=msg_send)
+        if msg_send:
+            self.do_send_recv(send_meth='send_dict',
+                              recv_meth='recv_dict',
+                              msg_send=msg_send)
         
     def test_send_recv_dict_names(self):
         r"""Test send/recv message as dict with names."""
