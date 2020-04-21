@@ -132,6 +132,7 @@ cache:
 build: false
 
 test_script:
+  - "yggclean"
   - "yggtest --ci %YGG_TEST_FLAGS%"
 
 after_test:

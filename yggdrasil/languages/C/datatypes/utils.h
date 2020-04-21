@@ -206,6 +206,8 @@ std::map<const char*, int, strcomp> get_type_map() {
     global_type_map["instance"] = T_INSTANCE;
     global_type_map["schema"] = T_SCHEMA;
     global_type_map["any"] = T_ANY;
+    // Aliases
+    global_type_map["map"] = T_OBJECT;
   }
   return global_type_map;
 };
@@ -374,6 +376,53 @@ public:
     @returns YggGeneric* Pointer to element at index i.
    */
   YggGeneric* get_object_element(const char *k);
+  /*!
+    @brief Get data and check against a data type.
+    @param[in] exp_type MetaschemaType* Type that is expected to be
+    returned.
+   */
+  void* get_data(const MetaschemaType* exp_type) const;
+  /*!
+    @brief Get the size of a map.
+    @returns size_t Size of the wrapped map.
+   */
+  size_t get_data_array_size() const;
+  /*!
+    @brief Get the size of an array.
+    @returns size_t Size of the wrapped array.
+   */
+  size_t get_data_map_size() const;
+  /*!
+    @brief Get an array of keys in the map.
+    @param[out] keys char*** Pointer to memory that should be reallocated
+    to allow for a storate of character array pointers.
+    @returns size_t Number of keys in keys array.
+   */
+  size_t get_data_map_keys(char*** keys) const;
+  /*!
+    @brief Get an array item.
+    @param[in] i const size_t Index of array element that should be
+    returned.
+    @param[in] item_type MetaschemaType* Type that should be returned.
+    @param[in] return_generic bool If true, the generic wrapper object
+    will be returned. Defaults to false.
+    @returns void* Pointer to the data.
+   */
+  void* get_data_array_item(const size_t i,
+			    const MetaschemaType* item_type,
+			    bool return_generic=false) const;
+  /*!
+    @brief Get a map item.
+    @param[in] key const char* String key for item that should be
+    returned.
+    @param[in] item_type MetaschemaType* Type that should be returned.
+    @param[in] return_generic bool If true, the generic wrapper object
+    will be returned. Defaults to false.
+    @returns void* Pointer to the data.
+   */
+  void* get_data_map_item(const char *key,
+			  const MetaschemaType* item_type,
+			  bool return_generic=false) const;
 };
 
 

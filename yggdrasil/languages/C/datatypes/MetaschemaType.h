@@ -416,6 +416,28 @@ public:
     ygglog_throw_error("MetaschemaType::set_length: Cannot set length for type '%s'.", type_);
   }
   /*!
+    @brief Get the type associated with an item.
+    @param[in] index const size_t Index of item to get type for.
+    @returns MetaschemaType* Pointer to type class for item.
+   */
+  virtual const MetaschemaType* get_item_type(const size_t index) const {
+    MetaschemaType* out = NULL;
+    UNUSED(index);
+    ygglog_throw_error("MetaschemaType::get_item_type: Cannot get item type for type '%s'.", type_);
+    return out;
+  }
+  /*!
+    @brief Get the type associated with a property.
+    @param[in] key const char* Property key to get type for.
+    @returns MetaschemaType* Pointer to type class for property.
+   */
+  virtual const MetaschemaType* get_property_type(const char* key) const {
+    MetaschemaType* out = NULL;
+    UNUSED(key);
+    ygglog_throw_error("MetaschemaType::get_property_type: Cannot get property type for type '%s'.", type_);
+    return out;
+  }
+  /*!
     @brief Set the _variable_length private variable.
     @param[in] new_variable_length bool New value.
    */
@@ -1566,6 +1588,101 @@ YggGeneric* YggGeneric::get_object_element(const char* k) {
   }
   YggGeneric* out = it->second;
   return out;
+};
+
+void* YggGeneric::get_data(const MetaschemaType* exp_type) const {
+  if (*type != *exp_type) {
+    printf("Wrapped Type:\n");
+    type->display();
+    printf("Excepted Type:\n");
+    exp_type->display();
+    ygglog_throw_error("YggGeneric::get_data: Type of generic wrapped data does not match expected type.");
+  }
+  return get_data();
+};
+
+size_t YggGeneric::get_data_array_size() const {
+  if (type->type_code() != T_ARRAY) {
+    ygglog_throw_error("YggGeneric::get_data_array_item: Object is not an array.");
+  }
+  YggGenericVector* arr = (YggGenericVector*)get_data();
+  if (arr == NULL) {
+    ygglog_throw_error("YggGeneric::get_data_array_item: Array is NULL.");
+  }
+  return arr->size();
+};
+
+size_t YggGeneric::get_data_map_size() const {
+  if (type->type_code() != T_OBJECT) {
+    ygglog_throw_error("YggGeneric::get_data_map_size: Object is not a map.");
+  }
+  YggGenericMap* map = (YggGenericMap*)get_data();
+  if (map == NULL) {
+    ygglog_throw_error("YggGeneric::get_data_map_size: Map is NULL.");
+  }
+  return map->size();
+};
+
+size_t YggGeneric::get_data_map_keys(char*** keys) const {
+  size_t i;
+  if (type->type_code() != T_OBJECT) {
+    ygglog_throw_error("YggGeneric::get_data_map_keys: Object is not a map.");
+  }
+  YggGenericMap* map = (YggGenericMap*)get_data();
+  if (map == NULL) {
+    ygglog_throw_error("YggGeneric::get_data_map_keys: Map is NULL.");
+  }
+  keys[0] = (char**)realloc(keys[0], map->size()*sizeof(char*));
+  YggGenericMap::iterator it;
+  for (i = 0, it = map->begin(); it != map->end(); it++, i++) {
+    keys[0][i] = (char*)malloc(it->first.length() + 1);
+    // keys[0][i] = (char*)realloc(keys[0][i], it->first.length() + 1);
+    strcpy(keys[0][i], it->first.c_str());
+  }
+  return map->size();
+};
+
+void* YggGeneric::get_data_array_item(const size_t i,
+				      const MetaschemaType* item_type,
+				      bool return_generic) const {
+  if (type->type_code() != T_ARRAY) {
+    ygglog_throw_error("YggGeneric::get_data_array_item: Object is not an array.");
+  }
+  YggGenericVector* arr = (YggGenericVector*)get_data();
+  if (arr == NULL) {
+    ygglog_throw_error("YggGeneric::get_data_array_item: Array is NULL.");
+  }
+  if (i > arr->size()) {
+    ygglog_throw_error("YggGeneric::get_data_array_item: Array has %lu elements, but %lu were requested.", arr->size(), i);
+  }
+  YggGeneric* out = (*arr)[i];
+  if (return_generic) {
+    return (void*)out;
+  } else {
+    return out->get_data(item_type);
+  }
+};
+
+void* YggGeneric::get_data_map_item(const char *key,
+				    const MetaschemaType* item_type,
+				    bool return_generic) const {
+  if (type->type_code() != T_OBJECT) {
+    ygglog_throw_error("YggGeneric::get_data_map_item: Object is not a map.");
+  }
+  YggGenericMap* map = (YggGenericMap*)get_data();
+  if (map == NULL) {
+    ygglog_throw_error("YggGeneric::get_data_map_item: Map is NULL.");
+  }
+  YggGenericMap::iterator map_it = map->find(key);
+  if (map_it == map->end()) {
+    ygglog_throw_error("YggGeneric::get_data_map_item: Could not located item for key '%s'.", key);
+  }
+  YggGeneric* out = map_it->second;
+  if (return_generic) {
+    return (void*)out;
+  } else {
+    return out->get_data(item_type);
+  }
 };
 
 typedef std::map<std::string, MetaschemaType*> MetaschemaTypeMap;
