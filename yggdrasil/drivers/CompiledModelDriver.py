@@ -1265,7 +1265,7 @@ class CompilerBase(CompilationToolBase):
 
     @classmethod
     def get_output_file(cls, src, dont_link=False, working_dir=None,
-                        libtype=None, no_src_ext=False,
+                        libtype=None, no_src_ext=False, no_tool_suffix=False,
                         suffix="", **kwargs):
         r"""Determine the appropriate output file that will result when
         compiling a given source file.
@@ -1284,6 +1284,8 @@ class CompilerBase(CompilationToolBase):
             no_src_ext (bool, optional): If True, the source extension will not
                 be added to the object file name. Defaults to False. Ignored if
                 dont_link is False.
+            no_tool_suffix (bool, optional): If True, the tool suffix will not
+                be added to the object file name. Defaults to False.
             suffix (str, optional): Suffix that should be added to the
                 output file (before the extension). Defaults to "".
             **kwargs: Additional keyword arguments are ignored unless dont_link
@@ -1308,7 +1310,9 @@ class CompilerBase(CompilationToolBase):
                                                    libtype=libtype, **kwargs))
             else:
                 src_base, src_ext = os.path.splitext(src)
-                tool_suffix = cls.get_tool_suffix()
+                tool_suffix = ''
+                if not no_tool_suffix:
+                    tool_suffix = cls.get_tool_suffix()
                 if no_src_ext or src_base.endswith('_%s' % src_ext[1:]):
                     obj = '%s%s%s%s' % (src_base, suffix, tool_suffix, cls.object_ext)
                 else:
@@ -1649,7 +1653,7 @@ class LinkerBase(CompilationToolBase):
     
     @classmethod
     def get_output_file(cls, obj, build_library=False, working_dir=None,
-                        suffix="", **kwargs):
+                        suffix="", no_tool_suffix=False, **kwargs):
         r"""Determine the appropriate output file that will result when linking
         a given object file.
 
@@ -1663,6 +1667,8 @@ class LinkerBase(CompilationToolBase):
                 should be located. Defaults to None and is ignored.
             suffix (str, optional): Suffix that should be added to the
                 output file (before the extension). Defaults to "".
+            no_tool_suffix (bool, optional): If True, the tool suffix will not
+                be added to the object file name. Defaults to False.
             **kwargs: Additional keyword arguments are ignored.
 
         Returns:
@@ -1680,9 +1686,12 @@ class LinkerBase(CompilationToolBase):
             prefix = ''
             out_ext = cls.executable_ext
         obj_dir, obj_base = os.path.split(obj)
+        tool_suffix = ''
+        if not no_tool_suffix:
+            tool_suffix = cls.get_tool_suffix()
         out_base = '%s%s%s%s%s' % (prefix,
                                    os.path.splitext(obj_base)[0],
-                                   suffix, cls.get_tool_suffix(),
+                                   suffix, tool_suffix,
                                    out_ext)
         out = os.path.join(obj_dir, out_base)
         if (not os.path.isabs(out)) and (working_dir is not None):
@@ -3016,9 +3025,10 @@ class CompiledModelDriver(ModelDriver):
             libtype = v.get('libtype', None)
             if (libtype is not None) and (libtype not in v):  # pragma: no cover
                 if (libtype == 'static') and (archiver is not None):
-                    v[libtype] = archiver.get_output_file(k)
+                    v[libtype] = archiver.get_output_file(k, no_tool_suffix=True)
                 elif (libtype == 'shared') and (linker is not None):
-                    v[libtype] = linker.get_output_file(k, build_library=True)
+                    v[libtype] = linker.get_output_file(k, no_tool_suffix=True,
+                                                        build_library=True)
         return out
 
     @classmethod
