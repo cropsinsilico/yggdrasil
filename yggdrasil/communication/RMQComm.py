@@ -389,7 +389,7 @@ class RMQComm(AsyncComm.AsyncComm):
         self.sched_task(0.0, super(RMQComm, self)._send_multipart_worker,
                         args=[msg, header], kwargs=kwargs, store_output=True)
         T = self.start_timeout()
-        while (not T.is_out) and (self.sched_out is None):
+        while (not T.is_out) and (self.sched_out is None):  # pragma: debug
             self.sleep()
         self.stop_timeout()
         out = self.sched_out

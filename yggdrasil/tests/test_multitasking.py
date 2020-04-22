@@ -28,21 +28,60 @@ def test_LockedAttr():
                   getattr, z, 'x')
 
 
-def test_Task():
-    r"""Test Task."""
-    # Thread
-    # q = multitasking.SafeThread(target=target)
+def test_TaskThread():
+    r"""Test thread based Task."""
     q = multitasking.Task(target=target)
     assert(not q.is_alive())
     q.start()
     q._base._errored.wait(1.0)
     assert(q._base._errored.is_set())
-    # Process
+
+
+def test_TaskProcess():
+    r"""Test process based Task."""
     q = multitasking.Task(target=target, task_method='parallel')
     assert(not q.is_alive())
     q.start()
-    q.join(10.0)
+    q.join(60.0)
     assert(not q.is_alive())
+
+
+class TestContextThread(YggTestClass):
+    r"""Test for thread based Context."""
+
+    _cls = 'Context'
+    _mod = 'yggdrasil.multitasking'
+    _task_method = 'thread'
+
+    def __init__(self, *args, **kwargs):
+        super(TestContextThread, self).__init__(*args, **kwargs)
+        self._inst_kwargs = {'task_method': self._task_method}
+
+    def test_RLock(self):
+        r"""Test creation of RLock from context."""
+        x = self.instance.RLock()
+        x.disconnect()
+
+    def test_Event(self):
+        r"""Test creation of Event from context."""
+        x = self.instance.Event()
+        x.disconnect()
+
+    def test_Task(self):
+        r"""Test creation of Task from context."""
+        x = self.instance.Task()
+        x.disconnect()
+
+    def test_Queue(self):
+        r"""Test creation of Queue from context."""
+        x = self.instance.Queue()
+        x.disconnect()
+
+
+class TestContextProcess(YggTestClass):
+    r"""Test for process based Context."""
+
+    _task_method = 'process'
 
 
 class TstContextObject(object):
@@ -113,6 +152,9 @@ class TestYggTask(YggTestClass):
         r"""Test process ID and ident."""
         self.instance.pid
         self.instance.ident
+
+    def test_daemon(self):
+        r"""Test process/thread daemon property."""
         self.instance.daemon
 
     def test_exitcode(self):
@@ -126,6 +168,13 @@ class TestYggTask(YggTestClass):
     def test_kill(self):
         r"""Test kill."""
         self.instance.kill()
+
+    def test_flag_manipulation(self):
+        r"""Test flag manipulation."""
+        self.instance.set_flag_attr('error_flag')
+        assert(self.instance.check_flag_attr('error_flag'))
+        self.instance.clear_flag_attr('error_flag')
+        assert(not self.instance.check_flag_attr('error_flag'))
 
 
 class TestYggProcess(TestYggTask):

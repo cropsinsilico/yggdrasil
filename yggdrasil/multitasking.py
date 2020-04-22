@@ -718,9 +718,6 @@ class LockedObject(AliasObject):
                  task_context=None, **kwargs):
         self.lock = RLock(task_method=task_method,
                           task_context=task_context)
-        if issubclass(self._base_class, ContextObject):
-            kwargs['task_method'] = task_method
-            kwargs['task_context'] = task_context
         super(LockedObject, self).__init__(*args, **kwargs)
 
     def disconnect(self):
@@ -777,33 +774,6 @@ class LockedDict(LockedObject):
 #         r"""Add a subdictionary."""
 #         self._dict_refs[key] = weakref.WeakValueDictionary()
 #         self[key] = self._dict_refs[key]
-
-
-class LockedQueue(LockedObject):
-    r"""Locked queue."""
-
-    _base_class = Queue
-    _base_meth = ['empty', 'full', 'get', 'get_nowait', 'join_thread',
-                  'put', 'put_nowait', 'qsize', 'join']
-    _unlocked_attr = ['empty', 'full', 'get', 'get_nowait',
-                      'join_thread', 'put', 'put_nowait', 'join']
-
-    @property
-    def context(self):
-        r"""Context: Context used to create this object."""
-        return self._base.context
-
-    @property
-    def dummy_copy(self):
-        r"""Dummy copy of base."""
-        return DummyQueue()
-        
-    def disconnect(self):
-        r"""Disconnect from the aliased object by replacing it with
-        a dummy object."""
-        self._base.disconnect()
-        if LockedQueue is not None:
-            super(LockedQueue, self).disconnect()
 
 
 class YggTask(YggClass):
@@ -877,13 +847,16 @@ class YggTask(YggClass):
         r"""Return the flag attribute."""
         return getattr(self, attr)
 
-    def set_flag_attr(self, attr):
+    def set_flag_attr(self, attr, value=True):
         r"""Set a flag."""
-        self.get_flag_attr(attr).set()
+        if value:
+            self.get_flag_attr(attr).set()
+        else:
+            self.get_flag_attr(attr).clear()
 
-    def unset_flag_attr(self, attr):
-        r"""Unset a flag."""
-        self.get_flag_attr(attr).unset()
+    def clear_flag_attr(self, attr):
+        r"""Clear a flag."""
+        self.set_flag_attr(attr, value=False)
 
     def check_flag_attr(self, attr):
         r"""Determine if a flag is set."""
@@ -1028,21 +1001,13 @@ class YggTask(YggClass):
         r"""Get the main process/thread."""
         return self.context.main_task()
 
-    def set_started_flag(self):
+    def set_started_flag(self, value=True):
         r"""Set the started flag for the thread/process to True."""
-        self.set_flag_attr('start_flag')
+        self.set_flag_attr('start_flag', value=value)
 
-    def set_terminated_flag(self):
+    def set_terminated_flag(self, value=True):
         r"""Set the terminated flag for the thread/process to True."""
-        self.set_flag_attr('terminate_flag')
-
-    def unset_started_flag(self):  # pragma: debug
-        r"""Set the started flag for the thread/process to False."""
-        self.unset_flag_attr('start_flag')
-
-    def unset_terminated_flag(self):  # pragma: debug
-        r"""Set the terminated flag for the thread/process to False."""
-        self.unset_flag_attr('terminated_flag')
+        self.set_flag_attr('terminate_flag', value=value)
 
     @property
     def was_started(self):
@@ -1102,26 +1067,18 @@ class YggTaskLoop(YggTask):
         if not dont_break:
             self.set_break_flag()
 
-    def set_break_flag(self):
+    def set_break_flag(self, value=True):
         r"""Set the break flag for the thread/process to True."""
-        self.set_flag_attr('break_flag')
-
-    def unset_break_flag(self):  # pragma: debug
-        r"""Set the break flag for the thread/process to False."""
-        self.unset_flag_attr('break_flag')
+        self.set_flag_attr('break_flag', value=value)
 
     @property
     def was_break(self):
         r"""bool: True if the break flag was set."""
         return self.check_flag_attr('break_flag')
 
-    def set_loop_flag(self):
+    def set_loop_flag(self, value=True):
         r"""Set the loop flag for the thread/process to True."""
-        self.set_flag_attr('loop_flag')
-
-    def unset_loop_flag(self):  # pragma: debug
-        r"""Set the loop flag for the thread/process to False."""
-        self.unset_flag_attr('loop_flag')
+        self.set_flag_attr('loop_flag', value=value)
 
     @property
     def was_loop(self):

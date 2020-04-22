@@ -340,23 +340,17 @@ class ConnectionDriver(Driver):
             return self.shared[attr]
         return super(ConnectionDriver, self).get_flag_attr(attr)
 
-    def set_flag_attr(self, attr):
+    def set_flag_attr(self, attr, value=True):
         r"""Set a flag."""
         if attr in self.shared:
             exist = self.shared[attr]
-            exist.set()
+            if value:
+                exist.set()
+            else:
+                exist.clear()
             self.shared[attr] = exist
             return
-        super(ConnectionDriver, self).set_flag_attr(attr)
-
-    def unset_flag_attr(self, attr):  # pragma: debug
-        r"""Unset a flag."""
-        if attr in self.shared:
-            exist = self.shared[attr]
-            exist.unset()
-            self.shared[attr] = exist
-            return
-        super(ConnectionDriver, self).unset_flag_attr(attr)
+        super(ConnectionDriver, self).set_flag_attr(attr, value=value)
 
     @property
     def nrecv(self):
