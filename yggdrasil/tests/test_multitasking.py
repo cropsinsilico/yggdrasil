@@ -133,6 +133,10 @@ class TestQueue(TstContextObject, YggTestClass):
 
     _cls = 'Queue'
 
+    def test_join(self):
+        r"""Test join."""
+        self.instance.join()
+
 
 class TestYggTask(YggTestClass):
     r"""Test basic behavior of YggTask class."""
