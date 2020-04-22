@@ -176,9 +176,9 @@ public:
 		   size_t *nargs, va_list_t &ap) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-    writer;
-    nargs;
-    ap;
+    UNUSED(writer);
+    UNUSED(nargs);
+    UNUSED(ap);
 #endif
     ygglog_error("AsciiTableMetaschemaType::encode_data: AsciiTable type cannot be JSON encoded.");
     return false;
@@ -193,8 +193,8 @@ public:
 		   YggGeneric* x) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-    writer;
-    x;
+    UNUSED(writer);
+    UNUSED(x);
 #endif
     ygglog_error("AsciiTableMetaschemaType::encode_data: AsciiTable type cannot be JSON encoded.");
     return false;
@@ -251,10 +251,10 @@ public:
 		const int allow_realloc, YggGeneric* x) override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-    buf;
-    buf_siz;
-    allow_realloc;
-    x;
+    UNUSED(buf);
+    UNUSED(buf_siz);
+    UNUSED(allow_realloc);
+    UNUSED(x);
 #endif
     ygglog_error("AsciiTableMetaschemaType::deserialize: serialization from generic wrapper for table not supported.");
     return -1;
@@ -277,10 +277,10 @@ public:
 		   size_t *nargs, va_list_t &ap) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-    data;
-    allow_realloc;
-    nargs;
-    ap;
+    UNUSED(data);
+    UNUSED(allow_realloc);
+    UNUSED(nargs);
+    UNUSED(ap);
 #endif
     ygglog_error("AsciiTableMetaschemaType::decode_data: AsciiTable type cannot be JSON decoded.");
     return false;
@@ -294,8 +294,8 @@ public:
   bool decode_data(rapidjson::Value &data, YggGeneric* x) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-    data;
-    x;
+    UNUSED(data);
+    UNUSED(x);
 #endif
     ygglog_error("AsciiTableMetaschemaType::decode_data: AsciiTable type cannot be JSON decoded.");
     return false;
@@ -360,9 +360,9 @@ public:
 		  YggGeneric* x) override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-    buf;
-    buf_siz;
-    x;
+    UNUSED(buf);
+    UNUSED(buf_siz);
+    UNUSED(x);
 #endif
     ygglog_error("AsciiTableMetaschemaType::deserialize: deserialization into generic wrapper for table not supported.");
     return -1;

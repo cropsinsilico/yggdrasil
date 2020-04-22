@@ -1874,7 +1874,7 @@ extern "C" {
 				    const char* units, const bool use_generic=false) {
     size_t *shape_ptr = (size_t*)malloc(ndim*sizeof(size_t));
     // size_t shape_size_t[ndim];
-    int i;
+    size_t i;
     for (i = 0; i < ndim; i++) {
       shape_ptr[i] = (size_t)shape[i];
       // shape_size_t[i] = (size_t)shape[i];

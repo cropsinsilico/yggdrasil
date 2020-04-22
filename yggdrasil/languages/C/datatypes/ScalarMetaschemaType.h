@@ -200,7 +200,7 @@ public:
     MetaschemaType::display(indent);
     printf("%s%-15s = %s\n", indent, "subtype", subtype_);
     printf("%s%-15s = %d\n", indent, "subtype_code", subtype_code_);
-    printf("%s%-15s = %zu\n", indent, "precision", precision_);
+    printf("%s%-15s = %ld\n", indent, "precision", precision_);
     printf("%s%-15s = %s\n", indent, "units", units_);
   }
   /*!
@@ -1754,7 +1754,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
   */
   void display(const char* indent="") const override {
     ScalarMetaschemaType::display(indent);
-    printf("%s%-15s = %zu\n", indent, "length", length_);
+    printf("%s%-15s = %ld\n", indent, "length", length_);
   }
   /*!
     @brief Get type information as a Python dictionary.
@@ -2051,9 +2051,9 @@ void NDArrayMetaschemaType::display(const char* indent) const {
   printf("%s%-15s = [ ", indent, "shape");
   if (ndim() > 0) {
     size_t i;
-    printf("%zu", shape_[0]);
+    printf("%ld", shape_[0]);
     for (i = 1; i < ndim(); i++) {
-      printf(", %zu", shape_[i]);
+      printf(", %ld", shape_[i]);
     }
   }
   printf(" ]\n");

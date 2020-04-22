@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-// static char prefix_char = '#';
+static char prefix_char = '#';
 
 
 /*! @brief C-friendly definition of MetaschemaType. */

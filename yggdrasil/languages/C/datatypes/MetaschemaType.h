@@ -443,7 +443,7 @@ public:
    */
   virtual void set_variable_length(bool new_variable_length) {
 #ifdef _WIN32
-    new_variable_length;
+    UNUSED(new_variable_length);
 #endif 
     ygglog_throw_error("MetaschemaType::set_variable_length: Cannot set variable_length for type '%s'.", type_);
   }
@@ -453,7 +453,7 @@ public:
    */
   virtual void set_in_table(bool new_in_table) {
 #ifdef _WIN32
-    new_in_table;
+    UNUSED(new_in_table);
 #endif 
     ygglog_throw_error("MetaschemaType::set_in_table: Cannot set in_table for type '%s'.", type_);
   }

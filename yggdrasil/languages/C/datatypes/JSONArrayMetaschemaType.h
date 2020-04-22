@@ -182,13 +182,13 @@ public:
     if (all_arrays()) {
       printf("%s%-15s = %s\n", indent, "all_arrays", "true");
     }
-    printf("%s%zu Elements\n", indent, items_.size());
+    printf("%s%ld Elements\n", indent, items_.size());
     char new_indent[100] = "";
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
     size_t i;
     for (i = 0; i < items_.size(); i++) {
-      printf("%sElement %zu:\n", indent, i);
+      printf("%sElement %ld:\n", indent, i);
       items_[i]->display(new_indent);
     }
   }
@@ -268,7 +268,7 @@ public:
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
     data->get_data(arg);
-    printf("%sArray with %zu elements:\n", indent, arg.size());
+    printf("%sArray with %ld elements:\n", indent, arg.size());
     for (it = arg.begin(); it != arg.end(); it++) {
       (*it)->display(new_indent);
     }

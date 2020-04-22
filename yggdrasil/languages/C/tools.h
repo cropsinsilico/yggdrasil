@@ -550,7 +550,7 @@ void va_list_t_skip(va_list_t *ap, size_t nbytes) {
     } else if (nbytes == sizeof(char*)) {
       va_arg(ap->va, char*);
     } else {
-      printf("WARNING: Cannot get argument of size %zd.\n", nbytes);
+      printf("WARNING: Cannot get argument of size %ld.\n", nbytes);
       va_arg(ap->va, void*);
       // va_arg(ap->va, char[nbytes]);
     }

@@ -39,7 +39,7 @@ public:
     MetaschemaType("direct", use_generic) {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-    type_doc;
+    UNUSED(type_doc);
 #endif
   }
   /*!
@@ -83,9 +83,9 @@ public:
 		   size_t *nargs, va_list_t &ap) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-    writer;
-    nargs;
-    ap;
+    UNUSED(writer);
+    UNUSED(nargs);
+    UNUSED(ap);
 #endif
     ygglog_error("DirectMetaschemaType::encode_data: Direct type cannot be JSON encoded.");
     return false;
@@ -100,8 +100,8 @@ public:
 		   YggGeneric* x) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-    writer;
-    x;
+    UNUSED(writer);
+    UNUSED(x);
 #endif
     ygglog_error("DirectMetaschemaType::encode_data: Direct type cannot be JSON encoded.");
     return false;
@@ -186,10 +186,10 @@ public:
 		   size_t *nargs, va_list_t &ap) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-    data;
-    allow_realloc;
-    nargs;
-    ap;
+    UNUSED(data);
+    UNUSED(allow_realloc);
+    UNUSED(nargs);
+    UNUSED(ap);
 #endif
     ygglog_error("DirectMetaschemaType::decode_data: Direct type cannot be JSON decoded.");
     return false;
@@ -203,8 +203,8 @@ public:
   bool decode_data(rapidjson::Value &data, YggGeneric* x) const override {
     // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-    data;
-    x;
+    UNUSED(data);
+    UNUSED(x);
 #endif
     ygglog_error("DirectMetaschemaType::decode_data: Direct type cannot be JSON decoded.");
     return false;
