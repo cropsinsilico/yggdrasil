@@ -1310,14 +1310,13 @@ class CompilerBase(CompilationToolBase):
                                                    libtype=libtype, **kwargs))
             else:
                 src_base, src_ext = os.path.splitext(src)
-                tool_suffix = ''
                 if not no_tool_suffix:
-                    tool_suffix = cls.get_tool_suffix()
+                    suffix += cls.get_tool_suffix()
                 if no_src_ext or src_base.endswith('_%s' % src_ext[1:]):
-                    obj = '%s%s%s%s' % (src_base, suffix, tool_suffix, cls.object_ext)
+                    obj = '%s%s%s' % (src_base, suffix, cls.object_ext)
                 else:
-                    obj = '%s_%s%s%s%s' % (src_base, src_ext[1:],
-                                           suffix, tool_suffix, cls.object_ext)
+                    obj = '%s_%s%s%s' % (src_base, src_ext[1:],
+                                         suffix, cls.object_ext)
                 if (not os.path.isabs(obj)) and (working_dir is not None):
                     obj = os.path.normpath(os.path.join(working_dir, obj))
         # Pass to linker unless dont_link is True
@@ -1686,13 +1685,11 @@ class LinkerBase(CompilationToolBase):
             prefix = ''
             out_ext = cls.executable_ext
         obj_dir, obj_base = os.path.split(obj)
-        tool_suffix = ''
         if not no_tool_suffix:
-            tool_suffix = cls.get_tool_suffix()
-        out_base = '%s%s%s%s%s' % (prefix,
-                                   os.path.splitext(obj_base)[0],
-                                   suffix, tool_suffix,
-                                   out_ext)
+            suffix += cls.get_tool_suffix()
+        out_base = '%s%s%s%s' % (prefix,
+                                 os.path.splitext(obj_base)[0],
+                                 suffix, out_ext)
         out = os.path.join(obj_dir, out_base)
         if (not os.path.isabs(out)) and (working_dir is not None):
             out = os.path.normpath(os.path.join(working_dir, out))
@@ -3221,7 +3218,9 @@ class CompiledModelDriver(ModelDriver):
         if products is None:
             products = []
         kwargs['dry_run'] = True
+        compiler = cls.get_tool('compiler', toolname=kwargs.get('toolname', None))
         suffix = cls.get_internal_suffix(commtype=kwargs.get('commtype', None))
+        suffix += compiler.get_tool_suffix()
         cls.compile_dependencies(products=products, **kwargs)
         new_products = []
         for i in range(len(products)):
