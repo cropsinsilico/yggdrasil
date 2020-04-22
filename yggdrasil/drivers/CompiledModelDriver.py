@@ -358,7 +358,7 @@ class CompilationToolBase(object):
                 tool used.
 
         """
-        return '_%s' % cls.toolname
+        return '_%sx' % cls.toolname
 
     @classmethod
     def set_env(cls, existing=None, **kwargs):
