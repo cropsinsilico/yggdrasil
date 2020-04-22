@@ -922,7 +922,8 @@ class CMakeModelDriver(BuildModelDriver):
                 flags.
 
         """
-        if kwargs.get('target_compiler', None) in ['gcc', 'g++', 'gfortran']:
+        if platform._is_win and (kwargs.get('target_compiler', None)
+                                 in ['gcc', 'g++', 'gfortran']):  # pragma: windows
             kwargs.setdefault('generator', 'MinGW Makefiles')
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         if CModelDriver._osx_sysroot is not None:
