@@ -41,7 +41,8 @@ def register_example(example_dir):
                             'test_%s.py' % example_base)
     if not os.path.isfile(testfile):  # pragma: no cover
         # TODO: Automate test creation
-        logging.error("Missing test file: %s" % testfile)
+        if not tools.is_subprocess():
+            logging.error("Missing test file: %s" % testfile)
     assert(os.path.isdir(srcdir))
     # Determine which languages are present in the example
     lang_avail = []

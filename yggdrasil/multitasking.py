@@ -557,7 +557,7 @@ class Task(ContextObject):
 
     def kill(self, *args, **kwargs):
         r"""Kill the task."""
-        if self.parallel:
+        if self.parallel and hasattr(self._base, 'kill'):
             self._base.kill(*args, **kwargs)
 
 
