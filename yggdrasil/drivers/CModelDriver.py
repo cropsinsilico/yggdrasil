@@ -92,6 +92,9 @@ class CCompilerBase(CompilerBase):
             cls.linker_attributes = dict(cls.linker_attributes,
                                          search_path_flags=['-Xlinker', '--verbose'],
                                          search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
+        elif platform._is_win and (cls.toolname not in [None, 'cl', 'msvc']):
+            cls.default_executable_env = None
+            cls.default_flags_env = None
         CompilerBase.before_registration(cls)
 
     @classmethod
@@ -164,6 +167,7 @@ class GCCCompiler(CCompilerBase):
             + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
             + [('library_rpath', '-Wl,-rpath')]))
     cxx_lib = 'stdc++'
+    toolset = 'gnu'
 
 
 class ClangCompiler(CCompilerBase):
@@ -184,6 +188,7 @@ class ClangCompiler(CCompilerBase):
             + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
             + [('library_rpath', '-rpath')]))
     cxx_lib = 'c++'
+    toolset = 'llvm'
 
 
 class MSVCCompiler(CCompilerBase):
@@ -228,6 +233,7 @@ class MSVCCompiler(CCompilerBase):
                              search_path_envvar='LIB',
                              search_path_flags=None)
     cxx_lib = None  # ('ucrtbase', 'msvcrt', 'msvcp140', 'vcruntime140')
+    toolset = 'msvc'
     
     @classmethod
     def language_version(cls, **kwargs):  # pragma: windows

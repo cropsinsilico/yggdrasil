@@ -7,7 +7,7 @@ from yggdrasil.drivers.CModelDriver import (
 
 class CPPCompilerBase(CCompilerBase):
     r"""Base class for C++ compilers."""
-    languages = ['c++']
+    languages = ['c++', 'c']
     default_executable_env = 'CXX'
     default_flags_env = 'CXXFLAGS'
     cpp_std = 'c++11'

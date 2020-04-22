@@ -92,6 +92,7 @@ class FortranCompilerBase(CompilerBase):
 #                                + [('module-dir', '-I%s'),
 #                                   ('module-search-path', '-I%s'),
 #                                   ('standard', '-std=%s')])
+#     toolset = 'llvm'
 
 
 class GFortranCompiler(FortranCompilerBase):
@@ -104,6 +105,7 @@ class GFortranCompiler(FortranCompilerBase):
                                + [('module-dir', '-J%s'),
                                   ('module-search-path', '-I%s'),
                                   ('standard', '-std=%s')])
+    toolset = 'gnu'
 
 
 # class IFortCompiler(FortranCompilerBase):
@@ -114,6 +116,7 @@ class GFortranCompiler(FortranCompilerBase):
 #                                + [('module-dir', '-module'),
 #                                   ('module-search-path', '-module'),
 #                                   ('standard', '-stand')])
+#     toolset = 'msvc'  # Is this strictly true?
 
 
 class FortranModelDriver(CompiledModelDriver):

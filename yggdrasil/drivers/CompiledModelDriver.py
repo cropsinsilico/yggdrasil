@@ -24,6 +24,7 @@ if _conda_prefix is not None:
     _system_suffix += '_' + os.path.basename(_conda_prefix)
 if _venv_prefix is not None:
     _system_suffix += '_' + os.path.basename(_venv_prefix)
+_registered_toolsets = {None: {}}
 
 
 def get_compilation_tool_registry(tooltype):
@@ -270,6 +271,8 @@ class CompilationToolBase(object):
     source_product_exts = []
     remove_product_exts = []
     is_gnu = False
+    toolset = None
+    is_build_tool = False
 
     _language_ext = None  # only update once per class
     
@@ -290,6 +293,11 @@ class CompilationToolBase(object):
         """
         if cls.toolname is None:  # pragma: debug
             raise ValueError("Registering unnamed compilation tool.")
+        if cls.toolset is not None:
+            global _registered_toolsets
+            _registered_toolsets.setdefault(cls.toolset, {})
+            for l in cls.languages:
+                _registered_toolsets[cls.toolset].setdefault(l, cls.toolname)
         cls.is_gnu = (cls.toolname in ['gcc', 'g++', 'gfortran', 'ar'])
         cls._schema_type = cls.tooltype
         attr_list = ['default_executable', 'default_flags']
@@ -339,6 +347,18 @@ class CompilationToolBase(object):
                 if new_ext is not None:
                     cls._language_ext += new_ext
         return cls._language_ext
+
+    @classmethod
+    def get_tool_suffix(cls):
+        r"""Get the string that should be added to tool products based on the
+        tool used.
+
+        Returns:
+            str: Suffix that should be added to tool products to indicate the
+                tool used.
+
+        """
+        return '_%s' % cls.toolname
 
     @classmethod
     def set_env(cls, existing=None, **kwargs):
@@ -845,9 +865,10 @@ class CompilationToolBase(object):
                     products.remove(isrc)
 
     @classmethod
-    def call(cls, args, language=None, skip_flags=False, dry_run=False,
-             out=None, overwrite=False, products=None, allow_error=False,
-             working_dir=None, additional_args=None, suffix='', **kwargs):
+    def call(cls, args, language=None, toolname=None, skip_flags=False,
+             dry_run=False, out=None, overwrite=False, products=None,
+             allow_error=False, working_dir=None, additional_args=None,
+             suffix='', **kwargs):
         r"""Call the tool with the provided arguments. If the first argument
         resembles the name of the tool executable, the executable will not be
         added.
@@ -858,6 +879,9 @@ class CompilationToolBase(object):
                 different than the languages supported by the current tool,
                 the correct tool is used instead. Defaults to None and is
                 ignored.
+            toolname (str, optional): Name of compilation tool that should be
+                used. Defaults to None and the default tool for the language
+                will be used.
             skip_flags (bool, optional): If True, args is assumed to include
                 any necessary flags. If False, args are assumed to the files
                 that the tool is called on and flags are determined from them.
@@ -901,7 +925,15 @@ class CompilationToolBase(object):
         language = kwargs.pop('%s_language' % cls.tooltype, language)
         if (language is not None) and (language not in cls.languages):
             lang_drv = import_component('model', language)
-            lang_cls = lang_drv.get_tool(cls.tooltype)
+            lang_cls = lang_drv.get_tool(cls.tooltype, toolname=toolname)
+            return lang_cls.call(args, skip_flags=skip_flags, dry_run=dry_run,
+                                 out=out, overwrite=overwrite, products=products,
+                                 allow_error=allow_error, working_dir=working_dir,
+                                 additional_args=additional_args,
+                                 suffix=suffix, **kwargs)
+        if (((toolname is not None) and (toolname != cls.toolname)
+             and (toolname not in cls.aliases))):
+            lang_cls = get_compilation_tool(cls.tooltype, toolname=toolname)
             return lang_cls.call(args, skip_flags=skip_flags, dry_run=dry_run,
                                  out=out, overwrite=overwrite, products=products,
                                  allow_error=allow_error, working_dir=working_dir,
@@ -1276,11 +1308,12 @@ class CompilerBase(CompilationToolBase):
                                                    libtype=libtype, **kwargs))
             else:
                 src_base, src_ext = os.path.splitext(src)
+                tool_suffix = cls.get_tool_suffix()
                 if no_src_ext or src_base.endswith('_%s' % src_ext[1:]):
-                    obj = '%s%s%s' % (src_base, suffix, cls.object_ext)
+                    obj = '%s%s%s%s' % (src_base, suffix, tool_suffix, cls.object_ext)
                 else:
-                    obj = '%s_%s%s%s' % (src_base, src_ext[1:],
-                                         suffix, cls.object_ext)
+                    obj = '%s_%s%s%s%s' % (src_base, src_ext[1:],
+                                           suffix, tool_suffix, cls.object_ext)
                 if (not os.path.isabs(obj)) and (working_dir is not None):
                     obj = os.path.normpath(os.path.join(working_dir, obj))
         # Pass to linker unless dont_link is True
@@ -1647,10 +1680,10 @@ class LinkerBase(CompilationToolBase):
             prefix = ''
             out_ext = cls.executable_ext
         obj_dir, obj_base = os.path.split(obj)
-        out_base = '%s%s%s%s' % (prefix,
-                                 os.path.splitext(obj_base)[0],
-                                 suffix,
-                                 out_ext)
+        out_base = '%s%s%s%s%s' % (prefix,
+                                   os.path.splitext(obj_base)[0],
+                                   suffix, cls.get_tool_suffix(),
+                                   out_ext)
         out = os.path.join(obj_dir, out_base)
         if (not os.path.isabs(out)) and (working_dir is not None):
             out = os.path.normpath(os.path.join(working_dir, out))
@@ -1910,6 +1943,9 @@ class CompiledModelDriver(ModelDriver):
                                    'Attempting to locate an alternative .')
                                   % (k, cls.language, default_tool_name))
                     setattr(cls, 'default_%s' % k, None)
+
+    def import_associated_language(cls, language):
+        pass
         
     def parse_arguments(self, args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
@@ -2132,22 +2168,27 @@ class CompiledModelDriver(ModelDriver):
                         archiver_flags=cls.get_tool(
                             'archiver', return_prop='flags', default=None))
                 out = get_compilation_tool(tooltype, toolname)(**kwargs)
+                if cls.language not in out.languages:
+                    associated = _registered_toolsets[out.toolset]
+                    if cls.language not in associated:  # pragma: debug
+                        raise RuntimeError(
+                            "Compilation tool %s not associated with the language %s."
+                            % (toolname, cls.language))
+                    out = get_compilation_tool(
+                        tooltype, associated[cls.language])(**kwargs)
             else:
-                if toolname is None:
-                    out_tool = cls.get_tool('compiler', default=None)
-                    if out_tool is None:  # pragma: debug
-                        if default is False:
-                            raise NotImplementedError("%s not set for language '%s'."
-                                                      % (tooltype.title(), cls.language))
-                        return default
-                    out = getattr(out_tool, tooltype)()
-                else:
-                    out = get_compilation_tool(tooltype, toolname)(**kwargs)
+                out_tool = cls.get_tool('compiler', toolname=toolname, default=None)
+                if out_tool is None:  # pragma: debug
+                    if default is False:
+                        raise NotImplementedError("%s not set for language '%s'."
+                                                  % (tooltype.title(), cls.language))
+                    return default
+                out = getattr(out_tool, tooltype)()
         # Returns correct property given the tool
         if return_prop == 'tool':
             return out
         elif return_prop == 'name':  # pragma: no cover
-            return out.name
+            return out.toolname
         elif return_prop == 'flags':  # pragma: no cover
             return out.flags
         else:
@@ -2289,7 +2330,8 @@ class CompiledModelDriver(ModelDriver):
         return out
 
     @classmethod
-    def get_dependency_object(cls, dep, default=None, commtype=None):
+    def get_dependency_object(cls, dep, default=None, commtype=None,
+                              toolname=None):
         r"""Get the location of an object file for a dependency.
 
         Args:
@@ -2303,6 +2345,9 @@ class CompiledModelDriver(ModelDriver):
                 comm type will be included. If None, flags for all installed
                 comm types will be included. Default to None. This keyword is
                 only used in the names of internal libraries.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
 
         Returns:
             str: Full path to the object file.
@@ -2314,13 +2359,13 @@ class CompiledModelDriver(ModelDriver):
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
                 return drv.get_dependency_object(
-                    dep, default=default, commtype=commtype)
+                    dep, default=default, commtype=commtype, toolname=toolname)
         out = None
         if dep in cls.internal_libraries:
             src = cls.get_dependency_source(dep)
             suffix = cls.get_internal_suffix(commtype=commtype)
             dep_lang = cls.internal_libraries[dep].get('language', cls.language)
-            tool = cls.get_tool('compiler', language=dep_lang)
+            tool = cls.get_tool('compiler', language=dep_lang, toolname=toolname)
             out = tool.get_output_file(
                 src, dont_link=True, suffix=suffix)
         elif os.path.isfile(dep):
@@ -2335,7 +2380,7 @@ class CompiledModelDriver(ModelDriver):
 
     @classmethod
     def get_dependency_library(cls, dep, default=None, libtype=None,
-                               commtype=None):
+                               commtype=None, toolname=None):
         r"""Get the library location for a dependency.
 
         Args:
@@ -2353,6 +2398,9 @@ class CompiledModelDriver(ModelDriver):
                 comm type will be included. If None, flags for all installed
                 comm types will be included. Default to None. This keyword is
                 only used in the names of internal libraries.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
 
         Returns:
             str: Full path to the library file. For header only libraries,
@@ -2371,7 +2419,7 @@ class CompiledModelDriver(ModelDriver):
                 drv = import_component('model', dep_lang)
                 return drv.get_dependency_library(
                     dep, default=default, libtype=libtype,
-                    commtype=commtype)
+                    commtype=commtype, toolname=toolname)
         libclass = None
         libinfo = {}
         if dep in cls.internal_libraries:
@@ -2414,7 +2462,7 @@ class CompiledModelDriver(ModelDriver):
             src = cls.get_dependency_source(dep)
             suffix = cls.get_internal_suffix(commtype=commtype)
             dep_lang = cls.internal_libraries[dep].get('language', cls.language)
-            tool = cls.get_tool('compiler', language=dep_lang)
+            tool = cls.get_tool('compiler', language=dep_lang, toolname=toolname)
             out = tool.get_output_file(dep, libtype=libtype, no_src_ext=True,
                                        build_library=True,
                                        suffix=suffix,
@@ -2530,10 +2578,13 @@ class CompiledModelDriver(ModelDriver):
         return out
 
     @classmethod
-    def get_compiler_flags(cls, **kwargs):
+    def get_compiler_flags(cls, toolname=None, **kwargs):
         r"""Determine the flags required by the current compiler.
 
         Args:
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
             **kwargs: Keyword arguments are passed to cls.update_compiler_kwargs
                 first and then the compiler's get_flags method.
 
@@ -2541,14 +2592,17 @@ class CompiledModelDriver(ModelDriver):
             list: Flags for the compiler.
 
         """
-        kwargs = cls.update_compiler_kwargs(**kwargs)
-        return cls.get_tool('compiler').get_flags(**kwargs)
+        kwargs = cls.update_compiler_kwargs(toolname=toolname, **kwargs)
+        return cls.get_tool('compiler', toolname=toolname).get_flags(**kwargs)
 
     @classmethod
-    def get_linker_flags(cls, **kwargs):
+    def get_linker_flags(cls, toolname=None, **kwargs):
         r"""Determine the flags required by the current linker.
 
         Args:
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
             **kwargs: Keyword arguments are passed to cls.update_linker_kwargs
                 first and then the linker's get_flags method.
 
@@ -2560,16 +2614,17 @@ class CompiledModelDriver(ModelDriver):
             tooltype = 'archiver'
         else:
             tooltype = 'linker'
-        tool = cls.get_tool(tooltype)
+        tool = cls.get_tool(tooltype, toolname=toolname)
         if tool is False:
             raise RuntimeError("No %s tool for language %s."
                                % (tooltype, cls.language))
-        kwargs = cls.update_linker_kwargs(**kwargs)
+        kwargs = cls.update_linker_kwargs(toolname=toolname, **kwargs)
         return tool.get_flags(**kwargs)
 
     @classmethod
     def update_compiler_kwargs(cls, for_api=False, for_model=False,
-                               commtype=None, directory=None, include_dirs=None,
+                               commtype=None, toolname=None,
+                               directory=None, include_dirs=None,
                                definitions=None, skip_interface_flags=False,
                                **kwargs):
         r"""Update keyword arguments supplied to the compiler get_flags method
@@ -2589,6 +2644,9 @@ class CompiledModelDriver(ModelDriver):
                 comm type will be included. If None, flags for all installed
                 comm types will be included. Default to None. This keyword is
                 only used if for_model is True.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
             include_dirs (list, optional): If provided, each list element will
                 be added as an included directory flag. Defaults to None and
                 is initialized as an empty list.
@@ -2644,7 +2702,7 @@ class CompiledModelDriver(ModelDriver):
             libinfo = cls.get_dependency_info(x)
             if libinfo.get('libtype', None) == 'object':
                 additional_objs.append(cls.get_dependency_object(
-                    x, commtype=commtype))
+                    x, commtype=commtype, toolname=toolname))
         if additional_objs:
             kwargs['additional_objs'] = additional_objs
         # Add directories for internal/external dependencies
@@ -2663,7 +2721,7 @@ class CompiledModelDriver(ModelDriver):
             if libtype != 'object':
                 kwargs = cls.update_linker_kwargs(
                     for_api=for_api, for_model=for_model, commtype=commtype,
-                    skip_interface_flags=skip_interface_flags,
+                    toolname=toolname, skip_interface_flags=skip_interface_flags,
                     internal_dependencies=internal_dependencies,
                     external_dependencies=external_dependencies, **kwargs)
             if libtype is not None:
@@ -2672,7 +2730,8 @@ class CompiledModelDriver(ModelDriver):
 
     @classmethod
     def update_linker_kwargs(cls, for_api=False, for_model=False, commtype=None,
-                             libtype='object', skip_interface_flags=False,
+                             toolname=None, libtype='object',
+                             skip_interface_flags=False,
                              use_library_path_internal=False, **kwargs):
         r"""Update keyword arguments supplied to the linker/archiver get_flags
         method for various options.
@@ -2688,6 +2747,9 @@ class CompiledModelDriver(ModelDriver):
                 comm type will be included. If None, flags for all installed
                 comm types will be included. Default to None. This keyword is
                 only used if for_model is True.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
             libtype (str, optional): Library type that should be created by the
                 linker/archiver. Valid values are 'static', 'shared', or
                 'object'. Defaults to 'object'.
@@ -2733,7 +2795,7 @@ class CompiledModelDriver(ModelDriver):
         all_dep = internal_dependencies + external_dependencies
         for dep in cls.get_dependency_order(all_dep):
             dep_lib = cls.get_dependency_library(
-                dep, commtype=commtype)
+                dep, commtype=commtype, toolname=toolname)
             if dep_lib:
                 if (((not kwargs.get('dry_run', False))
                      and (not os.path.isfile(dep_lib)))):  # pragma: debug
@@ -2760,29 +2822,37 @@ class CompiledModelDriver(ModelDriver):
         return kwargs
 
     @classmethod
-    def language_executable(cls):
+    def language_executable(cls, toolname=None):
         r"""Command required to compile/run a model written in this language
         from the command line.
+
+        Args:
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
 
         Returns:
             str: Name of (or path to) compiler/interpreter executable required
                 to run the compiler/interpreter from the command line.
 
         """
-        return cls.get_tool('compiler').get_executable()
+        return cls.get_tool('compiler', toolname=toolname).get_executable()
 
     @classmethod
-    def language_version(cls, **kwargs):
+    def language_version(cls, toolname=None, **kwargs):
         r"""Determine the version of this language.
 
         Args:
             **kwargs: Keyword arguments are passed to cls.run_executable.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
 
         Returns:
             str: Version of compiler/interpreter for this language.
 
         """
-        compiler = cls.get_tool('compiler')
+        compiler = cls.get_tool('compiler', toolname=toolname)
         if hasattr(compiler, 'language_version'):  # pragma: windows
             return compiler.language_version(**kwargs).strip()
         kwargs['version_flags'] = compiler.version_flags
@@ -2801,7 +2871,8 @@ class CompiledModelDriver(ModelDriver):
         return super(CompiledModelDriver, self).run_model(**kwargs)
         
     @classmethod
-    def executable_command(cls, args, exec_type='compiler', **kwargs):
+    def executable_command(cls, args, exec_type='compiler', toolname=None,
+                           **kwargs):
         r"""Compose a command for running a program using the compiler for this
         language and the provied arguments. If not already present, the
         compiler command and compiler flags are prepended to the provided
@@ -2817,6 +2888,9 @@ class CompiledModelDriver(ModelDriver):
                 returned, if 'linker', a command using the linker is returned,
                 and if 'direct', the raw args being provided are returned.
                 Defaults to 'compiler'.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
             **kwargs: Additional keyword arguments are passed to either
                 get_linker_flags or get_compiler_flags.
 
@@ -2833,9 +2907,9 @@ class CompiledModelDriver(ModelDriver):
             unused_kwargs.update(kwargs)
             return args
         elif exec_type == 'linker':
-            exec_cls = cls.get_tool('linker')
+            exec_cls = cls.get_tool('linker', toolname=toolname)
         elif exec_type == 'compiler':
-            exec_cls = cls.get_tool('compiler')
+            exec_cls = cls.get_tool('compiler', toolname=toolname)
         else:
             raise ValueError("Invalid exec_type '%s'" % exec_type)
         return exec_cls.get_executable_command(args, **kwargs)
@@ -3054,7 +3128,7 @@ class CompiledModelDriver(ModelDriver):
         return out
 
     @classmethod
-    def set_env_compiler(cls, compiler=None, **kwargs):
+    def set_env_compiler(cls, compiler=None, toolname=None, **kwargs):
         r"""Get environment variables that should be set for the compilation
         process.
 
@@ -3062,6 +3136,9 @@ class CompiledModelDriver(ModelDriver):
             compiler (CompilerBase, optional): Compiler that set_env shoudl
                 be called for. If not provided, the default compiler for
                 this language will be used.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method.
 
@@ -3070,10 +3147,11 @@ class CompiledModelDriver(ModelDriver):
 
         """
         if compiler is None:
-            compiler = cls.get_tool('compiler')
+            compiler = cls.get_tool('compiler', toolname=toolname)
         return compiler.set_env(**kwargs)
 
-    def set_env(self, for_compile=False, compile_kwargs=None, **kwargs):
+    def set_env(self, for_compile=False, compile_kwargs=None, toolname=None,
+                **kwargs):
         r"""Get environment variables that should be set for the model process.
 
         Args:
@@ -3081,6 +3159,9 @@ class CompiledModelDriver(ModelDriver):
                 that are necessary for compiling. Defaults to False.
             compile_kwargs (dict, optional): Keyword arguments that should be
                 passed to the compiler's set_env method. Defaults to empty dict.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method.
 
@@ -3092,7 +3173,7 @@ class CompiledModelDriver(ModelDriver):
         if for_compile:
             if compile_kwargs is None:
                 compile_kwargs = {}
-            compiler = self.get_tool_instance('compiler')
+            compiler = self.get_tool_instance('compiler', toolname=toolname)
             out = self.set_env_compiler(
                 compiler=compiler, existing=out,
                 logging_level=self.logger.getEffectiveLevel(),
@@ -3100,14 +3181,18 @@ class CompiledModelDriver(ModelDriver):
         return out
         
     @classmethod
-    def compile_dependencies(cls, **kwargs):
+    def compile_dependencies(cls, toolname=None, **kwargs):
         r"""Compile any required internal libraries, including the interface."""
         kwargs.setdefault('products', [])
         base_libraries = []
+        if toolname is None:
+            toolname = cls.get_tool('compiler', return_prop='name')
+        tools = _registered_toolsets[get_compilation_tool(
+            'compiler', toolname).toolset]
         for x in cls.base_languages:
             base_cls = import_component('model', x)
             base_libraries.append(base_cls.interface_library)
-            base_cls.compile_dependencies(**kwargs)
+            base_cls.compile_dependencies(toolname=tools.get(x, None), **kwargs)
         if (((cls.interface_library is not None) and cls.is_installed()
              and (cls.interface_library not in base_libraries))):
             # cls.call_compiler(cls.interface_library)
@@ -3116,9 +3201,9 @@ class CompiledModelDriver(ModelDriver):
                 if isinstance(k, tuple):
                     assert(len(k) == 2)
                     ikw = dict(kwargs, language=k[0])
-                    cls.call_compiler(k[1], **ikw)
+                    cls.call_compiler(k[1], toolname=tools.get(k[0], None), **ikw)
                 else:
-                    cls.call_compiler(k, **kwargs)
+                    cls.call_compiler(k, toolname=toolname, **kwargs)
 
     @classmethod
     def cleanup_dependencies(cls, products=None, **kwargs):
@@ -3163,7 +3248,9 @@ class CompiledModelDriver(ModelDriver):
                               skip_interface_flags=skip_interface_flags,
                               overwrite=self.overwrite,
                               working_dir=self.working_dir,
-                              products=self.products)
+                              products=self.products,
+                              toolname=self.get_tool_instance('compiler',
+                                                              return_prop='name'))
         if not kwargs.get('dont_link', False):
             default_kwargs.update(linker_flags=self.linker_flags)
         for k, v in default_kwargs.items():
@@ -3187,7 +3274,8 @@ class CompiledModelDriver(ModelDriver):
         return _system_suffix
     
     @classmethod
-    def call_compiler(cls, src, language=None, dont_build=None, **kwargs):
+    def call_compiler(cls, src, language=None, toolname=None, dont_build=None,
+                      **kwargs):
         r"""Compile a source file into an executable or linkable object file,
         checking for errors.
 
@@ -3212,6 +3300,9 @@ class CompiledModelDriver(ModelDriver):
             language (str, optional): Language that should be used to compile
                 the files. Defaults to None and the language of the current
                 driver is used.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
             products (list, optional): Existing Python list that additional
                 products produced by the compilation should be appended to.
                 Defaults to None and is ignored.
@@ -3231,11 +3322,11 @@ class CompiledModelDriver(ModelDriver):
             kwargs['dont_link'] = dont_build
         language = kwargs.pop('compiler_language', language)
         if 'env' not in kwargs:
-            kwargs['env'] = cls.set_env_compiler()
+            kwargs['env'] = cls.set_env_compiler(toolname=toolname)
         # Compile using another driver if the language dosn't match
         if (language is not None) and (language != cls.language):
             drv = import_component('model', language)
-            return drv.call_compiler(src, **kwargs)
+            return drv.call_compiler(src, toolname=toolname, **kwargs)
         # Handle internal library
         if isinstance(src, str) and (src in cls.internal_libraries):
             dep = src
@@ -3255,20 +3346,20 @@ class CompiledModelDriver(ModelDriver):
                 kwargs.setdefault(
                     'out', cls.get_dependency_library(
                         dep, libtype=kwargs['libtype'],
-                        commtype=kwargs.get('commtype', None)))
+                        commtype=kwargs.get('commtype', None), toolname=toolname))
                 if (kwargs['libtype'] == 'static') and ('linker_language' in kwargs):
                     kwargs['archiver_language'] = kwargs.pop('linker_language')
             kwargs['suffix'] = cls.get_internal_suffix(
                 commtype=kwargs.get('commtype', None))
-            return cls.call_compiler(src, **kwargs)
+            return cls.call_compiler(src, toolname=toolname, **kwargs)
         # Compile using the compiler after updating the flags
-        kwargs = cls.update_compiler_kwargs(**kwargs)
-        tool = cls.get_tool('compiler')
+        kwargs = cls.update_compiler_kwargs(toolname=toolname, **kwargs)
+        tool = cls.get_tool('compiler', toolname=toolname)
         out = tool.call(src, **kwargs)
         return out
 
     @classmethod
-    def call_linker(cls, obj, language=None, **kwargs):
+    def call_linker(cls, obj, language=None, toolname=None, **kwargs):
         r"""Link several object files to create an executable or library (shared
         or static), checking for errors.
 
@@ -3277,6 +3368,9 @@ class CompiledModelDriver(ModelDriver):
             language (str, optional): Language that should be used to link
                 the files. Defaults to None and the language of the current
                 driver is used.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
             **kwargs: Additional keyword arguments are passed to run_executable.
 
         Returns:
@@ -3284,16 +3378,17 @@ class CompiledModelDriver(ModelDriver):
 
         """
         language = kwargs.pop('linker_language', language)
+        toolname = kwargs.pop('linker_toolname', toolname)
         # Link using another driver if the language dosn't match
         if (language is not None) and (language != cls.language):
             drv = import_component('model', language)
-            return drv.call_linker(obj, **kwargs)
+            return drv.call_linker(obj, toolname=toolname, **kwargs)
         # Determine tool that should be used
         if kwargs.get('libtype', 'object') == 'static':
-            tool = cls.get_tool('archiver')
+            tool = cls.get_tool('archiver', toolname=toolname)
         else:
-            tool = cls.get_tool('linker')
+            tool = cls.get_tool('linker', toolname=toolname)
         # Compile using the tool after updating the flags
-        kwargs = cls.update_linker_kwargs(**kwargs)
+        kwargs = cls.update_linker_kwargs(toolname=toolname, **kwargs)
         out = tool.call(obj, **kwargs)
         return out

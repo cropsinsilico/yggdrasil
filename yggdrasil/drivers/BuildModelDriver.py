@@ -40,7 +40,8 @@ class BuildToolBase(CompilerBase):
                          "for build tool '%s'" % cls.toolname)  # pragma: debug
 
     @classmethod
-    def set_env(cls, language=None, language_driver=None, **kwargs):
+    def set_env(cls, language=None, language_driver=None, language_compiler=None,
+                **kwargs):
         r"""Get environment variables that should be set for the model process.
 
         Args:
@@ -49,6 +50,10 @@ class BuildToolBase(CompilerBase):
             language_driver (ModelDriver, optional): Driver for language that
                 should be used. Defaults to None and will be imported based
                 on language.
+            language_compiler (str, optional): name of compilation tool that
+                should be used to set the environment variables. Defaults to
+                None and the default compilation tools for the provided
+                language/language_driver will be used.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method.
 
@@ -61,9 +66,21 @@ class BuildToolBase(CompilerBase):
             if language is None:
                 language = cls.get_default_target_language()
             language_driver = components.import_component('model', language)
-        compiler = language_driver.get_tool('compiler')
+        compiler = language_driver.get_tool('compiler', toolname=language_compiler)
         out = compiler.set_env(existing=out)
         return out
+
+    @classmethod
+    def get_tool_suffix(cls):
+        r"""Get the string that should be added to tool products based on the
+        tool used.
+
+        Returns:
+            str: Suffix that should be added to tool products to indicate the
+                tool used.
+
+        """
+        return ""
 
 
 class BuildModelDriver(CompiledModelDriver):
@@ -77,6 +94,9 @@ class BuildModelDriver(CompiledModelDriver):
             model executable. Defaults to None.
         target_language (str, optional): Language that the target is written in.
             Defaults to None and will be set based on the source files provided.
+        target_compiler (str, optional): Compilation tool that should be used
+            for the target language. Defaults to None and will be set based on
+            the selected language driver.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
@@ -89,6 +109,8 @@ class BuildModelDriver(CompiledModelDriver):
         target_language (str): Language that the target is written in.
         target_language_driver (ModelDriver): Language driver for the target
             language.
+        target_compiler (str): Compilation tool that should be used
+            for the target language.
 
     Class Attributes:
         built_where_called (bool): If True, it is assumed that compilation
@@ -138,6 +160,7 @@ class BuildModelDriver(CompiledModelDriver):
         # to normalize the model file path rather than the working directory
         # which may be different.
         default_attr = [('target_language_driver', None),
+                        ('target_compiler', None),
                         ('buildfile', None),
                         ('builddir', None),
                         ('sourcedir', None),
@@ -216,10 +239,13 @@ class BuildModelDriver(CompiledModelDriver):
             # Try to compile C as C++
             # if self.target_language == 'c':
             #     self.target_language = 'c++'
-        if (((self.target_language_driver is None)
-             and (self.target_language is not None))):
-            self.target_language_driver = components.import_component(
-                'model', self.target_language)
+        if self.target_language is not None:
+            if self.target_language_driver is None:
+                self.target_language_driver = components.import_component(
+                    'model', self.target_language)
+            if self.target_compiler is None:
+                self.target_compiler = self.target_language_driver.get_tool(
+                    'compiler', return_prop='name')
         return self.target_language
         
     @classmethod
@@ -252,8 +278,10 @@ class BuildModelDriver(CompiledModelDriver):
 
         """
         if self.target_language_driver is not None:
-            self.target_language_driver.compile_dependencies()
+            self.target_language_driver.compile_dependencies(
+                toolname=self.target_compiler)
         kwargs['working_dir'] = self.compile_working_dir
+        kwargs['target_compiler'] = self.target_compiler
         return super(BuildModelDriver, self).compile_model(**kwargs)
         
     def cleanup(self):
@@ -277,6 +305,7 @@ class BuildModelDriver(CompiledModelDriver):
             kwargs.setdefault('compile_kwargs', {})
             kwargs['compile_kwargs']['language'] = self.target_language
             kwargs['compile_kwargs']['language_driver'] = self.target_language_driver
+            kwargs['compile_kwargs']['language_compiler'] = self.target_compiler
         out = super(BuildModelDriver, self).set_env(**kwargs)
         if not kwargs.get('for_compile', False):
             if hasattr(self.target_language_driver, 'update_ld_library_path'):
