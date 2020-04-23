@@ -368,7 +368,8 @@ class FortranModelDriver(CompiledModelDriver):
         #         cls.default_compiler = 'flang'
         CompiledModelDriver.before_registration(cls)
         try:
-            cxx_lib = CModelDriver.CModelDriver.get_tool('compiler').cxx_lib
+            cxx_lib = CModelDriver.CModelDriver.get_tool(
+                'compiler', toolname='gfortran').cxx_lib
         except NotImplementedError:
             cxx_lib = None
         cxx_orig = cls.external_libraries.pop('cxx', None)
