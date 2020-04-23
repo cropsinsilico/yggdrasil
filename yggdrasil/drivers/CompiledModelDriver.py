@@ -959,6 +959,8 @@ class CompilationToolBase(object):
         # Call from another tool if the language dosn't match
         language = kwargs.pop('%s_language' % cls.tooltype, language)
         if (language is not None) and (language not in cls.languages):
+            if toolname is None:
+                toolname = cls.toolname
             lang_drv = import_component('model', language)
             lang_cls = lang_drv.get_tool(cls.tooltype, toolname=toolname)
             return lang_cls.call(args, skip_flags=skip_flags, dry_run=dry_run,
@@ -1572,7 +1574,7 @@ class LinkerBase(CompilationToolBase):
                     '%s_flags' % cls.tooltype, '%s_language' % cls.tooltype,
                     'libraries', 'library_dirs', 'library_libs', 'library_flags']
         kws_both = ['overwrite', 'products', 'allow_error', 'dry_run',
-                    'working_dir', 'env']
+                    'working_dir', 'env', 'toolname']
         kws_link += add_kws_link
         kws_both += add_kws_both
         kwargs_link = {}
