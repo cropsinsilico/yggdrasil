@@ -238,6 +238,13 @@ class TestConnectionParam(parent.TestParam):
 class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart):
     r"""Test class for the ConnectionDriver class without start."""
 
+    def test_manipulate_shared_event(self):
+        r"""Test setting and clearing events in the shared dictionary."""
+        self.instance.set_flag_attr('_skip_after_loop')
+        assert(self.instance.check_flag_attr('_skip_after_loop'))
+        self.instance.clear_flag_attr('_skip_after_loop')
+        assert(not self.instance.check_flag_attr('_skip_after_loop'))
+
     def test_send_recv(self):
         r"""Test sending/receiving with queues closed."""
         self.instance.close_comm()
@@ -428,6 +435,17 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
         r"""Convert a sent object into a received one."""
         return obj['a']
     
+
+class TestConnectionDriverProcess(TestConnectionDriver):
+    r"""Test class for the TestConnectionDriver using process."""
+    
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for tested class."""
+        out = super(TestConnectionDriverProcess, self).inst_kwargs
+        out['task_method'] = 'process'
+        return out
+
 
 def test_ConnectionDriverOnexit_errors():
     r"""Test that errors are raised for invalid onexit."""

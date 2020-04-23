@@ -2,29 +2,21 @@ import os
 import copy
 import uuid
 import atexit
-import threading
 import logging
 import types
 import time
-from yggdrasil.tests import assert_equal
-from yggdrasil import tools
+from yggdrasil import tools, multitasking
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
 from yggdrasil.components import import_component, create_component
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
-from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
-    JSONArrayMetaschemaType)
-from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
-    JSONObjectMetaschemaType)
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 
 
 logger = logging.getLogger(__name__)
-_registered_servers = dict()
-_registered_comms = dict()
-_server_lock = threading.RLock()
-_registry_lock = threading.RLock()
+_registered_servers = multitasking.LockedDict(task_method='thread')
+_registered_comms = multitasking.LockedDict(task_method='thread')
 
 
 def is_registered(comm_class, key):
@@ -35,8 +27,8 @@ def is_registered(comm_class, key):
         key (str): Key that should be checked.
 
     """
-    with _registry_lock:
-        global _registered_comms
+    global _registered_comms
+    with _registered_comms.lock:
         if comm_class not in _registered_comms:
             return False
         return (key in _registered_comms[comm_class])
@@ -52,7 +44,7 @@ def get_comm_registry(comm_class):
         dict: Dictionary of registered comm objects.
 
     """
-    with _registry_lock:
+    with _registered_comms.lock:
         if comm_class is None:
             out = {}
         else:
@@ -69,10 +61,10 @@ def register_comm(comm_class, key, value):
         value (obj): Object being registered.
 
     """
-    with _registry_lock:
-        global _registered_comms
+    global _registered_comms
+    with _registered_comms.lock:
         if comm_class not in _registered_comms:
-            _registered_comms[comm_class] = dict()
+            _registered_comms.add_subdict(comm_class)
         if key not in _registered_comms[comm_class]:
             _registered_comms[comm_class][key] = value
 
@@ -90,8 +82,8 @@ def unregister_comm(comm_class, key, dont_close=False):
         bool: True if an object was closed.
 
     """
-    with _registry_lock:
-        global _registered_comms
+    global _registered_comms
+    with _registered_comms.lock:
         if comm_class not in _registered_comms:
             return False
         if key not in _registered_comms[comm_class]:
@@ -117,10 +109,10 @@ def cleanup_comms(comm_class, close_func=None):
     count = 0
     if comm_class is None:
         return count
-    with _registry_lock:
-        global _registered_comms
+    global _registered_comms
+    with _registered_comms.lock:
         if comm_class in _registered_comms:
-            keys = [k for k in _registered_comms[comm_class].keys()]
+            keys = list(_registered_comms[comm_class].keys())
             for k in keys:
                 flag = unregister_comm(comm_class, k)
                 if flag:  # pragma: debug
@@ -128,26 +120,26 @@ def cleanup_comms(comm_class, close_func=None):
     return count
 
 
-class CommThreadLoop(tools.YggThreadLoop):
-    r"""Thread loop for comms to ensure cleanup.
+class CommTaskLoop(multitasking.YggTaskLoop):
+    r"""Task loop for comms to ensure cleanup.
 
     Args:
         comm (:class:.CommBase): Comm class that thread is for.
         name (str, optional): Name for the thread. If not provided, one is
             created by combining the comm name and the provided suffix.
         suffix (str, optional): Suffix that should be added to comm name to name
-            the thread. Defaults to 'CommThread'.
+            the thread. Defaults to 'CommTask'.
         **kwargs: Additional keyword arguments are passed to the parent class.
 
     Attributes:
         comm (:class:.CommBase): Comm class that thread is for.
 
     """
-    def __init__(self, comm, name=None, suffix='CommThread', **kwargs):
+    def __init__(self, comm, name=None, suffix='CommTask', **kwargs):
         self.comm = comm
         if name is None:
             name = '%s.%s' % (comm.name, suffix)
-        super(CommThreadLoop, self).__init__(name=name, **kwargs)
+        super(CommTaskLoop, self).__init__(name=name, **kwargs)
 
     def on_main_terminated(self):  # pragma: debug
         r"""Actions taken on the backlog thread when the main thread stops."""
@@ -162,10 +154,10 @@ class CommThreadLoop(tools.YggThreadLoop):
                 self.debug("Close in thread, closed = %s, nmsg = %d",
                            self.comm.is_closed, self.comm.n_msg)
                 return
-        super(CommThreadLoop, self).on_main_terminated()
+        super(CommTaskLoop, self).on_main_terminated()
 
 
-class CommServer(tools.YggThreadLoop):
+class CommServer(multitasking.YggTaskLoop):
     r"""Basic server object to keep track of clients.
 
     Attributes:
@@ -400,6 +392,9 @@ class CommBase(tools.YggClass):
     address_description = None
     no_serialization = False
     _model_schema_prop = ['is_default', 'outside_loop', 'default_file']
+    _disconnect_attr = (tools.YggClass._disconnect_attr
+                        + ['_closing_event', '_closing_thread',
+                           '_eof_recv', '_eof_sent'])
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
                  is_interface=None, language=None, partner_language='python',
@@ -407,7 +402,7 @@ class CommBase(tools.YggClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 comm=None, **kwargs):
+                 comm=None, touches_model=False, **kwargs):
         self._comm_class = None
         if comm is not None:
             assert(comm == self.comm_class)
@@ -461,6 +456,7 @@ class CommBase(tools.YggClass):
         self._last_header = None
         self._work_comms = {}
         self.single_use = single_use
+        self.touches_model = touches_model
         self._used = False
         self._multiple_first_send = True
         self._n_sent = 0
@@ -482,11 +478,12 @@ class CommBase(tools.YggClass):
         #     self._timeout_drain = False
         # else:
         #     self._timeout_drain = self.timeout
-        self._closing_event = threading.Event()
-        self._closing_thread = tools.YggThread(target=self.linger_close,
-                                               name=self.name + '.ClosingThread')
-        self._eof_recv = threading.Event()
-        self._eof_sent = threading.Event()
+        self._closing_event = multitasking.Event()
+        self._closing_thread = multitasking.YggTask(
+            target=self.linger_close,
+            name=self.name + '.ClosingTask')
+        self._eof_recv = multitasking.Event()
+        self._eof_sent = multitasking.Event()
         self._field_backlog = dict()
         if self.single_use:
             self._eof_recv.set()
@@ -500,6 +497,16 @@ class CommBase(tools.YggClass):
             self.bind()
         else:
             self.open()
+
+    def __getstate__(self):
+        if self.is_open and (self._commtype != 'buffer'):  # pragma: debug
+            raise RuntimeError("Cannot pickle an open comm.")
+        return super(CommBase, self).__getstate__()
+
+    def __setstate__(self, state):
+        super(CommBase, self).__setstate__(state)
+        if self.is_interface:  # pragma: debug
+            atexit.register(self.atexit)
 
     def _init_before_open(self, **kwargs):
         r"""Initialization steps that should be performed after base class, but
@@ -842,6 +849,7 @@ class CommBase(tools.YggClass):
 
     def open(self):
         r"""Open the connection."""
+        self.debug("Openning %s", self.address)
         self.bind()
 
     def _close(self, *args, **kwargs):
@@ -856,7 +864,7 @@ class CommBase(tools.YggClass):
                 comm. Defaults to False.
 
         """
-        self.debug('')
+        self.debug("Closing %s", self.address)
         if linger and self.is_open:
             self.linger()
         else:
@@ -893,7 +901,8 @@ class CommBase(tools.YggClass):
         if self.language_driver.comm_linger:  # pragma: matlab
             self.linger_close()
             self._closing_thread.set_terminated_flag()
-        self.debug("current_thread = %s", threading.current_thread().name)
+        self.debug("current_thread = %s",
+                   self._closing_thread.get_current_task())
         try:
             self._closing_thread.start()
             _started_thread = True
@@ -913,6 +922,8 @@ class CommBase(tools.YggClass):
         r"""Wait for messages to drain."""
         self.debug('')
         if self.direction == 'recv':
+            while self.is_open and (self.n_msg_recv_drain > 0):  # pragma: debug
+                self.recv(timeout=0)
             self.wait_for_confirm(timeout=self._timeout_drain)
         else:
             self.drain_messages(variable='n_msg_send')
@@ -1116,6 +1127,7 @@ class CommBase(tools.YggClass):
             bool: True if the object is empty, False otherwise.
 
         """
+        from yggdrasil.tests import assert_equal
         try:
             assert_equal(msg, emsg)
         except AssertionError:
@@ -1193,8 +1205,8 @@ class CommBase(tools.YggClass):
 
     def signon_to_server(self):
         r"""Add a client to an existing server or create one."""
-        with _server_lock:
-            global _registered_servers
+        global _registered_servers
+        with _registered_servers.lock:
             if self._server is None:
                 if not self.server_exists(self.address):
                     self.debug("Creating new server")
@@ -1207,7 +1219,8 @@ class CommBase(tools.YggClass):
 
     def signoff_from_server(self):
         r"""Remove a client from the server."""
-        with _server_lock:
+        global _registered_servers
+        with _registered_servers.lock:
             if self._server is not None:
                 self.debug("Signing off")
                 self._server.remove_client()
@@ -1606,7 +1619,7 @@ class CommBase(tools.YggClass):
             else:  # pragma: debug
                 self.special_debug("Sending message header failed.")
         if flag:
-            self.debug('Sent %d bytes', msg_len)
+            self.debug('Sent %d bytes to %s', msg_len, self.address)
         else:  # pragma: debug
             self.special_debug('Failed to send %d bytes', msg_len)
         return flag
@@ -1817,7 +1830,7 @@ class CommBase(tools.YggClass):
         else:
             msg_len = 1
         if flag and (msg_len > 0):
-            self.debug('%d bytes received', msg_len)
+            self.debug('%d bytes received from %s', msg_len, self.address)
         return flag, msg
         
     def recv_nolimit(self, *args, **kwargs):
@@ -1869,6 +1882,8 @@ class CommBase(tools.YggClass):
             RuntimeError: If the field order can not be determined.
 
         """
+        from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
+            JSONArrayMetaschemaType)
         metadata = kwargs.get('header_kwargs', {})
         if 'field_order' in kwargs:
             kwargs.setdefault('key_order', kwargs.pop('field_order'))
@@ -1902,6 +1917,8 @@ class CommBase(tools.YggClass):
         Raises:
 
         """
+        from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
+            JSONObjectMetaschemaType)
         if 'field_order' in kwargs:
             kwargs.setdefault('key_order', kwargs.pop('field_order'))
         key_order = kwargs.pop('key_order', None)

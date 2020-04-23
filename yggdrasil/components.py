@@ -2,8 +2,10 @@ import os
 import glob
 import copy
 import six
+import inspect
 import importlib
 # import warnings
+import weakref
 from collections import OrderedDict
 from yggdrasil.doctools import docs2args
 
@@ -35,6 +37,65 @@ _comptype2mod = {'serializer': 'serialize',
 # 'compiler': 'drivers',
 # 'linker': 'drivers',
 # 'archiver': 'drivers'}
+
+
+class ClassRegistry(OrderedDict):
+    r"""Class for registering classes."""
+
+    def __init__(self, *args, import_function=None, **kwargs):
+        module = inspect.getmodule(inspect.stack()[1][0])
+        self._module = module.__name__
+        self._directory = os.path.dirname(module.__file__)
+        # self._schema_directory = os.path.join(self._directory, 'schemas')
+        self._import_function = import_function
+        self._imported = False
+        super(ClassRegistry, self).__init__(*args, **kwargs)
+
+    def import_classes(self):
+        r"""Import all classes in the same directory."""
+        if self._imported:
+            return
+        self._imported = True
+        for x in glob.glob(os.path.join(self._directory, '*.py')):
+            mod = os.path.basename(x)[:-3]
+            if not mod.startswith('__'):
+                importlib.import_module(self._module + '.%s' % mod)
+        if self._import_function is not None:
+            self._import_function()
+
+    def keys(self, *args, **kwargs):
+        self.import_classes()
+        return super(ClassRegistry, self).keys(*args, **kwargs)
+
+    def values(self, *args, **kwargs):
+        self.import_classes()
+        return super(ClassRegistry, self).values(*args, **kwargs)
+
+    def items(self, *args, **kwargs):
+        self.import_classes()
+        return super(ClassRegistry, self).items(*args, **kwargs)
+
+    def __contains__(self, key):
+        self.import_classes()
+        return super(ClassRegistry, self).__contains__(key)
+
+    def get(self, key, default=None):
+        if (not self.has_entry(key)):
+            self.import_classes()
+        return super(ClassRegistry, self).get(key, default)
+
+    def __getitem__(self, *args, **kwargs):
+        try:
+            return super(ClassRegistry, self).__getitem__(*args, **kwargs)
+        except KeyError:  # pragma: no cover
+            # This will only be called during import
+            if self._imported:
+                raise
+            self.import_classes()
+            return super(ClassRegistry, self).__getitem__(*args, **kwargs)
+
+    def has_entry(self, key):
+        return super(ClassRegistry, self).__contains__(key)
 
 
 def init_registry():
@@ -278,7 +339,9 @@ def get_component_base_class(comptype, subtype=None, without_schema=False,
     """
     if comptype in _registry_base_classes:
         base_class_name = _registry_base_classes[comptype]
-    else:
+    else:  # pragma: no cover
+        # Only called during initial import which is not covered by
+        # the test runner
         default_class = import_component(comptype, subtype=subtype,
                                          without_schema=without_schema,
                                          **kwargs)
@@ -519,11 +582,22 @@ class ComponentBase(object):
     _schema_excluded_from_class_validation = []
     _schema_inherit = True
     _dont_register = False
+    _disconnect_attr = []
 
     def __new__(cls, *args, **kwargs):
         obj = object.__new__(cls)
-        obj._input_args = args
-        obj._input_kwargs = kwargs
+        obj._input_args = []
+        for x in args:
+            try:
+                obj._input_args.append(weakref.ref(x))
+            except TypeError:
+                obj._input_args.append(x)
+        obj._input_kwargs = {}
+        for k, v in kwargs.items():
+            try:
+                obj._input_kwargs[k] = weakref.ref(v)
+            except TypeError:
+                obj._input_kwargs[k] = v
         return obj
     
     def __init__(self, skip_component_schema_normalization=None, **kwargs):
@@ -553,7 +627,8 @@ class ComponentBase(object):
                 if isinstance(kwargs.get(k, None), (bytes, str)):
                     kwargs[k] = kwargs[k].split()
         # Parse keyword arguments using schema
-        if (comptype is not None) and (subtype is not None):
+        if (((comptype is not None) and (subtype is not None)
+             and (not skip_component_schema_normalization))):
             from yggdrasil.schema import get_schema
             s = get_schema().get_component_schema(
                 comptype, subtype, relaxed=True,
@@ -593,6 +668,25 @@ class ComponentBase(object):
             #                    "with the value %s.")
             #                   % (k, v, getattr(self, k)))
         self.extra_kwargs = kwargs
+
+    def __getstate__(self):
+        out = self.__dict__.copy()
+        del out['_input_args'], out['_input_kwargs']
+        return out
+
+    def __setstate__(self, state):
+        state['_input_args'] = []
+        state['_input_kwargs'] = {}
+        self.__dict__.update(state)
+
+    def __del__(self):
+        self.disconnect()
+
+    def disconnect(self):
+        r"""Disconnect attributes that are aliases."""
+        for k in self._disconnect_attr:
+            if hasattr(getattr(self, k, None), 'disconnect'):
+                getattr(self, k).disconnect()
 
     @staticmethod
     def before_registration(cls):

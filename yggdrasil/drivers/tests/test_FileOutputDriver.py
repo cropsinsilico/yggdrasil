@@ -89,8 +89,6 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
     def setup(self):
         r"""Create a driver instance and start the driver."""
         super(TestFileOutputDriver, self).setup()
-        # self.instance._comm_opened.wait(self.timeout)
-        # print(self.instance._comm_opened.is_set())
         self.send_file_contents()
         
     # def run_before_stop(self):

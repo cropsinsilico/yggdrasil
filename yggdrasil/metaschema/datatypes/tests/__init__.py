@@ -5,6 +5,13 @@ from yggdrasil.metaschema.datatypes.ScalarMetaschemaType import (
     ScalarMetaschemaType)
 
 
+def test_registry_operations():
+    r"""Test access to registry dictionary operations."""
+    datatypes._type_registry.items()
+    datatypes._type_registry.keys()
+    datatypes._type_registry.values()
+
+
 def test_get_type_class():
     r"""Test get_type_class."""
     for v in _valid_objects.keys():

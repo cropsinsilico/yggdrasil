@@ -30,6 +30,7 @@ environment:
     INSTALLLPY: 0
     INSTALLR: 1
     INSTALLC: 1
+    INSTALLSBML: 1
     BUILDDOCS: 0
     YGG_CONDA: 1
     YGG_TEST_FLAGS:

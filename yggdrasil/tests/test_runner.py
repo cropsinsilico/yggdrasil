@@ -26,6 +26,14 @@ def test_get_run():
                namespace=namespace)
 
 
+def test_run_process_connections():
+    r"""Test run with process based connections."""
+    namespace = "test_run_%s" % str(uuid.uuid4)
+    runner.run([ex_yamls['hello']['python']],
+               connection_task_method='process',
+               namespace=namespace)
+
+
 # def test_runner_error():
 #     r"""Start a runner for a model with an error."""
 #     cr = runner.get_runner([sc_yamls['error']])

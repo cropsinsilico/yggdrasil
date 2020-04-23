@@ -85,6 +85,11 @@ def test_get_installed():
     tools.get_installed_comm()
 
 
+def test_is_comm_installed():
+    r"""Test is_comm_installed for any."""
+    assert(tools.is_comm_installed('zmq', language='any'))
+
+
 def test_which():
     r"""Test location of executable."""
     assert(tools.which(sys.executable) is not None)
@@ -205,6 +210,7 @@ class TestYggClass(YggTestClass):
         self.instance.verbose_debug(1)
         self.instance.critical(1)
         self.instance.warning(1)
+        self.instance.warn(1)
         self.instance.error(1)
         self.instance.exception(1)
         try:

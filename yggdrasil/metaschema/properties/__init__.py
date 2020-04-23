@@ -1,10 +1,7 @@
-import os
-import glob
-import importlib
-from collections import OrderedDict
+from yggdrasil.components import ClassRegistry
 
 
-_metaschema_properties = OrderedDict()
+_metaschema_properties = ClassRegistry()
 
 
 def register_metaschema_property(prop_class):
@@ -28,7 +25,7 @@ def register_metaschema_property(prop_class):
     from yggdrasil.metaschema import _metaschema, _base_validator
     global _metaschema_properties
     prop_name = prop_class.name
-    if prop_name in _metaschema_properties:
+    if _metaschema_properties.has_entry(prop_name):
         raise ValueError("Property '%s' already registered." % prop_name)
     if prop_name in _base_validator.VALIDATORS:
         if (prop_class.schema is not None):
@@ -83,18 +80,7 @@ def get_metaschema_property(property_name, skip_generic=False):
 
     """
     from yggdrasil.metaschema.properties import MetaschemaProperty
-    if property_name in _metaschema_properties:
-        return _metaschema_properties[property_name]
-    else:
-        if skip_generic:
-            return None
-        else:
-            return MetaschemaProperty.MetaschemaProperty
-
-
-def import_all_properties():
-    r"""Import all types to ensure they are registered."""
-    for x in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
-        mod = os.path.basename(x)[:-3]
-        if not mod.startswith('__'):
-            importlib.import_module('yggdrasil.metaschema.properties.%s' % mod)
+    out = _metaschema_properties.get(property_name, None)
+    if (out is None) and (not skip_generic):
+        out = MetaschemaProperty.MetaschemaProperty
+    return out

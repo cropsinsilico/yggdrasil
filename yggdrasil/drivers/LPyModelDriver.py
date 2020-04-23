@@ -17,6 +17,8 @@ class LPyModelDriver(PythonModelDriver):  # pragma: lpy
     default_interpreter_flags = [_model_script]
     interface_dependencies = ['openalea.lpy']
     function_param = None
+    full_language = False
+    is_dsl = True
 
     @classmethod
     def language_version(cls, **kwargs):

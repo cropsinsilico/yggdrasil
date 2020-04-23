@@ -16,7 +16,6 @@ import shutil
 import inspect
 import time
 import signal
-import atexit
 import uuid as uuid_gen
 import subprocess
 import importlib
@@ -35,9 +34,6 @@ if ((logging.getLogger("yggdrasil").getEffectiveLevel()
      <= logging.DEBUG)):  # pragma: debug
     _stack_in_log = False
     _stack_in_timeout = True
-_thread_registry = {}
-_lock_registry = {}
-_main_thread = threading.main_thread()
 
 
 def apply_recurse(x, func, **kwargs):
@@ -112,37 +108,11 @@ def str2bytes(x, recurse=False):
     return out
 
 
-def check_threads():  # pragma: debug
-    r"""Check for threads that are still running."""
-    global _thread_registry
-    # logger.info("Checking %d threads" % len(_thread_registry))
-    for k, v in _thread_registry.items():
-        if v.is_alive():
-            logger.error("Thread is alive: %s" % k)
-    if threading.active_count() > 1:
-        logger.info("%d threads running" % threading.active_count())
-        for t in threading.enumerate():
-            logger.info("%s thread running" % t.name)
-
-
-def check_locks():  # pragma: debug
-    r"""Check for locks in lock registry that are locked."""
-    global _lock_registry
-    # logger.info("Checking %d locks" % len(_lock_registry))
-    for k, v in _lock_registry.items():
-        res = v.acquire(False)
-        if res:
-            v.release()
-        else:
-            logger.error("Lock could not be acquired: %s" % k)
-
-
-def check_sockets():  # pragma: debug
-    r"""Check registered sockets."""
-    from yggdrasil.communication import cleanup_comms
-    count = cleanup_comms('ZMQComm')
-    if count > 0:
-        logger.info("%d sockets closed." % count)
+def get_fds():  # pragma: debug
+    r"""Get a list of open file descriptors."""
+    out = subprocess.check_output(
+        'lsof -p {} | grep -v txt'.format(os.getpid()), shell=True)
+    return out.splitlines()[1:]
 
 
 def check_environ_bool(name, valid_values=['true', '1', True, 1]):
@@ -335,25 +305,6 @@ def is_subprocess():
 
     """
     return check_environ_bool('YGG_SUBPROCESS')
-
-
-def ygg_atexit():  # pragma: debug
-    r"""Things to do at exit."""
-    check_locks()
-    check_threads()
-    # # This causes a segfault in a C dependency
-    # if not is_subprocess():
-    #     check_sockets()
-    # Python 3.4 no longer supported if using pip 9.0.0, but this
-    # allows the code to work if somehow installed using an older
-    # version of pip
-    if sys.version_info[0:2] == (3, 4):  # pragma: no cover
-        # Print empty line to ensure close
-        print('', end='')
-        sys.stdout.flush()
-
-
-atexit.register(ygg_atexit)
 
 
 def which(program):
@@ -689,13 +640,13 @@ def get_installed_comm(language=None):
 
 def get_default_comm():
     r"""Get the default comm that should be used for message passing."""
-    comm_list = get_installed_comm()
     if 'YGG_DEFAULT_COMM' in os.environ:
         _default_comm = os.environ['YGG_DEFAULT_COMM']
-        if not is_comm_installed(_default_comm, language='any'):  # pragma: debug
-            raise Exception('Unsupported default comm %s set by YGG_DEFAULT_COMM' % (
-                            _default_comm))
+        # if not is_comm_installed(_default_comm, language='any'):  # pragma: debug
+        #     raise Exception('Unsupported default comm %s set by YGG_DEFAULT_COMM' % (
+        #                     _default_comm))
     else:
+        comm_list = get_installed_comm()
         if len(comm_list) > 0:
             _default_comm = comm_list[0]
         else:  # pragma: windows
@@ -1019,7 +970,49 @@ class TimeOut(object):
 #     return wrapper
 
 
-class YggClass(ComponentBase, logging.LoggerAdapter):
+class YggLoggerAdapter(logging.LoggerAdapter):
+    r"""Logger adapter for use with YggClass."""
+
+    def __init__(self, class_name, instance_name, *args, **kwargs):
+        self._class_name = class_name
+        self._instance_name = instance_name
+        super(YggLoggerAdapter, self).__init__(*args, **kwargs)
+    
+    def process(self, msg, kwargs):
+        r"""Process logging message."""
+        if _stack_in_log:  # pragma: no cover
+            stack = inspect.stack()
+            the_class = os.path.splitext(os.path.basename(
+                stack[2][0].f_globals["__file__"]))[0]
+            the_line = stack[2][2]
+            the_func = stack[2][3]
+            prefix = '%s(%s).%s[%d]' % (the_class,
+                                        self._instance_name,
+                                        the_func, the_line)
+        else:
+            prefix = '%s(%s)' % (self._class_name,
+                                 self._instance_name)
+        new_msg = '%s: %s' % (prefix, self.as_str(msg))
+        return new_msg, kwargs
+
+    def as_str(self, obj):
+        r"""Return str version of object if it is not already a string.
+
+        Args:
+            obj (object): Object that should be turned into a string.
+
+        Returns:
+            str: String version of provided object.
+
+        """
+        if not isinstance(obj, str):
+            obj_str = str(obj)
+        else:
+            obj_str = obj
+        return obj_str
+
+
+class YggClass(ComponentBase):
     r"""Base class for Ygg classes.
 
     Args:
@@ -1074,21 +1067,28 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         self.sched_out = None
         self.suppress_special_debug = False
         self._periodic_logs = {}
-        # self.logger = logging.getLogger(self.__module__)
-        # self.logger.basicConfig(
-        #     format=("%(levelname)s:%(module)s" +
-        #             # "(%s)" % self.name +
-        #             ".%(funcName)s[%(lineno)d]:%(message)s"))
         self._old_loglevel = None
         self._old_encoding = None
         self.debug_flag = False
-        self._ygg_class = str(self.__class__).split("'")[1].split('.')[-1]
         # Call super class, adding in schema properties
         for k in self._base_defaults:
             if k in self._schema_properties:
                 kwargs[k] = getattr(self, k)
         super(YggClass, self).__init__(**kwargs)
-        logging.LoggerAdapter.__init__(self, logging.getLogger(self.__module__), {})
+        self.logger = YggLoggerAdapter(
+            self.__class__.__name__, self.print_name,
+            logging.getLogger(self.__module__), {})
+
+    def __getstate__(self):
+        state = super(YggClass, self).__getstate__()
+        del state['logger']
+        return state
+
+    def __setstate__(self, state):
+        super(YggClass, self).__setstate__(state)
+        self.logger = YggLoggerAdapter(
+            self.__class__.__name__, self.print_name,
+            logging.getLogger(self.__module__), {})
 
     def __deepcopy__(self, memo):
         r"""Don't deep copy since threads cannot be copied."""
@@ -1100,9 +1100,9 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         return self._name
 
     @property
-    def ygg_class(self):
-        r"""str: Name of the class."""
-        return self._ygg_class
+    def print_name(self):
+        r"""str: Name of the class object."""
+        return self._name.replace('%', '%%')
 
     def language_info(self, languages):
         r"""Only do info debug message if the language is one of those specified."""
@@ -1110,7 +1110,7 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
             languages = [languages]
         languages = [l.lower() for l in languages]
         if get_subprocess_language().lower() in languages:  # pragma: debug
-            return self.info
+            return self.logger.info
         else:
             return self.dummy_log
 
@@ -1118,7 +1118,7 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
     def interface_info(self):
         r"""Only do info debug message if is interface."""
         if is_subprocess():  # pragma: debug
-            return self.info
+            return self.logger.info
         else:
             return self.dummy_log
 
@@ -1154,44 +1154,14 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         out = sblock + pprint.pformat(obj, **kwargs).replace('\n', '\n' + sblock)
         return out
 
-    def as_str(self, obj):
-        r"""Return str version of object if it is not already a string.
-
-        Args:
-            obj (object): Object that should be turned into a string.
-
-        Returns:
-            str: String version of provided object.
-
-        """
-        if not isinstance(obj, str):
-            obj_str = str(obj)
-        else:
-            obj_str = obj
-        return obj_str
-
-    def process(self, msg, kwargs):
-        r"""Process logging message."""
-        if _stack_in_log:  # pragma: no cover
-            stack = inspect.stack()
-            the_class = os.path.splitext(os.path.basename(
-                stack[2][0].f_globals["__file__"]))[0]
-            the_line = stack[2][2]
-            the_func = stack[2][3]
-            prefix = '%s(%s).%s[%d]' % (the_class, self.name, the_func, the_line)
-        else:
-            prefix = '%s(%s)' % (self.ygg_class, self.name)
-        new_msg = '%s: %s' % (prefix, self.as_str(msg))
-        return new_msg, kwargs
-
     def display(self, msg='', *args, **kwargs):
         r"""Print a message, no log."""
-        msg, kwargs = self.process(msg, kwargs)
+        msg, kwargs = self.logger.process(msg, kwargs)
         print(msg % args)
 
     def verbose_debug(self, *args, **kwargs):
         r"""Log a verbose debug level message."""
-        return self.log(9, *args, **kwargs)
+        return self.logger.log(9, *args, **kwargs)
         
     def dummy_log(self, *args, **kwargs):
         r"""Dummy log function that dosn't do anything."""
@@ -1214,7 +1184,7 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         else:
             self._periodic_logs[key] = 0
         if (self._periodic_logs[key] % period) == 0:
-            return self.debug
+            return self.logger.debug
         else:
             return self.dummy_log
 
@@ -1222,15 +1192,41 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
     def special_debug(self):
         r"""Log debug level message contingent of supression flag."""
         if not self.suppress_special_debug:
-            return self.debug
+            return self.logger.debug
         else:
             return self.dummy_log
+
+    @property
+    def info(self):
+        r"""Log an info level message."""
+        return self.logger.info
+
+    @property
+    def debug(self):
+        r"""Log a debug level message."""
+        return self.logger.debug
+
+    @property
+    def critical(self):
+        r"""Log a critical level message."""
+        return self.logger.critical
+
+    @property
+    def warn(self):
+        r"""Log a warning level message."""
+        return self.logger.warning
+
+    @property
+    def warning(self):
+        r"""Log a warning level message."""
+        return self.logger.warning
 
     @property
     def error(self):
         r"""Log an error level message."""
         self.errors.append('ERROR')
-        return super(YggClass, self).error
+        return self.logger.error
+        # return super(YggClass, self).error
 
     @property
     def exception(self):
@@ -1238,7 +1234,8 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
         exc_info = sys.exc_info()
         if exc_info is not None and exc_info != (None, None, None):
             self.errors.append('ERROR')
-            return super(YggClass, self).exception
+            return self.logger.exception
+            # return super(YggClass, self).exception
         else:
             return self.error
 
@@ -1256,7 +1253,7 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
 
     def printStatus(self):
         r"""Print the class status."""
-        self.info('%s(%s): state:', self.__module__, self.name)
+        self.logger.info('%s(%s): state:', self.__module__, self.print_name)
 
     def _task_with_output(self, func, *args, **kwargs):
         self.sched_out = func(*args, **kwargs)
@@ -1327,10 +1324,10 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
             stack = inspect.stack()
             fcn = stack[key_level + 2][3]
             cls = os.path.splitext(os.path.basename(stack[key_level + 2][1]))[0]
-            key = '%s(%s).%s.%s' % (cls, self.name, fcn,
+            key = '%s(%s).%s.%s' % (cls, self.print_name, fcn,
                                     threading.current_thread().name)
         else:
-            key = '%s(%s).%s' % (str(self.__class__).split("'")[1], self.name,
+            key = '%s(%s).%s' % (str(self.__class__).split("'")[1], self.print_name,
                                  threading.current_thread().name)
         if key_suffix is not None:
             key += key_suffix
@@ -1427,278 +1424,3 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
                 self.error("Timeout for %s at %5.2f/%5.2f s" % (
                     key, t.elapsed, t.max_time))
         del self._timeouts[key]
-        
-
-class YggThread(threading.Thread, YggClass):
-    r"""Thread for Ygg that tracks when the thread is started and joined.
-
-    Attributes:
-        lock (threading.RLock): Lock for accessing the sockets from multiple
-            threads.
-        start_event (threading.Event): Event indicating that the thread was
-            started.
-        terminate_event (threading.Event): Event indicating that the thread
-            should be terminated. The target must exit when this is set.
-
-    """
-    def __init__(self, name=None, target=None, args=(), kwargs=None,
-                 daemon=False, group=None, **ygg_kwargs):
-        global _lock_registry
-        if kwargs is None:
-            kwargs = {}
-        if (target is not None) and ('target' in self._schema_properties):
-            ygg_kwargs['target'] = target
-            target = None
-        thread_kwargs = dict(name=name, target=target, group=group,
-                             args=args, kwargs=kwargs)
-        super(YggThread, self).__init__(**thread_kwargs)
-        YggClass.__init__(self, self.name, **ygg_kwargs)
-        self._ygg_target = target
-        self._ygg_args = args
-        self._ygg_kwargs = kwargs
-        self.debug('')
-        self.lock = threading.RLock()
-        self.start_event = threading.Event()
-        self.terminate_event = threading.Event()
-        self.start_flag = False
-        self.terminate_flag = False
-        self._cleanup_called = False
-        self._calling_thread = None
-        if daemon:  # pragma: debug
-            self.setDaemon(True)
-            self.daemon = True
-        _thread_registry[self.name] = self
-        _lock_registry[self.name] = self.lock
-        atexit.register(self.atexit)
-
-    @property
-    def main_terminated(self):
-        r"""bool: True if the main thread has terminated."""
-        return (not _main_thread.is_alive())
-        # return (not self._calling_thread.is_alive())
-
-    def set_started_flag(self):
-        r"""Set the started flag for the thread to True."""
-        # self.start_event.set()
-        self.start_flag = True
-
-    def set_terminated_flag(self):
-        r"""Set the terminated flag for the thread to True."""
-        # self.terminate_event.set()
-        self.terminate_flag = True
-
-    def unset_started_flag(self):  # pragma: debug
-        r"""Set the started flag for the thread to False."""
-        # self.start_event.clear()
-        self.start_flag = False
-
-    def unset_terminated_flag(self):  # pragma: debug
-        r"""Set the terminated flag for the thread to False."""
-        # self.terminate_event.clear()
-        self.terminated_flag = False
-
-    @property
-    def was_started(self):
-        r"""bool: True if the thread was started. False otherwise."""
-        # return self.start_event.is_set()
-        return self.start_flag
-
-    @property
-    def was_terminated(self):
-        r"""bool: True if the thread was terminated. False otherwise."""
-        # return self.terminate_event.is_set()
-        return self.terminate_flag
-
-    def start(self, *args, **kwargs):
-        r"""Start thread and print info."""
-        self.debug('')
-        if not self.was_terminated:
-            self.set_started_flag()
-            self.before_start()
-        super(YggThread, self).start(*args, **kwargs)
-        self._calling_thread = threading.current_thread()
-        # print("Thread = %s, Called by %s" % (self.name, self._calling_thread.name))
-
-    def run(self, *args, **kwargs):
-        r"""Continue running until terminate event set."""
-        self.debug("Starting method")
-        try:
-            super(YggThread, self).run(*args, **kwargs)
-        except BaseException:  # pragma: debug
-            self.exception("THREAD ERROR")
-        finally:
-            for k in ['_ygg_target', '_ygg_args', '_ygg_kwargs']:
-                if hasattr(self, k):
-                    delattr(self, k)
-
-    def before_start(self):
-        r"""Actions to perform on the main thread before starting the thread."""
-        self.debug('')
-
-    def cleanup(self):
-        r"""Actions to perform to clean up the thread after it has stopped."""
-        self._cleanup_called = True
-
-    def wait(self, timeout=None, key=None):
-        r"""Wait until thread finish to return using sleeps rather than
-        blocking.
-
-        Args:
-            timeout (float, optional): Maximum time that should be waited for
-                the driver to finish. Defaults to None and is infinite.
-            key (str, optional): Key that should be used to register the timeout.
-                Defaults to None and is set based on the stack trace.
-
-        """
-        T = self.start_timeout(timeout, key_level=1, key=key)
-        while self.is_alive() and not T.is_out:
-            self.verbose_debug('Waiting for thread to finish...')
-            self.sleep()
-        self.stop_timeout(key_level=1, key=key)
-
-    def terminate(self, no_wait=False):
-        r"""Set the terminate event and wait for the thread to stop.
-
-        Args:
-            no_wait (bool, optional): If True, terminate will not block until
-                the thread stops. Defaults to False and blocks.
-
-        Raises:
-            AssertionError: If no_wait is False and the thread has not stopped
-                after the timeout.
-
-        """
-        self.debug('')
-        with self.lock:
-            if self.was_terminated:  # pragma: debug
-                self.debug('Driver already terminated.')
-                return
-            self.set_terminated_flag()
-        if not no_wait:
-            # if self.is_alive():
-            #     self.join(self.timeout)
-            self.wait(timeout=self.timeout)
-            assert(not self.is_alive())
-
-    def atexit(self):  # pragma: debug
-        r"""Actions performed when python exits."""
-        # self.debug('is_alive = %s', self.is_alive())
-        if self.is_alive():
-            self.info('Thread alive at exit')
-            if not self._cleanup_called:
-                self.cleanup()
-
-
-class YggThreadLoop(YggThread):
-    r"""Thread that will run a loop until the terminate event is called."""
-    def __init__(self, *args, **kwargs):
-        super(YggThreadLoop, self).__init__(*args, **kwargs)
-        self._1st_main_terminated = False
-        self.break_flag = False
-        self.loop_event = threading.Event()
-        self.loop_flag = False
-
-    def on_main_terminated(self, dont_break=False):  # pragma: debug
-        r"""Actions performed when 1st main terminated.
-
-        Args:
-            dont_break (bool, optional): If True, the break flag won't be set.
-                Defaults to False.
-
-        """
-        self._1st_main_terminated = True
-        if not dont_break:
-            self.set_break_flag()
-
-    def set_break_flag(self):
-        r"""Set the break flag for the thread to True."""
-        self.break_flag = True
-
-    def unset_break_flag(self):  # pragma: debug
-        r"""Set the break flag for the thread to False."""
-        self.break_flag = False
-
-    @property
-    def was_break(self):
-        r"""bool: True if the break flag was set."""
-        return self.break_flag
-
-    def set_loop_flag(self):
-        r"""Set the loop flag for the thread to True."""
-        # self.loop_event.set()
-        self.loop_flag = True
-
-    def unset_loop_flag(self):  # pragma: debug
-        r"""Set the loop flag for the thread to False."""
-        # self.loop_event.clear()
-        self.loop_flag = False
-
-    @property
-    def was_loop(self):
-        r"""bool: True if the thread was loop. False otherwise."""
-        # return self.loop_event.is_set()
-        return self.loop_flag
-
-    def wait_for_loop(self, timeout=None, key=None):
-        r"""Wait until thread enters loop to return using sleeps rather than
-        blocking.
-
-        Args:
-            timeout (float, optional): Maximum time that should be waited for
-                the thread to enter loop. Defaults to None and is infinite.
-            key (str, optional): Key that should be used to register the timeout.
-                Defaults to None and is set based on the stack trace.
-
-        """
-        T = self.start_timeout(timeout, key_level=1, key=key)
-        while (self.is_alive() and (not self.was_loop)
-               and (not T.is_out)):  # pragma: debug
-            self.verbose_debug('Waiting for thread to enter loop...')
-            self.sleep()
-        self.stop_timeout(key_level=1, key=key)
-
-    def before_loop(self):
-        r"""Actions performed before the loop."""
-        self.debug('')
-
-    def run_loop(self, *args, **kwargs):
-        r"""Actions performed on each loop iteration."""
-        if self._ygg_target:
-            self._ygg_target(*self._ygg_args, **self._ygg_kwargs)
-        else:
-            self.set_break_flag()
-
-    def after_loop(self):
-        r"""Actions performed after the loop."""
-        self.debug('')
-
-    def run(self, *args, **kwargs):
-        r"""Continue running until terminate event set."""
-        self.debug("Starting loop")
-        try:
-            self.before_loop()
-            if (not self.was_break):
-                self.set_loop_flag()
-            while (not self.was_break):
-                if ((self.main_terminated
-                     and (not self._1st_main_terminated))):  # pragma: debug
-                    self.on_main_terminated()
-                else:
-                    self.run_loop()
-            self.set_break_flag()
-        except BaseException:  # pragma: debug
-            self.exception("THREAD ERROR")
-            self.set_break_flag()
-        finally:
-            for k in ['_ygg_target', '_ygg_args', '_ygg_kwargs']:
-                if hasattr(self, k):
-                    delattr(self, k)
-        try:
-            self.after_loop()
-        except BaseException:  # pragma: debug
-            self.exception("AFTER LOOP ERROR")
-
-    def terminate(self, *args, **kwargs):
-        r"""Also set break flag."""
-        self.set_break_flag()
-        super(YggThreadLoop, self).terminate(*args, **kwargs)

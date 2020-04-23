@@ -56,7 +56,7 @@ class YggRunner(YggClass):
     """
     def __init__(self, modelYmls, namespace=None, host=None, rank=0,
                  ygg_debug_level=None, rmq_debug_level=None,
-                 ygg_debug_prefix=None):
+                 ygg_debug_prefix=None, connection_task_method='thread'):
         super(YggRunner, self).__init__('runner')
         if namespace is None:
             namespace = ygg_cfg.get('rmq', 'namespace', False)
@@ -65,6 +65,7 @@ class YggRunner(YggClass):
         self.namespace = namespace
         self.host = host
         self.rank = rank
+        self.connection_task_method = connection_task_method
         self.modeldrivers = {}
         self.inputdrivers = {}
         self.outputdrivers = {}
@@ -281,6 +282,7 @@ class YggRunner(YggClass):
                         ("Input driver %s could not locate a "
                          + "corresponding file or output channel %s") % (
                              x["name"], yml["args"]))
+        yml['task_method'] = self.connection_task_method
         drv = self.createDriver(yml)
         return drv
 
@@ -305,6 +307,7 @@ class YggRunner(YggClass):
                         ("Output driver %s could not locate a "
                          + "corresponding file or input channel %s") % (
                              x["name"], yml["args"]))
+        yml['task_method'] = self.connection_task_method
         drv = self.createDriver(yml)
         return drv
         
