@@ -125,9 +125,9 @@ definitions:
             type: string
           type: array
       required:
-      - datatype
       - name
       - commtype
+      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -265,8 +265,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -630,8 +630,8 @@ definitions:
           type: string
       required:
       - filetype
-      - name
       - working_dir
+      - name
       title: file_base
       type: object
     - anyOf:
@@ -1420,6 +1420,10 @@ definitions:
           description: Make target that should be built to create the model executable.
             Defaults to None.
           type: string
+        target_compiler:
+          description: Compilation tool that should be used for the target language.
+            Defaults to None and will be set based on the selected language driver.
+          type: string
         target_language:
           description: Language that the target is written in. Defaults to None and
             will be set based on the source files provided.
@@ -1452,9 +1456,9 @@ definitions:
           type: string
       required:
       - language
-      - name
       - args
       - working_dir
+      - name
       title: model_base
       type: object
     - anyOf:
@@ -1571,6 +1575,10 @@ definitions:
           target:
             description: Make target that should be built to create the model executable.
               Defaults to None.
+            type: string
+          target_compiler:
+            description: Compilation tool that should be used for the target language.
+              Defaults to None and will be set based on the selected language driver.
             type: string
           target_language:
             description: Language that the target is written in. Defaults to None
@@ -1841,6 +1849,10 @@ definitions:
           target:
             description: Make target that should be built to create the model executable.
               Defaults to None.
+            type: string
+          target_compiler:
+            description: Compilation tool that should be used for the target language.
+              Defaults to None and will be set based on the selected language driver.
             type: string
           target_language:
             description: Language that the target is written in. Defaults to None

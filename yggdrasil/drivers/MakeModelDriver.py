@@ -20,6 +20,9 @@ class MakeCompiler(BuildToolBase):
             model executable. Defaults to None.
         target_language (str, optional): Language that the target is written in.
             Defaults to None and will be set based on the source files provided.
+        target_compiler (str, optional): Compilation tool that should be used
+            for the target language. Defaults to None and will be set based on
+            the selected language driver.
         env_compiler (str, optional): Environment variable where the compiler
             executable should be stored for use within the Makefile. Defaults
             to 'CC'.
@@ -45,6 +48,8 @@ class MakeCompiler(BuildToolBase):
         target_language (str): Language that the target is written in.
         target_language_driver (ModelDriver): Language driver for the target
             language.
+        target_compiler (str): Compilation tool that should be used
+            for the target language.
         env_compiler (str): Compiler environment variable.
         env_compiler_flags (str): Compiler flags environment variable.
         env_linker (str): Linker environment variable.
@@ -56,6 +61,7 @@ class MakeCompiler(BuildToolBase):
         'makedir': {'type': 'string'},  # default will depend on makefile
         'target': {'type': 'string'},
         'target_language': {'type': 'string'},
+        'target_compiler': {'type': 'string'},
         'env_compiler': {'type': 'string', 'default': 'CC'},
         'env_compiler_flags': {'type': 'string', 'default': 'CFLAGS'},
         'env_linker': {'type': 'string', 'default': 'CC'},
@@ -68,7 +74,7 @@ class MakeCompiler(BuildToolBase):
     output_key = ''
     no_separate_linking = True
     default_archiver = False
-    linker_attributes = {'executable_ext': ''}
+    linker_attributes = {'executable_ext': '', 'tool_suffix_format': ''}
     build_language = 'make'
     
     @staticmethod
@@ -145,6 +151,7 @@ class MakeCompiler(BuildToolBase):
         for k in link_kws:
             kwargs.pop(k, None)
         kwargs.pop('outfile', None)
+        kwargs.pop('target_compiler', None)
         # if (target is None) and (outfile is not None):
         #     target = cls.file2base(outfile)
         out = super(MakeCompiler, cls).get_flags(outfile=target, **kwargs)
@@ -188,7 +195,7 @@ class MakeCompiler(BuildToolBase):
 
     @classmethod
     def set_env(cls, logging_level=None, language=None, language_driver=None,
-                **kwargs):
+                language_compiler=None, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
         Args:
@@ -199,6 +206,10 @@ class MakeCompiler(BuildToolBase):
             language_driver (ModelDriver, optional): Driver for language that
                 should be used. Defaults to None and will be imported based
                 on language.
+            language_compiler (str, optional): name of compilation tool that
+                should be used to set the environment variables. Defaults to
+                None and the default compilation tools for the provided
+                language/language_driver will be used.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method.
 
@@ -212,13 +223,14 @@ class MakeCompiler(BuildToolBase):
             language_driver = components.import_component('model', language)
         kwargs['language_driver'] = language_driver
         out = super(MakeCompiler, cls).set_env(**kwargs)
-        compiler = language_driver.get_tool('compiler')
+        compiler = language_driver.get_tool('compiler', toolname=language_compiler)
         compile_flags = language_driver.get_compiler_flags(
             for_model=True, skip_defaults=True, dont_skip_env_defaults=True,
-            logging_level=logging_level, dont_link=True)
-        linker = language_driver.get_tool('linker')
+            logging_level=logging_level, dont_link=True, toolnane=language_compiler)
+        linker = language_driver.get_tool('linker', toolname=language_compiler)
         linker_flags = language_driver.get_linker_flags(
-            for_model=True, skip_defaults=True, dont_skip_env_defaults=True)
+            for_model=True, skip_defaults=True, dont_skip_env_defaults=True,
+            toolname=language_compiler)
         for k in ['env_compiler', 'env_compiler_flags',
                   'env_linker', 'env_linker_flags']:
             kwargs.setdefault(k, cls._schema_properties[k]['default'])

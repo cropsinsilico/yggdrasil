@@ -263,6 +263,7 @@ class ARArchiver(ArchiverBase):
     static_library_flag = 'rcs'
     output_key = ''
     output_first_library = True
+    toolset = 'gnu'
 
 
 class LibtoolArchiver(ArchiverBase):
@@ -271,6 +272,7 @@ class LibtoolArchiver(ArchiverBase):
     languages = ['c', 'c++']
     default_executable_env = 'LIBTOOL'
     static_library_flag = '-static'  # This is the default
+    toolset = 'clang'
     
 
 class MSVCArchiver(ArchiverBase):
@@ -280,6 +282,7 @@ class MSVCArchiver(ArchiverBase):
     platforms = ['Windows']
     static_library_flag = None
     output_key = '/OUT:%s'
+    toolset = 'msvc'
     
 
 _top_lang_dir = get_language_dir('c')
@@ -299,7 +302,8 @@ try:
     _python_lib = ygg_cfg.get('c', 'python_%s' % libtype_order[0],
                               ygg_cfg.get('c', 'python_%s' % libtype_order[1], None))
     if (_python_lib is None) or (not os.path.isfile(_python_lib)):  # pragma: no cover
-        _python_lib = tools.get_python_c_library(allow_failure=False)
+        _python_lib = tools.get_python_c_library(
+            allow_failure=False, libtype=libtype_order[0])
 except BaseException:  # pragma: debug
     warnings.warn("ERROR LOCATING PYTHON LIBRARY")
     _python_lib = None
@@ -534,7 +538,7 @@ class CModelDriver(CompiledModelDriver):
             elif platform._is_mac:
                 cls.default_compiler = 'clang'
             elif platform._is_win:  # pragma: windows
-                cls.default_compiler = 'gcc'
+                cls.default_compiler = 'cl'
         CompiledModelDriver.after_registration(cls, **kwargs)
         if kwargs.get('second_pass', False):
             return
@@ -546,10 +550,15 @@ class CModelDriver(CompiledModelDriver):
             else:
                 cls.external_libraries['python']['libtype'] = 'shared'
                 cls.external_libraries['python']['shared'] = _python_lib
-        # for x in ['zmq', 'czmq']:
-        #     if x in cls.external_libraries:
-        #         if platform._is_win:  # pragma: windows
-        #             cls.external_libraries[x]['libtype'] = 'static'
+        if platform._is_win:  # pragma: windows
+            for libtype in ['static', 'shared']:
+                if libtype in cls.external_libraries['python']:
+                    continue
+                cls.external_libraries['python'][libtype] = tools.get_python_c_library(
+                    allow_failure=True, libtype=libtype)
+            for x in ['zmq', 'czmq', 'python']:
+                if x in cls.external_libraries:
+                    cls.external_libraries[x]['libtype'] = 'windows_import'
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']

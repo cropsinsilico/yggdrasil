@@ -3,6 +3,7 @@ import re
 import six
 import copy
 import glob
+import pprint
 import logging
 import warnings
 import subprocess
@@ -25,6 +26,34 @@ if _conda_prefix is not None:
 if _venv_prefix is not None:
     _system_suffix += '_' + os.path.basename(_venv_prefix)
 _registered_toolsets = {None: {}}
+
+
+def get_associated_tools(toolset):
+    r"""Get the set of tools associated with one or more toolset name(s) or tool(s).
+
+    Args:
+        toolset (str, list, CompilationToolBase): One or more name(s) of toolset(s)
+            or tool(s).
+
+    Returns:
+        dict: Mapping from language to toolname for the identified toolset.
+
+    """
+    if (((isinstance(toolset, type) and issubclass(toolset, CompilationToolBase))
+         or isinstance(toolset, CompilationToolBase))):
+        toolset = toolset.toolset
+    if isinstance(toolset, (list, tuple)):
+        assert(len(toolset) > 0)
+        toolset = toolset[0]
+    if toolset in _registered_toolsets:
+        return _registered_toolsets[toolset]
+    else:
+        for v in _registered_toolsets.values():
+            if toolset in list(v.values()):
+                return v
+    raise ValueError(("Could not identify toolset '%s'.\n"  # pragma: debug
+                      "Available toolsets:\n%s")
+                     % (toolset, pprint.pformat(_registered_toolsets)))
 
 
 def get_compilation_tool_registry(tooltype):
@@ -273,6 +302,7 @@ class CompilationToolBase(object):
     is_gnu = False
     toolset = None
     is_build_tool = False
+    tool_suffix_format = '_%sx'
 
     _language_ext = None  # only update once per class
     
@@ -298,7 +328,7 @@ class CompilationToolBase(object):
             _registered_toolsets.setdefault(cls.toolset, {})
             for l in cls.languages:
                 _registered_toolsets[cls.toolset].setdefault(l, cls.toolname)
-        cls.is_gnu = (cls.toolname in ['gcc', 'g++', 'gfortran', 'ar'])
+        cls.is_gnu = (cls.toolset == 'gnu')
         cls._schema_type = cls.tooltype
         attr_list = ['default_executable', 'default_flags']
         for k in attr_list:
@@ -358,7 +388,9 @@ class CompilationToolBase(object):
                 tool used.
 
         """
-        return '_%sx' % cls.toolname
+        if '%s' in cls.tool_suffix_format:
+            return cls.tool_suffix_format % cls.toolname
+        return cls.tool_suffix_format
 
     @classmethod
     def set_env(cls, existing=None, **kwargs):
@@ -1933,10 +1965,15 @@ class CompiledModelDriver(ModelDriver):
         for k, v in cls.external_libraries.items():
             libtype = v.get('libtype', None)
             if (libtype is not None) and (libtype not in v):
-                libfile = cls.cfg.get(cls.language,
-                                      '%s_%s' % (k, libtype), None)
-                if libfile is not None:
-                    v[libtype] = libfile
+                if libtype == 'windows_import':
+                    libtype = ['shared', 'static']
+                else:
+                    libtype = [libtype]
+                for t in libtype:
+                    libfile = cls.cfg.get(cls.language,
+                                          '%s_%s' % (k, t), None)
+                    if libfile is not None:
+                        v[t] = libfile
         for k in ['compiler', 'linker', 'archiver']:
             # Set default linker/archiver based on compiler
             default_tool_name = getattr(cls, 'default_%s' % k, None)
@@ -2175,7 +2212,7 @@ class CompiledModelDriver(ModelDriver):
                             'archiver', return_prop='flags', default=None))
                 out = get_compilation_tool(tooltype, toolname)(**kwargs)
                 if cls.language not in out.languages:
-                    associated = _registered_toolsets[out.toolset]
+                    associated = get_associated_tools(out)
                     if cls.language not in associated:  # pragma: debug
                         raise RuntimeError(
                             "Compilation tool %s not associated with the language %s."
@@ -2439,6 +2476,9 @@ class CompiledModelDriver(ModelDriver):
             libtype = libinfo.get('libtype', _default_libtype)
         if libinfo.get('libtype', None) in ['header_only', 'object']:
             return ''
+        # Do substitution when windows_import specified
+        if libtype == 'windows_import':
+            libtype = cls.get_windows_import_libtype(toolname)
         # Check that libtype is valid
         libtype_list = ['static', 'shared']
         if libtype not in libtype_list:
@@ -3026,6 +3066,13 @@ class CompiledModelDriver(ModelDriver):
                 elif (libtype == 'shared') and (linker is not None):
                     v[libtype] = linker.get_output_file(k, no_tool_suffix=True,
                                                         build_library=True)
+                elif libtype == 'windows_import':
+                    if (archiver is not None) and ('static' not in v):
+                        v['static'] = archiver.get_output_file(k, no_tool_suffix=True)
+                    if (linker is not None) and ('shared' not in v):
+                        v['shared'] = linker.get_output_file(k, no_tool_suffix=True,
+                                                             build_library=True)
+
         return out
 
     @classmethod
@@ -3081,7 +3128,7 @@ class CompiledModelDriver(ModelDriver):
                     # On windows search for both gnu and msvc library
                     # naming conventions
                     if platform._is_win:  # pragma: windows
-                        ext_sets = (('.dll.a', '.dll', '.so'),
+                        ext_sets = (('.dll', '.dll.a', '.so'),
                                     ('.lib', '.a'))
                         for exts in ext_sets:
                             if fname.endswith(exts):
@@ -3194,8 +3241,7 @@ class CompiledModelDriver(ModelDriver):
         base_libraries = []
         if toolname is None:
             toolname = cls.get_tool('compiler', return_prop='name')
-        tools = _registered_toolsets[get_compilation_tool(
-            'compiler', toolname).toolset]
+        tools = get_associated_tools(get_compilation_tool('compiler', toolname))
         for x in cls.base_languages:
             base_cls = import_component('model', x)
             base_libraries.append(base_cls.interface_library)
@@ -3281,6 +3327,17 @@ class CompiledModelDriver(ModelDriver):
 
         """
         return _system_suffix
+
+    @classmethod
+    def get_windows_import_libtype(cls, toolname=None):
+        r"""Get the library type that should be used when import library
+        requested."""
+        if toolname is None:
+            toolname = cls.get_tool('compiler', toolname=toolname, return_prop='name')
+        if toolname in list(_registered_toolsets['gnu'].values()):
+            return 'shared'
+        else:
+            return 'static'
     
     @classmethod
     def call_compiler(cls, src, language=None, toolname=None, dont_build=None,
@@ -3349,6 +3406,8 @@ class CompiledModelDriver(ModelDriver):
                 src = cls.get_dependency_source(dep)
             kwargs.setdefault('for_api', True)
             kwargs.setdefault('libtype', _default_libtype)
+            if kwargs['libtype'] == 'windows_import':
+                kwargs['libtype'] = cls.get_windows_import_libtype(toolname)
             if kwargs['libtype'] == 'header_only':
                 return src
             elif kwargs['libtype'] in ['static', 'shared']:

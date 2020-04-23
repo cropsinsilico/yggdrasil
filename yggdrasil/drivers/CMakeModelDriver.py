@@ -6,7 +6,7 @@ import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, components
 from yggdrasil.drivers.CompiledModelDriver import (
-    LinkerBase, get_compilation_tool, _registered_toolsets)
+    LinkerBase, get_compilation_tool, get_associated_tools)
 from yggdrasil.drivers.BuildModelDriver import (
     BuildModelDriver, BuildToolBase)
 from yggdrasil.drivers import CModelDriver
@@ -284,7 +284,7 @@ class CMakeConfigure(BuildToolBase):
                 out.append('-DCMAKE_GENERATOR_PLATFORM=x64')
         if target_compiler is not None:
             compiler = get_compilation_tool('compiler', target_compiler)
-            tools = _registered_toolsets[compiler.toolset]
+            tools = get_associated_tools(compiler)
             for l in compiler.languages:
                 tools.setdefault(l, compiler.toolname)
             cmake_vars = {'c_compiler': 'CMAKE_C_COMPILER',
@@ -294,6 +294,8 @@ class CMakeConfigure(BuildToolBase):
                           'fortran_compiler': 'CMAKE_Fortran_COMPILER',
                           'fortran_flags': 'CMAKE_Fortran_FLAGS'}
             for k, v in tools.items():
+                if ('%s_compiler' % k) not in cmake_vars:
+                    continue
                 itool = get_compilation_tool('compiler', v)
                 if itool.default_executable_env is None:
                     out.append('-D%s=%s' % (cmake_vars['%s_compiler' % k], v))
@@ -555,6 +557,7 @@ class CMakeBuilder(LinkerBase):
                                 ('target', '--target'),
                                 ('configuration', '--config')])
     executable_ext = ''
+    tool_suffix_format = ''
 
     @classmethod
     def call(cls, *args, **kwargs):
@@ -591,18 +594,6 @@ class CMakeBuilder(LinkerBase):
         kwargs_ex['add_kws_both'] = (kwargs.get('add_kws_both', [])
                                      + ['builddir', 'target'])
         return super(CMakeBuilder, cls).extract_kwargs(kwargs, **kwargs_ex)
-
-    @classmethod
-    def get_tool_suffix(cls):
-        r"""Get the string that should be added to tool products based on the
-        tool used.
-
-        Returns:
-            str: Suffix that should be added to tool products to indicate the
-                tool used.
-
-        """
-        return ""
 
     @classmethod
     def get_output_file(cls, obj, target=None, builddir=None, **kwargs):
@@ -726,6 +717,9 @@ class CMakeModelDriver(BuildModelDriver):
             model executable. Defaults to None.
         target_language (str, optional): Language that the target is written in.
             Defaults to None and will be set based on the source files provided.
+        target_compiler (str, optional): Compilation tool that should be used
+            for the target language. Defaults to None and will be set based on
+            the selected language driver.
         configuration (str, optional): Build type/configuration that should be
             built. Defaults to 'Release'.
         **kwargs: Additional keyword arguments are passed to parent class.
@@ -740,6 +734,8 @@ class CMakeModelDriver(BuildModelDriver):
         target_language (str): Language that the target is written in.
         target_language_driver (ModelDriver): Language driver for the target
             language.
+        target_compiler (str): Compilation tool that should be used
+            for the target language.
         configuration (str): Build type/configuration that should be built.
             This is only used on Windows.
 
