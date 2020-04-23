@@ -1145,7 +1145,8 @@ class CompilerBase(CompilationToolBase):
             if cls.default_linker is None:
                 cls.default_linker = cls.toolname
             copy_attr = ['toolname', 'aliases', 'languages', 'platforms',
-                         'default_executable', 'default_executable_env']
+                         'default_executable', 'default_executable_env',
+                         'toolset']
             # 'product_exts', 'product_files']
             linker_name = '%sLinker' % cls.__name__.split('Compiler')[0]
             linker_attr = copy.deepcopy(cls.linker_attributes)
