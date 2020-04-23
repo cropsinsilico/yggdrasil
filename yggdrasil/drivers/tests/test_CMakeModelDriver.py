@@ -88,7 +88,8 @@ def test_create_include():
     CMakeModelDriver.compile_dependencies()
     for c, l, lines in testlist:
         out = CMakeConfigure.create_include(None, target, compile_flags=c,
-                                            linker_flags=l, verbose=True)
+                                            linker_flags=l, verbose=True,
+                                            driver=CModelDriver)
         for x in lines:
             try:
                 assert(x in out)
@@ -99,11 +100,11 @@ def test_create_include():
     for fname in [fname_dll, fname_lib]:
         os.remove(fname)
     assert_raises(ValueError, CMakeConfigure.create_include,
-                  None, target, compile_flags=['invalid'])
+                  None, target, compile_flags=['invalid'], driver=CModelDriver)
     assert_raises(ValueError, CMakeConfigure.create_include,
-                  None, target, linker_flags=['-invalid'])
+                  None, target, linker_flags=['-invalid'], driver=CModelDriver)
     assert_raises(ValueError, CMakeConfigure.create_include,
-                  None, target, linker_flags=['/invalid'])
+                  None, target, linker_flags=['/invalid'], driver=CModelDriver)
 
 
 @requires_language('cmake', installed=False)
