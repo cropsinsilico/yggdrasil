@@ -326,8 +326,11 @@ class CompilationToolBase(object):
         if cls.toolset is not None:
             global _registered_toolsets
             _registered_toolsets.setdefault(cls.toolset, {})
-            for l in cls.languages:
-                _registered_toolsets[cls.toolset].setdefault(l, cls.toolname)
+            if cls.tooltype == 'compiler':
+                for l in cls.languages:
+                    _registered_toolsets[cls.toolset].setdefault(l, cls.toolname)
+            else:
+                _registered_toolsets[cls.toolset].setdefault(cls.tooltype, cls.toolname)
         cls.is_gnu = (cls.toolset == 'gnu')
         cls._schema_type = cls.tooltype
         attr_list = ['default_executable', 'default_flags']
