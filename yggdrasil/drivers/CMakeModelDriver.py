@@ -6,7 +6,7 @@ import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, components, tools
 from yggdrasil.drivers.CompiledModelDriver import (
-    LinkerBase, get_compilation_tool, get_associated_tools)
+    LinkerBase, get_compilation_tool, get_compatible_tool)
 from yggdrasil.drivers.BuildModelDriver import (
     BuildModelDriver, BuildToolBase)
 from yggdrasil.drivers import CModelDriver
@@ -284,21 +284,17 @@ class CMakeConfigure(BuildToolBase):
                 out.append('-DCMAKE_GENERATOR_PLATFORM=x64')
         if target_compiler is not None:
             compiler = get_compilation_tool('compiler', target_compiler)
-            tools = get_associated_tools(compiler)
-            for l in compiler.languages:
-                tools.setdefault(l, compiler.toolname)
             cmake_vars = {'c_compiler': 'CMAKE_C_COMPILER',
                           'c_flags': 'CMAKE_C_FLAGS',
                           'c++_compiler': 'CMAKE_CXX_COMPILER',
                           'c++_flags': 'CMAKE_CXX_FLAGS',
                           'fortran_compiler': 'CMAKE_Fortran_COMPILER',
                           'fortran_flags': 'CMAKE_Fortran_FLAGS'}
-            for k, v in tools.items():
-                if ('%s_compiler' % k) not in cmake_vars:
-                    continue
-                itool = get_compilation_tool('compiler', v)
+            for k in ['c', 'c++', 'fortran']:
+                itool = get_compatible_tool(compiler, 'compiler', k)
                 if itool.default_executable_env is None:
-                    out.append('-D%s=%s' % (cmake_vars['%s_compiler' % k], v))
+                    out.append('-D%s=%s' % (cmake_vars['%s_compiler' % k],
+                                            itool.toolname))
                 if itool.default_flags_env is None:
                     out.append('-D%s=%s' % (cmake_vars['%s_flags' % k], ''))
         return out

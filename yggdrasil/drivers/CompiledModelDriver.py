@@ -3,7 +3,6 @@ import re
 import six
 import copy
 import glob
-import pprint
 import logging
 import warnings
 import subprocess
@@ -25,35 +24,41 @@ if _conda_prefix is not None:
     _system_suffix += '_' + os.path.basename(_conda_prefix)
 if _venv_prefix is not None:
     _system_suffix += '_' + os.path.basename(_venv_prefix)
-_registered_toolsets = {None: {}}
 
 
-def get_associated_tools(toolset):
-    r"""Get the set of tools associated with one or more toolset name(s) or tool(s).
+def get_compatible_tool(tool, tooltype, language):
+    r"""Get a compatible compilation tool that can be used in
+    conjunction with the one provided based on the registry of
+    compilation toolsets.
 
     Args:
-        toolset (str, list, CompilationToolBase): One or more name(s) of toolset(s)
-            or tool(s).
+        tool (CompilationToolBase, str): Compilation tool or name of
+            a compilation tool to get compatible counterpart to.
+        tooltype (str): Type of compilation tool that should be
+            returned.
+        language (str): Language that compilation tool should handle.
 
     Returns:
-        dict: Mapping from language to toolname for the identified toolset.
+        CompilationToolBase: Compatible compilation tool class.
 
     """
-    if (((isinstance(toolset, type) and issubclass(toolset, CompilationToolBase))
-         or isinstance(toolset, CompilationToolBase))):
-        toolset = toolset.toolset
-    if isinstance(toolset, (list, tuple)):
-        assert(len(toolset) > 0)
-        toolset = toolset[0]
-    if toolset in _registered_toolsets:
-        return _registered_toolsets[toolset]
-    else:
-        for v in _registered_toolsets.values():
-            if toolset in list(v.values()):
-                return v
-    raise ValueError(("Could not identify toolset '%s'.\n"  # pragma: debug
-                      "Available toolsets:\n%s")
-                     % (toolset, pprint.pformat(_registered_toolsets)))
+    if isinstance(tool, str):
+        tool = get_compilation_tool(tooltype, tool)
+    if language in tool.languages:
+        return tool
+    reg = get_compilation_tool_registry(tooltype)['by_toolset']
+    for t in tool.compatible_toolsets:
+        x = reg.get(t, {}).get(language, [])
+        if len(x) == 1:
+            return x[0]
+        elif len(x) > 1:
+            for ix in x:
+                if ix.is_installed():
+                    reg[t][language] = [ix]
+                    return ix
+    raise ValueError(("Could not locate %s for %s language"
+                      "that is compatible with the %s %s.")
+                     % (tooltype, language, tool.toolname, tooltype))
 
 
 def get_compilation_tool_registry(tooltype):
@@ -178,9 +183,8 @@ class CompilationToolMeta(type):
             reg = get_compilation_tool_registry(cls.tooltype)
             if 'by_language' not in reg:
                 reg['by_language'] = OrderedDict()
-            for l in languages:
-                if l not in reg['by_language']:
-                    reg['by_language'][l] = OrderedDict()
+            if 'by_toolset' not in reg:
+                reg['by_toolset'] = OrderedDict()
             for x in [cls.toolname] + cls.aliases:
                 # Register by toolname
                 if (x in reg) and (str(reg[x]) != str(cls)):  # pragma: debug
@@ -191,11 +195,18 @@ class CompilationToolMeta(type):
                 reg[x] = cls
                 # Register by language
                 for l in languages:
+                    reg['by_language'].setdefault(l, OrderedDict())
                     if x in reg['by_language'][l]:  # pragma: debug
                         raise ValueError(("%s toolname '%s' already registered for "
                                           "%s language.")
                                          % (cls.tooltype.title(), x, l))
                     reg['by_language'][l][x] = cls
+                # Register by toolset
+                for t in cls.compatible_toolsets:
+                    reg['by_toolset'].setdefault(t, OrderedDict())
+                    for l in languages:
+                        reg['by_toolset'][t].setdefault(l, [])
+                        reg['by_toolset'][t][l].append(cls)
         return cls
 
 
@@ -301,6 +312,7 @@ class CompilationToolBase(object):
     remove_product_exts = []
     is_gnu = False
     toolset = None
+    compatible_toolsets = []
     is_build_tool = False
     tool_suffix_format = '_%sx'
 
@@ -323,15 +335,9 @@ class CompilationToolBase(object):
         """
         if cls.toolname is None:  # pragma: debug
             raise ValueError("Registering unnamed compilation tool.")
-        if cls.toolset is not None:
-            global _registered_toolsets
-            _registered_toolsets.setdefault(cls.toolset, {})
-            if cls.tooltype == 'compiler':
-                for l in cls.languages:
-                    _registered_toolsets[cls.toolset].setdefault(l, cls.toolname)
-            else:
-                _registered_toolsets[cls.toolset].setdefault(cls.tooltype, cls.toolname)
         cls.is_gnu = (cls.toolset == 'gnu')
+        if (cls.toolset is not None) and (cls.toolset not in cls.compatible_toolsets):
+            cls.compatible_toolsets.insert(0, cls.toolset)
         cls._schema_type = cls.tooltype
         attr_list = ['default_executable', 'default_flags']
         for k in attr_list:
@@ -2218,15 +2224,7 @@ class CompiledModelDriver(ModelDriver):
                             'archiver', return_prop='name', default=None),
                         archiver_flags=cls.get_tool(
                             'archiver', return_prop='flags', default=None))
-                out = get_compilation_tool(tooltype, toolname)(**kwargs)
-                if cls.language not in out.languages:
-                    associated = get_associated_tools(out)
-                    if cls.language not in associated:  # pragma: debug
-                        raise RuntimeError(
-                            "Compilation tool %s not associated with the language %s."
-                            % (toolname, cls.language))
-                    out = get_compilation_tool(
-                        tooltype, associated[cls.language])(**kwargs)
+                out = get_compatible_tool(toolname, tooltype, cls.language)(**kwargs)
             else:
                 out_tool = cls.get_tool('compiler', toolname=toolname, default=None)
                 if out_tool is None:  # pragma: debug
@@ -3247,13 +3245,14 @@ class CompiledModelDriver(ModelDriver):
         r"""Compile any required internal libraries, including the interface."""
         kwargs.setdefault('products', [])
         base_libraries = []
-        if toolname is None:
-            toolname = cls.get_tool('compiler', return_prop='name')
-        tools = get_associated_tools(get_compilation_tool('compiler', toolname))
+        compiler = cls.get_tool('compiler', toolname=toolname)
         for x in cls.base_languages:
+            toolname = None
+            if compiler.toolset is not None:
+                toolname = get_compatible_tool(compiler, 'compiler', x).toolname
             base_cls = import_component('model', x)
             base_libraries.append(base_cls.interface_library)
-            base_cls.compile_dependencies(toolname=tools.get(x, None), **kwargs)
+            base_cls.compile_dependencies(toolname=toolname, **kwargs)
         if (((cls.interface_library is not None) and cls.is_installed()
              and (cls.interface_library not in base_libraries))):
             # cls.call_compiler(cls.interface_library)
@@ -3261,8 +3260,9 @@ class CompiledModelDriver(ModelDriver):
             for k in dep_order[::-1]:
                 if isinstance(k, tuple):
                     assert(len(k) == 2)
-                    ikw = dict(kwargs, language=k[0])
-                    cls.call_compiler(k[1], toolname=tools.get(k[0], None), **ikw)
+                    ikw = dict(kwargs, language=k[0],
+                               toolname=get_compatible_tool(compiler, 'compiler', k[0]))
+                    cls.call_compiler(k[1], **ikw)
                 else:
                     cls.call_compiler(k, toolname=toolname, **kwargs)
 
@@ -3340,9 +3340,7 @@ class CompiledModelDriver(ModelDriver):
     def get_windows_import_libtype(cls, toolname=None):
         r"""Get the library type that should be used when import library
         requested."""
-        if toolname is None:
-            toolname = cls.get_tool('compiler', toolname=toolname, return_prop='name')
-        if toolname in list(_registered_toolsets['gnu'].values()):
+        if cls.get_tool('compiler', toolname=toolname).is_gnu:
             return 'shared'
         else:
             return 'static'
@@ -3395,7 +3393,7 @@ class CompiledModelDriver(ModelDriver):
         if dont_build is not None:
             kwargs['dont_link'] = dont_build
         language = kwargs.pop('compiler_language', language)
-        if 'env' not in kwargs:
+        if ('env' not in kwargs) and (not kwargs.get('dry_run', False)):
             kwargs['env'] = cls.set_env_compiler(toolname=toolname)
         # Compile using another driver if the language dosn't match
         if (language is not None) and (language != cls.language):

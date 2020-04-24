@@ -29,8 +29,10 @@ class TestFortranModelDriverNoInit(TestFortranModelParam,
         r"""Return the list of tuples mapping json type to expected native type."""
         out = super(TestFortranModelDriverNoInit, self).get_test_types()
         for i, (k, v) in enumerate(out):
-            if v == '*':
-                knew = {'type': k, 'subtype': 'float',
+            knew = k
+            vnew = v
+            if vnew == '*':
+                knew = {'type': knew, 'subtype': 'float',
                         'precision': 32}
                 vnew = 'real(kind = 4)'
                 if k == '1darray':
@@ -39,11 +41,18 @@ class TestFortranModelDriverNoInit(TestFortranModelParam,
                 elif k == 'ndarray':
                     knew['shape'] = (3, 4)
                     vnew += ', dimension(3,4)'
-                out[i] = (knew, vnew)
-            elif 'X' in v:
-                knew = {'type': k, 'precision': 64}
-                vnew = v.replace('X', '8')
-                out[i] = (knew, vnew)
+            elif 'X' in vnew:
+                if vnew.startswith('complex'):
+                    knew = {'type': knew, 'precision': 128}
+                elif 'ISO_10646' in vnew:
+                    knew = {'type': knew, 'precision': 4 * 64}
+                else:
+                    knew = {'type': knew, 'precision': 64}
+                vnew = vnew.replace('X', '8')
+            if vnew.startswith('ygg'):
+                vnew = 'type(%s)' % vnew
+            out[i] = (knew, vnew)
+                
         return out
     
     def test_write_function_def_single(self):

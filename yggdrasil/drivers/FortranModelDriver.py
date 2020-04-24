@@ -29,7 +29,7 @@ class FortranCompilerBase(CompilerBase):
     search_path_envvar = []
     default_linker = None
     default_executable = None
-    default_archiver = 'ar'
+    default_archiver = None
     product_exts = ['mod']
 
     @classmethod
@@ -106,6 +106,8 @@ class GFortranCompiler(FortranCompilerBase):
                                   ('module-search-path', '-I%s'),
                                   ('standard', '-std=%s')])
     toolset = 'gnu'
+    compatible_toolsets = ['llvm']
+    default_archiver = 'ar'
 
 
 # class IFortCompiler(FortranCompilerBase):

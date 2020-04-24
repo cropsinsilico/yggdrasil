@@ -169,6 +169,21 @@ class GCCCompiler(CCompilerBase):
     cxx_lib = 'stdc++'
     toolset = 'gnu'
 
+    @classmethod
+    def is_installed(cls):
+        r"""Determine if this tool is installed by looking for the executable.
+
+        Returns:
+            bool: True if the tool is installed, False otherwise.
+
+        """
+        out = super(GCCCompiler, cls).is_installed()
+        if out and platform._is_mac:
+            ver = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
+            if 'clang' in ver:
+                out = False  # Disable gcc when it is an alias for clang
+        return out
+
 
 class ClangCompiler(CCompilerBase):
     r"""clang compiler on Apple Mac OS."""
