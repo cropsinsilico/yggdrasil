@@ -291,7 +291,10 @@ class CMakeConfigure(BuildToolBase):
                           'fortran_compiler': 'CMAKE_Fortran_COMPILER',
                           'fortran_flags': 'CMAKE_Fortran_FLAGS'}
             for k in ['c', 'c++', 'fortran']:
-                itool = get_compatible_tool(compiler, 'compiler', k)
+                try:
+                    itool = get_compatible_tool(compiler, 'compiler', k)
+                except ValueError:
+                    continue
                 if itool.default_executable_env is None:
                     out.append('-D%s=%s' % (cmake_vars['%s_compiler' % k],
                                             itool.toolname))

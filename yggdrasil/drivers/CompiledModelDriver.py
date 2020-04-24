@@ -56,7 +56,7 @@ def get_compatible_tool(tool, tooltype, language):
                 if ix.is_installed():
                     reg[t][language] = [ix]
                     return ix
-    raise ValueError(("Could not locate %s for %s language"
+    raise ValueError(("Could not locate %s for %s language "
                       "that is compatible with the %s %s.")
                      % (tooltype, language, tool.toolname, tooltype))
 
