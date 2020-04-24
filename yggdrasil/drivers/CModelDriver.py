@@ -279,6 +279,7 @@ class ARArchiver(ArchiverBase):
     output_key = ''
     output_first_library = True
     toolset = 'gnu'
+    compatible_toolsets = ['llvm']
 
 
 class LibtoolArchiver(ArchiverBase):

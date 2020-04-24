@@ -1188,6 +1188,8 @@ class CompilerBase(CompilationToolBase):
         if linker:
             out = get_compilation_tool('linker', linker)(flags=linker_flags,
                                                          executable=linker)
+            if not out.is_installed():
+                out = get_compatible_tool(cls, 'linker', language=cls.languages[0])
         else:
             out = linker
         return out
@@ -1207,6 +1209,8 @@ class CompilerBase(CompilationToolBase):
         if archiver:
             out = get_compilation_tool('archiver', archiver)(flags=archiver_flags,
                                                              executable=archiver)
+            if not out.is_installed():
+                out = get_compatible_tool(cls, 'archiver', language=cls.languages[0])
         else:
             out = archiver
         return out
