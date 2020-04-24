@@ -1542,8 +1542,9 @@ class LinkerBase(CompilationToolBase):
                 libname = os.path.basename(libpath)
         else:
             libname = cls.file2base(libpath)
-        if cls.library_prefix and (not dont_split):
-            libname = libname.split(cls.library_prefix)[-1]
+        if ((cls.library_prefix and (not dont_split)
+             and libname.startswith(cls.library_prefix))):
+            libname = libname.split(cls.library_prefix, 1)[-1]
         return libname
 
     @classmethod

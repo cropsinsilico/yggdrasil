@@ -328,7 +328,7 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
             setattr(self.instance, 'compiler_tool', v)
             setattr(self.instance, 'linker_tool', v.linker())
             setattr(self.instance, 'archiver_tool', v.archiver())
-            self.instance.compile_dependencies()
+            self.instance.compile_dependencies(toolname=v.toolname)
             self.instance.compile_model()
         # Restore the old tools
         for k, v in old_tools.items():
