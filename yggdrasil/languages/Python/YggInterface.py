@@ -135,7 +135,7 @@ def YggRpcServer(name, infmt='%s', outfmt='%s'):
                         response_kwargs=ocomm_kwargs,
                         recv_timeout=False, **icomm_kwargs)
     return out
-    
+
 
 def YggRpcClient(name, outfmt='%s', infmt='%s'):
     r"""Get class for handling requests and response to an RPC Server from a
@@ -160,6 +160,22 @@ def YggRpcClient(name, outfmt='%s', infmt='%s'):
                         recv_timeout=False, **ocomm_kwargs)
     return out
     
+
+def YggTimestep(name):
+    r"""Get class for handling timestep synchronization requests.
+
+    Args:
+        name (str): The name of the server queues.
+
+    Returns:
+        :class:.ClientComm: Communication object.
+        
+    """
+    from yggdrasil.communication import ClientComm
+    out = InterfaceComm(name, comm_class=ClientComm.ClientComm,
+                        recv_timeout=False)
+    return out
+
 
 # Specialized classes for ascii IO
 def YggAsciiFileInput(name, **kwargs):

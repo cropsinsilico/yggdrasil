@@ -113,6 +113,10 @@ class ModelDriver(Driver):
             There will be one channel created for each server the model is a
             client of. Defaults to empty list. Use of `client_of` with `function`
             is not currently supported.
+        timesync (bool, optional): If True, the model is assumed to
+            call a send then receive of the state at each timestep
+            for syncronization with other models that are also
+            integrating in time. Defaults to False.
         overwrite (bool, optional): If True, any existing model products
             (compilation products, wrapper scripts, etc.) are removed prior to
             the run. If False, the products are not removed. Defaults to True.
@@ -221,6 +225,9 @@ class ModelDriver(Driver):
             started.
         client_of (list): The names of server models that this model is a
             client of.
+        timesync (bool): If True, the model is assumed to call a send
+            then receive of the state at each timestep for syncronization
+            with other models that are also integrating in time.
         with_strace (bool): If True, the command is run with strace or dtrace.
         strace_flags (list): Flags to pass to strace/dtrace.
         with_valgrind (bool): If True, the command is run with valgrind.
@@ -280,6 +287,7 @@ class ModelDriver(Driver):
         'is_server': {'type': 'boolean', 'default': False},
         'client_of': {'type': 'array', 'items': {'type': 'string'},
                       'default': []},
+        'timesync': {'type': 'boolean', 'default': False},
         'with_strace': {'type': 'boolean', 'default': False},
         'strace_flags': {'type': 'array',
                          'default': ['-e', 'trace=memory'],

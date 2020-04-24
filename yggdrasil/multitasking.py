@@ -1041,6 +1041,12 @@ class YggTask(YggClass):
                                self.context.task_method)
             self.sleep()
         self.stop_timeout(key_level=1, key=key)
+
+
+class BreakLoopException(BaseException):
+    r"""Special exception that can be raised by the target function
+    for a loop in order to break the loop."""
+    pass
         
 
 class YggTaskLoop(YggTask):
@@ -1122,7 +1128,10 @@ class YggTaskLoop(YggTask):
                  and (not self._1st_main_terminated))):  # pragma: debug
                 self.on_main_terminated()
             else:
-                self.run_loop()
+                try:
+                    self.run_loop()
+                except BreakLoopException:
+                    self.set_break_flag()
         self.set_break_flag()
         
     def run_loop(self, *args, **kwargs):

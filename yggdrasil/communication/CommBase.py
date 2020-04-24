@@ -748,6 +748,11 @@ class CommBase(tools.YggClass):
             self._comm_class = str(name_cls).split("'")[1].split(".")[-1]
         return self._comm_class
 
+    @property
+    def model_name(self):
+        r"""str: Name of the model using the comm."""
+        return os.environ.get('YGG_MODEL_NAME', '')
+
     @classmethod
     def underlying_comm_class(self):
         r"""str: Name of underlying communication class."""
@@ -1467,15 +1472,28 @@ class CommBase(tools.YggClass):
         # self.remove_work_comm(workcomm.uuid, in_thread=True)
         return ret
             
-    def on_send_eof(self):
+    def on_send_eof(self, header_kwargs=None):
         r"""Actions to perform when EOF being sent.
+
+        Args:
+            header_kwargs (dict, optional): Keyword arguments that should be
+                added to the header.
 
         Returns:
             bool: True if EOF message should be sent, False otherwise.
 
         """
         self.debug('')
-        msg_s = self.eof_msg
+        if header_kwargs:
+            msg_s = self.serialize(self.eof_msg,
+                                   header_kwargs=header_kwargs)
+        else:
+            msg_s = self.eof_msg
+        msg_len = len(msg_s)
+        if (msg_len > self.maxMsgSize) and (self.maxMsgSize != 0):  # pragma: debug
+            raise NotImplementedError(("EOF message with header (%d) "
+                                       "exceeds max message size (%d).")
+                                      % (msg_len, self.maxMsgSize))
         with self._closing_thread.lock:
             if not self._eof_sent.is_set():
                 self._eof_sent.set()
@@ -1504,7 +1522,7 @@ class CommBase(tools.YggClass):
         if len(msg) == 1:
             msg = msg[0]
         if self.is_eof(msg):
-            flag, msg_s = self.on_send_eof()
+            flag, msg_s = self.on_send_eof(header_kwargs=header_kwargs)
         else:
             flag = True
             # Covert object

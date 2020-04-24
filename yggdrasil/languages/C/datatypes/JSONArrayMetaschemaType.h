@@ -383,6 +383,28 @@ public:
     return out;
   }
   /*!
+    @brief Set the type associated with an item.
+    An error will be raised if the property identified by key is
+    already present and the provided type does not match the existing
+    type.
+    @param[in] index const size_t Index of the item to set the type for.
+    @param[in] itemtype const MetaschemaType* Pointer to item type that
+    should be associated with the provided index.
+   */
+  void set_item_type(const size_t index, const MetaschemaType* itemtype) override {
+    if (index < items_.size()) {
+      if ((*(items_[index])) != (*itemtype)) {
+	printf("New type:\n");
+	itemtype->display();
+	printf("Existing type:\n");
+	items_[index]->display();
+	ygglog_throw_error("JSONArrayMetaschemaType::set_item_type: New type dosn't match existing type for item %ld", index);
+      }
+    } else {
+      items_.push_back(itemtype->copy());
+    }
+  }
+  /*!
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.

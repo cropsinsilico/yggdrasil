@@ -406,6 +406,9 @@ public:
 class YggRpcClient : public YggRpc {
 public:
 
+  /*! @brief Empty constructor for inheritance. */
+  YggRpcClient(yggRpc_t x) : YggRpc(x) {}
+  
   /*!
     @brief Constructor for YggRpcClient.
     @param[in] name constant character pointer name used for input and output
@@ -469,6 +472,29 @@ public:
     va_end(va.va);
     return ret;
   }
+  
+};
+
+
+/*!
+  @brief C++ interface to timestep synchronization functionality.
+  The YggTimestep class is a basic wrapper around the C yggRpc_t
+  structure and associated client-side functions from the YggInterface.h
+  header. It provides the user with C++ style access to basic RPC client
+  operations.
+ */
+class YggTimestep : public YggRpcClient {
+public:
+
+  /*!
+    @brief Constructor for YggTimestep.
+    @param[in] name constant character pointer name used for input and output
+    queues.
+    @param[in] t_units const char* Units that should be used for the
+    timestep. "" indicates no units.
+   */
+  YggTimestep(const char *name, const char *t_units) :
+    YggRpcClient(yggTimestep(name, t_units)) {}
   
 };
 

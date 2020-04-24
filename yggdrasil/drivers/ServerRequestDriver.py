@@ -1,6 +1,6 @@
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
 from yggdrasil.drivers.ServerResponseDriver import ServerResponseDriver
-from yggdrasil.drivers.ClientRequestDriver import YGG_CLIENT_INI
+from yggdrasil.drivers.ClientRequestDriver import YGG_CLIENT_INI, YGG_CLIENT_EOF
 
 
 class ServerRequestDriver(ConnectionDriver):
@@ -87,6 +87,11 @@ class ServerRequestDriver(ConnectionDriver):
         to send responses."""
         return self.last_header['response_address']
 
+    @property
+    def client_model(self):
+        r"""str: Name of the client model."""
+        return self.last_header.get('client_model', '')
+
     def close_response_drivers(self):
         r"""Close response drivers."""
         with self.lock:
@@ -121,6 +126,11 @@ class ServerRequestDriver(ConnectionDriver):
         r"""On EOF, decrement number of clients. Only send EOF if the number
         of clients drops to 0."""
         with self.lock:
+            if self.client_model:
+                super(ServerRequestDriver, self).send_message(
+                    YGG_CLIENT_EOF,
+                    header_kwargs={'raw': True,
+                                   'client_model': self.client_model})
             self.nclients -= 1
             self.debug("Client signed off. nclients = %d", self.nclients)
             if self.nclients == 0:
@@ -184,4 +194,26 @@ class ServerRequestDriver(ConnectionDriver):
             kwargs['header_kwargs'].setdefault(
                 'response_address', response_driver.model_response_address)
             kwargs['header_kwargs'].setdefault('request_id', self.request_id)
+            kwargs['header_kwargs'].setdefault('client_model',
+                                               self.client_model)
         return super(ServerRequestDriver, self).send_message(*args, **kwargs)
+
+    def run_loop(self):
+        r"""Run the driver. Continue looping over messages until there are not
+        any left or the communication channel is closed.
+        """
+        super(ServerRequestDriver, self).run_loop()
+        if not self.was_break:
+            self.prune_response_drivers()
+
+    def prune_response_drivers(self):
+        r"""Remove response drivers that are no longer being used."""
+        remove_idx = []
+        for i, x in enumerate(self.response_drivers):
+            if (((not x.is_alive())
+                 and x.icomm.is_confirmed_recv
+                 and x.ocomm.is_confirmed_send)):
+                x.cleanup()
+                remove_idx.append(i)
+        for i in remove_idx[::-1]:
+            self.response_drivers.pop(i)

@@ -125,12 +125,23 @@ definitions:
             type: string
           type: array
       required:
-      - name
       - datatype
       - commtype
+      - name
       title: comm_base
       type: object
     - anyOf:
+      - additionalProperties: true
+        description: Schema for comm component ['rmq'] subtype.
+        properties:
+          commtype:
+            default: default
+            description: RabbitMQ connection.
+            enum:
+            - rmq
+            type: string
+        title: RMQComm
+        type: object
       - additionalProperties: true
         description: Schema for comm component ['buffer'] subtype.
         properties:
@@ -143,15 +154,15 @@ definitions:
         title: BufferComm
         type: object
       - additionalProperties: true
-        description: Schema for comm component ['default'] subtype.
+        description: Schema for comm component ['rmq_async'] subtype.
         properties:
           commtype:
             default: default
-            description: Communication mechanism selected based on the current platform.
+            description: Asynchronous RabbitMQ connection.
             enum:
-            - default
+            - rmq_async
             type: string
-        title: DefaultComm
+        title: RMQAsyncComm
         type: object
       - additionalProperties: true
         description: Schema for comm component ['ipc'] subtype.
@@ -165,26 +176,15 @@ definitions:
         title: IPCComm
         type: object
       - additionalProperties: true
-        description: Schema for comm component ['rmq'] subtype.
+        description: Schema for comm component ['default'] subtype.
         properties:
           commtype:
             default: default
-            description: RabbitMQ connection.
+            description: Communication mechanism selected based on the current platform.
             enum:
-            - rmq
+            - default
             type: string
-        title: RMQComm
-        type: object
-      - additionalProperties: true
-        description: Schema for comm component ['rmq_async'] subtype.
-        properties:
-          commtype:
-            default: default
-            description: Asynchronous RabbitMQ connection.
-            enum:
-            - rmq_async
-            type: string
-        title: RMQAsyncComm
+        title: DefaultComm
         type: object
       - additionalProperties: true
         description: Schema for comm component ['zmq'] subtype.
@@ -217,6 +217,7 @@ definitions:
           - file_input
           - file_output
           - input
+          - io
           - output
           - rmq_async_client
           - rmq_async_server
@@ -293,24 +294,15 @@ definitions:
         title: ClientDriver
         type: object
       - additionalProperties: true
-        description: Schema for connection component ['input'] subtype.
+        description: Schema for connection component ['rmq_client'] subtype.
         properties:
           connection_type:
-            description: Connection between one or more comms/files and a model.
+            description: Connection between a model acting as a client and a RabbitMQ
+              server request comm.
             enum:
-            - input
+            - rmq_client
             type: string
-        title: InputDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for connection component ['file_input'] subtype.
-        properties:
-          connection_type:
-            description: Connection between a file and a model.
-            enum:
-            - file_input
-            type: string
-        title: FileInputDriver
+        title: RMQClientDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['output'] subtype.
@@ -331,17 +323,6 @@ definitions:
             - file_output
             type: string
         title: FileOutputDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for connection component ['rmq_async_client'] subtype.
-        properties:
-          connection_type:
-            description: Connection between a model acting as a client and an asynchronous
-              RabbitMQ server request comm.
-            enum:
-            - rmq_async_client
-            type: string
-        title: RMQAsyncClientDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['server'] subtype.
@@ -366,15 +347,24 @@ definitions:
         title: RMQAsyncServerDriver
         type: object
       - additionalProperties: true
-        description: Schema for connection component ['rmq_client'] subtype.
+        description: Schema for connection component ['input'] subtype.
         properties:
           connection_type:
-            description: Connection between a model acting as a client and a RabbitMQ
-              server request comm.
+            description: Connection between one or more comms/files and a model.
             enum:
-            - rmq_client
+            - input
             type: string
-        title: RMQClientDriver
+        title: InputDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['file_input'] subtype.
+        properties:
+          connection_type:
+            description: Connection between a file and a model.
+            enum:
+            - file_input
+            type: string
+        title: FileInputDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['rmq_server'] subtype.
@@ -386,6 +376,27 @@ definitions:
             - rmq_server
             type: string
         title: RMQServerDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['io'] subtype.
+        properties:
+          connection_type:
+            description: Connection between two models.
+            enum:
+            - io
+            type: string
+        title: IODriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['rmq_async_client'] subtype.
+        properties:
+          connection_type:
+            description: Connection between a model acting as a client and an asynchronous
+              RabbitMQ server request comm.
+            enum:
+            - rmq_async_client
+            type: string
+        title: RMQAsyncClientDriver
         type: object
     description: Schema for connection components.
     title: connection
@@ -629,9 +640,9 @@ definitions:
             is used.
           type: string
       required:
+      - name
       - filetype
       - working_dir
-      - name
       title: file_base
       type: object
     - anyOf:
@@ -667,33 +678,6 @@ definitions:
         title: FileComm
         type: object
       - additionalProperties: true
-        description: Schema for file component ['ascii'] subtype.
-        properties:
-          comment:
-            default: '# '
-            description: One or more characters indicating a comment. Defaults to
-              '# '.
-            type: string
-          datatype:
-            description: JSON schema defining the type of object that the serializer
-              will be used to serialize/deserialize. Defaults to default_datatype.
-            type: schema
-          filetype:
-            default: binary
-            description: This file is read/written as encoded text one line at a time.
-            enum:
-            - ascii
-            type: string
-          newline:
-            default: '
-
-              '
-            description: One or more characters indicating a newline. Defaults to
-              '\n'.
-            type: string
-        title: AsciiFileComm
-        type: object
-      - additionalProperties: true
         description: Schema for file component ['map'] subtype.
         properties:
           comment:
@@ -727,46 +711,7 @@ definitions:
         title: AsciiMapComm
         type: object
       - additionalProperties: true
-        description: Schema for file component ['table'] subtype.
-        properties:
-          comment:
-            default: '# '
-            description: One or more characters indicating a comment. Defaults to
-              '# '.
-            type: string
-          datatype:
-            description: JSON schema defining the type of object that the serializer
-              will be used to serialize/deserialize. Defaults to default_datatype.
-            type: schema
-          delimiter:
-            default: "\t"
-            description: Character(s) that should be used to separate columns. Defaults
-              to '\t'.
-            type: string
-          filetype:
-            default: binary
-            description: The file is an ASCII table that will be read/written one
-              row at a time. If ``as_array`` is ``True``, the table will be read/written
-              all at once.
-            enum:
-            - table
-            type: string
-          newline:
-            default: '
-
-              '
-            description: One or more characters indicating a newline. Defaults to
-              '\n'.
-            type: string
-          use_astropy:
-            default: false
-            description: If True, the astropy package will be used to serialize/deserialize
-              table. Defaults to False.
-            type: boolean
-        title: AsciiTableComm
-        type: object
-      - additionalProperties: true
-        description: Schema for file component ['json'] subtype.
+        description: Schema for file component ['ply'] subtype.
         properties:
           comment:
             default: '# '
@@ -779,49 +724,10 @@ definitions:
             type: schema
           filetype:
             default: binary
-            description: The file contains a JSON serialized object.
+            description: The file is in the `Ply <http://paulbourke.net/dataformats/ply/>`_
+              data format for 3D structures.
             enum:
-            - json
-            type: string
-          indent:
-            default: "\t"
-            description: String or number of spaces that should be used to indent
-              each level within the seiralized structure. Defaults to '\t'.
-            type:
-            - string
-            - int
-          newline:
-            default: '
-
-              '
-            description: One or more characters indicating a newline. Defaults to
-              '\n'.
-            type: string
-          sort_keys:
-            default: true
-            description: If True, the serialization of dictionaries will be in key
-              sorted order. Defaults to True.
-            type: boolean
-        title: JSONFileComm
-        type: object
-      - additionalProperties: true
-        description: Schema for file component ['mat'] subtype.
-        properties:
-          comment:
-            default: '# '
-            description: One or more characters indicating a comment. Defaults to
-              '# '.
-            type: string
-          datatype:
-            description: JSON schema defining the type of object that the serializer
-              will be used to serialize/deserialize. Defaults to default_datatype.
-            type: schema
-          filetype:
-            default: binary
-            description: The file is a Matlab .mat file containing one or more serialized
-              Matlab variables.
-            enum:
-            - mat
+            - ply
             type: string
           newline:
             default: '
@@ -830,7 +736,7 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
-        title: MatFileComm
+        title: PlyFileComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['netcdf'] subtype.
@@ -879,7 +785,7 @@ definitions:
         title: NetCDFFileComm
         type: object
       - additionalProperties: true
-        description: Schema for file component ['ply'] subtype.
+        description: Schema for file component ['wofost'] subtype.
         properties:
           comment:
             default: '# '
@@ -890,12 +796,16 @@ definitions:
             description: JSON schema defining the type of object that the serializer
               will be used to serialize/deserialize. Defaults to default_datatype.
             type: schema
+          delimiter:
+            default: ' = '
+            description: Delimiter that should be used to separate name/value pairs
+              in the map. Defaults to \t.
+            type: string
           filetype:
             default: binary
-            description: The file is in the `Ply <http://paulbourke.net/dataformats/ply/>`_
-              data format for 3D structures.
+            description: The file is a WOFOST parameter file.
             enum:
-            - ply
+            - wofost
             type: string
           newline:
             default: '
@@ -904,10 +814,49 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
-        title: PlyFileComm
+        title: WOFOSTParamFileComm
         type: object
       - additionalProperties: true
-        description: Schema for file component ['obj'] subtype.
+        description: Schema for file component ['table'] subtype.
+        properties:
+          comment:
+            default: '# '
+            description: One or more characters indicating a comment. Defaults to
+              '# '.
+            type: string
+          datatype:
+            description: JSON schema defining the type of object that the serializer
+              will be used to serialize/deserialize. Defaults to default_datatype.
+            type: schema
+          delimiter:
+            default: "\t"
+            description: Character(s) that should be used to separate columns. Defaults
+              to '\t'.
+            type: string
+          filetype:
+            default: binary
+            description: The file is an ASCII table that will be read/written one
+              row at a time. If ``as_array`` is ``True``, the table will be read/written
+              all at once.
+            enum:
+            - table
+            type: string
+          newline:
+            default: '
+
+              '
+            description: One or more characters indicating a newline. Defaults to
+              '\n'.
+            type: string
+          use_astropy:
+            default: false
+            description: If True, the astropy package will be used to serialize/deserialize
+              table. Defaults to False.
+            type: boolean
+        title: AsciiTableComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['mat'] subtype.
         properties:
           comment:
             default: '# '
@@ -920,10 +869,10 @@ definitions:
             type: schema
           filetype:
             default: binary
-            description: The file is in the `Obj <http://paulbourke.net/dataformats/obj/>`_
-              data format for 3D structures.
+            description: The file is a Matlab .mat file containing one or more serialized
+              Matlab variables.
             enum:
-            - obj
+            - mat
             type: string
           newline:
             default: '
@@ -932,7 +881,34 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
-        title: ObjFileComm
+        title: MatFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['ascii'] subtype.
+        properties:
+          comment:
+            default: '# '
+            description: One or more characters indicating a comment. Defaults to
+              '# '.
+            type: string
+          datatype:
+            description: JSON schema defining the type of object that the serializer
+              will be used to serialize/deserialize. Defaults to default_datatype.
+            type: schema
+          filetype:
+            default: binary
+            description: This file is read/written as encoded text one line at a time.
+            enum:
+            - ascii
+            type: string
+          newline:
+            default: '
+
+              '
+            description: One or more characters indicating a newline. Defaults to
+              '\n'.
+            type: string
+        title: AsciiFileComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['pandas'] subtype.
@@ -982,7 +958,7 @@ definitions:
         title: PandasFileComm
         type: object
       - additionalProperties: true
-        description: Schema for file component ['pickle'] subtype.
+        description: Schema for file component ['obj'] subtype.
         properties:
           comment:
             default: '# '
@@ -995,9 +971,10 @@ definitions:
             type: schema
           filetype:
             default: binary
-            description: The file contains one or more pickled Python objects.
+            description: The file is in the `Obj <http://paulbourke.net/dataformats/obj/>`_
+              data format for 3D structures.
             enum:
-            - pickle
+            - obj
             type: string
           newline:
             default: '
@@ -1006,39 +983,7 @@ definitions:
             description: One or more characters indicating a newline. Defaults to
               '\n'.
             type: string
-        title: PickleFileComm
-        type: object
-      - additionalProperties: true
-        description: Schema for file component ['wofost'] subtype.
-        properties:
-          comment:
-            default: '# '
-            description: One or more characters indicating a comment. Defaults to
-              '# '.
-            type: string
-          datatype:
-            description: JSON schema defining the type of object that the serializer
-              will be used to serialize/deserialize. Defaults to default_datatype.
-            type: schema
-          delimiter:
-            default: ' = '
-            description: Delimiter that should be used to separate name/value pairs
-              in the map. Defaults to \t.
-            type: string
-          filetype:
-            default: binary
-            description: The file is a WOFOST parameter file.
-            enum:
-            - wofost
-            type: string
-          newline:
-            default: '
-
-              '
-            description: One or more characters indicating a newline. Defaults to
-              '\n'.
-            type: string
-        title: WOFOSTParamFileComm
+        title: ObjFileComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['yaml'] subtype.
@@ -1084,6 +1029,72 @@ definitions:
               '\n'.
             type: string
         title: YAMLFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['json'] subtype.
+        properties:
+          comment:
+            default: '# '
+            description: One or more characters indicating a comment. Defaults to
+              '# '.
+            type: string
+          datatype:
+            description: JSON schema defining the type of object that the serializer
+              will be used to serialize/deserialize. Defaults to default_datatype.
+            type: schema
+          filetype:
+            default: binary
+            description: The file contains a JSON serialized object.
+            enum:
+            - json
+            type: string
+          indent:
+            default: "\t"
+            description: String or number of spaces that should be used to indent
+              each level within the seiralized structure. Defaults to '\t'.
+            type:
+            - string
+            - int
+          newline:
+            default: '
+
+              '
+            description: One or more characters indicating a newline. Defaults to
+              '\n'.
+            type: string
+          sort_keys:
+            default: true
+            description: If True, the serialization of dictionaries will be in key
+              sorted order. Defaults to True.
+            type: boolean
+        title: JSONFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['pickle'] subtype.
+        properties:
+          comment:
+            default: '# '
+            description: One or more characters indicating a comment. Defaults to
+              '# '.
+            type: string
+          datatype:
+            description: JSON schema defining the type of object that the serializer
+              will be used to serialize/deserialize. Defaults to default_datatype.
+            type: schema
+          filetype:
+            default: binary
+            description: The file contains one or more pickled Python objects.
+            enum:
+            - pickle
+            type: string
+          newline:
+            default: '
+
+              '
+            description: One or more characters indicating a newline. Defaults to
+              '\n'.
+            type: string
+        title: PickleFileComm
         type: object
     description: Schema for file components.
     title: file
@@ -1132,6 +1143,24 @@ definitions:
         title: DirectFilter
         type: object
       - additionalProperties: true
+        description: Schema for filter component ['statement'] subtype.
+        properties:
+          filtertype:
+            enum:
+            - statement
+          statement:
+            description: Python statement in terms of the message as represented by
+              the string "%x%" that should evaluate to a boolean, True if the message
+              should pass through the filter, False if it should not. The statement
+              should only use a limited set of builtins and the math library (See
+              yggdrasil.tools.safe_eval). If more complex relationships are required,
+              use the FunctionFilter class.
+            type: string
+        required:
+        - statement
+        title: StatementFilter
+        type: object
+      - additionalProperties: true
         description: Schema for filter component ['function'] subtype.
         properties:
           filtertype:
@@ -1150,24 +1179,6 @@ definitions:
         - function
         title: FunctionFilter
         type: object
-      - additionalProperties: true
-        description: Schema for filter component ['statement'] subtype.
-        properties:
-          filtertype:
-            enum:
-            - statement
-          statement:
-            description: Python statement in terms of the message as represented by
-              the string "%x%" that should evaluate to a boolean, True if the message
-              should pass through the filter, False if it should not. The statement
-              should only use a limited set of builtins and the math library (See
-              yggdrasil.tools.safe_eval). If more complex relationships are required,
-              use the FunctionFilter class.
-            type: string
-        required:
-        - statement
-        title: StatementFilter
-        type: object
     description: Schema for filter components.
     title: filter
   model:
@@ -1178,6 +1189,23 @@ definitions:
         - args
       description: Base schema for all subtypes of model components.
       properties:
+        aggregation:
+          default: mean
+          description: Method(s) that should be used to aggregate synonymous variables
+            across models. This can be a single method that should be used for all
+            synonymous variables or a dictionary mapping between synonymous variables
+            and the method that should be used by that variable. If a variable is
+            not present in the dictionary or a values is not provided, 'mean' will
+            be used. See the documentation for pandas.DataFrame.aggregate for available
+            options.
+          oneOf:
+          - type: string
+          - type: function
+          - additionalProperties:
+              oneOf:
+              - type: string
+              - type: function
+            type: object
         args:
           description: The full path to the file containing the model program that
             will be run by the driver or a list starting with the program file and
@@ -1277,6 +1305,18 @@ definitions:
           default: {}
           description: Settings for the integrator. Defaults to empty dict.
           type: object
+        interpolation:
+          default: linear
+          description: Method(s) that should be used to interpolate missing timesteps.
+            This can be a single method or a dictionary mapping between model name
+            and the interpolation methods that should be used for variables from that
+            model. Defaults to 'linear'. See the documentation for pandas.DataFrame.interpolate
+            for available options.
+          oneOf:
+          - type: string
+          - additionalProperties:
+              type: string
+            type: object
         interpreter:
           description: Name or path of interpreter executable that should be used
             to run the model. If not provided, the interpreter will be determined
@@ -1317,6 +1357,7 @@ definitions:
           - python
           - r
           - sbml
+          - timesync
           type: string
         linker:
           description: Command or path to executable that should be used to link the
@@ -1456,6 +1497,25 @@ definitions:
           items:
             type: string
           type: array
+        synonyms:
+          default: {}
+          description: Mapping from variable name to lists of alternate variables
+            that should also be merged with the variable name specified in the key.
+            List entries can be either names of variables or 3-element tuples containing
+            the alternate variable name, a function for converting from the alternate
+            variable to the key variable, and a function for converting from the key
+            variable to the alternate variable. Defaults to empty dictionary.
+          items:
+            items:
+              oneOf:
+              - type: string
+              - items:
+                - type: string
+                - type: function
+                - type: function
+                type: array
+            type: array
+          type: object
         target:
           description: Make target that should be built to create the model executable.
             Defaults to None.
@@ -1464,6 +1524,12 @@ definitions:
           description: Language that the target is written in. Defaults to None and
             will be set based on the source files provided.
           type: string
+        timesync:
+          default: false
+          description: If True, the model is assumed to call a send then receive of
+            the state at each timestep for syncronization with other models that are
+            also integrating in time. Defaults to False.
+          type: boolean
         use_symunit:
           default: false
           description: If True, input/output variables with units will be represented
@@ -1492,257 +1558,12 @@ definitions:
           type: string
       required:
       - language
-      - args
-      - working_dir
       - name
+      - working_dir
+      - args
       title: model_base
       type: object
     - anyOf:
-      - additionalProperties: true
-        description: Schema for model component ['c'] subtype.
-        properties:
-          compiler:
-            description: Command or path to executable that should be used to compile
-              the model. If not provided, the compiler will be determined based on
-              configuration options for the language (if present) and the registered
-              compilers that are available on the current operating system.
-            type: string
-          compiler_flags:
-            default: []
-            description: Flags that should be passed to the compiler during compilation.
-              If nto provided, the compiler flags will be determined based on configuration
-              options for the language (if present), the compiler defaults, and the
-              default_compiler_flags class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in C.
-            enum:
-            - c
-            type: string
-          linker:
-            description: Command or path to executable that should be used to link
-              the model. If not provided, the linker will be determined based on configuration
-              options for the language (if present) and the registered linkers that
-              are available on the current operating system
-            type: string
-          linker_flags:
-            default: []
-            description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
-              options for the language (if present), the linker defaults, and the
-              default_linker_flags class attribute.
-            items:
-              type: string
-            type: array
-          source_files:
-            default: []
-            description: Source files that should be compiled into an executable.
-              Defaults to an empty list and the driver will search for a source file
-              based on the model executable (the first model argument).
-            items:
-              type: string
-            type: array
-        title: CModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['cmake'] subtype.
-        properties:
-          builddir:
-            description: Directory where the build should be saved. Defaults to <sourcedir>/build.
-              It can be relative to working_dir or absolute.
-            type: string
-          compiler:
-            description: Command or path to executable that should be used to compile
-              the model. If not provided, the compiler will be determined based on
-              configuration options for the language (if present) and the registered
-              compilers that are available on the current operating system.
-            type: string
-          compiler_flags:
-            default: []
-            description: Flags that should be passed to the compiler during compilation.
-              If nto provided, the compiler flags will be determined based on configuration
-              options for the language (if present), the compiler defaults, and the
-              default_compiler_flags class attribute.
-            items:
-              type: string
-            type: array
-          configuration:
-            default: Release
-            description: Build type/configuration that should be built. Defaults to
-              'Release'.
-            type: string
-          language:
-            default: executable
-            description: Model is written in C/C++ and has a CMake build system.
-            enum:
-            - cmake
-            type: string
-          linker:
-            description: Command or path to executable that should be used to link
-              the model. If not provided, the linker will be determined based on configuration
-              options for the language (if present) and the registered linkers that
-              are available on the current operating system
-            type: string
-          linker_flags:
-            default: []
-            description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
-              options for the language (if present), the linker defaults, and the
-              default_linker_flags class attribute.
-            items:
-              type: string
-            type: array
-          source_files:
-            default: []
-            description: Source files that should be compiled into an executable.
-              Defaults to an empty list and the driver will search for a source file
-              based on the model executable (the first model argument).
-            items:
-              type: string
-            type: array
-          sourcedir:
-            description: Source directory to call cmake on. If not provided it is
-              set to working_dir. This should be the directory containing the CMakeLists.txt
-              file. It can be relative to working_dir or absolute.
-            type: string
-          target:
-            description: Make target that should be built to create the model executable.
-              Defaults to None.
-            type: string
-          target_language:
-            description: Language that the target is written in. Defaults to None
-              and will be set based on the source files provided.
-            type: string
-        title: CMakeModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['c++', 'cpp'] subtype.
-        properties:
-          compiler:
-            description: Command or path to executable that should be used to compile
-              the model. If not provided, the compiler will be determined based on
-              configuration options for the language (if present) and the registered
-              compilers that are available on the current operating system.
-            type: string
-          compiler_flags:
-            default: []
-            description: Flags that should be passed to the compiler during compilation.
-              If nto provided, the compiler flags will be determined based on configuration
-              options for the language (if present), the compiler defaults, and the
-              default_compiler_flags class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in C++.
-            enum:
-            - c++
-            - cpp
-            type: string
-          linker:
-            description: Command or path to executable that should be used to link
-              the model. If not provided, the linker will be determined based on configuration
-              options for the language (if present) and the registered linkers that
-              are available on the current operating system
-            type: string
-          linker_flags:
-            default: []
-            description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
-              options for the language (if present), the linker defaults, and the
-              default_linker_flags class attribute.
-            items:
-              type: string
-            type: array
-          source_files:
-            default: []
-            description: Source files that should be compiled into an executable.
-              Defaults to an empty list and the driver will search for a source file
-              based on the model executable (the first model argument).
-            items:
-              type: string
-            type: array
-        title: CPPModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['executable'] subtype.
-        properties:
-          language:
-            default: executable
-            description: Model is an executable.
-            enum:
-            - executable
-            type: string
-        title: ExecutableModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['python'] subtype.
-        properties:
-          interpreter:
-            description: Name or path of interpreter executable that should be used
-              to run the model. If not provided, the interpreter will be determined
-              based on configuration options for the language (if present) and the
-              default_interpreter class attribute.
-            type: string
-          interpreter_flags:
-            default: []
-            description: Flags that should be passed to the interpreter when running
-              the model. If not provided, the flags are determined based on configuration
-              options for the language (if present) and the default_interpreter_flags
-              class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in Python.
-            enum:
-            - python
-            type: string
-          skip_interpreter:
-            default: false
-            description: If True, no interpreter will be added to the arguments. This
-              should only be used for subclasses that will not be invoking the model
-              via the command line. Defaults to False.
-            type: boolean
-        title: PythonModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['lpy'] subtype.
-        properties:
-          interpreter:
-            description: Name or path of interpreter executable that should be used
-              to run the model. If not provided, the interpreter will be determined
-              based on configuration options for the language (if present) and the
-              default_interpreter class attribute.
-            type: string
-          interpreter_flags:
-            default: []
-            description: Flags that should be passed to the interpreter when running
-              the model. If not provided, the flags are determined based on configuration
-              options for the language (if present) and the default_interpreter_flags
-              class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is an LPy system.
-            enum:
-            - lpy
-            type: string
-          skip_interpreter:
-            default: false
-            description: If True, no interpreter will be added to the arguments. This
-              should only be used for subclasses that will not be invoking the model
-              via the command line. Defaults to False.
-            type: boolean
-        title: LPyModelDriver
-        type: object
       - additionalProperties: true
         description: Schema for model component ['make'] subtype.
         properties:
@@ -1833,6 +1654,70 @@ definitions:
         title: MakeModelDriver
         type: object
       - additionalProperties: true
+        description: Schema for model component ['python'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in Python.
+            enum:
+            - python
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: PythonModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['lpy'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is an LPy system.
+            enum:
+            - lpy
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: LPyModelDriver
+        type: object
+      - additionalProperties: true
         description: Schema for model component ['matlab'] subtype.
         properties:
           interpreter:
@@ -1870,6 +1755,105 @@ definitions:
         title: MatlabModelDriver
         type: object
       - additionalProperties: true
+        description: Schema for model component ['c'] subtype.
+        properties:
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in C.
+            enum:
+            - c
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+        title: CModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['c++', 'cpp'] subtype.
+        properties:
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in C++.
+            enum:
+            - c++
+            - cpp
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+        title: CPPModelDriver
+        type: object
+      - additionalProperties: true
         description: Schema for model component ['R', 'r'] subtype.
         properties:
           interpreter:
@@ -1901,6 +1885,87 @@ definitions:
               via the command line. Defaults to False.
             type: boolean
         title: RModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['timesync'] subtype.
+        properties:
+          aggregation:
+            default: mean
+            description: Method(s) that should be used to aggregate synonymous variables
+              across models. This can be a single method that should be used for all
+              synonymous variables or a dictionary mapping between synonymous variables
+              and the method that should be used by that variable. If a variable is
+              not present in the dictionary or a values is not provided, 'mean' will
+              be used. See the documentation for pandas.DataFrame.aggregate for available
+              options.
+            oneOf:
+            - type: string
+            - type: function
+            - additionalProperties:
+                oneOf:
+                - type: string
+                - type: function
+              type: object
+          interpolation:
+            default: linear
+            description: Method(s) that should be used to interpolate missing timesteps.
+              This can be a single method or a dictionary mapping between model name
+              and the interpolation methods that should be used for variables from
+              that model. Defaults to 'linear'. See the documentation for pandas.DataFrame.interpolate
+              for available options.
+            oneOf:
+            - type: string
+            - additionalProperties:
+                type: string
+              type: object
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is dedicated to synchronizingtimesteps between other
+              models.
+            enum:
+            - timesync
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+          synonyms:
+            default: {}
+            description: Mapping from variable name to lists of alternate variables
+              that should also be merged with the variable name specified in the key.
+              List entries can be either names of variables or 3-element tuples containing
+              the alternate variable name, a function for converting from the alternate
+              variable to the key variable, and a function for converting from the
+              key variable to the alternate variable. Defaults to empty dictionary.
+            items:
+              items:
+                oneOf:
+                - type: string
+                - items:
+                  - type: string
+                  - type: function
+                  - type: function
+                  type: array
+              type: array
+            type: object
+        title: TimeSyncModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['sbml'] subtype.
@@ -1981,6 +2046,88 @@ definitions:
             type: integer
         title: SBMLModelDriver
         type: object
+      - additionalProperties: true
+        description: Schema for model component ['cmake'] subtype.
+        properties:
+          builddir:
+            description: Directory where the build should be saved. Defaults to <sourcedir>/build.
+              It can be relative to working_dir or absolute.
+            type: string
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          configuration:
+            default: Release
+            description: Build type/configuration that should be built. Defaults to
+              'Release'.
+            type: string
+          language:
+            default: executable
+            description: Model is written in C/C++ and has a CMake build system.
+            enum:
+            - cmake
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+          sourcedir:
+            description: Source directory to call cmake on. If not provided it is
+              set to working_dir. This should be the directory containing the CMakeLists.txt
+              file. It can be relative to working_dir or absolute.
+            type: string
+          target:
+            description: Make target that should be built to create the model executable.
+              Defaults to None.
+            type: string
+          target_language:
+            description: Language that the target is written in. Defaults to None
+              and will be set based on the source files provided.
+            type: string
+        title: CMakeModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['executable'] subtype.
+        properties:
+          language:
+            default: executable
+            description: Model is an executable.
+            enum:
+            - executable
+            type: string
+        title: ExecutableModelDriver
+        type: object
     description: Schema for model components.
     title: model
   serializer:
@@ -2014,8 +2161,8 @@ definitions:
           type: boolean
         delimiter:
           default: "\t"
-          description: Delimiter that should be used to separate name/value pairs
-            in the map. Defaults to \t.
+          description: Character(s) that should be used to separate columns. Defaults
+            to '\t'.
           type: string
         encoded_datatype:
           description: JSON schema describing the type that serialized objects should
@@ -2111,23 +2258,6 @@ definitions:
       type: object
     - anyOf:
       - additionalProperties: true
-        description: Schema for serializer component ['map'] subtype.
-        properties:
-          delimiter:
-            default: "\t"
-            description: Delimiter that should be used to separate name/value pairs
-              in the map. Defaults to \t.
-            type: string
-          seritype:
-            default: default
-            description: Serialzation of mapping between key/value pairs with one
-              pair per line and using a character delimiter to separate keys and values.
-            enum:
-            - map
-            type: string
-        title: AsciiMapSerialize
-        type: object
-      - additionalProperties: true
         description: Schema for serializer component ['default'] subtype.
         properties:
           seritype:
@@ -2186,101 +2316,6 @@ definitions:
         title: AsciiTableSerialize
         type: object
       - additionalProperties: true
-        description: Schema for serializer component ['direct'] subtype.
-        properties:
-          seritype:
-            default: default
-            description: Direct serialization of bytes.
-            enum:
-            - direct
-            type: string
-        title: DirectSerialize
-        type: object
-      - additionalProperties: true
-        description: Schema for serializer component ['functional'] subtype.
-        properties:
-          encoded_datatype:
-            description: JSON schema describing the type that serialized objects should
-              conform to. Defaults to the class attribute default_encoded_datatype.
-              If either func_serialize or func_deserialize are not provided, this
-              needs to be specified in order to serialize non-bytes objects.
-            type: schema
-          func_deserialize:
-            description: Callable object that takes objects of a type that conforms
-              to encoded_datatype and returns a deserialized Python object. Defaults
-              to None and the default deserialization for encoded_datatype will be
-              used.
-            type: function
-          func_serialize:
-            description: Callable object that takes Python objects as input and returns
-              a representation that conforms to encoded_datatype. Defaults to None
-              and the default serialization for encoded_datatype will be used.
-            type: function
-          seritype:
-            default: default
-            description: Serializer that uses provied function to serialize messages.
-            enum:
-            - functional
-            type: string
-        title: FunctionalSerialize
-        type: object
-      - additionalProperties: true
-        description: Schema for serializer component ['json'] subtype.
-        properties:
-          indent:
-            default: "\t"
-            description: String or number of spaces that should be used to indent
-              each level within the seiralized structure. Defaults to '\t'.
-            type:
-            - string
-            - int
-          seritype:
-            default: default
-            description: Serializes Python objects using the JSON standard.
-            enum:
-            - json
-            type: string
-          sort_keys:
-            default: true
-            description: If True, the serialization of dictionaries will be in key
-              sorted order. Defaults to True.
-            type: boolean
-        title: JSONSerialize
-        type: object
-      - additionalProperties: true
-        description: Schema for serializer component ['mat'] subtype.
-        properties:
-          seritype:
-            default: default
-            description: Serializes objects using the Matlab .mat format.
-            enum:
-            - mat
-            type: string
-        title: MatSerialize
-        type: object
-      - additionalProperties: true
-        description: Schema for serializer component ['ply'] subtype.
-        properties:
-          seritype:
-            default: default
-            description: Serialize 3D structures using Ply format.
-            enum:
-            - ply
-            type: string
-        title: PlySerialize
-        type: object
-      - additionalProperties: true
-        description: Schema for serializer component ['obj'] subtype.
-        properties:
-          seritype:
-            default: default
-            description: Serialize 3D structures using Obj format.
-            enum:
-            - obj
-            type: string
-        title: ObjSerialize
-        type: object
-      - additionalProperties: true
         description: Schema for serializer component ['pandas'] subtype.
         properties:
           delimiter:
@@ -2330,6 +2365,118 @@ definitions:
         title: PandasSerialize
         type: object
       - additionalProperties: true
+        description: Schema for serializer component ['functional'] subtype.
+        properties:
+          encoded_datatype:
+            description: JSON schema describing the type that serialized objects should
+              conform to. Defaults to the class attribute default_encoded_datatype.
+              If either func_serialize or func_deserialize are not provided, this
+              needs to be specified in order to serialize non-bytes objects.
+            type: schema
+          func_deserialize:
+            description: Callable object that takes objects of a type that conforms
+              to encoded_datatype and returns a deserialized Python object. Defaults
+              to None and the default deserialization for encoded_datatype will be
+              used.
+            type: function
+          func_serialize:
+            description: Callable object that takes Python objects as input and returns
+              a representation that conforms to encoded_datatype. Defaults to None
+              and the default serialization for encoded_datatype will be used.
+            type: function
+          seritype:
+            default: default
+            description: Serializer that uses provied function to serialize messages.
+            enum:
+            - functional
+            type: string
+        title: FunctionalSerialize
+        type: object
+      - additionalProperties: true
+        description: Schema for serializer component ['mat'] subtype.
+        properties:
+          seritype:
+            default: default
+            description: Serializes objects using the Matlab .mat format.
+            enum:
+            - mat
+            type: string
+        title: MatSerialize
+        type: object
+      - additionalProperties: true
+        description: Schema for serializer component ['direct'] subtype.
+        properties:
+          seritype:
+            default: default
+            description: Direct serialization of bytes.
+            enum:
+            - direct
+            type: string
+        title: DirectSerialize
+        type: object
+      - additionalProperties: true
+        description: Schema for serializer component ['json'] subtype.
+        properties:
+          indent:
+            default: "\t"
+            description: String or number of spaces that should be used to indent
+              each level within the seiralized structure. Defaults to '\t'.
+            type:
+            - string
+            - int
+          seritype:
+            default: default
+            description: Serializes Python objects using the JSON standard.
+            enum:
+            - json
+            type: string
+          sort_keys:
+            default: true
+            description: If True, the serialization of dictionaries will be in key
+              sorted order. Defaults to True.
+            type: boolean
+        title: JSONSerialize
+        type: object
+      - additionalProperties: true
+        description: Schema for serializer component ['ply'] subtype.
+        properties:
+          seritype:
+            default: default
+            description: Serialize 3D structures using Ply format.
+            enum:
+            - ply
+            type: string
+        title: PlySerialize
+        type: object
+      - additionalProperties: true
+        description: Schema for serializer component ['map'] subtype.
+        properties:
+          delimiter:
+            default: "\t"
+            description: Delimiter that should be used to separate name/value pairs
+              in the map. Defaults to \t.
+            type: string
+          seritype:
+            default: default
+            description: Serialzation of mapping between key/value pairs with one
+              pair per line and using a character delimiter to separate keys and values.
+            enum:
+            - map
+            type: string
+        title: AsciiMapSerialize
+        type: object
+      - additionalProperties: true
+        description: Schema for serializer component ['obj'] subtype.
+        properties:
+          seritype:
+            default: default
+            description: Serialize 3D structures using Obj format.
+            enum:
+            - obj
+            type: string
+        title: ObjSerialize
+        type: object
+      - additionalProperties: true
         description: Schema for serializer component ['pickle'] subtype.
         properties:
           seritype:
@@ -2339,23 +2486,6 @@ definitions:
             - pickle
             type: string
         title: PickleSerialize
-        type: object
-      - additionalProperties: true
-        description: Schema for serializer component ['wofost'] subtype.
-        properties:
-          delimiter:
-            default: ' = '
-            description: Delimiter that should be used to separate name/value pairs
-              in the map. Defaults to \t.
-            type: string
-          seritype:
-            default: default
-            description: Serialization of mapping between keys and scalar or array
-              values as used in the WOFOST parameter files.
-            enum:
-            - wofost
-            type: string
-        title: WOFOSTParamSerialize
         type: object
       - additionalProperties: true
         description: Schema for serializer component ['yaml'] subtype.
@@ -2385,6 +2515,23 @@ definitions:
             - yaml
             type: string
         title: YAMLSerialize
+        type: object
+      - additionalProperties: true
+        description: Schema for serializer component ['wofost'] subtype.
+        properties:
+          delimiter:
+            default: ' = '
+            description: Delimiter that should be used to separate name/value pairs
+              in the map. Defaults to \t.
+            type: string
+          seritype:
+            default: default
+            description: Serialization of mapping between keys and scalar or array
+              values as used in the WOFOST parameter files.
+            enum:
+            - wofost
+            type: string
+        title: WOFOSTParamSerialize
         type: object
     description: Schema for serializer components.
     title: serializer
@@ -2480,47 +2627,6 @@ definitions:
         title: PandasTransform
         type: object
       - additionalProperties: true
-        description: Schema for transform component ['direct'] subtype.
-        properties:
-          transformtype:
-            enum:
-            - direct
-        title: DirectTransform
-        type: object
-      - additionalProperties: true
-        description: Schema for transform component ['function'] subtype.
-        properties:
-          function:
-            description: The handle for a callable Python object (e.g. function) that
-              should be used to transform messages or a string of the form "<function
-              file>:<function name>" identifying a function where "<function file>"
-              is the module or Python file containing the function and "<function
-              name>" is the name of the function. The function should take the message
-              as input and return the transformed message.
-            type: function
-          transformtype:
-            enum:
-            - function
-        required:
-        - function
-        title: FunctionTransform
-        type: object
-      - additionalProperties: true
-        description: Schema for transform component ['map_fields'] subtype.
-        properties:
-          map:
-            additionalProperties:
-              type: string
-            description: A mapping from original field name to new field names.
-            type: object
-          transformtype:
-            enum:
-            - map_fields
-        required:
-        - map
-        title: MapFieldsTransform
-        type: object
-      - additionalProperties: true
         description: Schema for transform component ['select_fields'] subtype.
         properties:
           original_order:
@@ -2547,6 +2653,24 @@ definitions:
         title: SelectFieldsTransform
         type: object
       - additionalProperties: true
+        description: Schema for transform component ['function'] subtype.
+        properties:
+          function:
+            description: The handle for a callable Python object (e.g. function) that
+              should be used to transform messages or a string of the form "<function
+              file>:<function name>" identifying a function where "<function file>"
+              is the module or Python file containing the function and "<function
+              name>" is the name of the function. The function should take the message
+              as input and return the transformed message.
+            type: function
+          transformtype:
+            enum:
+            - function
+        required:
+        - function
+        title: FunctionTransform
+        type: object
+      - additionalProperties: true
         description: Schema for transform component ['statement'] subtype.
         properties:
           statement:
@@ -2562,6 +2686,29 @@ definitions:
         required:
         - statement
         title: StatementTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['direct'] subtype.
+        properties:
+          transformtype:
+            enum:
+            - direct
+        title: DirectTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['map_fields'] subtype.
+        properties:
+          map:
+            additionalProperties:
+              type: string
+            description: A mapping from original field name to new field names.
+            type: object
+          transformtype:
+            enum:
+            - map_fields
+        required:
+        - map
+        title: MapFieldsTransform
         type: object
     description: Schema for transform components.
     title: transform

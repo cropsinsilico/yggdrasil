@@ -41,6 +41,19 @@ class DSLModelDriver(InterpretedModelDriver):  # pragma: no cover
         return drv.is_library_installed(lib, **kwargs)
     
     @classmethod
+    def language_version(cls, **kwargs):
+        r"""Determine the version of this language.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.run_executable.
+
+        Returns:
+            str: Version of compiler/interpreter for this language.
+
+        """
+        return None
+    
+    @classmethod
     def model_wrapper(cls, *args, **kwargs):  # pragma: no cover
         r"""Model wrapper."""
         raise NotImplementedError

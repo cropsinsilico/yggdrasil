@@ -493,7 +493,7 @@ class SerializeBase(tools.YggClass):
                        'commtype', 'filetype', 'response_address', 'request_id',
                        'append', 'in_temp', 'is_series', 'working_dir', 'fmts',
                        'model_driver', 'env', 'send_converter', 'recv_converter',
-                       'typedef_base']
+                       'typedef_base', 'client_model', 'closed_clients']
         kws = list(kwargs.keys())
         for k in kws:
             if (k in _remove_kws) or k.startswith('zmq'):

@@ -158,6 +158,20 @@ def parse_yaml(files):
     yml_norm = s.validate(yml_prep, normalize=True)
     # print('normalized')
     # pprint.pprint(yml_norm)
+    # Determine if any of the models require synchronization
+    add_timesync = False
+    for yml in yml_norm['models']:
+        if yml.get('timesync', False):
+            add_timesync = True
+            yml.setdefault('client_of', [])
+            yml['client_of'].append('timestep_synchonization')
+    if add_timesync:
+        yml_norm['models'].append({'name': 'timestep_synchonization',
+                                   'language': 'timesync',
+                                   'is_server': True,
+                                   'working_dir': os.getcwd(),
+                                   'inputs': [],
+                                   'outputs': []})
     # Parse models, then connections to ensure connections can be processed
     existing = None
     for k in ['models', 'connections']:
@@ -279,9 +293,15 @@ def parse_model(yml, existing):
         srv_names = yml['client_of']
         yml['client_of'] = srv_names
         for srv in srv_names:
-            cli = {'name': '%s:%s_%s' % (yml['name'], srv, yml['name']),
+            if srv == 'timestep_synchonization':
+                cli_name = '%s:timestep' % yml['name']
+                cli_datatype = {'type': 'bytes'}
+            else:
+                cli_name = '%s:%s_%s' % (yml['name'], srv, yml['name'])
+                cli_datatype = {'type': 'bytes'}
+            cli = {'name': cli_name,
                    'commtype': 'default',
-                   'datatype': {'type': 'bytes'},
+                   'datatype': cli_datatype,
                    'driver': 'ClientDriver',
                    'args': srv + '_SERVER',
                    'working_dir': yml['working_dir']}

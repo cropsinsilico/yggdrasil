@@ -268,6 +268,10 @@ public:
       ygglog_throw_error("MetaschemaType::update: New type information is NULL.");
     }
     if (strcmp(type_, new_info->type()) != 0) {
+      printf("New type:\n");
+      new_info->display();
+      printf("Existing type:\n");
+      display();
       ygglog_throw_error("MetaschemaType::update: Cannot update type %s to type %s.",
 			 type_, new_info->type());
     }
@@ -389,6 +393,17 @@ public:
     return out;
   }
   /*!
+    @brief Set the type associated with an item.
+    @param[in] index const size_t Index of the item to set the type for.
+    @param[in] itemtype const MetaschemaType* Pointer to item type that
+    should be associated with the provided index.
+   */
+  virtual void set_item_type(const size_t index, const MetaschemaType* itemtype) {
+    UNUSED(index);
+    UNUSED(itemtype);
+    ygglog_throw_error("MetaschemaType::set_item_type: Cannot set item type for type '%s'.", type_);
+  }
+  /*!
     @brief Get the type associated with a property.
     @param[in] key const char* Property key to get type for.
     @returns MetaschemaType* Pointer to type class for property.
@@ -398,6 +413,17 @@ public:
     UNUSED(key);
     ygglog_throw_error("MetaschemaType::get_property_type: Cannot get property type for type '%s'.", type_);
     return out;
+  }
+  /*!
+    @brief Set the type associated with a property.
+    @param[in] key const char* Property key to set type for.
+    @param[in] proptype const MetaschemaType* Pointer to property type
+    that should be associated with the provided key.
+   */
+  virtual void set_property_type(const char* key, const MetaschemaType* proptype) {
+    UNUSED(key);
+    UNUSED(proptype);
+    ygglog_throw_error("MetaschemaType::set_property_type: Cannot set property type for type '%s'.", type_);
   }
   /*!
     @brief Set the _variable_length private variable.
@@ -1261,10 +1287,10 @@ YggGeneric::YggGeneric() : type(NULL), data(NULL), nbytes(0) {};
 
 YggGeneric::YggGeneric(const MetaschemaType* in_type, void* in_data, size_t in_nbytes) : type(NULL), data(NULL), nbytes(in_nbytes) {
   set_type(in_type);
-  set_data(in_data);
   if (nbytes == 0) {
     nbytes = type->nbytes();
   }
+  set_data(in_data);
 };
 
 YggGeneric::YggGeneric(const YggGeneric &other) :
@@ -1467,6 +1493,23 @@ void* YggGeneric::get_data_array_item(const size_t i,
   }
 };
 
+void YggGeneric::set_data_array_item(const size_t index,
+				     const YggGeneric* value) {
+  if (type->type_code() != T_ARRAY) {
+    ygglog_throw_error("YggGeneric::set_data_array_item: Object is not an array.");
+  }
+  YggGenericVector* arr = (YggGenericVector*)get_data();
+  if (arr == NULL) {
+    ygglog_throw_error("YggGeneric::set_data_array_item: Array is NULL.");
+  }
+  type->set_item_type(index, value->get_type());
+  if (index < arr->size()) {
+    (*arr)[index] = value->copy();
+  } else {
+    arr->push_back(value->copy());
+  }
+};
+
 void* YggGeneric::get_data_map_item(const char *key,
 				    const MetaschemaType* item_type,
 				    bool return_generic) const {
@@ -1487,6 +1530,19 @@ void* YggGeneric::get_data_map_item(const char *key,
   } else {
     return out->get_data(item_type);
   }
+};
+
+void YggGeneric::set_data_map_item(const char *key,
+				   const YggGeneric* value) {
+  if (type->type_code() != T_OBJECT) {
+    ygglog_throw_error("YggGeneric::set_data_map_item: Object is not a map.");
+  }
+  YggGenericMap* map = (YggGenericMap*)get_data();
+  if (map == NULL) {
+    ygglog_throw_error("YggGeneric::set_data_map_item: Map is NULL.");
+  }
+  type->set_property_type(key, value->get_type());
+  (*map)[key] = value->copy();
 };
 
 

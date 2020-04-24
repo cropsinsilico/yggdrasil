@@ -321,6 +321,16 @@ public:
 			    const MetaschemaType* item_type,
 			    bool return_generic=false) const;
   /*!
+    @brief Set an array item.
+    @param[in] index const size_t Index of array element that should
+    be set. If larger than the current size of the array, the element
+    will be appended to the end of the array.
+    @param value const YggGeneric* Pointer to value that the indexed
+    item in the array should be set to.
+   */
+  void set_data_array_item(const size_t index,
+			   const YggGeneric* value);
+  /*!
     @brief Get a map item.
     @param[in] key const char* String key for item that should be
     returned.
@@ -332,6 +342,14 @@ public:
   void* get_data_map_item(const char *key,
 			  const MetaschemaType* item_type,
 			  bool return_generic=false) const;
+  /*!
+    @brief Set a map item.
+    @param[in] key const char* String key for item that should be set.
+    @param[in] value const YggGeneric* Pointer to value that map item
+    should be set to.
+   */
+  void set_data_map_item(const char *key, const YggGeneric* value);
+  
 };
 
 
