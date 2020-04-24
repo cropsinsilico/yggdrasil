@@ -10,6 +10,7 @@ def show_diff(old, new, cross=None):
     diff = set(old) - set(new)
     if cross is not None:
         diff = diff & cross
+    print(' %d files' % len(diff))
     for x in diff:
         print(b'    %s' % x)
     return diff
@@ -20,7 +21,7 @@ def make_driver(**kwargs):
     old = tools.get_fds()
     out = ConnectionDriver('test', **kwargs)
     new = tools.get_fds()
-    print('created')
+    print('created', end='')
     created = show_diff(new, old)
     return out, new, old, created
 
@@ -38,9 +39,9 @@ def check_driver(method, **kwargs):
     gc.collect()
     time.sleep(1.0)
     new = tools.get_fds()
-    print('%s closed' % method)
+    print('%s closed' % method, end='')
     show_diff(old, new, created)
-    print('%s leaked' % method)
+    print('%s leaked' % method, end='')
     show_diff(new, old0, created)
     if method != 'delete':
         del x

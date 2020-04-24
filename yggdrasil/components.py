@@ -51,13 +51,6 @@ class ClassRegistry(OrderedDict):
         self._imported = False
         super(ClassRegistry, self).__init__(*args, **kwargs)
 
-    @classmethod
-    def from_directory(cls, directory):
-        r"""Create registry from directory."""
-        out = cls()
-        out._directory = directory
-        return out
-
     def import_classes(self):
         r"""Import all classes in the same directory."""
         if self._imported:
@@ -94,7 +87,8 @@ class ClassRegistry(OrderedDict):
     def __getitem__(self, *args, **kwargs):
         try:
             return super(ClassRegistry, self).__getitem__(*args, **kwargs)
-        except KeyError:
+        except KeyError:  # pragma: no cover
+            # This will only be called during import
             if self._imported:
                 raise
             self.import_classes()
@@ -345,7 +339,9 @@ def get_component_base_class(comptype, subtype=None, without_schema=False,
     """
     if comptype in _registry_base_classes:
         base_class_name = _registry_base_classes[comptype]
-    else:
+    else:  # pragma: no cover
+        # Only called during initial import which is not covered by
+        # the test runner
         default_class = import_component(comptype, subtype=subtype,
                                          without_schema=without_schema,
                                          **kwargs)
@@ -674,9 +670,13 @@ class ComponentBase(object):
         self.extra_kwargs = kwargs
 
     def __getstate__(self):
-        return self.__dict__.copy()
+        out = self.__dict__.copy()
+        del out['_input_args'], out['_input_kwargs']
+        return out
 
     def __setstate__(self, state):
+        state['_input_args'] = []
+        state['_input_kwargs'] = {}
         self.__dict__.update(state)
 
     def __del__(self):

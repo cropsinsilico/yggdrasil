@@ -197,6 +197,246 @@ generic_t pop_generic_va(size_t* nargs, va_list_t* ap);
  */
 generic_t* pop_generic_va_ptr(size_t* nargs, va_list_t* ap);
 
+/*!
+  @brief Get the number of elements in an array object.
+  @param[in] x generic_t Generic object that is presumed to contain an array.
+  @returns size_t Number of elements in array.
+ */
+size_t generic_array_get_size(generic_t x);
+
+/*!
+  @brief Get an item from an array for types that don't require additional parameters.
+  @param[in] x generic_t Generic object that is presumed to contain an array.
+  @param[in] index size_t Index for value that should be returned.
+  @param[in] type const char* Type of value expected.
+  @returns void* Pointer to data for array item.
+ */
+void* generic_array_get_item(generic_t x, const size_t index,
+			   const char *type);
+bool generic_array_get_bool(generic_t x, const size_t index);
+int generic_array_get_integer(generic_t x, const size_t index);
+void* generic_array_get_null(generic_t x, const size_t index);
+double generic_array_get_number(generic_t x, const size_t index);
+char* generic_array_get_string(generic_t x, const size_t index);
+generic_t generic_array_get_object(generic_t x, const size_t index);
+generic_t generic_array_get_array(generic_t x, const size_t index);
+char* generic_array_get_direct(generic_t x, const size_t index);
+ply_t generic_array_get_ply(generic_t x, const size_t index);
+obj_t generic_array_get_obj(generic_t x, const size_t index);
+python_t generic_array_get_python_class(generic_t x, const size_t index);
+python_t generic_array_get_python_function(generic_t x, const size_t index);
+schema_t generic_array_get_schema(generic_t x, const size_t index);
+generic_t generic_array_get_any(generic_t x, const size_t index);
+
+  
+/*!
+  @brief Get a scalar value from an array.
+  @param[in] x generic_t Generic object that is presumed to contain an array.
+  @param[in] index size_t Index for value that should be returned.
+  @param[in] subtype const char* Subtype of scalar expected.
+  @param[in] precision const int Precision of scalar that is expected.
+  @returns void* Pointer to scalar data.
+ */
+void* generic_array_get_scalar(generic_t x, const size_t index,
+			     const char *subtype, const size_t precision);
+int8_t generic_array_get_int8(generic_t x, const size_t index);
+int16_t generic_array_get_int16(generic_t x, const size_t index);
+int32_t generic_array_get_int32(generic_t x, const size_t index);
+int64_t generic_array_get_int64(generic_t x, const size_t index);
+uint8_t generic_array_get_uint8(generic_t x, const size_t index);
+uint16_t generic_array_get_uint16(generic_t x, const size_t index);
+uint32_t generic_array_get_uint32(generic_t x, const size_t index);
+uint64_t generic_array_get_uint64(generic_t x, const size_t index);
+float generic_array_get_float(generic_t x, const size_t index);
+double generic_array_get_double(generic_t x, const size_t index);
+long double generic_array_get_long_double(generic_t x, const size_t index);
+complex_float_t generic_array_get_complex_float(generic_t x, const size_t index);
+complex_double_t generic_array_get_complex_double(generic_t x, const size_t index);
+complex_long_double_t generic_array_get_complex_long_double(generic_t x, const size_t index);
+char* generic_array_get_bytes(generic_t x, const size_t index);
+char* generic_array_get_unicode(generic_t x, const size_t index);
+  
+/*!
+  @brief Get a 1d array value from an array.
+  @param[in] x generic_t Generic object that is presumed to contain an array.
+  @param[in] index size_t Index for value that should be returned.
+  @param[in] subtype const char* Subtype of array expected.
+  @param[in] precision const size_t Precision of array that is expected.
+  @param[out] data void** Pointer to pointer that should be reallocated to store the data.
+  @returns size_t Number of elements in the data.
+ */
+size_t generic_array_get_1darray(generic_t x, const size_t index,
+			       const char *subtype, const size_t precision,
+			       void** data);
+size_t generic_array_get_1darray_int8(generic_t x, const size_t index, int8_t** data);
+size_t generic_array_get_1darray_int16(generic_t x, const size_t index, int16_t** data);
+size_t generic_array_get_1darray_int32(generic_t x, const size_t index, int32_t** data);
+size_t generic_array_get_1darray_int64(generic_t x, const size_t index, int64_t** data);
+size_t generic_array_get_1darray_uint8(generic_t x, const size_t index, uint8_t** data);
+size_t generic_array_get_1darray_uint16(generic_t x, const size_t index, uint16_t** data);
+size_t generic_array_get_1darray_uint32(generic_t x, const size_t index, uint32_t** data);
+size_t generic_array_get_1darray_uint64(generic_t x, const size_t index, uint64_t** data);
+size_t generic_array_get_1darray_float(generic_t x, const size_t index, float** data);
+size_t generic_array_get_1darray_double(generic_t x, const size_t index, double** data);
+size_t generic_array_get_1darray_long_double(generic_t x, const size_t index, long double** data);
+size_t generic_array_get_1darray_complex_float(generic_t x, const size_t index, complex_float_t** data);
+size_t generic_array_get_1darray_complex_double(generic_t x, const size_t index, complex_double_t** data);
+size_t generic_array_get_1darray_complex_long_double(generic_t x, const size_t index, complex_long_double_t** data);
+size_t generic_array_get_1darray_bytes(generic_t x, const size_t index, char** data);
+size_t generic_array_get_1darray_unicode(generic_t x, const size_t index, char** data);
+  
+/*!
+  @brief Get a nd array value from an array.
+  @param[in] x generic_t Generic object that is presumed to contain an array.
+  @param[in] index size_t Index for value that should be returned.
+  @param[in] subtype const char* Subtype of array expected.
+  @param[in] precision const size_t Precision of array that is expected.
+  @param[out] data void** Pointer to array that should be reallocated to store the data.
+  @param[out] shape size_t** Pointer to array that should be reallocated to store the array shape in each dimension.
+  @returns size_t Number of dimensions in the array.
+ */
+size_t generic_array_get_ndarray(generic_t x, const size_t index,
+			       const char *subtype, const size_t precision,
+			       void** data, size_t** shape);
+size_t generic_array_get_ndarray_int8(generic_t x, const size_t index, int8_t** data, size_t** shape);
+size_t generic_array_get_ndarray_int16(generic_t x, const size_t index, int16_t** data, size_t** shape);
+size_t generic_array_get_ndarray_int32(generic_t x, const size_t index, int32_t** data, size_t** shape);
+size_t generic_array_get_ndarray_int64(generic_t x, const size_t index, int64_t** data, size_t** shape);
+size_t generic_array_get_ndarray_uint8(generic_t x, const size_t index, uint8_t** data, size_t** shape);
+size_t generic_array_get_ndarray_uint16(generic_t x, const size_t index, uint16_t** data, size_t** shape);
+size_t generic_array_get_ndarray_uint32(generic_t x, const size_t index, uint32_t** data, size_t** shape);
+size_t generic_array_get_ndarray_uint64(generic_t x, const size_t index, uint64_t** data, size_t** shape);
+size_t generic_array_get_ndarray_float(generic_t x, const size_t index, float** data, size_t** shape);
+size_t generic_array_get_ndarray_double(generic_t x, const size_t index, double** data, size_t** shape);
+size_t generic_array_get_ndarray_long_double(generic_t x, const size_t index, long double** data, size_t** shape);
+size_t generic_array_get_ndarray_complex_float(generic_t x, const size_t index, complex_float_t** data, size_t** shape);
+size_t generic_array_get_ndarray_complex_double(generic_t x, const size_t index, complex_double_t** data, size_t** shape);
+size_t generic_array_get_ndarray_complex_long_double(generic_t x, const size_t index, complex_long_double_t** data, size_t** shape);
+size_t generic_array_get_ndarray_bytes(generic_t x, const size_t index, char** data, size_t** shape);
+size_t generic_array_get_ndarray_unicode(generic_t x, const size_t index, char** data, size_t** shape);
+  
+/*!
+  @brief Get the number of elements in an map object.
+  @param[in] x generic_t Generic object that is presumed to contain a map.
+  @returns size_t Number of elements in map.
+ */
+size_t generic_map_get_size(generic_t x);
+/*!
+  @brief Get the keys in a map object.
+  @param[in] x generic_t Generic object that is presumed to contain a map.
+  @param[out] keys char*** Pointer to memory where array of keys should be stored.
+  @returns size_t Number of keys in map.
+ */
+size_t generic_map_get_keys(generic_t x, char*** keys);
+/*!
+  @brief Get an item from a map for types that don't require additional parameters.
+  @param[in] x generic_t Generic object that is presumed to contain a map.
+  @param[in] key const char* Key string for value that should be returned.
+  @param[in] type const char* Type of value expected.
+  @returns void* Pointer to data for map item.
+ */
+void* generic_map_get_item(generic_t x, const char* key,
+			   const char *type);
+bool generic_map_get_bool(generic_t x, const char* key);
+int generic_map_get_integer(generic_t x, const char* key);
+void* generic_map_get_null(generic_t x, const char* key);
+double generic_map_get_number(generic_t x, const char* key);
+char* generic_map_get_string(generic_t x, const char* key);
+generic_t generic_map_get_object(generic_t x, const char* key);
+generic_t generic_map_get_array(generic_t x, const char* key);
+char* generic_map_get_direct(generic_t x, const char* key);
+ply_t generic_map_get_ply(generic_t x, const char* key);
+obj_t generic_map_get_obj(generic_t x, const char* key);
+python_t generic_map_get_python_class(generic_t x, const char* key);
+python_t generic_map_get_python_function(generic_t x, const char* key);
+schema_t generic_map_get_schema(generic_t x, const char* key);
+generic_t generic_map_get_any(generic_t x, const char* key);
+  
+/*!
+  @brief Get a scalar value from a map.
+  @param[in] x generic_t Generic object that is presumed to contain a map.
+  @param[in] key const char* Key string for value that should be returned.
+  @param[in] subtype const char* Subtype of scalar expected.
+  @param[in] precision const int Precision of scalar that is expected.
+  @returns void* Pointer to scalar data.
+ */
+void* generic_map_get_scalar(generic_t x, const char* key,
+			     const char *subtype, const size_t precision);
+int8_t generic_map_get_int8(generic_t x, const char* key);
+int16_t generic_map_get_int16(generic_t x, const char* key);
+int32_t generic_map_get_int32(generic_t x, const char* key);
+int64_t generic_map_get_int64(generic_t x, const char* key);
+uint8_t generic_map_get_uint8(generic_t x, const char* key);
+uint16_t generic_map_get_uint16(generic_t x, const char* key);
+uint32_t generic_map_get_uint32(generic_t x, const char* key);
+uint64_t generic_map_get_uint64(generic_t x, const char* key);
+float generic_map_get_float(generic_t x, const char* key);
+double generic_map_get_double(generic_t x, const char* key);
+long double generic_map_get_long_double(generic_t x, const char* key);
+complex_float_t generic_map_get_complex_float(generic_t x, const char* key);
+complex_double_t generic_map_get_complex_double(generic_t x, const char* key);
+complex_long_double_t generic_map_get_complex_long_double(generic_t x, const char* key);
+char* generic_map_get_bytes(generic_t x, const char* key);
+char* generic_map_get_unicode(generic_t x, const char* key);
+  
+/*!
+  @brief Get a 1d array value from a map.
+  @param[in] x generic_t Generic object that is presumed to contain a map.
+  @param[in] key const char* Key string for value that should be returned.
+  @param[in] subtype const char* Subtype of array expected.
+  @param[in] precision const size_t Precision of array that is expected.
+  @param[out] data void** Pointer to pointer that should be reallocated to store the data.
+  @returns size_t Number of elements in the data.
+ */
+size_t generic_map_get_1darray(generic_t x, const char* key,
+			       const char *subtype, const size_t precision,
+			       void** data);
+size_t generic_map_get_1darray_int8(generic_t x, const char* key, int8_t** data);
+size_t generic_map_get_1darray_int16(generic_t x, const char* key, int16_t** data);
+size_t generic_map_get_1darray_int32(generic_t x, const char* key, int32_t** data);
+size_t generic_map_get_1darray_int64(generic_t x, const char* key, int64_t** data);
+size_t generic_map_get_1darray_uint8(generic_t x, const char* key, uint8_t** data);
+size_t generic_map_get_1darray_uint16(generic_t x, const char* key, uint16_t** data);
+size_t generic_map_get_1darray_uint32(generic_t x, const char* key, uint32_t** data);
+size_t generic_map_get_1darray_uint64(generic_t x, const char* key, uint64_t** data);
+size_t generic_map_get_1darray_float(generic_t x, const char* key, float** data);
+size_t generic_map_get_1darray_double(generic_t x, const char* key, double** data);
+size_t generic_map_get_1darray_long_double(generic_t x, const char* key, long double** data);
+size_t generic_map_get_1darray_complex_float(generic_t x, const char* key, complex_float_t** data);
+size_t generic_map_get_1darray_complex_double(generic_t x, const char* key, complex_double_t** data);
+size_t generic_map_get_1darray_complex_long_double(generic_t x, const char* key, complex_long_double_t** data);
+size_t generic_map_get_1darray_bytes(generic_t x, const char* key, char** data);
+size_t generic_map_get_1darray_unicode(generic_t x, const char* key, char** data);
+  
+/*!
+  @brief Get a nd array value from a map.
+  @param[in] x generic_t Generic object that is presumed to contain a map.
+  @param[in] key const char* Key string for value that should be returned.
+  @param[in] subtype const char* Subtype of array expected.
+  @param[in] precision const size_t Precision of array that is expected.
+  @param[out] data void** Pointer to array that should be reallocated to store the data.
+  @param[out] shape size_t** Pointer to array that should be reallocated to store the array shape in each dimension.
+  @returns size_t Number of dimensions in the array.
+ */
+size_t generic_map_get_ndarray(generic_t x, const char* key,
+			       const char *subtype, const size_t precision,
+			       void** data, size_t** shape);
+size_t generic_map_get_ndarray_int8(generic_t x, const char* key, int8_t** data, size_t** shape);
+size_t generic_map_get_ndarray_int16(generic_t x, const char* key, int16_t** data, size_t** shape);
+size_t generic_map_get_ndarray_int32(generic_t x, const char* key, int32_t** data, size_t** shape);
+size_t generic_map_get_ndarray_int64(generic_t x, const char* key, int64_t** data, size_t** shape);
+size_t generic_map_get_ndarray_uint8(generic_t x, const char* key, uint8_t** data, size_t** shape);
+size_t generic_map_get_ndarray_uint16(generic_t x, const char* key, uint16_t** data, size_t** shape);
+size_t generic_map_get_ndarray_uint32(generic_t x, const char* key, uint32_t** data, size_t** shape);
+size_t generic_map_get_ndarray_uint64(generic_t x, const char* key, uint64_t** data, size_t** shape);
+size_t generic_map_get_ndarray_float(generic_t x, const char* key, float** data, size_t** shape);
+size_t generic_map_get_ndarray_double(generic_t x, const char* key, double** data, size_t** shape);
+size_t generic_map_get_ndarray_long_double(generic_t x, const char* key, long double** data, size_t** shape);
+size_t generic_map_get_ndarray_complex_float(generic_t x, const char* key, complex_float_t** data, size_t** shape);
+size_t generic_map_get_ndarray_complex_double(generic_t x, const char* key, complex_double_t** data, size_t** shape);
+size_t generic_map_get_ndarray_complex_long_double(generic_t x, const char* key, complex_long_double_t** data, size_t** shape);
+size_t generic_map_get_ndarray_bytes(generic_t x, const char* key, char** data, size_t** shape);
+size_t generic_map_get_ndarray_unicode(generic_t x, const char* key, char** data, size_t** shape);
 
 /*!
   @brief Destroy a structure containing a Python object.
@@ -609,11 +849,11 @@ int split_head_body(const char *buf, const size_t buf_siz,
 /*!
   @brief Format header to a string.
   @param[in] head comm_head_t Header to be formatted.
-  @param[out] buf char * Buffer where header should be written.
+  @param[out] buf char ** Pointer to buffer where header should be written.
   @param[in] buf_siz size_t Size of buf.
   @returns: int Size of header written.
 */
-int format_comm_header(const comm_head_t head, char *buf, const size_t buf_siz);
+int format_comm_header(const comm_head_t head, char **buf, size_t buf_siz);
 
 
 /*!

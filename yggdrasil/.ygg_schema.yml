@@ -126,8 +126,8 @@ definitions:
           type: array
       required:
       - commtype
-      - datatype
       - name
+      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -270,8 +270,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -479,11 +479,13 @@ definitions:
           - json
           - map
           - mat
+          - netcdf
           - obj
           - pandas
           - pickle
           - ply
           - table
+          - wofost
           - yaml
           type: string
         filter:
@@ -528,6 +530,11 @@ definitions:
         no_header:
           default: false
           description: If True, headers will not be read or serialized from/to tables.
+            Defaults to False.
+          type: boolean
+        read_attributes:
+          default: false
+          description: If True, the attributes are read in as well as the variables.
             Defaults to False.
           type: boolean
         read_meth:
@@ -606,12 +613,26 @@ definitions:
           description: If True, the astropy package will be used to serialize/deserialize
             table. Defaults to False.
           type: boolean
+        variables:
+          description: List of variables to read in. If not provided, all variables
+            will be read.
+          items:
+            type: string
+          type: array
         vars:
           description: Names of variables to be sent/received by this comm. Defaults
             to [].
           items:
             type: string
           type: array
+        version:
+          default: 1
+          description: Version of netCDF format that should be used. Defaults to 1.
+            Options are 1 (classic format) and 2 (64-bit offset format).
+          enum:
+          - 1
+          - 2
+          type: integer
         wait_for_creation:
           default: 0.0
           description: Time (in seconds) that should be waited before opening for
@@ -720,6 +741,84 @@ definitions:
               '\n'.
             type: string
         title: PlyFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['netcdf'] subtype.
+        properties:
+          comment:
+            default: '# '
+            description: One or more characters indicating a comment. Defaults to
+              '# '.
+            type: string
+          datatype:
+            description: JSON schema defining the type of object that the serializer
+              will be used to serialize/deserialize. Defaults to default_datatype.
+            type: schema
+          filetype:
+            default: binary
+            description: The file is read/written as netCDF.
+            enum:
+            - netcdf
+            type: string
+          newline:
+            default: '
+
+              '
+            description: One or more characters indicating a newline. Defaults to
+              '\n'.
+            type: string
+          read_attributes:
+            default: false
+            description: If True, the attributes are read in as well as the variables.
+              Defaults to False.
+            type: boolean
+          variables:
+            description: List of variables to read in. If not provided, all variables
+              will be read.
+            items:
+              type: string
+            type: array
+          version:
+            default: 1
+            description: Version of netCDF format that should be used. Defaults to
+              1. Options are 1 (classic format) and 2 (64-bit offset format).
+            enum:
+            - 1
+            - 2
+            type: integer
+        title: NetCDFFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['wofost'] subtype.
+        properties:
+          comment:
+            default: '# '
+            description: One or more characters indicating a comment. Defaults to
+              '# '.
+            type: string
+          datatype:
+            description: JSON schema defining the type of object that the serializer
+              will be used to serialize/deserialize. Defaults to default_datatype.
+            type: schema
+          delimiter:
+            default: ' = '
+            description: Delimiter that should be used to separate name/value pairs
+              in the map. Defaults to \t.
+            type: string
+          filetype:
+            default: binary
+            description: The file is a WOFOST parameter file.
+            enum:
+            - wofost
+            type: string
+          newline:
+            default: '
+
+              '
+            description: One or more characters indicating a newline. Defaults to
+              '\n'.
+            type: string
+        title: WOFOSTParamFileComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['table'] subtype.
@@ -1409,9 +1508,9 @@ definitions:
           type: string
       required:
       - working_dir
-      - args
       - name
       - language
+      - args
       title: model_base
       type: object
     - anyOf:
@@ -2039,6 +2138,7 @@ definitions:
           - pickle
           - ply
           - table
+          - wofost
           - yaml
           type: string
         sort_keys:
@@ -2317,6 +2417,23 @@ definitions:
             - yaml
             type: string
         title: YAMLSerialize
+        type: object
+      - additionalProperties: true
+        description: Schema for serializer component ['wofost'] subtype.
+        properties:
+          delimiter:
+            default: ' = '
+            description: Delimiter that should be used to separate name/value pairs
+              in the map. Defaults to \t.
+            type: string
+          seritype:
+            default: default
+            description: Serialization of mapping between keys and scalar or array
+              values as used in the WOFOST parameter files.
+            enum:
+            - wofost
+            type: string
+        title: WOFOSTParamSerialize
         type: object
     description: Schema for serializer components.
     title: serializer

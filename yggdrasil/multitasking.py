@@ -334,7 +334,7 @@ class Context(MultiObject):
             return _main_thread
 
 
-class DummyContextObject(object):
+class DummyContextObject(object):  # pragma: no cover
 
     @property
     def context(self):
@@ -433,7 +433,7 @@ class RLock(ContextObject):
 
 class DummyEvent(DummyContextObject):  # pragma: no cover
 
-    def __init__(self, value):
+    def __init__(self, value=False):
         self._value = value
 
     def is_set(self):
@@ -448,7 +448,7 @@ class DummyEvent(DummyContextObject):  # pragma: no cover
     def wait(self, *args, **kwargs):
         if self._value:
             return
-        raise RuntimeError("DummyEvent will never change to True.")
+        raise AliasDisconnectError("DummyEvent will never change to True.")
 
 
 class Event(ContextObject):
@@ -492,6 +492,9 @@ class DummyTask(DummyContextObject):  # pragma: no cover
         return False
 
     def terminate(self):
+        pass
+
+    def kill(self):
         pass
     
 
@@ -540,7 +543,7 @@ class Task(ContextObject):
     def is_alive(self):
         r"""Determine if the process/thread is alive."""
         out = self._base.is_alive()
-        if out is None:
+        if out is None:  # pragma: debug
             out = False
         return out
 
@@ -552,6 +555,11 @@ class Task(ContextObject):
         else:
             return self._base.ident
 
+    def kill(self, *args, **kwargs):
+        r"""Kill the task."""
+        if self.parallel and hasattr(self._base, 'kill'):
+            self._base.kill(*args, **kwargs)
+
 
 class DummyQueue(DummyContextObject):  # pragma: no cover
 
@@ -562,16 +570,16 @@ class DummyQueue(DummyContextObject):  # pragma: no cover
         return False
 
     def get(self, *args, **kwargs):
-        raise RuntimeError("There are no messages in a DummyQueue.")
+        raise AliasDisconnectError("There are no messages in a DummyQueue.")
 
     def get_nowait(self, *args, **kwargs):
-        raise RuntimeError("There are no messages in a DummyQueue.")
+        raise AliasDisconnectError("There are no messages in a DummyQueue.")
 
     def put(self, *args, **kwargs):
-        raise RuntimeError("Cannot put messages in a DummyQueue.")
+        raise AliasDisconnectError("Cannot put messages in a DummyQueue.")
 
     def put_nowait(self, *args, **kwargs):
-        raise RuntimeError("Cannot put messages in a DummyQueue.")
+        raise AliasDisconnectError("Cannot put messages in a DummyQueue.")
 
     def qsize(self):
         return 0
@@ -589,8 +597,7 @@ class DummyQueue(DummyContextObject):  # pragma: no cover
 class Queue(ContextObject):
     r"""Multiprocessing/threading queue."""
 
-    _base_meth = ['empty', 'full', 'get', 'get_nowait', 'join_thread',
-                  'put', 'put_nowait', 'qsize']
+    _base_meth = ['full', 'get', 'get_nowait', 'join_thread', 'qsize']
     
     @classmethod
     def get_base_class(cls, context):
@@ -600,6 +607,17 @@ class Queue(ContextObject):
         else:
             return queue.Queue
 
+    def __getstate__(self):
+        state = super(Queue, self).__getstate__()
+        if (not self.parallel) and (not isinstance(state['_base'], DummyQueue)):
+            state['_base'] = None
+        return state
+
+    def __setstate__(self, state):
+        if state['_base'] is None:
+            state['_base'] = queue.Queue
+        super(Queue, self).__setstate__(state)
+
     @property
     def dummy_copy(self):
         r"""Dummy copy of base."""
@@ -608,7 +626,10 @@ class Queue(ContextObject):
     def join(self, *args, **kwargs):
         self.check_for_base('join')
         if self.parallel:
-            self._base.close()
+            try:
+                self._base.close()
+            except OSError:  # pragma: debug
+                pass
             return self._base.join_thread(*args, **kwargs)
         else:
             return self._base.join(*args, **kwargs)
@@ -620,6 +641,29 @@ class Queue(ContextObject):
             self.join()
         if Queue is not None:
             super(Queue, self).disconnect()
+
+    def empty(self):
+        try:
+            return self._base.empty()
+        except OSError:  # pragma: debug
+            self.disconnect()
+            return True
+
+    def put(self, *args, **kwargs):
+        try:
+            self._base.put(*args, **kwargs)
+        except AttributeError:  # pragma: debug
+            # Multiprocessing queue asserts it is not closed
+            self.disconnect()
+            raise AliasDisconnectError("Queue was closed.")
+
+    def put_nowait(self, *args, **kwargs):
+        try:
+            self._base.put_nowait(*args, **kwargs)
+        except AttributeError:  # pragma: debug
+            # Multiprocessing queue asserts it is not closed
+            self.disconnect()
+            raise AliasDisconnectError("Queue was closed.")
 
 
 class Dict(ContextObject):
@@ -651,7 +695,7 @@ class Dict(ContextObject):
         a dummy object."""
         try:
             final_value = self._base.copy()
-        except BaseException:
+        except BaseException:  # pragma: debug
             final_value = {}
         if isinstance(self._base, LockedDict):
             self._base.disconnect()
@@ -674,9 +718,6 @@ class LockedObject(AliasObject):
                  task_context=None, **kwargs):
         self.lock = RLock(task_method=task_method,
                           task_context=task_context)
-        if issubclass(self._base_class, ContextObject):
-            kwargs['task_method'] = task_method
-            kwargs['task_context'] = task_context
         super(LockedObject, self).__init__(*args, **kwargs)
 
     def disconnect(self):
@@ -713,53 +754,26 @@ class LockedDict(LockedObject):
         r"""Dummy copy of base."""
         try:
             out = self._base.copy()
-        except BaseException:
+        except BaseException:  # pragma: debug
             out = {}
         return out
 
 
-class LockedWeakValueDict(LockedDict):
-    r"""Dictionary of weakrefs that can be shared between threads."""
+# class LockedWeakValueDict(LockedDict):
+#     r"""Dictionary of weakrefs that can be shared between threads."""
 
-    _base_class = weakref.WeakValueDictionary
-    _base_attr = ['data']
-    _base_meth = ['itervaluerefs', 'valuerefs']
+#     _base_class = weakref.WeakValueDictionary
+#     _base_attr = ['data']
+#     _base_meth = ['itervaluerefs', 'valuerefs']
     
-    def __init__(self, *args, **kwargs):
-        self._dict_refs = {}
-        super(LockedWeakValueDict, self).__init__(*args, **kwargs)
+#     def __init__(self, *args, **kwargs):
+#         self._dict_refs = {}
+#         super(LockedWeakValueDict, self).__init__(*args, **kwargs)
 
-    def add_subdict(self, key):
-        r"""Add a subdictionary."""
-        self._dict_refs[key] = weakref.WeakValueDictionary()
-        self[key] = self._dict_refs[key]
-
-
-class LockedQueue(LockedObject):
-    r"""Locked queue."""
-
-    _base_class = Queue
-    _base_meth = ['empty', 'full', 'get', 'get_nowait', 'join_thread',
-                  'put', 'put_nowait', 'qsize', 'join']
-    _unlocked_attr = ['empty', 'full', 'get', 'get_nowait',
-                      'join_thread', 'put', 'put_nowait', 'join']
-
-    @property
-    def context(self):
-        r"""Context: Context used to create this object."""
-        return self._base.context
-
-    @property
-    def dummy_copy(self):
-        r"""Dummy copy of base."""
-        return DummyQueue()
-        
-    def disconnect(self):
-        r"""Disconnect from the aliased object by replacing it with
-        a dummy object."""
-        self._base.disconnect()
-        if LockedQueue is not None:
-            super(LockedQueue, self).disconnect()
+#     def add_subdict(self, key):
+#         r"""Add a subdictionary."""
+#         self._dict_refs[key] = weakref.WeakValueDictionary()
+#         self[key] = self._dict_refs[key]
 
 
 class YggTask(YggClass):
@@ -829,25 +843,28 @@ class YggTask(YggClass):
         r"""Create a flag."""
         setattr(self, attr, self.context.Event())
 
-    def set_flag_attr(self, attr):
-        r"""Set a flag."""
-        getattr(self, attr).set()
+    def get_flag_attr(self, attr):
+        r"""Return the flag attribute."""
+        return getattr(self, attr)
 
-    def unset_flag_attr(self, attr):
-        r"""Unset a flag."""
-        getattr(self, attr).unset()
+    def set_flag_attr(self, attr, value=True):
+        r"""Set a flag."""
+        if value:
+            self.get_flag_attr(attr).set()
+        else:
+            self.get_flag_attr(attr).clear()
+
+    def clear_flag_attr(self, attr):
+        r"""Clear a flag."""
+        self.set_flag_attr(attr, value=False)
 
     def check_flag_attr(self, attr):
         r"""Determine if a flag is set."""
-        flag = getattr(self, attr, None)
-        if flag is None:
-            return False
-        else:
-            return flag.is_set()
+        return self.get_flag_attr(attr).is_set()
 
     def wait_flag_attr(self, attr, timeout=None):
         r"""Wait until a flag is True."""
-        return getattr(self, attr).wait(timeout=timeout)
+        return self.get_flag_attr(attr).wait(timeout=timeout)
 
     def start(self, *args, **kwargs):
         r"""Start thread/process and print info."""
@@ -939,10 +956,8 @@ class YggTask(YggClass):
 
     def kill(self, *args, **kwargs):
         r"""Kill the process."""
-        if self.as_process:
-            return self.terminate(*args, **kwargs)
-        else:
-            return self.process_instance.kill(*args, **kwargs)
+        self.process_instance.kill(*args, **kwargs)
+        return self.terminate(*args, **kwargs)
 
     def terminate(self, no_wait=False):
         r"""Set the terminate event and wait for the thread/process to stop.
@@ -986,21 +1001,13 @@ class YggTask(YggClass):
         r"""Get the main process/thread."""
         return self.context.main_task()
 
-    def set_started_flag(self):
+    def set_started_flag(self, value=True):
         r"""Set the started flag for the thread/process to True."""
-        self.set_flag_attr('start_flag')
+        self.set_flag_attr('start_flag', value=value)
 
-    def set_terminated_flag(self):
+    def set_terminated_flag(self, value=True):
         r"""Set the terminated flag for the thread/process to True."""
-        self.set_flag_attr('terminate_flag')
-
-    def unset_started_flag(self):  # pragma: debug
-        r"""Set the started flag for the thread/process to False."""
-        self.unset_flag_attr('start_flag')
-
-    def unset_terminated_flag(self):  # pragma: debug
-        r"""Set the terminated flag for the thread/process to False."""
-        self.unset_flag_attr('terminated_flag')
+        self.set_flag_attr('terminate_flag', value=value)
 
     @property
     def was_started(self):
@@ -1060,26 +1067,18 @@ class YggTaskLoop(YggTask):
         if not dont_break:
             self.set_break_flag()
 
-    def set_break_flag(self):
+    def set_break_flag(self, value=True):
         r"""Set the break flag for the thread/process to True."""
-        self.set_flag_attr('break_flag')
-
-    def unset_break_flag(self):  # pragma: debug
-        r"""Set the break flag for the thread/process to False."""
-        self.unset_flag_attr('break_flag')
+        self.set_flag_attr('break_flag', value=value)
 
     @property
     def was_break(self):
         r"""bool: True if the break flag was set."""
         return self.check_flag_attr('break_flag')
 
-    def set_loop_flag(self):
+    def set_loop_flag(self, value=True):
         r"""Set the loop flag for the thread/process to True."""
-        self.set_flag_attr('loop_flag')
-
-    def unset_loop_flag(self):  # pragma: debug
-        r"""Set the loop flag for the thread/process to False."""
-        self.unset_flag_attr('loop_flag')
+        self.set_flag_attr('loop_flag', value=value)
 
     @property
     def was_loop(self):
