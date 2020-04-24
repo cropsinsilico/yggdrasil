@@ -34,6 +34,7 @@ env:
     INSTALLLPY=0
     INSTALLR=1
     INSTALLFORTRAN=1
+    INSTALLSBML=1
     YGG_SECOND_TEST=
     BUILDDOCS=0
     YGG_TEST_FLAGS="--test-suite=examples"

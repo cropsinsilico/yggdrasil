@@ -1,0 +1,16 @@
+model:
+  name: feedback
+  language: sbml
+  args: ../scripts/sbml_model.xml
+  inputs:
+    - name: input
+      vars: time,S1,S2
+      default_file:
+        name: ../data/sbml_input.txt
+        filetype: table
+  outputs:
+    - name: output
+      as_array: true
+      default_file:
+        name: sbml_output.txt
+        filetype: table

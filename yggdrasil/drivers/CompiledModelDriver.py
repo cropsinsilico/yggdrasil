@@ -1988,9 +1988,10 @@ class CompiledModelDriver(ModelDriver):
                                                     default=None)
                 if (((default_tool is None)
                      or (not default_tool.is_installed()))):  # pragma: debug
-                    warnings.warn(('Default %s for %s (%s) not installed. '
-                                   'Attempting to locate an alternative .')
-                                  % (k, cls.language, default_tool_name))
+                    if not tools.is_subprocess():
+                        warnings.warn(('Default %s for %s (%s) not installed. '
+                                       'Attempting to locate an alternative .')
+                                      % (k, cls.language, default_tool_name))
                     setattr(cls, 'default_%s' % k, None)
 
     def import_associated_language(cls, language):

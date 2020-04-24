@@ -12,6 +12,7 @@ _is_win = (sys.platform in ['win32', 'cygwin'])
 INSTALLLPY = (os.environ.get('INSTALLLPY', '0') == '1')
 INSTALLR = (os.environ.get('INSTALLR', '0') == '1')
 INSTALLFORTRAN = (os.environ.get('INSTALLFORTRAN', '0') == '1')
+INSTALLSBML = (os.environ.get('INSTALLSBML', '0') == '1')
 INSTALLAPY = (os.environ.get('INSTALLAPY', '0') == '1')
 INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
 INSTALLRMQ = (os.environ.get('INSTALLRMQ', '0') == '1')
@@ -145,7 +146,7 @@ def deploy_package_on_ci(method):
     install_req = os.path.join("utils", "install_from_requirements.py")
     if method == 'conda':
         cmds += [
-            "%s install -q conda-build conda-verify %s %s %s" % (
+            "%s install -q conda-build conda-verify scipy %s %s %s" % (
                 conda_cmd,
                 os.environ.get('NUMPY', 'numpy'),
                 os.environ.get('MATPLOTLIB', 'matplotlib'),
@@ -157,6 +158,10 @@ def deploy_package_on_ci(method):
             cmds.append(
                 "python %s conda requirements_documentation.txt" % (
                     install_req))
+        if INSTALLSBML:
+            cmds += [
+                "echo Installing roadrunner for running SBML models..."
+                "pip install libroadrunner"]
         if INSTALLAPY:
             cmds += [
                 "echo Installing AstroPy...",
@@ -244,6 +249,8 @@ def deploy_package_on_ci(method):
             else:
                 raise NotImplementedError("Could not determine "
                                           "Fortran installation method.")
+        if INSTALLSBML:
+            cmds += ['pip install libroadrunner']
         if INSTALLAPY:
             cmds += [
                 "echo Installing AstroPy...",

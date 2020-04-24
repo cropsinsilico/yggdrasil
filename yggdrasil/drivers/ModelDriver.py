@@ -10,17 +10,13 @@ import uuid
 import tempfile
 from collections import OrderedDict
 from pprint import pformat
-from yggdrasil import platform, tools, languages
+from yggdrasil import platform, tools, languages, multitasking
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.metaschema.datatypes import is_default_typedef
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     _valid_types)
-from threading import Event
-try:
-    from Queue import Queue, Empty
-except ImportError:
-    from queue import Queue, Empty  # python 3.x
+from queue import Empty
 logger = logging.getLogger(__name__)
 
 
@@ -297,7 +293,6 @@ class ModelDriver(Driver):
                            'items': {'type': 'string'}},
         'outputs_in_inputs': {'type': 'boolean'}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
-    # 'inputs', 'outputs', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
     language = None
@@ -316,6 +311,7 @@ class ModelDriver(Driver):
     inverse_type_map = None
     function_param = None
     version_flags = ['--version']
+    full_language = True
     outputs_in_inputs = False
     include_arg_count = False
     include_channel_obj = False
@@ -325,6 +321,7 @@ class ModelDriver(Driver):
     import_after_exec = False
     declare_functions_as_var = False
     dont_declare_channel = False
+    is_dsl = False
     brackets = None
     zero_based = True
     max_line_width = None
@@ -338,16 +335,20 @@ class ModelDriver(Driver):
     _config_keys = []
     _config_attr_map = []
     _executable_search_dirs = None
+    _disconnect_attr = (Driver._disconnect_attr
+                        + ['queue', 'queue_thread',
+                           'event_process_kill_called',
+                           'event_process_kill_complete'])
 
     def __init__(self, name, args, model_index=0, **kwargs):
         self.model_outputs_in_inputs = kwargs.pop('outputs_in_inputs', None)
         super(ModelDriver, self).__init__(name, **kwargs)
         # Setup process things
         self.model_process = None
-        self.queue = Queue()
+        self.queue = multitasking.Queue()
         self.queue_thread = None
-        self.event_process_kill_called = Event()
-        self.event_process_kill_complete = Event()
+        self.event_process_kill_called = multitasking.Event()
+        self.event_process_kill_complete = multitasking.Event()
         # Strace/valgrind
         if self.with_strace and self.with_valgrind:
             raise RuntimeError("Trying to run with strace and valgrind.")
@@ -1065,6 +1066,7 @@ class ModelDriver(Driver):
         env['YGG_MODEL_LANGUAGE'] = self.language
         env['YGG_MODEL_NAME'] = self.name
         env['YGG_PYTHON_EXEC'] = sys.executable
+        env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):
@@ -1079,15 +1081,23 @@ class ModelDriver(Driver):
         self.model_process = self.run_model(**kwargs)
         # Start thread to queue output
         if not no_queue_thread:
-            self.queue_thread = tools.YggThreadLoop(
+            self.queue_thread = multitasking.YggTaskLoop(
                 target=self.enqueue_output_loop,
                 name=self.name + '.EnqueueLoop')
             self.queue_thread.start()
 
+    def queue_close(self):
+        r"""Close the queue for messages from the model process."""
+        self.model_process.stdout.close()
+
+    def queue_recv(self):
+        r"""Receive a message from the model process."""
+        return self.model_process.stdout.readline()
+
     def enqueue_output_loop(self):
         r"""Keep passing lines to queue."""
         try:
-            line = self.model_process.stdout.readline()
+            line = self.queue_recv()
         except BaseException as e:  # pragma: debug
             print(e)
             line = ""
@@ -1097,7 +1107,7 @@ class ModelDriver(Driver):
             self.queue.put(self._exit_line)
             self.debug("End of model output")
             try:
-                self.model_process.stdout.close()
+                self.queue_close()
             except BaseException:  # pragma: debug
                 pass
         else:
@@ -1209,7 +1219,7 @@ class ModelDriver(Driver):
                     self.queue_thread.set_break_flag()
                     self.queue_thread.wait(self.timeout)
                     try:
-                        self.model_process.stdout.close()
+                        self.queue_close()
                         self.queue_thread.wait(self.timeout)
                     except BaseException:  # pragma: debug
                         self.exception("Closed during concurrent action")
@@ -1226,7 +1236,8 @@ class ModelDriver(Driver):
         r"""Remove compile executable."""
         if self.overwrite:
             self.remove_products()
-        if self.function and os.path.isfile(self.model_src):
+        if ((self.function and isinstance(self.model_src, str)
+             and os.path.isfile(self.model_src))):
             assert(os.path.basename(self.model_src).startswith('ygg_'))
             os.remove(self.model_src)
         self.restore_files()

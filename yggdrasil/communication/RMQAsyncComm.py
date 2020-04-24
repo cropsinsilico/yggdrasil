@@ -1,5 +1,4 @@
-import threading
-from yggdrasil import tools
+from yggdrasil import tools, multitasking
 from yggdrasil.communication import RMQComm
 if RMQComm._rmq_installed:
     import pika
@@ -25,12 +24,14 @@ class RMQAsyncComm(RMQComm.RMQComm):
     Attributes:
         times_connected (int): Number of times that this connections has been
             established.
-        rmq_thread (tools.YggThread): Thread used to run IO loop.
+        rmq_thread (multitasking.YggTask): Thread used to run IO loop.
 
     """
     
     _commtype = 'rmq_async'
     _schema_subtype_description = ('Asynchronous RabbitMQ connection.')
+    _disconnect_attr = (RMQComm.RMQComm._disconnect_attr
+                        + ['_qres_lock', '_qres_event', 'rmq_thread'])
     
     def _init_before_open(self, **kwargs):
         r"""Initialize null variables and RMQ async thread."""
@@ -43,8 +44,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self._close_called = False
         self._buffered_messages = []
         self._qres = None
-        self._qres_lock = threading.RLock()
-        self._qres_event = threading.Event()
+        self._qres_lock = multitasking.RLock()
+        self._qres_event = multitasking.Event()
         self._qres_event.set()
         super(RMQAsyncComm, self)._init_before_open(**kwargs)
 
@@ -58,8 +59,9 @@ class RMQAsyncComm(RMQComm.RMQComm):
         if name is None:
             name = self.name
         self.rmq_thread_count += 1
-        return tools.YggThread(name=name + '.RMQThread%d' % self.rmq_thread_count,
-                               target=self.run_thread)
+        return multitasking.YggTask(
+            name=name + '.RMQThread%d' % self.rmq_thread_count,
+            target=self.run_thread)
 
     def run_thread(self):
         r"""Connect to the connection and begin the IO loop."""

@@ -142,6 +142,7 @@ class TestCommBase(YggTestClassInfo):
     def remove_instance(self, inst):
         r"""Remove an instance."""
         inst.close()
+        inst.disconnect()
         assert(inst.is_closed)
         super(TestCommBase, self).remove_instance(inst)
 

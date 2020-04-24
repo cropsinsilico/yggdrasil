@@ -1,21 +1,55 @@
-import threading
+from yggdrasil import multitasking
 from yggdrasil.communication import CommBase
 
 
-class LockedBuffer(list):
+class LockedBuffer(multitasking.Queue):
     r"""Buffer intended to be shared between threads/processes."""
 
     def __init__(self, *args, **kwargs):
-        self.lock = threading.RLock()
-        self.closed = False
-        return super(LockedBuffer, self).__init__(*args, **kwargs)
+        kwargs.setdefault('task_method', 'process')
+        super(LockedBuffer, self).__init__(*args, **kwargs)
+        self._closed = self.context.Event()
 
-    def __getattribute__(self, name):
-        if name == 'lock':
-            return list.__getattribute__(self, name)
-        else:
-            with self.lock:
-                return list.__getattribute__(self, name)
+    @property
+    def closed(self):
+        r"""bool: True if the queue is closed, False otherwise."""
+        if hasattr(self, '_closed'):
+            return self._closed.is_set()
+        return True  # pragma: debug
+
+    def close(self, join=False):
+        r"""Close the buffer."""
+        # with self.lock:
+        self.disconnect()
+
+    def disconnect(self):
+        if hasattr(self, '_closed'):
+            self._closed.set()
+            self._closed.disconnect()
+        super(LockedBuffer, self).disconnect()
+        
+    def __len__(self):
+        if self.closed:  # pragma: debug
+            return 0
+        return int(not self.empty())
+
+    def append(self, x):
+        r"""Add an element to the queue."""
+        self.put_nowait(x)
+
+    def pop(self, index=None, default=None):
+        r"""Remove the first element from the queue."""
+        assert(index == 0)
+        # with self.lock:
+        if (len(self) == 0) and (default is not None):
+            return default
+        return self.get()
+
+    def clear(self):
+        r"""Remove all elements from the queue."""
+        # with self.lock:
+        while not self.empty():
+            self.get()
 
 
 class BufferComm(CommBase.CommBase):
@@ -33,7 +67,7 @@ class BufferComm(CommBase.CommBase):
     """
     _commtype = 'buffer'
     no_serialization = True
-    
+
     @classmethod
     def is_installed(cls, language=None):
         r"""Determine if the necessary libraries are installed for this
@@ -79,7 +113,7 @@ class BufferComm(CommBase.CommBase):
         
     def _close(self, *args, **kwargs):
         r"""Close the connection."""
-        self.address.closed = True
+        self.address.close()
         
     @property
     def n_msg_recv(self):
@@ -139,11 +173,7 @@ class BufferComm(CommBase.CommBase):
         while (not T.is_out) and (not len(self.address)):
             self.sleep()
         self.stop_timeout(key_suffix='_recv')
-        with self.address.lock:
-            if len(self.address):
-                return (True, self.address.pop(0))
-            else:
-                return (True, self.empty_bytes_msg)
+        return (True, self.address.pop(0, self.empty_bytes_msg))
 
     def purge(self):
         r"""Purge all messages from the comm."""

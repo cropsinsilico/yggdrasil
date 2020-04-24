@@ -4,10 +4,8 @@ import pprint
 import jsonschema
 import yggdrasil
 from yggdrasil.metaschema.encoder import encode_json, decode_json
-from yggdrasil.metaschema.properties import (
-    get_registered_properties, import_all_properties)
-from yggdrasil.metaschema.datatypes import (
-    get_registered_types, import_all_types)
+from yggdrasil.metaschema.properties import get_registered_properties
+from yggdrasil.metaschema.datatypes import get_registered_types
 
 
 _metaschema_fbase = '.ygg_metaschema.json'
@@ -196,12 +194,3 @@ def normalize_instance(obj, schema, **kwargs):
     cls = get_validator()
     cls.check_schema(schema)
     return cls(schema).normalize(obj, **kwargs)
-
-
-def import_all_classes():
-    r"""Import all metaschema classes (types and properties)."""
-    import_all_properties()
-    import_all_types()
-
-
-import_all_classes()

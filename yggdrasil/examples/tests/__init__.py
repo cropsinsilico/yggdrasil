@@ -273,14 +273,15 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
             try:
                 self.check_results()
             finally:
-                self.cleanup()
+                self.example_cleanup()
                 # Remove copied makefile
                 if self.language == 'make':
                     makefile = os.path.join(self.yamldir, 'src', 'Makefile')
                     if os.path.isfile(makefile):
                         os.remove(makefile)
+                self.runner = None
 
-    def cleanup(self):
+    def example_cleanup(self):
         r"""Cleanup files created during the test."""
         if (self.yaml is not None) and (self.output_files is not None):
             timer_class = tools.YggClass()

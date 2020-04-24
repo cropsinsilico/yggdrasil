@@ -109,7 +109,7 @@ class FileComm(CommBase.CommBase):
             self.address = os.path.join(tempfile.gettempdir(), self.address)
         self.address = os.path.abspath(self.address)
         self._series_index = 0
-        if self.append:
+        if self.append and os.path.isfile(self.current_address):
             self.disable_header()
         if 'read_meth' not in self._schema_properties:
             self.read_meth = self.serializer.read_meth
@@ -495,6 +495,13 @@ class FileComm(CommBase.CommBase):
     def _close(self, *args, **kwargs):
         r"""Close the file."""
         self._file_close()
+        if ((self.is_series
+             and os.path.isfile(self.current_address)
+             and (os.path.getsize(self.current_address) == 0))):
+            try:
+                os.remove(self.current_address)
+            except PermissionError:  # pragma: no cover
+                pass
         self.unregister_comm(self.registry_key)
         super(FileComm, self)._close(*args, **kwargs)
 

@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import logging
 import pickle
+from yggdrasil.components import import_component
 from yggdrasil import tools, runner, examples, platform
 from yggdrasil import platform as ygg_platform
 from yggdrasil.tests import YggTestBase
@@ -46,10 +47,12 @@ def get_lang_list():
         list: Names of testable languages using timed_pipe.
 
     """
-    _lang_list = tools.get_installed_lang()
-    for k in ['lpy', 'make', 'cmake', 'executable']:
-        if k in _lang_list:
-            _lang_list.remove(k)
+    _all_lang = tools.get_installed_lang()
+    _lang_list = []
+    for k in _all_lang:
+        drv = import_component('model', k)
+        if drv.full_language:
+            _lang_list.append(k)
     if (len(_lang_list) == 0):  # pragma: debug
         raise Exception(("Timings cannot be performed if there is not at least "
                          "one valid language. len(valid_languages) = %d")
