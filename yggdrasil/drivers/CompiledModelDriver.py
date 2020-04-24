@@ -337,7 +337,7 @@ class CompilationToolBase(object):
             raise ValueError("Registering unnamed compilation tool.")
         cls.is_gnu = (cls.toolset == 'gnu')
         if (cls.toolset is not None) and (cls.toolset not in cls.compatible_toolsets):
-            cls.compatible_toolsets.insert(0, cls.toolset)
+            cls.compatible_toolsets = [cls.toolset] + cls.compatible_toolsets
         cls._schema_type = cls.tooltype
         attr_list = ['default_executable', 'default_flags']
         for k in attr_list:
