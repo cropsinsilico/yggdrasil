@@ -646,6 +646,13 @@ module fygg
      integer(kind=8) :: x
   end type ygguint8
 
+  interface assignment(=)
+     module procedure ygguint1_assign
+     module procedure ygguint2_assign
+     module procedure ygguint4_assign
+     module procedure ygguint8_assign
+  end interface assignment(=)
+
   public :: yggarg, yggchar_r, yggcomm, ygggeneric, &
        yggptr, yggnull, yggarr, yggmap, &
        yggschema, yggpython, yggply, yggobj, yggpyinst, yggpyfunc, &
@@ -661,6 +668,28 @@ contains
   include "YggInterface_arg.f90"
   include "YggInterface_conv.f90"
   include "YggInterface_assign.f90"
+
+
+  subroutine ygguint1_assign(self, other)
+    type(ygguint1), intent(inout) :: self
+    integer, intent(in) :: other
+    self%x = other
+  end subroutine ygguint1_assign
+  subroutine ygguint2_assign(self, other)
+    type(ygguint2), intent(inout) :: self
+    integer, intent(in) :: other
+    self%x = other
+  end subroutine ygguint2_assign
+  subroutine ygguint4_assign(self, other)
+    type(ygguint4), intent(inout) :: self
+    integer, intent(in) :: other
+    self%x = other
+  end subroutine ygguint4_assign
+  subroutine ygguint8_assign(self, other)
+    type(ygguint8), intent(inout) :: self
+    integer, intent(in) :: other
+    self%x = other
+  end subroutine ygguint8_assign
 
 
 #ifndef _WIN32

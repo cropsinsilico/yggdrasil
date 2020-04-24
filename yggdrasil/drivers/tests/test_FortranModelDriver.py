@@ -55,6 +55,11 @@ class TestFortranModelDriverNoInit(TestFortranModelParam,
                 
         return out
     
+    def test_write_function_def(self, *args, **kwargs):
+        r"""Test writing and running a function definition."""
+        kwargs['declare_functions_as_var'] = True
+        super(TestFortranModelDriverNoInit, self).test_write_function_def(*args, **kwargs)
+        
     def test_write_function_def_single(self):
         r"""Test writing and running a function definition with single output."""
         inputs = [{'name': 'x', 'value': 1.0,

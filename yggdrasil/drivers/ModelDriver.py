@@ -2728,7 +2728,7 @@ checking if the model flag indicates
             out.append('')
         # Add code with begin/end book ends
         if ((('exec_begin' in cls.function_param)
-             and (cls.function_param['exec_begin'] not in lines))):
+             and (cls.function_param['exec_begin'] not in '\n'.join(lines)))):
             out.append(cls.function_param['exec_begin'])
             if not isinstance(lines, (list, tuple)):
                 lines = [lines]

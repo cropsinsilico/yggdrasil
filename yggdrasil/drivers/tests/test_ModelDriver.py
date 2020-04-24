@@ -271,8 +271,11 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         assert_raises(RuntimeError, self.import_cls.run_code, lines)
 
     def test_write_function_def(self, inputs=None, outputs=None,
-                                outputs_in_inputs=None, **kwargs):
+                                outputs_in_inputs=None,
+                                declare_functions_as_var=None, **kwargs):
         r"""Test writing and running a function definition."""
+        if declare_functions_as_var is None:
+            declare_functions_as_var = self.import_cls.declare_functions_as_var
         if self.import_cls.function_param is None:
             self.assert_raises(NotImplementedError,
                                self.import_cls.write_function_def, None)
@@ -351,7 +354,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                     lines += self.import_cls.write_declaration(x)
                 if outputs_in_inputs:
                     lines += self.import_cls.write_declaration(flag_var)
-                if self.import_cls.declare_functions_as_var:
+                if declare_functions_as_var:
                     if outputs_in_inputs:
                         lines += self.import_cls.write_declaration(
                             dict(flag_var, name='test_function'))

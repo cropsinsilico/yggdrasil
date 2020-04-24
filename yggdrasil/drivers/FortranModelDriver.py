@@ -305,7 +305,7 @@ class FortranModelDriver(CompiledModelDriver):
         'while_begin': 'DO WHILE ({cond})',
         'while_end': 'END DO',
         'break': 'EXIT',
-        'exec_begin': 'PROGRAM main\n   use iso_c_binding',
+        'exec_begin': 'PROGRAM main\n   use iso_c_binding\n   use fygg',
         'exec_end': '   stop\nEND PROGRAM main',
         'free': 'DEALLOCATE({variable})',
         'function_def_begin': (
@@ -726,6 +726,8 @@ class FortranModelDriver(CompiledModelDriver):
                 necessary code to run it as an executable (e.g. C/C++'s main).
 
         """
+        if not isinstance(lines, list):
+            lines = [lines]
         last_use = 0
         for i, line in enumerate(lines):
             if not line.lstrip().lower().startswith('use'):
@@ -774,6 +776,8 @@ class FortranModelDriver(CompiledModelDriver):
             kwargs.setdefault(
                 'function_keys',
                 ('subroutine_def_begin', 'subroutine_def_end'))
+        # Package is required for new datatypes
+        kwargs['skip_interface'] = False
         return super(FortranModelDriver, cls).write_function_def(
             function_name, **kwargs)
 
