@@ -44,7 +44,7 @@ def get_compatible_tool(tool, tooltype, language):
     """
     if isinstance(tool, str):
         tool = get_compilation_tool(tooltype, tool)
-    if language in tool.languages:
+    if (tool.tooltype == tooltype) and (language in tool.languages):
         return tool
     reg = get_compilation_tool_registry(tooltype)['by_toolset']
     for t in tool.compatible_toolsets:
@@ -1217,20 +1217,14 @@ class CompilerBase(CompilationToolBase):
         """
         archiver = getattr(cls, '_archiver', cls.default_archiver)
         archiver_flags = getattr(cls, '_archiver_flags', cls.default_archiver_flags)
-        print('from class', archiver, archiver_flags)
         if archiver is None:
             archiver = find_compilation_tool('archiver', cls.languages[0])
-            print('find_compilation_tool', archiver)
         if archiver:
             out = get_compilation_tool('archiver', archiver)(flags=archiver_flags,
                                                              executable=archiver)
-            print('get_compilation_tool', archiver, out)
             if not out.is_installed():
-                print('not installed')
                 out = get_compatible_tool(cls, 'archiver', language=cls.languages[0])
-                print('compatible', out, cls.languages)
         else:
-            print('archiver not found', archiver)
             out = archiver
         return out
 
@@ -1250,7 +1244,6 @@ class CompilerBase(CompilationToolBase):
             CompilationToolBase: Linker/archiver that should be used.
 
         """
-        print('get library tool', libtype, cls)
         if libtype == 'static':
             tool = cls.archiver()
         else:
@@ -1432,12 +1425,9 @@ class CompilerBase(CompilationToolBase):
         """
         # Must be called before the class is used to get the linker
         # tools so that correct compiler is used as a base.
-        print('before', cls, kwargs.get('toolname', None),
-              kwargs.get('language', None))
         cls = cls.get_alternate_class(
             toolname=kwargs.get('toolname', None),
             language=kwargs.get('language', None))
-        print('after', cls)
         # Turn off linking if it is part of the compilation call
         if cls.no_separate_linking:
             dont_link = True
