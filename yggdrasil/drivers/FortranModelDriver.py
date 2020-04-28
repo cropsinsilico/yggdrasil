@@ -369,19 +369,15 @@ class FortranModelDriver(CompiledModelDriver):
         #     elif platform._is_win:  # pragma: windows
         #         cls.default_compiler = 'flang'
         CompiledModelDriver.before_registration(cls)
-        try:
-            cxx_lib = CModelDriver.CModelDriver.get_tool(
-                'compiler', toolname='gfortran').cxx_lib
-        except NotImplementedError:
-            cxx_lib = None
         cxx_orig = cls.external_libraries.pop('cxx', None)
-        if not isinstance(cxx_lib, (list, tuple)):
-            cxx_lib = [cxx_lib]
         if cxx_orig is not None:
-            for icxx in cxx_lib:
-                if (icxx is not None) and (icxx not in cls.external_libraries):
-                    cls.external_libraries[icxx] = cxx_orig.copy()
-                    cls.internal_libraries['fygg']['external_dependencies'].append(icxx)
+            if platform._is_mac:
+                cxx_lib = 'c++'
+            else:
+                cxx_lib = 'stdc++'
+            if cxx_lib not in cls.external_libraries:
+                cls.external_libraries[cxx_lib] = cxx_orig.copy()
+                cls.internal_libraries['fygg']['external_dependencies'].append(cxx_lib)
         
     def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.

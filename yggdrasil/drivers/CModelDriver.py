@@ -166,7 +166,6 @@ class GCCCompiler(CCompilerBase):
             list(LinkerBase.flag_options.items())
             + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
             + [('library_rpath', '-Wl,-rpath')]))
-    cxx_lib = 'stdc++'
     toolset = 'gnu'
 
     @classmethod
@@ -202,7 +201,6 @@ class ClangCompiler(CCompilerBase):
             list(LinkerBase.flag_options.items())
             + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
             + [('library_rpath', '-rpath')]))
-    cxx_lib = 'c++'
     toolset = 'llvm'
 
 
@@ -247,7 +245,6 @@ class MSVCCompiler(CCompilerBase):
                              shared_library_flag='/DLL',
                              search_path_envvar='LIB',
                              search_path_flags=None)
-    cxx_lib = None  # ('ucrtbase', 'msvcrt', 'msvcp140', 'vcruntime140')
     toolset = 'msvc'
     
     @classmethod

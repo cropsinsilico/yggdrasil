@@ -402,6 +402,35 @@ class CompilationToolBase(object):
         return cls.tool_suffix_format
 
     @classmethod
+    def get_alternate_class(cls, toolname=None, language=None):
+        r"""Return an alternate class to use if the provided toolname
+        dosn't match the current tool.
+
+        Args:
+            toolname (str, optional): Name of compilation tool that
+                should be used. Defaults to None and the current
+                toolname is assumed.
+            language (str, optional): Language that alternate class
+                should support. Defaults to None and the current
+                language will be assumed.
+
+        Returns:
+            CompilationToolBase: The compilation tool that corresponds
+                to the provided toolname.
+
+        """
+        if (language is not None) and (language not in cls.languages):
+            if toolname is None:
+                # Ensures that a compatible tool will be returned
+                toolname = cls.toolname
+            lang_drv = import_component('model', language)
+            cls = lang_drv.get_tool(cls.tooltype, toolname=toolname)
+        elif ((toolname is not None) and (toolname != cls.toolname)
+              and (toolname not in cls.aliases)):
+            cls = get_compilation_tool(cls.tooltype, toolname=toolname)
+        return cls
+            
+    @classmethod
     def set_env(cls, existing=None, **kwargs):
         r"""Set environment variables required for compilation.
 
@@ -964,24 +993,8 @@ class CompilationToolBase(object):
         """
         # Call from another tool if the language dosn't match
         language = kwargs.pop('%s_language' % cls.tooltype, language)
-        if (language is not None) and (language not in cls.languages):
-            if toolname is None:
-                toolname = cls.toolname
-            lang_drv = import_component('model', language)
-            lang_cls = lang_drv.get_tool(cls.tooltype, toolname=toolname)
-            return lang_cls.call(args, skip_flags=skip_flags, dry_run=dry_run,
-                                 out=out, overwrite=overwrite, products=products,
-                                 allow_error=allow_error, working_dir=working_dir,
-                                 additional_args=additional_args,
-                                 suffix=suffix, **kwargs)
-        if (((toolname is not None) and (toolname != cls.toolname)
-             and (toolname not in cls.aliases))):
-            lang_cls = get_compilation_tool(cls.tooltype, toolname=toolname)
-            return lang_cls.call(args, skip_flags=skip_flags, dry_run=dry_run,
-                                 out=out, overwrite=overwrite, products=products,
-                                 allow_error=allow_error, working_dir=working_dir,
-                                 additional_args=additional_args,
-                                 suffix=suffix, **kwargs)
+        cls = cls.get_alternate_class(toolname=toolname,
+                                      language=language)
         # Add additional arguments
         if isinstance(args, (str, bytes)):
             args = [args]
@@ -1410,6 +1423,11 @@ class CompilerBase(CompilationToolBase):
                 True, produced file otherwise.
 
         """
+        # Must be called before the class is used to get the linker
+        # tools so that correct compiler is used as a base.
+        cls = cls.get_alternate_class(
+            toolname=kwargs.get('toolname', None),
+            language=kwargs.get('language', None))
         # Turn off linking if it is part of the compilation call
         if cls.no_separate_linking:
             dont_link = True
@@ -1585,7 +1603,7 @@ class LinkerBase(CompilationToolBase):
                     '%s_flags' % cls.tooltype, '%s_language' % cls.tooltype,
                     'libraries', 'library_dirs', 'library_libs', 'library_flags']
         kws_both = ['overwrite', 'products', 'allow_error', 'dry_run',
-                    'working_dir', 'env', 'toolname']
+                    'working_dir', 'env']
         kws_link += add_kws_link
         kws_both += add_kws_both
         kwargs_link = {}
