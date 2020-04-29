@@ -2023,9 +2023,6 @@ class CompiledModelDriver(ModelDriver):
                                       % (k, cls.language, default_tool_name))
                     setattr(cls, 'default_%s' % k, None)
 
-    def import_associated_language(cls, language):
-        pass
-        
     def parse_arguments(self, args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.

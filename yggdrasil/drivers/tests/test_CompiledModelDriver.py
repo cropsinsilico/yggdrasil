@@ -320,7 +320,11 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
         # Record old tools
         old_tools = {}
         for k in ['compiler', 'linker', 'achiver']:
-            old_tools[k] = getattr(self.instance, '%s_tool' % k, None)
+            old_tools['%s_tool' % k] = getattr(self.instance,
+                                               '%s_tool' % k, None)
+        for k in ['compiler_flags', 'linker_flags']:
+            old_tools[k] = getattr(self.instance, k, None)
+            setattr(self.instance, k, [])
         # Compile with each compiler
         for k, v in self.import_cls.get_available_tools('compiler').items():
             if (not v.is_installed()) or getattr(v, 'is_build_tool', False):
@@ -332,7 +336,7 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
             self.instance.compile_model()
         # Restore the old tools
         for k, v in old_tools.items():
-            setattr(self.instance, '%s_tool' % k, v)
+            setattr(self.instance, k, v)
 
     def test_compile_model(self):
         r"""Test compile model with alternate set of input arguments."""
