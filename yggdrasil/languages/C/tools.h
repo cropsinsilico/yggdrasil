@@ -120,6 +120,8 @@ typedef struct complex_long_double_t {
 #endif
 /*! @brief End of file message. */
 #define YGG_MSG_EOF "EOF!!!"
+/*! @brief End of client message. */
+#define YGG_CLIENT_EOF "YGG_END_CLIENT"
 /*! @brief Resonable size for buffer. */
 #define YGG_MSG_BUF 2048
 /*! @brief Sleep time in micro-seconds */

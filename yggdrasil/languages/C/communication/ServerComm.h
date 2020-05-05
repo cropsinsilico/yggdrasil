@@ -177,6 +177,10 @@ int server_comm_recv(comm_t* x, char **data, const size_t len, const int allow_r
     req_comm->recv_eof[0] = 1;
     return ret;
   }
+  // On client sign off, do a second recv
+  if (strcmp((*data) + head.bodybeg, YGG_CLIENT_EOF) == 0) {
+    return server_comm_recv(x, data, len, allow_realloc);
+  }
   // If there is not a response address
   if (strlen(head.response_address) == 0) {
     ygglog_error("server_comm_recv(%s): No response address in message.", x->name);
