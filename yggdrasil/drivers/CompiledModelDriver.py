@@ -2347,7 +2347,7 @@ class CompiledModelDriver(ModelDriver):
                 out = tool.internal_libraries[dep]
         elif dep in cls.external_libraries:
             out = cls.external_libraries[dep]
-        elif os.path.isfile(dep):
+        elif isinstance(dep, str) and os.path.isfile(dep):
             out = dep
         if out is None:
             out = default
