@@ -372,7 +372,8 @@ def find_all(name, path):
     return result
 
 
-def locate_file(fname, environment_variable='PATH', directory_list=None):
+def locate_file(fname, environment_variable='PATH', directory_list=None,
+                show_alternates=False):
     r"""Locate a file within a set of paths defined by a list or environment
     variable.
 
@@ -390,6 +391,9 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
             to those specified by environment_variable. Defaults to None and is
             ignored. These directories will be searched be for those in the
             specified environment variables.
+        show_alternates (bool, optional): If True and there is more
+            than one match, the alternate matches will be printed in
+            a warning message. Defaults to False.
 
     Returns:
         bool, str: Full path to the located file if it was located, False
@@ -400,7 +404,8 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
         out = False
         for ifname in fname:
             out = locate_file(ifname, environment_variable=environment_variable,
-                              directory_list=directory_list)
+                              directory_list=directory_list,
+                              show_alternates=show_alternates)
             if out:
                 break
         return out
@@ -419,16 +424,19 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
         for path in directory_list:
             if path:
                 out += find_all(fname, path)
+            if out and (not show_alternates):
+                break
     if not out:
         return False
     first = out[0]
-    out = set(out)
-    out.remove(first)
-    if len(out) > 0:
-        warnings.warn(("More than one (%d) match to %s:\n%s\n "
-                       + "Using first match (%s)") %
-                      (len(out) + 1, fname, pprint.pformat(out),
-                       first), RuntimeWarning)
+    if show_alternates:  # pragma: debug
+        out = set(out)
+        out.remove(first)
+        if len(out) > 0:
+            warnings.warn(("More than one (%d) match to %s:\n%s\n "
+                           + "Using first match (%s)") %
+                          (len(out) + 1, fname, pprint.pformat(out),
+                           first), RuntimeWarning)
     return first
 
 

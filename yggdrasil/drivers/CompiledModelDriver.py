@@ -3178,6 +3178,7 @@ class CompiledModelDriver(ModelDriver):
                     # On windows search for both gnu and msvc library
                     # naming conventions
                     if platform._is_win:  # pragma: windows
+                        logger.info("Searching for base: %s" % fname)
                         ext_sets = (('.dll', '.dll.a', '.so'),
                                     ('.lib', '.a'))
                         for exts in ext_sets:
