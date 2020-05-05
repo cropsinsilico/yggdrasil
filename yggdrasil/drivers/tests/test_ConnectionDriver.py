@@ -438,6 +438,8 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
 
 class TestConnectionDriverProcess(TestConnectionDriver):
     r"""Test class for the TestConnectionDriver using process."""
+
+    icomm_name = 'buffer'
     
     @property
     def inst_kwargs(self):

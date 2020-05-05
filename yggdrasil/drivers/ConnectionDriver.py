@@ -304,6 +304,8 @@ class ConnectionDriver(Driver):
                 else:
                     all_files = False
                     ikws += s['comm'].get_subtype_properties(icomm_cls._commtype)
+                    if (icomm_cls._commtype == 'buffer') and self.as_process:
+                        x['buffer_task_method'] = 'process'
             ikws = list(set(ikws))
             for k in ikws:
                 if (k not in comm_kws) and (k in kwargs):
