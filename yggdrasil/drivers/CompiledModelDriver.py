@@ -1158,7 +1158,7 @@ class CompilerBase(CompilationToolBase):
         if platform._is_win:  # pragma: windows
             if not cls.is_gnu:
                 cls.object_ext = '.obj'
-            cls.search_path_env.append(os.path.join('Library', 'include'))
+            cls.search_path_env.append(os.path.join('library', 'include'))
         if cls.no_separate_linking:
             cls.is_linker = True
             cls.compile_only_flag = None
@@ -1519,7 +1519,7 @@ class LinkerBase(CompilationToolBase):
     library_ext = None  # depends on the OS
     executable_ext = '.out'
     output_first_library = None
-    search_path_env = 'lib'
+    search_path_env = ['lib']
 
     @staticmethod
     def before_registration(cls):
@@ -1533,10 +1533,10 @@ class LinkerBase(CompilationToolBase):
             cls.library_prefix = ''
             cls.library_ext = '.dll'
             cls.executable_ext = '.exe'
-            cls.search_path_env = 'DLLs'
+            cls.search_path_env += [
+                'DLLs', os.path.join('library', 'bin')]
             if cls.is_gnu:
                 cls.library_ext += '.a'
-                cls.search_path_env = ['DLLs', 'lib']
                 cls.library_prefix = 'lib'
         elif platform._is_mac:
             # TODO: Dynamic library by default on windows?
@@ -1798,7 +1798,7 @@ class ArchiverBase(LinkerBase):
                 cls.library_ext = '.a'
             else:
                 cls.library_ext = '.lib'
-            cls.search_path_env = os.path.join('Library', 'lib')
+            cls.search_path_env = os.path.join('library', 'lib')
         else:
             cls.library_ext = '.a'
 
@@ -3168,10 +3168,12 @@ class CompiledModelDriver(ModelDriver):
                 # PATH environment variable.
                 tool = None
                 try:
-                    if t in ['include']:
+                    if t == 'include':
                         tool = cls.get_tool('compiler', default=None)
-                    else:
+                    elif t == 'shared':
                         tool = cls.get_tool('linker', default=None)
+                    else:
+                        tool = cls.get_tool('archiver', default=None)
                 except NotImplementedError:  # pragma: debug
                     pass
                 fpath = None
@@ -3181,8 +3183,8 @@ class CompiledModelDriver(ModelDriver):
                     # naming conventions
                     if platform._is_win:  # pragma: windows
                         logger.info("Searching for base: %s" % fname)
-                        ext_sets = (('.dll', '.dll.a', '.so'),
-                                    ('.lib', '.a'))
+                        ext_sets = (('.dll', '.dll.a'),
+                                    ('.lib', ))
                         for exts in ext_sets:
                             if fname.endswith(exts):
                                 base = fname.split('.', 1)[0]
