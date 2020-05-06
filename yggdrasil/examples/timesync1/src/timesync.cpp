@@ -64,6 +64,20 @@ int main(int argc, char *argv[]) {
 	 t, t_units, generic_map_get_double(state, "x"),
 	 generic_map_get_double(state, "y"));
 
+  // Send initial state to output
+  generic_t msg = copy_generic(state);
+  ret = generic_map_set_double(msg, "time", t, t_units);
+  if (ret < 0) {
+    printf("timesync(C++): Failed to set time in initial output map.\n");
+    return -1;
+  }
+  ret = out.send(1, msg);
+  if (ret < 0) {
+    printf("timesync(C++): Failed to send initial output for t=%f.\n", t);
+    return -1;
+  }
+  destroy_generic(&msg);
+
   // Iterate until end
   while (t < t_end) {
 
