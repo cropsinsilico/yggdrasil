@@ -344,7 +344,8 @@ class ModelDriver(Driver):
                            'event_process_kill_called',
                            'event_process_kill_complete'])
 
-    def __init__(self, name, args, model_index=0, **kwargs):
+    def __init__(self, name, args, model_index=0, clients=[],
+                 **kwargs):
         self.model_outputs_in_inputs = kwargs.pop('outputs_in_inputs', None)
         super(ModelDriver, self).__init__(name, **kwargs)
         # Setup process things
@@ -360,6 +361,7 @@ class ModelDriver(Driver):
              and platform._is_win)):  # pragma: windows
             raise RuntimeError("strace/valgrind options invalid on windows.")
         self.model_index = model_index
+        self.clients = clients
         self.env_copy = ['LANG', 'PATH', 'USER']
         self._exit_line = b'EXIT'
         for k in self.env_copy:
@@ -1068,6 +1070,7 @@ class ModelDriver(Driver):
         env['YGG_MODEL_NAME'] = self.name
         env['YGG_PYTHON_EXEC'] = sys.executable
         env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
+        env['YGG_NCLIENTS'] = str(len(self.clients))
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):

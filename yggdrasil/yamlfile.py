@@ -163,18 +163,25 @@ def parse_yaml(files):
     for yml in yml_norm['models']:
         if yml.get('timesync', False):
             if yml['timesync'] is True:
-                yml['timesync'] = 'timestep'
+                yml['timesync'] = 'timesync'
             tsync = yml['timesync']
             timesync_names.append(tsync)
             yml.setdefault('timesync_client_of', [])
             yml['timesync_client_of'].append(tsync)
     for tsync in set(timesync_names):
-        yml_norm['models'].append({'name': tsync,
-                                   'language': 'timesync',
-                                   'is_server': True,
-                                   'working_dir': os.getcwd(),
-                                   'inputs': [],
-                                   'outputs': []})
+        for m in yml_norm['models']:
+            if m['name'] == tsync:
+                assert(m['language'] == 'timesync')
+                m.update(is_server=True, inputs=[], outputs=[])
+                break
+        else:
+            yml_norm['models'].append({'name': tsync,
+                                       'args': [],
+                                       'language': 'timesync',
+                                       'is_server': True,
+                                       'working_dir': os.getcwd(),
+                                       'inputs': [],
+                                       'outputs': []})
     # Parse models, then connections to ensure connections can be processed
     existing = None
     for k in ['models', 'connections']:

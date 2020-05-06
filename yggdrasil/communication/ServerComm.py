@@ -1,3 +1,4 @@
+import os
 from collections import OrderedDict
 from yggdrasil.components import import_component
 from yggdrasil.communication import CommBase, get_comm
@@ -43,6 +44,7 @@ class ServerComm(CommBase.CommBase):
         self._used_response_comms = dict()
         self.clients = []
         self.closed_clients = []
+        self.nclients_expected = int(os.environ['YGG_NCLIENTS'])
         super(ServerComm, self).__init__(self.icomm.name, dont_open=dont_open,
                                          recv_timeout=self.icomm.recv_timeout,
                                          is_interface=self.icomm.is_interface,
@@ -157,6 +159,13 @@ class ServerComm(CommBase.CommBase):
     def open_clients(self):
         r"""list: Available open clients."""
         return list(set(self.clients) - set(self.closed_clients))
+
+    @property
+    def all_clients_connected(self):
+        r"""bool: True if all expected clients have connected.
+        False otherwise."""
+        return ((self.nclients_expected > 0)
+                and (len(self.clients) >= self.nclients_expected))
 
     # RESPONSE COMM
     def create_response_comm(self):

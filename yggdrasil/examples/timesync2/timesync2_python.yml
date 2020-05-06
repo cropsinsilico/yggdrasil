@@ -1,0 +1,46 @@
+---
+
+models:
+  - name: statesync
+    language: timesync
+    synonyms:
+      x:
+        - [xvar, ./src/timesync.py:xvar2x, ./src/timesync.py:x2xvar]
+      y:
+        - yvar
+    aggregation:
+      x: ./src/timesync.py:xagg
+      y: sum
+    interpolation:
+      x: index
+      y: spline
+  - name: modelA
+    language: python
+    args:
+      - ./src/timesync.py
+      - {{TIMESYNC_TSTEP_A}}  # Pass the timestep in hours
+      - hr
+      - x
+      - y
+    timesync: statesync
+    outputs:
+      name: output
+      default_file:
+        name: modelA_output.txt
+        in_temp: True
+        filetype: table
+  - name: modelB
+    language: python
+    args:
+      - ./src/timesync.py
+      - {{TIMESYNC_TSTEP_B}}  # Pass the timestep in days
+      - day
+      - xvar
+      - yvar
+    timesync: statesync
+    outputs:
+      name: output
+      default_file:
+        name: modelB_output.txt
+        in_temp: True
+        filetype: table

@@ -387,7 +387,7 @@ comm_t* yggRpcServer(const char *name, const char *inFormat, const char *outForm
   @return comm_t structure with provided info.
  */
 static inline
-comm_t* yggTimestep(const char *name, const char *t_units) {
+comm_t* yggTimesync(const char *name, const char *t_units) {
   dtype_t* dtypes_out[2];
   dtypes_out[0] = create_dtype_scalar("float", 64, t_units, false);
   dtypes_out[1] = create_dtype_json_object(0, NULL, NULL, true);

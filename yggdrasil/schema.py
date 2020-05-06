@@ -1300,6 +1300,8 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
     iodict = getattr(normalizer, 'iodict', None)
     if isinstance(instance, dict):
         standardize(instance, ['inputs', 'outputs'])
+        if instance.get('language', None) == 'timesync':
+            instance.setdefault('args', [])
         prefix = '%s:' % instance['name']
         for io in ['inputs', 'outputs']:
             if len(instance[io]) == 0:

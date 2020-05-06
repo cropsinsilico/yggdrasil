@@ -44,3 +44,7 @@ In addition to dictionaries mapping from variable to method, a single value can 
       y: yvar
     aggregation: min
     interpolation: nearest
+
+.. note::
+   
+   Since each synchronization call invokes overhead, it is not advised that the ``call`` method be executed inside integration methods. Instead, synchonization ``call`` methods should be executed at larger timesteps.

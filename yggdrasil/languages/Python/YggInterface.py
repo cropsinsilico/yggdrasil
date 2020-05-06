@@ -161,11 +161,12 @@ def YggRpcClient(name, outfmt='%s', infmt='%s'):
     return out
     
 
-def YggTimestep(name):
+def YggTimesync(name='timesync'):
     r"""Get class for handling timestep synchronization requests.
 
     Args:
-        name (str): The name of the server queues.
+        name (str, optional): The name of the server queues. Defaults
+            to 'timesync'.
 
     Returns:
         :class:.ClientComm: Communication object.

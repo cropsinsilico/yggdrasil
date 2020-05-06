@@ -125,8 +125,8 @@ definitions:
             type: string
           type: array
       required:
-      - commtype
       - datatype
+      - commtype
       - name
       title: comm_base
       type: object
@@ -641,8 +641,8 @@ definitions:
           type: string
       required:
       - working_dir
-      - filetype
       - name
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1190,6 +1190,14 @@ definitions:
       description: Base schema for all subtypes of model components.
       properties:
         aggregation:
+          anyOf:
+          - type: function
+          - type: string
+          - additionalProperties:
+              anyOf:
+              - type: function
+              - type: string
+            type: object
           default: mean
           description: Method(s) that should be used to aggregate synonymous variables
             across models. This can be a single method that should be used for all
@@ -1198,14 +1206,6 @@ definitions:
             not present in the dictionary or a values is not provided, 'mean' will
             be used. See the documentation for pandas.DataFrame.aggregate for available
             options.
-          oneOf:
-          - type: string
-          - type: function
-          - additionalProperties:
-              oneOf:
-              - type: string
-              - type: function
-            type: object
         args:
           description: The full path to the file containing the model program that
             will be run by the driver or a list starting with the program file and
@@ -1498,16 +1498,9 @@ definitions:
             type: string
           type: array
         synonyms:
-          default: {}
-          description: Mapping from variable name to lists of alternate variables
-            that should also be merged with the variable name specified in the key.
-            List entries can be either names of variables or 3-element tuples containing
-            the alternate variable name, a function for converting from the alternate
-            variable to the key variable, and a function for converting from the key
-            variable to the alternate variable. Defaults to empty dictionary.
-          items:
+          additionalProperties:
             items:
-              oneOf:
+              anyOf:
               - type: string
               - items:
                 - type: string
@@ -1515,6 +1508,13 @@ definitions:
                 - type: function
                 type: array
             type: array
+          default: {}
+          description: Mapping from variable name to lists of alternate variables
+            that should also be merged with the variable name specified in the key.
+            List entries can be either names of variables or 3-element tuples containing
+            the alternate variable name, a function for converting from the alternate
+            variable to the key variable, and a function for converting from the key
+            variable to the alternate variable. Defaults to empty dictionary.
           type: object
         target:
           description: Make target that should be built to create the model executable.
@@ -1562,10 +1562,10 @@ definitions:
             is used.
           type: string
       required:
-      - language
-      - args
       - working_dir
+      - args
       - name
+      - language
       title: model_base
       type: object
     - anyOf:
@@ -1895,6 +1895,14 @@ definitions:
         description: Schema for model component ['timesync'] subtype.
         properties:
           aggregation:
+            anyOf:
+            - type: function
+            - type: string
+            - additionalProperties:
+                anyOf:
+                - type: function
+                - type: string
+              type: object
             default: mean
             description: Method(s) that should be used to aggregate synonymous variables
               across models. This can be a single method that should be used for all
@@ -1903,14 +1911,6 @@ definitions:
               not present in the dictionary or a values is not provided, 'mean' will
               be used. See the documentation for pandas.DataFrame.aggregate for available
               options.
-            oneOf:
-            - type: string
-            - type: function
-            - additionalProperties:
-                oneOf:
-                - type: string
-                - type: function
-              type: object
           interpolation:
             default: linear
             description: Method(s) that should be used to interpolate missing timesteps.
@@ -1952,16 +1952,9 @@ definitions:
               via the command line. Defaults to False.
             type: boolean
           synonyms:
-            default: {}
-            description: Mapping from variable name to lists of alternate variables
-              that should also be merged with the variable name specified in the key.
-              List entries can be either names of variables or 3-element tuples containing
-              the alternate variable name, a function for converting from the alternate
-              variable to the key variable, and a function for converting from the
-              key variable to the alternate variable. Defaults to empty dictionary.
-            items:
+            additionalProperties:
               items:
-                oneOf:
+                anyOf:
                 - type: string
                 - items:
                   - type: string
@@ -1969,6 +1962,13 @@ definitions:
                   - type: function
                   type: array
               type: array
+            default: {}
+            description: Mapping from variable name to lists of alternate variables
+              that should also be merged with the variable name specified in the key.
+              List entries can be either names of variables or 3-element tuples containing
+              the alternate variable name, a function for converting from the alternate
+              variable to the key variable, and a function for converting from the
+              key variable to the alternate variable. Defaults to empty dictionary.
             type: object
         title: TimeSyncModelDriver
         type: object
