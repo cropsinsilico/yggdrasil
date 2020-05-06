@@ -27,6 +27,9 @@ main <- function(t_step, t_units) {
     stop('timesync(R): Initial sync failed.')
   }
   state <- result[[1]]
+  fprintf('timesync(R): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n',
+          units::drop_units(t), units::deparse_unit(t),
+	  state[['x']], state[['y']])
 
   # Send initial state to output
   msg = state
@@ -49,6 +52,9 @@ main <- function(t_step, t_units) {
       stop(sprintf('timesync(R): sync for t=%f failed.', t))
     }
     state <- result[[1]]
+    fprintf('timesync(R): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n',
+            units::drop_units(t), units::deparse_unit(t),
+  	    state[['x']], state[['y']])
 
     # Send output
     msg = state

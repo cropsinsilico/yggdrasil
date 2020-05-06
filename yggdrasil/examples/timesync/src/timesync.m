@@ -22,6 +22,9 @@ function timesync(t_step, t_units)
     error('timesync(Matlab): Initial sync failed.');
   end;
   state = result{1};
+  [t_data, t_unit] = separateUnits(t);
+  fprintf('timesync(Matlab): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n', ...
+	  t_data, symunit2str(t_unit), state('x'), state('y'));
 
   % Send initial state to output
   msg_keys = keys(state);
@@ -46,6 +49,9 @@ function timesync(t_step, t_units)
       error(sprintf('timesync(Matlab): sync for t=%f failed.\n', t));
     end;
     state = result{1};
+    [t_data, t_unit] = separateUnits(t);
+    fprintf('timesync(Matlab): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n', ...
+  	    t_data, symunit2str(t_unit), state('x'), state('y'));
 
     % Send output
     msg_keys = keys(state);

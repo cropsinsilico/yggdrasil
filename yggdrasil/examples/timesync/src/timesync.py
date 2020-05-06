@@ -47,6 +47,8 @@ def main(t_step, t_units):
     if not ret:
         raise RuntimeError("timesync(Python): Initial sync failed.")
     state = result[0]
+    print('timesync(Python): t = % 8s, x = %+ 5.2f, y = %+ 5.2f' % (
+        t, state['x'], state['y']))
 
     # Send initial state to output
     flag = out.send(dict(state, time=t))
@@ -66,6 +68,8 @@ def main(t_step, t_units):
         if not ret:
             raise RuntimeError("timesync(Python): sync for t=%f failed." % t)
         state = result[0]
+        print('timesync(Python): t = % 8s, x = %+ 5.2f, y = %+ 5.2f' % (
+            t, state['x'], state['y']))
 
         # Send output
         flag = out.send(dict(state, time=t))

@@ -1,6 +1,7 @@
-#include "YggInterface.hpp"
-#include <stdio.h>
+#define _USE_MATH_DEFINES  // Required to use M_PI with MSVC
 #include <math.h>
+#include <stdio.h>
+#include "YggInterface.hpp"
 
 
 int timestep_calc(double t, const char* t_units, generic_t state) {
@@ -59,6 +60,9 @@ int main(int argc, char *argv[]) {
     printf("timesync(C++): Initial sync failed.\n");
     return -1;
   }
+  printf("timesync(C++): t = %5.1f %-3s, x = %+ 5.2f, y = %+ 5.2f\n",
+	 t, t_units, generic_map_get_double(state, "x"),
+	 generic_map_get_double(state, "y"));
 
   // Iterate until end
   while (t < t_end) {
@@ -77,6 +81,9 @@ int main(int argc, char *argv[]) {
       printf("timesync(C++): sync for t=%f failed.\n", t);
       return -1;
     }
+    printf("timesync(C++): t = %5.1f %-3s, x = %+ 5.2f, y = %+ 5.2f\n",
+	   t, t_units, generic_map_get_double(state, "x"),
+	   generic_map_get_double(state, "y"));
 
     // Send output
     generic_t msg = copy_generic(state);
