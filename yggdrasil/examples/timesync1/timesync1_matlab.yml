@@ -5,7 +5,7 @@ models:
     language: matlab
     args:
       - ./src/timesync.m
-      - 20  # Pass the timestep in hours
+      - {{TIMESYNC_TSTEP_A}}  # Pass the timestep in hours
       - hr
     timesync: True
     use_symunit: True
@@ -19,7 +19,7 @@ models:
     language: matlab
     args:
       - ./src/timesync.m
-      - 3  # Pass the timestep in days
+      - {{TIMESYNC_TSTEP_B}}  # Pass the timestep in days
       - day
     timesync: True
     use_symunit: True

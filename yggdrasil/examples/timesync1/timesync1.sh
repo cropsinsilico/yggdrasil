@@ -2,6 +2,8 @@
 
 export YGG_DEBUG="INFO"
 export YGG_NAMESPACE="timesync1"
+export TIMESYNC_TSTEP_A=7  # hr (20 for short run)
+export TIMESYNC_TSTEP_B=1  # days (3 for short run)
 
 yaml= 
 

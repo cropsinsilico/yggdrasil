@@ -93,7 +93,7 @@ def write_ref_link(fd, k):
 def write_toc_file(fd, key_list):
     head = "Examples"
     fd.write(head + '\n')
-    fd.write(len(head)*'=' + '\n\n')
+    fd.write((len(head) * '=') + '\n\n')
     fd.write(".. toctree::\n\n")
     for k in key_list:
         fd.write("   %s\n" % get_rst_file(k).split('.rst')[0])
@@ -103,7 +103,7 @@ def write_toc_file(fd, key_list):
 def write_rst(fd, k):
     head = '%s Example' % k
     fd.write(head + '\n')
-    fd.write(len(head)*'=' + '\n\n')
+    fd.write((len(head) * '=') + '\n\n')
     for l in source[k]:
         write_lang(fd, k, l)
         fd.write('\n')
@@ -112,15 +112,26 @@ def write_rst(fd, k):
 def write_lang(fd, k, l):
     head = '%s Version' % lang2print[l]
     fd.write(head + '\n')
-    fd.write(len(head)*'-' + '\n\n')
+    fd.write((len(head) * '-') + '\n\n')
     write_src(fd, k, l)
     fd.write('\n')
     write_yml(fd, k, l)
     fd.write('\n')
 
     
-def write_code_line(fd, s, upone=False, language=None):
+def write_code_line(fd, s, upone=False, language=None,
+                    replacements=[]):
     p = os.path.sep + get_rel_path(s, upone=True)
+    if replacements:
+        pnew = os.path.join(os.path.dirname(__file__),
+                            os.path.basename(p))
+        with open(p, 'r') as pfd:
+            contents = pfd.read()
+        for x, y in replacements:
+            contents = contents.replace(x, y)
+        with open(pnew, 'w') as pfd:
+            pfd.write(contents)
+        p = pnew
     ext2lang = {'.yml': 'yaml', '.py': 'python',
                 '.c': 'c', '.cpp': 'c++', '.m': 'matlab'}
     if language is None:
@@ -146,11 +157,17 @@ def write_src(fd, k, l, upone=False):
     
 def write_yml(fd, k, l, upone=False):
     fd.write("Model YAML:\n\n")
+    replacements = []
+    if k.startswith('timesync'):
+        replacements = [('{{TIMESYNC_TSTEP_A}}', '7'),
+                        ('{{TIMESYNC_TSTEP_B}}', '1')]
     if isinstance(yamls[k][l], list):
         for y in yamls[k][l]:
-            write_code_line(fd, y, upone=upone, language='yaml')
+            write_code_line(fd, y, upone=upone, language='yaml',
+                            replacements=replacements)
     else:
-        write_code_line(fd, yamls[k][l], upone=upone, language='yaml')
+        write_code_line(fd, yamls[k][l], upone=upone, language='yaml',
+                        replacements=replacements)
 
         
 # rst_examples = source.keys()  # all examples
@@ -158,8 +175,8 @@ rst_examples = ['gs_lesson%d' % x for x in range(1, 5)]
 rst_examples.append('gs_lesson4b')  # Special case
 rst_examples += ['formatted_io%d' % x for x in range(1, 10)]
 rst_examples += ['rpc_lesson%d' % x for x in range(1, 3)]
-rst_examples += ['model_function', 'conditional_io', 'transformed_io',
-                 'timesync']
+rst_examples += ['model_function', 'conditional_io', 'transformed_io']
+rst_examples += ['timesync%d' % x for x in range(1, 2)]
 make_toc_file(rst_examples)
 for k in rst_examples:
     make_rst_file(k)
