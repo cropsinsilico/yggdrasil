@@ -3194,7 +3194,8 @@ class CompiledModelDriver(ModelDriver):
                                               'lib' + base + ext]
                                 break
                     fpath = tools.locate_file(
-                        fname, directory_list=search_list)
+                        fname, directory_list=search_list,
+                        environment_variable=None)
             if fpath:
                 logger.info('Located %s: %s' % (fname, fpath))
                 # if (t in ['static']) and platform._is_mac:
