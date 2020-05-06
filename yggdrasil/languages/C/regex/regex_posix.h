@@ -2,16 +2,14 @@
 #ifndef REGEX_POSIX_H_
 #define REGEX_POSIX_H_
 
+#include <regex.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
-#include <regex>
 extern "C" {
-#else
-#include <regex.h>
 #endif
 
 /*!

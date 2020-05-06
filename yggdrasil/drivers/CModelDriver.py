@@ -77,13 +77,6 @@ class CCompilerBase(CompilerBase):
     search_regex_end = 'End of search list.'
     search_regex = [r'(?:#include <...> search starts here:)|'
                     r'(?: ([^\n]+?)(?: \(framework directory\))?)\n']
-    internal_libraries = {
-        'regex': {'source': 'regex_posix.h',
-                  'directory': os.path.join(_top_lang_dir, 'regex'),
-                  'language': 'c',
-                  'libtype': 'header_only',
-                  'internal_dependencies': [],
-                  'external_dependencies': []}}
 
     @staticmethod
     def before_registration(cls):
@@ -254,13 +247,6 @@ class MSVCCompiler(CCompilerBase):
                              search_path_envvar='LIB',
                              search_path_flags=None)
     toolset = 'msvc'
-    internal_libraries = {
-        'regex': {'source': 'regex_win32.cpp',
-                  'directory': os.path.join(_top_lang_dir, 'regex'),
-                  'language': 'c++',
-                  'libtype': _default_internal_libtype,
-                  'internal_dependencies': [],
-                  'external_dependencies': []}}
     
     @classmethod
     def language_version(cls, **kwargs):  # pragma: windows
@@ -378,7 +364,18 @@ class CModelDriver(CompiledModelDriver):
                                           'python', 'numpy'],
                 'include_dirs': [_incl_comm, _incl_seri],
                 'compiler_flags': []},
-        'regex': 'compiler_specific',
+        'regex_win32': {'source': 'regex_win32.cpp',
+                        'directory': os.path.join(_top_lang_dir, 'regex'),
+                        'language': 'c++',
+                        'libtype': _default_internal_libtype,
+                        'internal_dependencies': [],
+                        'external_dependencies': []},
+        'regex_posix': {'source': 'regex_posix.h',
+                        'directory': os.path.join(_top_lang_dir, 'regex'),
+                        'language': 'c',
+                        'libtype': 'header_only',
+                        'internal_dependencies': [],
+                        'external_dependencies': []},
         'datatypes': {'directory': os.path.join(_top_lang_dir, 'datatypes'),
                       'language': 'c++',
                       'libtype': _default_internal_libtype,
@@ -575,6 +572,12 @@ class CModelDriver(CompiledModelDriver):
             for x in ['zmq', 'czmq', 'python']:
                 if x in cls.external_libraries:
                     cls.external_libraries[x]['libtype'] = 'windows_import'
+        # Platform specific regex internal library
+        if platform._is_win:  # pragma: windows
+            regex_lib = cls.internal_libraries['regex_win32']
+        else:
+            regex_lib = cls.internal_libraries['regex_posix']
+        cls.internal_libraries['regex'] = regex_lib
         # Platform specific internal library options
         cls.internal_libraries['ygg']['include_dirs'] += [_top_lang_dir]
         if platform._is_win:  # pragma: windows

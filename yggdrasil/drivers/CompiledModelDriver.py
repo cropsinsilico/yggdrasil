@@ -2342,9 +2342,11 @@ class CompiledModelDriver(ModelDriver):
                 return drv.get_dependency_info(dep, toolname=toolname)
         if dep in cls.internal_libraries:
             out = cls.internal_libraries[dep]
-            if out == 'compiler_specific':
-                tool = cls.get_tool('compiler', toolname=toolname)
-                out = tool.internal_libraries[dep]
+            if out == 'compiler_specific':  # pragma: debug
+                # tool = cls.get_tool('compiler', toolname=toolname)
+                # out = tool.internal_libraries[dep]
+                raise RuntimeError("Renable the above code to allow "
+                                   "for compiler specific libraries.")
         elif dep in cls.external_libraries:
             out = cls.external_libraries[dep]
         elif isinstance(dep, str) and os.path.isfile(dep):

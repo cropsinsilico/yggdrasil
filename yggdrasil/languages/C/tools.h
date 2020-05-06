@@ -90,7 +90,7 @@ typedef struct complex_long_double_t {
   long double im;
 } complex_long_double_t;
 // Platform specific
-#ifdef _MSC_VER
+#ifdef _WIN32
 #include "regex/regex_win32.h"
 #include "getline_win32.h"
 #else
