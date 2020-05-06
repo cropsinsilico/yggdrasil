@@ -124,14 +124,14 @@ def write_code_line(fd, s, upone=False, language=None,
     p = os.path.sep + get_rel_path(s, upone=True)
     if replacements:
         pnew = os.path.join(os.path.dirname(__file__),
-                            os.path.basename(p))
-        with open(p, 'r') as pfd:
+                            os.path.basename(s))
+        with open(s, 'r') as pfd:
             contents = pfd.read()
         for x, y in replacements:
             contents = contents.replace(x, y)
         with open(pnew, 'w') as pfd:
             pfd.write(contents)
-        p = pnew
+        p = os.path.sep + get_rel_path(pnew, upone=True)
     ext2lang = {'.yml': 'yaml', '.py': 'python',
                 '.c': 'c', '.cpp': 'c++', '.m': 'matlab'}
     if language is None:
