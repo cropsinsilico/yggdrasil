@@ -190,9 +190,10 @@ class ServerComm(CommBase.CommBase):
         if request_id is None:
             (request_id, ocomm) = self.ocomm.popitem(last=False)
         else:
-            ocomm = self.ocomm.pop(request_id)
-        ocomm.close_in_thread(no_wait=True)
-        self._used_response_comms[ocomm.name] = ocomm
+            ocomm = self.ocomm.pop(request_id, None)
+        if ocomm is not None:
+            ocomm.close_in_thread(no_wait=True)
+            self._used_response_comms[ocomm.name] = ocomm
 
     # SEND METHODS
     def send_to(self, request_id, *args, **kwargs):
