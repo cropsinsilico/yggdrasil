@@ -288,6 +288,11 @@ class CommBase(tools.YggClass):
             input/outputs to/from a model being wrapped. The receive/send
             calls for this comm will be outside the loop for the model.
             Defaults to False.
+        default_file (:class:FileComm, optional): Comm information for
+            a file that input should be drawn from (for input comms)
+            or that output should be sent to (for output comms) in
+            the event that a yaml does not pair the comm with another
+            model comm or a file.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
