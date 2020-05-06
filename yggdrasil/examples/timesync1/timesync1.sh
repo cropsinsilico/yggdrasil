@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export YGG_DEBUG="INFO"
-export YGG_NAMESPACE="timesync"
+export YGG_NAMESPACE="timesync1"
 
 yaml= 
 
@@ -9,23 +9,23 @@ yaml=
 case $1 in
     "" | -p | --python )
 	echo "Running Python"
-	yaml='timesync_python.yml'
+	yaml='timesync1_python.yml'
 	;;
     -m | --matlab )
 	echo "Running Matlab"
-	yaml='timesync_matlab.yml'
+	yaml='timesync1_matlab.yml'
 	;;
     -c | --gcc )
 	echo "Running C"
-	yaml='timesync_c.yml'
+	yaml='timesync1_c.yml'
 	;;
     --cpp | --g++ )
 	echo "Running C++"
-	yaml='timesync_cpp.yml'
+	yaml='timesync1_cpp.yml'
 	;;
     -r | -R )
 	echo "Running R"
-	yaml='timesync_r.yml'
+	yaml='timesync1_r.yml'
 	;;
 esac
 
