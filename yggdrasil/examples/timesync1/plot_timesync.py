@@ -9,10 +9,15 @@ def main(fileA, fileB):
                            as_array=True).recv()[1]
     dataB = AsciiTableComm('test', address=fileB, direction='recv',
                            as_array=True).recv()[1]
-    plt.plot(dataA[0], dataA[1], 'b-')
-    plt.plot(dataA[0], dataA[2], 'r-')
-    plt.plot(dataB[0].to(dataA[0].units), dataB[1], 'b--')
-    plt.plot(dataB[0].to(dataA[0].units), dataB[2], 'r--')
+    plt.plot(dataA[0], dataA[1], 'b-', label='x (model A)')
+    plt.plot(dataA[0], dataA[2], 'r-', label='y (model A)')
+    plt.plot(dataB[0].to(dataA[0].units), dataB[1], 'b--',
+             label='x (model B)')
+    plt.plot(dataB[0].to(dataA[0].units), dataB[2], 'r--',
+             label='y (model B)')
+    plt.xlabel('Time (%s)' % dataA[0].units)
+    plt.ylabel('State Value')
+    plt.legend()
     plt.show()
 
 
