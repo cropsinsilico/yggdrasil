@@ -125,8 +125,8 @@ definitions:
             type: string
           type: array
       required:
-      - datatype
       - commtype
+      - datatype
       - name
       title: comm_base
       type: object
@@ -266,8 +266,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -640,9 +640,9 @@ definitions:
             is used.
           type: string
       required:
-      - name
-      - filetype
       - working_dir
+      - filetype
+      - name
       title: file_base
       type: object
     - anyOf:
@@ -1525,11 +1525,16 @@ definitions:
             will be set based on the source files provided.
           type: string
         timesync:
+          anyOf:
+          - type: boolean
+          - type: string
           default: false
-          description: If True, the model is assumed to call a send then receive of
+          description: If set, the model is assumed to call a send then receive of
             the state at each timestep for syncronization with other models that are
-            also integrating in time. Defaults to False.
-          type: boolean
+            also integrating in time. If a string is provided, it is assumed to be
+            the name of the server that will handle timestep synchronization. If a
+            boolean is provided, the name of the server will be assumed to be 'timestep'.
+            Defaults to False.
         use_symunit:
           default: false
           description: If True, input/output variables with units will be represented
@@ -1558,9 +1563,9 @@ definitions:
           type: string
       required:
       - language
-      - name
-      - working_dir
       - args
+      - working_dir
+      - name
       title: model_base
       type: object
     - anyOf:

@@ -159,14 +159,17 @@ def parse_yaml(files):
     # print('normalized')
     # pprint.pprint(yml_norm)
     # Determine if any of the models require synchronization
-    add_timesync = False
+    timesync_names = []
     for yml in yml_norm['models']:
         if yml.get('timesync', False):
-            add_timesync = True
-            yml.setdefault('client_of', [])
-            yml['client_of'].append('timestep_synchonization')
-    if add_timesync:
-        yml_norm['models'].append({'name': 'timestep_synchonization',
+            if yml['timesync'] is True:
+                yml['timesync'] = 'timestep'
+            tsync = yml['timesync']
+            timesync_names.append(tsync)
+            yml.setdefault('timesync_client_of', [])
+            yml['timesync_client_of'].append(tsync)
+    for tsync in set(timesync_names):
+        yml_norm['models'].append({'name': tsync,
                                    'language': 'timesync',
                                    'is_server': True,
                                    'working_dir': os.getcwd(),
@@ -288,11 +291,16 @@ def parse_model(yml, existing):
                'working_dir': yml['working_dir']}
         yml['inputs'].append(srv)
         yml['clients'] = []
+    # Mark timesync clients
+    timesync = yml.pop('timesync_client_of', [])
+    if timesync:
+        yml.setdefault('client_of', [])
+        yml['client_of'] += timesync
     # Add client driver
     if yml.get('client_of', []):
         for srv in yml['client_of']:
-            if srv == 'timestep_synchonization':
-                cli_name = '%s:timestep' % yml['name']
+            if srv in timesync:
+                cli_name = '%s:%s' % (yml['name'], srv)
             else:
                 cli_name = '%s:%s_%s' % (yml['name'], srv, yml['name'])
             cli = {'name': cli_name,
