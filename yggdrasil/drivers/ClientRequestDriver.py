@@ -110,7 +110,7 @@ class ClientRequestDriver(ConnectionDriver):
         # NOTE: This means that any client_model value in the last
         # header will not be propagated to the server. This also assumes
         # that there is only one client model serviced by this driver
-        return self.name
+        return self.name.split(':')[0]
 
     @property
     def request_name(self):

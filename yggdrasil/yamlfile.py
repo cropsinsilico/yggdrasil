@@ -290,18 +290,14 @@ def parse_model(yml, existing):
         yml['clients'] = []
     # Add client driver
     if yml.get('client_of', []):
-        srv_names = yml['client_of']
-        yml['client_of'] = srv_names
-        for srv in srv_names:
+        for srv in yml['client_of']:
             if srv == 'timestep_synchonization':
                 cli_name = '%s:timestep' % yml['name']
-                cli_datatype = {'type': 'bytes'}
             else:
                 cli_name = '%s:%s_%s' % (yml['name'], srv, yml['name'])
-                cli_datatype = {'type': 'bytes'}
             cli = {'name': cli_name,
                    'commtype': 'default',
-                   'datatype': cli_datatype,
+                   'datatype': {'type': 'bytes'},
                    'driver': 'ClientDriver',
                    'args': srv + '_SERVER',
                    'working_dir': yml['working_dir']}

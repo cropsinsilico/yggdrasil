@@ -419,7 +419,7 @@ class CommBase(tools.YggClass):
         self._name = name + suffix
         if address is None:
             if self.name not in os.environ:
-                model_name = os.environ.get('YGG_MODEL_NAME', '')
+                model_name = self.model_name
                 prefix = '%s:' % model_name
                 if model_name and (not self.name.startswith(prefix)):
                     self._name = prefix + self.name
