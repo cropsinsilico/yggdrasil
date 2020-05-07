@@ -266,8 +266,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -640,8 +640,8 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - name
+      - working_dir
       - filetype
       title: file_base
       type: object
@@ -1199,13 +1199,6 @@ definitions:
               - type: string
             type: object
           default: mean
-          description: Method(s) that should be used to aggregate synonymous variables
-            across models. This can be a single method that should be used for all
-            synonymous variables or a dictionary mapping between synonymous variables
-            and the method that should be used by that variable. If a variable is
-            not present in the dictionary or a values is not provided, 'mean' will
-            be used. See the documentation for pandas.DataFrame.aggregate for available
-            options.
         args:
           description: The full path to the file containing the model program that
             will be run by the driver or a list starting with the program file and
@@ -1306,12 +1299,7 @@ definitions:
           description: Settings for the integrator. Defaults to empty dict.
           type: object
         interpolation:
-          default: linear
-          description: Method(s) that should be used to interpolate missing timesteps.
-            This can be a single method or a dictionary mapping between model name
-            and the interpolation methods that should be used for variables from that
-            model. Defaults to 'linear'. See the documentation for pandas.DataFrame.interpolate
-            for available options.
+          default: index
           oneOf:
           - type: string
           - additionalProperties:
@@ -1499,22 +1487,33 @@ definitions:
           type: array
         synonyms:
           additionalProperties:
-            items:
+            additionalProperties:
               anyOf:
               - type: string
-              - items:
-                - type: string
-                - type: function
-                - type: function
-                type: array
-            type: array
+              - properties:
+                  alt:
+                    anyOf:
+                    - type: string
+                    - items:
+                        type: string
+                      type: array
+                  alt2base:
+                    type: function
+                  base2alt:
+                    type: function
+                required:
+                - alt
+                - alt2base
+                - base2alt
+                type: object
+            type: object
           default: {}
-          description: Mapping from variable name to lists of alternate variables
-            that should also be merged with the variable name specified in the key.
-            List entries can be either names of variables or 3-element tuples containing
-            the alternate variable name, a function for converting from the alternate
-            variable to the key variable, and a function for converting from the key
-            variable to the alternate variable. Defaults to empty dictionary.
+          description: 'Mapping from model names to mappings from base variables names
+            to information about one or more alternate variable names used by the
+            named model that should be converted to the base variable. Values for
+            providing information about alternate variables can either be strings
+            (implies equivalence with the base variable in everything but name and
+            units) or mappings with the keys:'
           type: object
         target:
           description: Make target that should be built to create the model executable.
@@ -1562,10 +1561,10 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
+      - language
       - args
       - name
-      - language
+      - working_dir
       title: model_base
       type: object
     - anyOf:
@@ -1904,20 +1903,8 @@ definitions:
                 - type: string
               type: object
             default: mean
-            description: Method(s) that should be used to aggregate synonymous variables
-              across models. This can be a single method that should be used for all
-              synonymous variables or a dictionary mapping between synonymous variables
-              and the method that should be used by that variable. If a variable is
-              not present in the dictionary or a values is not provided, 'mean' will
-              be used. See the documentation for pandas.DataFrame.aggregate for available
-              options.
           interpolation:
-            default: linear
-            description: Method(s) that should be used to interpolate missing timesteps.
-              This can be a single method or a dictionary mapping between model name
-              and the interpolation methods that should be used for variables from
-              that model. Defaults to 'linear'. See the documentation for pandas.DataFrame.interpolate
-              for available options.
+            default: index
             oneOf:
             - type: string
             - additionalProperties:
@@ -1953,22 +1940,33 @@ definitions:
             type: boolean
           synonyms:
             additionalProperties:
-              items:
+              additionalProperties:
                 anyOf:
                 - type: string
-                - items:
-                  - type: string
-                  - type: function
-                  - type: function
-                  type: array
-              type: array
+                - properties:
+                    alt:
+                      anyOf:
+                      - type: string
+                      - items:
+                          type: string
+                        type: array
+                    alt2base:
+                      type: function
+                    base2alt:
+                      type: function
+                  required:
+                  - alt
+                  - alt2base
+                  - base2alt
+                  type: object
+              type: object
             default: {}
-            description: Mapping from variable name to lists of alternate variables
-              that should also be merged with the variable name specified in the key.
-              List entries can be either names of variables or 3-element tuples containing
-              the alternate variable name, a function for converting from the alternate
-              variable to the key variable, and a function for converting from the
-              key variable to the alternate variable. Defaults to empty dictionary.
+            description: 'Mapping from model names to mappings from base variables
+              names to information about one or more alternate variable names used
+              by the named model that should be converted to the base variable. Values
+              for providing information about alternate variables can either be strings
+              (implies equivalence with the base variable in everything but name and
+              units) or mappings with the keys:'
             type: object
         title: TimeSyncModelDriver
         type: object

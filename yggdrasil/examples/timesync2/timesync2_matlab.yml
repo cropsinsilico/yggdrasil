@@ -17,9 +17,9 @@ models:
       x: index
       y: spline
   - name: modelA
-    language: python
+    language: matlab
     args:
-      - ./src/timesync.py
+      - ./src/timesync.m
       - {{TIMESYNC_TSTEP_A}}  # Pass the timestep in hours
       - hr
       - x
@@ -32,9 +32,9 @@ models:
         in_temp: True
         filetype: table
   - name: modelB
-    language: python
+    language: matlab
     args:
-      - ./src/timesync.py
+      - ./src/timesync.m
       - {{TIMESYNC_TSTEP_B}}  # Pass the timestep in days
       - day
       - xvar

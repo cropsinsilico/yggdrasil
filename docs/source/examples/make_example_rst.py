@@ -101,7 +101,7 @@ def write_toc_file(fd, key_list):
         
 
 def write_rst(fd, k):
-    head = '%s Example' % k
+    head = '.. _%s_rst:\n\n%s Example' % (k, k)
     fd.write(head + '\n')
     fd.write((len(head) * '=') + '\n\n')
     for l in source[k]:
@@ -123,8 +123,8 @@ def write_code_line(fd, s, upone=False, language=None,
                     replacements=[]):
     p = os.path.sep + get_rel_path(s, upone=True)
     if replacements:
-        pnew = os.path.join(os.path.dirname(__file__),
-                            os.path.basename(s))
+        pnew = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                            'temp', os.path.basename(s))
         with open(s, 'r') as pfd:
             contents = pfd.read()
         for x, y in replacements:
@@ -176,7 +176,7 @@ rst_examples.append('gs_lesson4b')  # Special case
 rst_examples += ['formatted_io%d' % x for x in range(1, 10)]
 rst_examples += ['rpc_lesson%d' % x for x in range(1, 3)]
 rst_examples += ['model_function', 'conditional_io', 'transformed_io']
-rst_examples += ['timesync%d' % x for x in range(1, 2)]
+rst_examples += ['timesync%d' % x for x in range(1, 3)]
 make_toc_file(rst_examples)
 for k in rst_examples:
     make_rst_file(k)

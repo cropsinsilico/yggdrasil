@@ -6,27 +6,6 @@ from yggdrasil import units, tools, multitasking
 from yggdrasil.drivers.DSLModelDriver import DSLModelDriver
 
 
-def chain_conversion(*args):
-    r"""Get a conversion function from a list of conversion
-    functions. The functions will be applied in the order they are
-    supplied.
-
-    Args:
-        *args: Conversion functions to chain.
-
-    Returns:
-        function: Conversion function.
-
-    """
-    def fconvert(x):
-        out = x
-        for a in args:
-            if a is not None:
-                out = a(out)
-        return out
-    return fconvert
-
-
 def convert_with_nan(func):
     r"""Wrap conversion function so that NaNs are not ignored.
 
@@ -53,14 +32,25 @@ class TimeSyncModelDriver(DSLModelDriver):
     r"""Class for synchronizing states for timesteps between two models.
 
     Args:
-        synonyms (dict, optional): Mapping from variable name to lists
-            of alternate variables that should also be merged with the
-            variable name specified in the key. List entries can be
-            either names of variables or 3-element tuples containing
-            the alternate variable name, a function for converting
-            from the alternate variable to the key variable, and a
-            function for converting from the key variable to the
-            alternate variable. Defaults to empty dictionary.
+        synonyms (dict, optional): Mapping from model names to mappings
+            from base variables names to information about one or
+            more alternate variable names used by the named model
+            that should be converted to the base variable. Values for
+            providing information about alternate variables can either
+            be strings (implies equivalence with the base variable in
+            everything but name and units) or mappings with the keys:
+
+              alt (str, list): Name of one or more variables used by
+                 the model that should be used to calculate the named
+                 base variable.
+              alt2base (function): Callable object that takes the
+                 alternate variables named by the 'alt' property as
+                 input and returns the base variable.
+              base2alt (function): Callable object that takes the base
+                 variable as input and returns the alternate variables
+                 named by the 'alt' property.
+
+            Defaults to an empty dictionary.
         aggregation (str, dict, optional): Method(s) that should be used
             to aggregate synonymous variables across models. This can
             be a single method that should be used for all synonymous
@@ -83,14 +73,18 @@ class TimeSyncModelDriver(DSLModelDriver):
     _schema_properties = {
         'synonyms': {'type': 'object',
                      'additionalProperties': {
-                         'type': 'array',
-                         'items': {'anyOf': [
+                         'type': 'object',
+                         'additionalProperties': {'anyOf': [
                              {'type': 'string'},
-                             {'type': 'array',
-                              'items': [
-                                  {'type': 'string'},
-                                  {'type': 'function'},
-                                  {'type': 'function'}]}]}},
+                             {'type': 'object',
+                              'required': ['alt', 'alt2base', 'base2alt'],
+                              'properties': {
+                                  'alt': {'anyOf': [
+                                      {'type': 'string'},
+                                      {'type': 'array',
+                                       'items': {'type': 'string'}}]},
+                                  'alt2base': {'type': 'function'},
+                                  'base2alt': {'type': 'function'}}}]}},
                      'default': {}},
         'aggregation': {
             'anyOf': [{'type': 'function'},
@@ -110,17 +104,22 @@ class TimeSyncModelDriver(DSLModelDriver):
 
     def __init__(self, name, *args, **kwargs):
         super(TimeSyncModelDriver, self).__init__(name, *args, **kwargs)
-        self.inv_synonyms = {}
-        for s0, x in self.synonyms.items():
-            for s in x:
-                if isinstance(s, (tuple, list)):
-                    assert(len(s) == 3)
-                    name, fto, ffrom = s[:]
-                else:
-                    name = s
-                    fto = None
-                    ffrom = None
-                self.inv_synonyms[name] = (s0, fto, ffrom)
+        # Ensure that synonyms are uniform in their format and check
+        # that they are valid
+        for k, v in self.synonyms.items():
+            for s0, x in list(v.items()):
+                if isinstance(x, str):
+                    x = {'alt': x, 'alt2base': None, 'base2alt': None}
+                if not isinstance(x['alt'], list):
+                    x['alt'] = [x['alt']]
+                if ((((x['alt2base'] is None) or (x['base2alt'] is None))
+                     and (len(x['alt']) > 1))):  # pragma: debug
+                    raise RuntimeError(
+                        ('Cannot convert from multiple alternate '
+                         'variables (%s) to single base variable (%s) '
+                         'without transformation functions.')
+                        % (x['alt'], s0))
+                v[s0] = x
 
     def parse_arguments(self, args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
@@ -137,11 +136,11 @@ class TimeSyncModelDriver(DSLModelDriver):
     @property
     def model_wrapper_args(self):
         r"""tuple: Positional arguments for the model wrapper."""
-        return (self.name, self.inv_synonyms, self.interpolation,
+        return (self.name, self.synonyms, self.interpolation,
                 self.aggregation)
 
     @classmethod
-    def model_wrapper(cls, name, inv_synonyms, interpolation,
+    def model_wrapper(cls, name, synonyms, interpolation,
                       aggregation, env=None):
         r"""Model wrapper."""
         from yggdrasil.languages.Python.YggInterface import YggRpcServer
@@ -174,11 +173,15 @@ class TimeSyncModelDriver(DSLModelDriver):
                     table_units[client_model] = {
                         k: units.get_units(v) for k, v in state.items()}
                     table_units[client_model]['time'] = units.get_units(t)
+                    for k, v in synonyms.get(client_model, {}).items():
+                        if v['alt2base'] is not None:
+                            table_units[client_model][k] = units.get_units(
+                                v['alt2base'](*[state[a] for a in v['alt']]))
+                        else:
+                            table_units[client_model][k] = table_units[
+                                client_model][v['alt'][0]]
                     for k, v in table_units[client_model].items():
                         table_units['base'].setdefault(k, v)
-                        if k in inv_synonyms:
-                            table_units['base'].setdefault(
-                                inv_synonyms[k][0], v)
                 # Update the state
                 if t_pd not in times:
                     times.append(t_pd)
@@ -201,7 +204,7 @@ class TimeSyncModelDriver(DSLModelDriver):
                 target=cls.response_loop,
                 args=(client_model, request_id, rpc, t_pd,
                       variables, tables, table_units, table_lock,
-                      inv_synonyms, interpolation, aggregation))
+                      synonyms, interpolation, aggregation))
             threads[request_id].start()
         # Cleanup threads
         for v in threads.values():
@@ -214,7 +217,7 @@ class TimeSyncModelDriver(DSLModelDriver):
     @classmethod
     def response_loop(cls, client_model, request_id, rpc,
                       time, variables, tables, table_units, table_lock,
-                      inv_synonyms, interpolation, aggregation):
+                      synonyms, interpolation, aggregation):
         r"""Check for available data and send response if it is
         available.
 
@@ -231,8 +234,8 @@ class TimeSyncModelDriver(DSLModelDriver):
             table_units (dict): Mapping from model name to dictionaries
                 mapping from variable names to units.
             table_lock (RLock): Thread-safe lock for accessing table.
-            inv_synonyms (dict): Dictionary mapping from variables to
-                base variables and mapping functions used to convert
+            synonyms (dict): Dictionary mapping from base variables to
+                alternate variables and mapping functions used to convert
                 between the variables. Defaults to empty dict and no
                 conversions are performed.
             interpolation (dict): Mapping from model name to the
@@ -248,36 +251,47 @@ class TimeSyncModelDriver(DSLModelDriver):
             tools.sleep(1.0)
             return
         tot = cls.merge(tables, table_units, table_lock, rpc.open_clients,
-                        inv_synonyms, interpolation, aggregation)
+                        synonyms, interpolation, aggregation)
+        # Check if data is available at the desired timestep?
+        # Convert units
+        for k in tot.columns:
+            funits = units.get_conversion_function(table_units['base'][k],
+                                                   table_units[client_model][k])
+            tot[k] = tot[k].apply(funits)
+        # Transform back to variables expected by the model
+        for kbase, alt in synonyms.get(client_model, {}).items():
+            if alt['base2alt'] is not None:
+                alt_vars = alt['base2alt'](tot[kbase])
+                if isinstance(alt_vars, tuple):
+                    assert(len(alt_vars) == len(alt['alt']))
+                    for k, v in zip(alt['alt'], alt_vars):
+                        tot[k] = v
+                else:
+                    assert(len(alt['alt']) == 1)
+                    tot[alt['alt'][0]] = alt_vars
+            else:
+                tot[alt['alt'][0]] = tot[kbase]
+        # Get state
         state = {}
-        valid = True
         for v in variables:
-            v_alt, fto, ffrom = inv_synonyms.get(v, (v, None, None))
-            v_res = tot.loc[time, v_alt]
+            v_res = tot.loc[time, v]
             if pd.isna(v_res):
-                valid = False
-                break
-            v_res = units.convert_to(
-                units.add_units(v_res, table_units['base'][v_alt]),
-                table_units[client_model][v])
-            if ffrom is not None:
-                v_res = ffrom(v_res)
-            state[v] = v_res
-        if valid:
-            time_u = units.convert_to(units.convert_from_pandas_timedelta(time),
-                                      table_units[client_model]['time'])
-            flag = rpc.send_to(request_id, state)  # time_u, state)
-            if not flag:
-                raise RuntimeError(("Failed to send response to "
-                                    "request %s for time %s from "
-                                    "model %s.")
-                                   % (request_id, time_u, client_model))
-            raise multitasking.BreakLoopException
-        tools.sleep(1.0)
+                tools.sleep(1.0)
+                return
+            state[v] = units.add_units(v_res, table_units[client_model][v])
+        time_u = units.convert_to(units.convert_from_pandas_timedelta(time),
+                                  table_units[client_model]['time'])
+        flag = rpc.send_to(request_id, state)  # time_u, state)
+        if not flag:
+            raise RuntimeError(("Failed to send response to "
+                                "request %s for time %s from "
+                                "model %s.")
+                               % (request_id, time_u, client_model))
+        raise multitasking.BreakLoopException
     
     @classmethod
     def merge(cls, tables, table_units, table_lock, open_clients,
-              inv_synonyms, interpolation, aggregation):
+              synonyms, interpolation, aggregation):
         r"""Merge tables from models to get data.
 
         Args:
@@ -287,8 +301,8 @@ class TimeSyncModelDriver(DSLModelDriver):
                 mapping from variable names to units.
             table_lock (RLock): Thread-safe lock for accessing table.
             open_clients (list): Clients that are still open.
-            inv_synonyms (dict): Dictionary mapping from variables to
-                base variables and mapping functions used to convert
+            synonyms (dict): Dictionary mapping from base variables to
+                alternate variables and mapping functions used to convert
                 between the variables. Defaults to empty dict and no
                 conversions are performed.
             interpolation (dict): Mapping from model name to the
@@ -318,17 +332,23 @@ class TimeSyncModelDriver(DSLModelDriver):
                     limit_area=limit_area)
         # Rename + transformation
         for model, v in table_temp.items():
+            drop = []
+            for kbase, alt in synonyms.get(model, {}).items():
+                if alt['alt2base'] is not None:
+                    args = [v[k] for k in alt['alt']]
+                    v[kbase] = alt['alt2base'](*args)
+                else:
+                    v[kbase] = v[alt['alt'][0]]
+                drop += alt['alt']
+            for k in drop:
+                v = v.drop(k, axis=1)
+            # Units
             for k in v.columns:
                 if k == 'time':
                     continue
-                kbase = inv_synonyms.get(k, (k, None, None))
                 funits = units.get_conversion_function(table_units[model][k],
-                                                       table_units['base'][kbase[0]])
-                fk = chain_conversion(kbase[1], funits)
-                if kbase[0] != k:
-                    v[kbase[0]] = v[k]
-                    v = v.drop(k, axis=1)
-                v[kbase[0]] = v[kbase[0]].apply(fk)
+                                                       table_units['base'][k])
+                v[k] = v[k].apply(funits)
             table_temp[model] = v
         # Append
         out = pd.DataFrame()

@@ -16,8 +16,8 @@ def main(fileA, fileB, example_name):
     if example_name == 'timesync2':
         ytrue *= 2.0
         dataB[1] *= 2.0
-    plt.plot(dataA[0], xtrue, 'k', label='x (True)')
-    plt.plot(dataA[0], ytrue, 'k', label='y (True)')
+    plt.plot(dataA[0], xtrue, 'k')
+    plt.plot(dataA[0], ytrue, 'k')
     plt.plot(dataA[0], dataA[1], 'b-', label='x (model A)')
     plt.plot(dataA[0], dataA[2], 'r-', label='y (model A)')
     plt.plot(dataB[0].to(dataA[0].units), dataB[1], 'b--',
