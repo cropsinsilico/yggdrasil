@@ -1,18 +1,32 @@
 
-function timesync(t_step, t_units, xname, yname)
+function timesync(t_step, t_units, model)
 
   t_step = str2num(t_step);
   fprintf('Hello from Matlab timesync: timestep = %f %s\n', t_step, t_units);
   t_step = t_step * str2symunit(t_units);
   t_start = 0.0000000000000001 * str2symunit(t_units);
   t_end = 5.0 * str2symunit('day');
+  if (model == 'A')
+    xname = 'x';
+    yname = 'y';
+    zname = 'a';
+  else
+    xname = 'xvar';
+    yname = 'yvar';
+    zname = 'b';
+  end;
   state = containers.Map('UniformValues', false, 'ValueType', 'any');
   state(xname) = sin(2.0 * pi * t_start / (10.0 * str2symunit('day')));
   if (xname == 'xvar')
     state(xname) = state(xname) / 2.0;
   end;
   state(yname) = cos(2.0 * pi * t_start / (5.0 * str2symunit('day')));
-
+  if (zname == 'a')
+    state(zname) = sin(2.0 * pi * t_start / (2.5 * str2symunit('day')));
+  else
+    state(zname) = cos(2.0 * pi * t_start / (2.5 * str2symunit('day')));
+  end;
+    
   % Set up connections matching yaml
   % Timestep synchronization connection will be 'statesync'
   timesync = YggInterface('YggTimesync', 'statesync');
@@ -26,9 +40,14 @@ function timesync(t_step, t_units, xname, yname)
   end;
   state = result{1};
   [t_data, t_unit] = separateUnits(t);
-  fprintf('timesync(Matlab): t = %5.1f %-1s, %s = %+ 5.2f, %s = %+ 5.2f\n', ...
-	  t_data, symunit2str(t_unit), ...
-	  xname, state(xname), yname, state(yname));
+  fprintf('timesync(Matlab): t = %5.1f %-1s', ...
+          t_data, symunit2str(t_unit));
+  state_keys = keys(state);
+  state_vals = values(state);
+  for i = 1:length(state_keys)
+    fprintf(', %s = %+ 5.2f', state_keys{i}, state_vals{i});
+  end;
+  fprintf('\n');
 
   % Send initial state to output
   msg_keys = keys(state);
@@ -49,6 +68,11 @@ function timesync(t_step, t_units, xname, yname)
     if (xname == 'xvar')
       state(xname) = state(xname) / 2.0;
     end;
+    if (zname == 'a')
+      state(zname) = sin(2.0 * pi * t / (2.5 * str2symunit('day')));
+    else
+      state(zname) = cos(2.0 * pi * t / (2.5 * str2symunit('day')));
+    end;
 
     % Synchronize the state
     [ret, result] = timesync.call(t, state);
@@ -57,9 +81,14 @@ function timesync(t_step, t_units, xname, yname)
     end;
     state = result{1};
     [t_data, t_unit] = separateUnits(t);
-    fprintf('timesync(Matlab): t = %5.1f %-1s, %s = %+ 5.2f, %s = %+ 5.2f\n', ...
-  	    t_data, symunit2str(t_unit), ...
-	    xname, state(xname), yname, state(yname));
+    fprintf('timesync(Matlab): t = %5.1f %-1s', ...
+            t_data, symunit2str(t_unit));
+    state_keys = keys(state);
+    state_vals = values(state);
+    for i = 1:length(state_keys)
+      fprintf(', %s = %+ 5.2f', state_keys{i}, state_vals{i});
+    end;
+    fprintf('\n');
 
     % Send output
     msg_keys = keys(state);

@@ -266,8 +266,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -640,9 +640,9 @@ definitions:
             is used.
           type: string
       required:
+      - working_dir
       - name
       - filetype
-      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1189,6 +1189,13 @@ definitions:
         - args
       description: Base schema for all subtypes of model components.
       properties:
+        additional_variables:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          default: {}
+          type: object
         aggregation:
           anyOf:
           - type: function
@@ -1574,10 +1581,10 @@ definitions:
             is used.
           type: string
       required:
-      - language
-      - name
       - args
       - working_dir
+      - name
+      - language
       title: model_base
       type: object
     - anyOf:
@@ -1906,6 +1913,13 @@ definitions:
       - additionalProperties: true
         description: Schema for model component ['timesync'] subtype.
         properties:
+          additional_variables:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            default: {}
+            type: object
           aggregation:
             anyOf:
             - type: function

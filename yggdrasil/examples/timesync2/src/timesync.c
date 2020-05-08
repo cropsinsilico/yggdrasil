@@ -5,16 +5,18 @@
 
 
 int timestep_calc(double t, const char* t_units, generic_t state,
-		  const char* xname, const char* yname) {
+		  const char* xname, const char* yname, const char* zname) {
   double x_period = 10.0; // Days
   double y_period = 5.0;  // Days
-  double x, y;
+  double z_period = 2.5;  // Days
+  double x, y, z;
   int ret = 0;
   if (strcmp(t_units, "day") == 0) {
     // No conversion necessary
   } else if (strcmp(t_units, "hr") == 0) {
     x_period = x_period * 24.0;
     y_period = y_period * 24.0;
+    z_period = z_period * 24.0;
   } else {
     printf("timestep_calc: Unsupported unit '%s'\n", t_units);
     ret = -1;
@@ -28,6 +30,14 @@ int timestep_calc(double t, const char* t_units, generic_t state,
     ret = generic_map_set_double(state, xname, x, "");
     ret = generic_map_set_double(state, yname, y, "");
   }
+  if (ret >= 0) {
+    if (strcmp(zname, "a") == 0) {
+      z = sin(2.0 * M_PI * t / z_period);
+    } else {
+      z = cos(2.0 * M_PI * t / z_period);
+    }
+    ret = generic_map_set_double(state, zname, z, "");
+  }
   return ret;
 }
 
@@ -36,18 +46,32 @@ int main(int argc, char *argv[]) {
 
   double t_step = atof(argv[1]);
   char* t_units = argv[2];
-  char* xname = argv[3];
-  char* yname = argv[4];
+  char* model = argv[3];
+  char* xname;
+  char* yname;
+  char* zname;
   int exit_code = 0;
   printf("Hello from C timesync: timestep %f %s\n", t_step, t_units);
   double t_start = 0.0;
   double t_end = 5.0;
+  size_t nkeys, ikey;
+  char** keys = NULL;
   if (strcmp(t_units, "hr") == 0) {
     t_end = 24.0 * t_end;
   }
+  if (strcmp(model, "A") == 0) {
+    xname = "x";
+    yname = "y";
+    zname = "a";
+  } else {
+    xname = "xvar";
+    yname = "yvar";
+    zname = "b";
+  }
   int ret;
-  generic_t state = init_generic_map();
-  ret = timestep_calc(t_start, t_units, state, xname, yname);
+  generic_t state_send = init_generic_map();
+  generic_t state_recv = init_generic_map();
+  ret = timestep_calc(t_start, t_units, state_send, xname, yname, zname);
   if (ret < 0) {
     printf("timesync(C): Error in initial timestep calculation.");
     return -1;
@@ -61,18 +85,21 @@ int main(int argc, char *argv[]) {
 
   // Initialize state and synchronize with other models
   double t = t_start;
-  ret = rpcCall(timesync, t, state, &state);
+  ret = rpcCall(timesync, t, state_send, &state_recv);
   if (ret < 0) {
     printf("timesync(C): Initial sync failed.\n");
     return -1;
   }
-  printf("timesync(C): t = %5.1f %-3s, %s = %+ 5.2f, %s = %+ 5.2f\n",
-	 t, t_units,
-	 xname, generic_map_get_double(state, xname),
-	 yname, generic_map_get_double(state, yname));
+  printf("timesync(C): t = %5.1f %-3s", t, t_units);
+  nkeys = generic_map_get_keys(state_recv, &keys);
+  for (ikey = 0; ikey < nkeys; ikey++) {
+    printf(", %s = %+ 5.2f", keys[ikey],
+	   generic_map_get_double(state_recv, keys[ikey]));
+  }
+  printf("\n");
 
   // Send initial state to output
-  generic_t msg = copy_generic(state);
+  generic_t msg = copy_generic(state_recv);
   ret = generic_map_set_double(msg, "time", t, t_units);
   if (ret < 0) {
     printf("timesync(C): Failed to set time in initial output map.\n");
@@ -90,25 +117,28 @@ int main(int argc, char *argv[]) {
 
     // Perform calculations to update the state
     t = t + t_step;
-    ret = timestep_calc(t, t_units, state, xname, yname);
+    ret = timestep_calc(t, t_units, state_send, xname, yname, zname);
     if (ret < 0) {
       printf("timesync(C): Error in timestep calculation for t = %f.\n", t);
       return -1;
     }
 
     // Synchronize the state
-    ret = rpcCall(timesync, t, state, &state);
+    ret = rpcCall(timesync, t, state_send, &state_recv);
     if (ret < 0) {
       printf("timesync(C): sync for t=%f failed.\n", t);
       return -1;
     }
-    printf("timesync(C): t = %5.1f %-3s, %s = %+ 5.2f, %s = %+ 5.2f\n",
-	   t, t_units,
-	   xname, generic_map_get_double(state, xname),
-	   yname, generic_map_get_double(state, yname));
+    printf("timesync(C): t = %5.1f %-3s", t, t_units);
+    nkeys = generic_map_get_keys(state_recv, &keys);
+    for (ikey = 0; ikey < nkeys; ikey++) {
+      printf(", %s = %+ 5.2f", keys[ikey],
+	     generic_map_get_double(state_recv, keys[ikey]));
+	}
+    printf("\n");
 
     // Send output
-    msg = copy_generic(state);
+    msg = copy_generic(state_recv);
     ret = generic_map_set_double(msg, "time", t, t_units);
     if (ret < 0) {
       printf("timesync(C): Failed to set time in output map.\n");
@@ -120,10 +150,12 @@ int main(int argc, char *argv[]) {
       return -1;
     }
     destroy_generic(&msg);
+
   }
 
   printf("Goodbye from C timesync\n");
-  destroy_generic(&state);
+  destroy_generic(&state_send);
+  destroy_generic(&state_recv);
   return 0;
     
 }

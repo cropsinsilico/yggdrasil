@@ -4,6 +4,10 @@ from yggdrasil import units, tools, multitasking
 from yggdrasil.drivers.DSLModelDriver import DSLModelDriver
 
 
+_default_agg = 'mean'
+_default_interp = 'index'
+
+
 class TimeSyncModelDriver(DSLModelDriver):
     r"""Class for synchronizing states for timesteps between two models.
 
@@ -42,6 +46,10 @@ class TimeSyncModelDriver(DSLModelDriver):
             (or keyword arguments) that should be used for variables
             from that model. Defaults to 'index'. See the documentation
             for pandas.DataFrame.interpolate for available options.
+        additional_variables (dict, optional): Mapping from model
+            name to a list of variables from other models that are
+            not provided by the model, but should still be returned
+            to the model. Defaults to empty dictionary.
 
     """
 
@@ -63,14 +71,6 @@ class TimeSyncModelDriver(DSLModelDriver):
                                   'alt2base': {'type': 'function'},
                                   'base2alt': {'type': 'function'}}}]}},
                      'default': {}},
-        'aggregation': {
-            'anyOf': [{'type': 'function'},
-                      {'type': 'string'},
-                      {'type': 'object',
-                       'additionalProperties': {
-                           'anyOf': [{'type': 'function'},
-                                     {'type': 'string'}]}}],
-            'default': 'mean'},
         'interpolation': {
             'anyOf': [{'type': 'string'},
                       {'type': 'object',
@@ -84,7 +84,20 @@ class TimeSyncModelDriver(DSLModelDriver):
                        'required': ['method'],
                        'properties': {
                            'method': {'type': 'string'}}}],
-            'default': 'index'}}
+            'default': _default_interp},
+        'aggregation': {
+            'anyOf': [{'type': 'function'},
+                      {'type': 'string'},
+                      {'type': 'object',
+                       'additionalProperties': {
+                           'anyOf': [{'type': 'function'},
+                                     {'type': 'string'}]}}],
+            'default': _default_agg},
+        'additional_variables': {
+            'type': 'object',
+            'additionalProperties': {'type': 'array',
+                                     'items': {'type': 'string'}},
+            'default': {}}}
     language = 'timesync'
 
     def __init__(self, name, *args, **kwargs):
@@ -129,11 +142,11 @@ class TimeSyncModelDriver(DSLModelDriver):
     def model_wrapper_args(self):
         r"""tuple: Positional arguments for the model wrapper."""
         return (self.name, self.synonyms, self.interpolation,
-                self.aggregation)
+                self.aggregation, self.additional_variables)
 
     @classmethod
     def model_wrapper(cls, name, synonyms, interpolation,
-                      aggregation, env=None):
+                      aggregation, additional_variables, env=None):
         r"""Model wrapper."""
         from yggdrasil.languages.Python.YggInterface import YggRpcServer
         if env is not None:
@@ -144,6 +157,10 @@ class TimeSyncModelDriver(DSLModelDriver):
         tables = {}
         table_units = {'base': {}}
         table_lock = multitasking.RLock()
+        default_agg = _default_agg
+        if not isinstance(aggregation, dict):
+            default_agg = aggregation
+            aggregation = {}
         while True:
             # Check for errors on response threads
             for v in threads.values():
@@ -167,7 +184,7 @@ class TimeSyncModelDriver(DSLModelDriver):
             with table_lock:
                 if client_model not in tables:
                     tables[client_model] = pd.DataFrame({'time': times})
-                # Update units
+                # Update units & aggregation methods
                 if client_model not in table_units:
                     # NOTE: this assumes that units will not change
                     # between timesteps for a single model. Is there a
@@ -175,7 +192,9 @@ class TimeSyncModelDriver(DSLModelDriver):
                     table_units[client_model] = {
                         k: units.get_units(v) for k, v in state.items()}
                     table_units[client_model]['time'] = units.get_units(t)
+                    alt_vars = []
                     for k, v in synonyms.get(client_model, {}).items():
+                        alt_vars += v['alt']
                         if v['alt2base'] is not None:
                             table_units[client_model][k] = units.get_units(
                                 v['alt2base'](*[state[a] for a in v['alt']]))
@@ -184,6 +203,8 @@ class TimeSyncModelDriver(DSLModelDriver):
                                 client_model][v['alt'][0]]
                     for k, v in table_units[client_model].items():
                         table_units['base'].setdefault(k, v)
+                    for k in list(set(state.keys()) - set(alt_vars)):
+                        aggregation.setdefault(k, default_agg)
                 # Update the state
                 if t_pd not in times:
                     times.append(t_pd)
@@ -201,11 +222,13 @@ class TimeSyncModelDriver(DSLModelDriver):
                         table = table.append(new_data)
                     tables[model] = table.sort_values('time')
             # Assign thread to handle checking when data is filled in
-            variables = list(state.keys())
+            internal_variables = list(state.keys())
+            external_variables = additional_variables.get(client_model, [])
             threads[request_id] = multitasking.YggTaskLoop(
                 target=cls.response_loop,
                 args=(client_model, request_id, rpc, t_pd,
-                      variables, tables, table_units, table_lock,
+                      internal_variables, external_variables,
+                      tables, table_units, table_lock,
                       synonyms, interpolation, aggregation))
             threads[request_id].start()
         # Cleanup threads
@@ -239,8 +262,9 @@ class TimeSyncModelDriver(DSLModelDriver):
         return True
 
     @classmethod
-    def response_loop(cls, client_model, request_id, rpc,
-                      time, variables, tables, table_units, table_lock,
+    def response_loop(cls, client_model, request_id, rpc, time,
+                      internal_variables, external_variables,
+                      tables, table_units, table_lock,
                       synonyms, interpolation, aggregation):
         r"""Check for available data and send response if it is
         available.
@@ -252,7 +276,10 @@ class TimeSyncModelDriver(DSLModelDriver):
             rpc (ServerComm): Server RPC comm that should be used to
                 reply to the request when the data is available.
             time (pandas.Timedelta): Time to get variables at.
-            variables (list): Variables that should be available.
+            internal_variables (list): Variables that model is requesting
+                that it also calculates.
+            external_variables (list): Variables that model is requesting
+                that will be provided by other models.
             tables (dict): Mapping from model name to pandas DataFrames
                 containing variables supplied by the model.
             table_units (dict): Mapping from model name to dictionaries
@@ -279,6 +306,10 @@ class TimeSyncModelDriver(DSLModelDriver):
             return
         tot = cls.merge(tables, table_units, table_lock, rpc.open_clients,
                         synonyms, interpolation, aggregation)
+        # Update external units
+        for k in external_variables:
+            if k not in table_units[client_model]:
+                table_units[client_model][k] = table_units['base'][k]
         # Check if data is available at the desired timestep?
         # Convert units
         for k in tot.columns:
@@ -300,7 +331,7 @@ class TimeSyncModelDriver(DSLModelDriver):
                 tot[alt['alt'][0]] = tot[kbase]
         # Get state
         state = {}
-        for v in variables:
+        for v in internal_variables + external_variables:
             v_res = tot.loc[time, v]
             state[v] = units.add_units(v_res, table_units[client_model][v])
         time_u = units.convert_to(units.convert_from_pandas_timedelta(time),
@@ -338,7 +369,8 @@ class TimeSyncModelDriver(DSLModelDriver):
 
 
         """
-        interp_default = {'method': 'index'}
+        # Adjust input arguments
+        interp_default = {'method': _default_interp}
         if 'method' in interpolation:
             interp_default = interpolation
             interpolation = {}

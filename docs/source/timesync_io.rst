@@ -42,6 +42,7 @@ In the example below, these parameters are used to modify how the state variable
 
 * Model A has state variables ``x`` and ``y`` while Model B has state variables ``xvar`` and ``yvar`` (set in the yaml)
 * ``xvar`` in Model B is equal to half of ``x`` in Model A
+* Model A alone calculates state variable ``a``, while model B alone calculates state variable ``b``. The models need to exchange these variables.
 
 .. include:: examples/timesync2_yml.rst
 
@@ -65,12 +66,23 @@ To handle reconcilation between analagous variables, |yggdrasil| allows users to
    
    Units conversions will be handled by |yggdrasil| and do not need to be addressed by the ``synonyms`` parameters so long as the state variables have units when passed to the timestep synchronization interface ``call`` method.
 
+Additional Variables
+~~~~~~~~~~~~~~~~~~~~
+
+Models can also request state variables from other models that they do not calculate themselves via the ``additional_variables`` parameter in the yaml. The value for this parameter should be a mapping from model name to a list of external variables that should be returned to the model. For example, in the above yaml, model A requests state variable ``b`` from model B and model B requests state variable ``a`` from model A.
+
 Interpolation
 ~~~~~~~~~~~~~
+
+The ``interpolation`` parameter controls how data is obtained for timesteps that are not sampled by the model. This is particularly important for models that have very different timesteps. Values for the ``interpolation`` parameter can be strings specifying the method that should be used to interpolate or mapping of keyword arguments to `pandas.DataFrame.interpolate <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.interpolate.html>`_. A single ``interpolation`` parameter can be used for all models or specialed ``interpolation`` parameters can be specified a model-by-model basis using a mapping as in the example above. Interpolation is done on the data from each model independently after applying the transformations described by the ``synonyms`` parameter.
 
 Aggregation
 ~~~~~~~~~~~
 
+After the model data is interpolated to get missing timesteps, the data samples at each timestep are aggregated. By default, the samples from each model are averaged, but there are many ways to aggregate data. In the example above, the data for the ``x`` variable are aggregated using a function ``xagg`` from the ``./src/timesync.py`` file which always returns the largest absolute value. The data for the ``y`` variable are aggregated by summing as would be the case when two models represent separate processes that modify a cumulative variable (e.g. mass added/subtracted by different processes).
+
+Additional Tips
+~~~~~~~~~~~~~~~
 
 In addition to dictionaries mapping from variable to method, a single value can be provided for the ``aggregation`` and ``interpolation`` parameter; the same method will the be used for all of the variables e.g.::
   

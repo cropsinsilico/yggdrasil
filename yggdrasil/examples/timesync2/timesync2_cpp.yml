@@ -18,14 +18,16 @@ models:
     aggregation:
       x: ./src/timesync.py:xagg
       y: sum
+    additional_variables:
+      modelA: [b]
+      modelB: [a]
   - name: modelA
     language: c++
     args:
       - ./src/timesync.cpp
       - {{TIMESYNC_TSTEP_A}}  # Pass the timestep in hours
       - hr
-      - x
-      - y
+      - A
     timesync: statesync
     outputs:
       name: output
@@ -39,8 +41,7 @@ models:
       - ./src/timesync.cpp
       - {{TIMESYNC_TSTEP_B}}  # Pass the timestep in days
       - day
-      - xvar
-      - yvar
+      - B
     timesync: statesync
     outputs:
       name: output
