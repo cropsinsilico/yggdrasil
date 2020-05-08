@@ -125,9 +125,9 @@ definitions:
             type: string
           type: array
       required:
-      - datatype
-      - commtype
       - name
+      - commtype
+      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -641,8 +641,8 @@ definitions:
           type: string
       required:
       - name
-      - working_dir
       - filetype
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1299,12 +1299,25 @@ definitions:
           description: Settings for the integrator. Defaults to empty dict.
           type: object
         interpolation:
-          default: index
-          oneOf:
+          anyOf:
           - type: string
           - additionalProperties:
-              type: string
+              oneOf:
+              - type: string
+              - properties:
+                  method:
+                    type: string
+                required:
+                - method
+                type: object
             type: object
+          - properties:
+              method:
+                type: string
+            required:
+            - method
+            type: object
+          default: index
         interpreter:
           description: Name or path of interpreter executable that should be used
             to run the model. If not provided, the interpreter will be determined
@@ -1562,8 +1575,8 @@ definitions:
           type: string
       required:
       - language
-      - args
       - name
+      - args
       - working_dir
       title: model_base
       type: object
@@ -1904,12 +1917,25 @@ definitions:
               type: object
             default: mean
           interpolation:
-            default: index
-            oneOf:
+            anyOf:
             - type: string
             - additionalProperties:
-                type: string
+                oneOf:
+                - type: string
+                - properties:
+                    method:
+                      type: string
+                  required:
+                  - method
+                  type: object
               type: object
+            - properties:
+                method:
+                  type: string
+              required:
+              - method
+              type: object
+            default: index
           interpreter:
             description: Name or path of interpreter executable that should be used
               to run the model. If not provided, the interpreter will be determined

@@ -38,10 +38,16 @@ Controlling Synchonization
 
 There are several ways to customize how timesteps are merged between models. In order to set these options, an explicit entry must be added to the yaml for the timestep synchronization model. At a minimum the timestep synchronization model yaml entry should have ``language: timesync`` and it's name should be the same as the ``timesync`` parameter value for the models it will synchronize (``'timesync'`` if the models have ``timesync: True``). Additional parameters in the timestep synchronization model yaml entry will be used to control how timesteps are synchronized.
 
-.. include:: examples/timesync2_src.rst
+In the example below, these parameters are used to modify how the state variables are synchronized. Models A and B are identical except:
 
+* Model A has state variables ``x`` and ``y`` while Model B has state variables ``xvar`` and ``yvar`` (set in the yaml)
+* ``xvar`` in Model B is equal to half of ``x`` in Model A
 
 .. include:: examples/timesync2_yml.rst
+
+.. image:: examples/images/timesync2_result.png
+
+(The source code associated with this model is very similar to the souce code above, but can be found `here <examples/timesync2.html>`__ for reference.)
 
 Synonyms (Conversion)
 ~~~~~~~~~~~~~~~~~~~~~
@@ -77,8 +83,8 @@ In addition to dictionaries mapping from variable to method, a single value can 
 	  alt2base: timesync:xvar2x
 	  base2alt: timesync:x2xvar
         y: yvar
-    aggregation: min
     interpolation: nearest
+    aggregation: min
 
 .. note::
    

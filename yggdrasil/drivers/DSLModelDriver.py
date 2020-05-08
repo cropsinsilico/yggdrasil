@@ -115,3 +115,11 @@ class DSLModelDriver(InterpretedModelDriver):  # pragma: no cover
         if p.returncode != 0:
             raise RuntimeError("Model failed.")
         return ''
+
+    def after_loop(self):
+        r"""Actions to perform after run_loop has finished. Mainly checking
+        if there was an error and then handling it."""
+        super(DSLModelDriver, self).after_loop()
+        self.info("returncode = %d", self.model_process.returncode)
+        if self.model_process.returncode != 0:
+            self.error("Error on model process.")

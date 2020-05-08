@@ -10,12 +10,14 @@ models:
           alt2base: ./src/timesync.py:xvar2x
           base2alt: ./src/timesync.py:x2xvar
         y: yvar
+    interpolation:
+      modelA: krogh
+      modelB:
+        method: spline
+        order: 5
     aggregation:
       x: ./src/timesync.py:xagg
       y: sum
-    interpolation:
-      x: index
-      y: spline
   - name: modelA
     language: c
     args:

@@ -1,32 +1,8 @@
 import os
-import functools
-import numpy as np
 import pandas as pd
 from yggdrasil import units, tools, multitasking
 from yggdrasil.drivers.DSLModelDriver import DSLModelDriver
 
-
-def convert_with_nan(func):
-    r"""Wrap conversion function so that NaNs are not ignored.
-
-    Args:
-        func (function): Function that should be applied when NaNs
-            are not present.
-
-    Returns:
-        function: Wrapped conversion function.
-
-    """
-    @functools.wraps(func)
-    def func_nan(x):
-        if x.isna().any(axis=None):
-            return np.nan
-        elif isinstance(func, str):
-            return x.apply(func)
-        else:
-            return func(x)
-    return func_nan
-            
 
 class TimeSyncModelDriver(DSLModelDriver):
     r"""Class for synchronizing states for timesteps between two models.
@@ -59,11 +35,12 @@ class TimeSyncModelDriver(DSLModelDriver):
             variable is not present in the dictionary or a values is
             not provided, 'mean' will be used. See the documentation
             for pandas.DataFrame.aggregate for available options.
-        interpolation (str, dict, optional): Method(s) that should be
-            used to interpolate missing timesteps. This can be a single
-            method or a dictionary mapping between model name and the
-            interpolation methods that should be used for variables from
-            that model. Defaults to 'index'. See the documentation
+        interpolation (str, dict, optional): Method(s) or keyword
+            arguments that should be used to interpolate missing
+            timesteps. This can be a single method or a dictionary
+            mapping between model name and the interpolation methods
+            (or keyword arguments) that should be used for variables
+            from that model. Defaults to 'index'. See the documentation
             for pandas.DataFrame.interpolate for available options.
 
     """
@@ -95,16 +72,24 @@ class TimeSyncModelDriver(DSLModelDriver):
                                      {'type': 'string'}]}}],
             'default': 'mean'},
         'interpolation': {
-            'oneOf': [{'type': 'string'},
+            'anyOf': [{'type': 'string'},
                       {'type': 'object',
-                       'additionalProperties': {
-                           'type': 'string'}}],
+                       'additionalProperties': {'oneOf': [
+                           {'type': 'string'},
+                           {'type': 'object',
+                            'required': ['method'],
+                            'properties': {
+                                'method': {'type': 'string'}}}]}},
+                      {'type': 'object',
+                       'required': ['method'],
+                       'properties': {
+                           'method': {'type': 'string'}}}],
             'default': 'index'}}
     language = 'timesync'
 
     def __init__(self, name, *args, **kwargs):
         super(TimeSyncModelDriver, self).__init__(name, *args, **kwargs)
-        # Ensure that synonyms are uniform in their format and check
+        # Ensure that options are uniform in their format and check
         # that they are valid
         for k, v in self.synonyms.items():
             for s0, x in list(v.items()):
@@ -120,6 +105,13 @@ class TimeSyncModelDriver(DSLModelDriver):
                          'without transformation functions.')
                         % (x['alt'], s0))
                 v[s0] = x
+        if isinstance(self.interpolation, str):
+            self.interpolation = {'method': self.interpolation}
+        if 'method' not in self.interpolation:
+            for k, v in list(self.interpolation.items()):
+                if isinstance(v, str):
+                    v = {'method': v}
+                    self.interpolation[k] = v
 
     def parse_arguments(self, args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
@@ -153,11 +145,21 @@ class TimeSyncModelDriver(DSLModelDriver):
         table_units = {'base': {}}
         table_lock = multitasking.RLock()
         while True:
+            # Check for errors on response threads
+            for v in threads.values():
+                if v.check_flag_attr('error_flag'):  # pragma: debug
+                    for v in threads.values():
+                        if v.is_alive():
+                            v.terminate()
+                    raise Exception("Error on response thread.")
             # Receive values from client models
-            flag, values, request_id = rpc.recv_from()
+            flag, values, request_id = rpc.recv_from(timeout=1.0)
             if not flag:
                 print("timesync server: End of input.")
                 break
+            if len(values) == 0:
+                rpc.sleep()
+                continue
             t, state = values[:]
             t_pd = units.convert_to_pandas_timedelta(t)
             client_model = rpc.ocomm[request_id].client_model
@@ -209,10 +211,32 @@ class TimeSyncModelDriver(DSLModelDriver):
         # Cleanup threads
         for v in threads.values():
             if v.is_alive():
-                v.wait(5.0)
+                v.wait(0.5)
         for v in threads.values():
             if v.is_alive():
                 v.terminate()
+
+    @classmethod
+    def check_for_data(cls, time, tables, table_lock, open_clients):
+        r"""Check for a time in the tables to determine if there is
+        sufficient data available to calculate the state.
+
+        Args:
+            time (pandas.Timedelta): Time that state is requested at.
+            tables (dict): Mapping from model name to pandas DataFrames
+                containing variables supplied by the model.
+            table_lock (RLock): Thread-safe lock for accessing table.
+            open_clients (list): Clients that are still open.
+
+        Returns:
+            bool: True if there is sufficient data, False otherwise.
+
+        """
+        with table_lock:
+            for k, v in tables.items():
+                if (k in open_clients) and (time > max(v.dropna()['time'])):
+                    return False
+        return True
 
     @classmethod
     def response_loop(cls, client_model, request_id, rpc,
@@ -239,15 +263,18 @@ class TimeSyncModelDriver(DSLModelDriver):
                 between the variables. Defaults to empty dict and no
                 conversions are performed.
             interpolation (dict): Mapping from model name to the
-                interpolation method that should be used. Defaults to
+                interpolation kwargs that should be used. Defaults to
                 empty dictionary.
             aggregation (dict): Mapping from variable name to the
                 aggregation method that should be used. Defaults to
                 empty dictionary.
 
         """
-        if not rpc.all_clients_connected:
+        if not (rpc.all_clients_connected
+                and cls.check_for_data(time, tables, table_lock,
+                                       rpc.open_clients)):
             # Don't start sampling until all clients have connected
+            # and there is data available for the requested timestep
             tools.sleep(1.0)
             return
         tot = cls.merge(tables, table_units, table_lock, rpc.open_clients,
@@ -275,13 +302,10 @@ class TimeSyncModelDriver(DSLModelDriver):
         state = {}
         for v in variables:
             v_res = tot.loc[time, v]
-            if pd.isna(v_res):
-                tools.sleep(1.0)
-                return
             state[v] = units.add_units(v_res, table_units[client_model][v])
         time_u = units.convert_to(units.convert_from_pandas_timedelta(time),
                                   table_units[client_model]['time'])
-        flag = rpc.send_to(request_id, state)  # time_u, state)
+        flag = rpc.send_to(request_id, state)
         if not flag:
             raise RuntimeError(("Failed to send response to "
                                 "request %s for time %s from "
@@ -306,7 +330,7 @@ class TimeSyncModelDriver(DSLModelDriver):
                 between the variables. Defaults to empty dict and no
                 conversions are performed.
             interpolation (dict): Mapping from model name to the
-                interpolation method that should be used. Defaults to
+                interpolation kwargs that should be used. Defaults to
                 empty dictionary.
             aggregation (dict): Mapping from variable name to the
                 aggregation method that should be used. Defaults to
@@ -314,22 +338,29 @@ class TimeSyncModelDriver(DSLModelDriver):
 
 
         """
-        interp_default = 'index'
-        if isinstance(interpolation, str):
+        interp_default = {'method': 'index'}
+        if 'method' in interpolation:
             interp_default = interpolation
             interpolation = {}
         # Interpolate
         table_temp = {}
         with table_lock:
             for k, v in tables.items():
-                if k in open_clients:
-                    limit_area = 'inside'
-                else:
-                    limit_area = None
+                kws = interpolation.get(k, interp_default).copy()
+                if k not in open_clients:
+                    # Ensure that clients that have signed of are
+                    # extrapolated, otherwise they would never produce
+                    # valid data
+                    kws['limit_area'] = None
+                if 'order' in kws:
+                    kws['order'] = min(v.dropna().shape[0] - 1,
+                                       kws['order'])
                 v = v.set_index('time')
-                table_temp[k] = v.interpolate(
-                    method=interpolation.get(k, interp_default),
-                    limit_area=limit_area)
+                # Cannot interpolate on pandas timedelta as of pandas 1.0.1
+                ind = v.index
+                v.index = v.index.total_seconds()
+                table_temp[k] = v.interpolate(**kws)
+                table_temp[k].index = ind
         # Rename + transformation
         for model, v in table_temp.items():
             drop = []
@@ -355,10 +386,5 @@ class TimeSyncModelDriver(DSLModelDriver):
         for k, v in table_temp.items():
             out = out.append(v)
         # Groupby + aggregate
-        if isinstance(aggregation, dict):
-            aggregation = {k: convert_with_nan(v) for k, v
-                           in aggregation.items()}
-        else:
-            aggregation = convert_with_nan(aggregation)
         out = out.groupby('time').agg(aggregation)
         return out

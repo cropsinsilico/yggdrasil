@@ -491,7 +491,7 @@ class AsyncComm(CommBase.CommBase):
             while ((not T.is_out) and (self.n_msg_direct_recv == 0)
                    and self.is_open_direct):
                 self.sleep()
-            self.stop_timeout(key_suffix='_recv:direct')
+            self.stop_timeout(key_suffix='_recv:direct', quiet=True)
             if not self.is_open_direct:  # pragma: debug
                 self.debug("Comm closed")
                 return (False, self.empty_bytes_msg)

@@ -945,7 +945,10 @@ class YggTask(YggClass):
     def exitcode(self):
         r"""Exit code."""
         if self.as_process:
-            return self.process_instance.exitcode
+            out = self.process_instance.exitcode
+            if (out == 0) and self.check_flag_attr('error_flag'):
+                out = 1
+            return out
         else:
             return int(self.check_flag_attr('error_flag'))
 
