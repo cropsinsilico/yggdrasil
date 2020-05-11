@@ -97,13 +97,13 @@ def ipc_queues():
         'T     ID     KEY        MODE       OWNER    GROUP']
     out = ipcs(['-q']).split('\n')
     qlist = []
-    for l in out:
+    for line in out:
         skip = False
-        if len(l) == 0:
+        if len(line) == 0:
             skip = True
         else:
             for ls in skip_lines:
-                if ls in l:
+                if ls in line:
                     skip = True
                     break
         if not skip:
@@ -115,7 +115,7 @@ def ipc_queues():
                 raise NotImplementedError("Unsure what column the queue key "
                                           + "is in on this platform "
                                           + "(%s)" % sys.platform)
-            qlist.append(l.split()[key_col])
+            qlist.append(line.split()[key_col])
     return qlist
 
 

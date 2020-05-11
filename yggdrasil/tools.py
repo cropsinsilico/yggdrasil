@@ -356,8 +356,8 @@ def find_all(name, path):
                                      stdout=subprocess.PIPE)
             (stdoutdata, stderrdata) = pfind.communicate()
             out = stdoutdata
-            for l in stderrdata.splitlines():
-                if b'Permission denied' not in l:
+            for line in stderrdata.splitlines():
+                if b'Permission denied' not in line:
                     raise subprocess.CalledProcessError(pfind.returncode,
                                                         ' '.join(args),
                                                         output=stderrdata)
@@ -654,8 +654,8 @@ def get_default_comm():
             tally = {}
             for c in get_supported_comm():
                 tally[c] = 0
-                for l in get_supported_lang():
-                    if is_comm_installed(c, language=l):
+                for lang in get_supported_lang():
+                    if is_comm_installed(c, language=lang):
                         tally[c] += 1
             _default_comm = max(tally)
             if tally[_default_comm] == 0:  # pragma: debug
@@ -1143,7 +1143,7 @@ class YggClass(ComponentBase):
         r"""Only do info debug message if the language is one of those specified."""
         if not isinstance(languages, (list, tuple)):
             languages = [languages]
-        languages = [l.lower() for l in languages]
+        languages = [lang.lower() for lang in languages]
         if get_subprocess_language().lower() in languages:  # pragma: debug
             return self.logger.info
         else:

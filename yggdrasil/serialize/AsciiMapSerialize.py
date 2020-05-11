@@ -61,8 +61,8 @@ class AsciiMapSerialize(SerializeBase):
         """
         out = dict()
         lines = tools.bytes2str(msg.split(self.newline), recurse=True)
-        for l in lines:
-            kv = [x for x in l.split(self.delimiter) if x]
+        for line in lines:
+            kv = [x for x in line.split(self.delimiter) if x]
             if len(kv) <= 1:
                 # TODO: Allow empty?
                 continue
@@ -75,7 +75,7 @@ class AsciiMapSerialize(SerializeBase):
                     except BaseException:
                         out[kv[0]] = kv[1]
             else:
-                raise ValueError("Line has more than one delimiter: " + str(l))
+                raise ValueError("Line has more than one delimiter: " + str(line))
         return out
 
     @classmethod

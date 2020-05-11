@@ -34,9 +34,9 @@ def test_get_source():
     r"""Test getting source file for test."""
     lang_list = timing.get_lang_list()
     dir_list = ['src', 'dst']
-    for l in lang_list:
+    for lang in lang_list:
         for d in dir_list:
-            fname = timing.get_source(l, d)
+            fname = timing.get_source(lang, d)
             assert(os.path.isfile(fname))
 
 

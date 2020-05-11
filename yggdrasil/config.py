@@ -224,9 +224,9 @@ def update_language_config(languages=None, skip_warnings=False,
     if (languages is None) or overwrite:
         all_languages = tools.get_supported_lang()
         languages = ['c', 'c++', 'make', 'cmake', 'python', 'lpy', 'r', 'matlab']
-        for l in all_languages:
-            if l.lower() not in languages:
-                languages.append(l)
+        for lang in all_languages:
+            if lang.lower() not in languages:
+                languages.append(lang)
     elif not isinstance(languages, list):
         languages = [languages]
     if disable_languages is None:
@@ -238,8 +238,8 @@ def update_language_config(languages=None, skip_warnings=False,
     if overwrite:
         shutil.copy(def_config_file, usr_config_file)
         ygg_cfg_usr.reload()
-    drivers = OrderedDict([(l, import_component('model', l))
-                           for l in languages])
+    drivers = OrderedDict([(lang, import_component('model', lang))
+                           for lang in languages])
     drv = list(get_language_order(drivers).values())
     for idrv in drv:
         if (((idrv.language in disable_languages)
