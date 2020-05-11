@@ -116,12 +116,12 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                     out[k] = units.add_units(
                         out[k], self.parse_units(k_units))
         
-        for l in lines:
-            if (not l.strip()) or l.startswith('**'):
+        for line in lines:
+            if (not line.strip()) or line.startswith('**'):
                 continue
-            match = re.fullmatch(regex, l)
+            match = re.fullmatch(regex, line)
             if not match:  # pragma: debug
-                raise Exception("Failed to parse line: '%s'" % l)
+                raise Exception("Failed to parse line: '%s'" % line)
             match = match.groupdict()
             if match.get('name', None):
                 finalize_element()

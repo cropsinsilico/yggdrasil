@@ -2575,8 +2575,8 @@ checking if the model flag indicates
         # needed in the future
         # assert(not free_vars)
         for x in free_vars:
-            out += [cls.function_param['indent'] + l
-                    for l in cls.write_free(x)]
+            out += [cls.function_param['indent'] + line
+                    for line in cls.write_free(x)]
         if output_var and ('return' in cls.function_param):
             out.append(cls.function_param['indent']
                        + cls.format_function_param(

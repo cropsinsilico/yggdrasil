@@ -194,19 +194,19 @@ class CompilationToolMeta(type):
                         % (cls.tooltype.title(), x, cls, reg[x]))
                 reg[x] = cls
                 # Register by language
-                for l in languages:
-                    reg['by_language'].setdefault(l, OrderedDict())
-                    if x in reg['by_language'][l]:  # pragma: debug
+                for lang in languages:
+                    reg['by_language'].setdefault(lang, OrderedDict())
+                    if x in reg['by_language'][lang]:  # pragma: debug
                         raise ValueError(("%s toolname '%s' already registered for "
                                           "%s language.")
-                                         % (cls.tooltype.title(), x, l))
-                    reg['by_language'][l][x] = cls
+                                         % (cls.tooltype.title(), x, lang))
+                    reg['by_language'][lang][x] = cls
                 # Register by toolset
                 for t in cls.compatible_toolsets:
                     reg['by_toolset'].setdefault(t, OrderedDict())
-                    for l in languages:
-                        reg['by_toolset'][t].setdefault(l, [])
-                        reg['by_toolset'][t][l].append(cls)
+                    for lang in languages:
+                        reg['by_toolset'][t].setdefault(lang, [])
+                        reg['by_toolset'][t][lang].append(cls)
         return cls
 
 
