@@ -1135,11 +1135,11 @@ def dict2list(d, order=None):
     return out
 
 
-def list2dict(l, names=None):
+def list2dict(arrays, names=None):
     r"""Convert a list of arrays to a dictionary of arrays.
 
     Args:
-        l (list): List of arrays.
+        arrays (list): List of arrays.
         names (list, optional): Names to give to the new fields. Defaults to
             names based on order (e.g. 'f0', 'f1').
 
@@ -1147,11 +1147,12 @@ def list2dict(l, names=None):
         dict: Dictionary of arrays.
 
     """
-    if not isinstance(l, (list, tuple)):
-        raise TypeError("l must be a list or tuple, not %s." % type(l))
+    if not isinstance(arrays, (list, tuple)):
+        raise TypeError("arrays must be a list or tuple, not %s."
+                        % type(arrays))
     if names is None:
-        names = ['f%d' % i for i in range(len(l))]
-    out = {k: x for k, x in zip(names, l)}
+        names = ['f%d' % i for i in range(len(arrays))]
+    out = {k: x for k, x in zip(names, arrays)}
     return out
 
 
@@ -1170,11 +1171,11 @@ def numpy2list(arr):
     return dict2list(numpy2dict(arr), order=arr.dtype.names)
 
 
-def list2numpy(l, names=None):
+def list2numpy(arrays, names=None):
     r"""Convert a list of arrays to a numpy structured array.
 
     Args:
-        l (list): List of arrays.
+        arrays (list): List of arrays.
         names (list, optional): Names to give to the new fields. Defaults to
             names based on order.
 
@@ -1182,7 +1183,7 @@ def list2numpy(l, names=None):
         np.ndarray: Structured numpy array.
 
     """
-    return dict2numpy(list2dict(l, names=names), order=names)
+    return dict2numpy(list2dict(arrays, names=names), order=names)
 
 
 def numpy2dict(arr):
@@ -1321,11 +1322,11 @@ def pandas2dict(frame):
     return numpy2dict(pandas2numpy(frame))
 
 
-def list2pandas(l, names=None):
+def list2pandas(arrays, names=None):
     r"""Convert a list of arrays to a Pandas DataFrame.
 
     Args:
-        l (list): List of arrays.
+        arrays (list): List of arrays.
         names (list, optional): Names to give to the new fields. Defaults to
             names based on order (e.g. 'f0', 'f1').
 
@@ -1333,9 +1334,9 @@ def list2pandas(l, names=None):
         pandas.DataFrame: Pandas data frame with contents from the input list.
 
     """
-    out = numpy2pandas(list2numpy(l, names=names))
+    out = numpy2pandas(list2numpy(arrays, names=names))
     if names is None:
-        out.columns = pandas.RangeIndex(len(l))
+        out.columns = pandas.RangeIndex(len(arrays))
     return out
 
 

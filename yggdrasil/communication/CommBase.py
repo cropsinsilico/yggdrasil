@@ -710,8 +710,8 @@ class CommBase(tools.YggClass):
             language = lang_list
         if isinstance(language, list):
             out = (not use_any)
-            for l in language:
-                if not cls.is_installed(language=l):
+            for lang in language:
+                if not cls.is_installed(language=lang):
                     if not use_any:
                         out = False
                         break

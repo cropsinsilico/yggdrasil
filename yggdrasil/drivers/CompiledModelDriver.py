@@ -147,9 +147,9 @@ class CompilationToolMeta(type):
             reg = get_compilation_tool_registry(cls.tooltype)
             if 'by_language' not in reg:
                 reg['by_language'] = OrderedDict()
-            for l in languages:
-                if l not in reg['by_language']:
-                    reg['by_language'][l] = OrderedDict()
+            for lang in languages:
+                if lang not in reg['by_language']:
+                    reg['by_language'][lang] = OrderedDict()
             for x in [cls.toolname] + cls.aliases:
                 # Register by toolname
                 if (x in reg) and (str(reg[x]) != str(cls)):  # pragma: debug
@@ -159,12 +159,12 @@ class CompilationToolMeta(type):
                         % (cls.tooltype.title(), x, cls, reg[x]))
                 reg[x] = cls
                 # Register by language
-                for l in languages:
-                    if x in reg['by_language'][l]:  # pragma: debug
+                for lang in languages:
+                    if x in reg['by_language'][lang]:  # pragma: debug
                         raise ValueError(("%s toolname '%s' already registered for "
                                           "%s language.")
-                                         % (cls.tooltype.title(), x, l))
-                    reg['by_language'][l][x] = cls
+                                         % (cls.tooltype.title(), x, lang))
+                    reg['by_language'][lang][x] = cls
         return cls
 
 
