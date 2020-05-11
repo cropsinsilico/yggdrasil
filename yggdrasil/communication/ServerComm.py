@@ -1,4 +1,5 @@
 import os
+import uuid
 from collections import OrderedDict
 from yggdrasil.components import import_component
 from yggdrasil.communication import CommBase, get_comm
@@ -44,7 +45,7 @@ class ServerComm(CommBase.CommBase):
         self._used_response_comms = dict()
         self.clients = []
         self.closed_clients = []
-        self.nclients_expected = int(os.environ['YGG_NCLIENTS'])
+        self.nclients_expected = int(os.environ.get('YGG_NCLIENTS', 0))
         super(ServerComm, self).__init__(self.icomm.name, dont_open=dont_open,
                                          recv_timeout=self.icomm.recv_timeout,
                                          is_interface=self.icomm.is_interface,
@@ -178,6 +179,8 @@ class ServerComm(CommBase.CommBase):
                            direction='send', is_response_server=True,
                            single_use=True, **self.response_kwargs)
         request_id = self.icomm._last_header['request_id']
+        while request_id in self.ocomm:  # pragma: debug
+            request_id += str(uuid.uuid4())
         self.ocomm[request_id] = get_comm(
             self.name + '.server_response_comm.' + request_id,
             **comm_kwargs)

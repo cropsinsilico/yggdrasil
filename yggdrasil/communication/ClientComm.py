@@ -155,8 +155,8 @@ class ClientComm(CommBase.CommBase):
         comm_kwargs = dict(direction='recv', is_response_client=True,
                            single_use=True, **self.response_kwargs)
         header = dict(request_id=str(uuid.uuid4()))
-        if header['request_id'] in self.icomm:  # pragma: debug
-            raise ValueError("Request ID %s already in use." % header['request_id'])
+        while header['request_id'] in self.icomm:  # pragma: debug
+            header['request_id'] += str(uuid.uuid4())
         c = new_comm('client_response_comm.' + header['request_id'], **comm_kwargs)
         header['response_address'] = c.address
         header['client_model'] = self.model_name
