@@ -198,8 +198,8 @@ def yggclean():
     args = parser.parse_args()
     if (len(args.language) == 0) or ('all' in args.language):
         args.language = get_supported_lang()
-    for l in args.language:
-        import_component('model', l).cleanup_dependencies()
+    for lang in args.language:
+        import_component('model', lang).cleanup_dependencies()
 
 
 def yggcc():
@@ -313,15 +313,15 @@ def update_config():
              {'help': (
                  'The full path to the MacOS SDK '
                  'that should be used.')}))
-    for l in prelang:
-        if l in lang_args:
-            lang_args2kwargs[l] = []
-            for args, kwargs in lang_args.get(l, []):
+    for lang in prelang:
+        if lang in lang_args:
+            lang_args2kwargs[lang] = []
+            for args, kwargs in lang_args.get(lang, []):
                 parser.add_argument(*args, **kwargs)
-                lang_args2kwargs[l].append(parser._actions[-1].dest)
+                lang_args2kwargs[lang].append(parser._actions[-1].dest)
     args = parser.parse_args()
-    lang_kwargs = {l: {k: getattr(args, k) for k in alist}
-                   for l, alist in lang_args2kwargs.items()}
+    lang_kwargs = {lang: {k: getattr(args, k) for k in alist}
+                   for lang, alist in lang_args2kwargs.items()}
     if args.show_file:
         print('Config file located here: %s' % config.usr_config_file)
     if args.remove_file and os.path.isfile(config.usr_config_file):
