@@ -73,6 +73,7 @@ typedef struct comm_head_t {
   char request_id[COMMBUFFSIZ]; //!< Request id.
   char zmq_reply[COMMBUFFSIZ]; //!< Reply address for ZMQ sockets.
   char zmq_reply_worker[COMMBUFFSIZ]; //!< Reply address for worker socket.
+  int type_in_data; //!< 1 if type is stored with the data during serialization.
   // These should be removed once JSON fully implemented
   int serializer_type; //!< Code indicating the type of serializer.
   char format_str[COMMBUFFSIZ]; //!< Format string for serializer.
@@ -1165,6 +1166,7 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
   out.bodybeg = 0;
   out.valid = 1;
   out.nargs_populated = 0;
+  out.type_in_data = 0;
   // Parameters sent in header
   out.size = size;
   if (address == NULL)
@@ -1259,9 +1261,23 @@ int split_head_body(const char *buf, const size_t buf_siz,
   @param[in] buf_siz size_t Size of buf.
   @returns: int Size of header written.
 */
-int format_comm_header(const comm_head_t head, char **buf, size_t buf_siz);
+int format_comm_header(comm_head_t head, char **buf, size_t buf_siz,
+		       const size_t max_header_size);
 
 
+/*!
+  @brief Extract type from data and updated header.
+  @param[in] buf char** Pointer to data containing type.
+  @param[in] buf_siz size_t Size of buf.
+  @param[in,out] head comm_head_t* Pointer to header structure that
+  should be updated.
+  @returns: int -1 if there is an error, size of adjusted data that
+  dosn't include type otherwise.
+ */
+int parse_type_in_data(char **buf, const size_t buf_siz,
+		       comm_head_t* head);
+
+  
 /*!
   @brief Extract header information from a string.
   @param[in] buf const char* Message that header should be extracted from.

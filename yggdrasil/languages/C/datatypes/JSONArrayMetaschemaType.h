@@ -59,11 +59,6 @@ public:
       ygglog_throw_error("JSONArrayMetaschemaType: Items missing.");
     if (!(type_doc[item_key_].IsArray()))
       ygglog_throw_error("JSONArrayMetaschemaType: Items must be an array.");
-    if (type_doc.HasMember("format_str")) {
-      if (!(type_doc["format_str"].IsString()))
-	ygglog_throw_error("JSONArrayMetaschemaType: format_str must be a string.");
-      strncpy(format_str_, type_doc["format_str"].GetString(), 1000);
-    }
     rapidjson::SizeType i;
     MetaschemaTypeVector items;
     for (i = 0; i < type_doc[item_key_].Size(); i++) {
@@ -594,10 +589,6 @@ public:
    */
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override {
     if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
-    if (strlen(format_str_) > 0) {
-      writer->Key("format_str");
-      writer->String(format_str_, (rapidjson::SizeType)strlen(format_str_));
-    }
     writer->Key(item_key_);
     writer->StartArray();
     size_t i;

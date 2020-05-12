@@ -1381,6 +1381,7 @@ class CommBase(tools.YggClass):
         # Don't send metadata for files
         # kwargs.setdefault('dont_encode', self.is_file)
         kwargs.setdefault('no_metadata', self.is_file)
+        kwargs.setdefault('max_header_size', self.maxMsgSize)
         return self.serializer.serialize(*args, **kwargs)
 
     def deserialize(self, *args, **kwargs):

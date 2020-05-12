@@ -1,7 +1,6 @@
 import six
 import copy
 import uuid
-import pprint
 import importlib
 import jsonschema
 from yggdrasil import tools
@@ -573,15 +572,6 @@ class MetaschemaType(object):
         # Encode
         metadata = cls.encode_type(obj_t, typedef=typedef)
         data = cls.encode_data(obj_t, metadata)
-        # Add extra keyword arguments to metadata, ensuring type not overwritten
-        for k, v in kwargs.items():
-            if (k in metadata) and (v != metadata[k]):
-                error_str = ("Key '%s' set by the type encoder.\n"
-                             + " User defined value:\n%s\n"
-                             + "Type encoder defined value:\n%s\n") % (
-                                 k, pprint.pformat(v), pprint.pformat(metadata[k]))
-                raise RuntimeError(error_str)
-            metadata[k] = v
         return metadata, data
 
     @classmethod
@@ -633,7 +623,7 @@ class MetaschemaType(object):
         return out
 
     def serialize(self, obj, no_metadata=False, dont_encode=False,
-                  dont_check=False, **kwargs):
+                  dont_check=False, max_header_size=0, **kwargs):
         r"""Serialize a message.
 
         Args:
@@ -646,12 +636,19 @@ class MetaschemaType(object):
             dont_check (bool, optional): If True, the object being serialized
                 will not be checked against the type definition. Defaults to
                 False.
+            max_header_size (int, optional): Maximum size that header
+                should occupy in order to be sent in a single message.
+                A value of 0 indicates that any size header is valid.
+                Defaults to 0.
             **kwargs: Additional keyword arguments are added to the metadata.
 
         Returns:
             bytes, str: Serialized message.
 
         """
+        for k in ['size', 'data', 'datatype']:
+            if k in kwargs:
+                raise RuntimeError("'%s' is a reserved keyword in the metadata." % k)
         if ((isinstance(obj, bytes)
              and ((obj == tools.YGG_MSG_EOF) or kwargs.get('raw', False)
                   or dont_encode))):
@@ -659,21 +656,34 @@ class MetaschemaType(object):
             data = obj
             is_raw = True
         else:
-            metadata, data = self.encode(obj, typedef=self._typedef,
-                                         typedef_validated=True,
-                                         dont_check=dont_check, **kwargs)
+            typedef, data = self.encode(obj, typedef=self._typedef,
+                                        typedef_validated=True,
+                                        dont_check=dont_check, **kwargs)
+            metadata = {'datatype': typedef}
+            metadata.update(kwargs)
             is_raw = False
-        for k in ['size', 'data']:
-            if k in metadata:
-                raise RuntimeError("'%s' is a reserved keyword in the metadata." % k)
         if not is_raw:
             data = encoder.encode_json(data)
         if no_metadata:
             return data
         metadata['size'] = len(data)
         metadata.setdefault('id', str(uuid.uuid4()))
-        metadata = encoder.encode_json(metadata)
-        msg = YGG_MSG_HEAD + metadata + YGG_MSG_HEAD + data
+        header = YGG_MSG_HEAD + encoder.encode_json(metadata) + YGG_MSG_HEAD
+        if (max_header_size > 0) and (len(header) > max_header_size):
+            metadata_type = {}
+            for k in ['datatype', 'serializer', 'typedef_base']:
+                if k in metadata:
+                    metadata_type[k] = metadata.pop(k)
+            assert(metadata_type)
+            data = (encoder.encode_json(metadata_type) + YGG_MSG_HEAD + data)
+            metadata['size'] = len(data)
+            metadata['type_in_data'] = True
+            header = YGG_MSG_HEAD + encoder.encode_json(metadata) + YGG_MSG_HEAD
+            if len(header) > max_header_size:  # pragma: debug
+                raise AssertionError(("The header is larger (%d) than the "
+                                      "maximum (%d): %s")
+                                     % (len(header), max_header_size, header))
+        msg = header + data
         return msg
     
     def deserialize(self, msg, no_data=False, metadata=None, dont_decode=False,
@@ -705,13 +715,20 @@ class MetaschemaType(object):
             raise TypeError("Message to be deserialized is not bytes type.")
         # Check for header
         if YGG_MSG_HEAD in msg:
-            if metadata is not None:
+            if isinstance(metadata, dict) and metadata.get('type_in_data', False):
+                assert(msg.count(YGG_MSG_HEAD) == 1)
+                typedef, data = msg.split(YGG_MSG_HEAD, 1)
+                metadata.update(encoder.decode_json(typedef))
+                metadata.pop('type_in_data')
+                metadata['size'] = len(data)
+            elif metadata is not None:
                 raise ValueError("Metadata in header and provided by keyword.")
-            _, metadata, data = msg.split(YGG_MSG_HEAD, 2)
-            if len(metadata) == 0:
-                metadata = dict(size=len(data))
             else:
-                metadata = encoder.decode_json(metadata)
+                _, metadata, data = msg.split(YGG_MSG_HEAD, 2)
+                if len(metadata) == 0:
+                    metadata = dict(size=len(data))
+                else:
+                    metadata = encoder.decode_json(metadata)
         else:
             data = msg
             if metadata is None:
@@ -734,7 +751,7 @@ class MetaschemaType(object):
             return data, metadata
         else:
             data = encoder.decode_json(data)
-            obj = self.decode(metadata, data, self._typedef,
+            obj = self.decode(metadata['datatype'], data, self._typedef,
                               typedef_validated=True, dont_check=dont_check)
         return obj, metadata
 

@@ -3,7 +3,6 @@ import pprint
 import numpy as np
 import warnings
 from yggdrasil import tools, units, serialize
-from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.datatypes import (
     guess_type_from_obj, get_type_from_def, get_type_class, compare_schema,
     type2numpy)
@@ -438,8 +437,7 @@ class SerializeBase(tools.YggClass):
             return
         cls = guess_type_from_obj(msg)
         typedef = cls.encode_type(msg)
-        typedef = cls.extract_typedef(typedef)
-        metadata.update(typedef)
+        metadata['datatype'] = cls.extract_typedef(typedef)
         self.initialize_serializer(metadata)
 
     def initialize_serializer(self, metadata, extract=False):
@@ -481,7 +479,6 @@ class SerializeBase(tools.YggClass):
         old_datatype = None
         if self.initialized:
             old_datatype = copy.deepcopy(self.datatype)
-        _metaschema = get_metaschema()
         # Raise an error if the types are not compatible
         seritype = kwargs.pop('seritype', self.seritype)
         if (seritype != self._seritype) and (seritype != 'default'):  # pragma: debug
@@ -504,9 +501,6 @@ class SerializeBase(tools.YggClass):
                 setattr(self, k, kwargs.pop(k))
         # Create preliminary typedef
         typedef = kwargs.pop('datatype', {})
-        for k in _metaschema['properties'].keys():
-            if k in kwargs:
-                typedef[k] = kwargs.pop(k)
         # Update extra keywords
         if (len(kwargs) > 0):
             self.extra_kwargs.update(kwargs)
@@ -664,7 +658,7 @@ class SerializeBase(tools.YggClass):
         raise NotImplementedError("func_deserialize not implemented.")
     
     def serialize(self, args, header_kwargs=None, add_serializer_info=False,
-                  no_metadata=False):
+                  no_metadata=False, max_header_size=0):
         r"""Serialize a message.
 
         Args:
@@ -675,6 +669,10 @@ class SerializeBase(tools.YggClass):
                 will be added to the metadata. Defaults to False.
             no_metadata (bool, optional): If True, no metadata will be added to
                 the serialized message. Defaults to False.
+            max_header_size (int, optional): Maximum size that header
+                should occupy in order to be sent in a single message.
+                A value of 0 indicates that any size header is valid.
+                Defaults to 0.
 
         Returns:
             bytes, str: Serialized message.
@@ -689,7 +687,8 @@ class SerializeBase(tools.YggClass):
         if isinstance(args, bytes) and (args == tools.YGG_MSG_EOF):
             header_kwargs['raw'] = True
         self.initialize_from_message(args, **header_kwargs)
-        metadata = {'no_metadata': no_metadata}
+        metadata = {'no_metadata': no_metadata,
+                    'max_header_size': max_header_size}
         if add_serializer_info:
             self.debug("serializer_info = %s", str(self.serializer_info))
             metadata.update(self.serializer_info)
@@ -710,8 +709,9 @@ class SerializeBase(tools.YggClass):
                                         % (type(data), bytes))
                     metadata['dont_encode'] = True
                     if not no_metadata:
-                        metadata['metadata'] = self.datatype.encode_type(
-                            args, typedef=self.typedef)
+                        metadata['metadata'] = {
+                            'datatype': self.datatype.encode_type(
+                                args, typedef=self.typedef)}
         if ((self.initialized
              and (not tools.check_environ_bool('YGG_VALIDATE_ALL_MESSAGES')))):
             metadata.setdefault('dont_check', True)
@@ -747,19 +747,20 @@ class SerializeBase(tools.YggClass):
                       or metadata.get('raw', False)):
                 if 'metadata' in metadata:
                     for k, v in metadata.items():
-                        if k not in ['type', 'precision', 'units', 'metadata']:
+                        if k not in ['datatype', 'metadata']:
                             metadata['metadata'][k] = v
                     metadata = metadata.pop('metadata')
                 if not self.initialized:
                     self.update_serializer(extract=True, **metadata)
                 out = self.func_deserialize(out)
         # Update serializer
-        typedef_base = metadata.pop('typedef_base', {})
-        typedef = copy.deepcopy(metadata)
-        typedef.update(typedef_base)
         if not ((metadata.get('size', 0) == 0)
                 or metadata.get('incomplete', False)
                 or metadata.get('raw', False)):
+            typedef_base = metadata.pop('typedef_base', {})
+            typedef = copy.deepcopy(metadata)
+            typedef.setdefault('datatype', {})
+            typedef['datatype'].update(typedef_base)
             self.initialize_serializer(typedef, extract=True)
         return out, metadata
 

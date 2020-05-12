@@ -30,7 +30,8 @@
 
 // C++ functions
 MetaschemaType* type_from_doc(const rapidjson::Value &type_doc,
-			      const bool use_generic=true) {
+			      const bool use_generic=true,
+			      const rapidjson::Value *header_doc=NULL) {
   if (!(type_doc.IsObject()))
     ygglog_throw_error("type_from_doc: Parsed document is not an object.");
   if (!(type_doc.HasMember("type")))
@@ -50,8 +51,17 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc,
     case T_STRING:
       return new MetaschemaType(type_doc, use_generic);
       // Enhanced types
-    case T_ARRAY:
-      return new JSONArrayMetaschemaType(type_doc, "", use_generic);
+    case T_ARRAY: {
+      char format_str[1000] = "";
+      if (header_doc != NULL) {
+	if (header_doc->HasMember("format_str")) {
+	  if (!((*header_doc)["format_str"].IsString()))
+	    ygglog_throw_error("type_from_doc: JSONArrayMetaschemaType: format_str must be a string.");
+	  strncpy(format_str, (*header_doc)["format_str"].GetString(), 1000);
+	}
+      }
+      return new JSONArrayMetaschemaType(type_doc, format_str, use_generic);
+    }
     case T_OBJECT:
       return new JSONObjectMetaschemaType(type_doc, use_generic);
       // Non-standard types
@@ -86,6 +96,18 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc,
   }
   ygglog_throw_error("Could not find class from doc for type '%s'.", type);
   return NULL;
+};
+
+
+MetaschemaType* type_from_header_doc(const rapidjson::Value &header_doc,
+				 const bool use_generic=true) {
+  if (!(header_doc.IsObject()))
+    ygglog_throw_error("type_from_header_doc: Parsed document is not an object.");
+  if (!(header_doc.HasMember("datatype")))
+    ygglog_throw_error("type_from_header_doc: Parsed header dosn't contain a 'datatype' entry.");
+  if (!(header_doc["datatype"].IsObject()))
+    ygglog_throw_error("type_from_header_doc: Parsed datatype is not an object.");
+  return type_from_doc(header_doc["datatype"], use_generic, &header_doc);
 };
 
 
@@ -166,6 +188,18 @@ bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
     head.multipart = 1;
   } else {
     head.multipart = 0;
+  }
+  // Flag specifying that type is in data
+  if (head_doc.HasMember("type_in_data")) {
+    if (!(head_doc["type_in_data"].IsBool())) {
+      ygglog_error("update_header_from_doc: type_in_data is not boolean.");
+      return false;
+    }
+    if (head_doc["type_in_data"].GetBool()) {
+      head.type_in_data = 1;
+    } else {
+      head.type_in_data = 0;
+    }
   }
   // String fields
   const char **n;
@@ -423,6 +457,76 @@ MetaschemaType* dtype2class(const dtype_t* dtype) {
     ygglog_throw_error("dtype2class: No handler for type '%s'.", dtype->type);
   }
   return NULL;
+};
+
+
+rapidjson::StringBuffer format_comm_header_json(const comm_head_t head,
+						const bool type_only=false) {
+  rapidjson::StringBuffer head_buf;
+  rapidjson::Writer<rapidjson::StringBuffer> head_writer(head_buf);
+  head_writer.StartObject();
+  // Type
+  if (!(head.type_in_data)) {
+    if (head.dtype != NULL) {
+      head_writer.Key("datatype");
+      head_writer.StartObject();
+      MetaschemaType* type = dtype2class(head.dtype);
+      if (!(type->encode_type_prop(&head_writer))) {
+	ygglog_throw_error("format_comm_header_json: Error encoding type.");
+      }
+      head_writer.EndObject();
+      if (strcmp(type->type(), "array") == 0) {
+	JSONArrayMetaschemaType* array_type = static_cast<JSONArrayMetaschemaType*>(type);
+	size_t format_str_len = strlen(array_type->format_str());
+	if (format_str_len > 0) {
+	  head_writer.Key("format_str");
+	  head_writer.String(array_type->format_str(),
+			     (rapidjson::SizeType)format_str_len);
+	}
+      }
+    }
+  }
+  if (type_only) {
+    head_writer.EndObject();
+    return head_buf;
+  }
+  // Generic things
+  head_writer.Key("size");
+  head_writer.Int((int)(head.size));
+  if (head.type_in_data) {
+    head_writer.Key("type_in_data");
+    head_writer.Bool(true);
+  }
+  // Strings
+  const char **n;
+  const char *string_fields[] = {"address", "id", "request_id", "response_address",
+				 "zmq_reply", "zmq_reply_worker", ""};
+  n = string_fields;
+  while (strcmp(*n, "") != 0) {
+    const char *target = NULL;
+    if (strcmp(*n, "address") == 0) {
+      target = head.address;
+    } else if (strcmp(*n, "id") == 0) {
+      target = head.id;
+    } else if (strcmp(*n, "request_id") == 0) {
+      target = head.request_id;
+    } else if (strcmp(*n, "response_address") == 0) {
+      target = head.response_address;
+    } else if (strcmp(*n, "zmq_reply") == 0) {
+      target = head.zmq_reply;
+    } else if (strcmp(*n, "zmq_reply_worker") == 0) {
+      target = head.zmq_reply_worker;
+    } else {
+      ygglog_throw_error("format_comm_header_json: '%s' not handled.", *n);
+    }
+    if (strlen(target) > 0) {
+      head_writer.Key(*n);
+      head_writer.String(target);
+    }
+    n++;
+  }
+  head_writer.EndObject();
+  return head_buf;
 };
 
 
@@ -2697,76 +2801,82 @@ extern "C" {
       return NULL;
     }
   }
-  int format_comm_header(const comm_head_t head, char **buf, size_t buf_siz) {
+  int format_comm_header(comm_head_t head, char **buf, size_t buf_siz,
+			 const size_t max_header_size) {
     try {
-      // Header
-      rapidjson::StringBuffer head_buf;
-      rapidjson::Writer<rapidjson::StringBuffer> head_writer(head_buf);
-      head_writer.StartObject();
-      if (head.dtype != NULL) {
-	MetaschemaType* type = dtype2class(head.dtype);
-	if (!(type->encode_type_prop(&head_writer))) {
-	  return -1;
-	}
-      }
-      head_writer.Key("size");
-      head_writer.Int((int)(head.size));
-      // Strings
-      const char **n;
-      const char *string_fields[] = {"address", "id", "request_id", "response_address",
-				     "zmq_reply", "zmq_reply_worker", ""};
-      n = string_fields;
-      while (strcmp(*n, "") != 0) {
-	const char *target = NULL;
-	if (strcmp(*n, "address") == 0) {
-	  target = head.address;
-	} else if (strcmp(*n, "id") == 0) {
-	  target = head.id;
-	} else if (strcmp(*n, "request_id") == 0) {
-	  target = head.request_id;
-	} else if (strcmp(*n, "response_address") == 0) {
-	  target = head.response_address;
-	} else if (strcmp(*n, "zmq_reply") == 0) {
-	  target = head.zmq_reply;
-	} else if (strcmp(*n, "zmq_reply_worker") == 0) {
-	  target = head.zmq_reply_worker;
-	} else {
-	  ygglog_error("format_comm_header: '%s' not handled.", *n);
-	  return -1;
-	}
-	if (strlen(target) > 0) {
-	  head_writer.Key(*n);
-	  head_writer.String(target);
-	}
-	n++;
-      }
-      head_writer.EndObject();
-      // Combine
-      int ret = snprintf(*buf, buf_siz, "%s%s%s",
-			 MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
-      if ((ret < 0) || ((size_t)ret > buf_siz)) {
-	if (ret < 0) {
+      // JSON Serialization
+      rapidjson::StringBuffer head_buf = format_comm_header_json(head);
+      rapidjson::StringBuffer type_buf;
+      // Check size
+      int ret;
 #ifdef _WIN32
-    buf_siz = _scprintf("%s%s%s", MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
+      ret = _scprintf("%s%s%s", MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
 #else
-	  buf_siz = 10 * buf_siz;
+      ret = snprintf(*buf, 0, "%s%s%s", MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
 #endif
-	} else {
-	  buf_siz = (size_t)(ret+1);
-	}
+      if (ret > max_header_size) {
+	type_buf = format_comm_header_json(head, true);
+	head.type_in_data = 1;
+	head.size = head.size + strlen(MSG_HEAD_SEP) + strlen(type_buf.GetString());
+	head_buf = format_comm_header_json(head);
+#ifdef _WIN32
+	ret = _scprintf("%s%s%s%s%s", MSG_HEAD_SEP,
+			head_buf.GetString(), MSG_HEAD_SEP,
+			type_buf.GetString(), MSG_HEAD_SEP);
+#else
+	ret = snprintf(*buf, 0, "%s%s%s%s%s", MSG_HEAD_SEP,
+		       head_buf.GetString(), MSG_HEAD_SEP,
+		       type_buf.GetString(), MSG_HEAD_SEP);
+#endif
+      }
+      // Realloc if necessary
+      if ((size_t)ret > buf_siz) {
+	buf_siz = (size_t)(ret+1);
 	buf[0] = (char*)realloc(buf[0], buf_siz);
-	ret = snprintf(*buf, buf_siz, "%s%s%s",
-		       MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
-	if ((size_t)ret > buf_siz) {
-	  ygglog_error("format_comm_header: Header size (%d) exceeds buffer size (%lu): '%s%s%s'.",
-		       ret, buf_siz, MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
-	  return -1;
-	}
+      }
+      // Format
+      if (head.type_in_data) {
+	ret = snprintf(*buf, buf_siz, "%s%s%s%s%s", MSG_HEAD_SEP,
+		       head_buf.GetString(), MSG_HEAD_SEP,
+		       type_buf.GetString(), MSG_HEAD_SEP);
+      } else {
+	ret = snprintf(*buf, buf_siz, "%s%s%s", MSG_HEAD_SEP,
+		       head_buf.GetString(), MSG_HEAD_SEP);
+      }
+      if ((size_t)ret > buf_siz) {
+	ygglog_error("format_comm_header: Header size (%d) exceeds buffer size (%lu): '%s%s%s'.",
+		     ret, buf_siz, MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
+	return -1;
       }
       ygglog_debug("format_comm_header: Header = '%s'", *buf);
       return ret;
     } catch(...) {
       ygglog_error("format_comm_header: C++ exception thrown.");
+      return -1;
+    }
+  }
+
+  int parse_type_in_data(char **buf, const size_t buf_siz,
+			 comm_head_t* head) {
+    size_t typesiz;
+    int ret;
+    size_t sind, eind;
+    try {
+      ret = find_match(MSG_HEAD_SEP, *buf, &sind, &eind);
+      if (ret < 0) {
+	ygglog_error("parse_type_in_data: Error locating head separation tag.");
+	return -1;
+      }
+      // type = *buf;
+      typesiz = sind;
+      rapidjson::Document type_doc;
+      type_doc.Parse(*buf, typesiz);
+      head->dtype = create_dtype(type_from_header_doc(type_doc));
+      ret = buf_siz - eind;
+      memmove(*buf, *buf + eind, ret);
+      return ret;
+    } catch(...) {
+      ygglog_error("parse_type_in_data: C++ exception thrown.");
       return -1;
     }
   }
@@ -2801,8 +2911,10 @@ extern "C" {
       if (!(head_doc.IsObject()))
 	ygglog_throw_error("parse_comm_header: Parsed header document is not an object.");
       dtype_t* dtype;
-      if (head_doc.HasMember("type")) {
-	dtype = create_dtype(type_from_doc(head_doc));
+      if (head_doc.HasMember("datatype")) {
+	dtype = create_dtype(type_from_header_doc(head_doc));
+      } else if (head_doc.HasMember("type_in_data")) {
+	dtype = NULL;
       } else {
 	dtype = create_dtype_direct();
       }
