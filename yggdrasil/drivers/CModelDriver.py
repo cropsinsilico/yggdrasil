@@ -154,7 +154,7 @@ class CCompilerBase(CompilerBase):
             else:
                 out.append(os.path.join(base_path, 'lib'))
         return out
-        
+
 
 class GCCCompiler(CCompilerBase):
     r"""Interface class for gcc compiler/linker."""
@@ -278,6 +278,7 @@ class ARArchiver(ArchiverBase):
     output_first_library = True
     toolset = 'gnu'
     compatible_toolsets = ['llvm']
+    search_path_envvar = 'LIBRARY_PATH'
 
 
 class LibtoolArchiver(ArchiverBase):
@@ -287,6 +288,7 @@ class LibtoolArchiver(ArchiverBase):
     default_executable_env = 'LIBTOOL'
     static_library_flag = '-static'  # This is the default
     toolset = 'clang'
+    search_path_envvar = 'LIBRARY_PATH'
     
 
 class MSVCArchiver(ArchiverBase):
@@ -297,6 +299,7 @@ class MSVCArchiver(ArchiverBase):
     static_library_flag = None
     output_key = '/OUT:%s'
     toolset = 'msvc'
+    search_path_envvar = 'LIB'
     
 
 _incl_interface = _top_lang_dir
