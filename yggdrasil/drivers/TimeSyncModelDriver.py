@@ -216,10 +216,10 @@ class TimeSyncModelDriver(DSLModelDriver):
                     new_data = pd.DataFrame(new_data)
                     idx = table['time'].isin([t_pd])
                     if not idx.any():
-                        table = table.append(new_data)
+                        table = table.append(new_data, sort=False)
                     elif model == client_model:
                         table = table.drop(table.index[idx])
-                        table = table.append(new_data)
+                        table = table.append(new_data, sort=False)
                     tables[model] = table.sort_values('time')
             # Assign thread to handle checking when data is filled in
             internal_variables = list(state.keys())
@@ -387,6 +387,9 @@ class TimeSyncModelDriver(DSLModelDriver):
                 if 'order' in kws:
                     kws['order'] = min(v.dropna().shape[0] - 1,
                                        kws['order'])
+                    if kws['order'] == 0:
+                        kws.pop('order')
+                        kws.update(interp_default)
                 v = v.set_index('time')
                 # Cannot interpolate on pandas timedelta as of pandas 1.0.1
                 ind = v.index
@@ -416,7 +419,7 @@ class TimeSyncModelDriver(DSLModelDriver):
         # Append
         out = pd.DataFrame()
         for k, v in table_temp.items():
-            out = out.append(v)
+            out = out.append(v, sort=False)
         # Groupby + aggregate
         out = out.groupby('time').agg(aggregation)
         return out
