@@ -48,6 +48,16 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
     r"""clang++ compiler on Apple Mac OS."""
     toolname = 'clang++'
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        if platform._is_win:  # pragma: windows
+            cls.default_executable = 'clang'
+        CPPCompilerBase.before_registration(cls)
+
 
 class CPPModelDriver(CModelDriver):
     r"""Class for running C++ models."""

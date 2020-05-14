@@ -299,6 +299,7 @@ class MSVCArchiver(ArchiverBase):
     static_library_flag = None
     output_key = '/OUT:%s'
     toolset = 'msvc'
+    compatible_toolsets = ['llvm']
     search_path_envvar = 'LIB'
     
 
