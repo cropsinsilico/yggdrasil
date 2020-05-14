@@ -159,7 +159,7 @@ def deploy_package_on_ci(method):
                     install_req))
         if INSTALLSBML:
             cmds += [
-                "echo Installing roadrunner for running SBML models..."
+                "echo Installing roadrunner for running SBML models...",
                 "pip install libroadrunner"]
         if INSTALLAPY:
             cmds += [
