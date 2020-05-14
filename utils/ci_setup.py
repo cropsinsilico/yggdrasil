@@ -18,6 +18,24 @@ INSTALLRMQ = (os.environ.get('INSTALLRMQ', '0') == '1')
 BUILDDOCS = (os.environ.get('BUILDDOCS', '0') == '1')
 
 
+def call_conda_command(args, **kwargs):
+    r"""Function for calling conda commands as the conda script is not
+    available on subprocesses for windows unless invoked via the shell.
+
+    Args:
+        args (list): Command arguments.
+        **kwargs: Additional keyword arguments are passed to subprocess.check_output.
+
+    Returns:
+        str: The output from the command.
+
+    """
+    if _is_win:
+        args = ' '.join(args)
+        kwargs['shell'] = True
+    return subprocess.check_output(args, **kwargs).decode("utf-8")
+
+
 def call_script(lines):
     r"""Write lines to a script and call it.
 
