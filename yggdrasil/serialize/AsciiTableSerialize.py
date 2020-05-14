@@ -1,7 +1,6 @@
 from yggdrasil import units, serialize, tools
 from yggdrasil.serialize import _default_delimiter_str
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
-from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     definition2dtype, data2dtype)
 
