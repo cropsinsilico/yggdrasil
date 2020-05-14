@@ -1794,10 +1794,7 @@ class ArchiverBase(LinkerBase):
         for k in ['shared_library_flag']:
             setattr(cls, k, None)
         if platform._is_win:  # pragma: windows
-            if cls.is_gnu:
-                cls.library_ext = '.a'
-            else:
-                cls.library_ext = '.lib'
+            cls.library_ext = '.lib'
             cls.search_path_env = os.path.join('library', 'lib')
         else:
             cls.library_ext = '.a'
