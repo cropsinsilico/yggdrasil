@@ -88,8 +88,12 @@ def ygginfo():
         if args.verbose:
             # Conda info
             if os.environ.get('CONDA_PREFIX', ''):
-                out = tools.bytes2str(subprocess.check_output(
-                    ['conda', 'info'])).strip()
+                if platform._is_win:  # pragma: windows
+                    out = tools.bytes2str(subprocess.check_output(
+                        'conda info', shell=True)).strip()
+                else:
+                    out = tools.bytes2str(subprocess.check_output(
+                        ['conda', 'info'])).strip()
                 curr_prefix += prefix
                 vardict.append((curr_prefix + 'Conda Info:', "\n%s%s"
                                 % (curr_prefix + prefix,

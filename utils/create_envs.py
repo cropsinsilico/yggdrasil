@@ -1,7 +1,7 @@
 import os
 import argparse
-import subprocess
 from install_from_requirements import locate_conda_exe
+from ci_setup import call_conda_command
 _utils_dir = os.path.dirname(os.path.abspath(__file__))
 _pkg_dir = os.path.dirname(_utils_dir)
 
@@ -17,7 +17,7 @@ def conda_env_exists(name):
 
     """
     args = ['conda', 'info', '--envs']
-    out = subprocess.check_output(args).decode("utf-8")
+    out = call_conda_command(args)
     envs = []
     for x in out.splitlines():
         if x.startswith('#') or (not x):
@@ -46,7 +46,7 @@ def create_env(name, python='3.6', packages=None):
         packages.append('ipython')
     args = ['conda', 'create', '-y', '-n', name, 'python=%s' % python] + packages
     print('running', args)
-    print(subprocess.check_output(args).decode("utf-8"))
+    print(call_conda_command(args))
     assert(conda_env_exists(name))
 
 
@@ -77,19 +77,19 @@ def create_devenv(env_type, python='3.6', name=None, **kwargs):
         # environment
     elif env_type == 'pip':
         req_suffixes.append('_piponly')
-        print(subprocess.check_output(['conda', 'install', '-y', '--name', name,
-                                       'czmq', 'zeromq']).decode("utf-8"))
+        print(call_conda_command(['conda', 'install', '-y', '--name', name,
+                                  'czmq', 'zeromq']))
     req = [os.path.join(_pkg_dir, 'requirements%s.txt' % x)
            for x in req_suffixes]
     args = ([python_cmd, os.path.join(_utils_dir,
                                       'install_from_requirements.py'),
              '--conda-env', name, env_type] + req)
-    print(subprocess.check_output(args).decode("utf-8"))
+    print(call_conda_command(args))
     # This is not called directly because it needs to be invoked with the
     # version of Python installed in the target environment
     # install_from_requirements(env_type, req, conda_env=name)
-    print(subprocess.check_output([python_cmd, 'setup.py', 'develop'],
-                                  cwd=_pkg_dir).decode("utf-8"))
+    print(call_conda_command([python_cmd, 'setup.py', 'develop'],
+                             cwd=_pkg_dir))
     print("Created environment %s" % name)
     
 
