@@ -3,7 +3,7 @@ from pip._vendor.packaging.requirements import Requirement, InvalidRequirement
 import os
 import sys
 import argparse
-import subprocess
+from ci_setup import call_conda_command
 
 
 def prune(fname_in, fname_out=None, excl_suffix=None):
@@ -125,7 +125,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
             args = [pip_cmd, 'install', '-r', temp_file]
             if user:
                 args.append('--user')
-        print(subprocess.check_output(args).decode("utf-8"))
+        print(call_conda_command(args))
     except BaseException:
         if os.path.isfile(temp_file):
             with open(temp_file, 'r') as fd:
