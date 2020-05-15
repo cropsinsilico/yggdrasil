@@ -29,7 +29,7 @@ def merge_z(z1, z2):
 
 def split_z(z):
     r"""Split z into z1 and z2 variables."""
-    return (z/2.0, z/2.0)
+    return (z / 2.0, z / 2.0)
 
 
 def timestep_calc(t, model):
