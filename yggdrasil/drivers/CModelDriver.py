@@ -66,7 +66,7 @@ class CCompilerBase(CompilerBase):
     languages = ['c']
     default_executable_env = 'CC'
     default_flags_env = 'CFLAGS'
-    default_flags = ['-g', '-Wall']
+    default_flags = ['-g', '-Wall', '-v']
     # GCC & CLANG have similar call patterns
     linker_attributes = {'default_flags_env': 'LDFLAGS',
                          'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
