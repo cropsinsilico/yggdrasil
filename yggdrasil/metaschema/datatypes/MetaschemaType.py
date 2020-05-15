@@ -718,7 +718,8 @@ class MetaschemaType(object):
             if isinstance(metadata, dict) and metadata.get('type_in_data', False):
                 assert(msg.count(YGG_MSG_HEAD) == 1)
                 typedef, data = msg.split(YGG_MSG_HEAD, 1)
-                metadata.update(encoder.decode_json(typedef))
+                if len(typedef) > 0:
+                    metadata.update(encoder.decode_json(typedef))
                 metadata.pop('type_in_data')
                 metadata['size'] = len(data)
             elif metadata is not None:

@@ -1256,13 +1256,17 @@ int split_head_body(const char *buf, const size_t buf_siz,
 
 /*!
   @brief Format header to a string.
-  @param[in] head comm_head_t Header to be formatted.
+  @param[in] head comm_head_t* Pointer to header to be formatted.
   @param[out] buf char ** Pointer to buffer where header should be written.
   @param[in] buf_siz size_t Size of buf.
+  @param[in] max_header_size size_t Maximum size that header can occupy
+  before the type should be moved to the data portion of the message.
+  @param[in] int no_type If 1, type information will not be added to
+  the header. If 0, it will be.
   @returns: int Size of header written.
 */
-int format_comm_header(comm_head_t head, char **buf, size_t buf_siz,
-		       const size_t max_header_size);
+int format_comm_header(comm_head_t *head, char **buf, size_t buf_siz,
+		       const size_t max_header_size, const int no_type);
 
 
 /*!

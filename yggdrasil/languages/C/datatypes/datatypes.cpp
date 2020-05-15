@@ -461,12 +461,13 @@ MetaschemaType* dtype2class(const dtype_t* dtype) {
 
 
 rapidjson::StringBuffer format_comm_header_json(const comm_head_t head,
+						const int no_type,
 						const bool type_only=false) {
   rapidjson::StringBuffer head_buf;
   rapidjson::Writer<rapidjson::StringBuffer> head_writer(head_buf);
   head_writer.StartObject();
   // Type
-  if (!(head.type_in_data)) {
+  if ((!(head.type_in_data)) && (!(no_type))) {
     if (head.dtype != NULL) {
       head_writer.Key("datatype");
       head_writer.StartObject();
@@ -2801,11 +2802,11 @@ extern "C" {
       return NULL;
     }
   }
-  int format_comm_header(comm_head_t head, char **buf, size_t buf_siz,
-			 const size_t max_header_size) {
+  int format_comm_header(comm_head_t* head, char **buf, size_t buf_siz,
+			 const size_t max_header_size, const int no_type) {
     try {
       // JSON Serialization
-      rapidjson::StringBuffer head_buf = format_comm_header_json(head);
+      rapidjson::StringBuffer head_buf = format_comm_header_json(*head, no_type);
       rapidjson::StringBuffer type_buf;
       // Check size
       int ret;
@@ -2815,10 +2816,10 @@ extern "C" {
       ret = snprintf(*buf, 0, "%s%s%s", MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
 #endif
       if (ret > max_header_size) {
-	type_buf = format_comm_header_json(head, true);
-	head.type_in_data = 1;
-	head.size = head.size + strlen(MSG_HEAD_SEP) + strlen(type_buf.GetString());
-	head_buf = format_comm_header_json(head);
+	type_buf = format_comm_header_json(*head, no_type, true);
+	head->type_in_data = 1;
+	head->size = head->size + strlen(MSG_HEAD_SEP) + strlen(type_buf.GetString());
+	head_buf = format_comm_header_json(*head, no_type);
 #ifdef _WIN32
 	ret = _scprintf("%s%s%s%s%s", MSG_HEAD_SEP,
 			head_buf.GetString(), MSG_HEAD_SEP,
@@ -2835,7 +2836,7 @@ extern "C" {
 	buf[0] = (char*)realloc(buf[0], buf_siz);
       }
       // Format
-      if (head.type_in_data) {
+      if (head->type_in_data) {
 	ret = snprintf(*buf, buf_siz, "%s%s%s%s%s", MSG_HEAD_SEP,
 		       head_buf.GetString(), MSG_HEAD_SEP,
 		       type_buf.GetString(), MSG_HEAD_SEP);
