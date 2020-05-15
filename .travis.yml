@@ -130,7 +130,9 @@ before_install:
     # Activate environment
     if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
       source activate test-environment
-      export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+      if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+        export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+      fi
     fi
     if [[ -n "$YGG_PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then
       source venv/bin/activate
