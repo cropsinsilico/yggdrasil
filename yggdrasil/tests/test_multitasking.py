@@ -1,5 +1,5 @@
 import pickle
-from yggdrasil import multitasking
+from yggdrasil import multitasking, tools
 from yggdrasil.tests import assert_raises
 from yggdrasil.tests.test_tools import YggTestClass
 
@@ -149,8 +149,13 @@ class TestYggTask(YggTestClass):
         self.namespace = 'TESTING_%s' % self.uuid
         self.attr_list += ['name', 'sleeptime', 'longsleep', 'timeout']
         self._inst_kwargs = {'timeout': self.timeout,
-                             'sleeptime': self.sleeptime}
+                             'sleeptime': self.sleeptime,
+                             'target': self.target}
         self.debug_flag = False
+
+    @staticmethod
+    def target(cls):
+        tools.sleep(10.0)
 
     def test_id(self):
         r"""Test process ID and ident."""
@@ -171,6 +176,8 @@ class TestYggTask(YggTestClass):
 
     def test_kill(self):
         r"""Test kill."""
+        if self._inst_kwargs.get('task_method', None) == 'process':
+            self.instance.start()
         self.instance.kill()
 
     def test_flag_manipulation(self):
@@ -186,7 +193,7 @@ class TestYggProcess(TestYggTask):
 
     def __init__(self, *args, **kwargs):
         super(TestYggProcess, self).__init__(*args, **kwargs)
-        self._inst_kwargs['method'] = 'process'
+        self._inst_kwargs['task_method'] = 'process'
 
 
 class TestYggProcessFork(TestYggProcess):

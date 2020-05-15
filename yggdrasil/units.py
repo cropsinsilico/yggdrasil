@@ -69,7 +69,7 @@ def convert_from_pandas_timedelta(x):
     return add_units(x.total_seconds(), 's')
 
 
-def convert_matlab_unit_string(m_str):
+def convert_matlab_unit_string(m_str):  # pragma: matlab
     r"""Convert Matlab unit string to string that the Python package
     can understand.
 

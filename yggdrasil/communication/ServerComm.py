@@ -189,20 +189,16 @@ class ServerComm(CommBase.CommBase):
         if client_model and (client_model not in self.clients):
             self.clients.append(client_model)
 
-    def remove_response_comm(self, request_id=None):
+    def remove_response_comm(self, request_id):
         r"""Remove response comm.
 
         Args:
-            request_id (str, optional): The ID used to register the
-                response comm that should be removed. Defaults to None
-                and the first comm added to the registry will be removed.
+            request_id (str): The ID used to register the response
+                comm that should be removed.
 
         """
         # self.icomm._last_header = None
-        if request_id is None:
-            (request_id, ocomm) = self.ocomm.popitem(last=False)
-        else:
-            ocomm = self.ocomm.pop(request_id, None)
+        ocomm = self.ocomm.pop(request_id, None)
         if ocomm is not None:
             ocomm.close_in_thread(no_wait=True)
             self._used_response_comms[ocomm.name] = ocomm

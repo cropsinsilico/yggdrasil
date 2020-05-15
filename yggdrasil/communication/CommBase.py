@@ -414,7 +414,7 @@ class CommBase(tools.YggClass):
         if isinstance(kwargs.get('datatype', None), MetaschemaType):
             self.datatype = kwargs.pop('datatype')
         super(CommBase, self).__init__(name, **kwargs)
-        if not self.__class__.is_installed(language='python'):
+        if not self.__class__.is_installed(language='python'):  # pragma: debug
             raise RuntimeError("Comm class %s not installed" % self.__class__)
         suffix = determine_suffix(no_suffix=no_suffix,
                                   reverse_names=reverse_names,
