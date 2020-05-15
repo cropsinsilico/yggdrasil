@@ -42,6 +42,7 @@ In the example below, these parameters are used to modify how the state variable
 
 * Model A has state variables ``x`` and ``y`` while Model B has state variables ``xvar`` and ``yvar`` (set in the yaml)
 * ``xvar`` in Model B is equal to half of ``x`` in Model A
+* Model A has state variables ``z1`` and ``z2`` which can be used to calculate ``z``, a state variable calculated directly by Model B.
 * Model A alone calculates state variable ``a``, while model B alone calculates state variable ``b``. The models need to exchange these variables.
 
 .. include:: examples/timesync2_yml.rst
@@ -55,7 +56,7 @@ Synonyms (Conversion)
 
 It is unlikely that variables will match perfectly between models, beit in name or definition. For example, in the model defined above, model A and B use different names to describe the same variable (``y`` and ``yvar`` respectively). Similarly the variables ``x`` and ``xvar`` used by models A and B respectively are analagous, but ``xvar`` is defined slightly differently (namely ``xvar=x/2``).
 
-To handle reconcilation between analagous variables, |yggdrasil| allows users to define relationships between variables in different models using the ``synonyms`` parameter. The value for the ``synonyms`` parameter should be a mapping between model names and mapping from base variable names (these should be variables named by one or more models) and the analogous variable that the model uses. If the model just uses a different name for the same concept as the base, this can be just a string (e.g. the ``synonyms`` entry for ``y`` in ``modelB`` above). If additional calculations are required to convert between the variables used in the models, a mapping can be provided (e.g. the ``synonyms`` entry for ``x`` in ``modelB``). The keys in the entry should be:
+To handle reconcilation between analagous variables, |yggdrasil| allows users to define relationships between variables in different models using the ``synonyms`` parameter. The value for the ``synonyms`` parameter should be a mapping between model names and mapping from base variable names (these should be variables named by one or more models) and the analogous variable that the model uses. If the model just uses a different name for the same concept as the base, this can be just a string (e.g. the ``synonyms`` entry for ``y`` in ``modelB`` above). If additional calculations are required to convert between the variables used in the models, a mapping can be provided (e.g. the ``synonyms`` entry for ``x`` in ``modelB``). In addition, calculation mapping from one model to another can also involve more than one variable (e.g. the ``synonyms`` entry for ``z`` in ``modelA``). The keys in the entry should be:
 
 * ``alt``: One or more state variables used by the model to calculate the base state variable.
 * ``alt2base``: Function for converting from the state variable(s) used by the model to the base variable.
@@ -92,8 +93,8 @@ In addition to dictionaries mapping from variable to method, a single value can 
       modelB:
         x:
 	  alt: xvar
-	  alt2base: timesync:xvar2x
-	  base2alt: timesync:x2xvar
+	  alt2base: ./src/timesync.py:xvar2x
+	  base2alt: ./src/timesync.py:x2xvar
         y: yvar
     interpolation: nearest
     aggregation: min
