@@ -5,11 +5,11 @@
 
 
 int timestep_calc(double t, const char* t_units, generic_t state,
-		  const char* xname, const char* yname, const char* zname) {
+		  const char* model) {
   double x_period = 10.0; // Days
   double y_period = 5.0;  // Days
-  double z_period = 2.5;  // Days
-  double x, y, z;
+  double z_period = 20.0; // Days
+  double o_period = 2.5;  // Days
   int ret = 0;
   if (strcmp(t_units, "day") == 0) {
     // No conversion necessary
@@ -17,26 +17,42 @@ int timestep_calc(double t, const char* t_units, generic_t state,
     x_period = x_period * 24.0;
     y_period = y_period * 24.0;
     z_period = z_period * 24.0;
+    o_period = o_period * 24.0;
   } else {
     printf("timestep_calc: Unsupported unit '%s'\n", t_units);
     ret = -1;
   }
   if (ret >= 0) {
-    x = sin(2.0 * M_PI * t / x_period);
-    y = cos(2.0 * M_PI * t / y_period);
-    if (strcmp(xname, "xvar") == 0) {
-      x = x / 2.0;
-    }
-    ret = generic_map_set_double(state, xname, x, "");
-    ret = generic_map_set_double(state, yname, y, "");
-  }
-  if (ret >= 0) {
-    if (strcmp(zname, "a") == 0) {
-      z = sin(2.0 * M_PI * t / z_period);
+    if (strcmp(model, "A") == 0) {
+      ret = generic_map_set_double(state, "x",
+				   sin(2.0 * M_PI * t / x_period),
+				   "");
+      ret = generic_map_set_double(state, "y",
+				   cos(2.0 * M_PI * t / y_period),
+				   "");
+      ret = generic_map_set_double(state, "z1",
+				   -cos(2.0 * M_PI * t / z_period),
+				   "");
+      ret = generic_map_set_double(state, "z2",
+				   -cos(2.0 * M_PI * t / z_period),
+				   "");
+      ret = generic_map_set_double(state, "a",
+				   sin(2.0 * M_PI * t / o_period),
+				   "");
     } else {
-      z = cos(2.0 * M_PI * t / z_period);
+      ret = generic_map_set_double(state, "xvar",
+				   sin(2.0 * M_PI * t / x_period) / 2.0,
+				   "");
+      ret = generic_map_set_double(state, "yvar",
+				   cos(2.0 * M_PI * t / y_period),
+				   "");
+      ret = generic_map_set_double(state, "z",
+				   -2.0 * cos(2.0 * M_PI * t / z_period),
+				   "");
+      ret = generic_map_set_double(state, "b",
+				   cos(2.0 * M_PI * t / o_period),
+				   "");
     }
-    ret = generic_map_set_double(state, zname, z, "");
   }
   return ret;
 }
@@ -47,9 +63,6 @@ int main(int argc, char *argv[]) {
   double t_step = atof(argv[1]);
   char* t_units = argv[2];
   char* model = argv[3];
-  char* xname;
-  char* yname;
-  char* zname;
   int exit_code = 0;
   printf("Hello from C++ timesync: timestep %f %s\n", t_step, t_units);
   double t_start = 0.0;
@@ -59,19 +72,10 @@ int main(int argc, char *argv[]) {
   if (strcmp(t_units, "hr") == 0) {
     t_end = 24.0 * t_end;
   }
-  if (strcmp(model, "A") == 0) {
-    xname = "x";
-    yname = "y";
-    zname = "a";
-  } else {
-    xname = "xvar";
-    yname = "yvar";
-    zname = "b";
-  }
   int ret;
   generic_t state_send = init_generic_map();
   generic_t state_recv = init_generic_map();
-  ret = timestep_calc(t_start, t_units, state_send, xname, yname, zname);
+  ret = timestep_calc(t_start, t_units, state_send, model);
   if (ret < 0) {
     printf("timesync(C++): Error in initial timestep calculation.");
     return -1;
@@ -117,7 +121,7 @@ int main(int argc, char *argv[]) {
 
     // Perform calculations to update the state
     t = t + t_step;
-    ret = timestep_calc(t, t_units, state_send, xname, yname, zname);
+    ret = timestep_calc(t, t_units, state_send, model);
     if (ret < 0) {
       printf("timesync(C++): Error in timestep calculation for t = %f.\n", t);
       return -1;

@@ -1,17 +1,19 @@
 library(yggdrasil)
 
 
-timestep_calc <- function(t, xname, yname, zname) {
+timestep_calc <- function(t, model) {
   state = list()
-  state[[xname]] = sinpi(2.0 * t / units::set_units(10.0, 'day', mode="standard"))
-  state[[yname]] = cospi(2.0 * t / units::set_units(5.0, 'day', mode="standard"))
-  if (xname == 'xvar') {
-    state[[xname]] = state[[xname]] / 2.0
-  }
-  if (zname == 'a') {
-    state[[zname]] = sinpi(2.0 * t / units::set_units(2.5, 'day', model="standard"))
+  if (model == 'A') {
+    state[['x']] = sinpi(2.0 * t / units::set_units(10.0, 'day', mode="standard"))
+    state[['y']] = cospi(2.0 * t / units::set_units(5.0, 'day', mode="standard"))
+    state[['z1']] = -cospi(2.0 * t / units::set_units(20.0, 'day', mode="standard"))
+    state[['z2']] = -cospi(2.0 * t / units::set_units(20.0, 'day', mode="standard"))
+    state[['a']] = sinpi(2.0 * t / units::set_units(2.5, 'day', model="standard"))
   } else {
-    state[[zname]] = cospi(2.0 * t / units::set_units(2.5, 'day', model="standard"))
+    state[['xvar']] = sinpi(2.0 * t / units::set_units(10.0, 'day', mode="standard")) / 2.0
+    state[['yvar']] = cospi(2.0 * t / units::set_units(5.0, 'day', mode="standard"))
+    state[['z']] = -2.0 * cospi(2.0 * t / units::set_units(20.0, 'day', mode="standard"))
+    state[['b']] = cospi(2.0 * t / units::set_units(2.5, 'day', model="standard"))
   }
   return(state)
 }
@@ -22,16 +24,7 @@ main <- function(t_step, t_units, model) {
   t_step <- units::set_units(t_step, t_units, mode="standard")
   t_start <- units::set_units(0.0, t_units, mode="standard")
   t_end <- units::set_units(5.0, 'day', mode="standard")
-  if (model == 'A') {
-    xname = 'x'
-    yname = 'y'
-    zname = 'a'
-  } else {
-    xname = 'xvar'
-    yname = 'yvar'
-    zname = 'b'
-  }
-  state <- timestep_calc(t_start, xname, yname, zname)
+  state <- timestep_calc(t_start, model)
 
   # Set up connections matching yaml
   # Timestep synchronization connection will be 'statesync'
@@ -65,7 +58,7 @@ main <- function(t_step, t_units, model) {
         
     # Perform calculations to update the state
     t <- t + t_step
-    state <- timestep_calc(t, xname, yname, zname)
+    state <- timestep_calc(t, model)
 
     # Synchronize the state
     c(ret, result) %<-% timesync$call(t, state)

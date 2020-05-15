@@ -22,32 +22,44 @@ def xagg(series):
     return max(series, key=abs)
 
 
-def timestep_calc(t, xname, yname, zname):
+def merge_z(z1, z2):
+    r"""Merge the z1 and z2 variables."""
+    return z1 + z2
+
+
+def split_z(z):
+    r"""Split z into z1 and z2 variables."""
+    return (z/2.0, z/2.0)
+
+
+def timestep_calc(t, model):
     r"""Updates the state based on the time where x is a sine wave
     with period of 10 days and y is a cosine wave with a period of 5 days.
-    If zname is 'a', the third state variable will be a sine with a
-    period of 2.5 days. If zname is 'b', the third state variable will
-    be a cosine with a period of 2.5 days.
+    If model is 'A', the forth state variable will be 'a', a sine
+    with a period of 2.5 days. If model is 'B', the forth state
+    variable will be 'b', a cosine with a period of 2.5 days.
 
     Args:
         t (float): Current time.
-        xname (str): Name of x state variable.
-        yname (str): Name of y state variable.
-        zname (str): Name of third, model-specific, state variable.
+        model (str): Identifier for the model (A or B).
 
     Returns:
         dict: Map of state parameters.
 
     """
-    state = {
-        xname: np.sin(2.0 * np.pi * t / units.add_units(10, 'day')),
-        yname: np.cos(2.0 * np.pi * t / units.add_units(5, 'day'))}
-    if xname == 'xvar':
-        state[xname] = x2xvar(state[xname])
-    if zname == 'a':
-        state[zname] = np.sin(2.0 * np.pi * t / units.add_units(2.5, 'day'))
+    if model == 'A':
+        state = {
+            'x': np.sin(2.0 * np.pi * t / units.add_units(10, 'day')),
+            'y': np.cos(2.0 * np.pi * t / units.add_units(5, 'day')),
+            'z1': -np.cos(2.0 * np.pi * t / units.add_units(20, 'day')),
+            'z2': -np.cos(2.0 * np.pi * t / units.add_units(20, 'day')),
+            'a': np.sin(2.0 * np.pi * t / units.add_units(2.5, 'day'))}
     else:
-        state[zname] = np.cos(2.0 * np.pi * t / units.add_units(2.5, 'day'))
+        state = {
+            'xvar': x2xvar(np.sin(2.0 * np.pi * t / units.add_units(10, 'day'))),
+            'yvar': np.cos(2.0 * np.pi * t / units.add_units(5, 'day')),
+            'z': -2.0 * np.cos(2.0 * np.pi * t / units.add_units(20, 'day')),
+            'b': np.cos(2.0 * np.pi * t / units.add_units(2.5, 'day'))}
     return state
 
 
@@ -64,15 +76,7 @@ def main(t_step, t_units, model):
     t_step = units.add_units(t_step, t_units)
     t_start = units.add_units(0.0, t_units)
     t_end = units.add_units(5.0, 'day')
-    if model == 'A':
-        xname = 'x'
-        yname = 'y'
-        zname = 'a'
-    else:
-        xname = 'xvar'
-        yname = 'yvar'
-        zname = 'b'
-    state = timestep_calc(t_start, xname, yname, zname)
+    state = timestep_calc(t_start, model)
 
     # Set up connections matching yaml
     # Timestep synchronization connection will be 'statesync'
@@ -101,7 +105,7 @@ def main(t_step, t_units, model):
 
         # Perform calculations to update the state
         t = t + t_step
-        state = timestep_calc(t, xname, yname, zname)
+        state = timestep_calc(t, model)
 
         # Synchronize the state
         ret, result = timesync.call(t, state)

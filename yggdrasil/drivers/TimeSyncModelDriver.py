@@ -231,12 +231,14 @@ class TimeSyncModelDriver(DSLModelDriver):
                       tables, table_units, table_lock,
                       synonyms, interpolation, aggregation))
             threads[request_id].start()
-        # Cleanup threads
+        # Cleanup threads (only called if there is an error since the
+        # loop will only be broken when all of the clients have signed
+        # off, implying that all requests have been responded to).
         for v in threads.values():
-            if v.is_alive():
+            if v.is_alive():  # pragma: debug
                 v.wait(0.5)
         for v in threads.values():
-            if v.is_alive():
+            if v.is_alive():  # pragma: debug
                 v.terminate()
 
     @classmethod
@@ -320,7 +322,7 @@ class TimeSyncModelDriver(DSLModelDriver):
         for kbase, alt in synonyms.get(client_model, {}).items():
             if alt['base2alt'] is not None:
                 alt_vars = alt['base2alt'](tot[kbase])
-                if isinstance(alt_vars, tuple):
+                if isinstance(alt_vars, (tuple, list)):
                     assert(len(alt_vars) == len(alt['alt']))
                     for k, v in zip(alt['alt'], alt_vars):
                         tot[k] = v
@@ -337,7 +339,7 @@ class TimeSyncModelDriver(DSLModelDriver):
         time_u = units.convert_to(units.convert_from_pandas_timedelta(time),
                                   table_units[client_model]['time'])
         flag = rpc.send_to(request_id, state)
-        if not flag:
+        if not flag:  # pragma: debug
             raise RuntimeError(("Failed to send response to "
                                 "request %s for time %s from "
                                 "model %s.")
@@ -410,8 +412,6 @@ class TimeSyncModelDriver(DSLModelDriver):
                 v = v.drop(k, axis=1)
             # Units
             for k in v.columns:
-                if k == 'time':
-                    continue
                 funits = units.get_conversion_function(table_units[model][k],
                                                        table_units['base'][k])
                 v[k] = v[k].apply(funits)

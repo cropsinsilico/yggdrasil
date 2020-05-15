@@ -10,8 +10,9 @@ def main(fileA, fileB, example_name):
     if example_name == 'timesync2':
         figsize = (10.8, 4.8)
         fig = plt.figure(figsize=figsize)
-        ax1 = fig.add_subplot(1, 2, 1)
-        ax2 = fig.add_subplot(1, 2, 2, sharey=ax1)
+        ax1 = fig.add_subplot(2, 2, 1)
+        ax2 = fig.add_subplot(2, 2, 2, sharey=ax1)
+        ax3 = fig.add_subplot(2, 2, 3, sharex=ax1)
     else:
         figsize = None
         fig = plt.figure(figsize=figsize)
@@ -22,6 +23,7 @@ def main(fileA, fileB, example_name):
                            as_array=True).recv_dict()[1]
     xtrue = np.sin(2.0 * np.pi * dataA['time'] / units.add_units(10, 'day'))
     ytrue = np.cos(2.0 * np.pi * dataA['time'] / units.add_units(5, 'day'))
+    ztrue = -np.cos(2.0 * np.pi * dataA['time'] / units.add_units(20, 'day'))
     atrue = np.sin(2.0 * np.pi * dataA['time'] / units.add_units(2.5, 'day'))
     btrue = np.cos(2.0 * np.pi * dataA['time'] / units.add_units(2.5, 'day'))
     if example_name == 'timesync2':
@@ -40,16 +42,22 @@ def main(fileA, fileB, example_name):
     ax1.set_ylabel('State Value')
     ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2)
     if example_name == 'timesync2':
-        ax2.plot(dataA['time'], atrue, 'k')
-        ax2.plot(dataA['time'], btrue, 'k')
-        ax2.plot(dataA['time'], dataA['a'], 'c-', label='a (model A)')
-        ax2.plot(dataA['time'], dataA['b'], 'm-', label='b (model A)')
-        ax2.plot(dataB['time'].to(dataA['time'].units), dataB['a'],
-                 'c--', label='a (model B)')
-        ax2.plot(dataB['time'].to(dataA['time'].units), dataB['b'],
-                 'm--', label='b (model B)')
+        ax2.plot(dataA['time'], ztrue, 'k')
+        ax2.plot(dataA['time'], dataA['z1'], 'o-', label='z1 (model A)')
+        ax2.plot(dataA['time'], dataA['z2'], 'o-', label='z2 (model A)')
+        ax2.plot(dataB['time'].to(dataA['time'].units), dataB['z'],
+                 'o--', label='z (model B)')
         ax2.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2)
-        plt.subplots_adjust(left=0.075, right=0.95, wspace=0.1)
+        ax3.plot(dataA['time'], atrue, 'k')
+        ax3.plot(dataA['time'], btrue, 'k')
+        ax3.plot(dataA['time'], dataA['a'], 'c-', label='a (model A)')
+        ax3.plot(dataA['time'], dataA['b'], 'm-', label='b (model A)')
+        ax3.plot(dataB['time'].to(dataA['time'].units), dataB['a'],
+                 'c--', label='a (model B)')
+        ax3.plot(dataB['time'].to(dataA['time'].units), dataB['b'],
+                 'm--', label='b (model B)')
+        ax3.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2)
+        plt.subplots_adjust(left=0.075, right=0.95, wspace=0.1, hspace=0.45)
     plt.show()
 
 
