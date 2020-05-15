@@ -9,7 +9,7 @@ import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, tools
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase, ArchiverBase)
+    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase)
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     _valid_types)
 from yggdrasil.languages import get_language_dir
@@ -66,7 +66,7 @@ class CCompilerBase(CompilerBase):
     languages = ['c']
     default_executable_env = 'CC'
     default_flags_env = 'CFLAGS'
-    default_flags = ['-g', '-Wall', '-v']
+    default_flags = ['-g', '-Wall']
     # GCC & CLANG have similar call patterns
     linker_attributes = {'default_flags_env': 'LDFLAGS',
                          'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
@@ -147,6 +147,34 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
+    linker_attributes = dict(GCCCompiler.linker_attributes,
+                             flag_options=OrderedDict(
+                                 list(GCCCompiler.linker_attributes.get(
+                                     'flag_options', {}).items())
+                                 + list(LinkerBase.flag_options.items())
+                                 + [('linker-version',
+                                     '-mlinker-version=%s')]))
+
+    @classmethod
+    def call(cls, *args, **kwargs):
+        r"""Call the compiler."""
+        if not (kwargs.get('skip_flags', False)
+                or kwargs.get('dont_link', False)
+                or (kwargs.get('libtype', None) in ['object', 'static'])):
+            # Handle case where clang (10.0.0) is trying to pass
+            # -platform_version to a version of ld64 that dosn't support
+            # it (<520).
+            # https://bugs.llvm.org/show_bug.cgi?id=44813
+            # https://reviews.llvm.org/D71579
+            # https://reviews.llvm.org/D74784
+            out = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
+            regex = r'clang version (?P<version>\d+)\.\d+\.\d+'
+            match = re.search(regex, out)
+            if (match is not None) and (int(match.group('version')) >= 10):
+                ld_version = LDLinker.tool_version()
+                if float(ld_version) < 520:
+                    kwargs['linker-version'] = ld_version
+        return super(ClangCompiler, cls).call(*args, **kwargs)
 
 
 class MSVCCompiler(CCompilerBase):
@@ -191,14 +219,14 @@ class MSVCCompiler(CCompilerBase):
                              search_path_flags=None)
     
     @classmethod
-    def language_version(cls, **kwargs):  # pragma: windows
-        r"""Determine the version of this language.
+    def tool_version(cls, **kwargs):  # pragma: windows
+        r"""Determine the version of this tool.
 
         Args:
             **kwargs: Keyword arguments are passed to cls.call.
 
         Returns:
-            str: Version of compiler/interpreter for this language.
+            str: Version of the tool.
 
         """
         out = cls.call(cls.version_flags, skip_flags=True,
@@ -207,7 +235,38 @@ class MSVCCompiler(CCompilerBase):
             raise RuntimeError("Version call failed: %s" % out)
         return out.split('Copyright')[0]
 
-    
+
+# C Linkers
+class LDLinker(LinkerBase):
+    r"""Linker class for ld tool."""
+    toolname = 'ld'
+    languages = ['c', 'c++', 'fortran']
+    version_flags = ['-v']
+
+    @classmethod
+    def tool_version(cls, **kwargs):
+        r"""Determine the version of this tool.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.call.
+
+        Returns:
+            str: Version of the tool.
+
+        """
+        out = cls.call(cls.version_flags, skip_flags=True,
+                       allow_error=True, **kwargs)
+        if platform._is_mac:
+            regex = r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)'
+        else:
+            regex = (r'GNU ld \(GNU Binutils for (?P<os>.+)\) '
+                     r'(?P<version>\d+(?:\.\d+){0,2})')
+        match = re.search(regex, out)
+        if match is None:  # pragma: debug
+            raise RuntimeError("Could not locate version in string: %s" % out)
+        return match.group('version')
+
+
 # C Archivers
 class ARArchiver(ArchiverBase):
     r"""Archiver class for ar tool."""
