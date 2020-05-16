@@ -82,7 +82,7 @@ class MakeCompiler(BuildToolBase):
             cls.linker_attributes['executable_ext'] = '.exe'
 
     @classmethod
-    def language_version(cls, **kwargs):
+    def tool_version(cls, **kwargs):
         r"""Determine the version of this language.
 
         Args:
