@@ -219,7 +219,7 @@ class LDLinker(LinkerBase):
     # Languages disabled for ld by default to prevent it being
     # selected instead of the default which seems to be happening
     # on the CI
-    languages = []  # ['c', 'c++', 'fortran']
+    languages = ['c']  # ['c', 'c++', 'fortran']
     default_executable_env = 'LD'
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
