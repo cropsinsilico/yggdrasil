@@ -57,6 +57,16 @@ def test_parse_component_error():
                   {}, 'invalid', 'invalid')
 
 
+@flaky.flaky(max_runs=3)
+def test_load_yaml_git():
+    r"""Test loading a yaml from a remote git repository."""
+    yml = "https://github.com/cropsinsilico/example-fakemodel/fakemodel.yml"
+    assert_raises(Exception, yamlfile.load_yaml, yml)
+    assert('model' in yamlfile.load_yaml('git:' + yml))
+    yml = "cropsinsilico/example-fakemodel/fakemodel.yml"
+    assert('model' in yamlfile.load_yaml('git:' + yml))
+    
+
 class YamlTestBase(YggTestClass):
     r"""Test base for yamlfile."""
     _contents = tuple()
@@ -137,14 +147,6 @@ class YamlTestBase(YggTestClass):
             yamlfile.parse_yaml(self.files[0])
         else:
             yamlfile.parse_yaml(self.files)
-
-    @flaky.flaky(max_runs=3)
-    def test_load_yaml_git(self):
-        yml = "https://github.com/cropsinsilico/example-fakemodel/fakemodel.yml"
-        self.assertRaises(Exception, yamlfile.load_yaml, yml)
-        self.assertTrue('model' in yamlfile.load_yaml('git:' + yml))
-        yml = "cropsinsilico/example-fakemodel/fakemodel.yml"
-        self.assertTrue('model' in yamlfile.load_yaml('git:' + yml))
 
 
 class YamlTestBaseError(YamlTestBase):
