@@ -59,30 +59,6 @@ class ClangPPLinker(ClangLinker):
     toolname = 'clang++'
     default_executable_env = ClangCompiler.default_executable_env
     languages = ['c++']
-    cpp_std = 'c++11'
-    
-    @classmethod
-    def get_flags(cls, **kwargs):
-        r"""Get a list of compiler flags.
-
-        Args:
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
-
-        Returns:
-            list: Compiler flags.
-
-        """
-        out = super(ClangPPLinker, cls).get_flags(**kwargs)
-        # Add standard library flag
-        std_flag = None
-        for i, a in enumerate(out):
-            if a.startswith('-std='):
-                std_flag = i
-                break
-        if std_flag is None:
-            out.append('-std=%s' % cls.cpp_std)
-        return out
 
 
 class CPPModelDriver(CModelDriver):

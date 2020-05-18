@@ -1236,8 +1236,8 @@ class ModelDriver(Driver):
         self.wait_process(self.timeout, key_suffix='.graceful_stop')
         super(ModelDriver, self).graceful_stop()
 
-    def cleanup(self):
-        r"""Remove compile executable."""
+    def cleanup_products(self):
+        r"""Remove products created in order to run the model."""
         if self.overwrite:
             self.remove_products()
         if ((self.function and isinstance(self.model_src, str)
@@ -1245,6 +1245,10 @@ class ModelDriver(Driver):
             assert(os.path.basename(self.model_src).startswith('ygg_'))
             os.remove(self.model_src)
         self.restore_files()
+
+    def cleanup(self):
+        r"""Remove compile executable."""
+        self.cleanup_products()
         super(ModelDriver, self).cleanup()
 
     def restore_files(self):

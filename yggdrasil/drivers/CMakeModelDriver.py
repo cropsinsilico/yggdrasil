@@ -457,6 +457,9 @@ class CMakeConfigure(BuildToolBase):
                 preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
             elif os.path.isfile(x):
                 library_flags.append(x)
+            elif x.startswith('-mlinker-version='):
+                preamble_lines.insert(0, 'target_link_options(%s PRIVATE %s)'
+                                      % (target, x))
             elif x.startswith('-') or x.startswith('/'):
                 raise ValueError("Could not parse linker flag '%s'." % x)
             else:
@@ -484,8 +487,6 @@ class CMakeConfigure(BuildToolBase):
                     lines.append('    ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
                 lines += ['    SET_TARGET_PROPERTIES(',
                           '        %s PROPERTIES' % xl,
-                          # '        LINKER_LANGUAGE CXX',
-                          # '        CXX_STANDARD 11',
                           '        IMPORTED_LOCATION %s)' % x,
                           'endif()',
                           'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
