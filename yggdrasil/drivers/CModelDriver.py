@@ -137,9 +137,10 @@ class GCCCompiler(CCompilerBase):
 
 
 class ClangCompiler(CCompilerBase):
-    r"""clang compiler on Apple Mac OS."""
+    r"""Interface class for clang compiler/linker."""
     toolname = 'clang'
-    platforms = ['MacOS']
+    platforms = ['MacOS', 'Linux', 'Windows']
+    default_linker = 'clang'
     default_archiver = 'libtool'
     flag_options = OrderedDict(list(CCompilerBase.flag_options.items())
                                + [('sysroot', '--sysroot'),
@@ -147,34 +148,9 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
-    linker_attributes = dict(GCCCompiler.linker_attributes,
-                             flag_options=OrderedDict(
-                                 list(GCCCompiler.linker_attributes.get(
-                                     'flag_options', {}).items())
-                                 + list(LinkerBase.flag_options.items())
-                                 + [('linker-version',
-                                     '-mlinker-version=%s')]))
-
-    @classmethod
-    def call(cls, *args, **kwargs):
-        r"""Call the compiler."""
-        if not (kwargs.get('skip_flags', False)
-                or kwargs.get('dont_link', False)
-                or (kwargs.get('libtype', None) in ['object', 'static'])):
-            # Handle case where clang (10.0.0) is trying to pass
-            # -platform_version to a version of ld64 that dosn't support
-            # it (<520).
-            # https://bugs.llvm.org/show_bug.cgi?id=44813
-            # https://reviews.llvm.org/D71579
-            # https://reviews.llvm.org/D74784
-            out = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
-            regex = r'clang version (?P<version>\d+)\.\d+\.\d+'
-            match = re.search(regex, out)
-            if (match is not None) and (int(match.group('version')) >= 10):
-                ld_version = LDLinker.tool_version()
-                if float(ld_version) < 520:
-                    kwargs['linker-version'] = ld_version
-        return super(ClangCompiler, cls).call(*args, **kwargs)
+    # Set to False since ClangLinker has its own class to handle
+    # conflict between versions of clang and ld.
+    is_linker = False
 
 
 class MSVCCompiler(CCompilerBase):
@@ -241,7 +217,10 @@ class LDLinker(LinkerBase):
     r"""Linker class for ld tool."""
     toolname = 'ld'
     languages = ['c', 'c++', 'fortran']
+    default_executable_env = 'LD'
+    default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
+    search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
 
     @classmethod
     def tool_version(cls, **kwargs):
@@ -265,6 +244,39 @@ class LDLinker(LinkerBase):
         if match is None:  # pragma: debug
             raise RuntimeError("Could not locate version in string: %s" % out)
         return match.group('version')
+
+
+class ClangLinker(LDLinker):
+    r"""Interface class for clang linker (calls to ld)."""
+    toolname = 'clang'
+    default_executable_env = ClangCompiler.default_executable_env
+    platforms = ClangCompiler.platforms
+    search_path_flags = ['-Xlinker', '-v']
+    search_regex = [r'\t([^\t\n]+)\n']
+    search_regex_begin = 'Library search paths:'
+    flag_options = OrderedDict(LDLinker.flag_options,
+                               **{'linker-version': '-mlinker-version=%s'})
+
+    @classmethod
+    def get_flags(cls, *args, **kwargs):
+        r"""Get a list of linker flags."""
+        # Handle case where clang (10.0.0) is trying to pass
+        # -platform_version to a version of ld64 that dosn't support
+        # it (<520).
+        # https://bugs.llvm.org/show_bug.cgi?id=44813
+        # https://reviews.llvm.org/D71579
+        # https://reviews.llvm.org/D74784
+        out = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
+        regex = r'clang version (?P<version>\d+)\.\d+\.\d+'
+        match = re.search(regex, out)
+        if (match is not None) and (int(match.group('version')) >= 10):
+            ld_version = LDLinker.tool_version()
+            if float(ld_version) < 520:
+                kwargs['linker-version'] = ld_version
+        out = super(ClangLinker, cls).get_flags(*args, **kwargs)
+        if '-lstdc++' not in out:
+            out.append('-lstdc++')
+        return out
 
 
 # C Archivers

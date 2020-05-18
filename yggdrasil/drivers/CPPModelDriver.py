@@ -2,7 +2,8 @@ import os
 import copy
 from yggdrasil import platform
 from yggdrasil.drivers.CModelDriver import (
-    CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler)
+    CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler,
+    ClangLinker)
 
 
 class CPPCompilerBase(CCompilerBase):
@@ -45,8 +46,43 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
 
 
 class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
-    r"""clang++ compiler on Apple Mac OS."""
+    r"""Interface class for clang++ compiler."""
     toolname = 'clang++'
+    default_linker = 'clang++'
+    # Set to False since ClangLinker has its own class to handle
+    # conflict between versions of clang and ld.
+    is_linker = False
+
+
+class ClangPPLinker(ClangLinker):
+    r"""Interface class for clang++ linker (calls to ld)."""
+    toolname = 'clang++'
+    default_executable_env = ClangCompiler.default_executable_env
+    languages = ['c++']
+    cpp_std = 'c++11'
+    
+    @classmethod
+    def get_flags(cls, **kwargs):
+        r"""Get a list of compiler flags.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            list: Compiler flags.
+
+        """
+        out = super(ClangPPLinker, cls).get_flags(**kwargs)
+        # Add standard library flag
+        std_flag = None
+        for i, a in enumerate(out):
+            if a.startswith('-std='):
+                std_flag = i
+                break
+        if std_flag is None:
+            out.append('-std=%s' % cls.cpp_std)
+        return out
 
 
 class CPPModelDriver(CModelDriver):
