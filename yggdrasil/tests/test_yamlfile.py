@@ -1,6 +1,7 @@
 import tempfile
 import os
 import yaml
+import flaky
 import io as sio
 from jsonschema.exceptions import ValidationError
 from yggdrasil import yamlfile
@@ -137,6 +138,7 @@ class YamlTestBase(YggTestClass):
         else:
             yamlfile.parse_yaml(self.files)
 
+    @flaky.flaky(max_runs=3)
     def test_load_yaml_git(self):
         yml = "https://github.com/cropsinsilico/example-fakemodel/fakemodel.yml"
         self.assertRaises(Exception, yamlfile.load_yaml, yml)
