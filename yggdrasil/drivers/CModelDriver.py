@@ -216,7 +216,10 @@ class MSVCCompiler(CCompilerBase):
 class LDLinker(LinkerBase):
     r"""Linker class for ld tool."""
     toolname = 'ld'
-    languages = ['c', 'c++', 'fortran']
+    # Languages disabled for ld by default to prevent it being
+    # selected instead of the default which seems to be happening
+    # on the CI
+    languages = []  # ['c', 'c++', 'fortran']
     default_executable_env = 'LD'
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
@@ -249,6 +252,7 @@ class LDLinker(LinkerBase):
 class ClangLinker(LDLinker):
     r"""Interface class for clang linker (calls to ld)."""
     toolname = 'clang'
+    languages = ['c', 'c++']
     default_executable_env = ClangCompiler.default_executable_env
     platforms = ClangCompiler.platforms
     search_path_flags = ['-Xlinker', '-v']
