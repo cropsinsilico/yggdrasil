@@ -7,9 +7,7 @@ import queue
 from yggdrasil import multitasking
 from yggdrasil.communication import new_comm
 from yggdrasil.drivers.Driver import Driver
-from yggdrasil.components import (
-    import_component, create_component, isinstance_component)
-from yggdrasil.schema import get_schema
+from yggdrasil.components import create_component, isinstance_component
 
 
 def _translate_list2element(arr):
@@ -207,12 +205,12 @@ class ConnectionDriver(Driver):
     @property
     def _is_input(self):
         r"""bool: True if the connection is providing input to a model."""
-        return (self._direction == 'input')
+        return (self._direction in ['any', 'input'])
 
     @property
     def _is_output(self):
         r"""bool: True if the connection is retreiving output from a model."""
-        return (self._direction == 'output')
+        return (self._direction in ['any', 'output'])
 
     def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
         super(ConnectionDriver, self).__init__(name, **kwargs)
@@ -258,79 +256,39 @@ class ConnectionDriver(Driver):
                    self.icomm.name, self.icomm.address,
                    self.ocomm.name, self.ocomm.address)
 
-    def _init_single_comm(self, name, io, comm_kws, **kwargs):
+    def _init_single_comm(self, name, io, comm_kws):
         r"""Parse keyword arguments for input/output comm."""
         self.debug("Creating %s comm", io)
-        s = get_schema()
         if comm_kws is None:
             comm_kws = dict()
         else:
             comm_kws = copy.deepcopy(comm_kws)
         if io == 'input':
             direction = 'recv'
-            comm_type = self._icomm_type
-            touches_model = self._is_output
             attr_comm = 'icomm'
             comm_kws['close_on_eof_recv'] = False
         else:
             direction = 'send'
-            comm_type = self._ocomm_type
-            touches_model = self._is_input
             attr_comm = 'ocomm'
         comm_kws['direction'] = direction
         comm_kws['dont_open'] = True
         comm_kws['reverse_names'] = True
-        comm_kws.setdefault('comm', {'comm': comm_type})
-        assert(name == self.name)
         comm_kws.setdefault('name', name)
-        if not isinstance(comm_kws['comm'], list):
-            comm_kws['comm'] = [comm_kws['comm']]
-        for i, x in enumerate(comm_kws['comm']):
-            if x is None:
-                comm_kws['comm'][i] = dict()
-            elif not isinstance(x, dict):
-                comm_kws['comm'][i] = dict(comm=x)
-            comm_kws['comm'][i].setdefault('comm', comm_type)
-        any_files = False
-        all_files = True
-        if not touches_model:
-            comm_kws['no_suffix'] = True
-            ikws = []
-            for x in comm_kws['comm']:
-                icomm_cls = import_component('comm', x['comm'])
-                if icomm_cls.is_file:
-                    any_files = True
-                    ikws += s['file'].get_subtype_properties(icomm_cls._filetype)
-                else:
-                    all_files = False
-                    ikws += s['comm'].get_subtype_properties(icomm_cls._commtype)
-            ikws = list(set(ikws))
-            for k in ikws:
-                if (k not in comm_kws) and (k in kwargs):
-                    comm_kws[k] = kwargs.pop(k)
-            if ('comm_env' in kwargs) and ('comm_env' not in comm_kws):
-                comm_kws['env'] = kwargs.pop('comm_env')
-        if any_files and (io == 'input'):
-            kwargs.setdefault('timeout_send_1st', 60)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
-        comm_kws['touches_model'] = touches_model
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
-        if touches_model:
-            self.env.update(getattr(self, attr_comm).opp_comms)
-        elif not all_files:
-            self.comm_env.update(getattr(self, attr_comm).opp_comms)
-        return kwargs
 
     def _init_comms(self, name, icomm_kws=None, ocomm_kws=None, **kwargs):
         r"""Parse keyword arguments for input/output comms."""
-        kwargs = self._init_single_comm(name, 'input', icomm_kws, **kwargs)
+        self._init_single_comm(name, 'input', icomm_kws)
         try:
-            kwargs = self._init_single_comm(name, 'output', ocomm_kws, **kwargs)
+            self._init_single_comm(name, 'output', ocomm_kws)
         except BaseException:
             self.icomm.close()
             raise
         # Apply keywords dependent on comms
+        if self.icomm.any_files:
+            kwargs.setdefault('timeout_send_1st', 60)
         self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
         self.debug('Final env:\n%s', self.pprint(self.env, 1))
 

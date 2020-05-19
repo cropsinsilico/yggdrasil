@@ -89,6 +89,14 @@ class ForkComm(CommBase.CommBase):
         return len(self.comm_list)
 
     @property
+    def any_files(self):
+        r"""bool: True if the comm interfaces with any files."""
+        for x in self.comm_list:
+            if x.is_file:
+                return True
+        return False
+        
+    @property
     def curr_comm(self):
         r"""CommBase: Current comm."""
         return self.comm_list[self.curr_comm_index % len(self)]
@@ -123,6 +131,20 @@ class ForkComm(CommBase.CommBase):
             kwargs['address'] = addresses
         args = tuple([name] + list(args))
         return args, kwargs
+
+    @property
+    def model_env(self):
+        r"""dict: Mapping between model name and opposite comm
+        environment variables that need to be provided to the model."""
+        out = {}
+        for x in self.comm_list:
+            iout = x.model_env
+            for k, v in iout.items():
+                if k in out:
+                    out[k].update(v)
+                else:
+                    out[k] = v
+        return out
 
     @property
     def opp_comms(self):

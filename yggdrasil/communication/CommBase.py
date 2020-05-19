@@ -207,6 +207,9 @@ class CommBase(tools.YggClass):
             interface binding. Defaults to False.
         language (str, optional): Programming language of the calling model.
             Defaults to 'python'.
+        partner_model (str, optional): Name of model that this comm is
+            partnered with. Default to None, indicating that the partner
+            is not a model.
         partner_language (str, optional): Programming language of this comm's
             partner comm. Defaults to 'python'.
         datatype (schema, optional): JSON schema (with expanded core types
@@ -309,6 +312,7 @@ class CommBase(tools.YggClass):
             connection.
         is_interface (bool): True if this comm is a Python interface binding.
         language (str): Language that this comm is being called from.
+        partner_model (str): Name of model that this comm is partnered with.
         partner_language (str): Programming language of this comm's partner comm.
         serializer (:class:.DefaultSerialize): Object that will be used to
             serialize/deserialize messages to/from python objects.
@@ -402,12 +406,13 @@ class CommBase(tools.YggClass):
                            '_eof_recv', '_eof_sent'])
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
-                 is_interface=None, language=None, partner_language='python',
+                 is_interface=None, language=None,
+                 partner_model=None, partner_language='python',
                  recv_timeout=0.0, close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 comm=None, touches_model=False, **kwargs):
+                 comm=None, **kwargs):
         self._comm_class = None
         if comm is not None:
             assert(comm == self.comm_class)
@@ -416,6 +421,8 @@ class CommBase(tools.YggClass):
         super(CommBase, self).__init__(name, **kwargs)
         if not self.__class__.is_installed(language='python'):  # pragma: debug
             raise RuntimeError("Comm class %s not installed" % self.__class__)
+        if partner_model is None:
+            no_suffix = True
         suffix = determine_suffix(no_suffix=no_suffix,
                                   reverse_names=reverse_names,
                                   direction=direction)
@@ -439,17 +446,20 @@ class CommBase(tools.YggClass):
         self.is_interface = is_interface
         if self.is_interface:
             # All models connect to python connection drivers
+            partner_model = None
             partner_language = 'python'
             recv_timeout = False
         if language is None:
             language = 'python'
         self.language = language
+        self.partner_model = partner_model
         self.partner_language = partner_language
         self.partner_language_driver = None
-        if partner_language:
+        if self.partner_language:
             self.partner_language_driver = import_component(
                 'model', self.partner_language)
         self.language_driver = import_component('model', self.language)
+        self.touches_model = (self.partner_model is not None)
         self.is_client = is_client
         self.is_server = is_server
         self.is_response_client = is_response_client
@@ -461,7 +471,6 @@ class CommBase(tools.YggClass):
         self._last_header = None
         self._work_comms = {}
         self.single_use = single_use
-        self.touches_model = touches_model
         self._used = False
         self._multiple_first_send = True
         self._n_sent = 0
@@ -601,7 +610,7 @@ class CommBase(tools.YggClass):
         cls._default_serializer_class = import_component('serializer',
                                                          cls._default_serializer,
                                                          without_schema=True)
-        
+
     @classmethod
     def get_testing_options(cls, serializer=None, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
@@ -684,6 +693,11 @@ class CommBase(tools.YggClass):
         lines, _ = self.get_status_message(*args, **kwargs)
         self.info('\n'.join(lines))
 
+    @property
+    def any_files(self):
+        r"""bool: True if the comm interfaces with any files."""
+        return self.is_file
+        
     @classmethod
     def is_installed(cls, language=None):
         r"""Determine if the necessary libraries are installed for this
@@ -824,6 +838,15 @@ class CommBase(tools.YggClass):
             return new_cls(*args, **kwargs)
         return cls(*args, **kwargs)
 
+    @property
+    def model_env(self):
+        r"""dict: Mapping between model name and opposite comm
+        environment variables that need to be provided to the model."""
+        out = {}
+        if self.partner_model is not None:
+            out[self.partner_model] = self.opp_comms
+        return out
+        
     @property
     def opp_address(self):
         r"""str: Address for opposite comm."""

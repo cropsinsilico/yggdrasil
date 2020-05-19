@@ -243,8 +243,7 @@ def parse_component(yml, ctype, existing=None):
     s = get_schema()
     if not isinstance(yml, dict):
         raise TypeError("Component entry in yml must be a dictionary.")
-    ctype_list = ['input', 'output', 'model', 'connection',
-                  'model_input', 'model_output']
+    ctype_list = ['input', 'output', 'model', 'connection']
     if existing is None:
         existing = {k: {} for k in ctype_list}
     if ctype not in ctype_list:
@@ -322,6 +321,7 @@ def parse_model(yml, existing):
     for io in ['inputs', 'outputs']:
         for x in yml[io]:
             x['model_driver'] = [yml['name']]
+            x['partner_model'] = yml['name']
             x['partner_language'] = language
             existing = parse_component(x, io[:-1], existing=existing)
     return existing
@@ -382,73 +382,30 @@ def parse_connection(yml, existing):
     else:
         args = '%s_to_%s' % (iname, oname)
     name = args
-    # TODO: Use RMQ drivers when models are on different machines
-    # ocomm_pair = ('default', 'rmq')
-    # icomm_pair = ('rmq', 'default')
-    # Output driver
-    xo = None
-    if iname:  # empty name results when all of the inputs are files
-        iyml = yml['inputs']
-        xo = {'name': iname, 'model_driver': [],
-              'icomm_kws': {'comm': []},
-              'ocomm_kws': {'comm': []}}
-        for i, y in enumerate(iyml):
-            if not is_file['inputs'][i]:
-                xo['icomm_kws']['comm'].append(existing['output'][y['name']])
-                xo['icomm_kws']['comm'][-1].update(**y)
-                xo['model_driver'] += existing['output'][y['name']]['model_driver']
-                del existing['output'][y['name']]
-        # Add single non-file intermediate output comm if there are any non-file
-        # outputs and an output comm for each file output
-        if (sum(is_file['outputs']) < len(is_file['outputs'])):
-            xo['ocomm_kws']['comm'].append({'name': args, 'no_suffix': True,
-                                            'comm': 'buffer'})
-        for i, y in enumerate(yml['outputs']):
-            if is_file['outputs'][i]:
-                xo['ocomm_kws']['comm'].append(y)
-        existing = parse_component(xo, 'output', existing)
-        xo['args'] = args
-        xo['driver'] = 'OutputDriver'
-    # Input driver
-    xi = None
-    if oname:  # empty name results when all of the outputs are files
-        oyml = yml['outputs']
-        xi = {'name': oname, 'model_driver': [],
-              'icomm_kws': {'comm': []},
-              'ocomm_kws': {'comm': []}}
-        for i, y in enumerate(oyml):
-            if not is_file['outputs'][i]:
-                xi['ocomm_kws']['comm'].append(existing['input'][y['name']])
-                xi['ocomm_kws']['comm'][-1].update(**y)
-                xi['model_driver'] += existing['input'][y['name']]['model_driver']
-                del existing['input'][y['name']]
-        # Add single non-file intermediate input comm if there are any non-file
-        # inputs and an input comm for each file input
-        if (sum(is_file['inputs']) < len(is_file['inputs'])):
-            xi['icomm_kws']['comm'].append({'name': args, 'no_suffix': True,
-                                            'comm': 'buffer'})
-        for i, y in enumerate(yml['inputs']):
-            if is_file['inputs'][i]:
-                xi['icomm_kws']['comm'].append(y)
-        existing = parse_component(xi, 'input', existing)
-        xi['args'] = args
-        xi['driver'] = 'InputDriver'
-
-    # Parse drivers
-
-    # Transfer connection keywords to one connection driver
-    conn_keys_gen = ['inputs', 'outputs']
-    conn_keys = list(set(schema['connection'].properties) - set(conn_keys_gen))
-    yml_conn = {}
-    yml_conn.pop('name', None)
-    for k in conn_keys:
-        if k in yml:
-            yml_conn[k] = yml[k]
-    if xi is None:
-        xo.update(**yml_conn)
-    else:
-        xi.update(**yml_conn)
-    yml['name'] = name
+    # Connection
+    xx = {'name': name, 'driver': 'ConnectionDriver',
+          'src_models': [], 'dst_models': [],
+          'icomm_kws': {'comm': []},
+          'ocomm_kws': {'comm': []}}
+    for i, y in enumerate(yml['inputs']):
+        if is_file['inputs'][i]:
+            xx['icomm_kws']['comm'].append(y)
+        else:
+            xx['icomm_kws']['comm'].append(existing['output'][y['name']])
+            xx['icomm_kws']['comm'][-1].update(**y)
+            xx['src_models'] += existing['output'][y['name']]['model_driver']
+            del existing['output'][y['name']]
+    for i, y in enumerate(yml['outputs']):
+        if is_file['outputs'][i]:
+            xx['ocomm_kws']['comm'].append(y)
+        else:
+            xx['ocomm_kws']['comm'].append(existing['input'][y['name']])
+            xx['ocomm_kws']['comm'][-1].update(**y)
+            xx['dst_models'] += existing['input'][y['name']]['model_driver']
+            del existing['input'][y['name']]
+    # TODO: Split comms if models are not co-located and the master
+    # process needs access to the message passed
+    yml.update(xx)
     return existing
 
 
@@ -466,11 +423,17 @@ def link_model_io(existing):
     for m in existing['model'].keys():
         existing['model'][m]['input_drivers'] = []
         existing['model'][m]['output_drivers'] = []
-    # Add input dirvers
+    # Add connections
+    for io in existing['connection'].values():
+        for m in io['src_models']:
+            existing['model'][m]['output_drivers'].append(io)
+        for m in io['dst_models']:
+            existing['model'][m]['input_drivers'].append(io)
+    # Add input drivers
     for io in existing['input'].values():
         for m in io['model_driver']:
             existing['model'][m]['input_drivers'].append(io)
-    # Add output dirvers
+    # Add output drivers
     for io in existing['output'].values():
         for m in io['model_driver']:
             existing['model'][m]['output_drivers'].append(io)

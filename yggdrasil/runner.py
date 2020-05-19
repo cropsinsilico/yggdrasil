@@ -67,6 +67,7 @@ class YggRunner(YggClass):
         self.rank = rank
         self.connection_task_method = connection_task_method
         self.modeldrivers = {}
+        self.connectiondrivers = {}
         self.inputdrivers = {}
         self.outputdrivers = {}
         self.serverdrivers = {}
@@ -80,10 +81,11 @@ class YggRunner(YggClass):
         # Update environment based on config
         cfg_environment()
         # Parse yamls
-        drivers = yamlfile.parse_yaml(modelYmls)
-        self.inputdrivers = drivers['input']
-        self.outputdrivers = drivers['output']
-        self.modeldrivers = drivers['model']
+        self.drivers = yamlfile.parse_yaml(modelYmls)
+        self.connectiondrivers = self.drivers['connection']
+        self.inputdrivers = self.drivers['input']
+        self.outputdrivers = self.drivers['output']
+        self.modeldrivers = self.drivers['model']
         for x in self.outputdrivers.values():
             self._outputchannels[x['args']] = x
         for x in self.inputdrivers.values():
@@ -194,7 +196,8 @@ class YggRunner(YggClass):
     @property
     def all_drivers(self):
         r"""iterator: For all drivers."""
-        return chain(self.inputdrivers.values(), self.outputdrivers.values(),
+        return chain(self.connectiondrivers.values(),
+                     self.inputdrivers.values(), self.outputdrivers.values(),
                      self.modeldrivers.values())
 
     def io_drivers(self, model=None):
@@ -209,14 +212,16 @@ class YggRunner(YggClass):
 
         """
         if model is None:
-            out = chain(self.inputdrivers.values(), self.outputdrivers.values())
+            out = chain(self.connectiondrivers.values(),
+                        self.inputdrivers.values(),
+                        self.outputdrivers.values())
         else:
             driver = self.modeldrivers[model]
             out = chain(driver.get('input_drivers', dict()),
                         driver.get('output_drivers', dict()))
         return out
 
-    def createDriver(self, yml):
+    def create_driver(self, yml):
         r"""Create a driver instance from the yaml information.
 
         Args:
@@ -252,11 +257,7 @@ class YggRunner(YggClass):
             object: An instance of the specified driver.
 
         """
-        yml['env'] = {}
-        for iod in self.io_drivers(yml['name']):
-            yml['env'].update(iod['instance'].env)
-            iod['models'].append(yml['name'])
-        drv = self.createDriver(yml)
+        drv = self.create_driver(yml)
         if 'client_of' in yml:
             for srv in yml['client_of']:
                 self.modeldrivers[srv]['clients'].append(yml['name'])
@@ -264,6 +265,30 @@ class YggRunner(YggClass):
                    yml['name'], pformat(yml['instance'].env))
         return drv
 
+    def create_connection_driver(self, yml):
+        r"""Create a connection driver instance from the yaml information.
+
+        Args:
+            yml (yaml): Yaml object containing driver information.
+
+        Returns:
+            object: An instance of the specified driver.
+
+        """
+        yml['models'] = []
+        yml['task_method'] = self.connection_task_method
+        drv = self.create_driver(yml)
+        for model, env in drv.icomm.model_env.items():
+            self.modeldrivers[model].setdefault('env', {})
+            self.modeldrivers[model]['env'].update(env)
+            yml['models'].append(model)
+        for model, env in drv.ocomm.model_env.items():
+            self.modeldrivers[model].setdefault('env', {})
+            self.modeldrivers[model]['env'].update(env)
+            yml['models'].append(model)
+        yml['models'] = list(set(yml['models']))
+        return drv
+        
     def createInputDriver(self, yml):
         r"""Create an input driver instance from the yaml information.
 
@@ -274,17 +299,14 @@ class YggRunner(YggClass):
             object: An instance of the specified driver.
 
         """
-        yml['models'] = []
-        if yml['args'] not in self._outputchannels:
+        if ('args' in yml) and (yml['args'] not in self._outputchannels):
             for x in yml['icomm_kws']['comm']:
                 if 'filetype' not in x:
                     raise ValueError(
                         ("Input driver %s could not locate a "
                          + "corresponding file or output channel %s") % (
                              x["name"], yml["args"]))
-        yml['task_method'] = self.connection_task_method
-        drv = self.createDriver(yml)
-        return drv
+        return self.create_connection_driver(yml)
 
     def createOutputDriver(self, yml):
         r"""Create an output driver instance from the yaml information.
@@ -296,27 +318,28 @@ class YggRunner(YggClass):
             object: An instance of the specified driver.
 
         """
-        yml['models'] = []
         if yml['args'] in self._inputchannels:
-            yml.setdefault('comm_env', {})
-            yml['comm_env'] = self._inputchannels[yml['args']]['instance'].comm_env
-        if yml['args'] not in self._inputchannels:
+            yml['ocomm_kws']['env'] = self._inputchannels[
+                yml['args']]['instance'].icomm.opp_comms
+        else:
             for x in yml['ocomm_kws']['comm']:
                 if 'filetype' not in x:
                     raise ValueError(
                         ("Output driver %s could not locate a "
                          + "corresponding file or input channel %s") % (
                              x["name"], yml["args"]))
-        yml['task_method'] = self.connection_task_method
-        drv = self.createDriver(yml)
-        return drv
-        
+        return self.create_connection_driver(yml)
+
     def loadDrivers(self):
         r"""Load all of the necessary drivers, doing the IO drivers first
         and adding IO driver environmental variables back tot he models."""
         self.debug('')
         driver = dict(name='name')
         try:
+            # Create connection drivers
+            self.debug("Loading connection drivers")
+            for driver in self.connectiondrivers.values():
+                self.create_connection_driver(driver)
             # Create input drivers
             self.debug("Loading input drivers")
             for driver in self.inputdrivers.values():

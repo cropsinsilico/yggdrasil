@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from itertools import chain
 from yggdrasil import serialize
 from yggdrasil.tests import extra_example
 from yggdrasil.examples.tests import ExampleTstBase
@@ -34,7 +35,8 @@ class TestExampleAsciiIO(ExampleTstBase):
     @property
     def output_file(self):
         r"""str: Output file for the run."""
-        for o, yml in self.runner.outputdrivers.items():
+        for o, yml in chain(self.runner.outputdrivers.items(),
+                            self.runner.connectiondrivers.items()):
             if yml['ocomm_kws']['comm'][0].get('filetype', None) == 'ascii':
                 return os.path.join(self.tempdir,
                                     yml['ocomm_kws']['comm'][0]['address'])
@@ -43,7 +45,8 @@ class TestExampleAsciiIO(ExampleTstBase):
     @property
     def output_table(self):
         r"""str: Output table for the run."""
-        for o, yml in self.runner.outputdrivers.items():
+        for o, yml in chain(self.runner.outputdrivers.items(),
+                            self.runner.connectiondrivers.items()):
             if (((yml['ocomm_kws']['comm'][0].get('filetype', None) == 'table')
                  and (not yml['ocomm_kws']['comm'][0].get('as_array', False)))):
                 return os.path.join(self.tempdir,
@@ -53,7 +56,8 @@ class TestExampleAsciiIO(ExampleTstBase):
     @property
     def output_array(self):
         r"""str: Output array for the run."""
-        for o, yml in self.runner.outputdrivers.items():
+        for o, yml in chain(self.runner.outputdrivers.items(),
+                            self.runner.connectiondrivers.items()):
             if (((yml['ocomm_kws']['comm'][0].get('filetype', None) == 'table')
                  and (yml['ocomm_kws']['comm'][0].get('as_array', False)))):
                 return os.path.join(self.tempdir,

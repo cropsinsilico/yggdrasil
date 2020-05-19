@@ -58,10 +58,15 @@ def new_comm(name, comm=None, **kwargs):
         else:
             kwargs['comm'] = comm
             comm = 'ForkComm'
-    comm_cls = import_component('comm', comm)
-    if comm in ['DefaultComm', 'default']:
+    if comm is None:
+        for k in ['commtype', 'filetype']:
+            if k in kwargs:
+                comm = kwargs.pop(k)
+                break
+    elif comm in ['DefaultComm', 'default']:
         commtype = kwargs.pop('commtype', 'default')
         assert(commtype == 'default')
+    comm_cls = import_component('comm', comm)
     return comm_cls.new_comm(name, **kwargs)
 
 
