@@ -33,9 +33,10 @@ class ServerComm(CommBase.CommBase):
             response_kwargs = dict()
         icomm_name = name
         icomm_kwargs = kwargs
-        icomm_kwargs['direction'] = 'recv'
-        icomm_kwargs['dont_open'] = True
-        icomm_kwargs['comm'] = request_comm
+        icomm_kwargs.update(direction='recv',
+                            dont_open=True,
+                            comm=request_comm,
+                            is_server=True)
         self.response_kwargs = response_kwargs
         self.icomm = get_comm(icomm_name, **icomm_kwargs)
         self.ocomm = OrderedDict()

@@ -421,7 +421,7 @@ class CommBase(tools.YggClass):
         super(CommBase, self).__init__(name, **kwargs)
         if not self.__class__.is_installed(language='python'):  # pragma: debug
             raise RuntimeError("Comm class %s not installed" % self.__class__)
-        if partner_model is None:
+        if (partner_model is None) and (not is_interface):
             no_suffix = True
         suffix = determine_suffix(no_suffix=no_suffix,
                                   reverse_names=reverse_names,

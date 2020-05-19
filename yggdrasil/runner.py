@@ -278,11 +278,7 @@ class YggRunner(YggClass):
         yml['models'] = []
         yml['task_method'] = self.connection_task_method
         drv = self.create_driver(yml)
-        for model, env in drv.icomm.model_env.items():
-            self.modeldrivers[model].setdefault('env', {})
-            self.modeldrivers[model]['env'].update(env)
-            yml['models'].append(model)
-        for model, env in drv.ocomm.model_env.items():
+        for model, env in drv.model_env.items():
             self.modeldrivers[model].setdefault('env', {})
             self.modeldrivers[model]['env'].update(env)
             yml['models'].append(model)

@@ -125,9 +125,9 @@ definitions:
             type: string
           type: array
       required:
+      - datatype
       - name
       - commtype
-      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -213,7 +213,7 @@ definitions:
         connection_type:
           enum:
           - client
-          - default
+          - connection
           - file_input
           - file_output
           - input
@@ -223,6 +223,8 @@ definitions:
           - rmq_async_server
           - rmq_client
           - rmq_server
+          - rpc_request
+          - rpc_response
           - server
           type: string
         driver:
@@ -266,19 +268,19 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
       - additionalProperties: true
-        description: Schema for connection component ['default'] subtype.
+        description: Schema for connection component ['connection'] subtype.
         properties:
           connection_type:
             description: Connection between one or more comms/files and one or more
               comms/files.
             enum:
-            - default
+            - connection
             type: string
         title: ConnectionDriver
         type: object
@@ -303,6 +305,28 @@ definitions:
             - rmq_client
             type: string
         title: RMQClientDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['rpc_response'] subtype.
+        properties:
+          connection_type:
+            description: Connection between one or more comms/files and one or more
+              comms/files.
+            enum:
+            - rpc_response
+            type: string
+        title: RPCResponseDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['rpc_request'] subtype.
+        properties:
+          connection_type:
+            description: Connection between one or more comms/files and one or more
+              comms/files.
+            enum:
+            - rpc_request
+            type: string
+        title: RPCRequestDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['output'] subtype.
@@ -1581,10 +1605,10 @@ definitions:
             is used.
           type: string
       required:
-      - args
+      - language
       - working_dir
       - name
-      - language
+      - args
       title: model_base
       type: object
     - anyOf:

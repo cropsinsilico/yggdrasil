@@ -158,35 +158,19 @@ def parse_yaml(files):
     yml_norm = s.validate(yml_prep, normalize=True)
     # print('normalized')
     # pprint.pprint(yml_norm)
-    # Determine if any of the models require synchronization
-    timesync_names = []
-    for yml in yml_norm['models']:
-        if yml.get('timesync', False):
-            if yml['timesync'] is True:
-                yml['timesync'] = 'timesync'
-            tsync = yml['timesync']
-            timesync_names.append(tsync)
-            yml.setdefault('timesync_client_of', [])
-            yml['timesync_client_of'].append(tsync)
-    for tsync in set(timesync_names):
-        for m in yml_norm['models']:
-            if m['name'] == tsync:
-                assert(m['language'] == 'timesync')
-                m.update(is_server=True, inputs=[], outputs=[])
-                break
-        else:
-            yml_norm['models'].append({'name': tsync,
-                                       'args': [],
-                                       'language': 'timesync',
-                                       'is_server': True,
-                                       'working_dir': os.getcwd(),
-                                       'inputs': [],
-                                       'outputs': []})
     # Parse models, then connections to ensure connections can be processed
     existing = None
     for k in ['models', 'connections']:
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
+    # Create server/client connections
+    for srv, clients in existing['server'].items():
+        yml = {'inputs': [{'name': x for x in clients}],
+               'outputs': [{'name': srv}],
+               'driver': 'RPCRequestDriver'}
+        existing = parse_component(yml, 'connection', existing=existing)
+        existing['model'][yml['dst_models'][0]]['clients'] = yml['src_models']
+    existing.pop('server')
     # Make sure that I/O channels initialized
     opp_map = {'input': 'output', 'output': 'input'}
     for io in ['input', 'output']:
@@ -243,7 +227,7 @@ def parse_component(yml, ctype, existing=None):
     s = get_schema()
     if not isinstance(yml, dict):
         raise TypeError("Component entry in yml must be a dictionary.")
-    ctype_list = ['input', 'output', 'model', 'connection']
+    ctype_list = ['input', 'output', 'model', 'connection', 'server']
     if existing is None:
         existing = {k: {} for k in ctype_list}
     if ctype not in ctype_list:
@@ -287,35 +271,44 @@ def parse_model(yml, existing):
     _lang2driver = get_schema()['model'].subtype2class
     language = yml.pop('language')
     yml['driver'] = _lang2driver[language]
-    # Add server driver
+    # Add timesync server
+    if yml.get('timesync', False):
+        if yml['timesync'] is True:
+            yml['timesync'] = 'timesync'
+        tsync = yml['timesync']
+        yml.setdefault('client_of', [])
+        yml['client_of'].append(tsync)
+        if tsync not in existing['model']:
+            tsync_yml = {'name': tsync, 'args': [],
+                         'language': 'timesync', 'is_server': True,
+                         'working_dir': os.getcwd(),
+                         'inputs': [], 'outputs': []}
+            existing = parse_model(tsync_yml, existing=existing)
+    if (language == 'timesync'):
+        if (yml['name'] in existing['model']):
+            existing['model'].pop(yml['name'])
+        yml.update(is_server=True, inputs=[], outputs=[])
+    # Add server input
     if yml.get('is_server', False):
         srv = {'name': '%s:%s' % (yml['name'], yml['name']),
-               'commtype': 'default',
-               'datatype': {'type': 'bytes'},
-               'driver': 'ServerDriver',
-               'args': yml['name'] + '_SERVER',
-               'working_dir': yml['working_dir']}
-        yml['inputs'].append(srv)
+               'working_dir': yml['working_dir'],
+               'is_timesync': (language == 'timesync')}
         yml['clients'] = []
-    # Mark timesync clients
-    timesync = yml.pop('timesync_client_of', [])
-    if timesync:
-        yml.setdefault('client_of', [])
-        yml['client_of'] += timesync
-    # Add client driver
+        yml['inputs'].append(srv)
+        existing['server'].setdefault(srv['name'], [])
+    # Add client output
     if yml.get('client_of', []):
         for srv in yml['client_of']:
-            if srv in timesync:
+            srv_name = '%s:%s' % (srv, srv)
+            if srv == yml.get('timesync', False):
                 cli_name = '%s:%s' % (yml['name'], srv)
             else:
                 cli_name = '%s:%s_%s' % (yml['name'], srv, yml['name'])
             cli = {'name': cli_name,
-                   'commtype': 'default',
-                   'datatype': {'type': 'bytes'},
-                   'driver': 'ClientDriver',
-                   'args': srv + '_SERVER',
                    'working_dir': yml['working_dir']}
             yml['outputs'].append(cli)
+            existing['server'].setdefault(srv_name, [])
+            existing['server'][srv_name].append(cli_name)
     # Model index and I/O channels
     yml['model_index'] = len(existing['model'])
     for io in ['inputs', 'outputs']:
@@ -383,7 +376,7 @@ def parse_connection(yml, existing):
         args = '%s_to_%s' % (iname, oname)
     name = args
     # Connection
-    xx = {'name': name, 'driver': 'ConnectionDriver',
+    xx = {'name': name,
           'src_models': [], 'dst_models': [],
           'icomm_kws': {'comm': []},
           'ocomm_kws': {'comm': []}}
@@ -406,6 +399,7 @@ def parse_connection(yml, existing):
     # TODO: Split comms if models are not co-located and the master
     # process needs access to the message passed
     yml.update(xx)
+    yml.setdefault('driver', 'ConnectionDriver')
     return existing
 
 

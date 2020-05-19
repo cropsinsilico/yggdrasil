@@ -170,6 +170,7 @@ class ConnectionDriver(Driver):
     _schema_subtype_description = ('Connection between one or more comms/files '
                                    'and one or more comms/files.')
     _schema_subtype_default = 'default'
+    _connection_type = 'connection'
     _schema_required = ['inputs', 'outputs']
     _schema_properties = {
         'connection_type': {'type': 'string'},  # 'default': 'default'},
@@ -292,6 +293,20 @@ class ConnectionDriver(Driver):
         self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
         self.debug('Final env:\n%s', self.pprint(self.env, 1))
 
+    @property
+    def model_env(self):
+        r"""dict: Mapping between model name and opposite comm
+        environment variables that need to be provided to the model."""
+        out = {}
+        for x in [self.icomm, self.ocomm]:
+            iout = x.model_env
+            for k, v in iout.items():
+                if k in out:
+                    out[k].update(v)
+                else:
+                    out[k] = v
+        return out
+        
     def get_flag_attr(self, attr):
         r"""Return the flag attribute."""
         if attr in self.shared:
