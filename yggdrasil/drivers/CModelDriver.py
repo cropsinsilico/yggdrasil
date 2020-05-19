@@ -251,10 +251,12 @@ class LDLinker(LinkerBase):
 
 class ClangLinker(LDLinker):
     r"""Interface class for clang linker (calls to ld)."""
-    toolname = 'clang'
-    languages = ['c', 'c++']
-    default_executable_env = ClangCompiler.default_executable_env
+    toolname = ClangCompiler.toolname
+    aliases = ClangCompiler.aliases
+    languages = ClangCompiler.languages
     platforms = ClangCompiler.platforms
+    default_executable = ClangCompiler.default_executable
+    default_executable_env = ClangCompiler.default_executable_env
     search_path_flags = ['-Xlinker', '-v']
     search_regex = [r'\t([^\t\n]+)\n']
     search_regex_begin = 'Library search paths:'

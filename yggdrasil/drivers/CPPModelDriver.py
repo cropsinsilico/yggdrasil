@@ -56,9 +56,10 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
 
 class ClangPPLinker(ClangLinker):
     r"""Interface class for clang++ linker (calls to ld)."""
-    toolname = 'clang++'
-    languages = ['c++']
-    default_executable_env = ClangCompiler.default_executable_env
+    toolname = ClangPPCompiler.toolname
+    languages = ClangPPCompiler.languages
+    default_executable = ClangPPCompiler.default_executable
+    default_executable_env = ClangPPCompiler.default_executable_env
 
 
 class CPPModelDriver(CModelDriver):
