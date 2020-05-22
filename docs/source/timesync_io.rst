@@ -3,7 +3,7 @@
 Timestep Synchronization
 ========================
 
-Many models are time dependent with variables being updated as the time is incremented. When integrating two (or more) models that have timestep's, care must be taken to ensure that variables are correctly synchonized between the models at each timestep. To aid in this process |yggdrasil| provides a special timestep synchronization interface and model driver. Synchronizations proceeds as follows:
+Many models are time dependent with variables being updated as the time is incremented. When integrating two (or more) models that have timesteps, care must be taken to ensure that variables are correctly synchonized between the models at each timestep. To aid in this process |yggdrasil| provides a special timestep synchronization interface and model driver. Synchronizations proceeds as follows:
 
 #. A client model **requests** synchronization at a given timestep by calling the synchronization interface with the time of the desired timestep (with units) and any local state variables to the synchronization driver.
 #. The synchronization driver **converts** synonymous state variables from all models to a base set of state variables.
