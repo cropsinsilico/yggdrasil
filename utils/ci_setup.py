@@ -171,6 +171,10 @@ def deploy_package_on_ci(method):
                 os.environ.get('MATPLOTLIB', 'matplotlib'),
                 os.environ.get('JSONSCHEMA', 'jsonschema')),
             "%s info -a" % conda_cmd,
+            # required as conda-forge version of codecov is < 2.1,
+            # which causes the upload to fail. Remove this when the
+            # conda-forge version is updated
+            "pip install codecov",
             "python %s conda requirements_testing.txt" % install_req
         ]
         if BUILDDOCS:
