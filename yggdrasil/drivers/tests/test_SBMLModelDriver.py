@@ -6,11 +6,6 @@ class TestSBMLModelParam(parent.TestInterpretedModelParam):
     r"""Test parameters for SBMLModelDriver class."""
 
     driver = 'SBMLModelDriver'
-    
-    def tests_on_not_installed(self):
-        r"""Tests for when the driver is not installed."""
-        super(TestSBMLModelParam, self).tests_on_not_installed()
-        self.assert_raises(RuntimeError, self.import_cls.language_version)
 
         
 class TestSBMLModelDriverNoInit(TestSBMLModelParam,

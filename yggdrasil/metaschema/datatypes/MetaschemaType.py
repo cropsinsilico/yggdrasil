@@ -670,11 +670,14 @@ class MetaschemaType(object):
         metadata.setdefault('id', str(uuid.uuid4()))
         header = YGG_MSG_HEAD + encoder.encode_json(metadata) + YGG_MSG_HEAD
         if (max_header_size > 0) and (len(header) > max_header_size):
-            metadata_type = {}
-            for k in ['datatype', 'serializer', 'typedef_base']:
-                if k in metadata:
-                    metadata_type[k] = metadata.pop(k)
-            assert(metadata_type)
+            metadata_type = metadata
+            metadata = {}
+            for k in ['address', 'size', 'id', 'request_id',
+                      'response_address', 'zmq_reply',
+                      'zmq_reply_worker', 'model']:
+                if k in metadata_type:
+                    metadata[k] = metadata_type.pop(k)
+            assert(metadata)
             data = (encoder.encode_json(metadata_type) + YGG_MSG_HEAD + data)
             metadata['size'] = len(data)
             metadata['type_in_data'] = True

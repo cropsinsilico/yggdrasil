@@ -599,6 +599,7 @@ class TestCommBase(YggTestClassInfo):
         r"""Test send/recv of a large message."""
         assert(len(self.msg_long) > self.maxMsgSize)
         self.do_send_recv('send_nolimit', 'recv_nolimit', self.msg_long,
+                          send_kwargs=dict(header_kwargs=dict(x=self.msg_long)),
                           print_status=True)
 
     def test_send_recv_array(self):
