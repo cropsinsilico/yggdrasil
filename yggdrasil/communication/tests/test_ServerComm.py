@@ -17,6 +17,15 @@ class TestServerComm(test_CommBase.TestCommBase):
         r"""dict: Keyword arguments for send instance."""
         return {'comm': 'ClientComm'}
     
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for tested class."""
+        out = super(TestServerComm, self).inst_kwargs
+        # Required to prevent use of ZMQ DEALER socket when just
+        # testing functionality of server-client interaction
+        out['is_server'] = False
+        return out
+    
     @unittest.skipIf(True, 'Server')
     def test_error_send(self):
         r"""Disabled: Test error on send."""

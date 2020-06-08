@@ -49,6 +49,7 @@ class ServerRequestDriver(ConnectionDriver):
         ocomm_kws = kwargs.get('ocomm_kws', {})
         ocomm_kws['comm'] = None
         ocomm_kws['name'] = model_request_name
+        ocomm_kws['socket_type'] = 'ROUTER'
         kwargs['ocomm_kws'] = ocomm_kws
         # Parent and attributes
         super(ServerRequestDriver, self).__init__(model_request_name, **kwargs)
@@ -90,7 +91,7 @@ class ServerRequestDriver(ConnectionDriver):
     @property
     def client_model(self):
         r"""str: Name of the client model."""
-        return self.last_header.get('client_model', '')
+        return self.last_header.get('model', '')
 
     def close_response_drivers(self):
         r"""Close response drivers."""
@@ -130,7 +131,7 @@ class ServerRequestDriver(ConnectionDriver):
                 super(ServerRequestDriver, self).send_message(
                     YGG_CLIENT_EOF,
                     header_kwargs={'raw': True,
-                                   'client_model': self.client_model})
+                                   'model': self.client_model})
             self.nclients -= 1
             self.debug("Client signed off. nclients = %d", self.nclients)
             if self.nclients == 0:
@@ -194,8 +195,7 @@ class ServerRequestDriver(ConnectionDriver):
             kwargs['header_kwargs'].setdefault(
                 'response_address', response_driver.model_response_address)
             kwargs['header_kwargs'].setdefault('request_id', self.request_id)
-            kwargs['header_kwargs'].setdefault('client_model',
-                                               self.client_model)
+            kwargs['header_kwargs'].setdefault('model', self.client_model)
         return super(ServerRequestDriver, self).send_message(*args, **kwargs)
 
     def run_loop(self):

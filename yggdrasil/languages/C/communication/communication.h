@@ -422,6 +422,10 @@ comm_head_t comm_send_multipart_header(const comm_t *x, const char * data,
 				       const size_t len) {
   comm_head_t head = init_header(len, NULL, NULL);
   sprintf(head.id, "%d", rand());
+  char *model_name = getenv("YGG_MODEL_NAME");
+  if (model_name != NULL) {
+    strcpy(head.model, model_name);
+  }
   head.multipart = 1;
   head.valid = 1;
   // Add datatype information to header

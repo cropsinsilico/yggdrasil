@@ -35,8 +35,8 @@ class ServerComm(CommBase.CommBase):
         icomm_kwargs = kwargs
         icomm_kwargs.update(direction='recv',
                             dont_open=True,
-                            comm=request_comm,
-                            is_server=True)
+                            comm=request_comm)
+        icomm_kwargs.setdefault('is_server', True)
         self.response_kwargs = response_kwargs
         self.icomm = get_comm(icomm_name, **icomm_kwargs)
         self.ocomm = OrderedDict()
@@ -185,7 +185,7 @@ class ServerComm(CommBase.CommBase):
         self.ocomm[request_id] = get_comm(
             self.name + '.server_response_comm.' + request_id,
             **comm_kwargs)
-        client_model = self.icomm._last_header.get('client_model', '')
+        client_model = self.icomm._last_header.get('model', '')
         self.ocomm[request_id].client_model = client_model
         if client_model and (client_model not in self.clients):
             self.clients.append(client_model)
@@ -281,7 +281,7 @@ class ServerComm(CommBase.CommBase):
         if flag:
             if isinstance(msg, bytes) and (msg == YGG_CLIENT_EOF):
                 self.closed_clients.append(
-                    self.icomm._last_header['client_model'])
+                    self.icomm._last_header['model'])
                 return self.recv(*args, **kwargs)
             elif not (self.icomm.is_eof(msg) or self.icomm.is_empty_recv(msg)):
                 self.create_response_comm()

@@ -204,7 +204,8 @@ bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
   // String fields
   const char **n;
   const char *string_fields[] = {"address", "id", "request_id", "response_address",
-				 "zmq_reply", "zmq_reply_worker", ""};
+				 "zmq_reply", "zmq_reply_worker",
+				 "model", ""};
   n = string_fields;
   while (strcmp(*n, "") != 0) {
     if (head_doc.HasMember(*n)) {
@@ -226,6 +227,8 @@ bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
 	target = head.zmq_reply;
       } else if (strcmp(*n, "zmq_reply_worker") == 0) {
 	target = head.zmq_reply_worker;
+      } else if (strcmp(*n, "model") == 0) {
+	target = head.model;
       } else {
 	ygglog_error("update_header_from_doc: '%s' not handled.", *n);
 	return false;
@@ -501,7 +504,8 @@ rapidjson::StringBuffer format_comm_header_json(const comm_head_t head,
   // Strings
   const char **n;
   const char *string_fields[] = {"address", "id", "request_id", "response_address",
-				 "zmq_reply", "zmq_reply_worker", ""};
+				 "zmq_reply", "zmq_reply_worker",
+				 "model", ""};
   n = string_fields;
   while (strcmp(*n, "") != 0) {
     const char *target = NULL;
@@ -517,6 +521,8 @@ rapidjson::StringBuffer format_comm_header_json(const comm_head_t head,
       target = head.zmq_reply;
     } else if (strcmp(*n, "zmq_reply_worker") == 0) {
       target = head.zmq_reply_worker;
+    } else if (strcmp(*n, "model") == 0) {
+      target = head.model;
     } else {
       ygglog_throw_error("format_comm_header_json: '%s' not handled.", *n);
     }

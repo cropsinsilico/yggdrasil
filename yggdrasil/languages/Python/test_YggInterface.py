@@ -374,8 +374,10 @@ class TestYggRpcClient(TestYggOutput):
     def iodriver_args(self):
         r"""list: Connection driver arguments."""
         args, kwargs = super(TestYggRpcClient, self).iodriver_args
-        kwargs['icomm_kws']['comm'] = [{'name': '%s:%s_%s' % (
-            self.model1, self.name, self.model1)}]
+        kwargs['icomm_kws']['comm'] = [
+            {'name': '%s:%s_%s' % (
+                self.model1, self.name, self.model1),
+             'partner_model': self.model1}]
         return (args, kwargs)
         
     def test_msg(self):
@@ -419,7 +421,10 @@ class TestYggRpcServer(TestYggInput):
     def iodriver_args(self):
         r"""list: Connection driver arguments."""
         args, kwargs = super(TestYggRpcServer, self).iodriver_args
-        kwargs['clients'] = [self.model1]
+        kwargs['icomm_kws']['comm'] = [
+            {'name': '%s:%s_%s' % (
+                self.model1, self.name, self.model1),
+             'partner_model': self.model1}]
         return (args, kwargs)
 
     @property

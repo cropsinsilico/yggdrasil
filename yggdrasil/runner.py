@@ -44,10 +44,7 @@ class YggRunner(YggClass):
         host (str): Name of the host that the models will be launched from.
         rank (int): Rank of this set of models if run in parallel.
         modeldrivers (dict): Model drivers associated with this run.
-        inputdrivers (dict): Input drivers associated with this run.
-        outputdrivers (dict): Output drivers associated with this run.
-        serverdrivers (dict): The addresses associated with different server
-            drivers.
+        connectiondrivers (dict): Connection drivers for this run.
         interrupt_time (float): Time of last interrupt signal.
         error_flag (bool): True if one or more models raises an error.
 
@@ -68,12 +65,7 @@ class YggRunner(YggClass):
         self.connection_task_method = connection_task_method
         self.modeldrivers = {}
         self.connectiondrivers = {}
-        self.inputdrivers = {}
-        self.outputdrivers = {}
-        self.serverdrivers = {}
         self.interrupt_time = 0
-        self._inputchannels = {}
-        self._outputchannels = {}
         self._old_handlers = {}
         self.error_flag = False
         self.debug("Running in %s with path %s namespace %s rank %d",
@@ -83,13 +75,7 @@ class YggRunner(YggClass):
         # Parse yamls
         self.drivers = yamlfile.parse_yaml(modelYmls)
         self.connectiondrivers = self.drivers['connection']
-        self.inputdrivers = self.drivers['input']
-        self.outputdrivers = self.drivers['output']
         self.modeldrivers = self.drivers['model']
-        for x in self.outputdrivers.values():
-            self._outputchannels[x['args']] = x
-        for x in self.inputdrivers.values():
-            self._inputchannels[x['args']] = x
 
     def pprint(self, *args):
         r"""Print with color."""
@@ -197,7 +183,6 @@ class YggRunner(YggClass):
     def all_drivers(self):
         r"""iterator: For all drivers."""
         return chain(self.connectiondrivers.values(),
-                     self.inputdrivers.values(), self.outputdrivers.values(),
                      self.modeldrivers.values())
 
     def io_drivers(self, model=None):
@@ -212,9 +197,7 @@ class YggRunner(YggClass):
 
         """
         if model is None:
-            out = chain(self.connectiondrivers.values(),
-                        self.inputdrivers.values(),
-                        self.outputdrivers.values())
+            out = self.connectiondrivers.values()
         else:
             driver = self.modeldrivers[model]
             out = chain(driver.get('input_drivers', dict()),
@@ -233,8 +216,6 @@ class YggRunner(YggClass):
         """
         self.debug('Creating %s, a %s', yml['name'], yml['driver'])
         curpath = os.getcwd()
-        if 'ClientDriver' in yml['driver']:
-            yml.setdefault('comm_address', self.serverdrivers[yml['args']])
         if 'working_dir' in yml:
             os.chdir(yml['working_dir'])
         try:
@@ -243,8 +224,6 @@ class YggRunner(YggClass):
             yml['instance'] = instance
         finally:
             os.chdir(curpath)
-        if 'ServerDriver' in yml['driver']:
-            self.serverdrivers[yml['args']] = instance.comm_address
         return instance
 
     def createModelDriver(self, yml):
@@ -258,9 +237,6 @@ class YggRunner(YggClass):
 
         """
         drv = self.create_driver(yml)
-        if 'client_of' in yml:
-            for srv in yml['client_of']:
-                self.modeldrivers[srv]['clients'].append(yml['name'])
         self.debug("Model %s:, env: %s",
                    yml['name'], pformat(yml['instance'].env))
         return drv
@@ -285,47 +261,6 @@ class YggRunner(YggClass):
         yml['models'] = list(set(yml['models']))
         return drv
         
-    def createInputDriver(self, yml):
-        r"""Create an input driver instance from the yaml information.
-
-        Args:
-            yml (yaml): Yaml object containing driver information.
-
-        Returns:
-            object: An instance of the specified driver.
-
-        """
-        if ('args' in yml) and (yml['args'] not in self._outputchannels):
-            for x in yml['icomm_kws']['comm']:
-                if 'filetype' not in x:
-                    raise ValueError(
-                        ("Input driver %s could not locate a "
-                         + "corresponding file or output channel %s") % (
-                             x["name"], yml["args"]))
-        return self.create_connection_driver(yml)
-
-    def createOutputDriver(self, yml):
-        r"""Create an output driver instance from the yaml information.
-
-        Args:
-            yml (yaml): Yaml object containing driver information.
-
-        Returns:
-            object: An instance of the specified driver.
-
-        """
-        if yml['args'] in self._inputchannels:
-            yml['ocomm_kws']['env'] = self._inputchannels[
-                yml['args']]['instance'].icomm.opp_comms
-        else:
-            for x in yml['ocomm_kws']['comm']:
-                if 'filetype' not in x:
-                    raise ValueError(
-                        ("Output driver %s could not locate a "
-                         + "corresponding file or input channel %s") % (
-                             x["name"], yml["args"]))
-        return self.create_connection_driver(yml)
-
     def loadDrivers(self):
         r"""Load all of the necessary drivers, doing the IO drivers first
         and adding IO driver environmental variables back tot he models."""
@@ -336,14 +271,6 @@ class YggRunner(YggClass):
             self.debug("Loading connection drivers")
             for driver in self.connectiondrivers.values():
                 self.create_connection_driver(driver)
-            # Create input drivers
-            self.debug("Loading input drivers")
-            for driver in self.inputdrivers.values():
-                self.createInputDriver(driver)
-            # Create output drivers
-            self.debug("Loading output drivers")
-            for driver in self.outputdrivers.values():
-                self.createOutputDriver(driver)
             # Create model drivers
             self.debug("Loading model drivers")
             for driver in self.modeldrivers.values():
@@ -440,7 +367,8 @@ class YggRunner(YggClass):
 
         """
         for drv in self.io_drivers(model['name']):
-            drv['models'].remove(model['name'])
+            if model['name'] in drv['models']:
+                drv['models'].remove(model['name'])
             if not drv['instance'].is_alive():
                 continue
             if (len(drv['models']) == 0):
@@ -456,13 +384,10 @@ class YggRunner(YggClass):
 
         """
         for srv_name in model.get('client_of', []):
-            # Remove this client from list for server
-            srv = self.modeldrivers[srv_name]
-            srv['clients'].remove(model['name'])
-            # Stop server if there are not any more clients
-            if len(srv['clients']) == 0:
-                iod = self.inputdrivers['%s:%s' % (srv_name, srv_name)]
-                iod['instance'].on_client_exit()
+            iod = self.connectiondrivers[srv_name]
+            iod['instance'].on_client_exit(model['name'])
+            if iod['instance'].nclients == 0:
+                srv = self.modeldrivers[srv_name]
                 srv['instance'].stop()
 
     def terminate(self):

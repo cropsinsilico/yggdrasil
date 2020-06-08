@@ -533,7 +533,12 @@ int init_zmq_comm(comm_t *comm) {
   if (comm->valid == 0)
     return ret;
   comm->msgBufSize = 100;
-  zsock_t *s = zsock_new(ZMQ_PAIR);
+  zsock_t *s;
+  if (comm->is_rpc) {
+    s = zsock_new(ZMQ_DEALER);
+  } else {
+    s = zsock_new(ZMQ_PAIR);
+  }
   if (s == NULL) {
     ygglog_error("init_zmq_address: Could not initialize empty socket.");
     return -1;

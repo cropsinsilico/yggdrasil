@@ -149,6 +149,11 @@ class ClientComm(CommBase.CommBase):
         r"""int: The number of outgoing messages in the connection to drain."""
         return self.ocomm.n_msg_send_drain
 
+    def atexit(self):  # pragma: debug
+        r"""Close operations."""
+        self.send_eof()
+        super(ClientComm, self).atexit()
+        
     # RESPONSE COMM
     def create_response_comm(self):
         r"""Create a response comm based on information from the last header."""
@@ -159,7 +164,6 @@ class ClientComm(CommBase.CommBase):
             header['request_id'] += str(uuid.uuid4())
         c = new_comm('client_response_comm.' + header['request_id'], **comm_kwargs)
         header['response_address'] = c.address
-        header['client_model'] = self.model_name
         self.icomm[header['request_id']] = c
         self.icomm_order.append(header['request_id'])
         return header
@@ -190,8 +194,9 @@ class ClientComm(CommBase.CommBase):
         #     self.debug("send(): Connection closed.")
         #     return False
         created_response = False
+        # Setting header_kwargs to empty dict ensures that the model
+        # name will be added even when messages is EOF
         kwargs.setdefault('header_kwargs', {})
-        kwargs['header_kwargs'].update(client_model=self.model_name)
         if (not self.is_eof(msg)) and self.ocomm.evaluate_filter(msg):
             kwargs['header_kwargs'].update(self.create_response_comm())
             created_response = True

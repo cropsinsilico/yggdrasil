@@ -76,7 +76,8 @@ class ClientRequestDriver(ConnectionDriver):
         kwargs['ocomm_kws'] = ocomm_kws
         # Parent and attributes
         super(ClientRequestDriver, self).__init__(model_request_name, **kwargs)
-        self.env[self.icomm.name] = self.icomm.address
+        assert(self.icomm.name in self.icomm.opp_comms)
+        assert(self.icomm.opp_comms[self.icomm.name] == self.icomm.address)
         self.response_drivers = []
         self.comm = comm
         self.comm_address = self.ocomm.opp_address
@@ -174,8 +175,7 @@ class ClientRequestDriver(ConnectionDriver):
         is_eof = kwargs.get('is_eof', False)
         if is_eof:
             kwargs.setdefault('header_kwargs', {})
-            kwargs['header_kwargs'].setdefault('client_model',
-                                               self.client_model)
+            kwargs['header_kwargs'].setdefault('model', self.client_model)
         else:
             with self.lock:
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
@@ -199,8 +199,7 @@ class ClientRequestDriver(ConnectionDriver):
             kwargs['header_kwargs'].setdefault(
                 'response_address', response_driver.response_address)
             kwargs['header_kwargs'].setdefault('request_id', self.request_id)
-            kwargs['header_kwargs'].setdefault('client_model',
-                                               self.client_model)
+            kwargs['header_kwargs'].setdefault('model', self.client_model)
         return super(ClientRequestDriver, self).send_message(*args, **kwargs)
 
     def run_loop(self):

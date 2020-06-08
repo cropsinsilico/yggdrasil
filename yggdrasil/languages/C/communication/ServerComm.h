@@ -52,6 +52,7 @@ int init_server_comm(comm_t *comm) {
   }
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
+  handle->is_rpc = 1;
   // printf("init_server_comm: name = %s, type=%d, address = %s\n",
   // 	 handle->name, handle->type, handle->address);
   strcpy(comm->direction, "recv");

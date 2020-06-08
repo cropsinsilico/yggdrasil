@@ -1,4 +1,4 @@
-from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
+from yggdrasil.drivers.ConnectionDriver import ConnectionDriver, run_remotely
 from yggdrasil.drivers.RPCResponseDriver import RPCResponseDriver
 
 # ----
@@ -45,9 +45,9 @@ class RPCRequestDriver(ConnectionDriver):
 
     def __init__(self, model_request_name, **kwargs):
         # Input communicator
-        icomm_kws = kwargs.get('icomm_kws', {})
-        icomm_kws['close_on_eof_recv'] = False
-        kwargs['icomm_kws'] = icomm_kws
+        # icomm_kws = kwargs.get('icomm_kws', {})
+        # icomm_kws['close_on_eof_recv'] = False
+        # kwargs['icomm_kws'] = icomm_kws
         # Output communicator
         ocomm_kws = kwargs.get('ocomm_kws', {})
         ocomm_kws['is_client'] = True
@@ -55,8 +55,14 @@ class RPCRequestDriver(ConnectionDriver):
         # Parent and attributes
         super(RPCRequestDriver, self).__init__(model_request_name, **kwargs)
         self.response_drivers = []
-        self.nclients = len(self.icomm_kws.get('comm', []))
+        self.clients = list(self.icomm.model_env.keys())
         self._block_response = False
+
+    @property
+    @run_remotely
+    def nclients(self):
+        r"""int: Number of clients that are connected."""
+        return len(self.clients)
 
     @property
     def model_env(self):
@@ -93,7 +99,7 @@ class RPCRequestDriver(ConnectionDriver):
     @property
     def client_model(self):
         r"""str: Name of the client model."""
-        return self.last_header.get('client_model', '')
+        return self.last_header.get('model', '')
 
     def close_response_drivers(self):
         r"""Close response driver."""
@@ -115,27 +121,49 @@ class RPCRequestDriver(ConnectionDriver):
         for x in self.response_drivers:
             x.printStatus(*args, **kwargs)
 
-    def on_client_exit(self):
-        r"""Close input comm to stop the loop."""
+    @run_remotely
+    def remove_client(self, name):
+        r"""Remove a client from the list of clients, sending
+        signoff for client to server and closing the driver if all
+        clients have signed off.
+
+        Args:
+            name (str): Name of client exiting.
+
+        """
         self.debug('')
-        self.wait_close_state('client exit')
         with self.lock:
-            self.icomm.close()
-        self.wait()
-        self.confirm_output()
-        self.debug('Finished')
+            if name in self.clients:
+                super(RPCRequestDriver, self).send_message(
+                    YGG_CLIENT_EOF,
+                    header_kwargs={'raw': True, 'model': name})
+                self.clients.remove(name)
+        self.debug("Client '%s' signed off. nclients = %d",
+                   name, self.nclients)
+
+    def on_client_exit(self, name):
+        r"""Actions performed on the master thread when a client
+        signs off.
+
+        Args:
+            name (str): Name of client exiting.
+
+        """
+        self.remove_client(name)
+        if self.nclients == 0:
+            self.debug("All clients have signed off.")
+            self.wait_close_state('client exit')
+            with self.lock:
+                self.icomm.close()
+            self.wait()
+            self.confirm_output()
+            self.debug('Finished')
     
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
         of clients drops to 0."""
         with self.lock:
-            if self.client_model:
-                super(RPCRequestDriver, self).send_message(
-                    YGG_CLIENT_EOF,
-                    header_kwargs={'raw': True,
-                                   'client_model': self.client_model})
-            self.nclients -= 1
-            self.debug("Client signed off. nclients = %d", self.nclients)
+            self.remove_client(self.client_model)
             if self.nclients == 0:
                 self.debug("All clients have signed off.")
                 return super(RPCRequestDriver, self).on_eof()
@@ -162,11 +190,7 @@ class RPCRequestDriver(ConnectionDriver):
             return False
         # Start response driver
         is_eof = kwargs.get('is_eof', False)
-        if is_eof:
-            kwargs.setdefault('header_kwargs', {})
-            kwargs['header_kwargs'].setdefault('client_model',
-                                               self.client_model)
-        else:
+        if not is_eof:
             with self.lock:
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     self.debug("Comm closed, not creating response driver.")
@@ -190,8 +214,7 @@ class RPCRequestDriver(ConnectionDriver):
             kwargs['header_kwargs'].setdefault(
                 'response_address', response_driver.response_address)
             kwargs['header_kwargs'].setdefault('request_id', self.request_id)
-            kwargs['header_kwargs'].setdefault('client_model',
-                                               self.client_model)
+            kwargs['header_kwargs'].setdefault('model', self.client_model)
         return super(RPCRequestDriver, self).send_message(*args, **kwargs)
 
     def run_loop(self):

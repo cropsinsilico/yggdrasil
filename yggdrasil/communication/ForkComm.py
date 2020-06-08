@@ -95,7 +95,15 @@ class ForkComm(CommBase.CommBase):
             if x.is_file:
                 return True
         return False
-        
+
+    @property
+    def last_comm(self):
+        r"""CommBase: Last comm that was used."""
+        idx = self.curr_comm_index
+        if idx > 0:
+            idx -= 1
+        return self.comm_list[idx % len(self)]
+    
     @property
     def curr_comm(self):
         r"""CommBase: Current comm."""
@@ -248,6 +256,32 @@ class ForkComm(CommBase.CommBase):
         r"""int: The number of outgoing messages in the connection to drain."""
         return sum([x.n_msg_send_drain for x in self.comm_list])
 
+    def is_empty_recv(self, msg):
+        r"""Check if a received message object is empty.
+
+        Args:
+            msg (obj): Message object.
+
+        Returns:
+            bool: True if the object is empty, False otherwise.
+
+        """
+        return self.last_comm.is_empty_recv(msg)
+    
+    def is_empty_send(self, msg):
+        r"""Check if a message object being sent is empty.
+
+        Args:
+            msg (obj): Message object.
+
+        Returns:
+            bool: True if the object is empty, False otherwise.
+
+        """
+        return self.last_comm.is_empty_send(msg)
+
+    # TODO: Handle transformation
+        
     def send(self, *args, **kwargs):
         r"""Send a message.
 
@@ -263,6 +297,7 @@ class ForkComm(CommBase.CommBase):
             out = x.send(*args, **kwargs)
             if not out:
                 return out
+            self.on_send(x)
         return out
 
     def recv(self, *args, **kwargs):
@@ -295,8 +330,10 @@ class ForkComm(CommBase.CommBase):
                         self.eof_recv[self.curr_comm_index % len(self)] = 1
                         if sum(self.eof_recv) == len(self):
                             out = (flag, msg)
+                        self.on_recv(x)
                     elif (not self.is_empty_recv(msg)):
                         out = (flag, msg)
+                        self.on_recv(x)
                 self.curr_comm_index += 1
             first_comm = False
             if out is None:
@@ -310,6 +347,27 @@ class ForkComm(CommBase.CommBase):
                 out = (True, self.empty_obj_recv)
         return out
 
+    def on_recv(self, x):
+        r"""Perform actions after receipt from child comm.
+
+        Args:
+            x (CommBase): Communication that message was received from.
+
+        """
+        self._last_header = x._last_header
+        if not self.serializer.initialized:
+            self.serializer = x.serializer
+
+    def on_send(self, x):
+        r"""Perform actions after send to child comm.
+
+        Args:
+            x (CommBase): Communication that message was sent to.
+
+        """
+        if not self.serializer.initialized:
+            self.serializer = x.serializer
+        
     def purge(self):
         r"""Purge all messages from the comm."""
         super(ForkComm, self).purge()

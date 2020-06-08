@@ -165,9 +165,10 @@ def parse_yaml(files):
             existing = parse_component(yml, k[:-1], existing=existing)
     # Create server/client connections
     for srv, clients in existing['server'].items():
-        yml = {'inputs': [{'name': x for x in clients}],
+        yml = {'inputs': [{'name': x} for x in clients],
                'outputs': [{'name': srv}],
-               'driver': 'RPCRequestDriver'}
+               'driver': 'RPCRequestDriver',
+               'name': existing['input'][srv]['model_driver'][0]}
         existing = parse_component(yml, 'connection', existing=existing)
         existing['model'][yml['dst_models'][0]]['clients'] = yml['src_models']
     existing.pop('server')
@@ -376,8 +377,7 @@ def parse_connection(yml, existing):
         args = '%s_to_%s' % (iname, oname)
     name = args
     # Connection
-    xx = {'name': name,
-          'src_models': [], 'dst_models': [],
+    xx = {'src_models': [], 'dst_models': [],
           'icomm_kws': {'comm': []},
           'ocomm_kws': {'comm': []}}
     for i, y in enumerate(yml['inputs']):
@@ -400,6 +400,7 @@ def parse_connection(yml, existing):
     # process needs access to the message passed
     yml.update(xx)
     yml.setdefault('driver', 'ConnectionDriver')
+    yml.setdefault('name', name)
     return existing
 
 

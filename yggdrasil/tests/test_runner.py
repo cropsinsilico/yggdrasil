@@ -81,16 +81,3 @@ class TestYggRunner(YggTestBase):
         super(TestYggRunner, self).setup(*args, **kwargs)
         self.runner = runner.YggRunner([ex_yamls['hello']['python']],
                                        'test_ygg_run')
-
-    def test_createIODriver(self):
-        r"""Test createInputDriver and createOutputDriver."""
-        yml = {'name': 'fake_IODriver',
-               'args': 'fake_channel',
-               'driver': 'InputDriver',
-               'working_dir': os.getcwd(),
-               'icomm_kws': {'comm': [{'name': 'fake_IODriver'}]},
-               'ocomm_kws': {'comm': [{'name': 'fake_IODriver'}]},
-               'kwargs': {}}
-        assert_raises(Exception, self.runner.createInputDriver, yml)
-        yml['driver'] = 'OutputDriver'
-        assert_raises(Exception, self.runner.createOutputDriver, yml)
