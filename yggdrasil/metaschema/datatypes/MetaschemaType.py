@@ -672,7 +672,9 @@ class MetaschemaType(object):
         if (max_header_size > 0) and (len(header) > max_header_size):
             metadata_type = metadata
             metadata = {}
-            for k in ['address', 'size', 'id', 'zmq_reply_worker']:
+            for k in ['address', 'size', 'id', 'request_id',
+                      'response_address', 'zmq_reply',
+                      'zmq_reply_worker', 'model']:
                 if k in metadata_type:
                     metadata[k] = metadata_type.pop(k)
             assert(metadata)
