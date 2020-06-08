@@ -154,7 +154,7 @@ class TestYggTask(YggTestClass):
         self.debug_flag = False
 
     @staticmethod
-    def target(cls):
+    def target(cls):  # pragma: no cover
         tools.sleep(10.0)
 
     def test_id(self):
