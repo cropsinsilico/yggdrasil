@@ -717,22 +717,21 @@ class MetaschemaType(object):
         if not isinstance(msg, bytes):
             raise TypeError("Message to be deserialized is not bytes type.")
         # Check for header
-        if YGG_MSG_HEAD in msg:
-            if isinstance(metadata, dict) and metadata.get('type_in_data', False):
-                assert(msg.count(YGG_MSG_HEAD) == 1)
-                typedef, data = msg.split(YGG_MSG_HEAD, 1)
-                if len(typedef) > 0:
-                    metadata.update(encoder.decode_json(typedef))
-                metadata.pop('type_in_data')
-                metadata['size'] = len(data)
-            elif metadata is not None:
+        if msg.startswith(YGG_MSG_HEAD):
+            if metadata is not None:
                 raise ValueError("Metadata in header and provided by keyword.")
+            _, metadata, data = msg.split(YGG_MSG_HEAD, 2)
+            if len(metadata) == 0:
+                metadata = dict(size=len(data))
             else:
-                _, metadata, data = msg.split(YGG_MSG_HEAD, 2)
-                if len(metadata) == 0:
-                    metadata = dict(size=len(data))
-                else:
-                    metadata = encoder.decode_json(metadata)
+                metadata = encoder.decode_json(metadata)
+        elif isinstance(metadata, dict) and metadata.get('type_in_data', False):
+            assert(msg.count(YGG_MSG_HEAD) == 1)
+            typedef, data = msg.split(YGG_MSG_HEAD, 1)
+            if len(typedef) > 0:
+                metadata.update(encoder.decode_json(typedef))
+            metadata.pop('type_in_data')
+            metadata['size'] = len(data)
         else:
             data = msg
             if metadata is None:
