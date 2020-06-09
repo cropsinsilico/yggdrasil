@@ -284,7 +284,8 @@ def parse_model(yml, existing):
                          'language': 'timesync', 'is_server': True,
                          'working_dir': os.getcwd(),
                          'inputs': [], 'outputs': []}
-            existing = parse_model(tsync_yml, existing=existing)
+            existing = parse_component(tsync_yml, 'model',
+                                       existing=existing)
     if (language == 'timesync'):
         if (yml['name'] in existing['model']):
             existing['model'].pop(yml['name'])
