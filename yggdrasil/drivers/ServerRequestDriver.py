@@ -97,7 +97,10 @@ class ServerRequestDriver(ConnectionDriver):
         with self.lock:
             self.debug("Closing response drivers.")
             self._block_response = True
-            for x in self.response_drivers:
+            for x in self.response_drivers:  # pragma: no cover
+                # This will only be called if the driver finishes
+                # with unpruned response drivers that were slow to
+                # finish
                 x.terminate()
             self.response_drivers = []
 
