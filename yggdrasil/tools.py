@@ -812,6 +812,90 @@ def eval_kwarg(x):
     return x
 
 
+class ProxyMeta(type):
+    r"""Metaclass for handling proxy."""
+
+    _special_names = [
+        '__abs__', '__add__', '__and__', '__call__', '__cmp__', '__coerce__',
+        '__contains__', '__delitem__', '__delslice__', '__div__', '__divmod__',
+        '__eq__', '__float__', '__floordiv__', '__ge__', '__getitem__',
+        '__getslice__', '__gt__', '__hex__', '__iadd__', '__iand__',
+        '__idiv__', '__idivmod__', '__ifloordiv__', '__ilshift__', '__imod__',
+        '__imul__', '__int__', '__invert__', '__ior__', '__ipow__', '__irshift__',
+        '__isub__', '__iter__', '__itruediv__', '__ixor__', '__le__', '__len__',
+        '__long__', '__lshift__', '__lt__', '__mod__', '__mul__', '__ne__',
+        '__neg__', '__oct__', '__or__', '__pos__', '__pow__', '__radd__',
+        '__rand__', '__rdiv__', '__rdivmod__', '__reduce__', '__reduce_ex__',
+        '__repr__', '__reversed__', '__rfloorfiv__', '__rlshift__', '__rmod__',
+        '__rmul__', '__ror__', '__rpow__', '__rrshift__', '__rshift__', '__rsub__',
+        '__rtruediv__', '__rxor__', '__setitem__', '__setslice__', '__sub__',
+        '__truediv__', '__xor__', 'next',
+    ]
+    
+    def __new__(cls, classname, bases, attrs):
+        overrides = attrs.get('__overrides__', [])
+        overrides.extend(attrs.get('__slots__', []))
+        overrides.append('wrapped_object')
+        overrides.extend(k for k in attrs.keys() if k not in
+                         ['__overrides__'])
+        if '_wrapped' not in overrides:
+            overrides.append('_wrapped')
+        attrs['__overrides__'] = overrides
+        
+        def make_method(name):
+            def method(self, *args, **kwargs):
+                mtd = getattr(object.__getattribute__(self, "_wrapped"), name)
+                return mtd(*args, **kwargs)
+            return method
+        
+        for name in cls._special_names:
+            attrs[name] = make_method(name)
+        return type.__new__(cls, classname, bases, attrs)
+
+
+class ProxyObject(metaclass=ProxyMeta):
+    r"""Proxy for another object."""
+    # http://code.activestate.com/recipes/496741-object-proxying/
+    
+    __slots__ = ["_wrapped", "__weakref__"]
+    
+    def __init__(self, wrapped):
+        object.__setattr__(self, "_wrapped", wrapped)
+
+    def __getattribute__(self, name):
+        if name in object.__getattribute__(self, '__overrides__'):
+            return object.__getattribute__(self, name)
+        return getattr(object.__getattribute__(self, "_wrapped"), name)
+    
+    def __delattr__(self, name):
+        if name in object.__getattribute__(self, '__overrides__'):
+            object.__delattr__(self, name)
+            return
+        delattr(object.__getattribute__(self, "_wrapped"), name)
+        
+    def __setattr__(self, name, value):
+        if name in object.__getattribute__(self, '__overrides__'):
+            object.__setattr__(self, name, value)
+            return
+        setattr(object.__getattribute__(self, "_wrapped"), name, value)
+
+    # Special cases
+    def __nonzero__(self):
+        return bool(object.__getattribute__(self, "_wrapped"))
+    
+    def __str__(self):
+        return str(object.__getattribute__(self, "_wrapped"))
+    
+    def __bytes__(self):
+        return bytes(object.__getattribute__(self, "_wrapped"))
+    
+    def __repr__(self):
+        return repr(object.__getattribute__(self, "_wrapped"))
+    
+    def __hash__(self):
+        return hash(object.__getattribute__(self, "_wrapped"))
+
+
 class YggPopen(subprocess.Popen):
     r"""Uses Popen to open a process without a buffer. If not already set,
     the keyword arguments 'bufsize', 'stdout', and 'stderr' are set to
