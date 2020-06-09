@@ -152,7 +152,7 @@ class RPCRequestDriver(ConnectionDriver):
         self.remove_client(name)
         if self.nclients == 0:
             self.debug("All clients have signed off.")
-            self.wait_close_state('client exit')
+            self.set_close_state('client exit')
             with self.lock:
                 self.icomm.close()
             self.wait()

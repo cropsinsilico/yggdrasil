@@ -203,16 +203,6 @@ class ConnectionDriver(Driver):
     _disconnect_attr = Driver._disconnect_attr + [
         '_comm_closed', '_skip_after_loop', 'shared', 'task_thread']
 
-    @property
-    def _is_input(self):
-        r"""bool: True if the connection is providing input to a model."""
-        return (self._direction in ['any', 'input'])
-
-    @property
-    def _is_output(self):
-        r"""bool: True if the connection is retreiving output from a model."""
-        return (self._direction in ['any', 'output'])
-
     def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Shared attributes (set once or synced using events)
@@ -506,28 +496,28 @@ class ConnectionDriver(Driver):
         self.debug('Returning')
 
     @run_remotely
-    def on_model_exit_remote(self):
+    def on_model_exit_remote(self, direction):
         r"""Drain input and then close it (on the remote process)."""
         if (self.onexit not in [None, 'on_model_exit', 'pass']):
             self.debug("Calling onexit = '%s'" % self.onexit)
             getattr(self, self.onexit)()
         self.drain_input(timeout=self.timeout)
-        self.set_close_state('model exit')
-        self.debug('Model exit triggered close')
-        if self._is_input:
-            with self.lock:
-                self.icomm.close()
-                self.ocomm.close()
-        if self._is_output:
+        if direction == 'input':
             self.wait_for_route(timeout=self.timeout)
             with self.lock:
                 self.icomm.close()
+        elif direction == 'output':
+            with self.lock:
+                self.icomm.close()
+                self.ocomm.close()
+        self.set_close_state('%s model exit' % direction)
+        self.debug('Exit of %s model triggered close', direction)
         self.set_break_flag()
 
-    def on_model_exit(self):
+    def on_model_exit(self, direction):
         r"""Drain input and then close it."""
         self.debug('')
-        self.on_model_exit_remote()
+        self.on_model_exit_remote(direction)
         self.wait()
         self.debug('Finished')
         super(ConnectionDriver, self).on_model_exit()
