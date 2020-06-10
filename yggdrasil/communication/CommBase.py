@@ -660,14 +660,18 @@ class CommBase(tools.YggClass):
                 out[k] = copy.deepcopy(out_seri[k])
         return out
 
-    def get_status_message(self, nindent=0, extra_lines=None):
+    def get_status_message(self, nindent=0, extra_lines_before=None,
+                           extra_lines_after=None):
         r"""Return lines composing a status message.
         
         Args:
             nindent (int, optional): Number of tabs that should be used to
                 indent each line. Defaults to 0.
-            extra_lines (list, optional): Additional lines that should be
+            extra_lines_before (list, optional): Additional lines that should be
                 added to the beginning of the default print message. Defaults to
+                empty list if not provided.
+            extra_lines_after (list, optional): Additional lines that should be
+                added to the end of the default print message. Defaults to
                 empty list if not provided.
                 
         Returns:
@@ -675,22 +679,30 @@ class CommBase(tools.YggClass):
                 prefix string used for the last message.
 
         """
-        if extra_lines is None:
-            extra_lines = []
+        if extra_lines_before is None:
+            extra_lines_before = []
+        if extra_lines_after is None:
+            extra_lines_after = []
         prefix = nindent * '\t'
         lines = ['', '%s%s:' % (prefix, self.name)]
         prefix += '\t'
-        lines += ['%s%s' % (prefix, x) for x in extra_lines]
+        lines += ['%s%s' % (prefix, x) for x in extra_lines_before]
         lines += ['%s%-15s: %s' % (prefix, 'address', self.address),
                   '%s%-15s: %s' % (prefix, 'direction', self.direction),
                   '%s%-15s: %s' % (prefix, 'open', self.is_open),
                   '%s%-15s: %s' % (prefix, 'nsent', self._n_sent),
                   '%s%-15s: %s' % (prefix, 'nrecv', self._n_recv)]
+        lines += ['%s%s' % (prefix, x) for x in extra_lines_after]
         return lines, prefix
 
     def printStatus(self, *args, **kwargs):
         r"""Print status of the communicator."""
-        lines, _ = self.get_status_message(*args, **kwargs)
+        nindent = kwargs.get('nindent', 0)
+        lines, prefix = self.get_status_message(*args, **kwargs)
+        if len(self._work_comms) > 0:
+            lines.append('%sWork comms:' % prefix)
+            for v in self._work_comms.values():
+                lines += v.get_status_message(nindent=nindent + 1)[0]
         self.info('\n'.join(lines))
 
     @property
@@ -992,12 +1004,18 @@ class CommBase(tools.YggClass):
     @property
     def is_confirmed_send(self):
         r"""bool: True if all sent messages have been confirmed."""
-        return True
+        for v in self._work_comms.values():
+            if (v.direction == 'send') and not v.is_confirmed_send:  # pragma: debug
+                return False
+        return (self.n_msg_send == 0)
 
     @property
     def is_confirmed_recv(self):
         r"""bool: True if all received messages have been confirmed."""
-        return True
+        for v in self._work_comms.values():
+            if (v.direction == 'recv') and not v.is_confirmed_recv:  # pragma: debug
+                return False
+        return (self.n_msg_recv == 0)
 
     @property
     def is_confirmed(self):

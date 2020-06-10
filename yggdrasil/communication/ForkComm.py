@@ -326,12 +326,12 @@ class ForkComm(CommBase.CommBase):
                 x = self.curr_comm
                 if x.is_open:
                     flag, msg = x.recv(*args, **kwargs)
-                    if self.is_eof(msg):
+                    if x.is_eof(msg):
                         self.eof_recv[self.curr_comm_index % len(self)] = 1
                         if sum(self.eof_recv) == len(self):
                             out = (flag, msg)
                         self.on_recv(x)
-                    elif (not self.is_empty_recv(msg)):
+                    elif (not x.is_empty_recv(msg)):
                         out = (flag, msg)
                         self.on_recv(x)
                 self.curr_comm_index += 1
@@ -344,7 +344,7 @@ class ForkComm(CommBase.CommBase):
                 self.debug('Comm closed')
                 out = (False, None)
             else:
-                out = (True, self.empty_obj_recv)
+                out = (True, self.last_comm.empty_obj_recv)
         return out
 
     def on_recv(self, x):
@@ -355,6 +355,7 @@ class ForkComm(CommBase.CommBase):
 
         """
         self._last_header = x._last_header
+        self.transform = x.transform
         if not self.serializer.initialized:
             self.serializer = x.serializer
 
@@ -365,9 +366,37 @@ class ForkComm(CommBase.CommBase):
             x (CommBase): Communication that message was sent to.
 
         """
+        self.transform = x.transform
         if not self.serializer.initialized:
             self.serializer = x.serializer
-        
+
+    @property
+    def _multiple_first_send(self):
+        return self.last_comm._multiple_first_send
+
+    @_multiple_first_send.setter
+    def _multiple_first_send(self, value):
+        for x in self.comm_list:
+            x._multiple_first_send = value
+
+    @property
+    def suppress_special_debug(self):
+        return self.last_comm.suppress_special_debug
+
+    @suppress_special_debug.setter
+    def suppress_special_debug(self, value):
+        for x in self.comm_list:
+            x.suppress_special_debug = value
+
+    @property
+    def _type_errors(self):
+        return self.last_comm._type_errors
+
+    @_type_errors.setter
+    def _type_errors(self, value):
+        for x in self.comm_list:
+            x._type_errors = value
+    
     def purge(self):
         r"""Purge all messages from the comm."""
         super(ForkComm, self).purge()
